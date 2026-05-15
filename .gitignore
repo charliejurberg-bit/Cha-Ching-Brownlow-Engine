@@ -1,0 +1,9 @@
+# Generated model outputs
+predictions/
+
+# Temporary/log files
+grid_err.txt
+grid_out.txt
+
+# Claude Code internals
+.claude/
