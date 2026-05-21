@@ -2537,12 +2537,7 @@ if _page == 'Game Analysis':
                     st.session_state[expand_key] = False
                 show_all  = st.session_state[expand_key]
                 disp_view = disp if show_all else disp.head(10)
-                row_height = min(len(disp_view) * 35 + 38, 780)
-                st.dataframe(
-                    _style_game_table(disp_view, winner_team=winner_team),
-                    width='stretch', hide_index=True,
-                    height=row_height, column_config=col_cfg,
-                )
+                st.table(_style_game_table(disp_view, winner_team=winner_team))
                 if n_total > 10:
                     remaining_rbr = n_total - 10
                     _exp_lbl = "↑ Show less" if show_all else f"↓ Show all {n_total} players  (+{remaining_rbr} more)"
