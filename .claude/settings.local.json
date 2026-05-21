@@ -41,7 +41,8 @@
       "PowerShell(Start-Sleep -Seconds 3; $r = Invoke-WebRequest -Uri \"http://localhost:8502\" -UseBasicParsing -TimeoutSec 10 -ErrorAction SilentlyContinue; $r.StatusCode)",
       "PowerShell(Stop-Process *)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8501)",
-      "Bash(git push *)"
+      "Bash(git push *)",
+      "Bash(python3 *)"
     ]
   }
 }

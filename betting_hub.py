@@ -42,10 +42,91 @@ RESULTS      = ["Pending", "Win", "Loss", "Void/Refund"]
 CC_THRESHOLD = 3   # checklist items needed to auto-flag a Cha Ching tip
 
 C = dict(
-    green='#2d5016', lgreen='#4a7a28', gold='#c9a84c', lgold='#e8c96d',
-    brown='#8b6f47', red='#c0392b', bg='#faf7f2', card='#f0ece4',
-    border='#ddd5c5', text='#2c2c2c',
+    green='#34d399', lgreen='#4a7a28', gold='#c9a84c', lgold='#e8c96d',
+    brown='#94a3b8', red='#c0392b', bg='#152533', card='#1e3a4a',
+    border='#2a4a5a', text='#e8f0f8',
 )
+
+def inject_global_css():
+    st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+html, body, [data-testid="stAppViewContainer"] {
+    background-color: #0f1923 !important;
+    color: #e8f0f8;
+    font-family: 'Sora', sans-serif;
+}
+[data-testid="stAppViewContainer"] > .main { background-color: #0f1923 !important; }
+[data-testid="block-container"] { padding-top: 1.5rem !important; max-width: 1200px; }
+[data-testid="stSidebar"] {
+    background-color: #0d1720 !important;
+    border-right: 1px solid #2a4a5a !important;
+}
+h1, h2, h3, h4 {
+    font-family: 'Sora', sans-serif !important;
+    color: #e8f0f8 !important;
+}
+[data-testid="stMetric"] {
+    background: #152533 !important;
+    border: 1px solid #2a4a5a !important;
+    border-radius: 10px !important;
+    padding: 16px !important;
+}
+[data-testid="stMetricLabel"] { color: #94a3b8 !important; font-size: 11px !important; text-transform: uppercase !important; }
+[data-testid="stMetricValue"] { color: #e8f0f8 !important; font-family: 'Sora', sans-serif !important; font-weight: 700 !important; }
+[data-testid="stDataFrame"] th {
+    background: #1e3a4a !important; color: #94a3b8 !important;
+    font-size: 11px !important; text-transform: uppercase !important;
+}
+[data-testid="stDataFrame"] td { background: #152533 !important; color: #e8f0f8 !important; }
+[data-testid="stDataFrame"] tr:hover td { background: #1e3a4a !important; }
+[data-testid="stSelectbox"] > div > div, [data-testid="stMultiSelect"] > div > div {
+    background: #152533 !important; border: 1px solid #2a4a5a !important; color: #e8f0f8 !important;
+}
+[data-testid="stTextInput"] input, [data-testid="stNumberInput"] input {
+    background: #152533 !important; border: 1px solid #2a4a5a !important; color: #e8f0f8 !important;
+}
+button[kind="primary"], [data-testid="baseButton-primary"] {
+    background: #34d399 !important; color: #0a1f14 !important;
+    border: none !important; font-family: 'Sora', sans-serif !important; font-weight: 600 !important;
+}
+hr { border: none !important; border-top: 1px solid #2a4a5a !important; }
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: #0f1923; }
+::-webkit-scrollbar-thumb { background: #2a4a5a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #34d399; }
+</style>
+""", unsafe_allow_html=True)
+
+def apply_chart_theme(fig):
+    import plotly.graph_objects as _go
+    fig.update_layout(
+        paper_bgcolor="#152533",
+        plot_bgcolor="#152533",
+        font=dict(family="Sora, sans-serif", color="#94a3b8", size=12),
+        title_font=dict(family="Sora, sans-serif", color="#e8f0f8", size=14),
+        xaxis=dict(
+            gridcolor="#1e3a4a",
+            linecolor="#2a4a5a",
+            tickcolor="#2a4a5a",
+            tickfont=dict(color="#94a3b8", size=11),
+        ),
+        yaxis=dict(
+            gridcolor="#1e3a4a",
+            linecolor="#2a4a5a",
+            tickcolor="#2a4a5a",
+            tickfont=dict(color="#94a3b8", size=11),
+        ),
+        legend=dict(
+            bgcolor="#1e3a4a",
+            bordercolor="#2a4a5a",
+            borderwidth=1,
+            font=dict(color="#94a3b8", size=11),
+        ),
+        margin=dict(l=16, r=16, t=40, b=16),
+    )
+    fig.update_traces(marker_line_width=0)
+    return fig
 
 # ── Data layer ─────────────────────────────────────────────────────────────────
 
@@ -248,13 +329,13 @@ BH_CSS = """
     align-items: center;
     will-change: transform;
 }
-.landing-card.brownlow { border-top: 5px solid #2d5016; }
+.landing-card.brownlow { border-top: 5px solid #34d399; }
 .landing-card.betting  { border-top: 5px solid #c9a84c; }
 .landing-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(0,0,0,0.13); }
 .landing-card:active { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.10); }
 .landing-icon  { font-size: 54px; margin-bottom: 14px; line-height: 1; }
 .landing-title { font-size: 28px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 10px; }
-.landing-title.brownlow { color: #2d5016; }
+.landing-title.brownlow { color: #34d399; }
 .landing-title.betting  { color: #c9a84c; }
 .landing-desc  { color: #6c6c6c; font-size: 13px; line-height: 1.6; max-width: 320px; }
 
@@ -273,7 +354,7 @@ BH_CSS = """
     transition: opacity 0.15s ease, transform 0.15s ease;
 }
 .nav-section-pill:hover { opacity: 0.85; transform: translateY(-1px); }
-.nav-pill-brownlow { background: #2d5016; color: #faf7f2; }
+.nav-pill-brownlow { background: #34d399; color: #e8f0f8; }
 .nav-pill-betting  { background: #c9a84c; color: #2c2c2c; }
 
 /* ── Betting metric cards ── */
@@ -289,17 +370,17 @@ BH_CSS = """
     will-change: transform;
 }
 .bh-metric:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.05); transform: translateY(-2px); }
-.bh-metric.positive { border-top: 3px solid #2d5016; }
+.bh-metric.positive { border-top: 3px solid #34d399; }
 .bh-metric.negative { border-top: 3px solid #c0392b; }
-.bh-metric.neutral  { border-top: 3px solid #8b6f47; }
+.bh-metric.neutral  { border-top: 3px solid #94a3b8; }
 .bh-metric.gold     { border-top: 3px solid #c9a84c; }
-.bh-label { color: #8b6f47; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+.bh-label { color: #94a3b8; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
 .bh-value { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; }
-.bh-value.pos { color: #2d5016; }
+.bh-value.pos { color: #34d399; }
 .bh-value.neg { color: #c0392b; }
 .bh-value.neu { color: #2c2c2c; }
 .bh-value.gold { color: #c9a84c; }
-.bh-sub   { color: #8b6f47; font-size: 11px; margin-top: 4px; line-height: 1.4; }
+.bh-sub   { color: #94a3b8; font-size: 11px; margin-top: 4px; line-height: 1.4; }
 
 /* ── Bet result badges ── */
 .bet-win     { background: #d4edda; color: #155724; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; transition: opacity 0.15s ease, transform 0.15s ease; }
@@ -323,7 +404,7 @@ BH_CSS = """
 .fixture-card {
     background: #ffffff;
     border: 1px solid #ddd5c5;
-    border-left: 4px solid #2d5016;
+    border-left: 4px solid #34d399;
     border-radius: 8px;
     padding: 14px 18px;
     margin-bottom: 8px;
@@ -334,7 +415,7 @@ BH_CSS = """
 }
 .fixture-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.09); transform: translateX(3px); border-left-color: #1a3009; }
 .fixture-teams { font-size: 15px; font-weight: 700; color: #2c2c2c; letter-spacing: -0.2px; }
-.fixture-meta  { font-size: 12px; color: #8b6f47; margin-top: 3px; line-height: 1.4; }
+.fixture-meta  { font-size: 12px; color: #94a3b8; margin-top: 3px; line-height: 1.4; }
 
 /* ── Checklist item ── */
 .cl-progress { font-size: 13px; color: #6c6c6c; margin: 8px 0; line-height: 1.5; }
@@ -346,11 +427,11 @@ BH_CSS = """
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: #f0ece4; }
 ::-webkit-scrollbar-thumb { background: #cfc4b0; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #8b6f47; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
 /* ── Trend section header ── */
 .trend-header {
-    color: #2d5016; font-size: 10px; font-weight: 800;
+    color: #34d399; font-size: 10px; font-weight: 800;
     letter-spacing: 2px; text-transform: uppercase;
     border-bottom: 2px solid #c9a84c; padding-bottom: 6px;
     margin: 24px 0 14px 0; padding-left: 12px;
@@ -854,7 +935,7 @@ def render_bh_dashboard():
     _inject_css()
     st.markdown(
         '<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Betting Hub Dashboard</h2>'
-        '<p style="color:#8b6f47;margin:4px 0 0 0">P&L summary, hit rates, recent bets</p></div>',
+        '<p style="color:#94a3b8;margin:4px 0 0 0">P&L summary, hit rates, recent bets</p></div>',
         unsafe_allow_html=True,
     )
 
@@ -890,7 +971,8 @@ def render_bh_dashboard():
     # ── P&L Chart ─────────────────────────────────────────────────────────────
     st.markdown('<div class="section-header">P&L Over Time</div>', unsafe_allow_html=True)
     settled = bets[bets['result'].isin(['Win', 'Loss'])].copy()
-    st.plotly_chart(_pl_chart(settled), use_container_width=True, key='bh_pl_chart')
+    _bh_pl_fig = apply_chart_theme(_pl_chart(settled))
+    st.plotly_chart(_bh_pl_fig, use_container_width=True, key='bh_pl_chart')
 
     # ── Recent bets ───────────────────────────────────────────────────────────
     _hdr_col, _tog_col = st.columns([3, 1])
@@ -946,7 +1028,7 @@ def render_bet_tracker():
     _inject_css()
     st.markdown(
         '<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Bet Tracker</h2>'
-        '<p style="color:#8b6f47;margin:4px 0 0 0">'
+        '<p style="color:#94a3b8;margin:4px 0 0 0">'
         'Full bet history with filters — log, edit, and import bets</p></div>',
         unsafe_allow_html=True,
     )
@@ -1050,7 +1132,7 @@ def render_bet_tracker():
         styles = pd.DataFrame('', index=df.index, columns=df.columns)
         for i, row in df.iterrows():
             if row['Result'] in ('✅ Win', 'Win'):
-                styles.loc[i, 'P&L'] = 'color: #2d5016; font-weight: 700'
+                styles.loc[i, 'P&L'] = 'color: #34d399; font-weight: 700'
             elif row['Result'] in ('❌ Loss', 'Loss'):
                 styles.loc[i, 'P&L'] = 'color: #c0392b; font-weight: 700'
             if row['CC'] == '★ CC':
@@ -1081,7 +1163,7 @@ def render_cha_ching_tips():
     st.markdown(
         '<div class="title-bar">'
         '<h2 style="color:#2c2c2c;margin:0">Cha Ching Tips</h2>'
-        '<p style="color:#8b6f47;margin:4px 0 0 0">'
+        '<p style="color:#94a3b8;margin:4px 0 0 0">'
         'Upcoming fixtures · Player prop markets · Cha Ching checklist</p></div>',
         unsafe_allow_html=True,
     )
@@ -1172,7 +1254,7 @@ def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
 
         st.markdown(
             f'<table style="width:100%;border-collapse:collapse;font-size:13px">'
-            f'<thead><tr style="background:#2d5016;color:#faf7f2">'
+            f'<thead><tr style="background:#34d399;color:#e8f0f8">'
             f'<th style="padding:7px 10px;text-align:left">Player</th>'
             f'<th style="padding:7px 10px">Line</th>'
             f'<th style="padding:7px 10px">Bookmaker</th>'
@@ -1187,7 +1269,7 @@ def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
         # Checklist buttons per player
         player_list = game_props['player'].tolist()
         if player_list:
-            st.markdown('<div style="font-size:11px;color:#8b6f47;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;margin:8px 0 4px 0">CHECKLIST</div>', unsafe_allow_html=True)
+            st.markdown('<div style="font-size:11px;color:#94a3b8;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;margin:8px 0 4px 0">CHECKLIST</div>', unsafe_allow_html=True)
             btn_cols = st.columns(min(len(player_list), 4))
             for i, player in enumerate(player_list):
                 with btn_cols[i % 4]:
@@ -1266,7 +1348,7 @@ def render_trends_analysis():
     st.markdown(
         '<div class="title-bar">'
         '<h2 style="color:#2c2c2c;margin:0">Trends &amp; Analysis</h2>'
-        '<p style="color:#8b6f47;margin:4px 0 0 0">'
+        '<p style="color:#94a3b8;margin:4px 0 0 0">'
         'Hit rate, ROI, and P&L breakdowns across markets, bookmakers, and odds ranges</p></div>',
         unsafe_allow_html=True,
     )
@@ -1296,6 +1378,7 @@ def render_trends_analysis():
             color=[C['green']] * len(mkt_grp),
         )
         fig.update_layout(height=300)
+        fig = apply_chart_theme(fig)
         st.plotly_chart(fig, use_container_width=True, key='tr_mkt_hit')
 
     with r1c2:
@@ -1307,6 +1390,7 @@ def render_trends_analysis():
         mkt_roi = mkt_roi.sort_values('roi', ascending=True)
         fig = _bar_chart(mkt_roi['market_type'].tolist(), mkt_roi['roi'].tolist(), 'ROI by Market (%)')
         fig.update_layout(height=300)
+        fig = apply_chart_theme(fig)
         st.plotly_chart(fig, use_container_width=True, key='tr_mkt_roi')
 
     # ── Row 2: Hit rate by bookmaker + ROI by odds range ───────────────────
@@ -1320,6 +1404,7 @@ def render_trends_analysis():
         fig = _bar_chart(bk_grp['bookmaker'].tolist(), bk_grp['hit_rate'].tolist(),
                          'Hit Rate by Bookmaker (%)', color=[C['green']] * len(bk_grp))
         fig.update_layout(height=300)
+        fig = apply_chart_theme(fig)
         st.plotly_chart(fig, use_container_width=True, key='tr_bk_hit')
 
     with r2c2:
@@ -1340,6 +1425,7 @@ def render_trends_analysis():
         ods_roi = ods_roi.sort_values('odds_band')
         fig = _bar_chart(ods_roi['odds_band'].tolist(), ods_roi['roi'].tolist(), 'ROI by Odds Range (%)')
         fig.update_layout(height=300)
+        fig = apply_chart_theme(fig)
         st.plotly_chart(fig, use_container_width=True, key='tr_ods_roi')
 
     # ── Monthly P&L ────────────────────────────────────────────────────────
@@ -1350,6 +1436,7 @@ def render_trends_analysis():
     monthly = monthly.sort_values('month')
     fig = _bar_chart(monthly['month'].tolist(), monthly['profit_loss'].tolist(), 'Monthly P&L (units)')
     fig.update_layout(height=300)
+    fig = apply_chart_theme(fig)
     st.plotly_chart(fig, use_container_width=True, key='tr_monthly')
 
     # ── Cha Ching vs non-CC comparison ────────────────────────────────────
@@ -1379,6 +1466,7 @@ def render_trends_analysis():
             yaxis=dict(gridcolor='#ede8df'),
             margin=dict(l=50, r=20, t=40, b=40),
         )
+        fig = apply_chart_theme(fig)
         st.plotly_chart(fig, use_container_width=True, key='tr_cc_hit')
 
     with rc2:
@@ -1397,6 +1485,7 @@ def render_trends_analysis():
             yaxis=dict(gridcolor='#ede8df', zeroline=True, zerolinecolor=C['border']),
             margin=dict(l=50, r=20, t=40, b=40),
         )
+        fig = apply_chart_theme(fig)
         st.plotly_chart(fig, use_container_width=True, key='tr_cc_roi')
 
     # ── Best / Worst performing markets (table) ────────────────────────────
@@ -1431,6 +1520,7 @@ def render_trends_analysis():
 
 def render_page(page: str):
     """Called from dashboard.py for each Betting Hub page."""
+    inject_global_css()
     _ensure_dirs()
     if page == 'BH Dashboard':
         render_bh_dashboard()

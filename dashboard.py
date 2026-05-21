@@ -283,8 +283,8 @@ st.markdown("""
     [data-testid="stToolbar"] { display: none !important; }
     [data-testid="collapsedControl"] { display: none !important; }
     * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; box-sizing: border-box; }
-    .stApp { background-color: #faf7f2; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #2c2c2c; }
-    .main .block-container { background-color: #faf7f2; padding-top: 0 !important; padding-bottom: 2.5rem; padding-left: 1rem !important; padding-right: 1rem !important; }
+    .stApp { background-color: #e8f0f8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #2c2c2c; }
+    .main .block-container { background-color: #e8f0f8; padding-top: 0 !important; padding-bottom: 2.5rem; padding-left: 1rem !important; padding-right: 1rem !important; }
     @media (max-width: 768px) {
         .main .block-container { padding-left: 0.4rem !important; padding-right: 0.4rem !important; }
     }
@@ -293,7 +293,7 @@ st.markdown("""
     ::-webkit-scrollbar { width: 6px; height: 6px; }
     ::-webkit-scrollbar-track { background: #f0ece4; }
     ::-webkit-scrollbar-thumb { background: #cfc4b0; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #8b6f47; }
+    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
     /* ── Sidebar ── */
     [data-testid="stSidebar"] { background-color: #e8e0d0; border-right: 1px solid #cfc4b0; }
@@ -303,7 +303,7 @@ st.markdown("""
     [data-testid="stSidebar"] div { color: #2c2c2c; }
     [data-testid="stSidebar"] h1,
     [data-testid="stSidebar"] h2,
-    [data-testid="stSidebar"] h3 { color: #2d5016 !important; }
+    [data-testid="stSidebar"] h3 { color: #34d399 !important; }
     [data-testid="stSidebar"] .stCaption { color: #6c6c6c !important; }
 
     /* ── Nav dropdown bar ── */
@@ -316,7 +316,7 @@ st.markdown("""
         flex-wrap: nowrap !important;
     }
     .nav-anchor + div[data-testid="stHorizontalBlock"] label {
-        color: #2d5016 !important;
+        color: #34d399 !important;
         font-size: 10px !important;
         font-weight: 700 !important;
         letter-spacing: 1.5px !important;
@@ -345,7 +345,7 @@ st.markdown("""
     hr {
         border: none !important;
         height: 1px !important;
-        background: linear-gradient(to right, transparent, #8b6f47 20%, #cfc4b0 50%, #8b6f47 80%, transparent) !important;
+        background: linear-gradient(to right, transparent, #94a3b8 20%, #cfc4b0 50%, #94a3b8 80%, transparent) !important;
         margin: 20px 0 !important;
         opacity: 0.6;
     }
@@ -353,8 +353,8 @@ st.markdown("""
     /* ── Run Update button: dark green ── */
     [data-testid="stBaseButton-primary"],
     button[kind="primary"] {
-        background-color: #2d5016 !important;
-        color: #faf7f2 !important;
+        background-color: #34d399 !important;
+        color: #e8f0f8 !important;
         border: none !important;
         font-weight: 600 !important;
         transition: background-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease !important;
@@ -363,7 +363,7 @@ st.markdown("""
     [data-testid="stBaseButton-primary"]:hover,
     button[kind="primary"]:hover {
         background-color: #1a3009 !important;
-        color: #faf7f2 !important;
+        color: #e8f0f8 !important;
         transform: translateY(-1px) !important;
         box-shadow: 0 3px 10px rgba(45,80,22,0.25) !important;
     }
@@ -410,13 +410,14 @@ st.markdown("""
         overflow: hidden;
         background: linear-gradient(
             135deg,
-            #2d5016 0%, #1a3009 25%, #3a6b1f 50%, #1a3009 75%, #2d5016 100%
+            #0f1923 0%, #152533 25%, #1e3a4a 50%, #152533 75%, #0f1923 100%
         );
         background-size: 300% 300%;
         animation: bannerShift 10s ease infinite;
         border-radius: 0;
         padding: 52px 48px 44px 48px;
         margin-bottom: 0;
+        border-bottom: 2px solid #34d399;
         text-align: center;
     }
     /* Diagonal line texture overlay */
@@ -446,9 +447,9 @@ st.markdown("""
         line-height: 1;
         background: linear-gradient(
             90deg,
-            #faf7f2 0%, #faf7f2 25%,
-            #e8c96d 40%, #c9a84c 50%, #e8c96d 60%,
-            #faf7f2 75%, #faf7f2 100%
+            #e8f0f8 0%, #e8f0f8 25%,
+            #34d399 40%, #34d399 50%, #34d399 60%,
+            #e8f0f8 75%, #e8f0f8 100%
         );
         background-size: 200% auto;
         -webkit-background-clip: text;
@@ -458,7 +459,7 @@ st.markdown("""
     }
     .cha-ching-sub {
         position: relative;
-        color: #b8d48a;
+        color: #34d399;
         font-size: 12px;
         font-weight: 700;
         letter-spacing: 5px;
@@ -504,7 +505,7 @@ st.markdown("""
     .quick-link-card {
         background: #ffffff;
         border: 1px solid #ddd5c5;
-        border-top: 3px solid #2d5016;
+        border-top: 3px solid #34d399;
         border-radius: 6px;
         padding: 16px 18px;
         margin: 0;
@@ -515,12 +516,12 @@ st.markdown("""
         will-change: transform;
     }
     .quick-link-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.08); border-top-color: #1a3009; transform: translateY(-2px); }
-    .quick-link-title { color: #2d5016; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin: 0 0 6px 0; }
+    .quick-link-title { color: #34d399; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin: 0 0 6px 0; }
     .quick-link-desc { color: #6c6c6c; font-size: 12px; line-height: 1.55; margin: 0; }
 
     /* ── Metric cards ── */
     .metric-card {
-        background: #faf7f2;
+        background: #e8f0f8;
         border: 1px solid #ddd5c5;
         border-radius: 8px;
         padding: 16px 20px;
@@ -534,7 +535,7 @@ st.markdown("""
     .metric-card-primary {
         background: #ffffff;
         border: 1px solid #ddd5c5;
-        border-left: 4px solid #2d5016;
+        border-left: 4px solid #34d399;
         border-radius: 8px;
         padding: 20px 24px;
         margin: 6px 0;
@@ -556,23 +557,23 @@ st.markdown("""
         will-change: transform;
     }
     .leader-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.05); transform: translateY(-2px); }
-    .metric-label { color: #8b6f47; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
-    .metric-value { color: #2d5016; font-size: 26px; font-weight: 700; margin-top: 2px; line-height: 1.15; }
-    .metric-value-lg { color: #2d5016; font-size: 32px; font-weight: 700; margin-top: 2px; line-height: 1.1; }
+    .metric-label { color: #94a3b8; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+    .metric-value { color: #34d399; font-size: 26px; font-weight: 700; margin-top: 2px; line-height: 1.15; }
+    .metric-value-lg { color: #34d399; font-size: 32px; font-weight: 700; margin-top: 2px; line-height: 1.1; }
     .metric-sub { color: #6c6c6c; font-size: 12px; margin-top: 4px; line-height: 1.4; }
 
     /* ── Title bar ── */
     .title-bar {
-        background: #faf7f2;
+        background: #e8f0f8;
         border: 1px solid #ddd5c5;
-        border-left: 5px solid #8b6f47;
+        border-left: 5px solid #94a3b8;
         padding: 18px 24px;
         border-radius: 6px;
         margin-bottom: 22px;
         box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
     }
     .title-bar h1 {
-        color: #2d5016;
+        color: #34d399;
         font-size: 24px;
         font-weight: 800;
         letter-spacing: -0.5px;
@@ -580,7 +581,7 @@ st.markdown("""
         line-height: 1.2;
     }
     .title-bar h2 {
-        color: #2d5016;
+        color: #34d399;
         font-size: 20px;
         font-weight: 800;
         letter-spacing: -0.3px;
@@ -588,7 +589,7 @@ st.markdown("""
         line-height: 1.2;
     }
     .title-bar p {
-        color: #8b6f47;
+        color: #94a3b8;
         font-size: 13px;
         font-weight: 500;
         margin: 0;
@@ -597,7 +598,7 @@ st.markdown("""
 
     /* ── Section headers ── */
     .section-header {
-        color: #2d5016;
+        color: #34d399;
         font-size: 10px;
         font-weight: 800;
         letter-spacing: 2px;
@@ -615,7 +616,7 @@ st.markdown("""
         top: 0;
         bottom: 0;
         width: 4px;
-        background: #2d5016;
+        background: #34d399;
         border-radius: 2px;
     }
 
@@ -637,7 +638,7 @@ st.markdown("""
         white-space: nowrap;
     }
     .global-header .subtitle {
-        color: #8b6f47;
+        color: #94a3b8;
         font-size: 12px;
         margin: 0;
         font-weight: 500;
@@ -657,15 +658,15 @@ st.markdown("""
         will-change: transform;
     }
     .dna-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.05); transform: translateY(-2px); }
-    .dna-label { color: #8b6f47; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 2px; }
-    .dna-value { color: #2d5016; font-size: 22px; font-weight: 700; line-height: 1.2; }
+    .dna-label { color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 2px; }
+    .dna-value { color: #34d399; font-size: 22px; font-weight: 700; line-height: 1.2; }
     .dna-sub   { color: #6c6c6c; font-size: 12px; margin-top: 3px; line-height: 1.4; }
 
     /* ── Dataframe — green header row, alternating body rows ── */
     [data-testid="stDataFrame"] thead th,
     [data-testid="stDataFrame"] th[role="columnheader"] {
-        background-color: #2d5016 !important;
-        color: #faf7f2 !important;
+        background-color: #34d399 !important;
+        color: #e8f0f8 !important;
         font-size: 11px !important;
         font-weight: 700 !important;
         letter-spacing: 0.8px !important;
@@ -677,7 +678,7 @@ st.markdown("""
         transition: background-color 0.12s ease !important;
     }
     [data-testid="stDataFrame"] tbody tr:nth-child(odd) td {
-        background-color: #faf7f2 !important;
+        background-color: #e8f0f8 !important;
         transition: background-color 0.12s ease !important;
     }
     [data-testid="stDataFrame"] tbody tr:hover td {
@@ -697,7 +698,7 @@ st.markdown("""
         margin: 0 0 10px 0;
     }
     .landing-hero p {
-        color: #8b6f47;
+        color: #94a3b8;
         font-size: 14px;
         margin: 0;
         font-weight: 500;
@@ -723,11 +724,11 @@ st.markdown("""
     }
     .landing-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(0,0,0,0.13); }
     .landing-card:active { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.10); }
-    .landing-card.brownlow { border-top: 5px solid #2d5016; }
+    .landing-card.brownlow { border-top: 5px solid #34d399; }
     .landing-card.betting  { border-top: 5px solid #c9a84c; }
     .landing-icon  { font-size: 54px; margin-bottom: 14px; line-height: 1; }
     .landing-title { font-size: 28px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 10px; }
-    .landing-title.brownlow { color: #2d5016; }
+    .landing-title.brownlow { color: #34d399; }
     .landing-title.betting  { color: #c9a84c; }
     .landing-desc  { color: #6c6c6c; font-size: 13px; line-height: 1.6; max-width: 300px; }
 
@@ -737,15 +738,15 @@ st.markdown("""
         font-weight: 600 !important;
         letter-spacing: 0.3px !important;
         padding: 8px 16px !important;
-        color: #8b6f47 !important;
+        color: #94a3b8 !important;
         transition: color 0.15s ease, opacity 0.15s ease !important;
     }
     [data-testid="stTabs"] [data-testid="stTab"][aria-selected="true"] {
-        color: #2d5016 !important;
+        color: #34d399 !important;
         font-weight: 700 !important;
     }
     [data-testid="stTabs"] [data-testid="stTab"]:hover {
-        color: #2d5016 !important;
+        color: #34d399 !important;
         opacity: 0.85 !important;
     }
 
@@ -758,7 +759,7 @@ st.markdown("""
         transition: border-color 0.15s ease, box-shadow 0.2s ease !important;
     }
     .stTextInput > div > div > input:focus {
-        border-color: #2d5016 !important;
+        border-color: #34d399 !important;
         box-shadow: 0 0 0 3px rgba(45,80,22,0.12) !important;
     }
     .stSelectbox > div > div,
@@ -769,7 +770,7 @@ st.markdown("""
     /* ── Secondary button ── */
     [data-testid="stBaseButton-secondary"] {
         background-color: #f0ece4 !important;
-        color: #2d5016 !important;
+        color: #34d399 !important;
         border: 1px solid #cfc4b0 !important;
         font-weight: 600 !important;
         transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease !important;
@@ -777,7 +778,7 @@ st.markdown("""
     }
     [data-testid="stBaseButton-secondary"]:hover {
         background-color: #e8e0d0 !important;
-        border-color: #8b6f47 !important;
+        border-color: #94a3b8 !important;
         color: #1a3009 !important;
         transform: translateY(-1px) !important;
     }
@@ -794,7 +795,7 @@ st.markdown("""
 
     /* ── Caption text ── */
     .stCaption, [data-testid="stCaptionContainer"] {
-        color: #8b6f47 !important;
+        color: #94a3b8 !important;
         font-size: 11px !important;
         letter-spacing: 0.2px !important;
     }
@@ -814,7 +815,7 @@ st.markdown("""
 
     /* ── Expander hover ── */
     [data-testid="stExpander"] summary { transition: color 0.15s ease !important; }
-    [data-testid="stExpander"] summary:hover { color: #2d5016 !important; }
+    [data-testid="stExpander"] summary:hover { color: #34d399 !important; }
 
     /* ── Spinner fades in (reduces visual jolt) ── */
     [data-testid="stSpinner"] { opacity: 0; animation: stFadeIn 0.3s ease 0.08s forwards; }
@@ -846,8 +847,8 @@ st.markdown("""
         display: inline-flex;
         align-items: center;
         gap: 5px;
-        background: #2d5016;
-        color: #faf7f2;
+        background: #34d399;
+        color: #e8f0f8;
         font-size: 10px;
         font-weight: 700;
         letter-spacing: 1.5px;
@@ -870,8 +871,8 @@ st.markdown("""
     .live-badge-off {
         display: inline-flex;
         align-items: center;
-        background: #8b6f47;
-        color: #faf7f2;
+        background: #94a3b8;
+        color: #e8f0f8;
         font-size: 10px;
         font-weight: 700;
         letter-spacing: 1.5px;
@@ -941,7 +942,7 @@ st.markdown("""
     }
     .game-card {
         border: 1px solid #cfc4b0;
-        border-left: 6px solid #2d5016;
+        border-left: 6px solid #34d399;
         border-radius: 0 10px 10px 0;
         padding: 20px 26px 18px 24px;
         background: #ffffff;
@@ -969,7 +970,7 @@ st.markdown("""
         opacity: 0.6;
     }
     .game-card-eyebrow {
-        color: #8b6f47;
+        color: #94a3b8;
         font-size: 10px;
         font-weight: 700;
         letter-spacing: 3px;
@@ -984,19 +985,19 @@ st.markdown("""
         line-height: 1.2;
     }
     .game-winner-name {
-        color: #2d5016;
+        color: #34d399;
         font-size: 26px;
         font-weight: 800;
         letter-spacing: -0.5px;
     }
     .game-loser-name {
-        color: #8b6f47;
+        color: #94a3b8;
         font-size: 16px;
         font-weight: 500;
     }
     .score-pill {
-        background: #2d5016;
-        color: #faf7f2;
+        background: #34d399;
+        color: #e8f0f8;
         font-size: 13px;
         font-weight: 700;
         padding: 5px 14px;
@@ -1006,7 +1007,7 @@ st.markdown("""
         display: inline-block;
     }
     .score-pill.draw {
-        background: #8b6f47;
+        background: #94a3b8;
     }
 
     /* ── Game table — rank badge cells ── */
@@ -1406,11 +1407,11 @@ def _rank_change_html(csv_path, current_player, player_col='Player'):
             return ''
         _idx = _pv.index[_pv[player_col] == current_player].tolist()
         if not _idx:
-            return ' <span style="color:#8b6f47;font-size:11px">↑ new</span>'
+            return ' <span style="color:#94a3b8;font-size:11px">↑ new</span>'
         _prev_rank = _idx[0] + 1
         _delta = _prev_rank - 1
         if _delta > 0:
-            return f' <span style="color:#2d5016;font-size:11px;font-weight:700">▲{_delta}</span>'
+            return f' <span style="color:#34d399;font-size:11px;font-weight:700">▲{_delta}</span>'
         if _delta < 0:
             return f' <span style="color:#8b1a1a;font-size:11px;font-weight:700">▼{abs(_delta)}</span>'
     except Exception:
@@ -1633,13 +1634,13 @@ def fetch_espn_brownlow():
 
 _TABLE_STYLES = [
     {"selector": "thead th", "props": [
-        ("background-color", "#2d5016"), ("color", "#faf7f2"),
+        ("background-color", "#34d399"), ("color", "#e8f0f8"),
         ("font-size", "11px"), ("font-weight", "700"),
         ("letter-spacing", "0.8px"), ("text-transform", "uppercase"),
         ("border-bottom", "none"), ("padding", "8px 10px"),
     ]},
     {"selector": "tbody tr:nth-child(even)", "props": [("background-color", "#f0ece4")]},
-    {"selector": "tbody tr:nth-child(odd)",  "props": [("background-color", "#faf7f2")]},
+    {"selector": "tbody tr:nth-child(odd)",  "props": [("background-color", "#e8f0f8")]},
     {"selector": "tbody tr:hover",           "props": [("background-color", "rgba(45,80,22,0.08)")]},
     {"selector": "td",                       "props": [("border-bottom", "1px solid #ede8df"), ("padding", "6px 10px")]},
 ]
@@ -2071,7 +2072,7 @@ if _page == 'Leaderboard':
         f'<h2 style="color:#2c2c2c;margin:0">{selected_season} Brownlow Leaderboard</h2>'
         f'{_lb_live_html}'
         f'</div>'
-        f'<p style="color:#8b6f47;margin:4px 0 0 0">'
+        f'<p style="color:#94a3b8;margin:4px 0 0 0">'
         f'{"Projected votes through current round" if is_2026 else "Model predicted vs actual results"}'
         f'</p></div></div>',
         unsafe_allow_html=True,
@@ -2169,8 +2170,8 @@ if _page == 'Leaderboard':
         fig.add_trace(go.Bar(name='Actual', x=chart['Player_Name'], y=chart['Actual_Votes'],
                              marker_color='#adb5bd', opacity=0.7))
     fig.add_trace(go.Bar(name='Model Expected', x=chart['Player_Name'],
-                         y=chart['Exp_Total_Votes'].round(1), marker_color='#2d5016', opacity=0.9))
-    fig.update_layout(barmode='group', plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2',
+                         y=chart['Exp_Total_Votes'].round(1), marker_color='#34d399', opacity=0.9))
+    fig.update_layout(barmode='group', plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8',
                       font_color='#2c2c2c', legend=dict(orientation='h', y=1.1),
                       xaxis_tickangle=-35, margin=dict(t=20, b=120))
     fig = apply_chart_theme(fig)
@@ -2182,7 +2183,7 @@ if _page == 'Leaderboard':
 if _page == 'Player Profile':
     st.markdown(
         f'<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Player Profile — {selected_season}</h2>'
-        f'<p style="color:#8b6f47;margin:4px 0 0 0">Round by round breakdown · vote probability · polling DNA</p></div>',
+        f'<p style="color:#94a3b8;margin:4px 0 0 0">Round by round breakdown · vote probability · polling DNA</p></div>',
         unsafe_allow_html=True,
     )
 
@@ -2218,8 +2219,8 @@ if _page == 'Player Profile':
                 if not is_2026 and 'Brownlow.Votes' in player_games.columns:
                     colors = []
                     for v in player_games['Brownlow.Votes']:
-                        if v == 3: colors.append('#8b6f47')
-                        elif v == 2: colors.append('#2d5016')
+                        if v == 3: colors.append('#94a3b8')
+                        elif v == 2: colors.append('#34d399')
                         elif v == 1: colors.append('#6b7c3a')
                         else: colors.append('#ddd5c5')
                     fig.add_trace(go.Bar(
@@ -2232,7 +2233,7 @@ if _page == 'Player Profile':
                 fig.add_trace(go.Scatter(
                     x=player_games['Round_num'], y=player_games['Exp_Votes'].round(2),
                     name='Expected Votes', mode='lines+markers',
-                    line=dict(color='#8b6f47', width=2, dash='dot'), marker=dict(size=6),
+                    line=dict(color='#94a3b8', width=2, dash='dot'), marker=dict(size=6),
                 ), secondary_y=False)
 
                 fig.add_trace(go.Scatter(
@@ -2243,7 +2244,7 @@ if _page == 'Player Profile':
                 ), secondary_y=True)
 
                 fig.update_layout(
-                    plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+                    plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
                     xaxis=dict(title='Round', dtick=1, gridcolor='#ede8df'),
                     legend=dict(orientation='h', y=1.12, bgcolor='rgba(0,0,0,0)'),
                     margin=dict(t=40, b=40), hovermode='x unified',
@@ -2259,7 +2260,7 @@ if _page == 'Player Profile':
                     key="profile_stat")
 
                 fig2 = go.Figure()
-                bar_colors = ['#2d5016' if w else '#e63946' for w in player_games['Is_Win'].fillna(0).astype(int)]
+                bar_colors = ['#34d399' if w else '#e63946' for w in player_games['Is_Win'].fillna(0).astype(int)]
                 fig2.add_trace(go.Bar(
                     x=player_games['Round_num'], y=player_games[stat_choice],
                     name=stat_choice.replace('.', ' ').replace('_', ' '),
@@ -2272,7 +2273,7 @@ if _page == 'Player Profile':
                     line=dict(color='#e63946', width=2), yaxis='y2',
                 ))
                 fig2.update_layout(
-                    plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+                    plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
                     xaxis=dict(title='Round', dtick=1, gridcolor='#ede8df'),
                     yaxis=dict(title=stat_choice.replace('.', ' '), gridcolor='#ede8df'),
                     yaxis2=dict(title='Poll %', overlaying='y', side='right', range=[0, 105], gridcolor='rgba(0,0,0,0)'),
@@ -2348,11 +2349,11 @@ if _page == 'Player Profile':
                                 labels=['3 votes', '2 votes', '1 vote', '0 votes'],
                                 values=[vote_counts.get(3, 0), vote_counts.get(2, 0),
                                         vote_counts.get(1, 0), vote_counts.get(0, 0)],
-                                marker_colors=['#8b6f47', '#2d5016', '#6b7c3a', '#ddd5c5'],
+                                marker_colors=['#94a3b8', '#34d399', '#6b7c3a', '#ddd5c5'],
                                 hole=0.4,
                             ))
                             fig_pie.update_layout(
-                                plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2',
+                                plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8',
                                 font_color='#2c2c2c', margin=dict(t=10, b=10),
                                 showlegend=True, height=250,
                                 legend=dict(orientation='h', y=-0.1),
@@ -2402,7 +2403,7 @@ if _page == 'Player Profile':
 if False:  # merged into Player Profile
     st.markdown(
         f'<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Player DNA — {selected_season}</h2>'
-        f'<p style="color:#8b6f47;margin:4px 0 0 0">Player-specific polling efficiency and tendencies</p></div>',
+        f'<p style="color:#94a3b8;margin:4px 0 0 0">Player-specific polling efficiency and tendencies</p></div>',
         unsafe_allow_html=True,
     )
 
@@ -2452,11 +2453,11 @@ if False:  # merged into Player Profile
                                 labels=['3 votes', '2 votes', '1 vote', '0 votes'],
                                 values=[vote_counts.get(3, 0), vote_counts.get(2, 0),
                                         vote_counts.get(1, 0), vote_counts.get(0, 0)],
-                                marker_colors=['#8b6f47', '#2d5016', '#6b7c3a', '#ddd5c5'],
+                                marker_colors=['#94a3b8', '#34d399', '#6b7c3a', '#ddd5c5'],
                                 hole=0.4,
                             ))
                             fig_pie.update_layout(
-                                plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2',
+                                plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8',
                                 font_color='#2c2c2c', margin=dict(t=10, b=10),
                                 showlegend=True, height=250,
                                 legend=dict(orientation='h', y=-0.1),
@@ -2509,7 +2510,7 @@ if False:  # merged into Player Profile
 if _page == 'Model Insights':
     st.markdown(
         f'<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Model Insights</h2>'
-        f'<p style="color:#8b6f47;margin:4px 0 0 0">Feature importance · XGBoost v4.0 · Out-of-sample accuracy {_BT_MIN}–{_BT_MAX}</p></div>',
+        f'<p style="color:#94a3b8;margin:4px 0 0 0">Feature importance · XGBoost v4.0 · Out-of-sample accuracy {_BT_MIN}–{_BT_MAX}</p></div>',
         unsafe_allow_html=True,
     )
     st.markdown('<div class="section-header">What Drives Brownlow Votes?</div>', unsafe_allow_html=True)
@@ -2524,7 +2525,7 @@ if _page == 'Model Insights':
             top20 = imp.head(20).sort_values('Importance %', ascending=True)
             fig3 = go.Figure(go.Bar(x=top20['Importance %'], y=top20['Feature'], orientation='h',
                                     marker=dict(color=top20['Importance %'], colorscale='Greens', showscale=False)))
-            fig3.update_layout(plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+            fig3.update_layout(plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
                                xaxis_title='Importance (%)', height=500, margin=dict(l=220, t=20))
             fig3 = apply_chart_theme(fig3)
             st.plotly_chart(fig3, width='stretch', key="chart_007")
@@ -2532,7 +2533,7 @@ if _page == 'Model Insights':
             all_imp = imp.sort_values('Importance %', ascending=True)
             fig4 = go.Figure(go.Bar(x=all_imp['Importance %'], y=all_imp['Feature'], orientation='h',
                                     marker=dict(color=all_imp['Importance %'], colorscale='Greens', showscale=False)))
-            fig4.update_layout(plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+            fig4.update_layout(plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
                                xaxis_title='Importance (%)', height=1400, margin=dict(l=250, t=20))
             fig4 = apply_chart_theme(fig4)
             st.plotly_chart(fig4, width='stretch', key="chart_008")
@@ -2549,7 +2550,7 @@ if _page == 'Model Insights':
 if _page == 'Coaches Votes':
     st.markdown(
         f'<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Coaches Votes — {selected_season}</h2>'
-        f'<p style="color:#8b6f47;margin:4px 0 0 0">Coaches award votes compared to Brownlow polling</p></div>',
+        f'<p style="color:#94a3b8;margin:4px 0 0 0">Coaches award votes compared to Brownlow polling</p></div>',
         unsafe_allow_html=True,
     )
 
@@ -2596,11 +2597,11 @@ if _page == 'Coaches Votes':
             top20_cv = cv_totals.head(20)
             fig_cv = go.Figure(go.Bar(
                 x=top20_cv['Player_Name'], y=top20_cv['Total_CV'],
-                marker_color='#2d5016', opacity=0.9,
+                marker_color='#34d399', opacity=0.9,
                 text=top20_cv['Total_CV'].astype(int), textposition='outside',
             ))
             fig_cv.update_layout(
-                plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+                plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
                 yaxis=dict(title='Total Coaches Votes', gridcolor='#ede8df'),
                 xaxis_tickangle=-35, margin=dict(t=20, b=120),
             )
@@ -2621,13 +2622,13 @@ if _page == 'Coaches Votes':
                     x=cv_corr['Coaches_Votes'] + jitter,
                     y=cv_corr['Brownlow.Votes'],
                     mode='markers',
-                    marker=dict(color='#2d5016', size=5, opacity=0.35),
+                    marker=dict(color='#34d399', size=5, opacity=0.35),
                     text=cv_corr['Player_Name'],
                     hovertemplate='<b>%{text}</b><br>Coaches V: %{x:.0f}<br>Brownlow V: %{y}<extra></extra>',
                 ))
                 corr_val = cv_corr[['Coaches_Votes', 'Brownlow.Votes']].corr().iloc[0, 1]
                 fig_scatter.update_layout(
-                    plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+                    plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
                     xaxis=dict(title='Coaches Votes', gridcolor='#ede8df'),
                     yaxis=dict(title='Brownlow Votes', gridcolor='#ede8df', dtick=1),
                     margin=dict(t=20, b=40), height=380,
@@ -2644,7 +2645,7 @@ if _page == 'Coaches Votes':
                 p_cv = cv_df[cv_df['Player_Name'] == sel_cv_player].sort_values('Round_num')
                 if not p_cv.empty:
                     fig_cv_p = go.Figure()
-                    bar_col = ['#2d5016' if w else '#e63946' for w in p_cv['Is_Win'].fillna(0).astype(int)]
+                    bar_col = ['#34d399' if w else '#e63946' for w in p_cv['Is_Win'].fillna(0).astype(int)]
                     fig_cv_p.add_trace(go.Bar(
                         x=p_cv['Round_num'], y=p_cv['Coaches_Votes'],
                         name='Coaches Votes', marker_color=bar_col, opacity=0.85,
@@ -2654,10 +2655,10 @@ if _page == 'Coaches Votes':
                         fig_cv_p.add_trace(go.Scatter(
                             x=p_cv['Round_num'], y=p_cv['Brownlow.Votes'],
                             name='Brownlow Votes', mode='lines+markers',
-                            line=dict(color='#8b6f47', width=2, dash='dot'), marker=dict(size=7),
+                            line=dict(color='#94a3b8', width=2, dash='dot'), marker=dict(size=7),
                         ))
                     fig_cv_p.update_layout(
-                        plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+                        plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
                         xaxis=dict(title='Round', dtick=1, gridcolor='#ede8df'),
                         yaxis=dict(title='Votes', gridcolor='#ede8df'),
                         legend=dict(orientation='h', y=1.1, bgcolor='rgba(0,0,0,0)'),
@@ -2673,7 +2674,7 @@ if _page == 'Coaches Votes':
 if _page == 'Game Analysis':
     st.markdown(
         f'<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Game Analysis — {selected_season}</h2>'
-        f'<p style="color:#8b6f47;margin:4px 0 0 0">Round-by-round match predictions · poll probability breakdown</p></div>',
+        f'<p style="color:#94a3b8;margin:4px 0 0 0">Round-by-round match predictions · poll probability breakdown</p></div>',
         unsafe_allow_html=True,
     )
     _ga_rbr_tab, _ga_pp_tab = st.tabs(["Round by Round", "Poll Probability"])
@@ -2699,7 +2700,7 @@ if _page == 'Game Analysis':
             rnd = rr[rr['Round_num'] == selected_round].copy()
             with info_col:
                 st.markdown(
-                    f'<div style="line-height:38px;color:#8b6f47;font-size:14px;">'
+                    f'<div style="line-height:38px;color:#94a3b8;font-size:14px;">'
                     f'Round {selected_round - 1} &nbsp;·&nbsp; {rnd["Match"].nunique()} matches &nbsp;·&nbsp; {len(rnd)} players'
                     f'</div>',
                     unsafe_allow_html=True,
@@ -2837,15 +2838,16 @@ if _page == 'Game Analysis':
         filtered_pp['P1%'] = (filtered_pp['Exp_1vote_games'] / filtered_pp['Games'] * 100).round(1)
 
         fig5 = go.Figure()
-        fig5.add_trace(go.Bar(name='P(3 votes)', x=filtered_pp['Player_Name'], y=filtered_pp['P3%'], marker_color='#8b6f47'))
-        fig5.add_trace(go.Bar(name='P(2 votes)', x=filtered_pp['Player_Name'], y=filtered_pp['P2%'], marker_color='#2d5016'))
+        fig5.add_trace(go.Bar(name='P(3 votes)', x=filtered_pp['Player_Name'], y=filtered_pp['P3%'], marker_color='#94a3b8'))
+        fig5.add_trace(go.Bar(name='P(2 votes)', x=filtered_pp['Player_Name'], y=filtered_pp['P2%'], marker_color='#34d399'))
         fig5.add_trace(go.Bar(name='P(1 vote)', x=filtered_pp['Player_Name'], y=filtered_pp['P1%'], marker_color='#6b7c3a'))
         fig5.update_layout(
-            barmode='stack', plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2',
+            barmode='stack', plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8',
             font_color='#2c2c2c', yaxis_title='Probability (%)',
             xaxis_tickangle=-35, legend=dict(orientation='h', y=1.05),
             margin=dict(t=20, b=120),
         )
+        fig5 = apply_chart_theme(fig5)
         st.plotly_chart(fig5, width='stretch', key="ga_pp_fig5")
 
 # ════════════════════════════════════════════════════════════
@@ -2854,7 +2856,7 @@ if _page == 'Game Analysis':
 if _page == 'Betting Edge':
     st.markdown(
         f'<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Betting Edge — {selected_season}</h2>'
-        f'<p style="color:#8b6f47;margin:4px 0 0 0">Season projection with floor/ceiling · EV analysis against bookmaker odds</p></div>',
+        f'<p style="color:#94a3b8;margin:4px 0 0 0">Season projection with floor/ceiling · EV analysis against bookmaker odds</p></div>',
         unsafe_allow_html=True,
     )
     _be_sp_tab, _be_vf_tab = st.tabs(["Season Projection", "Value Finder"])
@@ -2884,7 +2886,7 @@ if _page == 'Betting Edge':
             fig_proj = go.Figure()
             fig_proj.add_trace(go.Bar(
                 name='Expected (played rounds)', x=top30_sp['Player'], y=top30_sp['Exp_Total_Votes'],
-                marker_color='#2d5016', opacity=0.9,
+                marker_color='#34d399', opacity=0.9,
                 error_y=dict(type='data', array=err_upper.tolist(), arrayminus=err_lower.tolist(),
                              visible=True, color='rgba(45,80,22,0.55)', thickness=1.5, width=4),
                 hovertemplate='<b>%{x}</b><br>Expected so far: %{y:.1f}<br>'
@@ -2893,11 +2895,11 @@ if _page == 'Betting Edge':
             ))
             fig_proj.add_trace(go.Bar(
                 name='Projected Remaining', x=top30_sp['Player'], y=top30_sp['Projected_Remaining'],
-                marker_color='#8b6f47', opacity=0.9,
+                marker_color='#94a3b8', opacity=0.9,
                 hovertemplate='<b>%{x}</b><br>Projected remaining: %{y:.1f}<extra></extra>',
             ))
             fig_proj.update_layout(
-                barmode='stack', plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+                barmode='stack', plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
                 yaxis=dict(title='Votes', gridcolor='#ede8df'), xaxis=dict(tickangle=-35),
                 legend=dict(orientation='h', y=1.08, bgcolor='rgba(0,0,0,0)'),
                 margin=dict(t=20, b=130), height=480,
@@ -3002,7 +3004,7 @@ if _page == 'Betting Edge':
 if _page == 'Stat Filter':
     st.markdown(
         '<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Stat Filter</h2>'
-        '<p style="color:#8b6f47;margin:4px 0 0 0">Set thresholds and see historical poll rates — 2015–2026</p></div>',
+        '<p style="color:#94a3b8;margin:4px 0 0 0">Set thresholds and see historical poll rates — 2015–2026</p></div>',
         unsafe_allow_html=True,
     )
     hist = load_all_historical()
@@ -3084,12 +3086,12 @@ if _page == 'Stat Filter':
                     fig_bar = go.Figure(go.Bar(
                         x=['3 votes', '2 votes', '1 vote', '0 votes'],
                         y=[n3 / vote_total * 100, n2 / vote_total * 100, n1 / vote_total * 100, n0 / vote_total * 100],
-                        marker_color=['#8b6f47', '#2d5016', '#6b7c3a', '#ddd5c5'],
+                        marker_color=['#94a3b8', '#34d399', '#6b7c3a', '#ddd5c5'],
                         text=[f"{v:.1f}%" for v in [n3 / vote_total * 100, n2 / vote_total * 100, n1 / vote_total * 100, n0 / vote_total * 100]],
                         textposition='outside',
                     ))
                     fig_bar.update_layout(
-                        plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+                        plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
                         yaxis=dict(title='% of games', gridcolor='#ede8df', range=[0, max(n0 / vote_total * 100 * 1.1, 10)]),
                         xaxis=dict(gridcolor='#ede8df'), margin=dict(t=20, b=20), height=300, showlegend=False,
                     )
@@ -3160,7 +3162,7 @@ if False:  # merged into Game Analysis
         rnd = rr[rr['Round_num'] == selected_round].copy()
         with info_col:
             st.markdown(
-                f'<div style="line-height:38px;color:#8b6f47;font-size:14px;">'
+                f'<div style="line-height:38px;color:#94a3b8;font-size:14px;">'
                 f'Round {selected_round - 1} &nbsp;·&nbsp; {rnd["Match"].nunique()} matches &nbsp;·&nbsp; {len(rnd)} players'
                 f'</div>',
                 unsafe_allow_html=True,
@@ -3174,7 +3176,7 @@ if False:  # merged into Game Analysis
                 elif i == 1: base = 'background-color: rgba(107,124,58,0.15); font-weight:700;'
                 elif i == 2: base = 'background-color: rgba(45,80,22,0.12); font-weight:700;'
                 elif i % 2 == 0: base = 'background-color: #f0ece4;'
-                else: base = 'background-color: #faf7f2;'
+                else: base = 'background-color: #e8f0f8;'
                 result = []
                 for col in df.columns:
                     if col == 'P(3v) %' and i >= 3:
@@ -3187,7 +3189,7 @@ if False:  # merged into Game Analysis
                 return result
             return df.style.apply(_cell, axis=1)
 
-        GAME_COLOURS = ['#2d5016', '#e63946', '#8b6f47', '#6b7c3a', '#4a90d9', '#e07b39', '#6c3483', '#1a6e8c', '#7d6608', '#b03a2e']
+        GAME_COLOURS = ['#34d399', '#e63946', '#94a3b8', '#6b7c3a', '#4a90d9', '#e07b39', '#6c3483', '#1a6e8c', '#7d6608', '#b03a2e']
         game_order = rnd.drop_duplicates('Match')[['Match', 'Home.team', 'Away.team', 'Home.score', 'Away.score']].reset_index(drop=True)
         col_cfg = {
             'Player': st.column_config.TextColumn('Player'),
@@ -3213,15 +3215,15 @@ if False:  # merged into Game Analysis
                 away_score = int(float(game_row['Away.score']))
                 score_str = f"{home_score} – {away_score}"
                 if home_score > away_score:
-                    result_html = f"<span style='color:#2d5016;font-size:22px;font-weight:700'>{home}</span><span style='color:#8b6f47;font-size:18px'> def. {away}</span>"
+                    result_html = f"<span style='color:#34d399;font-size:22px;font-weight:700'>{home}</span><span style='color:#94a3b8;font-size:18px'> def. {away}</span>"
                 elif away_score > home_score:
-                    result_html = f"<span style='color:#2d5016;font-size:22px;font-weight:700'>{away}</span><span style='color:#8b6f47;font-size:18px'> def. {home}</span>"
+                    result_html = f"<span style='color:#34d399;font-size:22px;font-weight:700'>{away}</span><span style='color:#94a3b8;font-size:18px'> def. {home}</span>"
                 else:
-                    result_html = f"<span style='color:#2d5016;font-size:22px;font-weight:700'>{home} drew {away}</span>"
+                    result_html = f"<span style='color:#34d399;font-size:22px;font-weight:700'>{home} drew {away}</span>"
                 score_html = f"<span style='color:{colour};font-size:17px;font-weight:600'>&nbsp;&nbsp;{score_str}</span>"
                 header_body = f"{result_html}{score_html}"
             except (ValueError, TypeError):
-                header_body = f"<span style='color:#2d5016;font-size:22px;font-weight:700'>{match}</span>"
+                header_body = f"<span style='color:#34d399;font-size:22px;font-weight:700'>{match}</span>"
 
             st.markdown(
                 f'<div style="border-left:6px solid {colour};padding:16px 22px;background:#ffffff;'
@@ -3269,7 +3271,7 @@ if False:  # merged into Game Analysis
 if False:  # merged into Betting Edge
     st.markdown(
         '<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">2026 Season Projection</h2>'
-        '<p style="color:#8b6f47;margin:4px 0 0 0">Actual votes to date + model-projected remaining rounds</p></div>',
+        '<p style="color:#94a3b8;margin:4px 0 0 0">Actual votes to date + model-projected remaining rounds</p></div>',
         unsafe_allow_html=True,
     )
     proj = load_season_projection()
@@ -3296,7 +3298,7 @@ if False:  # merged into Betting Edge
         fig_proj = go.Figure()
         fig_proj.add_trace(go.Bar(
             name='Expected (played rounds)', x=top30_sp['Player'], y=top30_sp['Exp_Total_Votes'],
-            marker_color='#2d5016', opacity=0.9,
+            marker_color='#34d399', opacity=0.9,
             error_y=dict(type='data', array=err_upper.tolist(), arrayminus=err_lower.tolist(),
                          visible=True, color='rgba(45,80,22,0.55)', thickness=1.5, width=4),
             hovertemplate='<b>%{x}</b><br>Expected so far: %{y:.1f}<br>'
@@ -3305,11 +3307,11 @@ if False:  # merged into Betting Edge
         ))
         fig_proj.add_trace(go.Bar(
             name='Projected Remaining', x=top30_sp['Player'], y=top30_sp['Projected_Remaining'],
-            marker_color='#8b6f47', opacity=0.9,
+            marker_color='#94a3b8', opacity=0.9,
             hovertemplate='<b>%{x}</b><br>Projected remaining: %{y:.1f}<extra></extra>',
         ))
         fig_proj.update_layout(
-            barmode='stack', plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+            barmode='stack', plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
             yaxis=dict(title='Votes', gridcolor='#ede8df'), xaxis=dict(tickangle=-35),
             legend=dict(orientation='h', y=1.08, bgcolor='rgba(0,0,0,0)'),
             margin=dict(t=20, b=130), height=480,
@@ -3346,7 +3348,7 @@ if _page == 'Model Insights':
     st.markdown(
         '<div style="border-top:2px solid #ddd5c5;margin:36px 0 28px 0;position:relative;">'
         '<span style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);'
-        'background:#faf7f2;padding:0 14px;color:#8b6f47;font-size:11px;font-weight:700;'
+        'background:#e8f0f8;padding:0 14px;color:#94a3b8;font-size:11px;font-weight:700;'
         'letter-spacing:2px;text-transform:uppercase;">Model Accuracy</span></div>',
         unsafe_allow_html=True,
     )
@@ -3416,21 +3418,21 @@ Positive = improving trajectory, negative = declining.
 
         st.markdown('<div class="section-header">Predicted Rank of Actual Winner by Season</div>', unsafe_allow_html=True)
         fig_rank = go.Figure()
-        bar_colors_rank = ['#8b6f47' if r <= 3 else ('#2d5016' if r <= 5 else ('#6b7c3a' if r <= 10 else '#adb5bd'))
+        bar_colors_rank = ['#94a3b8' if r <= 3 else ('#34d399' if r <= 5 else ('#6b7c3a' if r <= 10 else '#adb5bd'))
                            for r in acc_df['Pred. Rank']]
         fig_rank.add_trace(go.Bar(
             x=acc_df['Season'].astype(str), y=acc_df['Pred. Rank'], marker_color=bar_colors_rank,
             text=[f"#{r} — {w}" for r, w in zip(acc_df['Pred. Rank'], acc_df['Actual Winner'])],
             textposition='outside', hovertemplate='%{text}<extra></extra>',
         ))
-        fig_rank.add_hline(y=3, line_dash='dot', line_color='#8b6f47', annotation_text='Top 3',
-                           annotation_position='right', annotation_font_color='#8b6f47')
-        fig_rank.add_hline(y=5, line_dash='dot', line_color='#2d5016', annotation_text='Top 5',
-                           annotation_position='right', annotation_font_color='#2d5016')
+        fig_rank.add_hline(y=3, line_dash='dot', line_color='#94a3b8', annotation_text='Top 3',
+                           annotation_position='right', annotation_font_color='#94a3b8')
+        fig_rank.add_hline(y=5, line_dash='dot', line_color='#34d399', annotation_text='Top 5',
+                           annotation_position='right', annotation_font_color='#34d399')
         fig_rank.add_hline(y=10, line_dash='dot', line_color='#6b7c3a', annotation_text='Top 10',
                            annotation_position='right', annotation_font_color='#6b7c3a')
         fig_rank.update_layout(
-            plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+            plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
             yaxis=dict(title='Predicted Rank of Actual Winner', autorange='reversed',
                        gridcolor='#ede8df', range=[max(acc_df['Pred. Rank']) + 2, 0]),
             xaxis=dict(title='Season', gridcolor='#ede8df'),
@@ -3445,7 +3447,7 @@ Positive = improving trajectory, negative = declining.
         sel_s = st.selectbox("Season", seasons_avail, index=len(seasons_avail) - 1, key='acc_season')
         s_data = bt[(bt['Season'] == sel_s) & (bt['Rank_Predicted'] <= 10)].copy().sort_values('Rank_Predicted')
         fig_scatter = go.Figure()
-        marker_colors_sc = ['#8b6f47' if row['Rank_Actual'] == 1 else '#adb5bd' for _, row in s_data.iterrows()]
+        marker_colors_sc = ['#94a3b8' if row['Rank_Actual'] == 1 else '#adb5bd' for _, row in s_data.iterrows()]
         fig_scatter.add_trace(go.Scatter(
             x=s_data['Actual_Votes'], y=s_data['Predicted_Votes'],
             mode='markers+text', marker=dict(size=12, color=marker_colors_sc),
@@ -3458,7 +3460,7 @@ Positive = improving trajectory, negative = declining.
             line=dict(color='#cfc4b0', dash='dash', width=1), showlegend=False, hoverinfo='skip',
         ))
         fig_scatter.update_layout(
-            plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+            plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
             xaxis=dict(title='Actual Votes', gridcolor='#ede8df', range=[0, max_v]),
             yaxis=dict(title='Predicted Votes', gridcolor='#ede8df', range=[0, max_v]),
             margin=dict(t=20, b=40), height=420,
@@ -3473,7 +3475,7 @@ Positive = improving trajectory, negative = declining.
 if _page == 'Player Comparison':
     st.markdown(
         f'<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Player Comparison — {selected_season}</h2>'
-        f'<p style="color:#8b6f47;margin:4px 0 0 0">Head-to-head model comparison and betting analysis</p></div>',
+        f'<p style="color:#94a3b8;margin:4px 0 0 0">Head-to-head model comparison and betting analysis</p></div>',
         unsafe_allow_html=True,
     )
 
@@ -3491,7 +3493,7 @@ if _page == 'Player Comparison':
     with _sel_col_vs:
         st.markdown(
             '<div style="display:flex;align-items:center;justify-content:center;height:100%;'
-            'padding-top:28px;font-size:28px;font-weight:900;color:#8b6f47;letter-spacing:2px">VS</div>',
+            'padding-top:28px;font-size:28px;font-weight:900;color:#94a3b8;letter-spacing:2px">VS</div>',
             unsafe_allow_html=True,
         )
     with _sel_col2:
@@ -3537,17 +3539,17 @@ if _page == 'Player Comparison':
             f'<div class="metric-label">{d["team"]}</div>'
             f'<div style="font-size:26px;font-weight:800;color:#2c2c2c;margin:4px 0 14px 0;line-height:1.1">{d["name"]}</div>'
             f'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 16px;">'
-            f'<div><div style="font-size:10px;color:#8b6f47;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Exp Votes</div>'
+            f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Exp Votes</div>'
             f'<div style="font-size:20px;font-weight:700;color:{colour}">{d["exp_votes"]}</div></div>'
-            f'<div><div style="font-size:10px;color:#8b6f47;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Floor</div>'
+            f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Floor</div>'
             f'<div style="font-size:20px;font-weight:700;color:{colour}">{floor_s}</div></div>'
-            f'<div><div style="font-size:10px;color:#8b6f47;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Ceiling</div>'
+            f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Ceiling</div>'
             f'<div style="font-size:20px;font-weight:700;color:{colour}">{ceil_s}</div></div>'
-            f'<div><div style="font-size:10px;color:#8b6f47;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Poll %</div>'
+            f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Poll %</div>'
             f'<div style="font-size:20px;font-weight:700;color:{colour}">{d["poll_pct"]}%</div></div>'
-            f'<div><div style="font-size:10px;color:#8b6f47;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">3-Vote Games</div>'
+            f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">3-Vote Games</div>'
             f'<div style="font-size:20px;font-weight:700;color:{colour}">{d["three_vote_games"]}</div></div>'
-            f'<div><div style="font-size:10px;color:#8b6f47;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Best Odds / Mkt%</div>'
+            f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Best Odds / Mkt%</div>'
             f'<div style="font-size:20px;font-weight:700;color:{colour}">{odds_s} <span style="font-size:13px;color:#6c6c6c">/ {mkt_s}</span></div></div>'
             f'</div></div>',
             unsafe_allow_html=True,
@@ -3565,9 +3567,9 @@ if _page == 'Player Comparison':
         with _tab_so:
             _cc1, _cc2 = st.columns(2)
             with _cc1:
-                _render_cmp_card(_d1, '#2d5016')
+                _render_cmp_card(_d1, '#34d399')
             with _cc2:
-                _render_cmp_card(_d2, '#8b6f47')
+                _render_cmp_card(_d2, '#94a3b8')
 
             st.markdown('<div class="section-header">Vote Projection Comparison</div>', unsafe_allow_html=True)
             _proj_cats = ['Floor', 'Expected', 'Ceiling']
@@ -3576,19 +3578,19 @@ if _page == 'Player Comparison':
             _fig_proj = go.Figure()
             _fig_proj.add_trace(go.Bar(
                 name=_p1, y=_proj_cats, x=_p1_proj, orientation='h',
-                marker_color='#2d5016', opacity=0.88,
+                marker_color='#34d399', opacity=0.88,
                 text=[f'{v:.1f}' for v in _p1_proj], textposition='outside',
                 textfont=dict(color='#2c2c2c', size=12),
             ))
             _fig_proj.add_trace(go.Bar(
                 name=_p2, y=_proj_cats, x=_p2_proj, orientation='h',
-                marker_color='#8b6f47', opacity=0.88,
+                marker_color='#94a3b8', opacity=0.88,
                 text=[f'{v:.1f}' for v in _p2_proj], textposition='outside',
                 textfont=dict(color='#2c2c2c', size=12),
             ))
             _fig_proj.update_layout(
                 barmode='group',
-                plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+                plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
                 xaxis=dict(title='Votes', gridcolor='#ede8df', zeroline=False),
                 yaxis=dict(title='', tickfont=dict(size=12)),
                 legend=dict(orientation='h', y=1.12, bgcolor='rgba(0,0,0,0)'),
@@ -3608,20 +3610,20 @@ if _page == 'Player Comparison':
                         _fig_rbr.add_trace(go.Scatter(
                             x=(_g1['Round_num'] - 1), y=_g1['Exp_Votes'].round(1),
                             name=_p1, mode='lines+markers',
-                            line=dict(color='#2d5016', width=2.5),
-                            marker=dict(size=7, color='#2d5016'),
+                            line=dict(color='#34d399', width=2.5),
+                            marker=dict(size=7, color='#34d399'),
                             hovertemplate='<b>' + _p1 + '</b><br>Round %{x}<br>%{y:.1f} exp votes<extra></extra>',
                         ))
                     if not _g2.empty:
                         _fig_rbr.add_trace(go.Scatter(
                             x=(_g2['Round_num'] - 1), y=_g2['Exp_Votes'].round(1),
                             name=_p2, mode='lines+markers',
-                            line=dict(color='#8b6f47', width=2.5),
-                            marker=dict(size=7, color='#8b6f47'),
+                            line=dict(color='#94a3b8', width=2.5),
+                            marker=dict(size=7, color='#94a3b8'),
                             hovertemplate='<b>' + _p2 + '</b><br>Round %{x}<br>%{y:.1f} exp votes<extra></extra>',
                         ))
                     _fig_rbr.update_layout(
-                        plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+                        plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
                         xaxis=dict(title='Round', dtick=1, gridcolor='#ede8df'),
                         yaxis=dict(title='Predicted Votes', gridcolor='#ede8df', rangemode='tozero'),
                         legend=dict(orientation='h', y=1.1, bgcolor='rgba(0,0,0,0)'),
@@ -3657,12 +3659,12 @@ if _page == 'Player Comparison':
                     _fig_radar.add_trace(go.Scatterpolar(
                         r=_p1_norm + [_p1_norm[0]], theta=_r_labels + [_r_labels[0]],
                         name=_p1, fill='toself', fillcolor='rgba(45,80,22,0.15)',
-                        line=dict(color='#2d5016', width=2.5),
+                        line=dict(color='#34d399', width=2.5),
                     ))
                     _fig_radar.add_trace(go.Scatterpolar(
                         r=_p2_norm + [_p2_norm[0]], theta=_r_labels + [_r_labels[0]],
                         name=_p2, fill='toself', fillcolor='rgba(139,111,71,0.15)',
-                        line=dict(color='#8b6f47', width=2.5),
+                        line=dict(color='#94a3b8', width=2.5),
                     ))
                     _fig_radar.update_layout(
                         polar=dict(
@@ -3671,7 +3673,7 @@ if _page == 'Player Comparison':
                                             tickfont=dict(size=9), tickvals=[25, 50, 75, 100]),
                             angularaxis=dict(gridcolor='#cfc4b0', tickfont=dict(size=11)),
                         ),
-                        paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+                        paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
                         legend=dict(orientation='h', y=-0.08, bgcolor='rgba(0,0,0,0)'),
                         margin=dict(t=30, b=60, l=60, r=60), height=420,
                     )
@@ -3695,21 +3697,21 @@ if _page == 'Player Comparison':
 
             st.markdown('<div class="section-header">Model Probability</div>', unsafe_allow_html=True)
             _h2h_ca, _h2h_cb = st.columns(2)
-            for _col, _d, _colour, _mpct in [(_h2h_ca, _d1, '#2d5016', _ma), (_h2h_cb, _d2, '#8b6f47', _mb)]:
+            for _col, _d, _colour, _mpct in [(_h2h_ca, _d1, '#34d399', _ma), (_h2h_cb, _d2, '#94a3b8', _mb)]:
                 with _col:
                     _fs = f"{_d['floor']}" if _d['floor'] is not None else "—"
                     _cs = f"{_d['ceiling']}" if _d['ceiling'] is not None else "—"
                     st.markdown(
                         f'<div style="background:#f0ece4;border:1px solid #ddd5c5;border-left:5px solid {_colour};'
                         f'border-radius:8px;padding:16px 20px;margin:4px 0;box-shadow:0 2px 8px rgba(0,0,0,0.06);">'
-                        f'<div style="font-size:10px;color:#8b6f47;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">{_d["team"]}</div>'
+                        f'<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">{_d["team"]}</div>'
                         f'<div style="font-size:22px;font-weight:800;color:#2c2c2c;margin:3px 0 12px 0">{_d["name"]}</div>'
                         f'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 14px;">'
-                        f'<div><div style="font-size:10px;color:#8b6f47;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Exp Votes</div>'
+                        f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Exp Votes</div>'
                         f'<div style="font-size:22px;font-weight:800;color:{_colour}">{_d["exp_votes"]}</div></div>'
-                        f'<div><div style="font-size:10px;color:#8b6f47;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Floor</div>'
+                        f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Floor</div>'
                         f'<div style="font-size:22px;font-weight:800;color:{_colour}">{_fs}</div></div>'
-                        f'<div><div style="font-size:10px;color:#8b6f47;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Ceiling</div>'
+                        f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Ceiling</div>'
                         f'<div style="font-size:22px;font-weight:800;color:{_colour}">{_cs}</div></div>'
                         f'</div></div>',
                         unsafe_allow_html=True,
@@ -3717,9 +3719,9 @@ if _page == 'Player Comparison':
             st.markdown(
                 f'<div style="margin:18px 0 6px 0;display:flex;border-radius:6px;overflow:hidden;height:44px;'
                 f'box-shadow:0 1px 4px rgba(0,0,0,0.10);">'
-                f'<div style="width:{_ma}%;background:#2d5016;display:flex;align-items:center;justify-content:center;">'
+                f'<div style="width:{_ma}%;background:#34d399;display:flex;align-items:center;justify-content:center;">'
                 f'<span style="color:#fff;font-weight:800;font-size:17px">{_ma}%</span></div>'
-                f'<div style="width:{_mb}%;background:#8b6f47;display:flex;align-items:center;justify-content:center;">'
+                f'<div style="width:{_mb}%;background:#94a3b8;display:flex;align-items:center;justify-content:center;">'
                 f'<span style="color:#fff;font-weight:800;font-size:17px">{_mb}%</span></div>'
                 f'</div>'
                 f'<div style="display:flex;justify-content:space-between;font-size:12px;color:#6c6c6c;margin-bottom:4px;">'
@@ -3751,12 +3753,12 @@ if _page == 'Player Comparison':
                 _edge_val = round(_ma - _mkta, 1) if _ma >= _mb else round(_mb - _mktb, 1)
                 _edge_abs = abs(_edge_val)
                 if _edge_val > 5:
-                    _ebg, _ebord, _elabel = '#eaf2e8', '#2d5016', 'MODEL EDGE'
+                    _ebg, _ebord, _elabel = '#eaf2e8', '#34d399', 'MODEL EDGE'
                     _emsg = (f"The model gives <strong>{_favoured}</strong> a <strong>+{_edge_abs}%</strong> "
                              f"edge over market implied. Model: {_ma if _favoured == _p1 else _mb}% &nbsp;·&nbsp; "
                              f"Market: {_mkta if _favoured == _p1 else _mktb}%")
                 elif _edge_val < -5:
-                    _ebg, _ebord, _elabel = '#f5ede3', '#8b6f47', 'MARKET FAVOURS'
+                    _ebg, _ebord, _elabel = '#f5ede3', '#94a3b8', 'MARKET FAVOURS'
                     _mkt_fav = _p2 if _favoured == _p1 else _p1
                     _emsg = (f"Market prices <strong>{_mkt_fav}</strong> <strong>{_edge_abs}%</strong> higher "
                              f"than the model suggests. Model: {_ma if _favoured == _p1 else _mb}% &nbsp;·&nbsp; "
@@ -3787,18 +3789,18 @@ if _page == 'Player Comparison':
                         _fig_h2h_rbr.add_trace(go.Scatter(
                             x=(_hg1['Round_num'] - 1), y=_hg1['Exp_Votes'].round(1),
                             name=_p1, mode='lines+markers',
-                            line=dict(color='#2d5016', width=2.5), marker=dict(size=7, color='#2d5016'),
+                            line=dict(color='#34d399', width=2.5), marker=dict(size=7, color='#34d399'),
                             hovertemplate='<b>' + _p1 + '</b><br>Round %{x}<br>%{y:.1f} exp votes<extra></extra>',
                         ))
                     if not _hg2.empty:
                         _fig_h2h_rbr.add_trace(go.Scatter(
                             x=(_hg2['Round_num'] - 1), y=_hg2['Exp_Votes'].round(1),
                             name=_p2, mode='lines+markers',
-                            line=dict(color='#8b6f47', width=2.5), marker=dict(size=7, color='#8b6f47'),
+                            line=dict(color='#94a3b8', width=2.5), marker=dict(size=7, color='#94a3b8'),
                             hovertemplate='<b>' + _p2 + '</b><br>Round %{x}<br>%{y:.1f} exp votes<extra></extra>',
                         ))
                     _fig_h2h_rbr.update_layout(
-                        plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+                        plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
                         xaxis=dict(title='Round', dtick=1, gridcolor='#ede8df'),
                         yaxis=dict(title='Predicted Votes', gridcolor='#ede8df', rangemode='tozero'),
                         legend=dict(orientation='h', y=1.1, bgcolor='rgba(0,0,0,0)'),
@@ -3814,7 +3816,7 @@ if _page == 'Player Comparison':
             _vund_d = _d2 if _ma >= _mb else _d1
             _vfav_pct = _ma if _ma >= _mb else _mb
             _vdiff_exp = round(abs(_d1['exp_votes'] - _d2['exp_votes']), 1)
-            _vc2 = '#2d5016' if _ma >= _mb else '#8b6f47'
+            _vc2 = '#34d399' if _ma >= _mb else '#94a3b8'
             _bet_line = ""
             if _edge_a is not None:
                 _v_edge = round(_ma - _mkta, 1) if _ma >= _mb else round(_mb - _mktb, 1)
@@ -3849,7 +3851,7 @@ if _page == 'Player Comparison':
 if False:  # merged into Player Comparison
     st.markdown(
         f'<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Head to Head — {selected_season}</h2>'
-        f'<p style="color:#8b6f47;margin:4px 0 0 0">Model probability vs market implied probability</p></div>',
+        f'<p style="color:#94a3b8;margin:4px 0 0 0">Model probability vs market implied probability</p></div>',
         unsafe_allow_html=True,
     )
 
@@ -3871,7 +3873,7 @@ if False:  # merged into Player Comparison
         with _h2h_vs:
             st.markdown(
                 '<div style="display:flex;align-items:center;justify-content:center;height:100%;'
-                'padding-top:28px;font-size:28px;font-weight:900;color:#8b6f47;letter-spacing:2px">VS</div>',
+                'padding-top:28px;font-size:28px;font-weight:900;color:#94a3b8;letter-spacing:2px">VS</div>',
                 unsafe_allow_html=True,
             )
         with _h2h_c2:
@@ -3936,8 +3938,8 @@ if False:  # merged into Player Comparison
 
                 _card_a, _card_b = st.columns(2)
                 for _col, _d, _colour, _model_pct in [
-                    (_card_a, _da, '#2d5016', _ma),
-                    (_card_b, _db, '#8b6f47', _mb),
+                    (_card_a, _da, '#34d399', _ma),
+                    (_card_b, _db, '#94a3b8', _mb),
                 ]:
                     with _col:
                         floor_s = f"{_d['floor']}" if _d['floor'] is not None else "—"
@@ -3945,14 +3947,14 @@ if False:  # merged into Player Comparison
                         st.markdown(
                             f'<div style="background:#f0ece4;border:1px solid #ddd5c5;border-left:5px solid {_colour};'
                             f'border-radius:8px;padding:16px 20px;margin:4px 0;box-shadow:0 2px 8px rgba(0,0,0,0.06);">'
-                            f'<div style="font-size:10px;color:#8b6f47;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">{_d["team"]}</div>'
+                            f'<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">{_d["team"]}</div>'
                             f'<div style="font-size:22px;font-weight:800;color:#2c2c2c;margin:3px 0 12px 0;line-height:1.1">{_d["name"]}</div>'
                             f'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 14px;">'
-                            f'<div><div style="font-size:10px;color:#8b6f47;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Exp Votes</div>'
+                            f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Exp Votes</div>'
                             f'<div style="font-size:22px;font-weight:800;color:{_colour}">{_d["exp"]}</div></div>'
-                            f'<div><div style="font-size:10px;color:#8b6f47;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Floor</div>'
+                            f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Floor</div>'
                             f'<div style="font-size:22px;font-weight:800;color:{_colour}">{floor_s}</div></div>'
-                            f'<div><div style="font-size:10px;color:#8b6f47;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Ceiling</div>'
+                            f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Ceiling</div>'
                             f'<div style="font-size:22px;font-weight:800;color:{_colour}">{ceil_s}</div></div>'
                             f'</div></div>',
                             unsafe_allow_html=True,
@@ -3962,9 +3964,9 @@ if False:  # merged into Player Comparison
                 st.markdown(
                     f'<div style="margin:18px 0 6px 0;display:flex;border-radius:6px;overflow:hidden;height:44px;'
                     f'box-shadow:0 1px 4px rgba(0,0,0,0.10);">'
-                    f'<div style="width:{_ma}%;background:#2d5016;display:flex;align-items:center;justify-content:center;">'
+                    f'<div style="width:{_ma}%;background:#34d399;display:flex;align-items:center;justify-content:center;">'
                     f'<span style="color:#fff;font-weight:800;font-size:17px">{_ma}%</span></div>'
-                    f'<div style="width:{_mb}%;background:#8b6f47;display:flex;align-items:center;justify-content:center;">'
+                    f'<div style="width:{_mb}%;background:#94a3b8;display:flex;align-items:center;justify-content:center;">'
                     f'<span style="color:#fff;font-weight:800;font-size:17px">{_mb}%</span></div>'
                     f'</div>'
                     f'<div style="display:flex;justify-content:space-between;font-size:12px;color:#6c6c6c;margin-bottom:4px;">'
@@ -4001,7 +4003,7 @@ if False:  # merged into Player Comparison
                     _edge_val = round(_ma - _mkta, 1) if _ma >= _mb else round(_mb - _mktb, 1)
                     if _edge_val > 5:
                         _edge_bg    = '#eaf2e8'
-                        _edge_bord  = '#2d5016'
+                        _edge_bord  = '#34d399'
                         _edge_label = 'MODEL EDGE'
                         _edge_msg   = (f"The model gives <strong>{_favoured}</strong> a "
                                        f"<strong>+{_edge_abs}%</strong> edge over market implied probability. "
@@ -4009,7 +4011,7 @@ if False:  # merged into Player Comparison
                                        f"Market: {_mkta if _favoured == _ha else _mktb}%")
                     elif _edge_val < -5:
                         _edge_bg    = '#f5ede3'
-                        _edge_bord  = '#8b6f47'
+                        _edge_bord  = '#94a3b8'
                         _edge_label = 'MARKET FAVOURS'
                         _mkt_fav    = _hb if _favoured == _ha else _ha
                         _edge_msg   = (f"Market prices <strong>{_mkt_fav}</strong> "
@@ -4045,20 +4047,20 @@ if False:  # merged into Player Comparison
                             _fig_h2h.add_trace(go.Scatter(
                                 x=(_hg1['Round_num'] - 1), y=_hg1['Exp_Votes'].round(1),
                                 name=_ha, mode='lines+markers',
-                                line=dict(color='#2d5016', width=2.5),
-                                marker=dict(size=7, color='#2d5016'),
+                                line=dict(color='#34d399', width=2.5),
+                                marker=dict(size=7, color='#34d399'),
                                 hovertemplate='<b>' + _ha + '</b><br>Round %{x}<br>%{y:.1f} exp votes<extra></extra>',
                             ))
                         if not _hg2.empty:
                             _fig_h2h.add_trace(go.Scatter(
                                 x=(_hg2['Round_num'] - 1), y=_hg2['Exp_Votes'].round(1),
                                 name=_hb, mode='lines+markers',
-                                line=dict(color='#8b6f47', width=2.5),
-                                marker=dict(size=7, color='#8b6f47'),
+                                line=dict(color='#94a3b8', width=2.5),
+                                marker=dict(size=7, color='#94a3b8'),
                                 hovertemplate='<b>' + _hb + '</b><br>Round %{x}<br>%{y:.1f} exp votes<extra></extra>',
                             ))
                         _fig_h2h.update_layout(
-                            plot_bgcolor='#faf7f2', paper_bgcolor='#faf7f2', font_color='#2c2c2c',
+                            plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
                             xaxis=dict(title='Round', dtick=1, gridcolor='#ede8df'),
                             yaxis=dict(title='Predicted Votes', gridcolor='#ede8df', rangemode='tozero'),
                             legend=dict(orientation='h', y=1.1, bgcolor='rgba(0,0,0,0)'),
@@ -4077,7 +4079,7 @@ if False:  # merged into Player Comparison
                 _vund_d = _db if _ma >= _mb else _da
                 _vfav_pct = _ma if _ma >= _mb else _mb
                 _vdiff_exp = round(abs(_da['exp'] - _db['exp']), 1)
-                _vc2   = '#2d5016' if _ma >= _mb else '#8b6f47'
+                _vc2   = '#34d399' if _ma >= _mb else '#94a3b8'
 
                 _bet_line = ""
                 if _edge_a is not None:
@@ -4135,7 +4137,7 @@ if _page == 'Live Tracker':
         f'<h2 style="color:#2c2c2c;margin:0">Live Tracker</h2>'
         f'<span class="{_badge_class}">{_dot_lbl}</span>'
         f'</div>'
-        f'<p style="color:#8b6f47;margin:0;font-size:13px">{_lt_sn}</p>'
+        f'<p style="color:#94a3b8;margin:0;font-size:13px">{_lt_sn}</p>'
         f'</div>',
         unsafe_allow_html=True,
     )
@@ -4147,10 +4149,10 @@ if _page == 'Live Tracker':
     with _ctrl_r:
         _lt_ts = _time.strftime("%H:%M:%S")
         st.markdown(
-            f'<p style="color:#8b6f47;font-size:12px;margin:6px 0 0 0">'
+            f'<p style="color:#94a3b8;font-size:12px;margin:6px 0 0 0">'
             f'Last fetched: {_lt_ts} &nbsp;·&nbsp; '
             f'<a href="https://www.afl.com.au/brownlow-medal/live-tracker" target="_blank" '
-            f'style="color:#2d5016">AFL.com.au tracker ↗</a></p>',
+            f'style="color:#34d399">AFL.com.au tracker ↗</a></p>',
             unsafe_allow_html=True,
         )
 
@@ -4239,7 +4241,7 @@ if _page == 'Live Tracker':
             def _lt_row_style(row):
                 base = "background-color:{bg};color:{fg};font-weight:{fw};"
                 if row["#"] == 1:
-                    return [base.format(bg="#2d5016", fg="#faf7f2", fw="700")] * len(row)
+                    return [base.format(bg="#34d399", fg="#e8f0f8", fw="700")] * len(row)
                 elif row["#"] <= 3:
                     return [base.format(bg="#e8f0dd", fg="#2c2c2c", fw="600")] * len(row)
                 return [""] * len(row)
@@ -4266,7 +4268,7 @@ if _page == 'Live Tracker':
                     )
             else:
                 st.markdown(
-                    '<div style="color:#8b6f47;font-size:13px;padding:12px 0">'
+                    '<div style="color:#94a3b8;font-size:13px;padding:12px 0">'
                     'No votes announced yet.</div>',
                     unsafe_allow_html=True,
                 )
@@ -4277,7 +4279,7 @@ if _page == 'Live Tracker':
         if _lt_top10.empty:
             _lt_top10 = _lt_df.head(10)
         _lt_colours = [
-            "#2d5016" if i == 0 else ("#6b7c3a" if i < 3 else "#8b6f47")
+            "#34d399" if i == 0 else ("#6b7c3a" if i < 3 else "#94a3b8")
             for i in range(len(_lt_top10))
         ]
         _fig_lt_bar = go.Figure(go.Bar(
@@ -4292,7 +4294,7 @@ if _page == 'Live Tracker':
         ))
         _fig_lt_bar.update_layout(
             height=340,
-            paper_bgcolor="#faf7f2", plot_bgcolor="#faf7f2",
+            paper_bgcolor="#e8f0f8", plot_bgcolor="#e8f0f8",
             margin=dict(l=0, r=40, t=10, b=10),
             xaxis=dict(showgrid=True, gridcolor="#ede8df", tickfont=dict(color="#6c6c6c")),
             yaxis=dict(tickfont=dict(color="#2c2c2c", size=12)),
@@ -4335,7 +4337,7 @@ if _page == 'Live Tracker':
                 except Exception:
                     d = 0
                 if d > 2:
-                    return ["", "", "", "", "color:#2d5016;font-weight:700"] * 1
+                    return ["", "", "", "", "color:#34d399;font-weight:700"] * 1
                 elif d < -2:
                     return ["", "", "", "", "color:#8b1a1a;font-weight:700"] * 1
                 return [""] * 5
@@ -4366,7 +4368,7 @@ if _page == 'Live Tracker':
 if _page == 'Model Comparison':
     st.markdown(
         '<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Model Comparison — 2026</h2>'
-        '<p style="color:#8b6f47;margin:4px 0 0 0">'
+        '<p style="color:#94a3b8;margin:4px 0 0 0">'
         'Cha Ching · AFL Predictor · Betfair · Wheelo · ESPN — five models, one view</p></div>',
         unsafe_allow_html=True,
     )
@@ -4565,7 +4567,7 @@ if _page == 'Model Comparison':
             with _cc:
                 if not _mdf.empty:
                     _top1 = _mdf.iloc[0]['Player']
-                    _color = "#2d5016" if _mcls == "metric-card-primary" else "#8b6f47"
+                    _color = "#34d399" if _mcls == "metric-card-primary" else "#94a3b8"
                     _chg = _rank_change_html(_mcsv, _top1) if _mcsv else ''
                     _ts = _file_ts(_mcsv) if _mcsv else ''
                 else:
@@ -4783,7 +4785,7 @@ if _page == 'Model Comparison':
                 z=_hmap_z_inv,
                 x=_hmap_models,
                 y=_hmap_players,
-                colorscale=[[0, '#f5f0e8'], [0.15, '#cfc4b0'], [0.5, '#8db86e'], [1, '#2d5016']],
+                colorscale=[[0, '#f5f0e8'], [0.15, '#cfc4b0'], [0.5, '#8db86e'], [1, '#34d399']],
                 zmin=1, zmax=float(_MC_SEN),
                 showscale=False,
                 text=_hmap_text,
@@ -4804,14 +4806,14 @@ if _page == 'Model Comparison':
                 )
 
             _fig_hmap.update_layout(
-                paper_bgcolor='#faf7f2',
-                plot_bgcolor='#faf7f2',
+                paper_bgcolor='#e8f0f8',
+                plot_bgcolor='#e8f0f8',
                 font_color='#2c2c2c',
                 height=640,
                 margin=dict(l=200, r=30, t=50, b=40),
                 xaxis=dict(
                     side='top',
-                    tickfont=dict(size=12, color='#2d5016'),
+                    tickfont=dict(size=12, color='#34d399'),
                     range=[-1, len(_hmap_models) - 0.5],
                 ),
                 yaxis=dict(autorange='reversed', tickfont=dict(size=11)),
@@ -4857,14 +4859,14 @@ if _page == 'Model Comparison':
                 text=_sc_mrg['Player'].tolist(),
                 textposition='top center',
                 textfont=dict(size=9, color='#2c2c2c'),
-                marker=dict(size=10, color='#2d5016', opacity=0.78,
-                            line=dict(color='#8b6f47', width=1.2)),
+                marker=dict(size=10, color='#34d399', opacity=0.78,
+                            line=dict(color='#94a3b8', width=1.2)),
                 name='Players',
                 hovertemplate='%{text}<br>CC Rank: %{x}<br>AFL Rank: %{y}<extra></extra>',
             ))
             _fig_sc.update_layout(
-                paper_bgcolor='#faf7f2',
-                plot_bgcolor='#faf7f2',
+                paper_bgcolor='#e8f0f8',
+                plot_bgcolor='#e8f0f8',
                 font_color='#2c2c2c',
                 height=540,
                 xaxis=dict(
@@ -4896,7 +4898,7 @@ if _page == 'Model Comparison':
 # ── Global footer ────────────────────────────────────────────
 st.markdown(
     '<div style="border-top:1px solid #ddd5c5;margin-top:40px;padding:14px 0;'
-    'color:#8b6f47;font-size:10px;letter-spacing:1.2px;text-align:center;'
+    'color:#94a3b8;font-size:10px;letter-spacing:1.2px;text-align:center;'
     'text-transform:uppercase;font-weight:600;">'
     f'Model v4.0 &nbsp;&nbsp;·&nbsp;&nbsp; Data: {_TRAIN_MIN}–{_TRAIN_MAX} &nbsp;&nbsp;·&nbsp;&nbsp; 93 features &nbsp;&nbsp;·&nbsp;&nbsp; MAE 0.0904'
     '</div>',
