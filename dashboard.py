@@ -2432,13 +2432,12 @@ if _page == 'Game Analysis':
 
             def _style_game_table(df, winner_team=None):
                 max_p3v = df['P(3v) %'].max() if len(df) > 0 and df['P(3v) %'].max() > 0 else 1.0
-                # Gold / silver / bronze for top 3 Rank cells
+                max_votes = df['Votes (exp)'].max() if len(df) > 0 and df['Votes (exp)'].max() > 0 else 3.0
                 _rank_badge = {
                     0: 'background-color:#c9a84c!important;color:#fff!important;font-weight:800!important;',
                     1: 'background-color:#9ea7ad!important;color:#fff!important;font-weight:700!important;',
                     2: 'background-color:#9a6b3c!important;color:#fff!important;font-weight:700!important;',
                 }
-                # Soft tint for top-3 rows
                 _top3_row = {
                     0: 'background-color:rgba(201,168,76,0.14)!important;font-weight:700!important;',
                     1: 'background-color:rgba(158,167,173,0.14)!important;font-weight:700!important;',
@@ -2448,16 +2447,13 @@ if _page == 'Game Analysis':
                     i = row.name
                     team = str(row.get('Team', ''))
                     is_winner = bool(winner_team and team == winner_team)
-                    # Determine row base style
                     if i in _top3_row:
                         base = _top3_row[i]
                     elif is_winner:
-                        # Winning team: soft green tint, alternating
                         base = ('background-color:#edf4ea!important;'
                                 if i % 2 == 0 else
-                                'background-color:#f0f5ee!important;')
+                                'background-color:#e6f0e3!important;')
                     else:
-                        # Losing team / no result: stronger alternating contrast
                         base = ('background-color:#f5f0e8!important;'
                                 if i % 2 == 0 else
                                 'background-color:#ffffff!important;')
@@ -2465,15 +2461,22 @@ if _page == 'Game Analysis':
                     for col in df.columns:
                         if col == 'Rank' and i in _rank_badge:
                             result.append(_rank_badge[i])
+                        elif col == 'Votes (exp)':
+                            v = row[col]
+                            norm = min(v / 3.0, 1.0) if v > 0 else 0.0
+                            r = int(250 - norm * 105)
+                            g = int(250 - norm * 80)
+                            b = int(250 - norm * 228)
+                            result.append(f'background-color:rgb({r},{g},{b})!important;color:#2c2c2c!important;font-weight:{"700" if norm > 0.6 else "400"}!important;')
                         elif col == 'P(3v) %' and i >= 3:
                             v = row[col]
                             norm = v / max_p3v if max_p3v > 0 else 0.0
                             a = 0.07 + norm * 0.40
-                            result.append(f'background-color:rgba(45,80,22,{a:.2f})!important;')
+                            result.append(f'background-color:rgba(45,80,22,{a:.2f})!important;color:#2c2c2c!important;')
                         else:
-                            result.append(base)
+                            result.append(base + 'color:#2c2c2c!important;')
                     return result
-                return df.style.apply(_cell, axis=1).set_properties(**{'color': '#2c2c2c', 'background-color': '#ffffff'})
+                return df.style.apply(_cell, axis=1)
 
             game_order = rnd.drop_duplicates('Match')[['Match', 'Home.team', 'Away.team', 'Home.score', 'Away.score']].reset_index(drop=True)
             col_cfg = {
