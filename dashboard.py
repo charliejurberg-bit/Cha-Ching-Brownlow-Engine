@@ -2473,7 +2473,7 @@ if _page == 'Game Analysis':
                         else:
                             result.append(base)
                     return result
-                return df.style.apply(_cell, axis=1)
+                return df.style.apply(_cell, axis=1).set_properties(**{'color': '#2c2c2c', 'background-color': '#ffffff'})
 
             game_order = rnd.drop_duplicates('Match')[['Match', 'Home.team', 'Away.team', 'Home.score', 'Away.score']].reset_index(drop=True)
             col_cfg = {
