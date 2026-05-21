@@ -757,6 +757,13 @@ st.markdown("""
         font-weight: 800 !important;
     }
 
+    [data-testid="stDataFrame"] {
+        background-color: transparent !important;
+    }
+    [data-testid="stDataFrame"] div {
+        background-color: transparent !important;
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
