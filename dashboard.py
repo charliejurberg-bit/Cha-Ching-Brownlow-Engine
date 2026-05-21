@@ -2467,7 +2467,8 @@ if _page == 'Game Analysis':
                             r = int(250 - norm * 105)
                             g = int(250 - norm * 80)
                             b = int(250 - norm * 228)
-                            result.append(f'background-color:rgb({r},{g},{b})!important;color:#2c2c2c!important;font-weight:{"700" if norm > 0.6 else "400"}!important;')
+                            fw = '700' if norm > 0.6 else '400'
+                            result.append(f'background-color:rgb({r},{g},{b})!important;color:#2c2c2c!important;font-weight:{fw}!important;')
                         elif col == 'P(3v) %' and i >= 3:
                             v = row[col]
                             norm = v / max_p3v if max_p3v > 0 else 0.0
