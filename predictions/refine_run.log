@@ -1,0 +1,78 @@
+Loading data...
+  Stats: 101,476 rows | Coaches: 14,955 rows
+  Wheelo: 104,696 rows
+
+Cleaning data...
+  Filtered finals: 101,476 -> 97,030 rows (4,446 removed)
+Merging coaches votes...
+Merging Wheelo data...
+  Wheelo features: 20
+Building static relative features...
+
+Dataset: 97,069 rows | 84 static + 6 impact features
+Time decay: 0.85
+
+Refined coefficient ranges:
+  Contested_Possessions    : [1.4250, 4.2750]  (best=2.85)
+  Hit_Outs                 : [0.7550, 2.2650]  (best=1.51)
+  Marks                    : [1.7500, 5.2500]  (best=3.5)
+  Marks_Inside_50          : [1.9050, 5.7150]  (best=3.81)
+  Score_Involvements       : [0.8250, 2.4750]  (best=1.65)
+  Tackles                  : [1.4650, 4.3950]  (best=2.93)
+
+Other stats: coefficient range [0.5, 4.0]
+
+Resuming: 69 results already saved
+
+Searching 300 combinations...
+  [ 70/300] MAE 0.0916  0.593*Clearances + 0.604*Contested_Marks + 1.977*Disposals + 2.775*Goals + 0.804*Inside_50s + 3.519*Marks + 3.981*Marks_Inside_50 + 2.106*Tackles + 1.196*Uncontested_Possessions
+  [ 71/300] MAE 0.0912  1.979*Contested_Marks + 2.039*Contested_Possessions + 1.473*Disposals + 2.309*Marks + 3.702*Tackles
+  [ 72/300] MAE 0.0913  3.466*Clearances + 3.146*Contested_Possessions + 3.325*Inside_50s + 3.054*Rebounds
+  [ 73/300] MAE 0.0912  0.779*Clangers + 0.66*Clearances + 1.298*Contested_Marks + 3.433*Contested_Possessions + 1.513*Goal_Assists + 2.521*Inside_50s + 1.315*One_Percenters + 0.854*Rebounds
+  [ 74/300] MAE 0.0913  2.369*Inside_50s + 4.096*Marks + 2.177*Marks_Inside_50 + 2.892*Rebounds + 3.325*Tackles + 2.956*Uncontested_Possessions
+  [ 75/300] MAE 0.0913  0.696*Clangers + 2.349*Contested_Possessions + 3.189*Goal_Assists + 2.519*Marks + 2.909*Rebounds
+  [ 76/300] MAE 0.0911  3.701*Clangers + 2.733*Contested_Possessions + 1.427*Goal_Assists + 1.885*Goals + 2.465*Inside_50s + 1.898*Kicks + 5.326*Marks_Inside_50 + 1.42*One_Percenters + 2.546*Rebounds + 2.188*Tackles
+  [ 77/300] MAE 0.0907  2.628*Contested_Possessions + 0.665*Goal_Assists + 3.272*Goals + 4.296*Marks_Inside_50 + 1.006*Score_Involvements
+  [ 78/300] MAE 0.0907  2.881*Contested_Marks + 2.142*Contested_Possessions + 5.049*Marks + 3.086*Tackles
+  [ 79/300] MAE 0.0908  0.511*Clangers + 1.054*Contested_Marks + 3.027*Goals + 2.325*Tackles
+  [ 80/300] MAE 0.0909  2.356*Clangers + 2.631*Contested_Marks + 2.349*Contested_Possessions + 0.502*Goal_Assists + 3.225*Goals + 1.818*Marks + 3.169*Rebounds + 1.077*Score_Involvements + 3.045*Tackles
+  [ 81/300] MAE 0.0911  0.742*Goals + 3.162*Inside_50s + 2.201*Kicks + 2.394*Marks_Inside_50 + 0.8*One_Percenters + 3.709*Tackles
+  [ 82/300] MAE 0.0917  3.143*Contested_Marks + 2.851*Handballs + 1.832*Hit_Outs + 4.533*Marks_Inside_50 + 1.896*One_Percenters + 3.751*Rebounds + 4.291*Tackles
+  [ 83/300] MAE 0.0907  2.56*Goals + 1.824*Hit_Outs + 0.525*Inside_50s + 1.974*Marks + 0.86*Score_Involvements + 3.088*Tackles
+  [ 84/300] MAE 0.0912  2.3*Clearances + 1.475*Goals + 1.488*Hit_Outs + 1.656*Kicks
+  [ 85/300] MAE 0.0915  2.597*Contested_Possessions + 0.83*Goal_Assists + 2.787*Handballs + 2.762*Inside_50s + 1.74*Kicks + 1.94*Marks + 4.416*Marks_Inside_50 + 2.25*Score_Involvements
+  [ 86/300] MAE 0.0907  2.377*Clangers + 1.971*Contested_Possessions + 0.991*Inside_50s + 2.604*Marks_Inside_50
+  [ 87/300] MAE 0.0911  3.997*Clearances + 3.47*Contested_Marks + 4.187*Contested_Possessions + 1.082*Goals + 2.154*Hit_Outs + 0.677*Kicks + 4.676*Marks
+  [ 88/300] MAE 0.0914  2.938*Clearances + 4.066*Contested_Possessions + 1.498*Disposals + 1.866*Handballs + 4.498*Marks + 1.913*Marks_Inside_50 + 2.03*Score_Involvements
+  [ 89/300] MAE 0.0908  1.15*Contested_Marks + 3.863*Disposals + 2.545*Goal_Assists + 2.26*Inside_50s + 2.301*Marks + 2.123*Marks_Inside_50 + 0.78*One_Percenters + 2.232*Score_Involvements + 3.657*Tackles + 2.583*Uncontested_Possessions
+  [ 90/300] MAE 0.0909  2.62*Contested_Possessions + 1.885*Disposals + 1.836*Hit_Outs + 2.543*Inside_50s + 2.668*Kicks + 3.58*Marks + 2.683*Marks_Inside_50 + 3.771*One_Percenters + 1.335*Uncontested_Possessions
+  [ 91/300] MAE 0.0912  0.756*Clangers + 2.181*Contested_Possessions + 3.583*Disposals + 3.766*Goals + 3.577*Kicks + 5.236*Marks + 3.995*One_Percenters + 1.177*Score_Involvements + 2.548*Tackles
+  [ 92/300] MAE 0.0915  3.573*Clangers + 0.863*Disposals + 1.154*Hit_Outs + 3.691*Marks + 3.761*One_Percenters
+  [ 93/300] MAE 0.0906  1.213*Contested_Marks + 3.012*Goal_Assists + 1.871*Score_Involvements + 3.237*Tackles
+  [ 94/300] MAE 0.0907  1.468*Contested_Marks + 2.73*Disposals + 1.919*Hit_Outs + 1.762*Marks + 3.519*Marks_Inside_50 + 0.977*Score_Involvements
+  [ 95/300] MAE 0.0910  2.41*Contested_Marks + 3.421*Disposals + 2.539*Goals + 2.12*Hit_Outs + 4.841*Marks + 0.763*Rebounds
+  [ 96/300] MAE 0.0911  3.286*Goal_Assists + 3.512*Goals + 2.112*Hit_Outs + 1.235*Rebounds + 2.308*Score_Involvements
+  [ 97/300] MAE 0.0908  2.061*Hit_Outs + 1.041*Inside_50s + 3.917*One_Percenters + 2.163*Score_Involvements + 3.755*Uncontested_Possessions
+  [ 98/300] MAE 0.0912  1.434*Clangers + 3.669*Contested_Possessions + 3.524*Disposals + 0.878*Handballs + 4.803*Marks + 5.176*Marks_Inside_50 + 3.338*Rebounds
+  [ 99/300] MAE 0.0911  1.176*Goal_Assists + 3.284*Handballs + 1.251*Hit_Outs + 2.547*Marks + 0.583*Uncontested_Possessions
+  [100/300] MAE 0.0904  3.869*Clangers + 0.904*Clearances + 3.896*Contested_Marks + 2.622*Disposals + 0.879*Handballs + 1.855*Hit_Outs + 3.271*Marks + 1.598*Rebounds + 1.263*Score_Involvements + 1.125*Uncontested_Possessions
+  [101/300] MAE 0.0910  3.724*Contested_Possessions + 3.08*Disposals + 3.791*Goal_Assists + 2.904*Handballs + 2.188*Hit_Outs + 2.32*Inside_50s + 3.548*Marks_Inside_50 + 1.19*Uncontested_Possessions
+  [102/300] MAE 0.0913  1.929*Clangers + 0.946*Contested_Marks + 1.972*Goal_Assists + 1.908*Inside_50s + 1.535*One_Percenters + 4.22*Tackles
+  [103/300] MAE 0.0911  2.127*Contested_Marks + 3.291*Contested_Possessions + 1.248*Disposals + 2.156*Goal_Assists + 1.423*Hit_Outs + 3.286*Inside_50s + 2.53*One_Percenters + 2.005*Rebounds + 3.654*Uncontested_Possessions
+  [104/300] MAE 0.0906  1.586*Clangers + 3.832*Clearances + 3.323*Goals + 0.978*Hit_Outs + 1.322*One_Percenters
+  [105/300] MAE 0.0907  1.181*Clearances + 1.951*Kicks + 4.304*Marks_Inside_50 + 3.505*Tackles
+  [106/300] MAE 0.0914  2.936*Clangers + 3.643*Contested_Possessions + 2.451*Disposals + 3.314*Goal_Assists + 3.711*Goals + 1.266*Kicks + 2.126*Uncontested_Possessions
+  [107/300] MAE 0.0912  3.143*Clangers + 2.456*Goal_Assists + 3.609*Marks + 2.395*Tackles
+  [108/300] MAE 0.0910  3.222*Clearances + 1.89*Hit_Outs + 1.337*Kicks + 4.69*Marks + 2.962*Marks_Inside_50 + 1.568*Score_Involvements + 2.196*Uncontested_Possessions
+  [109/300] MAE 0.0911  0.782*Clearances + 1.658*Contested_Marks + 1.035*Goal_Assists + 1.381*Hit_Outs + 1.841*Kicks + 1.028*One_Percenters + 1.249*Rebounds
+  [110/300] MAE 0.0909  0.568*Goals + 3.582*Handballs + 2.184*Hit_Outs + 5.05*Marks + 3.722*Marks_Inside_50 + 1.545*One_Percenters + 3.152*Tackles
+  [111/300] MAE 0.0905  1.078*Goal_Assists + 2.136*Handballs + 0.799*Hit_Outs + 1.915*Inside_50s + 1.676*Kicks + 4.493*Marks_Inside_50 + 1.036*Score_Involvements
+  [112/300] MAE 0.0910  1.241*Clangers + 2.741*Contested_Possessions + 0.975*Disposals + 3.164*Goals + 3.077*Marks + 0.676*One_Percenters + 1.364*Score_Involvements + 3.348*Tackles
+  [113/300] MAE 0.0913  3.122*Contested_Marks + 0.641*Disposals + 0.74*Goals + 0.834*Hit_Outs + 3.85*Kicks + 1.195*Score_Involvements + 4.254*Tackles
+  [114/300] MAE 0.0911  2.843*Disposals + 0.942*Handballs + 1.033*Kicks + 2.474*One_Percenters
+  [115/300] MAE 0.0915  3.368*Clearances + 3.118*Contested_Marks + 3.875*Marks + 3.877*One_Percenters + 0.901*Uncontested_Possessions
+  [116/300] MAE 0.0912  3.112*Contested_Possessions + 3.795*Disposals + 3.407*Handballs + 1.194*One_Percenters
+  [117/300] MAE 0.0909  2.481*Contested_Possessions + 3.239*Inside_50s + 1.715*One_Percenters + 1.66*Score_Involvements + 2.72*Tackles
+  [118/300] MAE 0.0911  2.725*Disposals + 2.024*Goals + 3.068*Handballs + 2.006*Hit_Outs + 4.6*Marks_Inside_50 + 3.879*Rebounds
+  [119/300] MAE 0.0913  3.771*Handballs + 1.176*Hit_Outs + 2.609*Marks + 3.133*Marks_Inside_50 + 3.201*Tackles + 2.078*Uncontested_Possessions
+  [120/300] MAE 0.0908  3.581*Clangers + 3.818*Clearances + 2.395*Contested_Possessions + 2.954*Disposals + 0.884*Hit_Outs + 3.02*Inside_50s + 1.467*Kicks + 4.542*Marks + 0.536*Rebounds + 1.631*Score_Involvements

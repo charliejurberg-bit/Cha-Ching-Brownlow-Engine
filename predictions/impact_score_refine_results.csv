@@ -1,0 +1,121 @@
+trial,n_stats,mae,formula,coef_Disposals,coef_Goals,coef_Clearances,coef_Inside_50s,coef_Goal_Assists,coef_Rebounds,coef_Handballs,coef_Kicks,coef_Contested_Marks,coef_One_Percenters,coef_Clangers,coef_Uncontested_Possessions,coef_Contested_Possessions,coef_Hit_Outs,coef_Marks,coef_Marks_Inside_50,coef_Score_Involvements,coef_Tackles
+1,9,0.091597,0.593*Clearances + 0.604*Contested_Marks + 1.977*Disposals + 2.775*Goals + 0.804*Inside_50s + 3.519*Marks + 3.981*Marks_Inside_50 + 2.106*Tackles + 1.196*Uncontested_Possessions,1.977,2.775,0.593,0.804,,,,,0.604,,,1.196,,,3.519,3.981,,2.106
+2,5,0.091212,1.979*Contested_Marks + 2.039*Contested_Possessions + 1.473*Disposals + 2.309*Marks + 3.702*Tackles,1.473,,,,,,,,1.979,,,,2.039,,2.309,,,3.702
+3,4,0.09128,3.466*Clearances + 3.146*Contested_Possessions + 3.325*Inside_50s + 3.054*Rebounds,,,3.466,3.325,,3.054,,,,,,,3.146,,,,,
+4,8,0.091244,0.779*Clangers + 0.66*Clearances + 1.298*Contested_Marks + 3.433*Contested_Possessions + 1.513*Goal_Assists + 2.521*Inside_50s + 1.315*One_Percenters + 0.854*Rebounds,,,0.66,2.521,1.513,0.854,,,1.298,1.315,0.779,,3.433,,,,,
+5,6,0.091265,2.369*Inside_50s + 4.096*Marks + 2.177*Marks_Inside_50 + 2.892*Rebounds + 3.325*Tackles + 2.956*Uncontested_Possessions,,,,2.369,,2.892,,,,,,2.956,,,4.096,2.177,,3.325
+6,5,0.091272,0.696*Clangers + 2.349*Contested_Possessions + 3.189*Goal_Assists + 2.519*Marks + 2.909*Rebounds,,,,,3.189,2.909,,,,,0.696,,2.349,,2.519,,,
+7,10,0.091097,3.701*Clangers + 2.733*Contested_Possessions + 1.427*Goal_Assists + 1.885*Goals + 2.465*Inside_50s + 1.898*Kicks + 5.326*Marks_Inside_50 + 1.42*One_Percenters + 2.546*Rebounds + 2.188*Tackles,,1.885,,2.465,1.427,2.546,,1.898,,1.42,3.701,,2.733,,,5.326,,2.188
+8,5,0.090714,2.628*Contested_Possessions + 0.665*Goal_Assists + 3.272*Goals + 4.296*Marks_Inside_50 + 1.006*Score_Involvements,,3.272,,,0.665,,,,,,,,2.628,,,4.296,1.006,
+9,4,0.090682,2.881*Contested_Marks + 2.142*Contested_Possessions + 5.049*Marks + 3.086*Tackles,,,,,,,,,2.881,,,,2.142,,5.049,,,3.086
+10,4,0.090827,0.511*Clangers + 1.054*Contested_Marks + 3.027*Goals + 2.325*Tackles,,3.027,,,,,,,1.054,,0.511,,,,,,,2.325
+11,9,0.090867,2.356*Clangers + 2.631*Contested_Marks + 2.349*Contested_Possessions + 0.502*Goal_Assists + 3.225*Goals + 1.818*Marks + 3.169*Rebounds + 1.077*Score_Involvements + 3.045*Tackles,,3.225,,,0.502,3.169,,,2.631,,2.356,,2.349,,1.818,,1.077,3.045
+12,6,0.091093,0.742*Goals + 3.162*Inside_50s + 2.201*Kicks + 2.394*Marks_Inside_50 + 0.8*One_Percenters + 3.709*Tackles,,0.742,,3.162,,,,2.201,,0.8,,,,,,2.394,,3.709
+13,7,0.09172,3.143*Contested_Marks + 2.851*Handballs + 1.832*Hit_Outs + 4.533*Marks_Inside_50 + 1.896*One_Percenters + 3.751*Rebounds + 4.291*Tackles,,,,,,3.751,2.851,,3.143,1.896,,,,1.832,,4.533,,4.291
+14,6,0.090669,2.56*Goals + 1.824*Hit_Outs + 0.525*Inside_50s + 1.974*Marks + 0.86*Score_Involvements + 3.088*Tackles,,2.56,,0.525,,,,,,,,,,1.824,1.974,,0.86,3.088
+15,4,0.091211,2.3*Clearances + 1.475*Goals + 1.488*Hit_Outs + 1.656*Kicks,,1.475,2.3,,,,,1.656,,,,,,1.488,,,,
+16,8,0.09152,2.597*Contested_Possessions + 0.83*Goal_Assists + 2.787*Handballs + 2.762*Inside_50s + 1.74*Kicks + 1.94*Marks + 4.416*Marks_Inside_50 + 2.25*Score_Involvements,,,,2.762,0.83,,2.787,1.74,,,,,2.597,,1.94,4.416,2.25,
+17,4,0.090691,2.377*Clangers + 1.971*Contested_Possessions + 0.991*Inside_50s + 2.604*Marks_Inside_50,,,,0.991,,,,,,,2.377,,1.971,,,2.604,,
+18,7,0.091068,3.997*Clearances + 3.47*Contested_Marks + 4.187*Contested_Possessions + 1.082*Goals + 2.154*Hit_Outs + 0.677*Kicks + 4.676*Marks,,1.082,3.997,,,,,0.677,3.47,,,,4.187,2.154,4.676,,,
+19,7,0.09138,2.938*Clearances + 4.066*Contested_Possessions + 1.498*Disposals + 1.866*Handballs + 4.498*Marks + 1.913*Marks_Inside_50 + 2.03*Score_Involvements,1.498,,2.938,,,,1.866,,,,,,4.066,,4.498,1.913,2.03,
+20,10,0.090845,1.15*Contested_Marks + 3.863*Disposals + 2.545*Goal_Assists + 2.26*Inside_50s + 2.301*Marks + 2.123*Marks_Inside_50 + 0.78*One_Percenters + 2.232*Score_Involvements + 3.657*Tackles + 2.583*Uncontested_Possessions,3.863,,,2.26,2.545,,,,1.15,0.78,,2.583,,,2.301,2.123,2.232,3.657
+21,9,0.090853,2.62*Contested_Possessions + 1.885*Disposals + 1.836*Hit_Outs + 2.543*Inside_50s + 2.668*Kicks + 3.58*Marks + 2.683*Marks_Inside_50 + 3.771*One_Percenters + 1.335*Uncontested_Possessions,1.885,,,2.543,,,,2.668,,3.771,,1.335,2.62,1.836,3.58,2.683,,
+22,9,0.091228,0.756*Clangers + 2.181*Contested_Possessions + 3.583*Disposals + 3.766*Goals + 3.577*Kicks + 5.236*Marks + 3.995*One_Percenters + 1.177*Score_Involvements + 2.548*Tackles,3.583,3.766,,,,,,3.577,,3.995,0.756,,2.181,,5.236,,1.177,2.548
+23,5,0.091451,3.573*Clangers + 0.863*Disposals + 1.154*Hit_Outs + 3.691*Marks + 3.761*One_Percenters,0.863,,,,,,,,,3.761,3.573,,,1.154,3.691,,,
+24,4,0.090588,1.213*Contested_Marks + 3.012*Goal_Assists + 1.871*Score_Involvements + 3.237*Tackles,,,,,3.012,,,,1.213,,,,,,,,1.871,3.237
+25,6,0.090661,1.468*Contested_Marks + 2.73*Disposals + 1.919*Hit_Outs + 1.762*Marks + 3.519*Marks_Inside_50 + 0.977*Score_Involvements,2.73,,,,,,,,1.468,,,,,1.919,1.762,3.519,0.977,
+26,6,0.091033,2.41*Contested_Marks + 3.421*Disposals + 2.539*Goals + 2.12*Hit_Outs + 4.841*Marks + 0.763*Rebounds,3.421,2.539,,,,0.763,,,2.41,,,,,2.12,4.841,,,
+27,5,0.091093,3.286*Goal_Assists + 3.512*Goals + 2.112*Hit_Outs + 1.235*Rebounds + 2.308*Score_Involvements,,3.512,,,3.286,1.235,,,,,,,,2.112,,,2.308,
+28,5,0.090807,2.061*Hit_Outs + 1.041*Inside_50s + 3.917*One_Percenters + 2.163*Score_Involvements + 3.755*Uncontested_Possessions,,,,1.041,,,,,,3.917,,3.755,,2.061,,,2.163,
+29,9,0.091597,0.593*Clearances + 0.604*Contested_Marks + 1.977*Disposals + 2.775*Goals + 0.804*Inside_50s + 3.519*Marks + 3.981*Marks_Inside_50 + 2.106*Tackles + 1.196*Uncontested_Possessions,1.977,2.775,0.593,0.804,,,,,0.604,,,1.196,,,3.519,3.981,,2.106
+30,5,0.091212,1.979*Contested_Marks + 2.039*Contested_Possessions + 1.473*Disposals + 2.309*Marks + 3.702*Tackles,1.473,,,,,,,,1.979,,,,2.039,,2.309,,,3.702
+31,4,0.09128,3.466*Clearances + 3.146*Contested_Possessions + 3.325*Inside_50s + 3.054*Rebounds,,,3.466,3.325,,3.054,,,,,,,3.146,,,,,
+32,8,0.091244,0.779*Clangers + 0.66*Clearances + 1.298*Contested_Marks + 3.433*Contested_Possessions + 1.513*Goal_Assists + 2.521*Inside_50s + 1.315*One_Percenters + 0.854*Rebounds,,,0.66,2.521,1.513,0.854,,,1.298,1.315,0.779,,3.433,,,,,
+33,6,0.091265,2.369*Inside_50s + 4.096*Marks + 2.177*Marks_Inside_50 + 2.892*Rebounds + 3.325*Tackles + 2.956*Uncontested_Possessions,,,,2.369,,2.892,,,,,,2.956,,,4.096,2.177,,3.325
+34,5,0.091272,0.696*Clangers + 2.349*Contested_Possessions + 3.189*Goal_Assists + 2.519*Marks + 2.909*Rebounds,,,,,3.189,2.909,,,,,0.696,,2.349,,2.519,,,
+35,10,0.091097,3.701*Clangers + 2.733*Contested_Possessions + 1.427*Goal_Assists + 1.885*Goals + 2.465*Inside_50s + 1.898*Kicks + 5.326*Marks_Inside_50 + 1.42*One_Percenters + 2.546*Rebounds + 2.188*Tackles,,1.885,,2.465,1.427,2.546,,1.898,,1.42,3.701,,2.733,,,5.326,,2.188
+36,5,0.090714,2.628*Contested_Possessions + 0.665*Goal_Assists + 3.272*Goals + 4.296*Marks_Inside_50 + 1.006*Score_Involvements,,3.272,,,0.665,,,,,,,,2.628,,,4.296,1.006,
+37,4,0.090682,2.881*Contested_Marks + 2.142*Contested_Possessions + 5.049*Marks + 3.086*Tackles,,,,,,,,,2.881,,,,2.142,,5.049,,,3.086
+38,4,0.090827,0.511*Clangers + 1.054*Contested_Marks + 3.027*Goals + 2.325*Tackles,,3.027,,,,,,,1.054,,0.511,,,,,,,2.325
+39,9,0.090867,2.356*Clangers + 2.631*Contested_Marks + 2.349*Contested_Possessions + 0.502*Goal_Assists + 3.225*Goals + 1.818*Marks + 3.169*Rebounds + 1.077*Score_Involvements + 3.045*Tackles,,3.225,,,0.502,3.169,,,2.631,,2.356,,2.349,,1.818,,1.077,3.045
+40,6,0.091093,0.742*Goals + 3.162*Inside_50s + 2.201*Kicks + 2.394*Marks_Inside_50 + 0.8*One_Percenters + 3.709*Tackles,,0.742,,3.162,,,,2.201,,0.8,,,,,,2.394,,3.709
+41,7,0.09172,3.143*Contested_Marks + 2.851*Handballs + 1.832*Hit_Outs + 4.533*Marks_Inside_50 + 1.896*One_Percenters + 3.751*Rebounds + 4.291*Tackles,,,,,,3.751,2.851,,3.143,1.896,,,,1.832,,4.533,,4.291
+42,6,0.090669,2.56*Goals + 1.824*Hit_Outs + 0.525*Inside_50s + 1.974*Marks + 0.86*Score_Involvements + 3.088*Tackles,,2.56,,0.525,,,,,,,,,,1.824,1.974,,0.86,3.088
+43,4,0.091211,2.3*Clearances + 1.475*Goals + 1.488*Hit_Outs + 1.656*Kicks,,1.475,2.3,,,,,1.656,,,,,,1.488,,,,
+44,8,0.09152,2.597*Contested_Possessions + 0.83*Goal_Assists + 2.787*Handballs + 2.762*Inside_50s + 1.74*Kicks + 1.94*Marks + 4.416*Marks_Inside_50 + 2.25*Score_Involvements,,,,2.762,0.83,,2.787,1.74,,,,,2.597,,1.94,4.416,2.25,
+45,4,0.090691,2.377*Clangers + 1.971*Contested_Possessions + 0.991*Inside_50s + 2.604*Marks_Inside_50,,,,0.991,,,,,,,2.377,,1.971,,,2.604,,
+46,7,0.091068,3.997*Clearances + 3.47*Contested_Marks + 4.187*Contested_Possessions + 1.082*Goals + 2.154*Hit_Outs + 0.677*Kicks + 4.676*Marks,,1.082,3.997,,,,,0.677,3.47,,,,4.187,2.154,4.676,,,
+47,7,0.09138,2.938*Clearances + 4.066*Contested_Possessions + 1.498*Disposals + 1.866*Handballs + 4.498*Marks + 1.913*Marks_Inside_50 + 2.03*Score_Involvements,1.498,,2.938,,,,1.866,,,,,,4.066,,4.498,1.913,2.03,
+48,10,0.090845,1.15*Contested_Marks + 3.863*Disposals + 2.545*Goal_Assists + 2.26*Inside_50s + 2.301*Marks + 2.123*Marks_Inside_50 + 0.78*One_Percenters + 2.232*Score_Involvements + 3.657*Tackles + 2.583*Uncontested_Possessions,3.863,,,2.26,2.545,,,,1.15,0.78,,2.583,,,2.301,2.123,2.232,3.657
+49,9,0.090853,2.62*Contested_Possessions + 1.885*Disposals + 1.836*Hit_Outs + 2.543*Inside_50s + 2.668*Kicks + 3.58*Marks + 2.683*Marks_Inside_50 + 3.771*One_Percenters + 1.335*Uncontested_Possessions,1.885,,,2.543,,,,2.668,,3.771,,1.335,2.62,1.836,3.58,2.683,,
+50,9,0.091228,0.756*Clangers + 2.181*Contested_Possessions + 3.583*Disposals + 3.766*Goals + 3.577*Kicks + 5.236*Marks + 3.995*One_Percenters + 1.177*Score_Involvements + 2.548*Tackles,3.583,3.766,,,,,,3.577,,3.995,0.756,,2.181,,5.236,,1.177,2.548
+51,5,0.091451,3.573*Clangers + 0.863*Disposals + 1.154*Hit_Outs + 3.691*Marks + 3.761*One_Percenters,0.863,,,,,,,,,3.761,3.573,,,1.154,3.691,,,
+52,4,0.090588,1.213*Contested_Marks + 3.012*Goal_Assists + 1.871*Score_Involvements + 3.237*Tackles,,,,,3.012,,,,1.213,,,,,,,,1.871,3.237
+53,6,0.090661,1.468*Contested_Marks + 2.73*Disposals + 1.919*Hit_Outs + 1.762*Marks + 3.519*Marks_Inside_50 + 0.977*Score_Involvements,2.73,,,,,,,,1.468,,,,,1.919,1.762,3.519,0.977,
+54,6,0.091033,2.41*Contested_Marks + 3.421*Disposals + 2.539*Goals + 2.12*Hit_Outs + 4.841*Marks + 0.763*Rebounds,3.421,2.539,,,,0.763,,,2.41,,,,,2.12,4.841,,,
+55,5,0.091093,3.286*Goal_Assists + 3.512*Goals + 2.112*Hit_Outs + 1.235*Rebounds + 2.308*Score_Involvements,,3.512,,,3.286,1.235,,,,,,,,2.112,,,2.308,
+56,5,0.090807,2.061*Hit_Outs + 1.041*Inside_50s + 3.917*One_Percenters + 2.163*Score_Involvements + 3.755*Uncontested_Possessions,,,,1.041,,,,,,3.917,,3.755,,2.061,,,2.163,
+57,7,0.091225,1.434*Clangers + 3.669*Contested_Possessions + 3.524*Disposals + 0.878*Handballs + 4.803*Marks + 5.176*Marks_Inside_50 + 3.338*Rebounds,3.524,,,,,3.338,0.878,,,,1.434,,3.669,,4.803,5.176,,
+58,5,0.091097,1.176*Goal_Assists + 3.284*Handballs + 1.251*Hit_Outs + 2.547*Marks + 0.583*Uncontested_Possessions,,,,,1.176,,3.284,,,,,0.583,,1.251,2.547,,,
+59,10,0.090433,3.869*Clangers + 0.904*Clearances + 3.896*Contested_Marks + 2.622*Disposals + 0.879*Handballs + 1.855*Hit_Outs + 3.271*Marks + 1.598*Rebounds + 1.263*Score_Involvements + 1.125*Uncontested_Possessions,2.622,,0.904,,,1.598,0.879,,3.896,,3.869,1.125,,1.855,3.271,,1.263,
+60,8,0.091014,3.724*Contested_Possessions + 3.08*Disposals + 3.791*Goal_Assists + 2.904*Handballs + 2.188*Hit_Outs + 2.32*Inside_50s + 3.548*Marks_Inside_50 + 1.19*Uncontested_Possessions,3.08,,,2.32,3.791,,2.904,,,,,1.19,3.724,2.188,,3.548,,
+61,6,0.091295,1.929*Clangers + 0.946*Contested_Marks + 1.972*Goal_Assists + 1.908*Inside_50s + 1.535*One_Percenters + 4.22*Tackles,,,,1.908,1.972,,,,0.946,1.535,1.929,,,,,,,4.22
+62,9,0.091067,2.127*Contested_Marks + 3.291*Contested_Possessions + 1.248*Disposals + 2.156*Goal_Assists + 1.423*Hit_Outs + 3.286*Inside_50s + 2.53*One_Percenters + 2.005*Rebounds + 3.654*Uncontested_Possessions,1.248,,,3.286,2.156,2.005,,,2.127,2.53,,3.654,3.291,1.423,,,,
+63,5,0.090596,1.586*Clangers + 3.832*Clearances + 3.323*Goals + 0.978*Hit_Outs + 1.322*One_Percenters,,3.323,3.832,,,,,,,1.322,1.586,,,0.978,,,,
+64,4,0.09072,1.181*Clearances + 1.951*Kicks + 4.304*Marks_Inside_50 + 3.505*Tackles,,,1.181,,,,,1.951,,,,,,,,4.304,,3.505
+65,7,0.091364,2.936*Clangers + 3.643*Contested_Possessions + 2.451*Disposals + 3.314*Goal_Assists + 3.711*Goals + 1.266*Kicks + 2.126*Uncontested_Possessions,2.451,3.711,,,3.314,,,1.266,,,2.936,2.126,3.643,,,,,
+66,4,0.091166,3.143*Clangers + 2.456*Goal_Assists + 3.609*Marks + 2.395*Tackles,,,,,2.456,,,,,,3.143,,,,3.609,,,2.395
+67,9,0.091597,0.593*Clearances + 0.604*Contested_Marks + 1.977*Disposals + 2.775*Goals + 0.804*Inside_50s + 3.519*Marks + 3.981*Marks_Inside_50 + 2.106*Tackles + 1.196*Uncontested_Possessions,1.977,2.775,0.593,0.804,,,,,0.604,,,1.196,,,3.519,3.981,,2.106
+68,5,0.091212,1.979*Contested_Marks + 2.039*Contested_Possessions + 1.473*Disposals + 2.309*Marks + 3.702*Tackles,1.473,,,,,,,,1.979,,,,2.039,,2.309,,,3.702
+69,4,0.09128,3.466*Clearances + 3.146*Contested_Possessions + 3.325*Inside_50s + 3.054*Rebounds,,,3.466,3.325,,3.054,,,,,,,3.146,,,,,
+70,9,0.091597,0.593*Clearances + 0.604*Contested_Marks + 1.977*Disposals + 2.775*Goals + 0.804*Inside_50s + 3.519*Marks + 3.981*Marks_Inside_50 + 2.106*Tackles + 1.196*Uncontested_Possessions,1.977,2.775,0.593,0.804,,,,,0.604,,,1.196,,,3.519,3.981,,2.106
+71,5,0.091212,1.979*Contested_Marks + 2.039*Contested_Possessions + 1.473*Disposals + 2.309*Marks + 3.702*Tackles,1.473,,,,,,,,1.979,,,,2.039,,2.309,,,3.702
+72,4,0.09128,3.466*Clearances + 3.146*Contested_Possessions + 3.325*Inside_50s + 3.054*Rebounds,,,3.466,3.325,,3.054,,,,,,,3.146,,,,,
+73,8,0.091244,0.779*Clangers + 0.66*Clearances + 1.298*Contested_Marks + 3.433*Contested_Possessions + 1.513*Goal_Assists + 2.521*Inside_50s + 1.315*One_Percenters + 0.854*Rebounds,,,0.66,2.521,1.513,0.854,,,1.298,1.315,0.779,,3.433,,,,,
+74,6,0.091265,2.369*Inside_50s + 4.096*Marks + 2.177*Marks_Inside_50 + 2.892*Rebounds + 3.325*Tackles + 2.956*Uncontested_Possessions,,,,2.369,,2.892,,,,,,2.956,,,4.096,2.177,,3.325
+75,5,0.091272,0.696*Clangers + 2.349*Contested_Possessions + 3.189*Goal_Assists + 2.519*Marks + 2.909*Rebounds,,,,,3.189,2.909,,,,,0.696,,2.349,,2.519,,,
+76,10,0.091097,3.701*Clangers + 2.733*Contested_Possessions + 1.427*Goal_Assists + 1.885*Goals + 2.465*Inside_50s + 1.898*Kicks + 5.326*Marks_Inside_50 + 1.42*One_Percenters + 2.546*Rebounds + 2.188*Tackles,,1.885,,2.465,1.427,2.546,,1.898,,1.42,3.701,,2.733,,,5.326,,2.188
+77,5,0.090714,2.628*Contested_Possessions + 0.665*Goal_Assists + 3.272*Goals + 4.296*Marks_Inside_50 + 1.006*Score_Involvements,,3.272,,,0.665,,,,,,,,2.628,,,4.296,1.006,
+78,4,0.090682,2.881*Contested_Marks + 2.142*Contested_Possessions + 5.049*Marks + 3.086*Tackles,,,,,,,,,2.881,,,,2.142,,5.049,,,3.086
+79,4,0.090827,0.511*Clangers + 1.054*Contested_Marks + 3.027*Goals + 2.325*Tackles,,3.027,,,,,,,1.054,,0.511,,,,,,,2.325
+80,9,0.090867,2.356*Clangers + 2.631*Contested_Marks + 2.349*Contested_Possessions + 0.502*Goal_Assists + 3.225*Goals + 1.818*Marks + 3.169*Rebounds + 1.077*Score_Involvements + 3.045*Tackles,,3.225,,,0.502,3.169,,,2.631,,2.356,,2.349,,1.818,,1.077,3.045
+81,6,0.091093,0.742*Goals + 3.162*Inside_50s + 2.201*Kicks + 2.394*Marks_Inside_50 + 0.8*One_Percenters + 3.709*Tackles,,0.742,,3.162,,,,2.201,,0.8,,,,,,2.394,,3.709
+82,7,0.09172,3.143*Contested_Marks + 2.851*Handballs + 1.832*Hit_Outs + 4.533*Marks_Inside_50 + 1.896*One_Percenters + 3.751*Rebounds + 4.291*Tackles,,,,,,3.751,2.851,,3.143,1.896,,,,1.832,,4.533,,4.291
+83,6,0.090669,2.56*Goals + 1.824*Hit_Outs + 0.525*Inside_50s + 1.974*Marks + 0.86*Score_Involvements + 3.088*Tackles,,2.56,,0.525,,,,,,,,,,1.824,1.974,,0.86,3.088
+84,4,0.091211,2.3*Clearances + 1.475*Goals + 1.488*Hit_Outs + 1.656*Kicks,,1.475,2.3,,,,,1.656,,,,,,1.488,,,,
+85,8,0.09152,2.597*Contested_Possessions + 0.83*Goal_Assists + 2.787*Handballs + 2.762*Inside_50s + 1.74*Kicks + 1.94*Marks + 4.416*Marks_Inside_50 + 2.25*Score_Involvements,,,,2.762,0.83,,2.787,1.74,,,,,2.597,,1.94,4.416,2.25,
+86,4,0.090691,2.377*Clangers + 1.971*Contested_Possessions + 0.991*Inside_50s + 2.604*Marks_Inside_50,,,,0.991,,,,,,,2.377,,1.971,,,2.604,,
+87,7,0.091068,3.997*Clearances + 3.47*Contested_Marks + 4.187*Contested_Possessions + 1.082*Goals + 2.154*Hit_Outs + 0.677*Kicks + 4.676*Marks,,1.082,3.997,,,,,0.677,3.47,,,,4.187,2.154,4.676,,,
+88,7,0.09138,2.938*Clearances + 4.066*Contested_Possessions + 1.498*Disposals + 1.866*Handballs + 4.498*Marks + 1.913*Marks_Inside_50 + 2.03*Score_Involvements,1.498,,2.938,,,,1.866,,,,,,4.066,,4.498,1.913,2.03,
+89,10,0.090845,1.15*Contested_Marks + 3.863*Disposals + 2.545*Goal_Assists + 2.26*Inside_50s + 2.301*Marks + 2.123*Marks_Inside_50 + 0.78*One_Percenters + 2.232*Score_Involvements + 3.657*Tackles + 2.583*Uncontested_Possessions,3.863,,,2.26,2.545,,,,1.15,0.78,,2.583,,,2.301,2.123,2.232,3.657
+90,9,0.090853,2.62*Contested_Possessions + 1.885*Disposals + 1.836*Hit_Outs + 2.543*Inside_50s + 2.668*Kicks + 3.58*Marks + 2.683*Marks_Inside_50 + 3.771*One_Percenters + 1.335*Uncontested_Possessions,1.885,,,2.543,,,,2.668,,3.771,,1.335,2.62,1.836,3.58,2.683,,
+91,9,0.091228,0.756*Clangers + 2.181*Contested_Possessions + 3.583*Disposals + 3.766*Goals + 3.577*Kicks + 5.236*Marks + 3.995*One_Percenters + 1.177*Score_Involvements + 2.548*Tackles,3.583,3.766,,,,,,3.577,,3.995,0.756,,2.181,,5.236,,1.177,2.548
+92,5,0.091451,3.573*Clangers + 0.863*Disposals + 1.154*Hit_Outs + 3.691*Marks + 3.761*One_Percenters,0.863,,,,,,,,,3.761,3.573,,,1.154,3.691,,,
+93,4,0.090588,1.213*Contested_Marks + 3.012*Goal_Assists + 1.871*Score_Involvements + 3.237*Tackles,,,,,3.012,,,,1.213,,,,,,,,1.871,3.237
+94,6,0.090661,1.468*Contested_Marks + 2.73*Disposals + 1.919*Hit_Outs + 1.762*Marks + 3.519*Marks_Inside_50 + 0.977*Score_Involvements,2.73,,,,,,,,1.468,,,,,1.919,1.762,3.519,0.977,
+95,6,0.091033,2.41*Contested_Marks + 3.421*Disposals + 2.539*Goals + 2.12*Hit_Outs + 4.841*Marks + 0.763*Rebounds,3.421,2.539,,,,0.763,,,2.41,,,,,2.12,4.841,,,
+96,5,0.091093,3.286*Goal_Assists + 3.512*Goals + 2.112*Hit_Outs + 1.235*Rebounds + 2.308*Score_Involvements,,3.512,,,3.286,1.235,,,,,,,,2.112,,,2.308,
+97,5,0.090807,2.061*Hit_Outs + 1.041*Inside_50s + 3.917*One_Percenters + 2.163*Score_Involvements + 3.755*Uncontested_Possessions,,,,1.041,,,,,,3.917,,3.755,,2.061,,,2.163,
+98,7,0.091225,1.434*Clangers + 3.669*Contested_Possessions + 3.524*Disposals + 0.878*Handballs + 4.803*Marks + 5.176*Marks_Inside_50 + 3.338*Rebounds,3.524,,,,,3.338,0.878,,,,1.434,,3.669,,4.803,5.176,,
+99,5,0.091097,1.176*Goal_Assists + 3.284*Handballs + 1.251*Hit_Outs + 2.547*Marks + 0.583*Uncontested_Possessions,,,,,1.176,,3.284,,,,,0.583,,1.251,2.547,,,
+100,10,0.090433,3.869*Clangers + 0.904*Clearances + 3.896*Contested_Marks + 2.622*Disposals + 0.879*Handballs + 1.855*Hit_Outs + 3.271*Marks + 1.598*Rebounds + 1.263*Score_Involvements + 1.125*Uncontested_Possessions,2.622,,0.904,,,1.598,0.879,,3.896,,3.869,1.125,,1.855,3.271,,1.263,
+101,8,0.091014,3.724*Contested_Possessions + 3.08*Disposals + 3.791*Goal_Assists + 2.904*Handballs + 2.188*Hit_Outs + 2.32*Inside_50s + 3.548*Marks_Inside_50 + 1.19*Uncontested_Possessions,3.08,,,2.32,3.791,,2.904,,,,,1.19,3.724,2.188,,3.548,,
+102,6,0.091295,1.929*Clangers + 0.946*Contested_Marks + 1.972*Goal_Assists + 1.908*Inside_50s + 1.535*One_Percenters + 4.22*Tackles,,,,1.908,1.972,,,,0.946,1.535,1.929,,,,,,,4.22
+103,9,0.091067,2.127*Contested_Marks + 3.291*Contested_Possessions + 1.248*Disposals + 2.156*Goal_Assists + 1.423*Hit_Outs + 3.286*Inside_50s + 2.53*One_Percenters + 2.005*Rebounds + 3.654*Uncontested_Possessions,1.248,,,3.286,2.156,2.005,,,2.127,2.53,,3.654,3.291,1.423,,,,
+104,5,0.090596,1.586*Clangers + 3.832*Clearances + 3.323*Goals + 0.978*Hit_Outs + 1.322*One_Percenters,,3.323,3.832,,,,,,,1.322,1.586,,,0.978,,,,
+105,4,0.09072,1.181*Clearances + 1.951*Kicks + 4.304*Marks_Inside_50 + 3.505*Tackles,,,1.181,,,,,1.951,,,,,,,,4.304,,3.505
+106,7,0.091364,2.936*Clangers + 3.643*Contested_Possessions + 2.451*Disposals + 3.314*Goal_Assists + 3.711*Goals + 1.266*Kicks + 2.126*Uncontested_Possessions,2.451,3.711,,,3.314,,,1.266,,,2.936,2.126,3.643,,,,,
+107,4,0.091166,3.143*Clangers + 2.456*Goal_Assists + 3.609*Marks + 2.395*Tackles,,,,,2.456,,,,,,3.143,,,,3.609,,,2.395
+108,7,0.091014,3.222*Clearances + 1.89*Hit_Outs + 1.337*Kicks + 4.69*Marks + 2.962*Marks_Inside_50 + 1.568*Score_Involvements + 2.196*Uncontested_Possessions,,,3.222,,,,,1.337,,,,2.196,,1.89,4.69,2.962,1.568,
+109,7,0.091056,0.782*Clearances + 1.658*Contested_Marks + 1.035*Goal_Assists + 1.381*Hit_Outs + 1.841*Kicks + 1.028*One_Percenters + 1.249*Rebounds,,,0.782,,1.035,1.249,,1.841,1.658,1.028,,,,1.381,,,,
+110,7,0.090873,0.568*Goals + 3.582*Handballs + 2.184*Hit_Outs + 5.05*Marks + 3.722*Marks_Inside_50 + 1.545*One_Percenters + 3.152*Tackles,,0.568,,,,,3.582,,,1.545,,,,2.184,5.05,3.722,,3.152
+111,7,0.090542,1.078*Goal_Assists + 2.136*Handballs + 0.799*Hit_Outs + 1.915*Inside_50s + 1.676*Kicks + 4.493*Marks_Inside_50 + 1.036*Score_Involvements,,,,1.915,1.078,,2.136,1.676,,,,,,0.799,,4.493,1.036,
+112,8,0.091021,1.241*Clangers + 2.741*Contested_Possessions + 0.975*Disposals + 3.164*Goals + 3.077*Marks + 0.676*One_Percenters + 1.364*Score_Involvements + 3.348*Tackles,0.975,3.164,,,,,,,,0.676,1.241,,2.741,,3.077,,1.364,3.348
+113,7,0.091339,3.122*Contested_Marks + 0.641*Disposals + 0.74*Goals + 0.834*Hit_Outs + 3.85*Kicks + 1.195*Score_Involvements + 4.254*Tackles,0.641,0.74,,,,,,3.85,3.122,,,,,0.834,,,1.195,4.254
+114,4,0.091132,2.843*Disposals + 0.942*Handballs + 1.033*Kicks + 2.474*One_Percenters,2.843,,,,,,0.942,1.033,,2.474,,,,,,,,
+115,5,0.09146,3.368*Clearances + 3.118*Contested_Marks + 3.875*Marks + 3.877*One_Percenters + 0.901*Uncontested_Possessions,,,3.368,,,,,,3.118,3.877,,0.901,,,3.875,,,
+116,4,0.09125,3.112*Contested_Possessions + 3.795*Disposals + 3.407*Handballs + 1.194*One_Percenters,3.795,,,,,,3.407,,,1.194,,,3.112,,,,,
+117,5,0.090891,2.481*Contested_Possessions + 3.239*Inside_50s + 1.715*One_Percenters + 1.66*Score_Involvements + 2.72*Tackles,,,,3.239,,,,,,1.715,,,2.481,,,,1.66,2.72
+118,6,0.091111,2.725*Disposals + 2.024*Goals + 3.068*Handballs + 2.006*Hit_Outs + 4.6*Marks_Inside_50 + 3.879*Rebounds,2.725,2.024,,,,3.879,3.068,,,,,,,2.006,,4.6,,
+119,6,0.091348,3.771*Handballs + 1.176*Hit_Outs + 2.609*Marks + 3.133*Marks_Inside_50 + 3.201*Tackles + 2.078*Uncontested_Possessions,,,,,,,3.771,,,,,2.078,,1.176,2.609,3.133,,3.201
+120,10,0.090785,3.581*Clangers + 3.818*Clearances + 2.395*Contested_Possessions + 2.954*Disposals + 0.884*Hit_Outs + 3.02*Inside_50s + 1.467*Kicks + 4.542*Marks + 0.536*Rebounds + 1.631*Score_Involvements,2.954,,3.818,3.02,,0.536,,1.467,,,3.581,,2.395,0.884,4.542,,1.631,

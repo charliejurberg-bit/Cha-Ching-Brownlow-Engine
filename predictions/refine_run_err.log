@@ -1,0 +1,31 @@
+Traceback (most recent call last):
+  File "C:\Users\charl\Python\brownlow_engine\impact_score_refine.py", line 317, in <module>
+    model.fit(X[train_idx], y.iloc[train_idx], sample_weight=w[train_idx],
+    ~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+              eval_set=[(X[val_idx], y.iloc[val_idx])], verbose=False)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\charl\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\xgboost\core.py", line 751, in inner_f
+    return func(**kwargs)
+  File "C:\Users\charl\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\xgboost\sklearn.py", line 1806, in fit
+    self._Booster = train(
+                    ~~~~~^
+        params,
+        ^^^^^^^
+    ...<9 lines>...
+        callbacks=self.callbacks,
+        ^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "C:\Users\charl\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\xgboost\core.py", line 751, in inner_f
+    return func(**kwargs)
+  File "C:\Users\charl\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\xgboost\training.py", line 200, in train
+    bst.update(dtrain, iteration=i, fobj=obj)
+    ~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\charl\AppData\Local\Packages\PythonSoftwareFoundation.Python.3.13_qbz5n2kfra8p0\LocalCache\local-packages\Python313\site-packages\xgboost\core.py", line 2391, in update
+    _LIB.XGBoosterUpdateOneIter(
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~^
+        self.handle, ctypes.c_int(iteration), dtrain.handle
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+KeyboardInterrupt

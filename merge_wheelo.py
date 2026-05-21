@@ -15,10 +15,11 @@ all_data = []
 print("Merging Wheelo CSVs...")
 
 # Find all wheelo CSVs
-files = glob.glob(f"{OUTPUT_DIR}/wheelo_*.csv") + \
-        glob.glob(f"{OUTPUT_DIR}/downloads/*.csv") + \
-        glob.glob(f"{OUTPUT_DIR}/*.csv")
-
+files = list(set(
+    glob.glob(f"{OUTPUT_DIR}/wheelo_*.csv") +
+    glob.glob(f"{OUTPUT_DIR}/downloads/*.csv") +
+    glob.glob(f"{OUTPUT_DIR}/*.csv")
+))
 files = [f for f in files if 'all_seasons' not in f]
 print(f"Found {len(files)} CSV files")
 

@@ -191,16 +191,26 @@ def scrape_all():
             season_rows = []
             print(f"\nSeason {season}:")
             
-            for round_num in range(1, 30):
+            # Wheelo uses Round 0 for the Opening Round (AFL seasons from 2023+),
+            # which corresponds to Round 1 in AFLTables. We scrape from Round 0
+            # and store the round as round_num+1 to align with AFLTables numbering.
+            wheelo_start = 0 if season >= 2023 else 1
+            for round_num in range(wheelo_start, 30):
                 clear_downloads()
-                
+
                 # Navigate to round
                 has_data = select_season_round(driver, season, round_num)
-                
+
                 if not has_data:
+                    if round_num == 0:
+                        print(f"  Round 0: no Opening Round data — starting from Round 1")
+                        continue
                     print(f"  Round {round_num}: no page data — stopping season")
                     break
-                
+
+                # AFLTables round number: Opening Round (Wheelo 0) → stored as Round 1
+                afltables_round = round_num + 1 if season >= 2023 else round_num
+
                 # Try download button first
                 downloaded = False
                 if click_download(driver):
@@ -209,7 +219,7 @@ def scrape_all():
                         try:
                             df = pd.read_csv(filepath)
                             df['Season'] = season
-                            df['Round'] = round_num
+                            df['Round'] = afltables_round
                             rows = df.to_dict('records')
                             season_rows.extend(rows)
                             print(f"  Round {round_num}: ✓ downloaded {len(df)} rows")
@@ -221,14 +231,16 @@ def scrape_all():
                 if not downloaded:
                     rows = parse_table_from_page(driver, season, round_num)
                     if rows:
+                        for row in rows:
+                            row['Round'] = afltables_round
                         season_rows.extend(rows)
                         print(f"  Round {round_num}: ✓ parsed {len(rows)} rows from page")
                     else:
                         print(f"  Round {round_num}: ⚠ no data")
-                        failed.append((season, round_num))
+                        failed.append((season, afltables_round))
                         # Stop if 3 consecutive empty rounds
                         if round_num >= 3:
-                            recent_failed = sum(1 for s,r in failed[-3:] if s==season and r >= round_num-2)
+                            recent_failed = sum(1 for s,r in failed[-3:] if s==season and r >= afltables_round-2)
                             if recent_failed >= 3:
                                 print(f"  3 consecutive empty rounds — moving to next season")
                                 break

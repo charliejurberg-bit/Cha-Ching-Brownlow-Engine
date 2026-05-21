@@ -1,0 +1,32 @@
+bet_id,date,match,market_type,selection,bookmaker,odds,stake,result,profit_loss,is_cha_ching,cha_ching_criteria,notes
+bee60b96,2026-05-20,,Goals O/U,Treacy 3+,Sportsbet,2.12,1.0,Loss,-1.0,True,,"2.1 in the first quarter, no shots at goal after that"
+383f0c8b,2026-03-26,Round 2 2026,Multi,Sheldrick 20+ AND McInerney 20+,TAB,1.35,2.0,Win,0.7,True,,"Miss by 1 promo on TAB, without Heeney and Gulden"
+a3b0b561,2026-03-26,Round 2 2026,Goals O/U,Thilthorpe 2+ goals,Other,1.44,2.0,Win,0.88,True,,
+88b4d7cc,2026-03-26,Round 2 2026,Disposals O/U,Harley Reid 20+,Ladbrokes,1.88,2.0,Win,1.76,True,,
+ba0a7919,2026-04-02,Round 3 2026,Disposals O/U,Sam Berry 20+,Ladbrokes,2.55,2.0,Win,3.1,True,,
+c9e77762,2026-04-02,Round 3 2026,Disposals O/U,Toby Greene 20+,Other,1.71,2.0,Win,1.42,True,,
+85f865ba,2026-04-02,Round 3 2026,Disposals O/U,Caleb Daniel under 23.5,Other,1.89,2.0,Win,1.78,True,,
+696b606c,2026-04-09,Round 4 2026,Disposals O/U,Isaac Heeney 22+,Sportsbet,1.63,2.0,Win,1.26,True,,
+5a26befe,2026-04-09,Round 4 2026,Goals O/U,Charlie Curnow 3+,Ladbrokes,1.57,2.0,Win,1.14,True,,
+cfc7c9c6,2026-04-09,Round 4 2026,Goals O/U,Aaron Naughton 3+,Bet365,1.67,2.0,Win,1.34,True,,
+797c5f3b,2026-04-17,Round 5 2026,Disposals O/U,Niel Erasmus 20+,TAB,1.58,2.0,Loss,-2.0,True,,"Miss by 1 promo on TAB, had 18"
+5b38e380,2026-04-17,Round 5 2026,Disposals O/U,Sparrow 20+,TAB,1.7,2.0,Loss,-2.0,True,,Had 18
+44f1b6ee,2026-04-17,Round 5 2026,Multi,Jeremy Cameron AND Shannon Neale combine 5+,Ladbrokes,1.46,2.0,Win,0.92,True,,
+574bc402,2026-04-24,Round 6 2026,Disposals O/U,Sam Berry 20+,Other,1.48,2.0,Win,0.96,True,,
+c2af09eb,2026-04-24,Round 6 2026,Disposals O/U,Izak Rankine 19+,Other,1.67,2.0,Win,1.34,True,,
+1d27ce47,2026-04-24,Round 6 2026,Disposals O/U,Blake Howes 13+,Pointsbet,1.59,2.0,Win,1.18,True,,
+9c41c8fe,2026-04-24,Round 6 2026,Disposals O/U,Harley Reid 20+,TAB,1.72,2.0,Win,1.44,True,,
+99b9a473,2026-05-01,Round 7 2026,Goals O/U,Charlie Curnow 3+,Other,0.0,2.0,Win,0.0,True,,
+2390e752,2026-05-01,Round 7 2026,Goals O/U,Charlie Curnow 5+,Other,4.9,0.5,Win,1.95,True,,
+76a2dc6d,2026-05-01,Round 7 2026,Disposals O/U,GRLJ 18+,Ladbrokes,1.5,2.0,Win,1.0,True,,
+b6b3997c,2026-05-01,Round 7 2026,Disposals O/U,Luke Jackson 19+,Pointsbet,1.56,2.0,Win,1.12,True,,
+8d35ef0a,2026-05-01,Round 7 2026,Disposals O/U,Elliot Yeo 19+,Sportsbet,1.61,2.0,Win,1.22,True,,
+04b81564,2026-05-01,Round 7 2026,Disposals O/U,Ben Keays 13+,Pointsbet,1.63,2.0,Win,1.26,True,,
+8502d98e,2026-05-01,Round 7 2026,Disposals O/U,Toby Greene 20+,Bet365,1.65,2.0,Win,1.3,True,,
+0bfb9c88,2026-05-01,Round 7 2026,Disposals O/U,Ben Keays 15+,Pointsbet,2.2,2.0,Win,2.4,True,,
+7650d2b3,2026-05-08,Round 8 2026,Multi,Tim Kelly 19+ AND Harley Reid 20+ AND Yeo 17+ (SGM),Sportsbet,1.8,2.0,Win,1.6,True,,
+f1b8151b,2026-05-08,Round 8 2026,Multi,Sparrow 14+ AND Kysaiah Pickett 14+ AND Connor Idun 13+,Pointsbet,1.78,2.0,Win,1.56,True,,
+794cc895,2026-05-15,Round 9 2026,Disposals O/U,Durham over 20.5,Ladbrokes,1.91,2.0,Win,1.82,True,,
+876c2bb7,2026-05-15,Round 9 2026,Goals O/U,Dan Curtin 1+,Sportsbet,1.95,2.0,Win,1.9,True,,
+8d557a62,2026-05-15,Round 9 2026,Goals O/U,Dan Curtin 2 goals,Bet365,6.25,0.5,Loss,-0.5,True,,
+76ce6bdf,2026-05-15,Round 9 2026,Multi,Sparrow 18+ AND Yeo 16+ AND W Duursma 14+,Pointsbet,1.89,2.0,Win,1.78,True,,

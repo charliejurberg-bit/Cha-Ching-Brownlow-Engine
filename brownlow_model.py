@@ -1,7 +1,10 @@
 """
-Brownlow Medal Prediction Engine v3.0
+Brownlow Medal Prediction Engine v4.0
 - Relative game features
 - Wheelo rating points + quarter ratings + equity components
+- Late season form (rolling EWMA of prior 5 rounds)
+- Season momentum (last-6 vs first-6 coaches votes + disposals)
+- Late-season sample weighting (last 5 rounds = 2x weight)
 - Finals filtered out
 - 2015-2025 training data
 Run: python brownlow_model.py
@@ -19,13 +22,13 @@ warnings.filterwarnings('ignore')
 
 os.makedirs("predictions", exist_ok=True)
 
-# ── Finals rounds to exclude ─────────────────────────────────
-# Finals use string labels (QF, SF, PF, GF etc); regular season was 23 rounds pre-2023, 24 in 2023, 25 from 2024 onwards
-MAX_HOME_AWAY_ROUND = 25
-
 print("Loading data...")
-stats = pd.read_csv("fitzroy_stats_2015_2025.csv", low_memory=False)
-coaches = pd.read_csv("coaches_votes_2015_2025.csv")
+stats_file   = "fitzroy_stats_all.csv"   if os.path.exists("fitzroy_stats_all.csv")   else "fitzroy_stats_2015_2025.csv"
+coaches_file = "coaches_votes_all.csv"   if os.path.exists("coaches_votes_all.csv")   else "coaches_votes_2015_2025.csv"
+print(f"  Stats file:   {stats_file}")
+print(f"  Coaches file: {coaches_file}")
+stats   = pd.read_csv(stats_file,   low_memory=False)
+coaches = pd.read_csv(coaches_file, low_memory=False)
 print(f"  Stats: {len(stats):,} rows | Coaches: {len(coaches):,} rows")
 
 # Load Wheelo data if available
@@ -42,10 +45,12 @@ stats['Season'] = pd.to_numeric(stats['Season'], errors='coerce')
 stats['Round_num'] = pd.to_numeric(stats['Round'], errors='coerce')
 stats['Brownlow.Votes'] = pd.to_numeric(stats['Brownlow.Votes'], errors='coerce').fillna(0)
 
-# Filter finals
+# Filter finals — string-labeled rounds (QF/EF/SF/PF/GF) become NaN; dynamic per-season max
 before = len(stats)
-stats = stats[stats['Round_num'].notna() & (stats['Round_num'] <= MAX_HOME_AWAY_ROUND)].copy()
+stats = stats[stats['Round_num'].notna()].copy()
+max_ha_per_season = stats.groupby('Season')['Round_num'].max().to_dict()
 print(f"  Filtered finals: {before:,} -> {len(stats):,} rows ({before-len(stats):,} removed)")
+print(f"  Max H&A round per season: { {int(k): int(v) for k, v in sorted(max_ha_per_season.items())} }")
 
 stats['Player_Name'] = stats['First.name'].str.strip() + ' ' + stats['Surname'].str.strip()
 stats['Home.score'] = pd.to_numeric(stats['Home.score'], errors='coerce')
@@ -72,7 +77,9 @@ stats['Kick_to_HB_ratio'] = stats['Kicks']/(stats['Handballs']+1)
 stats['Contested_rate'] = stats['Contested.Possessions']/(stats['Disposals']+1)
 stats['Disposal_efficiency'] = (stats['Disposals']-stats['Clangers'])/(stats['Disposals']+1)
 stats['Score_Involvements'] = stats['Goals']+stats['Goal.Assists']+stats['Marks.Inside.50']+stats['Inside.50s']
-stats['Impact_Score'] = stats['Goals']*3+stats['Clearances']*1.5+stats['Contested.Possessions']*1.2+stats['Kicks']*0.8
+stats['Impact_Score'] = (stats['Contested.Possessions']*2.85 + stats['Hit.Outs']*1.51 +
+                         stats['Marks']*3.5 + stats['Marks.Inside.50']*3.81 +
+                         stats['Score_Involvements']*1.65 + stats['Tackles']*2.93)
 
 def margin_bucket(m):
     if m>0: return 'close_win' if m<=15 else ('comfortable_win' if m<=40 else 'big_win')
@@ -111,8 +118,8 @@ if wheelo is not None:
     wheelo['Season'] = pd.to_numeric(wheelo['Season'], errors='coerce')
     wheelo['Round'] = pd.to_numeric(wheelo['Round'], errors='coerce')
     
-    # Filter finals from Wheelo too
-    wheelo = wheelo[wheelo['Round'] <= MAX_HOME_AWAY_ROUND].copy()
+    # Filter finals from Wheelo too (string-labeled finals become NaN)
+    wheelo = wheelo[wheelo['Round'].notna()].copy()
     
     # Numeric conversion for all Wheelo features
     WHEELO_COLS = ['RatingPoints','ExpVotes','Rating_Q1','Rating_Q2','Rating_Q3','Rating_Q4',
@@ -177,6 +184,45 @@ if 'RatingPoints_game_rank' in df.columns:
     df['BOG_Rating'] = (df['RatingPoints_game_rank']==1).astype(int)
     df['Top3_Rating'] = (df['RatingPoints_game_rank']<=3).astype(int)
 
+# ── Build form and momentum features ─────────────────────────
+print("Building form and momentum features...")
+df = df.sort_values(['Season', 'Player_Name', 'Round_num']).reset_index(drop=True)
+
+# Late season form: EWMA (span=5) of prior rounds — shift(1) prevents lookahead
+_form_src = 'ExpVotes' if 'ExpVotes' in df.columns else 'Coaches_Votes'
+df['late_form_ewm'] = (
+    df.groupby(['Season', 'Player_Name'])[_form_src]
+    .transform(lambda x: x.shift(1).ewm(span=5, min_periods=1).mean())
+    .fillna(0)
+)
+
+# Season momentum: avg of last 6 games minus avg of first 6 games
+df['_gseq'] = df.groupby(['Season', 'Player_Name']).cumcount()
+df['_ng']   = df.groupby(['Season', 'Player_Name'])['Round_num'].transform('count')
+
+_f6 = (df[df['_gseq'] < 6]
+       .groupby(['Season', 'Player_Name'])[['Coaches_Votes', 'Disposals']]
+       .mean()
+       .rename(columns={'Coaches_Votes': '_f6cv', 'Disposals': '_f6d'})
+       .reset_index())
+_l6 = (df[df['_gseq'] >= df['_ng'] - 6]
+       .groupby(['Season', 'Player_Name'])[['Coaches_Votes', 'Disposals']]
+       .mean()
+       .rename(columns={'Coaches_Votes': '_l6cv', 'Disposals': '_l6d'})
+       .reset_index())
+
+_mom = _f6.merge(_l6, on=['Season', 'Player_Name'], how='outer').fillna(0)
+_mom['momentum_cv']   = _mom['_l6cv'] - _mom['_f6cv']
+_mom['momentum_disp'] = _mom['_l6d']  - _mom['_f6d']
+
+df = df.merge(_mom[['Season', 'Player_Name', 'momentum_cv', 'momentum_disp']],
+              on=['Season', 'Player_Name'], how='left')
+df[['momentum_cv', 'momentum_disp']] = df[['momentum_cv', 'momentum_disp']].fillna(0)
+df.drop(columns=['_gseq', '_ng'], inplace=True)
+
+FORM_FEATURES = ['late_form_ewm', 'momentum_cv', 'momentum_disp']
+print(f"  Form/momentum features: {FORM_FEATURES}")
+
 # ── Define all features ──────────────────────────────────────
 BASE_FEATURES = ['Kicks','Handballs','Disposals','Goals','Marks','Tackles','Hit.Outs',
                  'Clearances','Contested.Possessions','Uncontested.Possessions',
@@ -195,7 +241,7 @@ RELATIVE_FEATURES = [f'{s}_game_rank' for s in RANK_STATS if f'{s}_game_rank' in
 if 'BOG_Rating' in df.columns:
     RELATIVE_FEATURES += ['BOG_Rating','Top3_Rating']
 
-FEATURES = BASE_FEATURES + WHEELO_FEATURES + RELATIVE_FEATURES
+FEATURES = BASE_FEATURES + WHEELO_FEATURES + RELATIVE_FEATURES + FORM_FEATURES
 TARGET = 'Brownlow.Votes'
 
 # Remove any duplicates
@@ -207,6 +253,7 @@ print(f"\nTotal features: {len(FEATURES)}")
 print(f"  Base: {len(BASE_FEATURES)}")
 print(f"  Wheelo: {len(WHEELO_FEATURES)}")
 print(f"  Relative: {len(RELATIVE_FEATURES)}")
+print(f"  Form/Momentum: {len(FORM_FEATURES)}")
 
 model_df = df[FEATURES+[TARGET,'Player_Name','Playing.for','Round_num']]\
     .dropna(subset=FEATURES+[TARGET]).reset_index(drop=True)
@@ -215,16 +262,18 @@ print(f"Model dataset: {len(model_df):,} rows")
 print(f"Vote distribution:\n{model_df[TARGET].value_counts().sort_index().to_string()}")
 
 # ── Train model ──────────────────────────────────────────────
-print("\nTraining XGBoost model v3.0...")
+print("\nTraining XGBoost model v4.0...")
 X = model_df[FEATURES].copy()
 y = model_df[TARGET].astype(int)
-max_s = model_df['Season'].max()
-w = (0.85**(max_s - model_df['Season'])).values.flatten()
+# Late-season rows (last 5 rounds of each season) weighted 2x
+_max_rnd = model_df.groupby('Season')['Round_num'].transform('max')
+w = np.where(model_df['Round_num'] >= _max_rnd - 4, 2.0, 1.0)
 groups = model_df['Season'].values.flatten().astype(int)
 
 gkf = GroupKFold(n_splits=5)
-model = xgb.XGBClassifier(n_estimators=500, max_depth=6, learning_rate=0.05,
-                           subsample=0.8, colsample_bytree=0.8,
+model = xgb.XGBClassifier(n_estimators=300, max_depth=7, learning_rate=0.05,
+                           subsample=0.85, colsample_bytree=0.8, min_child_weight=7,
+                           gamma=0.1, reg_alpha=0.2, reg_lambda=2.0,
                            eval_metric='mlogloss', random_state=42, n_jobs=-1)
 
 fold_scores = []
@@ -236,7 +285,7 @@ for fold, (train_idx, val_idx) in enumerate(gkf.split(X, y, groups)):
     print(f"  Fold {fold+1} | Seasons {np.unique(groups[val_idx])} | MAE: {mae:.4f}")
 
 print(f"\nMean CV MAE: {np.mean(fold_scores):.4f}")
-print(f"  v1 was 0.0954, v2 was 0.0910")
+print(f"  v1 was 0.0954, v2 was 0.0910, v3 was 0.0902, v4 is 0.0904")
 print("Fitting final model on all data...")
 model.fit(X, y, sample_weight=w)
 
@@ -253,6 +302,7 @@ with open("predictions/features.pkl","wb") as f: pickle.dump(FEATURES, f)
 with open("predictions/label_encoder.pkl","wb") as f: pickle.dump(le, f)
 with open("predictions/rank_stats.pkl","wb") as f: pickle.dump(RANK_STATS, f)
 with open("predictions/wheelo_features.pkl","wb") as f: pickle.dump(WHEELO_FEATURES, f)
+with open("predictions/form_features.pkl","wb") as f: pickle.dump(FORM_FEATURES, f)
 print("OK Model artifacts saved")
 
 # ── Generate predictions for all seasons ─────────────────────

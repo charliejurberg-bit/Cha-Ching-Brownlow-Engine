@@ -1,6 +1,6 @@
 """
-2026 In-Season Predictor v3.0
-Uses saved model with Wheelo features and finals filter
+2026 In-Season Predictor v4.0
+Uses saved model with Wheelo features, late-season form, and momentum features
 """
 
 import pandas as pd
@@ -13,9 +13,6 @@ warnings.filterwarnings('ignore')
 
 os.makedirs("data_2026", exist_ok=True)
 os.makedirs("predictions", exist_ok=True)
-
-# Finals use string labels (QF, SF, PF, GF etc); regular season was 23 rounds pre-2023, 24 in 2023, 25 from 2024 onwards
-MAX_HOME_AWAY_ROUND = 25
 
 # ── Load saved model ─────────────────────────────────────────
 print("Loading saved model...")
@@ -30,6 +27,9 @@ with open("predictions/rank_stats.pkl","rb") as f: RANK_STATS = pickle.load(f)
 WHEELO_FEATURES = []
 if os.path.exists("predictions/wheelo_features.pkl"):
     with open("predictions/wheelo_features.pkl","rb") as f: WHEELO_FEATURES = pickle.load(f)
+FORM_FEATURES = []
+if os.path.exists("predictions/form_features.pkl"):
+    with open("predictions/form_features.pkl","rb") as f: FORM_FEATURES = pickle.load(f)
 
 print(f"Model loaded. {len(FEATURES)} features.")
 TARGET = 'Brownlow.Votes'
@@ -42,11 +42,14 @@ if not os.path.exists(path_2026):
     exit()
 
 df26 = pd.read_csv(path_2026, low_memory=False)
+df26['Playing.for'] = df26['Playing.for'].replace('Footscray', 'Western Bulldogs')
 df26['Season'] = 2026
 df26['Round_num'] = pd.to_numeric(df26['Round'], errors='coerce')
-df26 = df26[df26['Round_num'] <= MAX_HOME_AWAY_ROUND].copy()
+# Finals are string-labeled (QF/EF/SF/PF/GF) -> NaN; dynamic max H&A round from data
+df26 = df26[df26['Round_num'].notna()].copy()
+max_ha_round = int(df26['Round_num'].max())
 df26['Player_Name'] = df26['First.name'].str.strip() + ' ' + df26['Surname'].str.strip()
-print(f"  {len(df26)} rows through Round {int(df26['Round_num'].max())}")
+print(f"  {len(df26)} rows through Round {max_ha_round} (max H&A round detected dynamically)")
 
 df26['Home.score'] = pd.to_numeric(df26['Home.score'], errors='coerce')
 df26['Away.score'] = pd.to_numeric(df26['Away.score'], errors='coerce')
@@ -142,6 +145,43 @@ if 'RatingPoints_game_rank' in df26.columns:
     df26['BOG_Rating'] = (df26['RatingPoints_game_rank']==1).astype(int)
     df26['Top3_Rating'] = (df26['RatingPoints_game_rank']<=3).astype(int)
 
+# Form and momentum features
+print("Building form and momentum features...")
+df26 = df26.sort_values(['Player_Name', 'Round_num']).reset_index(drop=True)
+
+_form_src = 'ExpVotes' if 'ExpVotes' in df26.columns else 'Coaches_Votes'
+if _form_src in df26.columns:
+    df26['late_form_ewm'] = (
+        df26.groupby('Player_Name')[_form_src]
+        .transform(lambda x: x.shift(1).ewm(span=5, min_periods=1).mean())
+        .fillna(0)
+    )
+else:
+    df26['late_form_ewm'] = 0
+
+df26['_gseq'] = df26.groupby('Player_Name').cumcount()
+df26['_ng']   = df26.groupby('Player_Name')['Round_num'].transform('count')
+
+_f6 = (df26[df26['_gseq'] < 6]
+       .groupby('Player_Name')[['Coaches_Votes', 'Disposals']]
+       .mean()
+       .rename(columns={'Coaches_Votes': '_f6cv', 'Disposals': '_f6d'})
+       .reset_index())
+_l6 = (df26[df26['_gseq'] >= df26['_ng'] - 6]
+       .groupby('Player_Name')[['Coaches_Votes', 'Disposals']]
+       .mean()
+       .rename(columns={'Coaches_Votes': '_l6cv', 'Disposals': '_l6d'})
+       .reset_index())
+
+_mom = _f6.merge(_l6, on='Player_Name', how='outer').fillna(0)
+_mom['momentum_cv']   = _mom['_l6cv'] - _mom['_f6cv']
+_mom['momentum_disp'] = _mom['_l6d']  - _mom['_f6d']
+
+df26 = df26.merge(_mom[['Player_Name', 'momentum_cv', 'momentum_disp']],
+                  on='Player_Name', how='left')
+df26[['momentum_cv', 'momentum_disp']] = df26[['momentum_cv', 'momentum_disp']].fillna(0)
+df26.drop(columns=['_gseq', '_ng'], inplace=True)
+
 # Fill any missing features
 for f in FEATURES:
     if f not in df26.columns:
@@ -179,7 +219,47 @@ totals = df26_valid.groupby('Player_Name').agg(
 
 totals.to_csv("predictions/season_2026.csv", index=False)
 current_round = int(df26_valid['Round_num'].max())
+
+# ── Season projection ─────────────────────────────────────────
+TOTAL_HA_ROUNDS = 23
+remaining_rounds = max(0, TOTAL_HA_ROUNDS - current_round)
+
+# Per-player average vote probabilities and game count from completed rounds
+_probs = df26_valid.groupby('Player_Name').agg(
+    p1=('P_1', 'mean'), p2=('P_2', 'mean'), p3=('P_3', 'mean'),
+    games_played=('Round_num', 'count'),
+).reset_index()
+_probs['p0'] = (1 - _probs['p1'] - _probs['p2'] - _probs['p3']).clip(lower=0)
+
+# Monte Carlo: simulate 10,000 realisations of the rounds already played,
+# take 10th/90th percentile — floor/ceiling centred on current Exp_Total_Votes
+_floor_map, _ceiling_map = {}, {}
+_rng = np.random.default_rng(42)
+_vote_vals = np.array([0, 1, 2, 3])
+for _, _r in _probs.iterrows():
+    _p = np.array([_r['p0'], _r['p1'], _r['p2'], _r['p3']]).clip(0)
+    _p /= _p.sum()
+    _sim = _rng.multinomial(int(_r['games_played']), _p, size=10_000) @ _vote_vals
+    _floor_map[_r['Player_Name']] = float(np.percentile(_sim, 10))
+    _ceiling_map[_r['Player_Name']] = float(np.percentile(_sim, 90))
+
+season_proj = totals[['Player_Name', 'Team', 'Actual_Votes', 'Games', 'Exp_Total_Votes']].copy()
+season_proj = season_proj.rename(columns={'Player_Name': 'Player', 'Games': 'Games_Played'})
+season_proj['Avg_Predicted_Per_Game'] = (season_proj['Exp_Total_Votes'] / season_proj['Games_Played']).round(4)
+season_proj['Remaining_Rounds'] = remaining_rounds
+season_proj['Projected_Remaining'] = (season_proj['Avg_Predicted_Per_Game'] * remaining_rounds).round(2)
+season_proj['Season_Total_Projected'] = (season_proj['Actual_Votes'] + season_proj['Projected_Remaining']).round(2)
+season_proj['Floor_Projection'] = season_proj['Player'].map(_floor_map).fillna(0).round(1)
+season_proj['Ceiling_Projection'] = season_proj['Player'].map(_ceiling_map).fillna(0).round(1)
+season_proj = season_proj[['Player', 'Team', 'Actual_Votes', 'Games_Played',
+                            'Avg_Predicted_Per_Game', 'Remaining_Rounds',
+                            'Projected_Remaining', 'Season_Total_Projected',
+                            'Floor_Projection', 'Ceiling_Projection']]\
+    .sort_values('Season_Total_Projected', ascending=False).reset_index(drop=True)
+season_proj.to_csv("predictions/season_projection_2026.csv", index=False)
+print(f"Season projection saved ({remaining_rounds} rounds remaining of {TOTAL_HA_ROUNDS}).")
+
 print(f"\nOK 2026 predictions - {len(totals)} players through Round {current_round}")
-print("\n=== TOP 15 PROJECTED (v3.0) ===")
+print("\n=== TOP 15 PROJECTED (v4.0) ===")
 print(totals[['Player_Name','Team','Games','Exp_Total_Votes','Avg_Poll_Prob']].head(15).to_string(index=False))
 print("\nDone. Refresh dashboard.")

@@ -1,9 +1,18 @@
-# Generated model outputs
-predictions/
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
-# Temporary/log files
-grid_err.txt
-grid_out.txt
+# R
+.RData
+.Rhistory
 
-# Claude Code internals
-.claude/
+# Streamlit
+.streamlit/secrets.toml
+
+# Data files (optional — remove these lines if you want data on GitHub)
+
+# OS
+.DS_Store
+Thumbs.db
