@@ -2432,7 +2432,6 @@ if _page == 'Game Analysis':
 
             def _style_game_table(df, winner_team=None):
                 max_p3v = df['P(3v) %'].max() if len(df) > 0 and df['P(3v) %'].max() > 0 else 1.0
-                max_votes = df['Votes (exp)'].max() if len(df) > 0 and df['Votes (exp)'].max() > 0 else 3.0
                 _rank_badge = {
                     0: 'background-color:#c9a84c!important;color:#fff!important;font-weight:800!important;',
                     1: 'background-color:#9ea7ad!important;color:#fff!important;font-weight:700!important;',
@@ -2450,32 +2449,20 @@ if _page == 'Game Analysis':
                     if i in _top3_row:
                         base = _top3_row[i]
                     elif is_winner:
-                        base = ('background-color:#edf4ea!important;'
-                                if i % 2 == 0 else
-                                'background-color:#e6f0e3!important;')
+                        base = ('background-color:#edf4ea!important;' if i % 2 == 0 else 'background-color:#e6f0e3!important;')
                     else:
-                        base = ('background-color:#f5f0e8!important;'
-                                if i % 2 == 0 else
-                                'background-color:#ffffff!important;')
+                        base = ('background-color:#f5f0e8!important;' if i % 2 == 0 else 'background-color:#ffffff!important;')
                     result = []
                     for col in df.columns:
                         if col == 'Rank' and i in _rank_badge:
                             result.append(_rank_badge[i])
-                        elif col == 'Votes (exp)':
-                            v = row[col]
-                            norm = min(v / 3.0, 1.0) if v > 0 else 0.0
-                            r = int(250 - norm * 105)
-                            g = int(250 - norm * 80)
-                            b = int(250 - norm * 228)
-                            fw = '700' if norm > 0.6 else '400'
-                            result.append(f'background-color:rgb({r},{g},{b})!important;color:#2c2c2c!important;font-weight:{fw}!important;')
                         elif col == 'P(3v) %' and i >= 3:
                             v = row[col]
                             norm = v / max_p3v if max_p3v > 0 else 0.0
                             a = 0.07 + norm * 0.40
-                            result.append(f'background-color:rgba(45,80,22,{a:.2f})!important;color:#2c2c2c!important;')
+                            result.append(f'background-color:rgba(45,80,22,{a:.2f})!important;')
                         else:
-                            result.append(base + 'color:#2c2c2c!important;')
+                            result.append(base)
                     return result
                 return df.style.apply(_cell, axis=1)
 
