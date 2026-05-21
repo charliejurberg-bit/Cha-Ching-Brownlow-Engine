@@ -657,20 +657,7 @@ st.markdown("""
         animation-delay: 0.07s;
     }
 
-    /* ── Dataframe rows: staggered reveal ── */
-    @keyframes rowFadeIn {
-        from { opacity: 0; transform: translateX(-4px); }
-        to   { opacity: 1; transform: translateX(0); }
-    }
-    [data-testid="stDataFrame"] tbody tr {
-        animation: rowFadeIn 0.2s ease both;
-    }
-    [data-testid="stDataFrame"] tbody tr:nth-child(1)  { animation-delay: 0ms; }
-    [data-testid="stDataFrame"] tbody tr:nth-child(2)  { animation-delay: 20ms; }
-    [data-testid="stDataFrame"] tbody tr:nth-child(3)  { animation-delay: 40ms; }
-    [data-testid="stDataFrame"] tbody tr:nth-child(4)  { animation-delay: 60ms; }
-    [data-testid="stDataFrame"] tbody tr:nth-child(5)  { animation-delay: 80ms; }
-    [data-testid="stDataFrame"] tbody tr:nth-child(n+6){ animation-delay: 100ms; }
+
 
     /* ── Expander: smooth height transition hint ── */
     [data-testid="stExpander"] [data-testid="stVerticalBlock"] {
