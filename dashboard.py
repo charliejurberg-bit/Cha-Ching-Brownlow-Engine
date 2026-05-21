@@ -2526,7 +2526,7 @@ if _page == 'Game Analysis':
                     'P(2v) %':   (gp['P_2'] * 100).round(1),
                     'Coaches V': pd.to_numeric(gp['Coaches_Votes'], errors='coerce').fillna(0).round(1),
                     'Disposals': pd.to_numeric(gp['Disposals'], errors='coerce').fillna(0).astype(int),
-                    'Cont. Poss': pd.to_numeric(gp['Contested.Possessions'], errors='coerce').fillna(0).astype(int),
+                    'Cont. Poss': pd.to_numeric(gp.get('Contested.Possessions', gp.get('ContPoss', pd.Series([0]*len(gp)))), errors='coerce').fillna(0).astype(int),
                     'Clearances': pd.to_numeric(gp['Clearances'], errors='coerce').fillna(0).astype(int),
                     'Goals':     pd.to_numeric(gp['Goals'], errors='coerce').fillna(0).astype(int),
                 }).reset_index(drop=True)
@@ -2958,7 +2958,7 @@ if False:  # merged into Game Analysis
                 'P(3v) %': (gp['P_3'] * 100).round(1), 'P(2v) %': (gp['P_2'] * 100).round(1),
                 'Coaches V': pd.to_numeric(gp['Coaches_Votes'], errors='coerce').fillna(0).round(1),
                 'Disposals': pd.to_numeric(gp['Disposals'], errors='coerce').fillna(0).astype(int),
-                'Cont. Poss': pd.to_numeric(gp['Contested.Possessions'], errors='coerce').fillna(0).astype(int),
+                'Cont. Poss': pd.to_numeric(gp.get('Contested.Possessions', gp.get('ContPoss', pd.Series([0]*len(gp)))), errors='coerce').fillna(0).astype(int),
                 'Clearances': pd.to_numeric(gp['Clearances'], errors='coerce').fillna(0).astype(int),
                 'Goals': pd.to_numeric(gp['Goals'], errors='coerce').fillna(0).astype(int),
             })
