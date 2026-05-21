@@ -2521,18 +2521,15 @@ if _page == 'Game Analysis':
                     'Player':     gp['Player_Name'],
                     'Team':       gp['Team'],
                     'Rank':       gp['Rank'].astype(int),
-                    'Votes (exp)': gp['Exp_Votes'].apply(lambda x: f"{x:.2f}"),
-                    'P(3v) %':   (gp['P_3'] * 100).apply(lambda x: f"{x:.2f}"),
-                    'P(2v) %':   (gp['P_2'] * 100).apply(lambda x: f"{x:.2f}"),
-                    'Coaches V': pd.to_numeric(gp['Coaches_Votes'], errors='coerce').fillna(0).apply(lambda x: f"{x:.2f}"),
+                    'Votes (exp)': gp['Exp_Votes'].round(1),
+                    'P(3v) %':   (gp['P_3'] * 100).round(1),
+                    'P(2v) %':   (gp['P_2'] * 100).round(1),
+                    'Coaches V': pd.to_numeric(gp['Coaches_Votes'], errors='coerce').fillna(0).round(1),
                     'Disposals': pd.to_numeric(gp['Disposals'], errors='coerce').fillna(0).astype(int),
                     'Cont. Poss': pd.to_numeric(gp['Contested.Possessions'], errors='coerce').fillna(0).astype(int),
                     'Clearances': pd.to_numeric(gp['Clearances'], errors='coerce').fillna(0).astype(int),
                     'Goals':     pd.to_numeric(gp['Goals'], errors='coerce').fillna(0).astype(int),
-                })
-                for col in disp.select_dtypes(include='float').columns:
-                    disp[col] = disp[col].round(1)
-                disp = disp.round(2)
+                }).reset_index(drop=True)
                 n_total    = len(disp)
                 expand_key = f"rr_expand_{selected_round}_{game_idx}"
                 if expand_key not in st.session_state:
