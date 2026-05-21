@@ -2425,7 +2425,8 @@ if _page == 'Game Analysis':
                 )
 
             def _style_game_table(df, winner_team=None):
-                max_p3v = df['P(3v) %'].max() if len(df) > 0 and df['P(3v) %'].max() > 0 else 1.0
+                max_p3v = pd.to_numeric(df['P(3v) %'], errors='coerce').max() if len(df) > 0 else 1.0
+                max_p3v = max_p3v if max_p3v > 0 else 1.0
                 _rank_badge = {
                     0: 'background-color:#c9a84c!important;color:#fff!important;font-weight:800!important;',
                     1: 'background-color:#9ea7ad!important;color:#fff!important;font-weight:700!important;',
@@ -2451,7 +2452,7 @@ if _page == 'Game Analysis':
                         if col == 'Rank' and i in _rank_badge:
                             result.append(_rank_badge[i])
                         elif col == 'P(3v) %' and i >= 3:
-                            v = row[col]
+                            v = float(row[col]) if row[col] != '' else 0.0
                             norm = v / max_p3v if max_p3v > 0 else 0.0
                             a = 0.07 + norm * 0.40
                             result.append(f'background-color:rgba(45,80,22,{a:.2f})!important;')
