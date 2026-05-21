@@ -2531,6 +2531,7 @@ if _page == 'Game Analysis':
                 })
                 for col in disp.select_dtypes(include='float').columns:
                     disp[col] = disp[col].round(1)
+                disp = disp.round(2)
                 n_total    = len(disp)
                 expand_key = f"rr_expand_{selected_round}_{game_idx}"
                 if expand_key not in st.session_state:
