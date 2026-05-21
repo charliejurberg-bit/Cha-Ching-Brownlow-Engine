@@ -40,7 +40,8 @@
       "PowerShell(Get-ChildItem \"C:\\\\Users\\\\User\\\\Python\\\\brownlow_engine\\\\data_betting\\\\\" -ErrorAction SilentlyContinue; if \\(-not \\(Test-Path \"C:\\\\Users\\\\User\\\\Python\\\\brownlow_engine\\\\data_betting\\\\\"\\)\\) { \"DIR NOT FOUND\" } else { \"DIR EXISTS\" })",
       "PowerShell(Start-Sleep -Seconds 3; $r = Invoke-WebRequest -Uri \"http://localhost:8502\" -UseBasicParsing -TimeoutSec 10 -ErrorAction SilentlyContinue; $r.StatusCode)",
       "PowerShell(Stop-Process *)",
-      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8501)"
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8501)",
+      "Bash(git push *)"
     ]
   }
 }
