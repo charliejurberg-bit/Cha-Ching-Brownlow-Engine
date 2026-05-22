@@ -180,25 +180,31 @@ def _load_tips() -> pd.DataFrame:
 
 
 def _save_tip(game_key: str, player: str, market_type: str,
-              criteria: list[str], is_flagged: bool, notes: str = ''):
-    _ensure_dirs()
-    df = _load_tips()
-    tip_id = str(uuid.uuid4())[:8]
-    new_row = {
-        'tip_id':       tip_id,
-        'game_key':     game_key,
-        'player':       player,
-        'market_type':  market_type,
-        'line':         '',
-        'bookmaker':    '',
-        'odds':         '',
-        'criteria_json': json.dumps(criteria),
-        'is_flagged':   is_flagged,
-        'notes':        notes,
-        'created_at':   datetime.now().strftime('%Y-%m-%d %H:%M'),
-    }
-    df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
-    df.to_csv(TIPS_CSV, index=False)
+              criteria: list[str], is_flagged: bool, notes: str = '') -> bool:
+    try:
+        _ensure_dirs()
+        df = _load_tips()
+        tip_id = str(uuid.uuid4())[:8]
+        new_row = {
+            'tip_id':       tip_id,
+            'game_key':     game_key,
+            'player':       player,
+            'market_type':  market_type,
+            'line':         '',
+            'bookmaker':    '',
+            'odds':         '',
+            'criteria_json': json.dumps(criteria),
+            'is_flagged':   is_flagged,
+            'notes':        notes,
+            'created_at':   datetime.now().strftime('%Y-%m-%d %H:%M'),
+            'result':       '',
+        }
+        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
+        df.to_csv(TIPS_CSV, index=False)
+        return True
+    except Exception as e:
+        st.error(f"Failed to save tip: {e}")
+        return False
 
 
 def _save_tip_result(tip_id: str, result: str):
@@ -751,9 +757,10 @@ def _checklist_dialog():
     with col1:
         if st.button("Save Tip", type="primary", use_container_width=True):
             criteria = [k for k, _ in CHECKLIST_ITEMS if st.session_state.get(f"{pfx}{k}", False)]
-            _save_tip(game_key, player, market, criteria, ticked >= CC_THRESHOLD, notes)
-            st.toast(f"Tip saved — {'Cha Ching flagged!' if ticked >= CC_THRESHOLD else 'not yet flagged'}")
-            st.rerun()
+            saved = _save_tip(game_key, player, market, criteria, ticked >= CC_THRESHOLD, notes)
+            if saved:
+                st.toast(f"Tip saved — {'Cha Ching flagged!' if ticked >= CC_THRESHOLD else 'not yet flagged'}")
+                st.rerun()
     with col2:
         if st.button("Cancel", use_container_width=True):
             st.rerun()
@@ -1406,22 +1413,11 @@ def render_cha_ching_tips():
     if 'result' not in tips_df.columns:
         tips_df['result'] = ''
 
-    # ── DEBUG (remove after diagnosis) ───────────────────────────────────────
-    with st.expander("🔍 DEBUG: tips_df state", expanded=True):
-        st.write(f"**tips_df rows:** {len(tips_df)}  |  **columns:** {list(tips_df.columns)}")
-        if not tips_df.empty:
-            st.write("**tips_df sample:**")
-            st.dataframe(tips_df[['tip_id','game_key','player','market_type','is_flagged','result']].head(10) if 'result' in tips_df.columns else tips_df.head(10))
-        st.write(f"**upcoming_keys ({len(upcoming_keys)}):** {upcoming_keys}")
-        flagged_debug = tips_df[tips_df['is_flagged'] == True] if not tips_df.empty else pd.DataFrame()
-        st.write(f"**is_flagged==True rows:** {len(flagged_debug)}")
-        flagged_str_debug = tips_df[tips_df['is_flagged'] == 'True'] if not tips_df.empty else pd.DataFrame()
-        st.write(f"**is_flagged=='True' (string) rows:** {len(flagged_str_debug)}")
-    # ── END DEBUG ─────────────────────────────────────────────────────────────
-
     flagged_all = tips_df[tips_df['is_flagged'] == True].copy() if not tips_df.empty else pd.DataFrame()
 
-    if not flagged_all.empty:
+    if flagged_all.empty:
+        st.caption("No Cha Ching tips flagged yet — use the checklist in Upcoming Games below to create one.")
+    else:
         flagged_all['result'] = flagged_all['result'].fillna('')
         live_tips    = flagged_all[~flagged_all['game_key'].isin(upcoming_keys) & (flagged_all['result'] == '')]
         settled_tips = flagged_all[~flagged_all['game_key'].isin(upcoming_keys) & (flagged_all['result'] != '')]
