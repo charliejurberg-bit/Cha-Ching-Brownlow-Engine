@@ -1,1 +1,1 @@
-tip_id,game_key,player,market_type,line,bookmaker,odds,criteria_json,is_flagged,notes,created_at
+tip_id,game_key,player,market_type,line,bookmaker,odds,stake,criteria_json,is_flagged,notes,created_at,result,profit_loss

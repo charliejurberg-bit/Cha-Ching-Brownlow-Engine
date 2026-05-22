@@ -131,15 +131,19 @@ def apply_chart_theme(fig):
 
 # ── Data layer ─────────────────────────────────────────────────────────────────
 
+TIPS_COLS = [
+    'tip_id', 'game_key', 'player', 'market_type', 'line',
+    'bookmaker', 'odds', 'stake', 'criteria_json', 'is_flagged',
+    'notes', 'created_at', 'result', 'profit_loss',
+]
+
+
 def _ensure_dirs():
     os.makedirs(DATA_DIR, exist_ok=True)
     if not os.path.exists(BETS_CSV):
         pd.DataFrame(columns=BETS_COLS).to_csv(BETS_CSV, index=False)
     if not os.path.exists(TIPS_CSV):
-        pd.DataFrame(columns=[
-            'tip_id', 'game_key', 'player', 'market_type', 'line',
-            'bookmaker', 'odds', 'criteria_json', 'is_flagged', 'notes', 'created_at',
-        ]).to_csv(TIPS_CSV, index=False)
+        pd.DataFrame(columns=TIPS_COLS).to_csv(TIPS_CSV, index=False)
     if not os.path.exists(PROPS_CSV):
         pd.DataFrame(columns=[
             'game_key', 'player', 'market_type', 'line', 'bookmaker', 'odds', 'updated_at',
@@ -174,9 +178,18 @@ def _save_bets(df: pd.DataFrame):
 def _load_tips() -> pd.DataFrame:
     _ensure_dirs()
     try:
-        return pd.read_csv(TIPS_CSV)
+        df = pd.read_csv(TIPS_CSV)
+        for col in TIPS_COLS:
+            if col not in df.columns:
+                df[col] = None
+        for col in ['odds', 'stake', 'line', 'profit_loss']:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+        for col in ['result', 'notes', 'bookmaker', 'player', 'market_type', 'game_key']:
+            df[col] = df[col].fillna('').astype(str)
+        df['is_flagged'] = df['is_flagged'].fillna(False).astype(bool)
+        return df
     except Exception:
-        return pd.DataFrame()
+        return pd.DataFrame(columns=TIPS_COLS)
 
 
 def _save_tip(game_key: str, player: str, market_type: str,
@@ -212,24 +225,22 @@ def _save_tip(game_key: str, player: str, market_type: str,
 
 
 def _save_tip_result(tip_id: str, result: str):
-    df = _load_tips()
-    if 'result' not in df.columns:
-        df['result'] = ''
-    if 'profit_loss' not in df.columns:
-        df['profit_loss'] = ''
-    mask = df['tip_id'] == tip_id
-    df.loc[mask, 'result'] = result
+    df = _load_tips()  # _load_tips now guarantees string dtype for 'result'
+    mask = df['tip_id'].astype(str) == str(tip_id)
     pl = 0.0
     if mask.any():
         row   = df[mask].iloc[0]
         odds  = pd.to_numeric(row.get('odds', 0),  errors='coerce') or 0.0
         stake = pd.to_numeric(row.get('stake', 0), errors='coerce') or 0.0
-        if odds > 1 and stake > 0:
+        if result and odds > 1 and stake > 0:
             pl = _compute_pl(float(odds), float(stake), result)
-            df.loc[mask, 'profit_loss'] = pl
+        df.loc[mask, 'result']       = result
+        df.loc[mask, 'profit_loss']  = pl if result else float('nan')
         df.to_csv(TIPS_CSV, index=False)
-        # Sync to bets.csv so it appears in Cha Ching Bet History
-        _sync_tip_to_bets(tip_id, row, result, pl)
+        try:
+            _sync_tip_to_bets(tip_id, row, result, pl)
+        except Exception as e:
+            st.error(f"Tip result saved but failed to sync to bet history: {e}")
     else:
         df.to_csv(TIPS_CSV, index=False)
 
