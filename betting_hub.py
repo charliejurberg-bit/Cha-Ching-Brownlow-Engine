@@ -180,24 +180,27 @@ def _load_tips() -> pd.DataFrame:
 
 
 def _save_tip(game_key: str, player: str, market_type: str,
-              criteria: list[str], is_flagged: bool, notes: str = '') -> bool:
+              criteria: list[str], is_flagged: bool, notes: str = '',
+              stake: float = 0.0, odds: float = 0.0, bookmaker: str = '') -> bool:
     try:
         _ensure_dirs()
         df = _load_tips()
         tip_id = str(uuid.uuid4())[:8]
         new_row = {
-            'tip_id':       tip_id,
-            'game_key':     game_key,
-            'player':       player,
-            'market_type':  market_type,
-            'line':         '',
-            'bookmaker':    '',
-            'odds':         '',
+            'tip_id':        tip_id,
+            'game_key':      game_key,
+            'player':        player,
+            'market_type':   market_type,
+            'line':          '',
+            'bookmaker':     bookmaker,
+            'odds':          round(float(odds), 2) if odds else '',
+            'stake':         round(float(stake), 2) if stake else 0.0,
             'criteria_json': json.dumps(criteria),
-            'is_flagged':   is_flagged,
-            'notes':        notes,
-            'created_at':   datetime.now().strftime('%Y-%m-%d %H:%M'),
-            'result':       '',
+            'is_flagged':    is_flagged,
+            'notes':         notes,
+            'created_at':    datetime.now().strftime('%Y-%m-%d %H:%M'),
+            'result':        '',
+            'profit_loss':   '',
         }
         df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
         df.to_csv(TIPS_CSV, index=False)
@@ -211,7 +214,16 @@ def _save_tip_result(tip_id: str, result: str):
     df = _load_tips()
     if 'result' not in df.columns:
         df['result'] = ''
-    df.loc[df['tip_id'] == tip_id, 'result'] = result
+    if 'profit_loss' not in df.columns:
+        df['profit_loss'] = ''
+    mask = df['tip_id'] == tip_id
+    df.loc[mask, 'result'] = result
+    if mask.any():
+        row = df[mask].iloc[0]
+        odds  = pd.to_numeric(row.get('odds', 0), errors='coerce') or 0.0
+        stake = pd.to_numeric(row.get('stake', 0), errors='coerce') or 0.0
+        if odds > 1 and stake > 0:
+            df.loc[mask, 'profit_loss'] = _compute_pl(float(odds), float(stake), result)
     df.to_csv(TIPS_CSV, index=False)
 
 
@@ -729,6 +741,8 @@ def _checklist_dialog():
     player     = st.session_state.get('_cl_player', 'Player')
     market     = st.session_state.get('_cl_market', 'Market')
     game_key   = st.session_state.get('_cl_game', '')
+    odds       = float(st.session_state.get('_cl_odds', 0.0) or 0.0)
+    bookmaker  = str(st.session_state.get('_cl_bookmaker', ''))
     pfx        = f"_clv_{game_key}_{player}_{market}_"
 
     st.markdown(f'<div style="font-weight:700;font-size:15px;color:{C["green"]};margin-bottom:4px">'
@@ -750,6 +764,23 @@ def _checklist_dialog():
         st.info(f"{ticked}/6 criteria met — tick {remaining} more to auto-flag")
 
     st.markdown('<hr style="margin:8px 0">', unsafe_allow_html=True)
+
+    oc1, oc2 = st.columns(2)
+    with oc1:
+        stake = st.number_input(
+            "Unit size", min_value=0.0, max_value=100.0,
+            value=float(st.session_state.get(f'{pfx}stake', 1.0)),
+            step=0.5, format='%.2f', key=f'{pfx}stake',
+        )
+    with oc2:
+        odds_display = f"{odds:.2f}" if odds > 1 else "—"
+        bookie_str   = f" ({bookmaker})" if bookmaker else ""
+        st.markdown(
+            f'<div style="margin-top:28px;font-family:DM Mono,monospace;font-size:14px;'
+            f'color:#f0b429;font-weight:700">{odds_display}{bookie_str}</div>',
+            unsafe_allow_html=True,
+        )
+
     notes = st.text_area("Notes", value=st.session_state.get(f'{pfx}notes', ''),
                          key=f'{pfx}notes', height=60, placeholder='Any extra context...')
 
@@ -757,7 +788,9 @@ def _checklist_dialog():
     with col1:
         if st.button("Save Tip", type="primary", use_container_width=True):
             criteria = [k for k, _ in CHECKLIST_ITEMS if st.session_state.get(f"{pfx}{k}", False)]
-            saved = _save_tip(game_key, player, market, criteria, ticked >= CC_THRESHOLD, notes)
+            saved = _save_tip(game_key, player, market, criteria,
+                              ticked >= CC_THRESHOLD, notes,
+                              stake=float(stake), odds=odds, bookmaker=bookmaker)
             if saved:
                 st.toast(f"Tip saved — {'Cha Ching flagged!' if ticked >= CC_THRESHOLD else 'not yet flagged'}")
                 st.rerun()
@@ -766,10 +799,13 @@ def _checklist_dialog():
             st.rerun()
 
 
-def _open_checklist(player: str, market: str, game_key: str):
-    st.session_state['_cl_player']  = player
-    st.session_state['_cl_market']  = market
-    st.session_state['_cl_game']    = game_key
+def _open_checklist(player: str, market: str, game_key: str,
+                    odds: float = 0.0, bookmaker: str = ''):
+    st.session_state['_cl_player']    = player
+    st.session_state['_cl_market']    = market
+    st.session_state['_cl_game']      = game_key
+    st.session_state['_cl_odds']      = odds
+    st.session_state['_cl_bookmaker'] = bookmaker
     _checklist_dialog()
 
 
@@ -1471,6 +1507,8 @@ def render_cha_ching_tips():
                     gkey   = str(tip.get('game_key', ''))
                     mtype  = str(tip.get('market_type', ''))
                     result = str(tip.get('result', ''))
+                    pl_raw = pd.to_numeric(tip.get('profit_loss', ''), errors='coerce')
+                    pl_str = f" &nbsp;{pl_raw:+.2f}u" if not pd.isna(pl_raw) and pl_raw != 0 else ''
                     label, color, bg = result_styles.get(result, (result, '#94a3b8', 'rgba(74,90,106,0.15)'))
                     st.markdown(
                         f'<div style="background:{bg};border:1px solid {color}33;border-radius:10px;'
@@ -1479,7 +1517,8 @@ def render_cha_ching_tips():
                         f'<div><span style="font-weight:700;color:#e8f0f8">{player}</span>'
                         f'<span style="font-size:12px;color:#94a3b8;margin-left:10px">'
                         f'{gkey} &nbsp;·&nbsp; {mtype}</span></div>'
-                        f'<span style="font-weight:800;color:{color};font-size:13px">{label}</span>'
+                        f'<span style="font-weight:800;color:{color};font-size:13px">'
+                        f'{label}{pl_str}</span>'
                         f'</div>',
                         unsafe_allow_html=True,
                     )
@@ -1631,9 +1670,13 @@ def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
                     is_flagged = not tip_match.empty and tip_match['is_flagged'].any()
                     label = f"{'★ ' if is_flagged else ''}Checklist: {player.split()[-1]}"
                     btn_type = "primary" if is_flagged else "secondary"
+                    p_row     = game_props[game_props['player'] == player]
+                    p_odds    = float(p_row['odds'].iloc[0]) if not p_row.empty else 0.0
+                    p_bookie  = str(p_row['bookmaker'].iloc[0]) if not p_row.empty else ''
                     if st.button(label, key=f"cl_{game_key}_{market_type}_{player}",
                                  type=btn_type, use_container_width=True):
-                        _open_checklist(player, market_type, game_key)
+                        _open_checklist(player, market_type, game_key,
+                                        odds=p_odds, bookmaker=p_bookie)
 
     else:
         st.caption(f"No {market_type} props loaded for this game.")
