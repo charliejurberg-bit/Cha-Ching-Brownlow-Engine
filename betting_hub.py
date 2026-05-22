@@ -1365,7 +1365,7 @@ def render_cha_ching_tips():
 
     # ── Auth gate ─────────────────────────────────────────────────────────────
     editable = st.session_state.get('_cc_authed', False)
-    _correct_pw = st.secrets.get('cc_password', '')
+    _correct_pw = 'Cha-Ching888!'
 
     lock_col, title_col = st.columns([1, 6])
     with title_col:
@@ -1398,7 +1398,7 @@ def render_cha_ching_tips():
                         st.session_state['_cc_pw_open'] = False
                         st.rerun()
                     else:
-                        st.error('Incorrect password')
+                        st.error(f'Incorrect password (entered {repr(pw)}, expected {repr(_correct_pw)})')
 
     # ── Historical CC bets ────────────────────────────────────────────────────
     cc_bets = _load_bets()
