@@ -1502,29 +1502,30 @@ def render_cha_ching_tips():
     # ── Manual game entry ─────────────────────────────────────────────────────
     if '_manual_games' not in st.session_state:
         st.session_state['_manual_games'] = []
+    if '_mg_n' not in st.session_state:
+        st.session_state['_mg_n'] = 0
 
     with st.expander("+ Add game manually", expanded=False):
+        _n = st.session_state['_mg_n']
         mg1, mg2, mg3, mg4 = st.columns([1.5, 2, 2, 1])
         with mg1:
-            mg_round = st.text_input("Round", placeholder="Round 11", key='mg_round')
+            mg_round = st.text_input("Round", placeholder="Round 11", key=f'mg_round_{_n}')
         with mg2:
-            mg_home  = st.text_input("Home team", placeholder="Richmond", key='mg_home')
+            mg_home  = st.text_input("Home team", placeholder="Richmond", key=f'mg_home_{_n}')
         with mg3:
-            mg_away  = st.text_input("Away team", placeholder="Essendon", key='mg_away')
+            mg_away  = st.text_input("Away team", placeholder="Essendon", key=f'mg_away_{_n}')
         with mg4:
             st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
             if st.button("Add", key='mg_add', use_container_width=True):
-                r = st.session_state.get('mg_round', '').strip()
-                h = st.session_state.get('mg_home', '').strip()
-                a = st.session_state.get('mg_away', '').strip()
+                r = mg_round.strip()
+                h = mg_home.strip()
+                a = mg_away.strip()
                 if r and h and a:
                     new_gkey = f"{r} {h} v {a}"
                     existing = [g['gkey'] for g in st.session_state['_manual_games']]
                     if new_gkey not in existing:
                         st.session_state['_manual_games'].append({'roundname': r, 'hteam': h, 'ateam': a, 'gkey': new_gkey})
-                    st.session_state['mg_round'] = ''
-                    st.session_state['mg_home']  = ''
-                    st.session_state['mg_away']  = ''
+                    st.session_state['_mg_n'] += 1  # new keys next render → inputs clear
                     st.rerun()
                 else:
                     st.warning("Fill in all three fields.")
