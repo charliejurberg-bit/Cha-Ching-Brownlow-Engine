@@ -181,7 +181,8 @@ def _load_tips() -> pd.DataFrame:
 
 def _save_tip(game_key: str, player: str, market_type: str,
               criteria: list[str], is_flagged: bool, notes: str = '',
-              stake: float = 0.0, odds: float = 0.0, bookmaker: str = '') -> bool:
+              stake: float = 0.0, odds: float = 0.0, bookmaker: str = '',
+              line: float = 0.0) -> bool:
     try:
         _ensure_dirs()
         df = _load_tips()
@@ -191,7 +192,7 @@ def _save_tip(game_key: str, player: str, market_type: str,
             'game_key':      game_key,
             'player':        player,
             'market_type':   market_type,
-            'line':          '',
+            'line':          round(float(line), 1) if line else '',
             'bookmaker':     bookmaker,
             'odds':          round(float(odds), 2) if odds else '',
             'stake':         round(float(stake), 2) if stake else 0.0,
@@ -743,6 +744,7 @@ def _checklist_dialog():
     game_key   = st.session_state.get('_cl_game', '')
     odds       = float(st.session_state.get('_cl_odds', 0.0) or 0.0)
     bookmaker  = str(st.session_state.get('_cl_bookmaker', ''))
+    line       = float(st.session_state.get('_cl_line', 0.0) or 0.0)
     pfx        = f"_clv_{game_key}_{player}_{market}_"
 
     st.markdown(f'<div style="font-weight:700;font-size:15px;color:{C["green"]};margin-bottom:4px">'
@@ -773,11 +775,12 @@ def _checklist_dialog():
             step=0.5, format='%.2f', key=f'{pfx}stake',
         )
     with oc2:
+        line_str     = f"O/U {line:.1f}  " if line > 0 else ""
         odds_display = f"{odds:.2f}" if odds > 1 else "—"
         bookie_str   = f" ({bookmaker})" if bookmaker else ""
         st.markdown(
             f'<div style="margin-top:28px;font-family:DM Mono,monospace;font-size:14px;'
-            f'color:#f0b429;font-weight:700">{odds_display}{bookie_str}</div>',
+            f'color:#f0b429;font-weight:700">{line_str}{odds_display}{bookie_str}</div>',
             unsafe_allow_html=True,
         )
 
@@ -790,7 +793,7 @@ def _checklist_dialog():
             criteria = [k for k, _ in CHECKLIST_ITEMS if st.session_state.get(f"{pfx}{k}", False)]
             saved = _save_tip(game_key, player, market, criteria,
                               ticked >= CC_THRESHOLD, notes,
-                              stake=float(stake), odds=odds, bookmaker=bookmaker)
+                              stake=float(stake), odds=odds, bookmaker=bookmaker, line=line)
             if saved:
                 st.toast(f"Tip saved — {'Cha Ching flagged!' if ticked >= CC_THRESHOLD else 'not yet flagged'}")
                 st.rerun()
@@ -800,12 +803,13 @@ def _checklist_dialog():
 
 
 def _open_checklist(player: str, market: str, game_key: str,
-                    odds: float = 0.0, bookmaker: str = ''):
+                    odds: float = 0.0, bookmaker: str = '', line: float = 0.0):
     st.session_state['_cl_player']    = player
     st.session_state['_cl_market']    = market
     st.session_state['_cl_game']      = game_key
     st.session_state['_cl_odds']      = odds
     st.session_state['_cl_bookmaker'] = bookmaker
+    st.session_state['_cl_line']      = line
     _checklist_dialog()
 
 
@@ -1690,10 +1694,11 @@ def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
                     p_row     = game_props[game_props['player'] == player]
                     p_odds    = float(p_row['odds'].iloc[0]) if not p_row.empty else 0.0
                     p_bookie  = str(p_row['bookmaker'].iloc[0]) if not p_row.empty else ''
+                    p_line    = float(p_row['line'].iloc[0]) if not p_row.empty else 0.0
                     if st.button(label, key=f"cl_{game_key}_{market_type}_{player}",
                                  type=btn_type, use_container_width=True):
                         _open_checklist(player, market_type, game_key,
-                                        odds=p_odds, bookmaker=p_bookie)
+                                        odds=p_odds, bookmaker=p_bookie, line=p_line)
 
     else:
         st.caption(f"No {market_type} props loaded for this game.")
