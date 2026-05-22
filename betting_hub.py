@@ -201,6 +201,14 @@ def _save_tip(game_key: str, player: str, market_type: str,
     df.to_csv(TIPS_CSV, index=False)
 
 
+def _save_tip_result(tip_id: str, result: str):
+    df = _load_tips()
+    if 'result' not in df.columns:
+        df['result'] = ''
+    df.loc[df['tip_id'] == tip_id, 'result'] = result
+    df.to_csv(TIPS_CSV, index=False)
+
+
 def _load_props() -> pd.DataFrame:
     _ensure_dirs()
     try:
@@ -509,6 +517,25 @@ BH_CSS = """
 /* ── Cha Ching badge pulse on hover ── */
 .cc-badge { transition: opacity 0.15s ease, transform 0.15s ease; display: inline-block; }
 .cc-badge:hover { opacity: 0.88; transform: scale(1.03); }
+
+/* ── Live tip badge ── */
+@keyframes live-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: 0.2; }
+}
+.live-badge {
+    display: inline-block;
+    background: #e05252;
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 1.2px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    animation: live-pulse 1.4s ease-in-out infinite;
+    vertical-align: middle;
+    margin-left: 6px;
+}
 
 /* ── Checklist progress line ── */
 .cl-progress { transition: color 0.15s ease; }
@@ -1374,6 +1401,84 @@ def render_cha_ching_tips():
         return
 
     props_df = _load_props()
+
+    # ── Live & Settled flagged tips ───────────────────────────────────────────
+    upcoming_keys = {_game_key(g) for _, g in fixtures.iterrows()}
+    if 'result' not in tips_df.columns:
+        tips_df['result'] = ''
+    flagged_all = tips_df[tips_df['is_flagged'] == True].copy() if not tips_df.empty else pd.DataFrame()
+
+    if not flagged_all.empty:
+        flagged_all['result'] = flagged_all['result'].fillna('')
+        live_tips    = flagged_all[~flagged_all['game_key'].isin(upcoming_keys) & (flagged_all['result'] == '')]
+        settled_tips = flagged_all[~flagged_all['game_key'].isin(upcoming_keys) & (flagged_all['result'] != '')]
+
+        # ── Live ──────────────────────────────────────────────────────────────
+        if not live_tips.empty:
+            st.markdown('<div class="section-header">Live Tips</div>', unsafe_allow_html=True)
+            for _, tip in live_tips.iterrows():
+                tip_id   = str(tip['tip_id'])
+                player   = str(tip.get('player', ''))
+                gkey     = str(tip.get('game_key', ''))
+                mtype    = str(tip.get('market_type', ''))
+                card_col, btn_col = st.columns([3, 2])
+                with card_col:
+                    st.markdown(
+                        f'<div style="background:#152533;border:1px solid #2a4a5a;border-radius:10px;'
+                        f'padding:12px 16px;margin-bottom:4px">'
+                        f'<div style="display:flex;align-items:center;gap:0;margin-bottom:4px">'
+                        f'<span style="font-weight:700;color:#e8f0f8;font-size:14px">{player}</span>'
+                        f'<span class="live-badge">● LIVE</span></div>'
+                        f'<div style="font-size:12px;color:#94a3b8">{gkey}'
+                        f'&nbsp;&nbsp;·&nbsp;&nbsp;{mtype}</div></div>',
+                        unsafe_allow_html=True,
+                    )
+                with btn_col:
+                    b1, b2, b3 = st.columns(3)
+                    with b1:
+                        if st.button('✅ Win', key=f'tip_win_{tip_id}', use_container_width=True):
+                            _save_tip_result(tip_id, 'Win')
+                            st.rerun()
+                    with b2:
+                        if st.button('❌ Loss', key=f'tip_loss_{tip_id}', use_container_width=True):
+                            _save_tip_result(tip_id, 'Loss')
+                            st.rerun()
+                    with b3:
+                        if st.button('↩️ Void', key=f'tip_void_{tip_id}', use_container_width=True):
+                            _save_tip_result(tip_id, 'Void/Refund')
+                            st.rerun()
+
+        # ── Settled ───────────────────────────────────────────────────────────
+        if not settled_tips.empty:
+            with st.expander(f"Settled Tips ({len(settled_tips)})", expanded=False):
+                result_styles = {
+                    'Win':         ('✅ Win',  '#34d399', 'rgba(52,211,153,0.12)'),
+                    'Loss':        ('❌ Loss', '#e05252', 'rgba(224,82,82,0.12)'),
+                    'Void/Refund': ('↩️ Void', '#94a3b8', 'rgba(74,90,106,0.15)'),
+                }
+                for _, tip in settled_tips.sort_values('game_key').iterrows():
+                    tip_id = str(tip['tip_id'])
+                    player = str(tip.get('player', ''))
+                    gkey   = str(tip.get('game_key', ''))
+                    mtype  = str(tip.get('market_type', ''))
+                    result = str(tip.get('result', ''))
+                    label, color, bg = result_styles.get(result, (result, '#94a3b8', 'rgba(74,90,106,0.15)'))
+                    st.markdown(
+                        f'<div style="background:{bg};border:1px solid {color}33;border-radius:10px;'
+                        f'padding:10px 16px;margin-bottom:6px;display:flex;align-items:center;'
+                        f'justify-content:space-between">'
+                        f'<div><span style="font-weight:700;color:#e8f0f8">{player}</span>'
+                        f'<span style="font-size:12px;color:#94a3b8;margin-left:10px">'
+                        f'{gkey} &nbsp;·&nbsp; {mtype}</span></div>'
+                        f'<span style="font-weight:800;color:{color};font-size:13px">{label}</span>'
+                        f'</div>',
+                        unsafe_allow_html=True,
+                    )
+                    # Allow clearing result to move back to live
+                    if st.button('Clear result', key=f'tip_clear_{tip_id}',
+                                 type='secondary', use_container_width=False):
+                        _save_tip_result(tip_id, '')
+                        st.rerun()
 
     st.markdown('<div class="section-header">Upcoming Games — Next 7 Days</div>',
                 unsafe_allow_html=True)
