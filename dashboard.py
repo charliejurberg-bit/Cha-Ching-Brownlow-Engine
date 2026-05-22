@@ -2533,11 +2533,11 @@ if _page == 'Game Analysis':
             def _style_game_table(df, winner_team=None):
                 max_p3v = pd.to_numeric(df['P(3v) %'], errors='coerce').max() if len(df) > 0 else 1.0
                 max_p3v = max_p3v if max_p3v > 0 else 1.0
-                # Rank cell: solid MT accent as bg so 1/2/3 pop on dark rows
+                # Rank cell: neon glowstick — dark bg, colored number, text-shadow halo
                 _rank_cell = {
-                    0: 'background-color:#f0b429!important;color:#0f1923!important;font-weight:800!important;text-align:center!important;',
-                    1: 'background-color:#34d399!important;color:#0f1923!important;font-weight:800!important;text-align:center!important;',
-                    2: 'background-color:#4a90c4!important;color:#0f1923!important;font-weight:800!important;text-align:center!important;',
+                    0: 'color:#f0b429!important;font-weight:900!important;text-align:center!important;text-shadow:0 0 6px rgba(240,180,41,0.95),0 0 14px rgba(240,180,41,0.55)!important;',
+                    1: 'color:#34d399!important;font-weight:900!important;text-align:center!important;text-shadow:0 0 6px rgba(52,211,153,0.95),0 0 14px rgba(52,211,153,0.55)!important;',
+                    2: 'color:#4a90c4!important;font-weight:900!important;text-align:center!important;text-shadow:0 0 6px rgba(74,144,196,0.95),0 0 14px rgba(74,144,196,0.55)!important;',
                 }
                 # Row tints match badge colors: gold / emerald / blue
                 _top3_row = {
@@ -2562,7 +2562,9 @@ if _page == 'Game Analysis':
                     result = []
                     for col in df.columns:
                         if col == 'Rank' and i in _rank_cell:
-                            result.append(_rank_cell[i])
+                            result.append(base + _rank_cell[i])
+                        elif col == 'Rank':
+                            result.append(base + 'text-align:center!important;')
                         elif col == 'P(3v) %' and i >= 3:
                             v = float(row[col]) if row[col] != '' else 0.0
                             norm = v / max_p3v if max_p3v > 0 else 0.0
