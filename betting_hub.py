@@ -228,35 +228,21 @@ def _save_tip_result(tip_id: str, result: str):
     df = _load_tips()  # _load_tips now guarantees string dtype for 'result'
     mask = df['tip_id'].astype(str) == str(tip_id)
     pl = 0.0
-    # DEBUG
-    import os as _os
-    _dbg = [
-        f"tip_id={tip_id!r}  result={result!r}",
-        f"tips CSV rows={len(df)}  mask.any()={mask.any()}",
-        f"tips CSV path={_os.path.abspath(TIPS_CSV)}",
-    ]
     if mask.any():
         row   = df[mask].iloc[0]
         odds  = pd.to_numeric(row.get('odds', 0),  errors='coerce') or 0.0
         stake = pd.to_numeric(row.get('stake', 0), errors='coerce') or 0.0
-        _dbg.append(f"odds={odds}  stake={stake}")
         if result and odds > 1 and stake > 0:
             pl = _compute_pl(float(odds), float(stake), result)
         df.loc[mask, 'result']       = result
         df.loc[mask, 'profit_loss']  = pl if result else float('nan')
         df.to_csv(TIPS_CSV, index=False)
-        _dbg.append(f"pl={pl}  saved tips CSV OK")
         try:
             _sync_tip_to_bets(tip_id, row, result, pl)
-            bets_after = _load_bets()
-            _dbg.append(f"bets CSV rows after sync={len(bets_after)}")
         except Exception as e:
             st.error(f"Tip result saved but failed to sync to bet history: {e}")
-            _dbg.append(f"SYNC ERROR: {e}")
     else:
         df.to_csv(TIPS_CSV, index=False)
-        _dbg.append("mask was False — tip_id not found in CSV")
-    st.warning("DEBUG: " + " | ".join(_dbg))
 
 
 def _sync_tip_to_bets(tip_id: str, tip_row, result: str, pl: float):
@@ -1383,19 +1369,6 @@ def render_cha_ching_tips():
         'Upcoming fixtures · Player prop markets · Cha Ching checklist</p></div>',
         unsafe_allow_html=True,
     )
-
-    # ── DEBUG ─────────────────────────────────────────────────────────────────
-    import os as _os
-    _tips_dbg = _load_tips()
-    _bets_dbg = _load_bets()
-    with st.expander("🔍 Debug info", expanded=True):
-        st.code(
-            f"tips CSV: {_os.path.abspath(TIPS_CSV)}\n"
-            f"bets CSV: {_os.path.abspath(BETS_CSV)}\n"
-            f"tips rows: {len(_tips_dbg)}  |  bets rows: {len(_bets_dbg)}\n"
-            f"CC bets (is_cha_ching=True): {len(_bets_dbg[_bets_dbg['is_cha_ching']==True])}\n"
-            + (f"tips:\n{_tips_dbg[['tip_id','player','result','is_flagged','odds','stake']].to_string()}" if not _tips_dbg.empty else "tips: (empty)")
-        )
 
     # ── Historical CC bets ────────────────────────────────────────────────────
     cc_bets = _load_bets()
