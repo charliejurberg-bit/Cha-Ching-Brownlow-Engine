@@ -1466,6 +1466,20 @@ def render_cha_ching_tips():
                 player   = str(tip.get('player', ''))
                 gkey     = str(tip.get('game_key', ''))
                 mtype    = str(tip.get('market_type', ''))
+                line_raw = pd.to_numeric(tip.get('line', ''), errors='coerce')
+                odds_raw = pd.to_numeric(tip.get('odds', ''), errors='coerce')
+                stake_raw= pd.to_numeric(tip.get('stake', ''), errors='coerce')
+                bookie   = str(tip.get('bookmaker', '') or '')
+                bet_parts = []
+                if not pd.isna(line_raw):
+                    bet_parts.append(f"O/U {line_raw:.1f}")
+                if not pd.isna(odds_raw) and odds_raw > 1:
+                    bet_parts.append(f"@ {odds_raw:.2f}")
+                if bookie:
+                    bet_parts.append(f"({bookie})")
+                if not pd.isna(stake_raw) and stake_raw > 0:
+                    bet_parts.append(f"— {stake_raw:.2f}u")
+                bet_detail = '&nbsp;&nbsp;'.join(bet_parts)
                 card_col, btn_col = st.columns([3, 2])
                 with card_col:
                     st.markdown(
@@ -1474,8 +1488,11 @@ def render_cha_ching_tips():
                         f'<div style="display:flex;align-items:center;gap:0;margin-bottom:4px">'
                         f'<span style="font-weight:700;color:#e8f0f8;font-size:14px">{player}</span>'
                         f'<span class="live-badge">● LIVE</span></div>'
-                        f'<div style="font-size:12px;color:#94a3b8">{gkey}'
-                        f'&nbsp;&nbsp;·&nbsp;&nbsp;{mtype}</div></div>',
+                        f'<div style="font-size:12px;color:#94a3b8;margin-bottom:2px">{gkey}'
+                        f'&nbsp;&nbsp;·&nbsp;&nbsp;{mtype}</div>'
+                        + (f'<div style="font-size:12px;font-family:DM Mono,monospace;color:#f0b429">'
+                           f'{bet_detail}</div>' if bet_detail else '')
+                        + f'</div>',
                         unsafe_allow_html=True,
                     )
                 with btn_col:
