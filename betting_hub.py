@@ -1504,26 +1504,27 @@ def render_cha_ching_tips():
         st.session_state['_manual_games'] = []
 
     with st.expander("+ Add game manually", expanded=False):
-        with st.form("manual_game_form", clear_on_submit=True):
-            mg1, mg2, mg3, mg4 = st.columns([1.5, 2, 2, 1])
-            with mg1:
-                mg_round = st.text_input("Round", placeholder="Round 11", key='mg_round')
-            with mg2:
-                mg_home  = st.text_input("Home team", placeholder="Richmond", key='mg_home')
-            with mg3:
-                mg_away  = st.text_input("Away team", placeholder="Essendon", key='mg_away')
-            with mg4:
-                st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
-                submitted = st.form_submit_button("Add", use_container_width=True)
-            if submitted:
-                r = mg_round.strip()
-                h = mg_home.strip()
-                a = mg_away.strip()
+        mg1, mg2, mg3, mg4 = st.columns([1.5, 2, 2, 1])
+        with mg1:
+            mg_round = st.text_input("Round", placeholder="Round 11", key='mg_round')
+        with mg2:
+            mg_home  = st.text_input("Home team", placeholder="Richmond", key='mg_home')
+        with mg3:
+            mg_away  = st.text_input("Away team", placeholder="Essendon", key='mg_away')
+        with mg4:
+            st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
+            if st.button("Add", key='mg_add', use_container_width=True):
+                r = st.session_state.get('mg_round', '').strip()
+                h = st.session_state.get('mg_home', '').strip()
+                a = st.session_state.get('mg_away', '').strip()
                 if r and h and a:
                     new_gkey = f"{r} {h} v {a}"
                     existing = [g['gkey'] for g in st.session_state['_manual_games']]
                     if new_gkey not in existing:
                         st.session_state['_manual_games'].append({'roundname': r, 'hteam': h, 'ateam': a, 'gkey': new_gkey})
+                    st.session_state['mg_round'] = ''
+                    st.session_state['mg_home']  = ''
+                    st.session_state['mg_away']  = ''
                     st.rerun()
                 else:
                     st.warning("Fill in all three fields.")
