@@ -219,13 +219,46 @@ def _save_tip_result(tip_id: str, result: str):
         df['profit_loss'] = ''
     mask = df['tip_id'] == tip_id
     df.loc[mask, 'result'] = result
+    pl = 0.0
     if mask.any():
-        row = df[mask].iloc[0]
-        odds  = pd.to_numeric(row.get('odds', 0), errors='coerce') or 0.0
+        row   = df[mask].iloc[0]
+        odds  = pd.to_numeric(row.get('odds', 0),  errors='coerce') or 0.0
         stake = pd.to_numeric(row.get('stake', 0), errors='coerce') or 0.0
         if odds > 1 and stake > 0:
-            df.loc[mask, 'profit_loss'] = _compute_pl(float(odds), float(stake), result)
-    df.to_csv(TIPS_CSV, index=False)
+            pl = _compute_pl(float(odds), float(stake), result)
+            df.loc[mask, 'profit_loss'] = pl
+        df.to_csv(TIPS_CSV, index=False)
+        # Sync to bets.csv so it appears in Cha Ching Bet History
+        _sync_tip_to_bets(tip_id, row, result, pl)
+    else:
+        df.to_csv(TIPS_CSV, index=False)
+
+
+def _sync_tip_to_bets(tip_id: str, tip_row, result: str, pl: float):
+    """Write or remove a settled tip as a CC bet record in bets.csv."""
+    bets = _load_bets()
+    # Remove any existing record for this tip (identified by bet_id == tip_id)
+    bets = bets[bets['bet_id'] != tip_id].copy()
+    if result:  # empty result means clearing — just remove
+        odds  = pd.to_numeric(tip_row.get('odds',  0), errors='coerce') or 0.0
+        stake = pd.to_numeric(tip_row.get('stake', 0), errors='coerce') or 0.0
+        new_bet = {
+            'bet_id':             tip_id,
+            'date':               date.today().strftime('%Y-%m-%d'),
+            'match':              str(tip_row.get('game_key', '')),
+            'market_type':        str(tip_row.get('market_type', '')),
+            'selection':          str(tip_row.get('player', '')),
+            'bookmaker':          str(tip_row.get('bookmaker', '') or ''),
+            'odds':               round(float(odds), 2),
+            'stake':              round(float(stake), 2),
+            'result':             result,
+            'profit_loss':        round(float(pl), 2),
+            'is_cha_ching':       True,
+            'cha_ching_criteria': str(tip_row.get('criteria_json', '') or ''),
+            'notes':              str(tip_row.get('notes', '') or ''),
+        }
+        bets = pd.concat([bets, pd.DataFrame([new_bet])], ignore_index=True)
+    _save_bets(bets)
 
 
 def _load_props() -> pd.DataFrame:
