@@ -1391,19 +1391,18 @@ def render_cha_ching_tips():
     with st.spinner("Loading fixtures..."):
         fixtures = _fetch_fixtures()
 
-    if fixtures.empty:
-        st.warning(
-            "Could not load upcoming fixtures from Squiggle API. "
-            "The API may be down or there are no games in the next 7 days."
-        )
-        st.caption("Squiggle API: https://api.squiggle.com.au")
-        _render_manual_props()
-        return
-
     props_df = _load_props()
 
     # ── Live & Settled flagged tips ───────────────────────────────────────────
-    upcoming_keys = {_game_key(g) for _, g in fixtures.iterrows()}
+    # Re-evaluate against current time — fixtures may be cached up to 24h old,
+    # so a game that was upcoming at cache time may have since kicked off.
+    _now_utc = pd.Timestamp.now(tz='UTC')
+    upcoming_keys = set()
+    for _, _g in fixtures.iterrows():
+        _dp = _g.get('date_parsed')
+        if pd.notna(_dp) and pd.Timestamp(_dp) > _now_utc:
+            upcoming_keys.add(_game_key(_g))
+
     if 'result' not in tips_df.columns:
         tips_df['result'] = ''
     flagged_all = tips_df[tips_df['is_flagged'] == True].copy() if not tips_df.empty else pd.DataFrame()
@@ -1479,6 +1478,16 @@ def render_cha_ching_tips():
                                  type='secondary', use_container_width=False):
                         _save_tip_result(tip_id, '')
                         st.rerun()
+
+    # ── Upcoming games ────────────────────────────────────────────────────────
+    if fixtures.empty:
+        st.warning(
+            "Could not load upcoming fixtures from Squiggle API. "
+            "The API may be down or there are no games in the next 7 days."
+        )
+        st.caption("Squiggle API: https://api.squiggle.com.au")
+        _render_manual_props()
+        return
 
     st.markdown('<div class="section-header">Upcoming Games — Next 7 Days</div>',
                 unsafe_allow_html=True)
