@@ -1445,6 +1445,7 @@ def _nav_select(cat_key):
 
 # ── Single nav row (Brownlow + Betting Hub) ───────────────────
 _ALL_NAV = {**_NAV_BROWNLOW, **_NAV_BETTING}
+_page = st.session_state.page
 
 # Reflect current page in the relevant dropdown before rendering
 for _cat, _pages in _ALL_NAV.items():
@@ -1461,8 +1462,6 @@ for _col, (_cat, _pages) in zip(_nav_cols, _ALL_NAV.items()):
             on_change=_nav_select,
             args=(f"_nav_{_cat}",),
         )
-
-_page = st.session_state.page
 
 # ── Controls row (season + odds timestamp + run update) ──────
 # Only show controls for Brownlow pages, not Betting Hub or Landing
