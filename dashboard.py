@@ -1442,17 +1442,20 @@ def _nav_select(cat_key):
     val = st.session_state.get(cat_key)
     if val is not None:
         st.session_state.page = val
-    st.session_state[cat_key] = None
 
 # ── Single nav row (Brownlow + Betting Hub) ───────────────────
 _ALL_NAV = {**_NAV_BROWNLOW, **_NAV_BETTING}
+
+# Reflect current page in the relevant dropdown before rendering
+for _cat, _pages in _ALL_NAV.items():
+    st.session_state[f"_nav_{_cat}"] = _page if _page in _pages else None
+
 st.markdown('<div class="nav-anchor"></div>', unsafe_allow_html=True)
 _nav_cols = st.columns(6)
 for _col, (_cat, _pages) in zip(_nav_cols, _ALL_NAV.items()):
     with _col:
         st.selectbox(
             _cat, _pages,
-            index=None,
             placeholder=_cat,
             key=f"_nav_{_cat}",
             on_change=_nav_select,
@@ -1561,7 +1564,7 @@ elif _page in _BH_PAGES:
 # ════════════════════════════════════════════════════════════
 if _page == 'Home':
     SEASON = 2026
-    CURRENT_ROUND = 10  # UPDATE THIS EACH WEEK
+    CURRENT_ROUND = max_season_rounds
 
     df = load_season(SEASON)
     odds_df = load_best_odds()
@@ -1631,8 +1634,7 @@ if _page == 'Home':
     c1, c2, c3, c4 = st.columns(4)
     with c1:
         st.markdown(f"""
-<div class="mt-card" style="background:#152533;border:1px solid #2a4a5a;
-            border-left:3px solid #f0b429;border-radius:10px;padding:16px 18px;">
+<div class="mt-card" style="background:#152533;border:1px solid rgba(240,180,41,0.3);border-radius:10px;padding:16px 18px;">
   <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
               color:#94a3b8;margin-bottom:6px;">Predicted winner</div>
   <div style="font-size:20px;font-weight:700;color:#f0b429;
@@ -1642,8 +1644,7 @@ if _page == 'Home':
 
     with c2:
         st.markdown(f"""
-<div class="mt-card" style="background:#152533;border:1px solid #2a4a5a;
-            border-left:3px solid #34d399;border-radius:10px;padding:16px 18px;">
+<div class="mt-card" style="background:#152533;border:1px solid rgba(52,211,153,0.3);border-radius:10px;padding:16px 18px;">
   <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
               color:#94a3b8;margin-bottom:6px;">Best odds</div>
   <div style="font-size:20px;font-weight:700;color:#34d399;
@@ -1653,8 +1654,7 @@ if _page == 'Home':
 
     with c3:
         st.markdown(f"""
-<div class="mt-card" style="background:#152533;border:1px solid #2a4a5a;
-            border-left:3px solid #4a90c4;border-radius:10px;padding:16px 18px;">
+<div class="mt-card" style="background:#152533;border:1px solid #2a4a5a;border-radius:10px;padding:16px 18px;">
   <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
               color:#94a3b8;margin-bottom:6px;">Model accuracy</div>
   <div style="font-size:20px;font-weight:700;color:#e8f0f8;
@@ -1664,8 +1664,7 @@ if _page == 'Home':
 
     with c4:
         st.markdown(f"""
-<div class="mt-card" style="background:#152533;border:1px solid #2a4a5a;
-            border-left:3px solid #e05252;border-radius:10px;padding:16px 18px;">
+<div class="mt-card" style="background:#152533;border:1px solid #2a4a5a;border-radius:10px;padding:16px 18px;">
   <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
               color:#94a3b8;margin-bottom:6px;">Round</div>
   <div style="font-size:20px;font-weight:700;color:#e8f0f8;
