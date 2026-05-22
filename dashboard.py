@@ -492,37 +492,74 @@ st.markdown("""
     .dna-value { color: #34d399; font-size: 22px; font-weight: 700; line-height: 1.2; }
     .dna-sub   { color: #94a3b8; font-size: 12px; margin-top: 3px; line-height: 1.4; }
 
-    /* ── Landing page hero ── */
-    .landing-hero { text-align: center; padding: 40px 0 32px 0; }
-    .landing-hero h2 { color: #e8f0f8; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin: 0 0 10px 0; }
-    .landing-hero p  { color: #4a5a6a; font-size: 14px; margin: 0; font-weight: 500; }
-
-    /* ── Landing cards (top border, no side stripe) ── */
-    .landing-card {
+    /* ── Landing page ── */
+    .land-ribbon {
+        display: flex;
         background: #152533;
         border: 1px solid #2a4a5a;
-        border-top: 3px solid #2a4a5a;
-        border-radius: 12px;
-        padding: 44px 36px 40px 36px;
-        text-align: center;
-        min-height: 240px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        cursor: pointer;
-        transition: background 220ms cubic-bezier(0.23,1,0.32,1), border-color 220ms ease-out;
+        border-radius: 8px;
+        margin: 12px 0 24px;
+        overflow: hidden;
     }
-    .landing-card:hover { background: #1e3a4a; }
-    .landing-card.brownlow { border-top-color: #34d399; }
-    .landing-card.betting  { border-top-color: #f0b429; }
-    .landing-icon  { font-size: 54px; margin-bottom: 14px; line-height: 1; }
-    .landing-title { font-size: 28px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 10px; }
-    .landing-title.brownlow { color: #34d399; }
-    .landing-title.betting  { color: #f0b429; }
-    .landing-desc  { color: #94a3b8; font-size: 13px; line-height: 1.6; max-width: 300px; }
-    .landing-icon  { display: inline-block; }
-    .landing-card:hover .landing-icon { transform: scale(1.06); transition: transform 180ms ease-out; }
+    .land-stat {
+        flex: 1;
+        padding: 14px 20px;
+        border-right: 1px solid #2a4a5a;
+    }
+    .land-stat:last-child { border-right: none; }
+    .land-stat-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #4a5a6a;
+        margin-bottom: 3px;
+    }
+    .land-stat-value {
+        font-size: 16px;
+        font-weight: 700;
+        color: #e8f0f8;
+        font-family: 'DM Mono', monospace;
+        letter-spacing: -0.3px;
+    }
+    .land-tile {
+        background: #152533;
+        border: 1px solid #2a4a5a;
+        border-radius: 10px;
+        padding: 28px 24px 24px;
+        margin-bottom: 10px;
+        transition: background 200ms ease-out;
+    }
+    .land-tile:hover { background: #1a2d3d; }
+    .land-tile.bw { border-top: 3px solid #34d399; }
+    .land-tile.bh { border-top: 3px solid #f0b429; }
+    .land-tile-icon { font-size: 40px; line-height: 1; margin-bottom: 14px; }
+    .land-tile-name { font-size: 20px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 8px; }
+    .land-tile-name.bw { color: #34d399; }
+    .land-tile-name.bh { color: #f0b429; }
+    .land-tile-desc { color: #94a3b8; font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
+    .land-tile-preview {
+        display: flex;
+        align-items: baseline;
+        gap: 6px;
+        padding: 9px 12px;
+        background: #1e3a4a;
+        border-radius: 6px;
+    }
+    .land-tile-preview.gold { background: rgba(240,180,41,0.07); }
+    .land-preview-label {
+        font-size: 10px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: #4a5a6a;
+    }
+    .land-preview-val {
+        font-size: 14px;
+        font-weight: 700;
+        color: #e8f0f8;
+        font-family: 'DM Mono', monospace;
+    }
 
     /* ── Secondary button ── */
     [data-testid="stBaseButton-secondary"] {
@@ -1517,37 +1554,86 @@ if _show_controls:
 # LANDING PAGE
 # ════════════════════════════════════════════════════════════
 if _page == 'Landing':
-    st.markdown(
-        '<div class="landing-hero">'
-        '<h2>What would you like to do today?</h2>'
-        '<p>Choose a section to get started</p>'
-        '</div>',
-        unsafe_allow_html=True,
-    )
-    _lc1, _lc2 = st.columns(2, gap="large")
-    with _lc1:
-        st.markdown(
-            '<div class="landing-card brownlow">'
-            '<div class="landing-icon">&#127942;</div>'
-            '<div class="landing-title brownlow">Brownlow</div>'
-            '<div class="landing-desc">Live leaderboard, player profiles, model predictions, '
-            'game-by-game analysis, and betting edge — everything for the 2026 Brownlow Medal count.</div>'
-            '</div>',
-            unsafe_allow_html=True,
+    # Live context: compute leader from current season data
+    _land_df = load_season(selected_season)
+    _land_leader = "—"
+    _land_votes = 0.0
+    if _land_df is not None and not _land_df.empty and 'Exp_Total_Votes' in _land_df.columns:
+        _land_top = (
+            _land_df.groupby("Player_Name")["Exp_Total_Votes"]
+            .sum()
+            .sort_values(ascending=False)
         )
+        if len(_land_top):
+            _land_leader = _land_top.index[0]
+            _land_votes = float(_land_top.iloc[0])
+
+    # Betting P&L summary
+    try:
+        _land_bets = betting_hub._load_bets()
+        _land_pl = float(_land_bets["profit_loss"].sum()) if not _land_bets.empty else None
+        _land_n = len(_land_bets)
+    except Exception:
+        _land_pl = None
+        _land_n = 0
+
+    if _land_pl is not None:
+        _pl_str = f"+${_land_pl:.2f}" if _land_pl >= 0 else f"-${abs(_land_pl):.2f}"
+    else:
+        _pl_str = "—"
+    _pl_color = "#34d399" if (_land_pl or 0) >= 0 else "#e05252"
+
+    # Context ribbon
+    st.markdown(f"""
+<div class="land-ribbon">
+  <div class="land-stat">
+    <div class="land-stat-label">Round</div>
+    <div class="land-stat-value">{max_season_rounds}</div>
+  </div>
+  <div class="land-stat">
+    <div class="land-stat-label">Current Leader</div>
+    <div class="land-stat-value" style="color:#34d399">{_land_leader}</div>
+  </div>
+  <div class="land-stat">
+    <div class="land-stat-label">Predicted Votes</div>
+    <div class="land-stat-value">{_land_votes:.1f}</div>
+  </div>
+  <div class="land-stat">
+    <div class="land-stat-label">Betting P&amp;L</div>
+    <div class="land-stat-value" style="color:{_pl_color}">{_pl_str}</div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
+    _lc1, _lc2 = st.columns(2, gap="medium")
+    with _lc1:
+        st.markdown(f"""
+<div class="land-tile bw">
+  <div class="land-tile-icon">&#127942;</div>
+  <div class="land-tile-name bw">Brownlow Medal</div>
+  <div class="land-tile-desc">Live leaderboard, player profiles, model predictions, game-by-game analysis, and betting edge.</div>
+  <div class="land-tile-preview">
+    <span class="land-preview-label">Leader</span>
+    <span class="land-preview-val">{_land_leader}</span>
+    <span class="land-preview-label" style="margin-left:10px">Proj. votes</span>
+    <span class="land-preview-val">{_land_votes:.1f}</span>
+  </div>
+</div>""", unsafe_allow_html=True)
         if st.button("Leaderboard →", use_container_width=True, type="primary", key="land_bw"):
             st.session_state.page = 'Leaderboard'
             st.rerun()
     with _lc2:
-        st.markdown(
-            '<div class="landing-card betting">'
-            '<div class="landing-icon">&#128176;</div>'
-            '<div class="landing-title betting">Betting Hub</div>'
-            '<div class="landing-desc">Track bets, log P&L, flag Cha Ching tips via the checklist, '
-            'analyse hit rates and ROI across markets, bookmakers, and odds ranges.</div>'
-            '</div>',
-            unsafe_allow_html=True,
-        )
+        _bets_preview = f"{_land_n} bets &nbsp;&middot;&nbsp; {_pl_str}" if _land_n > 0 else "No bets logged yet"
+        st.markdown(f"""
+<div class="land-tile bh">
+  <div class="land-tile-icon">&#128176;</div>
+  <div class="land-tile-name bh">Betting Hub</div>
+  <div class="land-tile-desc">Track bets, log P&amp;L, flag Cha Ching tips, analyse hit rates and ROI across markets.</div>
+  <div class="land-tile-preview gold">
+    <span class="land-preview-label">Season</span>
+    <span class="land-preview-val">{_bets_preview}</span>
+  </div>
+</div>""", unsafe_allow_html=True)
         if st.button("Open Betting Hub →", use_container_width=True, key="land_bh"):
             st.session_state.page = 'BH Dashboard'
             st.rerun()
