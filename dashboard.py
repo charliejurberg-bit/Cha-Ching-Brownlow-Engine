@@ -270,6 +270,11 @@ def apply_chart_theme(fig):
             borderwidth=1,
             font=dict(color="#94a3b8", size=11),
         ),
+        polar=dict(
+            bgcolor="#152533",
+            radialaxis=dict(gridcolor="#1e3a4a", tickfont=dict(color="#94a3b8", size=10)),
+            angularaxis=dict(gridcolor="#1e3a4a", tickfont=dict(color="#94a3b8", size=11)),
+        ),
         margin=dict(l=16, r=16, t=40, b=16),
     )
     fig.update_traces(marker_line_width=0)
@@ -278,130 +283,38 @@ def apply_chart_theme(fig):
 # ── CSS ──────────────────────────────────────────────────────
 st.markdown("""
 <style>
-    /* ── Global ── */
+    /* ── Structural ── */
     body { overflow-x: hidden !important; }
-    [data-testid="stToolbar"] { display: none !important; }
-    [data-testid="collapsedControl"] { display: none !important; }
+    [data-testid="stToolbar"]       { display: none !important; }
+    [data-testid="collapsedControl"]{ display: none !important; }
     * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; box-sizing: border-box; }
-    .stApp { background-color: #e8f0f8; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #2c2c2c; }
-    .main .block-container { background-color: #e8f0f8; padding-top: 0 !important; padding-bottom: 2.5rem; padding-left: 1rem !important; padding-right: 1rem !important; }
+    .main .block-container {
+        padding-top: 0 !important;
+        padding-bottom: 2.5rem;
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
     @media (max-width: 768px) {
         .main .block-container { padding-left: 0.4rem !important; padding-right: 0.4rem !important; }
     }
 
-    /* ── Scrollbar ── */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: #f0ece4; }
-    ::-webkit-scrollbar-thumb { background: #cfc4b0; border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
-
-    /* ── Sidebar ── */
-    [data-testid="stSidebar"] { background-color: #e8e0d0; border-right: 1px solid #cfc4b0; }
-    [data-testid="stSidebar"] p,
-    [data-testid="stSidebar"] label,
-    [data-testid="stSidebar"] span,
-    [data-testid="stSidebar"] div { color: #2c2c2c; }
-    [data-testid="stSidebar"] h1,
-    [data-testid="stSidebar"] h2,
-    [data-testid="stSidebar"] h3 { color: #34d399 !important; }
-    [data-testid="stSidebar"] .stCaption { color: #6c6c6c !important; }
-
     /* ── Nav dropdown bar ── */
     .nav-anchor + div[data-testid="stHorizontalBlock"] {
-        background: #e8e0d0 !important;
+        background: #0d1720 !important;
         padding: 2px 8px 6px 8px !important;
-        border-bottom: 2px solid #cfc4b0 !important;
+        border-bottom: 1px solid #2a4a5a !important;
         margin-bottom: 20px !important;
         border-radius: 0 0 8px 8px !important;
-        flex-wrap: nowrap !important;
     }
     .nav-anchor + div[data-testid="stHorizontalBlock"] label {
-        color: #34d399 !important;
+        color: #4a5a6a !important;
         font-size: 10px !important;
-        font-weight: 700 !important;
+        font-weight: 600 !important;
         letter-spacing: 1.5px !important;
         text-transform: uppercase !important;
     }
 
-    /* ── Sidebar diagonal texture ── */
-    [data-testid="stSidebar"] > div:first-child {
-        background-image:
-            url("data:image/svg+xml,%3Csvg width='20' height='20' viewBox='0 0 20 20' xmlns='http://www.w3.org/2000/svg'%3E%3Cline x1='0' y1='20' x2='20' y2='0' stroke='%238b6f47' stroke-width='0.5' opacity='0.25'/%3E%3C/svg%3E"),
-            linear-gradient(180deg, #e8e0d0 0%, #e0d8c6 100%) !important;
-    }
-
-    /* ── Card subtle grain ── */
-    .metric-card::after, .metric-card-primary::after, .dna-card::after, .quick-link-card::after {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 128 128' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-        border-radius: inherit;
-        pointer-events: none;
-    }
-    .metric-card, .metric-card-primary, .dna-card, .quick-link-card { position: relative; }
-
-    /* ── Decorative section dividers ── */
-    hr {
-        border: none !important;
-        height: 1px !important;
-        background: linear-gradient(to right, transparent, #94a3b8 20%, #cfc4b0 50%, #94a3b8 80%, transparent) !important;
-        margin: 20px 0 !important;
-        opacity: 0.6;
-    }
-
-    /* ── Run Update button: dark green ── */
-    [data-testid="stBaseButton-primary"],
-    button[kind="primary"] {
-        background-color: #34d399 !important;
-        color: #e8f0f8 !important;
-        border: none !important;
-        font-weight: 600 !important;
-        transition: background-color 0.15s ease, transform 0.12s ease, box-shadow 0.15s ease !important;
-        will-change: transform;
-    }
-    [data-testid="stBaseButton-primary"]:hover,
-    button[kind="primary"]:hover {
-        background-color: #1a3009 !important;
-        color: #e8f0f8 !important;
-        transform: translateY(-1px) !important;
-        box-shadow: 0 3px 10px rgba(45,80,22,0.25) !important;
-    }
-    [data-testid="stBaseButton-primary"]:active,
-    button[kind="primary"]:active {
-        transform: translateY(0px) !important;
-        box-shadow: none !important;
-        background-color: #122008 !important;
-    }
-
-    /* ── Banner gradient shift ── */
-    @keyframes bannerShift {
-        0%   { background-position: 0% 50%; }
-        50%  { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
-    }
-    /* ── Title shimmer sweep ── */
-    @keyframes titleShimmer {
-        from { background-position: 200% center; }
-        to   { background-position: -200% center; }
-    }
-    /* ── Column stagger enter ── */
-    @keyframes columnEnter {
-        from { opacity: 0; transform: translateY(10px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-    /* ── Chart reveal ── */
-    @keyframes chartReveal {
-        from { opacity: 0; transform: translateY(6px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-    /* ── Skeleton shimmer sweep ── */
-    @keyframes shimmerSweep {
-        0%   { background-position: 200% center; }
-        100% { background-position: -200% center; }
-    }
-
-    /* ── CHA CHING banner — full viewport width ── */
+    /* ── CHA CHING banner ── */
     .cha-ching-banner {
         position: relative;
         left: 50%;
@@ -414,30 +327,28 @@ st.markdown("""
         );
         background-size: 300% 300%;
         animation: bannerShift 10s ease infinite;
-        border-radius: 0;
         padding: 52px 48px 44px 48px;
         margin-bottom: 0;
-        border-bottom: 2px solid #34d399;
+        border-bottom: 1px solid #2a4a5a;
         text-align: center;
     }
-    /* Diagonal line texture overlay */
     .cha-ching-banner::before {
         content: '';
         position: absolute;
         inset: 0;
-        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23ffffff' stroke-width='0.5' opacity='0.07'%3E%3Cline x1='0' y1='60' x2='60' y2='0'/%3E%3Cline x1='30' y1='60' x2='60' y2='30'/%3E%3Cline x1='0' y1='30' x2='30' y2='0'/%3E%3C/g%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23ffffff' stroke-width='0.5' opacity='0.05'%3E%3Cline x1='0' y1='60' x2='60' y2='0'/%3E%3Cline x1='30' y1='60' x2='60' y2='30'/%3E%3Cline x1='0' y1='30' x2='30' y2='0'/%3E%3C/g%3E%3C/svg%3E");
         pointer-events: none;
     }
-    /* Decorative floating symbols */
     .cha-ching-deco {
         position: absolute;
         color: #ffffff;
         font-size: 80px;
-        opacity: 0.07;
+        opacity: 0.05;
         pointer-events: none;
         user-select: none;
         line-height: 1;
     }
+    /* Solid color — gradient text is banned */
     .cha-ching-title {
         position: relative;
         font-size: 84px;
@@ -445,17 +356,7 @@ st.markdown("""
         letter-spacing: -3px;
         margin: 0 0 14px 0;
         line-height: 1;
-        background: linear-gradient(
-            90deg,
-            #e8f0f8 0%, #e8f0f8 25%,
-            #34d399 40%, #34d399 50%, #34d399 60%,
-            #e8f0f8 75%, #e8f0f8 100%
-        );
-        background-size: 200% auto;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        animation: titleShimmer 5s linear infinite;
+        color: #e8f0f8;
     }
     .cha-ching-sub {
         position: relative;
@@ -468,7 +369,7 @@ st.markdown("""
         opacity: 0.9;
     }
 
-    /* ── Column stagger animations ── */
+    /* ── Column stagger ── */
     [data-testid="stColumn"] { animation: columnEnter 0.3s ease both; }
     [data-testid="stColumn"]:nth-child(1) { animation-delay: 0ms; }
     [data-testid="stColumn"]:nth-child(2) { animation-delay: 60ms; }
@@ -476,20 +377,20 @@ st.markdown("""
     [data-testid="stColumn"]:nth-child(4) { animation-delay: 180ms; }
     [data-testid="stColumn"]:nth-child(5) { animation-delay: 240ms; }
 
-    /* ── Chart reveal on render ── */
+    /* ── Chart reveal ── */
     [data-testid="stPlotlyChart"] { animation: chartReveal 0.4s ease both; }
 
-    /* ── Skeleton loader — shimmer sweep ── */
+    /* ── Skeleton loader (Midnight Turf) ── */
     .sk-card {
-        background: #ffffff;
-        border: 1px solid #ddd5c5;
+        background: #152533;
+        border: 1px solid #2a4a5a;
         border-radius: 8px;
         padding: 20px 24px;
         margin: 8px 0;
         overflow: hidden;
     }
     .sk-title, .sk-line, .sk-bar {
-        background: linear-gradient(90deg, #e8e0d0 25%, #f5f0e8 50%, #e8e0d0 75%);
+        background: linear-gradient(90deg, #1e3a4a 25%, #243a4a 50%, #1e3a4a 75%);
         background-size: 200% 100%;
         animation: shimmerSweep 1.4s linear infinite;
         border-radius: 4px;
@@ -503,352 +404,174 @@ st.markdown("""
 
     /* ── Quick link cards ── */
     .quick-link-card {
-        background: #ffffff;
-        border: 1px solid #ddd5c5;
-        border-top: 3px solid #34d399;
+        background: #152533;
+        border: 1px solid #2a4a5a;
+        border-top: 2px solid #34d399;
         border-radius: 6px;
         padding: 16px 18px;
         margin: 0;
         min-height: 80px;
-        box-shadow: 0 1px 4px rgba(0,0,0,0.04);
         cursor: pointer;
-        transition: box-shadow 0.18s ease, border-top-color 0.18s ease, transform 0.18s ease;
-        will-change: transform;
+        transition: background 180ms ease-out;
     }
-    .quick-link-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.08); border-top-color: #1a3009; transform: translateY(-2px); }
-    .quick-link-title { color: #34d399; font-size: 11px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; margin: 0 0 6px 0; }
-    .quick-link-desc { color: #6c6c6c; font-size: 12px; line-height: 1.55; margin: 0; }
+    .quick-link-card:hover { background: #1e3a4a; }
+    .quick-link-title { color: #4a5a6a; font-size: 11px; font-weight: 600; letter-spacing: 0.5px; text-transform: uppercase; margin: 0 0 6px 0; }
+    .quick-link-desc  { color: #94a3b8; font-size: 12px; line-height: 1.55; margin: 0; }
 
     /* ── Metric cards ── */
     .metric-card {
-        background: #e8f0f8;
-        border: 1px solid #ddd5c5;
+        background: #152533;
+        border: 1px solid #2a4a5a;
         border-radius: 8px;
         padding: 16px 20px;
         margin: 6px 0;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
-        cursor: default;
-        transition: box-shadow 0.18s ease, transform 0.18s ease;
-        will-change: transform;
+        transition: background 160ms ease-out;
     }
-    .metric-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.05); transform: translateY(-2px); }
+    .metric-card:hover { background: #1e3a4a; }
+    /* Accent-tinted full border; no side stripe */
     .metric-card-primary {
-        background: #ffffff;
-        border: 1px solid #ddd5c5;
-        border-left: 4px solid #34d399;
+        background: #152533;
+        border: 1px solid rgba(52,211,153,0.3);
         border-radius: 8px;
         padding: 20px 24px;
         margin: 6px 0;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
-        cursor: default;
-        transition: box-shadow 0.18s ease, transform 0.18s ease;
-        will-change: transform;
+        transition: background 160ms ease-out, border-color 160ms ease-out;
     }
-    .metric-card-primary:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.05); transform: translateY(-2px); }
+    .metric-card-primary:hover { background: #1a2f22; border-color: rgba(52,211,153,0.6); }
+    /* Gold-tinted full border for leader context */
     .leader-card {
-        background: #f0ece4;
-        border: 1px solid #ddd5c5;
-        border-left: 4px solid #c9a84c;
+        background: #1a2d1a;
+        border: 1px solid rgba(240,180,41,0.25);
         border-radius: 8px;
         padding: 20px 24px;
         margin: 6px 0;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
-        transition: box-shadow 0.18s ease, transform 0.18s ease;
-        will-change: transform;
+        transition: background 160ms ease-out;
     }
-    .leader-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.05); transform: translateY(-2px); }
-    .metric-label { color: #94a3b8; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
-    .metric-value { color: #34d399; font-size: 26px; font-weight: 700; margin-top: 2px; line-height: 1.15; }
+    .leader-card:hover { background: #1f341f; }
+    .metric-label    { color: #4a5a6a; font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 2px; }
+    .metric-value    { color: #34d399; font-size: 26px; font-weight: 700; margin-top: 2px; line-height: 1.15; }
     .metric-value-lg { color: #34d399; font-size: 32px; font-weight: 700; margin-top: 2px; line-height: 1.1; }
-    .metric-sub { color: #6c6c6c; font-size: 12px; margin-top: 4px; line-height: 1.4; }
+    .metric-sub      { color: #94a3b8; font-size: 12px; margin-top: 4px; line-height: 1.4; }
 
     /* ── Title bar ── */
     .title-bar {
-        background: #e8f0f8;
-        border: 1px solid #ddd5c5;
-        border-left: 5px solid #94a3b8;
+        background: #152533;
+        border: 1px solid #2a4a5a;
         padding: 18px 24px;
         border-radius: 6px;
         margin-bottom: 22px;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
+        animation: titleBarEnter 0.28s ease both;
     }
-    .title-bar h1 {
-        color: #34d399;
-        font-size: 24px;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-        margin: 0 0 4px 0;
-        line-height: 1.2;
-    }
-    .title-bar h2 {
-        color: #34d399;
-        font-size: 20px;
-        font-weight: 800;
-        letter-spacing: -0.3px;
-        margin: 0 0 4px 0;
-        line-height: 1.2;
-    }
-    .title-bar p {
-        color: #94a3b8;
-        font-size: 13px;
-        font-weight: 500;
-        margin: 0;
-        line-height: 1.55;
-    }
-
-    /* ── Section headers ── */
-    .section-header {
-        color: #34d399;
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: 2px;
-        text-transform: uppercase;
-        margin: 28px 0 14px 0;
-        border-bottom: 2px solid #cfc4b0;
-        padding-bottom: 7px;
-        padding-left: 14px;
-        position: relative;
-    }
-    .section-header::before {
-        content: '';
-        position: absolute;
-        left: 0;
-        top: 0;
-        bottom: 0;
-        width: 4px;
-        background: #34d399;
-        border-radius: 2px;
-    }
+    .title-bar h1 { color: #e8f0f8; font-size: 24px; font-weight: 700; letter-spacing: -0.5px; margin: 0 0 4px 0; line-height: 1.2; }
+    .title-bar h2 { color: #e8f0f8; font-size: 20px; font-weight: 700; letter-spacing: -0.3px; margin: 0 0 4px 0; line-height: 1.2; }
+    .title-bar p  { color: #94a3b8; font-size: 13px; font-weight: 500; margin: 0; line-height: 1.55; }
 
     /* ── Global header ── */
     .global-header {
         padding: 6px 0 12px 0;
-        border-bottom: 1px solid #ddd5c5;
+        border-bottom: 1px solid #2a4a5a;
         margin-bottom: 0;
         display: flex;
         align-items: baseline;
         gap: 16px;
     }
-    .global-header h1 {
-        color: #2c2c2c;
-        font-size: 20px;
-        font-weight: 700;
-        margin: 0;
-        letter-spacing: -0.4px;
-        white-space: nowrap;
-    }
-    .global-header .subtitle {
-        color: #94a3b8;
-        font-size: 12px;
-        margin: 0;
-        font-weight: 500;
-        letter-spacing: 0.2px;
-    }
+    .global-header h1       { color: #e8f0f8; font-size: 20px; font-weight: 700; margin: 0; letter-spacing: -0.4px; white-space: nowrap; }
+    .global-header .subtitle{ color: #4a5a6a; font-size: 12px; margin: 0; font-weight: 500; }
 
     /* ── DNA cards ── */
     .dna-card {
-        background: #f0ece4;
-        border: 1px solid #ddd5c5;
+        background: #152533;
+        border: 1px solid #2a4a5a;
         border-radius: 8px;
         padding: 14px 18px;
         margin: 4px 0;
-        box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
-        cursor: default;
-        transition: box-shadow 0.18s ease, transform 0.18s ease;
-        will-change: transform;
+        transition: background 160ms ease-out;
     }
-    .dna-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.05); transform: translateY(-2px); }
-    .dna-label { color: #94a3b8; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-bottom: 2px; }
+    .dna-card:hover { background: #1e3a4a; }
+    .dna-label { color: #4a5a6a; font-size: 10px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; margin-bottom: 2px; }
     .dna-value { color: #34d399; font-size: 22px; font-weight: 700; line-height: 1.2; }
-    .dna-sub   { color: #6c6c6c; font-size: 12px; margin-top: 3px; line-height: 1.4; }
-
-    /* ── Dataframe — green header row, alternating body rows ── */
-    [data-testid="stDataFrame"] thead th,
-    [data-testid="stDataFrame"] th[role="columnheader"] {
-        background-color: #34d399 !important;
-        color: #e8f0f8 !important;
-        font-size: 11px !important;
-        font-weight: 700 !important;
-        letter-spacing: 0.8px !important;
-        text-transform: uppercase !important;
-        border-bottom: none !important;
-    }
-    [data-testid="stDataFrame"] tbody tr:nth-child(even) td {
-        background-color: #f0ece4 !important;
-        transition: background-color 0.12s ease !important;
-    }
-    [data-testid="stDataFrame"] tbody tr:nth-child(odd) td {
-        background-color: #e8f0f8 !important;
-        transition: background-color 0.12s ease !important;
-    }
-    [data-testid="stDataFrame"] tbody tr:hover td {
-        background-color: rgba(45,80,22,0.08) !important;
-    }
+    .dna-sub   { color: #94a3b8; font-size: 12px; margin-top: 3px; line-height: 1.4; }
 
     /* ── Landing page hero ── */
-    .landing-hero {
-        text-align: center;
-        padding: 40px 0 32px 0;
-    }
-    .landing-hero h2 {
-        color: #2c2c2c;
-        font-size: 28px;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-        margin: 0 0 10px 0;
-    }
-    .landing-hero p {
-        color: #94a3b8;
-        font-size: 14px;
-        margin: 0;
-        font-weight: 500;
-        letter-spacing: 0.2px;
-    }
+    .landing-hero { text-align: center; padding: 40px 0 32px 0; }
+    .landing-hero h2 { color: #e8f0f8; font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin: 0 0 10px 0; }
+    .landing-hero p  { color: #4a5a6a; font-size: 14px; margin: 0; font-weight: 500; }
 
-    /* ── Landing cards ── */
+    /* ── Landing cards (top border, no side stripe) ── */
     .landing-card {
-        background: #ffffff;
-        border: 1px solid #ddd5c5;
+        background: #152533;
+        border: 1px solid #2a4a5a;
+        border-top: 3px solid #2a4a5a;
         border-radius: 12px;
         padding: 44px 36px 40px 36px;
         text-align: center;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.07);
         min-height: 240px;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
         cursor: pointer;
-        transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease;
-        will-change: transform;
+        transition: background 220ms cubic-bezier(0.23,1,0.32,1), border-color 220ms ease-out;
     }
-    .landing-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(0,0,0,0.13); }
-    .landing-card:active { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.10); }
-    .landing-card.brownlow { border-top: 5px solid #34d399; }
-    .landing-card.betting  { border-top: 5px solid #c9a84c; }
+    .landing-card:hover { background: #1e3a4a; }
+    .landing-card.brownlow { border-top-color: #34d399; }
+    .landing-card.betting  { border-top-color: #f0b429; }
     .landing-icon  { font-size: 54px; margin-bottom: 14px; line-height: 1; }
     .landing-title { font-size: 28px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 10px; }
     .landing-title.brownlow { color: #34d399; }
-    .landing-title.betting  { color: #c9a84c; }
-    .landing-desc  { color: #6c6c6c; font-size: 13px; line-height: 1.6; max-width: 300px; }
-
-    /* ── Tab styling ── */
-    [data-testid="stTabs"] [data-testid="stTab"] {
-        font-size: 12px !important;
-        font-weight: 600 !important;
-        letter-spacing: 0.3px !important;
-        padding: 8px 16px !important;
-        color: #94a3b8 !important;
-        transition: color 0.15s ease, opacity 0.15s ease !important;
-    }
-    [data-testid="stTabs"] [data-testid="stTab"][aria-selected="true"] {
-        color: #34d399 !important;
-        font-weight: 700 !important;
-    }
-    [data-testid="stTabs"] [data-testid="stTab"]:hover {
-        color: #34d399 !important;
-        opacity: 0.85 !important;
-    }
-
-    /* ── Input field focus theme ── */
-    .stTextInput > div > div > input {
-        border-color: #ddd5c5 !important;
-        border-radius: 6px !important;
-        background: #ffffff !important;
-        font-size: 13px !important;
-        transition: border-color 0.15s ease, box-shadow 0.2s ease !important;
-    }
-    .stTextInput > div > div > input:focus {
-        border-color: #34d399 !important;
-        box-shadow: 0 0 0 3px rgba(45,80,22,0.12) !important;
-    }
-    .stSelectbox > div > div,
-    .stNumberInput > div > div > input {
-        transition: border-color 0.15s ease, box-shadow 0.2s ease !important;
-    }
+    .landing-title.betting  { color: #f0b429; }
+    .landing-desc  { color: #94a3b8; font-size: 13px; line-height: 1.6; max-width: 300px; }
+    .landing-icon  { display: inline-block; }
+    .landing-card:hover .landing-icon { transform: scale(1.06); transition: transform 180ms ease-out; }
 
     /* ── Secondary button ── */
     [data-testid="stBaseButton-secondary"] {
-        background-color: #f0ece4 !important;
-        color: #34d399 !important;
-        border: 1px solid #cfc4b0 !important;
+        background-color: #1e3a4a !important;
+        color: #94a3b8 !important;
+        border: 1px solid #2a4a5a !important;
         font-weight: 600 !important;
-        transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, transform 0.12s ease !important;
-        will-change: transform;
+        transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease !important;
     }
     [data-testid="stBaseButton-secondary"]:hover {
-        background-color: #e8e0d0 !important;
-        border-color: #94a3b8 !important;
-        color: #1a3009 !important;
-        transform: translateY(-1px) !important;
+        background-color: #243a4a !important;
+        border-color: #34d399 !important;
+        color: #e8f0f8 !important;
     }
-    [data-testid="stBaseButton-secondary"]:active {
-        transform: translateY(0px) !important;
-        background-color: #ddd5c5 !important;
-    }
+    [data-testid="stBaseButton-secondary"]:active { background-color: #1a2f3a !important; }
 
     /* ── Alert / info boxes ── */
-    [data-testid="stAlert"] {
-        border-radius: 6px !important;
-        font-size: 13px !important;
-    }
+    [data-testid="stAlert"] { border-radius: 6px !important; font-size: 13px !important; }
 
-    /* ── Caption text ── */
-    .stCaption, [data-testid="stCaptionContainer"] {
-        color: #94a3b8 !important;
-        font-size: 11px !important;
-        letter-spacing: 0.2px !important;
-    }
+    /* ── Caption ── */
+    .stCaption, [data-testid="stCaptionContainer"] { color: #4a5a6a !important; font-size: 11px !important; }
 
-    /* ── Section header bar animates on hover ── */
-    .section-header::before { transition: width 0.15s ease; }
-    .section-header:hover::before { width: 5px; }
+    /* ── Page content fade-in ── */
+    .main .block-container > div:nth-child(n+3) { animation: pageEnter 0.22s ease forwards; }
 
-    /* ── Page content fade-in (skips banner + nav which are first 2 children) ── */
-    @keyframes pageEnter {
-        from { opacity: 0; transform: translateY(5px); }
-        to   { opacity: 1; transform: translateY(0); }
-    }
-    .main .block-container > div:nth-child(n+3) {
-        animation: pageEnter 0.22s ease forwards;
-    }
-
-    /* ── Expander hover ── */
+    /* ── Expander ── */
     [data-testid="stExpander"] summary { transition: color 0.15s ease !important; }
     [data-testid="stExpander"] summary:hover { color: #34d399 !important; }
+    [data-testid="stExpander"] [data-testid="stVerticalBlock"] { animation: pageEnter 0.2s ease both; }
 
-    /* ── Spinner fades in (reduces visual jolt) ── */
+    /* ── Spinner ── */
     [data-testid="stSpinner"] { opacity: 0; animation: stFadeIn 0.3s ease 0.08s forwards; }
-    @keyframes stFadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-    /* ── Toast slides in from right ── */
-    [data-testid="stToast"] { animation: toastIn 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) forwards; }
-    @keyframes toastIn {
-        from { opacity: 0; transform: translateX(16px); }
-        to   { opacity: 1; transform: translateX(0); }
-    }
+    /* ── Toast (ease-out — no bounce) ── */
+    [data-testid="stToast"] { animation: toastIn 0.22s cubic-bezier(0.23,1,0.32,1) forwards; }
 
     /* ── Selectbox smooth focus ── */
     [data-testid="stSelectbox"] [data-baseweb="select"] > div {
         transition: border-color 0.15s ease, box-shadow 0.2s ease !important;
     }
 
-    /* ── LIVE badge — pulsing ring ── */
-    @keyframes livePulse {
-        0%   { box-shadow: 0 0 0 0 rgba(45,80,22,0.6); }
-        65%  { box-shadow: 0 0 0 9px rgba(45,80,22,0); }
-        100% { box-shadow: 0 0 0 0 rgba(45,80,22,0); }
-    }
-    @keyframes liveDot {
-        0%, 100% { opacity: 1; transform: scale(1); }
-        50%      { opacity: 0.4; transform: scale(0.8); }
-    }
+    /* ── LIVE badge ── */
     .live-badge {
         display: inline-flex;
         align-items: center;
         gap: 5px;
-        background: #34d399;
-        color: #e8f0f8;
+        background: #1a3a2a;
+        border: 1px solid #34d399;
+        color: #34d399;
         font-size: 10px;
         font-weight: 700;
         letter-spacing: 1.5px;
@@ -861,9 +584,8 @@ st.markdown("""
     .live-badge::before {
         content: '';
         display: inline-block;
-        width: 6px;
-        height: 6px;
-        background: #b8d48a;
+        width: 6px; height: 6px;
+        background: #34d399;
         border-radius: 50%;
         animation: liveDot 1.4s ease-in-out infinite;
         flex-shrink: 0;
@@ -871,156 +593,115 @@ st.markdown("""
     .live-badge-off {
         display: inline-flex;
         align-items: center;
-        background: #94a3b8;
-        color: #e8f0f8;
+        background: #1e3a4a;
+        border: 1px solid #2a4a5a;
+        color: #4a5a6a;
         font-size: 10px;
         font-weight: 700;
         letter-spacing: 1.5px;
         padding: 4px 10px;
         border-radius: 4px;
         vertical-align: middle;
-        opacity: 0.85;
     }
 
     /* ── Card entrance ── */
+    .metric-card, .metric-card-primary, .leader-card, .dna-card, .quick-link-card {
+        animation: cardEntrance 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+    }
+    .section-header { animation: sectionReveal 0.22s ease both; }
+
+    /* ── Number pop (ease-out — no bounce) ── */
+    .metric-value, .metric-value-lg, .dna-value, .bh-value {
+        animation: numberPop 0.35s cubic-bezier(0.23,1,0.32,1) both;
+        animation-delay: 0.07s;
+    }
+
+    /* ── Game Analysis — match cards ── */
+    .game-card {
+        border: 1px solid #2a4a5a;
+        border-top: 2px solid #34d399;
+        border-radius: 10px;
+        padding: 20px 26px 18px 24px;
+        background: #152533;
+        margin: 44px 0 0 0;
+        animation: gameCardEnter 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
+        transition: background 160ms ease-out;
+        position: relative;
+        overflow: hidden;
+    }
+    .game-card:hover { background: #1e3a4a; }
+    .game-card-eyebrow  { color: #4a5a6a; font-size: 10px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; }
+    .game-card-title    { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; line-height: 1.2; }
+    .game-winner-name   { color: #34d399; font-size: 26px; font-weight: 800; letter-spacing: -0.5px; }
+    .game-loser-name    { color: #4a5a6a; font-size: 16px; font-weight: 500; }
+    .score-pill {
+        background: #1a3a2a;
+        border: 1px solid #34d399;
+        color: #34d399;
+        font-size: 13px; font-weight: 700;
+        padding: 5px 14px; border-radius: 20px;
+        letter-spacing: 0.5px; white-space: nowrap; display: inline-block;
+    }
+    .score-pill.draw { background: #1e3a4a; border-color: #94a3b8; color: #94a3b8; }
+
+    /* ── DataFrame rank cell ── */
+    [data-testid="stDataFrame"] tbody tr:nth-child(1) td:first-child { font-weight: 800 !important; }
+
+    /* ── Animations ── */
+    @keyframes bannerShift {
+        0%   { background-position: 0% 50%; }
+        50%  { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    @keyframes columnEnter {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes chartReveal {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes shimmerSweep {
+        0%   { background-position: 200% center; }
+        100% { background-position: -200% center; }
+    }
+    @keyframes pageEnter {
+        from { opacity: 0; transform: translateY(5px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes stFadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes toastIn {
+        from { opacity: 0; transform: translateX(16px); }
+        to   { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes livePulse {
+        0%   { box-shadow: 0 0 0 0 rgba(52,211,153,0.4); }
+        65%  { box-shadow: 0 0 0 8px rgba(52,211,153,0); }
+        100% { box-shadow: 0 0 0 0 rgba(52,211,153,0); }
+    }
+    @keyframes liveDot {
+        0%, 100% { opacity: 1; transform: scale(1); }
+        50%       { opacity: 0.4; transform: scale(0.8); }
+    }
     @keyframes cardEntrance {
         from { opacity: 0; transform: translateY(12px); }
         to   { opacity: 1; transform: translateY(0); }
     }
-    .metric-card, .metric-card-primary, .leader-card, .dna-card, .quick-link-card {
-        animation: cardEntrance 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
-    }
-
-    /* ── Section header slide-reveal ── */
     @keyframes sectionReveal {
         from { opacity: 0; transform: translateX(-8px); }
         to   { opacity: 1; transform: translateX(0); }
     }
-    .section-header { animation: sectionReveal 0.22s ease both; }
-
-    /* ── Title bar entrance ── */
     @keyframes titleBarEnter {
         from { opacity: 0; transform: translateY(-6px); }
         to   { opacity: 1; transform: translateY(0); }
     }
-    .title-bar { animation: titleBarEnter 0.28s ease both; }
-
-    /* ── Number pop — metric values spring in ── */
     @keyframes numberPop {
-        0%   { opacity: 0.15; transform: translateY(6px) scale(0.92); }
-        70%  { transform: translateY(-1px) scale(1.02); }
-        100% { opacity: 1;    transform: translateY(0) scale(1); }
+        from { opacity: 0.15; transform: translateY(6px); }
+        to   { opacity: 1;    transform: translateY(0); }
     }
-    .metric-value, .metric-value-lg, .dna-value, .bh-value {
-        animation: numberPop 0.42s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-        animation-delay: 0.07s;
-    }
-
-
-
-    /* ── Expander: smooth height transition hint ── */
-    [data-testid="stExpander"] [data-testid="stVerticalBlock"] {
-        animation: pageEnter 0.2s ease both;
-    }
-
-    /* ── Landing card icon bounce on hover ── */
-    .landing-card:hover .landing-icon {
-        animation: iconBounce 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
-    @keyframes iconBounce {
-        0%   { transform: scale(1); }
-        40%  { transform: scale(1.18); }
-        70%  { transform: scale(0.95); }
-        100% { transform: scale(1); }
-    }
-    .landing-icon { display: inline-block; }
-
-    /* ── Game Analysis — match cards ── */
     @keyframes gameCardEnter {
         from { opacity: 0; transform: translateY(10px); }
         to   { opacity: 1; transform: translateY(0); }
-    }
-    .game-card {
-        border: 1px solid #cfc4b0;
-        border-left: 6px solid #34d399;
-        border-radius: 0 10px 10px 0;
-        padding: 20px 26px 18px 24px;
-        background: #ffffff;
-        margin: 44px 0 0 0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.06), 0 8px 24px rgba(0,0,0,0.04);
-        animation: gameCardEnter 0.32s cubic-bezier(0.22, 0.61, 0.36, 1) both;
-        transition: box-shadow 0.18s ease, transform 0.15s ease;
-        will-change: transform;
-        position: relative;
-        overflow: hidden;
-    }
-    .game-card:hover {
-        box-shadow: 0 4px 18px rgba(0,0,0,0.09), 0 12px 32px rgba(0,0,0,0.06);
-        transform: translateY(-2px);
-    }
-    /* subtle inner corner accent */
-    .game-card::after {
-        content: '';
-        position: absolute;
-        top: 0; right: 0;
-        width: 0; height: 0;
-        border-style: solid;
-        border-width: 0 20px 20px 0;
-        border-color: transparent #f0ece4 transparent transparent;
-        opacity: 0.6;
-    }
-    .game-card-eyebrow {
-        color: #94a3b8;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        margin-bottom: 10px;
-    }
-    .game-card-title {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        flex-wrap: wrap;
-        line-height: 1.2;
-    }
-    .game-winner-name {
-        color: #34d399;
-        font-size: 26px;
-        font-weight: 800;
-        letter-spacing: -0.5px;
-    }
-    .game-loser-name {
-        color: #94a3b8;
-        font-size: 16px;
-        font-weight: 500;
-    }
-    .score-pill {
-        background: #34d399;
-        color: #e8f0f8;
-        font-size: 13px;
-        font-weight: 700;
-        padding: 5px 14px;
-        border-radius: 20px;
-        letter-spacing: 0.5px;
-        white-space: nowrap;
-        display: inline-block;
-    }
-    .score-pill.draw {
-        background: #94a3b8;
-    }
-
-    /* ── Game table — rank badge cells ── */
-    /* (cell-level colors applied by Pandas Styler; these are fallback overrides) */
-    [data-testid="stDataFrame"] tbody tr:nth-child(1) td:first-child {
-        font-weight: 800 !important;
-    }
-
-    [data-testid="stDataFrame"] {
-        background-color: transparent !important;
-    }
-    [data-testid="stDataFrame"] div {
-        background-color: transparent !important;
     }
 
 </style>
@@ -1634,15 +1315,17 @@ def fetch_espn_brownlow():
 
 _TABLE_STYLES = [
     {"selector": "thead th", "props": [
-        ("background-color", "#34d399"), ("color", "#e8f0f8"),
-        ("font-size", "11px"), ("font-weight", "700"),
-        ("letter-spacing", "0.8px"), ("text-transform", "uppercase"),
-        ("border-bottom", "none"), ("padding", "8px 10px"),
+        ("background-color", "#1e3a4a"), ("color", "#94a3b8"),
+        ("font-size", "11px"), ("font-weight", "600"),
+        ("letter-spacing", "0.08em"), ("text-transform", "uppercase"),
+        ("border-bottom", "1px solid #2a4a5a"), ("padding", "8px 10px"),
     ]},
-    {"selector": "tbody tr:nth-child(even)", "props": [("background-color", "#f0ece4")]},
-    {"selector": "tbody tr:nth-child(odd)",  "props": [("background-color", "#e8f0f8")]},
-    {"selector": "tbody tr:hover",           "props": [("background-color", "rgba(45,80,22,0.08)")]},
-    {"selector": "td",                       "props": [("border-bottom", "1px solid #ede8df"), ("padding", "6px 10px")]},
+    {"selector": "tbody tr:nth-child(even)", "props": [("background-color", "#152533")]},
+    {"selector": "tbody tr:nth-child(odd)",  "props": [("background-color", "#1a2d3d")]},
+    {"selector": "tbody tr:hover",           "props": [("background-color", "#1e3a4a")]},
+    {"selector": "td",                       "props": [
+        ("border-bottom", "1px solid #1e3040"), ("padding", "6px 10px"), ("color", "#e8f0f8"),
+    ]},
 ]
 
 
@@ -3668,12 +3351,12 @@ if _page == 'Player Comparison':
                     ))
                     _fig_radar.update_layout(
                         polar=dict(
-                            bgcolor='#f0ece4',
-                            radialaxis=dict(visible=True, range=[0, 100], gridcolor='#cfc4b0',
+                            bgcolor='#152533',
+                            radialaxis=dict(visible=True, range=[0, 100], gridcolor='#1e3a4a',
                                             tickfont=dict(size=9), tickvals=[25, 50, 75, 100]),
-                            angularaxis=dict(gridcolor='#cfc4b0', tickfont=dict(size=11)),
+                            angularaxis=dict(gridcolor='#1e3a4a', tickfont=dict(size=11)),
                         ),
-                        paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
+                        paper_bgcolor='#152533', font_color='#94a3b8',
                         legend=dict(orientation='h', y=-0.08, bgcolor='rgba(0,0,0,0)'),
                         margin=dict(t=30, b=60, l=60, r=60), height=420,
                     )
