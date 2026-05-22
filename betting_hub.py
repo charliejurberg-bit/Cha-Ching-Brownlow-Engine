@@ -1405,6 +1405,20 @@ def render_cha_ching_tips():
 
     if 'result' not in tips_df.columns:
         tips_df['result'] = ''
+
+    # ── DEBUG (remove after diagnosis) ───────────────────────────────────────
+    with st.expander("🔍 DEBUG: tips_df state", expanded=True):
+        st.write(f"**tips_df rows:** {len(tips_df)}  |  **columns:** {list(tips_df.columns)}")
+        if not tips_df.empty:
+            st.write("**tips_df sample:**")
+            st.dataframe(tips_df[['tip_id','game_key','player','market_type','is_flagged','result']].head(10) if 'result' in tips_df.columns else tips_df.head(10))
+        st.write(f"**upcoming_keys ({len(upcoming_keys)}):** {upcoming_keys}")
+        flagged_debug = tips_df[tips_df['is_flagged'] == True] if not tips_df.empty else pd.DataFrame()
+        st.write(f"**is_flagged==True rows:** {len(flagged_debug)}")
+        flagged_str_debug = tips_df[tips_df['is_flagged'] == 'True'] if not tips_df.empty else pd.DataFrame()
+        st.write(f"**is_flagged=='True' (string) rows:** {len(flagged_str_debug)}")
+    # ── END DEBUG ─────────────────────────────────────────────────────────────
+
     flagged_all = tips_df[tips_df['is_flagged'] == True].copy() if not tips_df.empty else pd.DataFrame()
 
     if not flagged_all.empty:
