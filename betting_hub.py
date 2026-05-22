@@ -1495,6 +1495,12 @@ def render_trends_analysis():
         mkt_full.style.applymap(_style_pl, subset=['P&L', 'ROI %']),
         use_container_width=True,
         hide_index=True,
+        column_config={
+            'Hit %':  st.column_config.NumberColumn('Hit %',  format='%.2f'),
+            'Staked': st.column_config.NumberColumn('Staked', format='%.2f'),
+            'P&L':    st.column_config.NumberColumn('P&L',    format='%.2f'),
+            'ROI %':  st.column_config.NumberColumn('ROI %',  format='%.2f'),
+        },
     )
 
 
