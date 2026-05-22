@@ -1370,7 +1370,7 @@ def render_trends_analysis():
                 _delete_user_import()
                 st.session_state.pop('_user_import_loaded', None)
                 st.rerun()
-    with st.expander("Upload your own betting spreadsheet (.csv or .xlsx)", expanded=False):
+    with st.expander("Upload your own betting spreadsheet (.csv or .xlsx)", expanded=(_imported_check is not None)):
         _imported = _load_user_import()
 
         _uploaded = st.file_uploader(
