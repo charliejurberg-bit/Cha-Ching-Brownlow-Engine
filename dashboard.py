@@ -2579,7 +2579,7 @@ if _page == 'Game Analysis':
 
                 return (df.style
                         .apply(_cell, axis=1)
-                        .format({'Rank': _fmt_rank}, escape=False))
+                        .format({'Rank': _fmt_rank}, escape=None))
 
             game_order = rnd.drop_duplicates('Match')[['Match', 'Home.team', 'Away.team', 'Home.score', 'Away.score']].reset_index(drop=True)
             col_cfg = {
