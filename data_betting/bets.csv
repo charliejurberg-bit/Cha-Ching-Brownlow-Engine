@@ -1,6 +1,6 @@
 bet_id,date,match,market_type,selection,bookmaker,odds,stake,result,profit_loss,is_cha_ching,cha_ching_criteria,notes
-bee60b96,2026-05-20,,Goals O/U,Treacy 3+,Sportsbet,2.12,1.0,Loss,-1.0,True,,"2.1 in the first quarter, no shots at goal after that"
-383f0c8b,2026-03-26,Round 2 2026,Multi,Sheldrick 20+ AND McInerney 20+,TAB,1.35,2.0,Win,0.7,True,,"Miss by 1 promo on TAB, without Heeney and Gulden"
+bee60b96,2026-05-17,Round 10 2026,Goals O/U,Treacy 3+,Sportsbet,2.12,0.5,Loss,-0.5,True,,"2.1 in the first quarter, no shots at goal after that"
+383f0c8b,2026-03-26,Round 2 2026,Multi,Sheldrick 20+ AND McInerney 20+,TAB,1.6,2.0,Win,1.2,True,,"Miss by 1 promo on TAB, without Heeney and Gulden"
 a3b0b561,2026-03-26,Round 2 2026,Goals O/U,Thilthorpe 2+ goals,Other,1.44,2.0,Win,0.88,True,,
 88b4d7cc,2026-03-26,Round 2 2026,Disposals O/U,Harley Reid 20+,Ladbrokes,1.88,2.0,Win,1.76,True,,
 ba0a7919,2026-04-02,Round 3 2026,Disposals O/U,Sam Berry 20+,Ladbrokes,2.55,2.0,Win,3.1,True,,
@@ -16,7 +16,7 @@ cfc7c9c6,2026-04-09,Round 4 2026,Goals O/U,Aaron Naughton 3+,Bet365,1.67,2.0,Win
 c2af09eb,2026-04-24,Round 6 2026,Disposals O/U,Izak Rankine 19+,Other,1.67,2.0,Win,1.34,True,,
 1d27ce47,2026-04-24,Round 6 2026,Disposals O/U,Blake Howes 13+,Pointsbet,1.59,2.0,Win,1.18,True,,
 9c41c8fe,2026-04-24,Round 6 2026,Disposals O/U,Harley Reid 20+,TAB,1.72,2.0,Win,1.44,True,,
-99b9a473,2026-05-01,Round 7 2026,Goals O/U,Charlie Curnow 3+,Other,0.0,2.0,Win,0.0,True,,
+99b9a473,2026-05-01,Round 7 2026,Goals O/U,Charlie Curnow 3+,Other,1.85,2.0,Win,1.7,True,,
 2390e752,2026-05-01,Round 7 2026,Goals O/U,Charlie Curnow 5+,Other,4.9,0.5,Win,1.95,True,,
 76a2dc6d,2026-05-01,Round 7 2026,Disposals O/U,GRLJ 18+,Ladbrokes,1.5,2.0,Win,1.0,True,,
 b6b3997c,2026-05-01,Round 7 2026,Disposals O/U,Luke Jackson 19+,Pointsbet,1.56,2.0,Win,1.12,True,,
