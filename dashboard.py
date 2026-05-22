@@ -1396,23 +1396,32 @@ def _round_floats(df: pd.DataFrame, dp: int = 1) -> pd.DataFrame:
         result[col] = result[col].round(dp)
     return result
 
+def _apply_mt_rows(df: pd.DataFrame) -> pd.DataFrame:
+    """Alternating MT dark row backgrounds. Required because st.dataframe uses canvas
+    rendering — CSS selectors on td/th don't reach inside it; only Styler .apply() does."""
+    out = pd.DataFrame('', index=df.index, columns=df.columns)
+    for i in range(len(df)):
+        out.iloc[i] = ('background-color: #152533; color: #e8f0f8;' if i % 2 == 0
+                       else 'background-color: #1a2d3d; color: #e8f0f8;')
+    return out
+
 def _style_table(df: pd.DataFrame) -> "pd.io.formats.style.Styler":
     rounded = _round_floats(df)
     float_fmt = {c: '{:.1f}' for c in rounded.select_dtypes(include=['float64', 'float32', 'float']).columns}
-    s = rounded.style.set_table_styles(_TABLE_STYLES)
+    s = rounded.style.apply(_apply_mt_rows, axis=None).set_table_styles(_TABLE_STYLES)
     if float_fmt:
         s = s.format(float_fmt)
     return s
 
 def _apply_team_border(row):
     team = row.get('Team', '')
-    colour = _TEAM_COLOURS.get(team, '#cccccc')
+    colour = _TEAM_COLOURS.get(team, '#2a4a5a')
     return [f'border-left: 3px solid {colour} !important;' if i == 0 else '' for i in range(len(row))]
 
 def _style_leaderboard_table(df: pd.DataFrame) -> "pd.io.formats.style.Styler":
     rounded = _round_floats(df)
     float_fmt = {c: '{:.1f}' for c in rounded.select_dtypes(include=['float64', 'float32', 'float']).columns}
-    s = rounded.style.set_table_styles(_TABLE_STYLES).apply(_apply_team_border, axis=1)
+    s = rounded.style.apply(_apply_mt_rows, axis=None).apply(_apply_team_border, axis=1).set_table_styles(_TABLE_STYLES)
     if float_fmt:
         s = s.format(float_fmt)
     return s
@@ -1836,7 +1845,7 @@ if _page == 'Leaderboard':
         f'<div class="title-bar" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'
         f'<div>'
         f'<div style="display:flex;align-items:center;gap:10px">'
-        f'<h2 style="color:#2c2c2c;margin:0">{selected_season} Brownlow Leaderboard</h2>'
+        f'<h2 style="color:#e8f0f8;margin:0">{selected_season} Brownlow Leaderboard</h2>'
         f'{_lb_live_html}'
         f'</div>'
         f'<p style="color:#94a3b8;margin:4px 0 0 0">'
@@ -1938,10 +1947,9 @@ if _page == 'Leaderboard':
                              marker_color='#adb5bd', opacity=0.7))
     fig.add_trace(go.Bar(name='Model Expected', x=chart['Player_Name'],
                          y=chart['Exp_Total_Votes'].round(1), marker_color='#34d399', opacity=0.9))
-    fig.update_layout(barmode='group', plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8',
-                      font_color='#2c2c2c', legend=dict(orientation='h', y=1.1),
-                      xaxis_tickangle=-35, margin=dict(t=20, b=120))
     fig = apply_chart_theme(fig)
+    fig.update_layout(barmode='group', legend=dict(orientation='h', y=1.1),
+                      xaxis_tickangle=-35, margin=dict(t=20, b=120))
     st.plotly_chart(fig, width='stretch', key="chart_002")
 
 # ════════════════════════════════════════════════════════════
