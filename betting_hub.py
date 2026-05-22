@@ -10,15 +10,16 @@ import numpy as np
 import plotly.graph_objects as go
 import os, json, uuid, time, requests
 from datetime import datetime, timedelta, date
-from io import StringIO
+from io import StringIO, BytesIO
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
-DATA_DIR     = "data_betting"
-BETS_CSV     = f"{DATA_DIR}/bets.csv"
-TIPS_CSV     = f"{DATA_DIR}/cha_ching_tips.csv"
-FIXTURES_CSV = f"{DATA_DIR}/fixtures_cache.csv"
-PROPS_CSV    = f"{DATA_DIR}/player_props_cache.csv"
+DATA_DIR        = "data_betting"
+BETS_CSV        = f"{DATA_DIR}/bets.csv"
+TIPS_CSV        = f"{DATA_DIR}/cha_ching_tips.csv"
+FIXTURES_CSV    = f"{DATA_DIR}/fixtures_cache.csv"
+PROPS_CSV       = f"{DATA_DIR}/player_props_cache.csv"
+USER_IMPORT_CSV = f"{DATA_DIR}/user_import.csv"
 
 BETS_COLS = [
     'bet_id', 'date', 'match', 'market_type', 'selection',
@@ -206,6 +207,22 @@ def _load_props() -> pd.DataFrame:
         return pd.read_csv(PROPS_CSV)
     except Exception:
         return pd.DataFrame()
+
+
+def _load_user_import() -> pd.DataFrame | None:
+    """Return the user-imported spreadsheet, or None if not present."""
+    if not os.path.exists(USER_IMPORT_CSV):
+        return None
+    try:
+        return pd.read_csv(USER_IMPORT_CSV)
+    except Exception:
+        return None
+
+
+def _delete_user_import():
+    """Remove the user-imported spreadsheet from disk."""
+    if os.path.exists(USER_IMPORT_CSV):
+        os.remove(USER_IMPORT_CSV)
 
 
 def _save_prop(game_key: str, player: str, market_type: str,
@@ -1334,6 +1351,97 @@ def render_trends_analysis():
         'Hit rate, ROI, and P&L breakdowns across markets, bookmakers, and odds ranges</p></div>',
         unsafe_allow_html=True,
     )
+
+    # ── My Spreadsheet ─────────────────────────────────────────────────────
+    st.markdown('<div class="trend-header">My Spreadsheet</div>', unsafe_allow_html=True)
+    with st.expander("Upload your own betting spreadsheet (.csv or .xlsx)", expanded=False):
+        _imported = _load_user_import()
+
+        _uploaded = st.file_uploader(
+            "Choose file",
+            type=['csv', 'xlsx'],
+            key='user_spreadsheet_upload',
+            label_visibility='collapsed',
+        )
+        if _uploaded is not None:
+            try:
+                if _uploaded.name.endswith('.xlsx'):
+                    _df_up = pd.read_excel(BytesIO(_uploaded.read()))
+                else:
+                    _df_up = pd.read_csv(_uploaded)
+                _ensure_dirs()
+                _df_up.to_csv(USER_IMPORT_CSV, index=False)
+                st.success(f"Saved — {len(_df_up):,} rows, {len(_df_up.columns)} columns.")
+                st.session_state['_user_import_loaded'] = True
+                st.rerun()
+            except Exception as _e:
+                st.error(f"Could not read file: {_e}")
+
+        if _imported is not None:
+            _del_col, _ = st.columns([1, 5])
+            with _del_col:
+                if st.button("🗑️ Delete My Spreadsheet", key='del_user_import'):
+                    _delete_user_import()
+                    st.session_state.pop('_user_import_loaded', None)
+                    st.rerun()
+            st.markdown(
+                f'<div style="font-size:12px;color:#94a3b8;margin:4px 0 10px 0">'
+                f'{len(_imported):,} rows &nbsp;·&nbsp; {len(_imported.columns)} columns'
+                f' &nbsp;·&nbsp; <span style="color:#34d399">saved locally</span></div>',
+                unsafe_allow_html=True,
+            )
+            # ── Comparison strip: user data vs Cha Ching bets ──────────────
+            _cc_bets = _load_bets()
+            _shared = [c for c in _imported.columns
+                       if c.lower().replace(' ', '_') in
+                       {'profit_loss', 'p&l', 'pl', 'stake', 'odds', 'result'}]
+            if _shared:
+                _imp_num = _imported.select_dtypes(include='number')
+                _cc_num  = _cc_bets.select_dtypes(include='number')
+                _cmp_cols = st.columns(2)
+                with _cmp_cols[0]:
+                    st.markdown(
+                        '<div style="font-size:11px;font-weight:700;color:#34d399;'
+                        'letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">'
+                        'My Spreadsheet</div>',
+                        unsafe_allow_html=True,
+                    )
+                    _disp_imp = _imported.copy()
+                    for _c in _disp_imp.select_dtypes(include='float').columns:
+                        _disp_imp[_c] = _disp_imp[_c].round(2)
+                    st.dataframe(_disp_imp, use_container_width=True,
+                                 hide_index=True, height=320)
+                with _cmp_cols[1]:
+                    st.markdown(
+                        '<div style="font-size:11px;font-weight:700;color:#f0b429;'
+                        'letter-spacing:1px;text-transform:uppercase;margin-bottom:6px">'
+                        'Cha Ching Bets</div>',
+                        unsafe_allow_html=True,
+                    )
+                    _disp_cc = _cc_bets[['date', 'selection', 'market_type', 'odds',
+                                         'stake', 'result', 'profit_loss']].copy()
+                    _disp_cc['date'] = _disp_cc['date'].dt.strftime('%d %b %Y')
+                    for _c in ['odds', 'stake', 'profit_loss']:
+                        _disp_cc[_c] = _disp_cc[_c].round(2)
+                    st.dataframe(_disp_cc, use_container_width=True,
+                                 hide_index=True, height=320,
+                                 column_config={
+                                     'odds':        st.column_config.NumberColumn('Odds',   format='%.2f'),
+                                     'stake':       st.column_config.NumberColumn('Stake',  format='%.2f'),
+                                     'profit_loss': st.column_config.NumberColumn('P&L',    format='%.2f'),
+                                 })
+            else:
+                _disp_imp = _imported.copy()
+                for _c in _disp_imp.select_dtypes(include='float').columns:
+                    _disp_imp[_c] = _disp_imp[_c].round(2)
+                st.dataframe(_disp_imp, use_container_width=True, hide_index=True, height=320)
+        else:
+            st.markdown(
+                '<div style="color:#4a5a6a;font-size:13px;padding:10px 0">'
+                'No spreadsheet uploaded yet. Upload a .csv or .xlsx to compare '
+                'your data alongside Cha Ching bets.</div>',
+                unsafe_allow_html=True,
+            )
 
     bets = _load_bets()
     if bets.empty or bets['result'].isin(['Win', 'Loss']).sum() < 2:
