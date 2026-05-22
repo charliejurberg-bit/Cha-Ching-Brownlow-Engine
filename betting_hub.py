@@ -1499,6 +1499,53 @@ def render_cha_ching_tips():
         _render_manual_props()
         return
 
+    # ── Manual game entry ─────────────────────────────────────────────────────
+    if '_manual_games' not in st.session_state:
+        st.session_state['_manual_games'] = []
+
+    with st.expander("+ Add game manually", expanded=False):
+        with st.form("manual_game_form", clear_on_submit=True):
+            mg1, mg2, mg3, mg4 = st.columns([1.5, 2, 2, 1])
+            with mg1:
+                mg_round = st.text_input("Round", placeholder="Round 11", key='mg_round')
+            with mg2:
+                mg_home  = st.text_input("Home team", placeholder="Richmond", key='mg_home')
+            with mg3:
+                mg_away  = st.text_input("Away team", placeholder="Essendon", key='mg_away')
+            with mg4:
+                st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
+                submitted = st.form_submit_button("Add", use_container_width=True)
+            if submitted:
+                r = mg_round.strip()
+                h = mg_home.strip()
+                a = mg_away.strip()
+                if r and h and a:
+                    new_gkey = f"{r} {h} v {a}"
+                    existing = [g['gkey'] for g in st.session_state['_manual_games']]
+                    if new_gkey not in existing:
+                        st.session_state['_manual_games'].append({'roundname': r, 'hteam': h, 'ateam': a, 'gkey': new_gkey})
+                    st.rerun()
+                else:
+                    st.warning("Fill in all three fields.")
+
+    # Render manually added games
+    if st.session_state['_manual_games']:
+        st.markdown('<div class="section-header">Manual Games</div>', unsafe_allow_html=True)
+        for mg in st.session_state['_manual_games']:
+            mgkey = mg['gkey']
+            col_exp, col_del = st.columns([9, 1])
+            with col_exp:
+                with st.expander(f"**{mgkey}**", expanded=True):
+                    tab_disp, tab_goals = st.tabs(["Disposals", "Goals"])
+                    for tab, mtype in [(tab_disp, "Disposals O/U"), (tab_goals, "Goals O/U")]:
+                        with tab:
+                            _render_market_tab(mgkey, mtype, props_df, tips_df)
+            with col_del:
+                st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
+                if st.button("✕", key=f'mg_del_{mgkey}', help="Remove this game"):
+                    st.session_state['_manual_games'] = [g for g in st.session_state['_manual_games'] if g['gkey'] != mgkey]
+                    st.rerun()
+
     st.markdown('<div class="section-header">Upcoming Games — Next 7 Days</div>',
                 unsafe_allow_html=True)
 
