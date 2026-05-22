@@ -1362,13 +1362,43 @@ def render_bet_tracker():
 
 def render_cha_ching_tips():
     _inject_css()
-    st.markdown(
-        '<div class="title-bar">'
-        '<h2 style="color:#2c2c2c;margin:0">Cha Ching Tips</h2>'
-        '<p style="color:#94a3b8;margin:4px 0 0 0">'
-        'Upcoming fixtures · Player prop markets · Cha Ching checklist</p></div>',
-        unsafe_allow_html=True,
-    )
+
+    # ── Auth gate ─────────────────────────────────────────────────────────────
+    editable = st.session_state.get('_cc_authed', False)
+    _correct_pw = st.secrets.get('cc_password', '')
+
+    lock_col, title_col = st.columns([1, 6])
+    with title_col:
+        st.markdown(
+            '<div class="title-bar">'
+            '<h2 style="color:#2c2c2c;margin:0">Cha Ching Tips</h2>'
+            '<p style="color:#94a3b8;margin:4px 0 0 0">'
+            'Upcoming fixtures · Player prop markets · Cha Ching checklist</p></div>',
+            unsafe_allow_html=True,
+        )
+    with lock_col:
+        st.markdown('<div style="height:10px"></div>', unsafe_allow_html=True)
+        if editable:
+            if st.button('🔓 Lock', key='_cc_lock', use_container_width=True):
+                st.session_state['_cc_authed'] = False
+                st.rerun()
+        else:
+            if st.button('🔒 Edit', key='_cc_unlock_btn', use_container_width=True):
+                st.session_state['_cc_pw_open'] = True
+
+    if st.session_state.get('_cc_pw_open') and not editable:
+        pw_col, _ = st.columns([2, 5])
+        with pw_col:
+            with st.form('_cc_pw_form', clear_on_submit=True):
+                pw = st.text_input('Password', type='password', label_visibility='collapsed',
+                                   placeholder='Enter password...')
+                if st.form_submit_button('Unlock', use_container_width=True):
+                    if pw == _correct_pw:
+                        st.session_state['_cc_authed'] = True
+                        st.session_state['_cc_pw_open'] = False
+                        st.rerun()
+                    else:
+                        st.error('Incorrect password')
 
     # ── Historical CC bets ────────────────────────────────────────────────────
     cc_bets = _load_bets()
@@ -1543,23 +1573,24 @@ def render_cha_ching_tips():
                         + f'</div>',
                         unsafe_allow_html=True,
                     )
-                with btn_col:
-                    b1, b2, b3 = st.columns(3)
-                    with b1:
-                        if st.button('✅ Win', key=f'tip_win_{tip_id}', use_container_width=True):
-                            _save_tip_result(tip_id, 'Win')
-                            st.toast('Tip settled as Win — synced to Bet History', icon='✅')
-                            st.rerun()
-                    with b2:
-                        if st.button('❌ Loss', key=f'tip_loss_{tip_id}', use_container_width=True):
-                            _save_tip_result(tip_id, 'Loss')
-                            st.toast('Tip settled as Loss — synced to Bet History', icon='❌')
-                            st.rerun()
-                    with b3:
-                        if st.button('↩️ Void', key=f'tip_void_{tip_id}', use_container_width=True):
-                            _save_tip_result(tip_id, 'Void/Refund')
-                            st.toast('Tip voided — synced to Bet History', icon='↩️')
-                            st.rerun()
+                if editable:
+                    with btn_col:
+                        b1, b2, b3 = st.columns(3)
+                        with b1:
+                            if st.button('✅ Win', key=f'tip_win_{tip_id}', use_container_width=True):
+                                _save_tip_result(tip_id, 'Win')
+                                st.toast('Tip settled as Win — synced to Bet History', icon='✅')
+                                st.rerun()
+                        with b2:
+                            if st.button('❌ Loss', key=f'tip_loss_{tip_id}', use_container_width=True):
+                                _save_tip_result(tip_id, 'Loss')
+                                st.toast('Tip settled as Loss — synced to Bet History', icon='❌')
+                                st.rerun()
+                        with b3:
+                            if st.button('↩️ Void', key=f'tip_void_{tip_id}', use_container_width=True):
+                                _save_tip_result(tip_id, 'Void/Refund')
+                                st.toast('Tip voided — synced to Bet History', icon='↩️')
+                                st.rerun()
 
         # ── Settled ───────────────────────────────────────────────────────────
         if not settled_tips.empty:
@@ -1590,11 +1621,11 @@ def render_cha_ching_tips():
                         f'</div>',
                         unsafe_allow_html=True,
                     )
-                    # Allow clearing result to move back to live
-                    if st.button('Clear result', key=f'tip_clear_{tip_id}',
-                                 type='secondary', use_container_width=False):
-                        _save_tip_result(tip_id, '')
-                        st.rerun()
+                    if editable:
+                        if st.button('Clear result', key=f'tip_clear_{tip_id}',
+                                     type='secondary', use_container_width=False):
+                            _save_tip_result(tip_id, '')
+                            st.rerun()
 
     # ── Upcoming games ────────────────────────────────────────────────────────
     if fixtures.empty:
@@ -1606,36 +1637,37 @@ def render_cha_ching_tips():
         _render_manual_props()
         return
 
-    # ── Manual game entry ─────────────────────────────────────────────────────
+    # ── Manual game entry — edit mode only ───────────────────────────────────
     if '_manual_games' not in st.session_state:
         st.session_state['_manual_games'] = []
     if '_mg_n' not in st.session_state:
         st.session_state['_mg_n'] = 0
 
-    with st.expander("+ Add game manually", expanded=False):
-        _n = st.session_state['_mg_n']
-        mg1, mg2, mg3, mg4 = st.columns([1.5, 2, 2, 1])
-        with mg1:
-            mg_round = st.text_input("Round", placeholder="Round 11", key=f'mg_round_{_n}')
-        with mg2:
-            mg_home  = st.text_input("Home team", placeholder="Richmond", key=f'mg_home_{_n}')
-        with mg3:
-            mg_away  = st.text_input("Away team", placeholder="Essendon", key=f'mg_away_{_n}')
-        with mg4:
-            st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
-            if st.button("Add", key='mg_add', use_container_width=True):
-                r = mg_round.strip()
-                h = mg_home.strip()
-                a = mg_away.strip()
-                if r and h and a:
-                    new_gkey = f"{r} {h} v {a}"
-                    existing = [g['gkey'] for g in st.session_state['_manual_games']]
-                    if new_gkey not in existing:
-                        st.session_state['_manual_games'].append({'roundname': r, 'hteam': h, 'ateam': a, 'gkey': new_gkey})
-                    st.session_state['_mg_n'] += 1  # new keys next render → inputs clear
-                    st.rerun()
-                else:
-                    st.warning("Fill in all three fields.")
+    if editable:
+        with st.expander("+ Add game manually", expanded=False):
+            _n = st.session_state['_mg_n']
+            mg1, mg2, mg3, mg4 = st.columns([1.5, 2, 2, 1])
+            with mg1:
+                mg_round = st.text_input("Round", placeholder="Round 11", key=f'mg_round_{_n}')
+            with mg2:
+                mg_home  = st.text_input("Home team", placeholder="Richmond", key=f'mg_home_{_n}')
+            with mg3:
+                mg_away  = st.text_input("Away team", placeholder="Essendon", key=f'mg_away_{_n}')
+            with mg4:
+                st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
+                if st.button("Add", key='mg_add', use_container_width=True):
+                    r = mg_round.strip()
+                    h = mg_home.strip()
+                    a = mg_away.strip()
+                    if r and h and a:
+                        new_gkey = f"{r} {h} v {a}"
+                        existing = [g['gkey'] for g in st.session_state['_manual_games']]
+                        if new_gkey not in existing:
+                            st.session_state['_manual_games'].append({'roundname': r, 'hteam': h, 'ateam': a, 'gkey': new_gkey})
+                        st.session_state['_mg_n'] += 1
+                        st.rerun()
+                    else:
+                        st.warning("Fill in all three fields.")
 
     # Render manually added games
     if st.session_state['_manual_games']:
@@ -1648,12 +1680,13 @@ def render_cha_ching_tips():
                     tab_disp, tab_goals = st.tabs(["Disposals", "Goals"])
                     for tab, mtype in [(tab_disp, "Disposals O/U"), (tab_goals, "Goals O/U")]:
                         with tab:
-                            _render_market_tab(mgkey, mtype, props_df, tips_df)
+                            _render_market_tab(mgkey, mtype, props_df, tips_df, editable=editable)
             with col_del:
-                st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
-                if st.button("✕", key=f'mg_del_{mgkey}', help="Remove this game"):
-                    st.session_state['_manual_games'] = [g for g in st.session_state['_manual_games'] if g['gkey'] != mgkey]
-                    st.rerun()
+                if editable:
+                    st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
+                    if st.button("✕", key=f'mg_del_{mgkey}', help="Remove this game"):
+                        st.session_state['_manual_games'] = [g for g in st.session_state['_manual_games'] if g['gkey'] != mgkey]
+                        st.rerun()
 
     st.markdown('<div class="section-header">Upcoming Games — Next 7 Days</div>',
                 unsafe_allow_html=True)
@@ -1669,11 +1702,11 @@ def render_cha_ching_tips():
 
             for tab, mtype in [(tab_disp, "Disposals O/U"), (tab_goals, "Goals O/U")]:
                 with tab:
-                    _render_market_tab(gkey, mtype, props_df, tips_df)
+                    _render_market_tab(gkey, mtype, props_df, tips_df, editable=editable)
 
 
 def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
-                       tips_df: pd.DataFrame):
+                       tips_df: pd.DataFrame, editable: bool = True):
     """Render a disposals or goals market tab for a game."""
     game_props = props_df[
         (props_df['game_key'] == game_key) &
@@ -1723,34 +1756,37 @@ def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
         )
 
         st.markdown('')
-        # Checklist buttons per player
-        player_list = game_props['player'].tolist()
-        if player_list:
-            st.markdown('<div style="font-size:11px;color:#94a3b8;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;margin:8px 0 4px 0">CHECKLIST</div>', unsafe_allow_html=True)
-            btn_cols = st.columns(min(len(player_list), 4))
-            for i, player in enumerate(player_list):
-                with btn_cols[i % 4]:
-                    tip_match = tips_df[
-                        (tips_df['game_key'] == game_key) &
-                        (tips_df['player'] == player) &
-                        (tips_df['market_type'] == market_type)
-                    ] if not tips_df.empty else pd.DataFrame()
-                    is_flagged = not tip_match.empty and tip_match['is_flagged'].any()
-                    label = f"{'★ ' if is_flagged else ''}Checklist: {player.split()[-1]}"
-                    btn_type = "primary" if is_flagged else "secondary"
-                    p_row     = game_props[game_props['player'] == player]
-                    p_odds    = float(p_row['odds'].iloc[0]) if not p_row.empty else 0.0
-                    p_bookie  = str(p_row['bookmaker'].iloc[0]) if not p_row.empty else ''
-                    p_line    = float(p_row['line'].iloc[0]) if not p_row.empty else 0.0
-                    if st.button(label, key=f"cl_{game_key}_{market_type}_{player}",
-                                 type=btn_type, use_container_width=True):
-                        _open_checklist(player, market_type, game_key,
-                                        odds=p_odds, bookmaker=p_bookie, line=p_line)
+        # Checklist buttons per player — edit mode only
+        if editable:
+            player_list = game_props['player'].tolist()
+            if player_list:
+                st.markdown('<div style="font-size:11px;color:#94a3b8;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;margin:8px 0 4px 0">CHECKLIST</div>', unsafe_allow_html=True)
+                btn_cols = st.columns(min(len(player_list), 4))
+                for i, player in enumerate(player_list):
+                    with btn_cols[i % 4]:
+                        tip_match = tips_df[
+                            (tips_df['game_key'] == game_key) &
+                            (tips_df['player'] == player) &
+                            (tips_df['market_type'] == market_type)
+                        ] if not tips_df.empty else pd.DataFrame()
+                        is_flagged = not tip_match.empty and tip_match['is_flagged'].any()
+                        label = f"{'★ ' if is_flagged else ''}Checklist: {player.split()[-1]}"
+                        btn_type = "primary" if is_flagged else "secondary"
+                        p_row     = game_props[game_props['player'] == player]
+                        p_odds    = float(p_row['odds'].iloc[0]) if not p_row.empty else 0.0
+                        p_bookie  = str(p_row['bookmaker'].iloc[0]) if not p_row.empty else ''
+                        p_line    = float(p_row['line'].iloc[0]) if not p_row.empty else 0.0
+                        if st.button(label, key=f"cl_{game_key}_{market_type}_{player}",
+                                     type=btn_type, use_container_width=True):
+                            _open_checklist(player, market_type, game_key,
+                                            odds=p_odds, bookmaker=p_bookie, line=p_line)
 
     else:
         st.caption(f"No {market_type} props loaded for this game.")
 
-    # ── Add / Edit Props ─────────────────────────────────────────────────────
+    # ── Add / Edit Props — edit mode only ────────────────────────────────────
+    if not editable:
+        return
     with st.expander(f"Add {market_type} props for this game"):
         with st.form(key=f"add_props_{game_key}_{market_type}"):
             st.markdown(f"**Enter player line and odds for {market_type}**")
