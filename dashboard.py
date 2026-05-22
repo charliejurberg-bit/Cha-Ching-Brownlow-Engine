@@ -2348,18 +2348,20 @@ if _page == 'Model Insights':
         with tab_top:
             top20 = imp.head(20).sort_values('Importance %', ascending=True)
             fig3 = go.Figure(go.Bar(x=top20['Importance %'], y=top20['Feature'], orientation='h',
-                                    marker=dict(color=top20['Importance %'], colorscale='Greens', showscale=False)))
-            fig3.update_layout(plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
-                               xaxis_title='Importance (%)', height=500, margin=dict(l=220, t=20))
+                                    marker=dict(color=top20['Importance %'],
+                                                colorscale=[[0, '#1e3a4a'], [1, '#34d399']],
+                                                showscale=False)))
             fig3 = apply_chart_theme(fig3)
+            fig3.update_layout(xaxis_title='Importance (%)', height=500, margin=dict(l=220, r=16, t=20, b=16))
             st.plotly_chart(fig3, width='stretch', key="chart_007")
         with tab_all:
             all_imp = imp.sort_values('Importance %', ascending=True)
             fig4 = go.Figure(go.Bar(x=all_imp['Importance %'], y=all_imp['Feature'], orientation='h',
-                                    marker=dict(color=all_imp['Importance %'], colorscale='Greens', showscale=False)))
-            fig4.update_layout(plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
-                               xaxis_title='Importance (%)', height=1400, margin=dict(l=250, t=20))
+                                    marker=dict(color=all_imp['Importance %'],
+                                                colorscale=[[0, '#1e3a4a'], [1, '#34d399']],
+                                                showscale=False)))
             fig4 = apply_chart_theme(fig4)
+            fig4.update_layout(xaxis_title='Importance (%)', height=1400, margin=dict(l=250, r=16, t=20, b=16))
             st.plotly_chart(fig4, width='stretch', key="chart_008")
 
         c1, c2 = st.columns(2)
