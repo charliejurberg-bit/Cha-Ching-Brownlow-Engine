@@ -1391,6 +1391,13 @@ def render_cha_ching_tips():
             if pd.notna(cc_bets['date']).any():
                 cc_min_d = cc_bets['date'].dropna().min().date()
                 cc_max_d = cc_bets['date'].dropna().max().date()
+                # Extend stored range to always include current data bounds
+                _stored = st.session_state.get('cc_hist_dr')
+                if _stored and isinstance(_stored, (tuple, list)) and len(_stored) == 2:
+                    if cc_max_d > _stored[1]:
+                        st.session_state['cc_hist_dr'] = (_stored[0], cc_max_d)
+                    if cc_min_d < _stored[0]:
+                        st.session_state['cc_hist_dr'] = (cc_min_d, st.session_state['cc_hist_dr'][1])
                 cc_dr = st.date_input("Date range", (cc_min_d, cc_max_d), key='cc_hist_dr')
             else:
                 cc_dr = None
@@ -1548,14 +1555,17 @@ def render_cha_ching_tips():
                     with b1:
                         if st.button('✅ Win', key=f'tip_win_{tip_id}', use_container_width=True):
                             _save_tip_result(tip_id, 'Win')
+                            st.toast('Tip settled as Win — synced to Bet History', icon='✅')
                             st.rerun()
                     with b2:
                         if st.button('❌ Loss', key=f'tip_loss_{tip_id}', use_container_width=True):
                             _save_tip_result(tip_id, 'Loss')
+                            st.toast('Tip settled as Loss — synced to Bet History', icon='❌')
                             st.rerun()
                     with b3:
                         if st.button('↩️ Void', key=f'tip_void_{tip_id}', use_container_width=True):
                             _save_tip_result(tip_id, 'Void/Refund')
+                            st.toast('Tip voided — synced to Bet History', icon='↩️')
                             st.rerun()
 
         # ── Settled ───────────────────────────────────────────────────────────
