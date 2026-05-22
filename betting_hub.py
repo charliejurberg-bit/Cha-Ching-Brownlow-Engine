@@ -1284,7 +1284,7 @@ def render_bet_tracker():
         if pd.notna(bets['date']).any():
             min_d = bets['date'].dropna().min().date()
             max_d = bets['date'].dropna().max().date()
-            date_range = st.date_input("Date range", (min_d, max_d), key='bt_dr')
+            date_range = st.date_input("Date range", (min_d, max_d))
         else:
             date_range = None
 
@@ -1391,14 +1391,7 @@ def render_cha_ching_tips():
             if pd.notna(cc_bets['date']).any():
                 cc_min_d = cc_bets['date'].dropna().min().date()
                 cc_max_d = cc_bets['date'].dropna().max().date()
-                # Extend stored range to always include current data bounds
-                _stored = st.session_state.get('cc_hist_dr')
-                if _stored and isinstance(_stored, (tuple, list)) and len(_stored) == 2:
-                    if cc_max_d > _stored[1]:
-                        st.session_state['cc_hist_dr'] = (_stored[0], cc_max_d)
-                    if cc_min_d < _stored[0]:
-                        st.session_state['cc_hist_dr'] = (cc_min_d, st.session_state['cc_hist_dr'][1])
-                cc_dr = st.date_input("Date range", (cc_min_d, cc_max_d), key='cc_hist_dr')
+                cc_dr = st.date_input("Date range", (cc_min_d, cc_max_d))
             else:
                 cc_dr = None
 
