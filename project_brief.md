@@ -81,19 +81,31 @@ _BH_PAGES = {'BH Dashboard', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis
 | `render_trends_analysis()` | 1264 | Trends page renderer |
 | `render_page(page)` | 1432 | Page router |
 
-## UI theme
+## UI theme — Midnight Turf
+
 ```python
 COLORS = {
-    "background": "#faf7f2",
-    "primary":    "#2d5016",   # dark green
-    "secondary":  "#8b6f47",   # brown/tan
+    "bg_base":        "#0f1923",   # dark navy — page background
+    "bg_surface":     "#152533",   # cards, panels
+    "bg_elevated":    "#1e3a4a",   # hover states, elevated cards
+    "accent":         "#34d399",   # emerald — primary CTA, positive values
+    "gold":           "#f0b429",   # medals, #1 prediction, top bets
+    "red":            "#e05252",   # losses, negative delta, warnings
+    "blue":           "#4a90c4",   # secondary info, model stats
+    "text_primary":   "#e8f0f8",   # headings, important numbers
+    "text_secondary": "#94a3b8",   # labels, body text
+    "text_muted":     "#4a5a6a",   # section headers, disabled
+    "border":         "#2a4a5a",   # card borders, dividers
 }
 ```
+
+Fonts: Sora (headings/UI), DM Mono (numbers/odds/code)
+Personality: sharp, premium, data-driven
 
 ## Known issues (active)
 1. `st.plotly_chart()` duplicate key errors — needs unique `key=` on every chart call
 2. Game Analysis page — low visual contrast, needs separation between sections
-3. UI feels static — design skills installed but not yet applied
+3. ~~UI feels static~~ — Midnight Turf design system applied (Round 10 2026)
 
 ## Current priorities
 1. Fix plotly_chart duplicate IDs across dashboard
