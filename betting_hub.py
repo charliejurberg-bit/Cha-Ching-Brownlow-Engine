@@ -1121,6 +1121,11 @@ def render_bet_tracker():
         use_container_width=True,
         hide_index=True,
         height=min(600, 60 + len(display) * 36),
+        column_config={
+            'Odds':  st.column_config.NumberColumn('Odds',  format='%.2f'),
+            'Stake': st.column_config.NumberColumn('Stake', format='%.2f'),
+            'P&L':   st.column_config.NumberColumn('P&L',   format='%.2f'),
+        },
     )
 
     # Export filtered
