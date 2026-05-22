@@ -2533,10 +2533,16 @@ if _page == 'Game Analysis':
             def _style_game_table(df, winner_team=None):
                 max_p3v = pd.to_numeric(df['P(3v) %'], errors='coerce').max() if len(df) > 0 else 1.0
                 max_p3v = max_p3v if max_p3v > 0 else 1.0
-                # Row tints: gold / emerald / blue for predicted 3v / 2v / 1v
+                # Rank cell: solid MT accent as bg so 1/2/3 pop on dark rows
+                _rank_cell = {
+                    0: 'background-color:#f0b429!important;color:#0f1923!important;font-weight:800!important;text-align:center!important;',
+                    1: 'background-color:#34d399!important;color:#0f1923!important;font-weight:800!important;text-align:center!important;',
+                    2: 'background-color:#4a90c4!important;color:#0f1923!important;font-weight:800!important;text-align:center!important;',
+                }
+                # Row tints match badge colors: gold / emerald / blue
                 _top3_row = {
-                    0: 'background-color:rgba(240,180,41,0.16)!important;color:#e8f0f8!important;font-weight:700!important;',
-                    1: 'background-color:rgba(52,211,153,0.12)!important;color:#e8f0f8!important;font-weight:700!important;',
+                    0: 'background-color:rgba(240,180,41,0.14)!important;color:#e8f0f8!important;font-weight:700!important;',
+                    1: 'background-color:rgba(52,211,153,0.11)!important;color:#e8f0f8!important;font-weight:700!important;',
                     2: 'background-color:rgba(74,144,196,0.10)!important;color:#e8f0f8!important;font-weight:700!important;',
                 }
                 def _cell(row):
@@ -2555,7 +2561,9 @@ if _page == 'Game Analysis':
                                 'background-color:#1a2d3d!important;color:#e8f0f8!important;')
                     result = []
                     for col in df.columns:
-                        if col == 'P(3v) %' and i >= 3:
+                        if col == 'Rank' and i in _rank_cell:
+                            result.append(_rank_cell[i])
+                        elif col == 'P(3v) %' and i >= 3:
                             v = float(row[col]) if row[col] != '' else 0.0
                             norm = v / max_p3v if max_p3v > 0 else 0.0
                             a = 0.07 + norm * 0.40
@@ -2563,23 +2571,7 @@ if _page == 'Game Analysis':
                         else:
                             result.append(base)
                     return result
-
-                def _fmt_rank(v):
-                    try:
-                        v = int(v)
-                    except (TypeError, ValueError):
-                        return str(v)
-                    if v == 1:
-                        return '<span class="rank-badge rank-badge-1">1</span>'
-                    if v == 2:
-                        return '<span class="rank-badge rank-badge-2">2</span>'
-                    if v == 3:
-                        return '<span class="rank-badge rank-badge-3">3</span>'
-                    return str(v)
-
-                return (df.style
-                        .apply(_cell, axis=1)
-                        .format({'Rank': _fmt_rank}, escape=None))
+                return df.style.apply(_cell, axis=1)
 
             game_order = rnd.drop_duplicates('Match')[['Match', 'Home.team', 'Away.team', 'Home.score', 'Away.score']].reset_index(drop=True)
             col_cfg = {
