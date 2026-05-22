@@ -3254,56 +3254,55 @@ Positive = improving trajectory, negative = declining.
 
         st.markdown('<div class="section-header">Predicted Rank of Actual Winner by Season</div>', unsafe_allow_html=True)
         fig_rank = go.Figure()
-        bar_colors_rank = ['#94a3b8' if r <= 3 else ('#34d399' if r <= 5 else ('#6b7c3a' if r <= 10 else '#adb5bd'))
+        bar_colors_rank = ['#f0b429' if r <= 3 else ('#34d399' if r <= 5 else ('#4a90c4' if r <= 10 else '#4a5a6a'))
                            for r in acc_df['Pred. Rank']]
         fig_rank.add_trace(go.Bar(
             x=acc_df['Season'].astype(str), y=acc_df['Pred. Rank'], marker_color=bar_colors_rank,
             text=[f"#{r} — {w}" for r, w in zip(acc_df['Pred. Rank'], acc_df['Actual Winner'])],
-            textposition='outside', hovertemplate='%{text}<extra></extra>',
+            textposition='outside', textfont=dict(color='#e8f0f8', size=11),
+            hovertemplate='%{text}<extra></extra>',
         ))
-        fig_rank.add_hline(y=3, line_dash='dot', line_color='#94a3b8', annotation_text='Top 3',
-                           annotation_position='right', annotation_font_color='#94a3b8')
+        fig_rank.add_hline(y=3, line_dash='dot', line_color='#f0b429', annotation_text='Top 3',
+                           annotation_position='right', annotation_font_color='#f0b429')
         fig_rank.add_hline(y=5, line_dash='dot', line_color='#34d399', annotation_text='Top 5',
                            annotation_position='right', annotation_font_color='#34d399')
-        fig_rank.add_hline(y=10, line_dash='dot', line_color='#6b7c3a', annotation_text='Top 10',
-                           annotation_position='right', annotation_font_color='#6b7c3a')
+        fig_rank.add_hline(y=10, line_dash='dot', line_color='#4a90c4', annotation_text='Top 10',
+                           annotation_position='right', annotation_font_color='#4a90c4')
+        fig_rank = apply_chart_theme(fig_rank)
         fig_rank.update_layout(
-            plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
             yaxis=dict(title='Predicted Rank of Actual Winner', autorange='reversed',
-                       gridcolor='#ede8df', range=[max(acc_df['Pred. Rank']) + 2, 0]),
-            xaxis=dict(title='Season', gridcolor='#ede8df'),
+                       range=[max(acc_df['Pred. Rank']) + 2, 0]),
+            xaxis=dict(title='Season'),
             margin=dict(t=40, b=40), showlegend=False,
         )
-        fig_rank = apply_chart_theme(fig_rank)
         st.plotly_chart(fig_rank, width='stretch', key="chart_015")
-        st.caption("Brown = Top 3   Green = Top 5   Olive = Top 10   Grey = Outside Top 10")
+        st.caption("Gold = Top 3   Green = Top 5   Blue = Top 10   Grey = Outside Top 10")
 
         st.markdown('<div class="section-header">Predicted vs Actual Votes — Top 10 Predicted Players</div>', unsafe_allow_html=True)
         seasons_avail = sorted(bt['Season'].unique().astype(int).tolist())
         sel_s = st.selectbox("Season", seasons_avail, index=len(seasons_avail) - 1, key='acc_season')
         s_data = bt[(bt['Season'] == sel_s) & (bt['Rank_Predicted'] <= 10)].copy().sort_values('Rank_Predicted')
         fig_scatter = go.Figure()
-        marker_colors_sc = ['#94a3b8' if row['Rank_Actual'] == 1 else '#adb5bd' for _, row in s_data.iterrows()]
+        marker_colors_sc = ['#f0b429' if row['Rank_Actual'] == 1 else '#4a90c4' for _, row in s_data.iterrows()]
         fig_scatter.add_trace(go.Scatter(
             x=s_data['Actual_Votes'], y=s_data['Predicted_Votes'],
             mode='markers+text', marker=dict(size=12, color=marker_colors_sc),
-            text=s_data['Player'], textposition='top center', textfont=dict(size=11, color='#2c2c2c'),
+            text=s_data['Player'], textposition='top center', textfont=dict(size=11, color='#e8f0f8'),
             hovertemplate='<b>%{text}</b><br>Actual: %{x}<br>Predicted: %{y:.1f}<extra></extra>',
         ))
         max_v = max(s_data['Actual_Votes'].max(), s_data['Predicted_Votes'].max()) + 5
         fig_scatter.add_trace(go.Scatter(
             x=[0, max_v], y=[0, max_v], mode='lines',
-            line=dict(color='#cfc4b0', dash='dash', width=1), showlegend=False, hoverinfo='skip',
+            line=dict(color='#4a5a6a', dash='dash', width=1), showlegend=False, hoverinfo='skip',
         ))
+        fig_scatter = apply_chart_theme(fig_scatter)
         fig_scatter.update_layout(
-            plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
-            xaxis=dict(title='Actual Votes', gridcolor='#ede8df', range=[0, max_v]),
-            yaxis=dict(title='Predicted Votes', gridcolor='#ede8df', range=[0, max_v]),
+            xaxis=dict(title='Actual Votes', range=[0, max_v]),
+            yaxis=dict(title='Predicted Votes', range=[0, max_v]),
             margin=dict(t=20, b=40), height=420,
         )
-        fig_scatter = apply_chart_theme(fig_scatter)
         st.plotly_chart(fig_scatter, width='stretch', key="chart_016")
-        st.caption("Brown dot = Actual winner   Grey dot = Other top 10 predicted   Dashed line = perfect prediction")
+        st.caption("Gold dot = Actual winner   Blue dot = Other top 10 predicted   Dashed line = perfect prediction")
 
 # ════════════════════════════════════════════════════════════
 # PLAYER COMPARISON
