@@ -1116,6 +1116,9 @@ def render_bet_tracker():
     if _imported_bets is not None and not _imported_bets.empty:
         bets = pd.concat([bets, _imported_bets], ignore_index=True)
 
+    # Bet Tracker shows non-CC bets only — CC bets live in Cha Ching Tips tab
+    bets = bets[bets['is_cha_ching'] != True].copy()
+
     # ── Action buttons ────────────────────────────────────────────────────────
     col_a, col_b, col_c = st.columns([1, 1, 6])
     with col_a:
@@ -1126,12 +1129,12 @@ def render_bet_tracker():
             _import_csv_dialog()
 
     if bets.empty:
-        st.info("No bets logged yet. Click **+ Add Bet** to log your first bet, or **Import CSV** to import a bookmaker export.")
+        st.info("No bets logged yet. Click **+ Add Bet** to log your first bet, or **Import CSV** to import a spreadsheet.")
         return
 
     # ── Filters ───────────────────────────────────────────────────────────────
     st.markdown('<div class="section-header">Filters</div>', unsafe_allow_html=True)
-    fc1, fc2, fc3, fc4, fc5 = st.columns(5)
+    fc1, fc2, fc3, fc4 = st.columns(4)
     with fc1:
         all_markets = ['All'] + sorted(bets['market_type'].dropna().unique().tolist())
         mkt_filter  = st.selectbox("Market", all_markets, index=0, key='bt_mkt')
@@ -1141,8 +1144,6 @@ def render_bet_tracker():
     with fc3:
         res_filter = st.selectbox("Result", ['All'] + RESULTS, index=0, key='bt_res')
     with fc4:
-        cc_filter = st.selectbox("Tips type", ['All', 'Cha Ching only', 'Non-CC only'], index=0, key='bt_cc')
-    with fc5:
         if pd.notna(bets['date']).any():
             min_d = bets['date'].dropna().min().date()
             max_d = bets['date'].dropna().max().date()
@@ -1158,10 +1159,6 @@ def render_bet_tracker():
         filt = filt[filt['bookmaker'] == bk_filter]
     if res_filter != 'All':
         filt = filt[filt['result'] == res_filter]
-    if cc_filter == 'Cha Ching only':
-        filt = filt[filt['is_cha_ching'] == True]
-    elif cc_filter == 'Non-CC only':
-        filt = filt[filt['is_cha_ching'] != True]
     if date_range and isinstance(date_range, (tuple, list)) and len(date_range) == 2:
         try:
             filt = filt[
@@ -1253,6 +1250,58 @@ def render_cha_ching_tips():
         'Upcoming fixtures · Player prop markets · Cha Ching checklist</p></div>',
         unsafe_allow_html=True,
     )
+
+    # ── Historical CC bets ────────────────────────────────────────────────────
+    cc_bets = _load_bets()
+    cc_bets = cc_bets[cc_bets['is_cha_ching'] == True].copy()
+
+    if not cc_bets.empty:
+        st.markdown('<div class="section-header">Cha Ching Bet History</div>', unsafe_allow_html=True)
+        fs = _betting_stats(cc_bets)
+        sc1, sc2, sc3, sc4, sc5, sc6 = st.columns(6)
+        for col, lbl, val in [
+            (sc1, "CC Bets",  str(fs['total_bets'])),
+            (sc2, "P&L",      f"{fs['total_pl']:+.2f}u"),
+            (sc3, "ROI",      f"{fs['roi']:+.1f}%"),
+            (sc4, "Hit Rate", f"{fs['hit_rate']:.1f}%"),
+            (sc5, "W/L",      f"{fs['wins']}W / {fs['losses']}L"),
+            (sc6, "Pending",  str(fs['pending'])),
+        ]:
+            col.metric(lbl, val)
+
+        cc_display = cc_bets[[
+            'date', 'match', 'market_type', 'selection', 'bookmaker',
+            'odds', 'stake', 'result', 'profit_loss', 'notes'
+        ]].copy()
+        cc_display['date']        = cc_display['date'].dt.strftime('%d %b %Y')
+        cc_display['odds']        = cc_display['odds'].round(2)
+        cc_display['stake']       = cc_display['stake'].round(2)
+        cc_display['profit_loss'] = cc_display['profit_loss'].round(2)
+        cc_display = cc_display.sort_values('date', ascending=False).reset_index(drop=True)
+        cc_display.columns = ['Date', 'Match', 'Market', 'Selection', 'Bookmaker',
+                              'Odds', 'Stake', 'Result', 'P&L', 'Notes']
+
+        def _style_cc(df):
+            styles = pd.DataFrame('', index=df.index, columns=df.columns)
+            for i, row in df.iterrows():
+                if row['Result'] == 'Win':
+                    styles.loc[i, 'P&L'] = 'color: #34d399; font-weight: 700'
+                elif row['Result'] == 'Loss':
+                    styles.loc[i, 'P&L'] = 'color: #e05252; font-weight: 700'
+            return styles
+
+        st.dataframe(
+            cc_display.style.apply(_style_cc, axis=None),
+            use_container_width=True,
+            hide_index=True,
+            height=min(500, 60 + len(cc_display) * 36),
+            column_config={
+                'Odds':  st.column_config.NumberColumn('Odds',  format='%.2f'),
+                'Stake': st.column_config.NumberColumn('Stake', format='%.2f'),
+                'P&L':   st.column_config.NumberColumn('P&L',   format='%.2f'),
+            },
+        )
+        st.divider()
 
     # ── Pending/flagged tips banner ───────────────────────────────────────────
     tips_df  = _load_tips()
