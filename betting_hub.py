@@ -225,6 +225,58 @@ def _delete_user_import():
         os.remove(USER_IMPORT_CSV)
 
 
+def _load_user_import_as_bets() -> pd.DataFrame | None:
+    """Load user_import.csv and normalise it to the bets schema."""
+    raw = _load_user_import()
+    if raw is None or raw.empty:
+        return None
+    df = raw.copy()
+    df.columns = [c.strip().lower().replace(' ', '_') for c in df.columns]
+    result_map = {
+        'won': 'Win', 'win': 'Win',
+        'lost': 'Loss', 'loss': 'Loss',
+        'pending': 'Pending',
+        'void': 'Void/Refund', 'void/refund': 'Void/Refund',
+    }
+    col = lambda *names: next((n for n in names if n in df.columns), None)
+    match_col   = col('match', 'event', 'race_event', 'race/event')
+    result_col  = col('result', 'status')
+    pl_col      = col('profit_loss', 'p&l', 'pl', 'profit/loss')
+    market_col  = col('market_type', 'market', 'bet_type', 'event_type')
+    rows = []
+    for _, r in df.iterrows():
+        raw_result = str(r.get(result_col, 'Pending') if result_col else 'Pending').strip().lower()
+        result = result_map.get(raw_result, 'Pending')
+        pl_raw = pd.to_numeric(r.get(pl_col, 0) if pl_col else 0, errors='coerce')
+        pl = float(pl_raw) if not pd.isna(pl_raw) else 0.0
+        odds_raw = pd.to_numeric(r.get('odds', 2), errors='coerce')
+        odds = float(odds_raw) if not pd.isna(odds_raw) else 2.0
+        stake_raw = pd.to_numeric(r.get('stake', 0), errors='coerce')
+        stake = abs(float(stake_raw)) if not pd.isna(stake_raw) else 0.0
+        rows.append({
+            'bet_id':            str(uuid.uuid4())[:8],
+            'date':              str(r.get('date', '')),
+            'match':             str(r.get(match_col, '') if match_col else ''),
+            'market_type':       str(r.get(market_col, 'Other') if market_col else 'Other'),
+            'selection':         str(r.get('selection', '')),
+            'bookmaker':         str(r.get('bookmaker', 'Other')),
+            'odds':              round(odds, 2),
+            'stake':             round(stake, 2),
+            'result':            result,
+            'profit_loss':       round(pl, 2),
+            'is_cha_ching':      False,
+            'cha_ching_criteria': '',
+            'notes':             str(r.get('notes', '')),
+        })
+    out = pd.DataFrame(rows)
+    out['date'] = pd.to_datetime(out['date'], errors='coerce')
+    out['odds'] = pd.to_numeric(out['odds'], errors='coerce')
+    out['stake'] = pd.to_numeric(out['stake'], errors='coerce')
+    out['profit_loss'] = pd.to_numeric(out['profit_loss'], errors='coerce')
+    out['is_cha_ching'] = False
+    return out
+
+
 def _save_prop(game_key: str, player: str, market_type: str,
                line: float, bookmaker: str, odds: float):
     df = _load_props()
@@ -1060,6 +1112,9 @@ def render_bet_tracker():
     )
 
     bets = _load_bets()
+    _imported_bets = _load_user_import_as_bets()
+    if _imported_bets is not None and not _imported_bets.empty:
+        bets = pd.concat([bets, _imported_bets], ignore_index=True)
 
     # ── Action buttons ────────────────────────────────────────────────────────
     col_a, col_b, col_c = st.columns([1, 1, 6])
