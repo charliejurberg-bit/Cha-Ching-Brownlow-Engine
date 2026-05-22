@@ -42,8 +42,8 @@ RESULTS      = ["Pending", "Win", "Loss", "Void/Refund"]
 CC_THRESHOLD = 3   # checklist items needed to auto-flag a Cha Ching tip
 
 C = dict(
-    green='#34d399', lgreen='#4a7a28', gold='#c9a84c', lgold='#e8c96d',
-    brown='#94a3b8', red='#c0392b', bg='#152533', card='#1e3a4a',
+    green='#34d399', lgreen='#1a5c40', gold='#f0b429', lgold='#f5c842',
+    brown='#94a3b8', red='#e05252', bg='#152533', card='#1e3a4a',
     border='#2a4a5a', text='#e8f0f8',
 )
 
@@ -314,14 +314,14 @@ BH_CSS = """
 <style>
 /* ── Landing page cards ── */
 .landing-card {
-    background: #ffffff;
-    border: 1px solid #ddd5c5;
+    background: #152533;
+    border: 1px solid #2a4a5a;
     border-radius: 12px;
     padding: 44px 36px 40px 36px;
     text-align: center;
     cursor: pointer;
-    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.22s ease;
-    box-shadow: 0 4px 20px rgba(0,0,0,0.07);
+    transition: transform 0.22s cubic-bezier(0.23,1,0.32,1), box-shadow 0.22s ease;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.25);
     min-height: 240px;
     display: flex;
     flex-direction: column;
@@ -329,15 +329,15 @@ BH_CSS = """
     align-items: center;
     will-change: transform;
 }
-.landing-card.brownlow { border-top: 5px solid #34d399; }
-.landing-card.betting  { border-top: 5px solid #c9a84c; }
-.landing-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(0,0,0,0.13); }
-.landing-card:active { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.10); }
+.landing-card.brownlow { border-top: 3px solid #34d399; }
+.landing-card.betting  { border-top: 3px solid #f0b429; }
+.landing-card:hover { transform: translateY(-4px); box-shadow: 0 12px 36px rgba(0,0,0,0.4); border-color: #3a6a7a; }
+.landing-card:active { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
 .landing-icon  { font-size: 54px; margin-bottom: 14px; line-height: 1; }
 .landing-title { font-size: 28px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 10px; }
 .landing-title.brownlow { color: #34d399; }
-.landing-title.betting  { color: #c9a84c; }
-.landing-desc  { color: #6c6c6c; font-size: 13px; line-height: 1.6; max-width: 320px; }
+.landing-title.betting  { color: #f0b429; }
+.landing-desc  { color: #94a3b8; font-size: 13px; line-height: 1.6; max-width: 320px; }
 
 /* ── Nav section pills ── */
 .nav-section-pill {
@@ -354,44 +354,44 @@ BH_CSS = """
     transition: opacity 0.15s ease, transform 0.15s ease;
 }
 .nav-section-pill:hover { opacity: 0.85; transform: translateY(-1px); }
-.nav-pill-brownlow { background: #34d399; color: #e8f0f8; }
-.nav-pill-betting  { background: #c9a84c; color: #2c2c2c; }
+.nav-pill-brownlow { background: #34d399; color: #0f1923; }
+.nav-pill-betting  { background: #f0b429; color: #0f1923; }
 
 /* ── Betting metric cards ── */
 .bh-metric {
-    background: #ffffff;
-    border: 1px solid #ddd5c5;
+    background: #152533;
+    border: 1px solid #2a4a5a;
     border-radius: 8px;
     padding: 16px 20px;
     text-align: center;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15), 0 4px 12px rgba(0,0,0,0.12);
     cursor: default;
     transition: box-shadow 0.18s ease, transform 0.18s ease;
     will-change: transform;
 }
-.bh-metric:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.08), 0 8px 24px rgba(0,0,0,0.05); transform: translateY(-2px); }
+.bh-metric:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.2); transform: translateY(-2px); }
 .bh-metric.positive { border-top: 3px solid #34d399; }
-.bh-metric.negative { border-top: 3px solid #c0392b; }
-.bh-metric.neutral  { border-top: 3px solid #94a3b8; }
-.bh-metric.gold     { border-top: 3px solid #c9a84c; }
+.bh-metric.negative { border-top: 3px solid #e05252; }
+.bh-metric.neutral  { border-top: 3px solid #4a5a6a; }
+.bh-metric.gold     { border-top: 3px solid #f0b429; }
 .bh-label { color: #94a3b8; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
 .bh-value { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; }
-.bh-value.pos { color: #34d399; }
-.bh-value.neg { color: #c0392b; }
-.bh-value.neu { color: #2c2c2c; }
-.bh-value.gold { color: #c9a84c; }
+.bh-value.pos  { color: #34d399; }
+.bh-value.neg  { color: #e05252; }
+.bh-value.neu  { color: #e8f0f8; }
+.bh-value.gold { color: #f0b429; }
 .bh-sub   { color: #94a3b8; font-size: 11px; margin-top: 4px; line-height: 1.4; }
 
 /* ── Bet result badges ── */
-.bet-win     { background: #d4edda; color: #155724; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; transition: opacity 0.15s ease, transform 0.15s ease; }
-.bet-loss    { background: #f8d7da; color: #721c24; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; transition: opacity 0.15s ease, transform 0.15s ease; }
-.bet-pending { background: #fff3cd; color: #856404; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; transition: opacity 0.15s ease, transform 0.15s ease; }
-.bet-void    { background: #e2e3e5; color: #383d41; padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; transition: opacity 0.15s ease, transform 0.15s ease; }
+.bet-win     { background: rgba(52,211,153,0.18);  color: #34d399; border: 1px solid rgba(52,211,153,0.4);  padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; }
+.bet-loss    { background: rgba(224,82,82,0.18);   color: #e05252; border: 1px solid rgba(224,82,82,0.4);   padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; }
+.bet-pending { background: rgba(240,180,41,0.15);  color: #f0b429; border: 1px solid rgba(240,180,41,0.4);  padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; }
+.bet-void    { background: rgba(74,90,106,0.25);   color: #94a3b8; border: 1px solid #2a4a5a;               padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; }
 
 /* ── Cha Ching tip badge ── */
 .cc-badge {
-    background: linear-gradient(135deg, #c9a84c, #e8c96d);
-    color: #2c2c2c;
+    background: #f0b429;
+    color: #0f1923;
     padding: 2px 10px;
     border-radius: 12px;
     font-size: 10px;
@@ -402,49 +402,40 @@ BH_CSS = """
 
 /* ── Fixture card ── */
 .fixture-card {
-    background: #ffffff;
-    border: 1px solid #ddd5c5;
-    border-left: 4px solid #34d399;
+    background: #152533;
+    border: 1px solid #2a4a5a;
+    border-top: 2px solid #34d399;
     border-radius: 8px;
     padding: 14px 18px;
     margin-bottom: 8px;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+    box-shadow: 0 1px 4px rgba(0,0,0,0.15);
     cursor: default;
-    transition: box-shadow 0.18s ease, transform 0.18s ease, border-left-color 0.18s ease;
+    transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
     will-change: transform;
 }
-.fixture-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.09); transform: translateX(3px); border-left-color: #1a3009; }
-.fixture-teams { font-size: 15px; font-weight: 700; color: #2c2c2c; letter-spacing: -0.2px; }
+.fixture-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.3); transform: translateY(-2px); border-color: #34d399; }
+.fixture-teams { font-size: 15px; font-weight: 700; color: #e8f0f8; letter-spacing: -0.2px; }
 .fixture-meta  { font-size: 12px; color: #94a3b8; margin-top: 3px; line-height: 1.4; }
 
 /* ── Checklist item ── */
-.cl-progress { font-size: 13px; color: #6c6c6c; margin: 8px 0; line-height: 1.5; }
+.cl-progress { font-size: 13px; color: #94a3b8; margin: 8px 0; line-height: 1.5; }
 
 /* ── Anti-aliasing & font rendering ── */
 * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #f0ece4; }
-::-webkit-scrollbar-thumb { background: #cfc4b0; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+::-webkit-scrollbar-track { background: #0f1923; }
+::-webkit-scrollbar-thumb { background: #2a4a5a; border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: #34d399; }
 
 /* ── Trend section header ── */
 .trend-header {
     color: #34d399; font-size: 10px; font-weight: 800;
     letter-spacing: 2px; text-transform: uppercase;
-    border-bottom: 2px solid #c9a84c; padding-bottom: 6px;
-    margin: 24px 0 14px 0; padding-left: 12px;
-    position: relative;
+    border-bottom: 1px solid #2a4a5a; padding-bottom: 6px;
+    margin: 24px 0 14px 0;
 }
-.trend-header::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px; background: #c9a84c; border-radius: 2px;
-    transition: width 0.15s ease;
-}
-.trend-header:hover::before { width: 4px; }
 
 /* ── Cha Ching badge pulse on hover ── */
 .cc-badge { transition: opacity 0.15s ease, transform 0.15s ease; display: inline-block; }
@@ -483,15 +474,15 @@ BH_CSS = """
     100% { background-position: -200% center; }
 }
 .bh-sk-card {
-    background: #ffffff;
-    border: 1px solid #ddd5c5;
+    background: #152533;
+    border: 1px solid #2a4a5a;
     border-radius: 8px;
     padding: 18px 22px;
     margin: 6px 0;
     overflow: hidden;
 }
 .bh-sk-title, .bh-sk-line {
-    background: linear-gradient(90deg, #e8e0d0 25%, #f5f0e8 50%, #e8e0d0 75%);
+    background: linear-gradient(90deg, #1e3a4a 25%, #2a4a5a 50%, #1e3a4a 75%);
     background-size: 200% 100%;
     animation: bhShimmerSweep 1.4s linear infinite;
     border-radius: 4px;
@@ -527,9 +518,7 @@ BH_CSS = """
     from { opacity: 0; transform: translateX(-8px); }
     to   { opacity: 1; transform: translateX(0); }
 }
-.bet-row-enter {
-    animation: betRowEnter 0.22s ease both;
-}
+.bet-row-enter { animation: betRowEnter 0.22s ease both; }
 
 /* ── BH section header reveal ── */
 @keyframes bhSectionReveal {
@@ -540,27 +529,15 @@ BH_CSS = """
 
 /* ── Cha Ching section header ── */
 .cc-section-header {
-    color: #c9a84c;
+    color: #f0b429;
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 2px;
     text-transform: uppercase;
-    border-bottom: 2px solid #c9a84c;
+    border-bottom: 1px solid #2a4a5a;
     padding-bottom: 6px;
-    padding-left: 12px;
     margin: 24px 0 14px 0;
-    position: relative;
 }
-.cc-section-header::before {
-    content: '';
-    position: absolute;
-    left: 0; top: 0; bottom: 0;
-    width: 3px;
-    background: linear-gradient(135deg, #c9a84c, #e8c96d);
-    border-radius: 2px;
-    transition: width 0.15s ease;
-}
-.cc-section-header:hover::before { width: 4px; }
 
 </style>
 """
@@ -593,7 +570,7 @@ def _pl_chart(df: pd.DataFrame) -> go.Figure:
         mode='lines',
         line=dict(color=C['green'], width=2.5),
         fill='tozeroy',
-        fillcolor='rgba(45,80,22,0.12)',
+        fillcolor='rgba(52,211,153,0.08)',
         name='P&L',
         hovertemplate='%{x|%d %b %Y}<br><b>%{y:+.2f} units</b><extra></extra>',
     ))
@@ -601,8 +578,8 @@ def _pl_chart(df: pd.DataFrame) -> go.Figure:
     fig.update_layout(
         paper_bgcolor=C['bg'], plot_bgcolor=C['bg'],
         font_color=C['text'], height=260, showlegend=False,
-        xaxis=dict(gridcolor='#ede8df', showgrid=True, title=''),
-        yaxis=dict(gridcolor='#ede8df', showgrid=True, zeroline=False, title='Units'),
+        xaxis=dict(gridcolor='#1e3a4a', showgrid=True, title=''),
+        yaxis=dict(gridcolor='#1e3a4a', showgrid=True, zeroline=False, title='Units'),
         margin=dict(l=60, r=20, t=10, b=40),
     )
     return fig
@@ -620,8 +597,8 @@ def _bar_chart(labels, values, title, color=None):
         paper_bgcolor=C['bg'], plot_bgcolor=C['bg'],
         font_color=C['text'], height=280, showlegend=False,
         title=dict(text=title, font=dict(size=12, color=C['brown'])),
-        xaxis=dict(gridcolor='#ede8df'),
-        yaxis=dict(gridcolor='#ede8df', zeroline=True, zerolinecolor=C['border']),
+        xaxis=dict(gridcolor='#1e3a4a'),
+        yaxis=dict(gridcolor='#1e3a4a', zeroline=True, zerolinecolor=C['border']),
         margin=dict(l=50, r=20, t=40, b=60),
     )
     return fig
@@ -934,7 +911,7 @@ def _import_csv_dialog():
 def render_bh_dashboard():
     _inject_css()
     st.markdown(
-        '<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Betting Hub Dashboard</h2>'
+        '<div class="title-bar"><h2 style="color:#e8f0f8;margin:0">Betting Hub Dashboard</h2>'
         '<p style="color:#94a3b8;margin:4px 0 0 0">P&L summary, hit rates, recent bets</p></div>',
         unsafe_allow_html=True,
     )
@@ -1002,7 +979,7 @@ def render_bh_dashboard():
             odds_str = f'{float(odds_val):.2f}' if float(odds_val) > 0 else '—'
             st.markdown(
                 f'<div class="bet-row-enter" style="display:flex;align-items:center;gap:12px;padding:8px 12px;'
-                f'background:#fff;border:1px solid {C["border"]};border-radius:6px;margin-bottom:4px;'
+                f'background:{C["bg"]};border:1px solid {C["border"]};border-radius:6px;margin-bottom:4px;'
                 f'transition:box-shadow 0.15s ease,transform 0.15s ease;" '
                 f'onmouseenter="this.style.transform=\'translateX(3px)\';this.style.boxShadow=\'0 3px 10px rgba(0,0,0,0.07)\'" '
                 f'onmouseleave="this.style.transform=\'\';this.style.boxShadow=\'\'">'
@@ -1027,7 +1004,7 @@ def render_bh_dashboard():
 def render_bet_tracker():
     _inject_css()
     st.markdown(
-        '<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Bet Tracker</h2>'
+        '<div class="title-bar"><h2 style="color:#e8f0f8;margin:0">Bet Tracker</h2>'
         '<p style="color:#94a3b8;margin:4px 0 0 0">'
         'Full bet history with filters — log, edit, and import bets</p></div>',
         unsafe_allow_html=True,
