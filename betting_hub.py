@@ -792,7 +792,9 @@ def _import_csv_dialog():
         fmt = 'sportsbet'
     elif _has('DATE', 'EVENT TYPE', 'RACE/EVENT', 'STAKE', 'RETURN'):
         fmt = 'tab'
-    elif _has('DATE', 'EVENT', 'SELECTION', 'STAKE'):
+    elif _has('DATE', 'MATCH', 'SELECTION', 'BOOKMAKER', 'ODDS', 'STAKE', 'RESULT', 'PROFIT_LOSS'):
+        fmt = 'native'
+    elif _has('DATE', 'EVENT', 'SELECTION', 'STAKE') or _has('DATE', 'MATCH', 'SELECTION', 'STAKE'):
         fmt = 'generic'
 
     st.success(f"Detected format: **{fmt.upper()}**")
@@ -867,6 +869,34 @@ def _import_csv_dialog():
             })
         return pd.DataFrame(rows)
 
+    def _remap_native(df):
+        df = df.copy()
+        df.columns = [c.upper() for c in df.columns]
+        result_map = {'WON': 'Win', 'WIN': 'Win', 'LOST': 'Loss', 'LOSS': 'Loss',
+                      'PENDING': 'Pending', 'VOID': 'Void/Refund', 'VOID/REFUND': 'Void/Refund'}
+        rows = []
+        for _, r in df.iterrows():
+            raw_result = str(r.get('RESULT', 'Pending')).strip().upper()
+            result = result_map.get(raw_result, 'Pending')
+            pl = pd.to_numeric(r.get('PROFIT_LOSS', 0), errors='coerce')
+            pl = float(pl) if not pd.isna(pl) else 0.0
+            rows.append({
+                'bet_id': str(uuid.uuid4())[:8],
+                'date': str(r.get('DATE', date.today().strftime('%Y-%m-%d'))),
+                'match': str(r.get('MATCH', '')),
+                'market_type': str(r.get('MARKET_TYPE', r.get('MARKET', 'Other'))),
+                'selection': str(r.get('SELECTION', '')),
+                'bookmaker': str(r.get('BOOKMAKER', 'Other')),
+                'odds': round(float(pd.to_numeric(r.get('ODDS', 2), errors='coerce') or 2.0), 2),
+                'stake': round(abs(float(pd.to_numeric(r.get('STAKE', 0), errors='coerce') or 0)), 2),
+                'result': result,
+                'profit_loss': round(pl, 2),
+                'is_cha_ching': False,
+                'cha_ching_criteria': '',
+                'notes': str(r.get('NOTES', '')),
+            })
+        return pd.DataFrame(rows)
+
     def _remap_generic(df):
         df = df.copy()
         col_map = {c: c.upper() for c in df.columns}
@@ -900,6 +930,8 @@ def _import_csv_dialog():
             mapped = _remap_sportsbet(raw)
         elif fmt == 'tab':
             mapped = _remap_tab(raw)
+        elif fmt == 'native':
+            mapped = _remap_native(raw)
         else:
             mapped = _remap_generic(raw)
     except Exception as e:
