@@ -157,6 +157,26 @@ code, [data-testid="stCode"] {
 [data-testid="stDataFrame"] tr:hover td {
     background: #1e3a4a !important;
 }
+[data-testid="stTable"] {
+    border: 1px solid #2a4a5a !important;
+    border-radius: 10px !important;
+    overflow: hidden !important;
+    width: 100% !important;
+}
+[data-testid="stTable"] thead th {
+    background: #1e3a4a !important;
+    color: #94a3b8 !important;
+    font-size: 11px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.07em !important;
+    border-bottom: 1px solid #2a4a5a !important;
+    padding: 8px 10px !important;
+}
+[data-testid="stTable"] td {
+    border-bottom: 1px solid #1e3040 !important;
+    font-size: 13px !important;
+    padding: 6px 10px !important;
+}
 [data-testid="stSelectbox"] > div > div,
 [data-testid="stMultiSelect"] > div > div {
     background: #152533 !important;
@@ -2448,7 +2468,7 @@ if _page == 'Coaches Votes':
 # ════════════════════════════════════════════════════════════
 if _page == 'Game Analysis':
     st.markdown(
-        f'<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Game Analysis — {selected_season}</h2>'
+        f'<div class="title-bar"><h2 style="color:#e8f0f8;margin:0">Game Analysis — {selected_season}</h2>'
         f'<p style="color:#94a3b8;margin:4px 0 0 0">Round-by-round match predictions · poll probability breakdown</p></div>',
         unsafe_allow_html=True,
     )
@@ -2485,14 +2505,14 @@ if _page == 'Game Analysis':
                 max_p3v = pd.to_numeric(df['P(3v) %'], errors='coerce').max() if len(df) > 0 else 1.0
                 max_p3v = max_p3v if max_p3v > 0 else 1.0
                 _rank_badge = {
-                    0: 'background-color:#c9a84c!important;color:#fff!important;font-weight:800!important;',
-                    1: 'background-color:#9ea7ad!important;color:#fff!important;font-weight:700!important;',
-                    2: 'background-color:#9a6b3c!important;color:#fff!important;font-weight:700!important;',
+                    0: 'background-color:#f0b429!important;color:#0f1923!important;font-weight:800!important;',
+                    1: 'background-color:#94a3b8!important;color:#0f1923!important;font-weight:700!important;',
+                    2: 'background-color:#cd7f32!important;color:#0f1923!important;font-weight:700!important;',
                 }
                 _top3_row = {
-                    0: 'background-color:rgba(201,168,76,0.14)!important;font-weight:700!important;',
-                    1: 'background-color:rgba(158,167,173,0.14)!important;font-weight:700!important;',
-                    2: 'background-color:rgba(154,107,60,0.13)!important;font-weight:700!important;',
+                    0: 'background-color:rgba(240,180,41,0.15)!important;color:#e8f0f8!important;font-weight:700!important;',
+                    1: 'background-color:rgba(148,163,184,0.12)!important;color:#e8f0f8!important;font-weight:700!important;',
+                    2: 'background-color:rgba(205,127,50,0.12)!important;color:#e8f0f8!important;font-weight:700!important;',
                 }
                 def _cell(row):
                     i = row.name
@@ -2501,9 +2521,13 @@ if _page == 'Game Analysis':
                     if i in _top3_row:
                         base = _top3_row[i]
                     elif is_winner:
-                        base = ('background-color:#edf4ea!important;' if i % 2 == 0 else 'background-color:#e6f0e3!important;')
+                        base = ('background-color:rgba(52,211,153,0.10)!important;color:#e8f0f8!important;'
+                                if i % 2 == 0 else
+                                'background-color:rgba(52,211,153,0.14)!important;color:#e8f0f8!important;')
                     else:
-                        base = ('background-color:#f5f0e8!important;' if i % 2 == 0 else 'background-color:#ffffff!important;')
+                        base = ('background-color:#152533!important;color:#e8f0f8!important;'
+                                if i % 2 == 0 else
+                                'background-color:#1a2d3d!important;color:#e8f0f8!important;')
                     result = []
                     for col in df.columns:
                         if col == 'Rank' and i in _rank_badge:
@@ -2512,7 +2536,7 @@ if _page == 'Game Analysis':
                             v = float(row[col]) if row[col] != '' else 0.0
                             norm = v / max_p3v if max_p3v > 0 else 0.0
                             a = 0.07 + norm * 0.40
-                            result.append(f'background-color:rgba(45,80,22,{a:.2f})!important;')
+                            result.append(f'background-color:rgba(52,211,153,{a:.2f})!important;color:#e8f0f8!important;')
                         else:
                             result.append(base)
                     return result
@@ -2613,16 +2637,15 @@ if _page == 'Game Analysis':
         filtered_pp['P1%'] = (filtered_pp['Exp_1vote_games'] / filtered_pp['Games'] * 100).round(1)
 
         fig5 = go.Figure()
-        fig5.add_trace(go.Bar(name='P(3 votes)', x=filtered_pp['Player_Name'], y=filtered_pp['P3%'], marker_color='#94a3b8'))
+        fig5.add_trace(go.Bar(name='P(3 votes)', x=filtered_pp['Player_Name'], y=filtered_pp['P3%'], marker_color='#f0b429'))
         fig5.add_trace(go.Bar(name='P(2 votes)', x=filtered_pp['Player_Name'], y=filtered_pp['P2%'], marker_color='#34d399'))
-        fig5.add_trace(go.Bar(name='P(1 vote)', x=filtered_pp['Player_Name'], y=filtered_pp['P1%'], marker_color='#6b7c3a'))
+        fig5.add_trace(go.Bar(name='P(1 vote)', x=filtered_pp['Player_Name'], y=filtered_pp['P1%'], marker_color='#4a90c4'))
+        fig5 = apply_chart_theme(fig5)
         fig5.update_layout(
-            barmode='stack', plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8',
-            font_color='#2c2c2c', yaxis_title='Probability (%)',
+            barmode='stack', yaxis_title='Probability (%)',
             xaxis_tickangle=-35, legend=dict(orientation='h', y=1.05),
             margin=dict(t=20, b=120),
         )
-        fig5 = apply_chart_theme(fig5)
         st.plotly_chart(fig5, width='stretch', key="ga_pp_fig5")
 
 # ════════════════════════════════════════════════════════════
