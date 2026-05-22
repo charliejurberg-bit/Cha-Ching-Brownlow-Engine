@@ -3249,7 +3249,7 @@ Positive = improving trajectory, negative = declining.
 # ════════════════════════════════════════════════════════════
 if _page == 'Player Comparison':
     st.markdown(
-        f'<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Player Comparison — {selected_season}</h2>'
+        f'<div class="title-bar"><h2 style="color:#e8f0f8;margin:0">Player Comparison — {selected_season}</h2>'
         f'<p style="color:#94a3b8;margin:4px 0 0 0">Head-to-head model comparison and betting analysis</p></div>',
         unsafe_allow_html=True,
     )
@@ -3309,23 +3309,23 @@ if _page == 'Player Comparison':
         odds_s  = f"${d['best_odds']}" if d['best_odds'] is not None else "—"
         mkt_s   = f"{d['market_pct']}%" if d['market_pct'] is not None else "—"
         st.markdown(
-            f'<div style="background:#f0ece4;border:1px solid #ddd5c5;border-left:5px solid {colour};'
-            f'border-radius:8px;padding:18px 22px;margin:6px 0;box-shadow:0 2px 8px rgba(0,0,0,0.06);">'
+            f'<div style="background:#152533;border:1px solid #2a4a5a;border-top:3px solid {colour};'
+            f'border-radius:8px;padding:18px 22px;margin:6px 0;">'
             f'<div class="metric-label">{d["team"]}</div>'
-            f'<div style="font-size:26px;font-weight:800;color:#2c2c2c;margin:4px 0 14px 0;line-height:1.1">{d["name"]}</div>'
+            f'<div style="font-size:26px;font-weight:800;color:#e8f0f8;margin:4px 0 14px 0;line-height:1.1">{d["name"]}</div>'
             f'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 16px;">'
-            f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Exp Votes</div>'
+            f'<div><div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Exp Votes</div>'
             f'<div style="font-size:20px;font-weight:700;color:{colour}">{d["exp_votes"]}</div></div>'
-            f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Floor</div>'
+            f'<div><div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Floor</div>'
             f'<div style="font-size:20px;font-weight:700;color:{colour}">{floor_s}</div></div>'
-            f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Ceiling</div>'
+            f'<div><div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Ceiling</div>'
             f'<div style="font-size:20px;font-weight:700;color:{colour}">{ceil_s}</div></div>'
-            f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Poll %</div>'
+            f'<div><div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Poll %</div>'
             f'<div style="font-size:20px;font-weight:700;color:{colour}">{d["poll_pct"]}%</div></div>'
-            f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">3-Vote Games</div>'
+            f'<div><div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">3-Vote Games</div>'
             f'<div style="font-size:20px;font-weight:700;color:{colour}">{d["three_vote_games"]}</div></div>'
-            f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Best Odds / Mkt%</div>'
-            f'<div style="font-size:20px;font-weight:700;color:{colour}">{odds_s} <span style="font-size:13px;color:#6c6c6c">/ {mkt_s}</span></div></div>'
+            f'<div><div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Best Odds / Mkt%</div>'
+            f'<div style="font-size:20px;font-weight:700;color:{colour}">{odds_s} <span style="font-size:13px;color:#94a3b8">/ {mkt_s}</span></div></div>'
             f'</div></div>',
             unsafe_allow_html=True,
         )
@@ -3355,24 +3355,23 @@ if _page == 'Player Comparison':
                 name=_p1, y=_proj_cats, x=_p1_proj, orientation='h',
                 marker_color='#34d399', opacity=0.88,
                 text=[f'{v:.1f}' for v in _p1_proj], textposition='outside',
-                textfont=dict(color='#2c2c2c', size=12),
+                textfont=dict(color='#e8f0f8', size=12),
             ))
             _fig_proj.add_trace(go.Bar(
                 name=_p2, y=_proj_cats, x=_p2_proj, orientation='h',
                 marker_color='#94a3b8', opacity=0.88,
                 text=[f'{v:.1f}' for v in _p2_proj], textposition='outside',
-                textfont=dict(color='#2c2c2c', size=12),
+                textfont=dict(color='#e8f0f8', size=12),
             ))
+            _fig_proj = apply_chart_theme(_fig_proj)
             _fig_proj.update_layout(
                 barmode='group',
-                plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
-                xaxis=dict(title='Votes', gridcolor='#ede8df', zeroline=False),
+                xaxis=dict(title='Votes', zeroline=False),
                 yaxis=dict(title='', tickfont=dict(size=12)),
-                legend=dict(orientation='h', y=1.12, bgcolor='rgba(0,0,0,0)'),
+                legend=dict(orientation='h', y=1.12),
                 margin=dict(t=20, b=20, l=10, r=60),
                 height=240,
             )
-            _fig_proj = apply_chart_theme(_fig_proj)
             st.plotly_chart(_fig_proj, width='stretch', key="chart_017")
 
             if game_df is not None:
@@ -3397,14 +3396,13 @@ if _page == 'Player Comparison':
                             marker=dict(size=7, color='#94a3b8'),
                             hovertemplate='<b>' + _p2 + '</b><br>Round %{x}<br>%{y:.1f} exp votes<extra></extra>',
                         ))
+                    _fig_rbr = apply_chart_theme(_fig_rbr)
                     _fig_rbr.update_layout(
-                        plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
-                        xaxis=dict(title='Round', dtick=1, gridcolor='#ede8df'),
-                        yaxis=dict(title='Predicted Votes', gridcolor='#ede8df', rangemode='tozero'),
-                        legend=dict(orientation='h', y=1.1, bgcolor='rgba(0,0,0,0)'),
+                        xaxis=dict(title='Round', dtick=1),
+                        yaxis=dict(title='Predicted Votes', rangemode='tozero'),
+                        legend=dict(orientation='h', y=1.1),
                         margin=dict(t=20, b=40), height=300, hovermode='x unified',
                     )
-                    _fig_rbr = apply_chart_theme(_fig_rbr)
                     st.plotly_chart(_fig_rbr, width='stretch', key="chart_018")
 
                 st.markdown('<div class="section-header">Stat Comparison</div>', unsafe_allow_html=True)
@@ -3433,12 +3431,12 @@ if _page == 'Player Comparison':
                     _fig_radar = go.Figure()
                     _fig_radar.add_trace(go.Scatterpolar(
                         r=_p1_norm + [_p1_norm[0]], theta=_r_labels + [_r_labels[0]],
-                        name=_p1, fill='toself', fillcolor='rgba(45,80,22,0.15)',
+                        name=_p1, fill='toself', fillcolor='rgba(52,211,153,0.12)',
                         line=dict(color='#34d399', width=2.5),
                     ))
                     _fig_radar.add_trace(go.Scatterpolar(
                         r=_p2_norm + [_p2_norm[0]], theta=_r_labels + [_r_labels[0]],
-                        name=_p2, fill='toself', fillcolor='rgba(139,111,71,0.15)',
+                        name=_p2, fill='toself', fillcolor='rgba(148,163,184,0.15)',
                         line=dict(color='#94a3b8', width=2.5),
                     ))
                     _fig_radar.update_layout(
@@ -3477,16 +3475,16 @@ if _page == 'Player Comparison':
                     _fs = f"{_d['floor']}" if _d['floor'] is not None else "—"
                     _cs = f"{_d['ceiling']}" if _d['ceiling'] is not None else "—"
                     st.markdown(
-                        f'<div style="background:#f0ece4;border:1px solid #ddd5c5;border-left:5px solid {_colour};'
-                        f'border-radius:8px;padding:16px 20px;margin:4px 0;box-shadow:0 2px 8px rgba(0,0,0,0.06);">'
-                        f'<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">{_d["team"]}</div>'
-                        f'<div style="font-size:22px;font-weight:800;color:#2c2c2c;margin:3px 0 12px 0">{_d["name"]}</div>'
+                        f'<div style="background:#152533;border:1px solid #2a4a5a;border-top:3px solid {_colour};'
+                        f'border-radius:8px;padding:16px 20px;margin:4px 0;">'
+                        f'<div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">{_d["team"]}</div>'
+                        f'<div style="font-size:22px;font-weight:800;color:#e8f0f8;margin:3px 0 12px 0">{_d["name"]}</div>'
                         f'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px 14px;">'
-                        f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Exp Votes</div>'
+                        f'<div><div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Exp Votes</div>'
                         f'<div style="font-size:22px;font-weight:800;color:{_colour}">{_d["exp_votes"]}</div></div>'
-                        f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Floor</div>'
+                        f'<div><div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Floor</div>'
                         f'<div style="font-size:22px;font-weight:800;color:{_colour}">{_fs}</div></div>'
-                        f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Ceiling</div>'
+                        f'<div><div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Ceiling</div>'
                         f'<div style="font-size:22px;font-weight:800;color:{_colour}">{_cs}</div></div>'
                         f'</div></div>',
                         unsafe_allow_html=True,
@@ -3499,7 +3497,7 @@ if _page == 'Player Comparison':
                 f'<div style="width:{_mb}%;background:#94a3b8;display:flex;align-items:center;justify-content:center;">'
                 f'<span style="color:#fff;font-weight:800;font-size:17px">{_mb}%</span></div>'
                 f'</div>'
-                f'<div style="display:flex;justify-content:space-between;font-size:12px;color:#6c6c6c;margin-bottom:4px;">'
+                f'<div style="display:flex;justify-content:space-between;font-size:12px;color:#94a3b8;margin-bottom:4px;">'
                 f'<span>{_p1}</span><span>{_p2}</span></div>',
                 unsafe_allow_html=True,
             )
@@ -3507,14 +3505,13 @@ if _page == 'Player Comparison':
             st.markdown('<div class="section-header">Market Implied Probability</div>', unsafe_allow_html=True)
             if _has_mkt:
                 st.markdown(
-                    f'<div style="margin:12px 0 6px 0;display:flex;border-radius:6px;overflow:hidden;height:44px;'
-                    f'box-shadow:0 1px 4px rgba(0,0,0,0.10);">'
-                    f'<div style="width:{_mkta}%;background:#5a7a9a;display:flex;align-items:center;justify-content:center;">'
-                    f'<span style="color:#fff;font-weight:800;font-size:17px">{_mkta}%</span></div>'
-                    f'<div style="width:{_mktb}%;background:#a07850;display:flex;align-items:center;justify-content:center;">'
-                    f'<span style="color:#fff;font-weight:800;font-size:17px">{_mktb}%</span></div>'
+                    f'<div style="margin:12px 0 6px 0;display:flex;border-radius:6px;overflow:hidden;height:44px;">'
+                    f'<div style="width:{_mkta}%;background:#4a90c4;display:flex;align-items:center;justify-content:center;">'
+                    f'<span style="color:#e8f0f8;font-weight:800;font-size:17px">{_mkta}%</span></div>'
+                    f'<div style="width:{_mktb}%;background:#1e3a4a;display:flex;align-items:center;justify-content:center;">'
+                    f'<span style="color:#94a3b8;font-weight:800;font-size:17px">{_mktb}%</span></div>'
                     f'</div>'
-                    f'<div style="display:flex;justify-content:space-between;font-size:12px;color:#6c6c6c;margin-bottom:4px;">'
+                    f'<div style="display:flex;justify-content:space-between;font-size:12px;color:#94a3b8;margin-bottom:4px;">'
                     f'<span>{_p1} &nbsp;${_d1["best_odds"]}</span><span>{_p2} &nbsp;${_d2["best_odds"]}</span></div>',
                     unsafe_allow_html=True,
                 )
@@ -3528,26 +3525,26 @@ if _page == 'Player Comparison':
                 _edge_val = round(_ma - _mkta, 1) if _ma >= _mb else round(_mb - _mktb, 1)
                 _edge_abs = abs(_edge_val)
                 if _edge_val > 5:
-                    _ebg, _ebord, _elabel = '#eaf2e8', '#34d399', 'MODEL EDGE'
+                    _ebg, _ebord, _elabel = 'rgba(52,211,153,0.08)', '#34d399', 'MODEL EDGE'
                     _emsg = (f"The model gives <strong>{_favoured}</strong> a <strong>+{_edge_abs}%</strong> "
                              f"edge over market implied. Model: {_ma if _favoured == _p1 else _mb}% &nbsp;·&nbsp; "
                              f"Market: {_mkta if _favoured == _p1 else _mktb}%")
                 elif _edge_val < -5:
-                    _ebg, _ebord, _elabel = '#f5ede3', '#94a3b8', 'MARKET FAVOURS'
+                    _ebg, _ebord, _elabel = 'rgba(74,144,196,0.08)', '#4a90c4', 'MARKET FAVOURS'
                     _mkt_fav = _p2 if _favoured == _p1 else _p1
                     _emsg = (f"Market prices <strong>{_mkt_fav}</strong> <strong>{_edge_abs}%</strong> higher "
                              f"than the model suggests. Model: {_ma if _favoured == _p1 else _mb}% &nbsp;·&nbsp; "
                              f"Market: {_mkta if _favoured == _p1 else _mktb}%")
                 else:
-                    _ebg, _ebord, _elabel = '#f0ece4', '#b0a090', 'NEUTRAL'
+                    _ebg, _ebord, _elabel = '#152533', '#2a4a5a', 'NEUTRAL'
                     _emsg = (f"Model and market broadly agree — difference is only "
                              f"<strong>{_edge_abs}%</strong>. No clear edge either way.")
                 st.markdown(
-                    f'<div style="background:{_ebg};border:1px solid #ddd5c5;border-left:6px solid {_ebord};'
-                    f'border-radius:8px;padding:16px 22px;margin:8px 0;box-shadow:0 2px 8px rgba(0,0,0,0.06);">'
+                    f'<div style="background:{_ebg};border:1px solid {_ebord};'
+                    f'border-radius:8px;padding:16px 22px;margin:8px 0;">'
                     f'<div style="font-size:11px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;'
                     f'color:{_ebord};margin-bottom:6px">{_elabel}</div>'
-                    f'<div style="font-size:14px;color:#2c2c2c;line-height:1.8">{_emsg}</div>'
+                    f'<div style="font-size:14px;color:#e8f0f8;line-height:1.8">{_emsg}</div>'
                     f'</div>',
                     unsafe_allow_html=True,
                 )
@@ -3574,14 +3571,13 @@ if _page == 'Player Comparison':
                             line=dict(color='#94a3b8', width=2.5), marker=dict(size=7, color='#94a3b8'),
                             hovertemplate='<b>' + _p2 + '</b><br>Round %{x}<br>%{y:.1f} exp votes<extra></extra>',
                         ))
+                    _fig_h2h_rbr = apply_chart_theme(_fig_h2h_rbr)
                     _fig_h2h_rbr.update_layout(
-                        plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
-                        xaxis=dict(title='Round', dtick=1, gridcolor='#ede8df'),
-                        yaxis=dict(title='Predicted Votes', gridcolor='#ede8df', rangemode='tozero'),
-                        legend=dict(orientation='h', y=1.1, bgcolor='rgba(0,0,0,0)'),
+                        xaxis=dict(title='Round', dtick=1),
+                        yaxis=dict(title='Predicted Votes', rangemode='tozero'),
+                        legend=dict(orientation='h', y=1.1),
                         margin=dict(t=20, b=40), height=300, hovermode='x unified',
                     )
-                    _fig_h2h_rbr = apply_chart_theme(_fig_h2h_rbr)
                     st.plotly_chart(_fig_h2h_rbr, width='stretch', key="chart_020")
 
             st.markdown('<div class="section-header">Verdict</div>', unsafe_allow_html=True)
@@ -3609,9 +3605,9 @@ if _page == 'Player Comparison':
                     _floor_note = (f" Even at floor, {_vfav.split()[0]} ({_vfav_d['floor']}) "
                                    f"exceeds {_vund.split()[0]}'s ceiling ({_vund_d['ceiling']}).")
             st.markdown(
-                f'<div style="background:#f0ece4;border:1px solid #ddd5c5;border-left:5px solid {_vc2};'
-                f'border-radius:8px;padding:20px 24px;margin:6px 0;box-shadow:0 2px 8px rgba(0,0,0,0.06);">'
-                f'<div style="font-size:14px;color:#2c2c2c;line-height:2;">'
+                f'<div style="background:#152533;border:1px solid #2a4a5a;border-top:3px solid {_vc2};'
+                f'border-radius:8px;padding:20px 24px;margin:6px 0;">'
+                f'<div style="font-size:14px;color:#e8f0f8;line-height:2;">'
                 f'The model picks <strong style="color:{_vc2};font-size:16px">{_vfav}</strong> with a '
                 f'<strong>{_vfav_pct}%</strong> probability of outpolling {_vund} '
                 f'({_d1["exp_votes"]} vs {_d2["exp_votes"]} expected votes, gap of {_vdiff_exp}).'
