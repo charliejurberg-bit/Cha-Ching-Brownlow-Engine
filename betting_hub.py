@@ -1496,6 +1496,9 @@ def render_trends_analysis():
         use_container_width=True,
         hide_index=True,
         column_config={
+            'Bets':   st.column_config.NumberColumn('Bets',   format='%d'),
+            'W':      st.column_config.NumberColumn('W',      format='%d'),
+            'L':      st.column_config.NumberColumn('L',      format='%d'),
             'Hit %':  st.column_config.NumberColumn('Hit %',  format='%.2f'),
             'Staked': st.column_config.NumberColumn('Staked', format='%.2f'),
             'P&L':    st.column_config.NumberColumn('P&L',    format='%.2f'),
