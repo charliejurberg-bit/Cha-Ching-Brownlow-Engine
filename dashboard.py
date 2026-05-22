@@ -701,6 +701,35 @@ st.markdown("""
     }
     .score-pill.draw { background: #1e3a4a; border-color: #94a3b8; color: #94a3b8; }
 
+    /* ── Game Analysis — animated rank badges ── */
+    .rank-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 26px;
+        height: 26px;
+        border-radius: 50%;
+        font-weight: 900;
+        font-size: 12px;
+        line-height: 1;
+        font-family: 'DM Mono', monospace;
+    }
+    .rank-badge-1 { background: #f0b429; color: #0f1923; animation: rankGlow1 2.4s ease-in-out infinite; }
+    .rank-badge-2 { background: #34d399; color: #0f1923; animation: rankGlow2 2.4s ease-in-out infinite; }
+    .rank-badge-3 { background: #4a90c4; color: #0f1923; animation: rankGlow3 2.4s ease-in-out infinite; }
+    @keyframes rankGlow1 {
+        0%,100% { box-shadow: 0 0 0 0 rgba(240,180,41,0.55); }
+        50%     { box-shadow: 0 0 0 7px rgba(240,180,41,0); }
+    }
+    @keyframes rankGlow2 {
+        0%,100% { box-shadow: 0 0 0 0 rgba(52,211,153,0.55); }
+        50%     { box-shadow: 0 0 0 7px rgba(52,211,153,0); }
+    }
+    @keyframes rankGlow3 {
+        0%,100% { box-shadow: 0 0 0 0 rgba(74,144,196,0.55); }
+        50%     { box-shadow: 0 0 0 7px rgba(74,144,196,0); }
+    }
+
     /* ── DataFrame rank cell ── */
     [data-testid="stDataFrame"] tbody tr:nth-child(1) td:first-child { font-weight: 800 !important; }
 
@@ -2504,15 +2533,11 @@ if _page == 'Game Analysis':
             def _style_game_table(df, winner_team=None):
                 max_p3v = pd.to_numeric(df['P(3v) %'], errors='coerce').max() if len(df) > 0 else 1.0
                 max_p3v = max_p3v if max_p3v > 0 else 1.0
-                _rank_badge = {
-                    0: 'background-color:#f0b429!important;color:#0f1923!important;font-weight:800!important;',
-                    1: 'background-color:#94a3b8!important;color:#0f1923!important;font-weight:700!important;',
-                    2: 'background-color:#cd7f32!important;color:#0f1923!important;font-weight:700!important;',
-                }
+                # Row tints: gold / emerald / blue for predicted 3v / 2v / 1v
                 _top3_row = {
-                    0: 'background-color:rgba(240,180,41,0.15)!important;color:#e8f0f8!important;font-weight:700!important;',
-                    1: 'background-color:rgba(148,163,184,0.12)!important;color:#e8f0f8!important;font-weight:700!important;',
-                    2: 'background-color:rgba(205,127,50,0.12)!important;color:#e8f0f8!important;font-weight:700!important;',
+                    0: 'background-color:rgba(240,180,41,0.16)!important;color:#e8f0f8!important;font-weight:700!important;',
+                    1: 'background-color:rgba(52,211,153,0.12)!important;color:#e8f0f8!important;font-weight:700!important;',
+                    2: 'background-color:rgba(74,144,196,0.10)!important;color:#e8f0f8!important;font-weight:700!important;',
                 }
                 def _cell(row):
                     i = row.name
@@ -2530,9 +2555,7 @@ if _page == 'Game Analysis':
                                 'background-color:#1a2d3d!important;color:#e8f0f8!important;')
                     result = []
                     for col in df.columns:
-                        if col == 'Rank' and i in _rank_badge:
-                            result.append(_rank_badge[i])
-                        elif col == 'P(3v) %' and i >= 3:
+                        if col == 'P(3v) %' and i >= 3:
                             v = float(row[col]) if row[col] != '' else 0.0
                             norm = v / max_p3v if max_p3v > 0 else 0.0
                             a = 0.07 + norm * 0.40
@@ -2540,7 +2563,23 @@ if _page == 'Game Analysis':
                         else:
                             result.append(base)
                     return result
-                return df.style.apply(_cell, axis=1)
+
+                def _fmt_rank(v):
+                    try:
+                        v = int(v)
+                    except (TypeError, ValueError):
+                        return str(v)
+                    if v == 1:
+                        return '<span class="rank-badge rank-badge-1">1</span>'
+                    if v == 2:
+                        return '<span class="rank-badge rank-badge-2">2</span>'
+                    if v == 3:
+                        return '<span class="rank-badge rank-badge-3">3</span>'
+                    return str(v)
+
+                return (df.style
+                        .apply(_cell, axis=1)
+                        .format({'Rank': _fmt_rank}, escape=False))
 
             game_order = rnd.drop_duplicates('Match')[['Match', 'Home.team', 'Away.team', 'Home.score', 'Away.score']].reset_index(drop=True)
             col_cfg = {
