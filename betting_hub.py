@@ -1398,7 +1398,7 @@ def render_cha_ching_tips():
                         st.session_state['_cc_pw_open'] = False
                         st.rerun()
                     else:
-                        st.error(f'Incorrect password (entered {repr(pw)}, expected {repr(_correct_pw)})')
+                        st.error('Incorrect password')
 
     # ── Historical CC bets ────────────────────────────────────────────────────
     cc_bets = _load_bets()
