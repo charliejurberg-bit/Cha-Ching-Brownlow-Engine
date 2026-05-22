@@ -2573,7 +2573,12 @@ if _page == 'Game Analysis':
                         else:
                             result.append(base)
                     return result
-                return df.style.apply(_cell, axis=1)
+                return df.style.apply(_cell, axis=1).format({
+                    'Votes (exp)': '{:.2f}',
+                    'P(3v) %':    '{:.2f}',
+                    'P(2v) %':    '{:.2f}',
+                    'Coaches V':  '{:.2f}',
+                })
 
             game_order = rnd.drop_duplicates('Match')[['Match', 'Home.team', 'Away.team', 'Home.score', 'Away.score']].reset_index(drop=True)
             col_cfg = {
