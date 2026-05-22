@@ -2533,23 +2533,23 @@ if _page == 'Game Analysis':
             def _style_game_table(df, winner_team=None):
                 max_p3v = pd.to_numeric(df['P(3v) %'], errors='coerce').max() if len(df) > 0 else 1.0
                 max_p3v = max_p3v if max_p3v > 0 else 1.0
-                # Rank cell: neon glowstick — colored number + text-shadow + glowing inset border
+                # Rank cell: neon number glow only — row box-shadow handled by _top3_row
                 _rank_cell = {
                     0: ('color:#f0b429!important;font-weight:900!important;text-align:center!important;'
-                        'text-shadow:0 0 6px rgba(240,180,41,1),0 0 16px rgba(240,180,41,0.6)!important;'
-                        'box-shadow:inset 0 0 0 1px rgba(240,180,41,0.75),0 0 10px rgba(240,180,41,0.30)!important;'),
+                        'text-shadow:0 0 6px rgba(240,180,41,1),0 0 18px rgba(240,180,41,0.65)!important;'),
                     1: ('color:#34d399!important;font-weight:900!important;text-align:center!important;'
-                        'text-shadow:0 0 6px rgba(52,211,153,1),0 0 16px rgba(52,211,153,0.6)!important;'
-                        'box-shadow:inset 0 0 0 1px rgba(52,211,153,0.75),0 0 10px rgba(52,211,153,0.30)!important;'),
+                        'text-shadow:0 0 6px rgba(52,211,153,1),0 0 18px rgba(52,211,153,0.65)!important;'),
                     2: ('color:#4a90c4!important;font-weight:900!important;text-align:center!important;'
-                        'text-shadow:0 0 6px rgba(74,144,196,1),0 0 16px rgba(74,144,196,0.6)!important;'
-                        'box-shadow:inset 0 0 0 1px rgba(74,144,196,0.75),0 0 10px rgba(74,144,196,0.30)!important;'),
+                        'text-shadow:0 0 6px rgba(74,144,196,1),0 0 18px rgba(74,144,196,0.65)!important;'),
                 }
-                # Row tints match badge colors: gold / emerald / blue
+                # Top-3 rows: subtle tint + neon inset border glow on every cell
                 _top3_row = {
-                    0: 'background-color:rgba(240,180,41,0.14)!important;color:#e8f0f8!important;font-weight:700!important;',
-                    1: 'background-color:rgba(52,211,153,0.11)!important;color:#e8f0f8!important;font-weight:700!important;',
-                    2: 'background-color:rgba(74,144,196,0.10)!important;color:#e8f0f8!important;font-weight:700!important;',
+                    0: ('background-color:rgba(240,180,41,0.07)!important;color:#e8f0f8!important;font-weight:700!important;'
+                        'box-shadow:inset 0 0 0 1px rgba(240,180,41,0.65),0 0 8px rgba(240,180,41,0.22)!important;'),
+                    1: ('background-color:rgba(52,211,153,0.06)!important;color:#e8f0f8!important;font-weight:700!important;'
+                        'box-shadow:inset 0 0 0 1px rgba(52,211,153,0.65),0 0 8px rgba(52,211,153,0.22)!important;'),
+                    2: ('background-color:rgba(74,144,196,0.06)!important;color:#e8f0f8!important;font-weight:700!important;'
+                        'box-shadow:inset 0 0 0 1px rgba(74,144,196,0.65),0 0 8px rgba(74,144,196,0.22)!important;'),
                 }
                 def _cell(row):
                     i = row.name
