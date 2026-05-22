@@ -1354,6 +1354,22 @@ def render_trends_analysis():
 
     # ── My Spreadsheet ─────────────────────────────────────────────────────
     st.markdown('<div class="trend-header">My Spreadsheet</div>', unsafe_allow_html=True)
+    _imported_check = _load_user_import()
+    if _imported_check is not None:
+        _strip_hdr, _strip_btn = st.columns([5, 1])
+        with _strip_hdr:
+            st.markdown(
+                f'<div style="font-size:12px;color:#94a3b8;padding:6px 0">'
+                f'<span style="color:#34d399;font-weight:700">✓ Spreadsheet loaded</span>'
+                f' &nbsp;·&nbsp; {len(_imported_check):,} rows'
+                f' &nbsp;·&nbsp; {len(_imported_check.columns)} columns</div>',
+                unsafe_allow_html=True,
+            )
+        with _strip_btn:
+            if st.button("Remove CSV", key='remove_user_import_strip', type='secondary'):
+                _delete_user_import()
+                st.session_state.pop('_user_import_loaded', None)
+                st.rerun()
     with st.expander("Upload your own betting spreadsheet (.csv or .xlsx)", expanded=False):
         _imported = _load_user_import()
 
