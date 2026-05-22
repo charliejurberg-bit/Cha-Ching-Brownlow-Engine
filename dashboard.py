@@ -4200,7 +4200,7 @@ if _page == 'Live Tracker':
 # ════════════════════════════════════════════════════════════
 if _page == 'Model Comparison':
     st.markdown(
-        '<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Model Comparison — 2026</h2>'
+        '<div class="title-bar"><h2 style="color:#e8f0f8;margin:0">Model Comparison — 2026</h2>'
         '<p style="color:#94a3b8;margin:4px 0 0 0">'
         'Cha Ching · AFL Predictor · Betfair · Wheelo · ESPN — five models, one view</p></div>',
         unsafe_allow_html=True,
@@ -4237,9 +4237,9 @@ if _page == 'Model Comparison':
                     if col not in df.columns:
                         continue
                     styles[col] = df[col].apply(
-                        lambda v: 'background-color:#d4edda;color:#155724;font-weight:700'
+                        lambda v: 'background-color:rgba(52,211,153,0.18);color:#34d399;font-weight:700'
                         if pd.notna(v) and int(v) <= 3
-                        else ('background-color:#fff3cd;color:#856404'
+                        else ('background-color:rgba(240,180,41,0.13);color:#f0b429'
                               if pd.notna(v) and int(v) <= 8 else '')
                     )
                 return styles
@@ -4503,9 +4503,9 @@ if _page == 'Model Comparison':
         def _mc_cmp_style(row):
             idx = row.name
             if _green_mask[idx]:
-                return ['background-color:#c8e6c9;color:#1b5e20'] * len(row)
+                return ['background-color:rgba(52,211,153,0.15);color:#34d399;font-weight:700'] * len(row)
             if _brown_mask[idx]:
-                return ['background-color:#d9c4a7;color:#5d3a1a'] * len(row)
+                return ['background-color:rgba(240,180,41,0.12);color:#f0b429;font-weight:700'] * len(row)
             return [''] * len(row)
 
         st.dataframe(
@@ -4514,12 +4514,14 @@ if _page == 'Model Comparison':
             key='mc_cmp_table',
         )
         st.markdown(
-            '<div style="display:flex;gap:20px;margin-top:6px;font-size:12px;color:#6c6c6c;">'
-            '<span><span style="display:inline-block;width:12px;height:12px;background:#c8e6c9;'
-            'border:1px solid #a5d6a7;border-radius:2px;vertical-align:middle;margin-right:5px"></span>'
+            '<div style="display:flex;gap:20px;margin-top:6px;font-size:12px;color:#94a3b8;">'
+            '<span><span style="display:inline-block;width:12px;height:12px;'
+            'background:rgba(52,211,153,0.20);border:1px solid #34d399;'
+            'border-radius:2px;vertical-align:middle;margin-right:5px"></span>'
             'All 5 models agree — player top 10 in every model</span>'
-            '<span><span style="display:inline-block;width:12px;height:12px;background:#d9c4a7;'
-            'border:1px solid #c4a97d;border-radius:2px;vertical-align:middle;margin-right:5px"></span>'
+            '<span><span style="display:inline-block;width:12px;height:12px;'
+            'background:rgba(240,180,41,0.18);border:1px solid #f0b429;'
+            'border-radius:2px;vertical-align:middle;margin-right:5px"></span>'
             'Cha Ching rank differs 5+ places from consensus</span>'
             '</div>',
             unsafe_allow_html=True,
@@ -4618,12 +4620,12 @@ if _page == 'Model Comparison':
                 z=_hmap_z_inv,
                 x=_hmap_models,
                 y=_hmap_players,
-                colorscale=[[0, '#f5f0e8'], [0.15, '#cfc4b0'], [0.5, '#8db86e'], [1, '#34d399']],
+                colorscale=[[0, '#0f1923'], [0.3, '#1e3a4a'], [0.7, '#1a5c40'], [1, '#34d399']],
                 zmin=1, zmax=float(_MC_SEN),
                 showscale=False,
                 text=_hmap_text,
                 texttemplate='%{text}',
-                textfont=dict(size=11),
+                textfont=dict(size=11, color='#e8f0f8'),
                 hovertemplate='%{y}<br>%{x}: Rank %{text}<extra></extra>',
             ))
 
@@ -4638,10 +4640,8 @@ if _page == 'Model Comparison':
                     font=dict(size=14, color=_tc),
                 )
 
+            _fig_hmap = apply_chart_theme(_fig_hmap)
             _fig_hmap.update_layout(
-                paper_bgcolor='#e8f0f8',
-                plot_bgcolor='#e8f0f8',
-                font_color='#2c2c2c',
                 height=640,
                 margin=dict(l=200, r=30, t=50, b=40),
                 xaxis=dict(
@@ -4649,9 +4649,8 @@ if _page == 'Model Comparison':
                     tickfont=dict(size=12, color='#34d399'),
                     range=[-1, len(_hmap_models) - 0.5],
                 ),
-                yaxis=dict(autorange='reversed', tickfont=dict(size=11)),
+                yaxis=dict(autorange='reversed', tickfont=dict(size=11, color='#94a3b8')),
             )
-            _fig_hmap = apply_chart_theme(_fig_hmap)
             st.plotly_chart(_fig_hmap, use_container_width=True, key='mc_heatmap')
             st.caption(
                 "Darker green = higher ranked. Numbers show rank position. "
@@ -4681,7 +4680,7 @@ if _page == 'Model Comparison':
                 x=list(range(1, _sc_max + 1)),
                 y=list(range(1, _sc_max + 1)),
                 mode='lines',
-                line=dict(color='#cfc4b0', dash='dash', width=1.5),
+                line=dict(color='#4a5a6a', dash='dash', width=1.5),
                 name='Perfect agreement',
                 hoverinfo='skip',
             ))
@@ -4691,33 +4690,30 @@ if _page == 'Model Comparison':
                 mode='markers+text',
                 text=_sc_mrg['Player'].tolist(),
                 textposition='top center',
-                textfont=dict(size=9, color='#2c2c2c'),
+                textfont=dict(size=9, color='#e8f0f8'),
                 marker=dict(size=10, color='#34d399', opacity=0.78,
-                            line=dict(color='#94a3b8', width=1.2)),
+                            line=dict(color='#2a4a5a', width=1.2)),
                 name='Players',
                 hovertemplate='%{text}<br>CC Rank: %{x}<br>AFL Rank: %{y}<extra></extra>',
             ))
+            _fig_sc = apply_chart_theme(_fig_sc)
             _fig_sc.update_layout(
-                paper_bgcolor='#e8f0f8',
-                plot_bgcolor='#e8f0f8',
-                font_color='#2c2c2c',
                 height=540,
                 xaxis=dict(
                     title='Cha Ching Rank',
-                    gridcolor='#ede8df', zeroline=False,
+                    zeroline=False,
                     tickmode='linear', tick0=1, dtick=2,
                     range=[0.5, _sc_max + 0.5],
                 ),
                 yaxis=dict(
                     title='AFL Predictor Rank',
                     autorange='reversed',
-                    gridcolor='#ede8df', zeroline=False,
+                    zeroline=False,
                     tickmode='linear', tick0=1, dtick=2,
                 ),
                 legend=dict(orientation='h', y=1.06),
                 margin=dict(l=70, r=30, t=60, b=70),
             )
-            _fig_sc = apply_chart_theme(_fig_sc)
             st.plotly_chart(_fig_sc, use_container_width=True, key='mc_scatter')
             _afl_note_sc = (" Note: AFL predictor has no live votes yet — ranks not meaningful."
                             if not _mc_afl_has_votes else "")
