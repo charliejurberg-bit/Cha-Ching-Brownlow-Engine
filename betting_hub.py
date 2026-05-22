@@ -839,10 +839,12 @@ def _checklist_dialog():
                               ticked >= CC_THRESHOLD, notes,
                               stake=float(stake), odds=odds, bookmaker=bookmaker, line=line)
             if saved:
+                st.session_state['_cl_open'] = False
                 st.toast(f"Tip saved — {'Cha Ching flagged!' if ticked >= CC_THRESHOLD else 'not yet flagged'}")
                 st.rerun()
     with col2:
         if st.button("Cancel", use_container_width=True):
+            st.session_state['_cl_open'] = False
             st.rerun()
 
 
@@ -854,7 +856,7 @@ def _open_checklist(player: str, market: str, game_key: str,
     st.session_state['_cl_odds']      = odds
     st.session_state['_cl_bookmaker'] = bookmaker
     st.session_state['_cl_line']      = line
-    _checklist_dialog()
+    st.session_state['_cl_open']      = True
 
 
 # ── Add Bet dialog ─────────────────────────────────────────────────────────────
@@ -1780,6 +1782,11 @@ def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
                                      type=btn_type, use_container_width=True):
                             _open_checklist(player, market_type, game_key,
                                             odds=p_odds, bookmaker=p_bookie, line=p_line)
+
+            if (st.session_state.get('_cl_open', False) and
+                    st.session_state.get('_cl_game') == game_key and
+                    st.session_state.get('_cl_market') == market_type):
+                _checklist_dialog()
 
     else:
         st.caption(f"No {market_type} props loaded for this game.")
