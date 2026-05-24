@@ -391,10 +391,8 @@ def render_banner():
     <span class="cha-ching-deco" style="top:2px;left:44%;font-size:54px">&#9733;</span>
     <span class="cha-ching-deco" style="bottom:-16px;right:9%;font-size:66px">&#9670;</span>
     <span class="cha-ching-deco" style="top:10px;right:22%;font-size:58px">&#9685;</span>
-    <div class="banner-content">
-        <div class="cha-ching-title">CHA CHING</div>
-        <div class="cha-ching-sub">{_mode_label} &nbsp;&middot;&nbsp; {_sub}</div>
-    </div>
+    <div class="cha-ching-title">CHA CHING</div>
+    <div class="cha-ching-sub">{_mode_label} &nbsp;&middot;&nbsp; {_sub}</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -451,21 +449,14 @@ st.markdown("""
         background-size: 300% 300%;
         animation: bannerShift 10s ease infinite;
         height: 420px;
-        padding: 0 48px;
-        margin-bottom: 0;
-        border-bottom: 1px solid #2a4a5a;
-        text-align: center;
-    }
-    .banner-content {
-        position: absolute;
-        top: 200px;
-        left: 0;
-        right: 0;
-        bottom: 0;
+        padding: 200px 48px 0;
         display: flex;
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        margin-bottom: 0;
+        border-bottom: 1px solid #2a4a5a;
+        text-align: center;
     }
     .cha-ching-banner::before {
         content: '';
