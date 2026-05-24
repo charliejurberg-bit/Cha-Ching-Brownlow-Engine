@@ -1685,6 +1685,7 @@ else:
     _snav_pages = ["BH Dashboard", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis"]
 
 # ── Build hub pill HTML ────────────────────────────────────────
+# JS walks UP from the anchor to its stVerticalBlock container, then queries buttons inside it.
 _hub_pill_html = ""
 for _hi, (_hkey, _hlabel) in enumerate([("brownlow", "🏆 Brownlow"), ("betting", "💰 Betting Hub")]):
     _ha = _hub == _hkey
@@ -1697,11 +1698,9 @@ for _hi, (_hkey, _hlabel) in enumerate([("brownlow", "🏆 Brownlow"), ("betting
         f"(function(){{"
         f"var a=document.querySelector('.hub-anchor');"
         f"if(!a)return;"
-        f"var c=a.closest('[data-testid=\"stMarkdownContainer\"]');"
+        f"var c=a.closest('[data-testid=\"stVerticalBlock\"]');"
         f"if(!c)return;"
-        f"var b=c.nextElementSibling;"
-        f"if(!b)return;"
-        f"var btns=b.querySelectorAll('button');"
+        f"var btns=c.querySelectorAll('button');"
         f"if(btns[{_hi}])btns[{_hi}].click();"
         f"}})()"
     )
@@ -1725,11 +1724,9 @@ for _sp in _snav_pages:
         f"(function(){{"
         f"var a=document.querySelector('.snav-anchor');"
         f"if(!a)return;"
-        f"var c=a.closest('[data-testid=\"stMarkdownContainer\"]');"
+        f"var c=a.closest('[data-testid=\"stVerticalBlock\"]');"
         f"if(!c)return;"
-        f"var b=c.nextElementSibling;"
-        f"if(!b)return;"
-        f"var btns=b.querySelectorAll('button');"
+        f"var btns=c.querySelectorAll('button');"
         f"for(var i=0;i<btns.length;i++){{"
         f"if(btns[i].innerText.trim()==='{_sp}'){{btns[i].click();break;}}"
         f"}}"
@@ -1743,10 +1740,12 @@ for _sp in _snav_pages:
     )
 
 # ── Render combined nav (two rows) ─────────────────────────────
+# CSS hides the stVerticalBlock containers that hold the functional buttons.
+# st.container() guarantees each button group renders as its own stVerticalBlock.
 st.markdown(f"""
 <style>
-[data-testid="element-container"]:has(.hub-anchor) + *,
-[data-testid="element-container"]:has(.snav-anchor) + * {{
+[data-testid="stVerticalBlock"]:has(.hub-anchor),
+[data-testid="stVerticalBlock"]:has(.snav-anchor) {{
     display: none !important;
 }}
 </style>
@@ -1763,32 +1762,35 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 # ── Hidden functional buttons: hub toggle ─────────────────────
-st.markdown('<div class="hub-anchor"></div>', unsafe_allow_html=True)
-_hc1, _hc2, _hc3 = st.columns([2, 2.5, 6.5])
-with _hc1:
-    if st.button("🏆 Brownlow", key="pill_brownlow",
-                 type="primary" if _hub == "brownlow" else "secondary"):
-        st.session_state["active_hub"] = "brownlow"
-        if st.session_state.page in _BH_PAGES:
-            st.session_state.page = "Home"
-        st.rerun()
-with _hc2:
-    if st.button("💰 Betting Hub", key="pill_betting",
-                 type="primary" if _hub == "betting" else "secondary"):
-        st.session_state["active_hub"] = "betting"
-        if st.session_state.page not in _BH_PAGES:
-            st.session_state.page = "BH Dashboard"
-        st.rerun()
+# Wrapped in st.container() so the stVerticalBlock:has(.hub-anchor) selector can target it.
+with st.container():
+    st.markdown('<div class="hub-anchor"></div>', unsafe_allow_html=True)
+    _hc1, _hc2, _hc3 = st.columns([2, 2.5, 6.5])
+    with _hc1:
+        if st.button("🏆 Brownlow", key="pill_brownlow",
+                     type="primary" if _hub == "brownlow" else "secondary"):
+            st.session_state["active_hub"] = "brownlow"
+            if st.session_state.page in _BH_PAGES:
+                st.session_state.page = "Home"
+            st.rerun()
+    with _hc2:
+        if st.button("💰 Betting Hub", key="pill_betting",
+                     type="primary" if _hub == "betting" else "secondary"):
+            st.session_state["active_hub"] = "betting"
+            if st.session_state.page not in _BH_PAGES:
+                st.session_state.page = "BH Dashboard"
+            st.rerun()
 
 # ── Hidden functional buttons: page strip ─────────────────────
-st.markdown('<div class="snav-anchor"></div>', unsafe_allow_html=True)
-_snav_cols = st.columns(len(_snav_pages), gap="small")
-for _sc, _sp in zip(_snav_cols, _snav_pages):
-    with _sc:
-        if st.button(_sp, key=f"snav_{_sp}",
-                     type="primary" if _page == _sp else "secondary"):
-            st.session_state["page"] = _sp
-            st.rerun()
+with st.container():
+    st.markdown('<div class="snav-anchor"></div>', unsafe_allow_html=True)
+    _snav_cols = st.columns(len(_snav_pages), gap="small")
+    for _sc, _sp in zip(_snav_cols, _snav_pages):
+        with _sc:
+            if st.button(_sp, key=f"snav_{_sp}",
+                         type="primary" if _page == _sp else "secondary"):
+                st.session_state["page"] = _sp
+                st.rerun()
 
 # ── Controls row (season + odds timestamp + run update) ──────
 # Only show controls for Brownlow pages, not Betting Hub or Landing
