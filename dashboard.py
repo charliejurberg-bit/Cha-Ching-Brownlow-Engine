@@ -54,7 +54,8 @@ html, body, [data-testid="stAppViewContainer"] {
 [data-testid="stAppViewContainer"] > .main {
     background-color: #0f1923 !important;
 }
-[data-testid="block-container"] {
+[data-testid="block-container"],
+[data-testid="stMainBlockContainer"] {
     padding-top: 0 !important;
     max-width: 1200px;
 }
@@ -408,7 +409,9 @@ st.markdown("""
     div[data-testid="stToolbar"]                { display: none !important; }
     [data-testid="collapsedControl"]            { display: none !important; }
     * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; box-sizing: border-box; }
-    .main .block-container {
+    .main .block-container,
+    [data-testid="stMainBlockContainer"],
+    [data-testid="block-container"] {
         padding-top: 0 !important;
         padding-bottom: 2.5rem;
         padding-left: 1rem !important;
