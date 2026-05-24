@@ -263,6 +263,18 @@ hr {
 .mt-card:nth-child(2) { animation-delay: 60ms; }
 .mt-card:nth-child(3) { animation-delay: 120ms; }
 .mt-card:nth-child(4) { animation-delay: 180ms; }
+#root > div:first-child {
+    padding-top: 0 !important;
+}
+[data-testid="stHeader"] {
+    display: none !important;
+}
+[data-testid="stToolbar"] {
+    display: none !important;
+}
+.block-container {
+    padding-top: 0 !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -299,6 +311,24 @@ def apply_chart_theme(fig):
     )
     fig.update_traces(marker_line_width=0)
     return fig
+
+def render_banner():
+    _hub = st.session_state.get("active_hub", "brownlow")
+    _sub = f"Through Round {max_season_rounds - 1}" if is_2026 else f"{selected_season} Season"
+    _mode_label = "Brownlow Predictor" if _hub == "brownlow" else "Betting Hub"
+    st.markdown(f"""
+<div class="cha-ching-banner">
+    <span class="cha-ching-deco" style="top:-12px;left:1%">&#9000;</span>
+    <span class="cha-ching-deco" style="top:6px;left:18%;font-size:60px">&#9651;</span>
+    <span class="cha-ching-deco" style="top:-8px;right:3%">&#9677;</span>
+    <span class="cha-ching-deco" style="bottom:-20px;left:8%;font-size:70px">&#11042;</span>
+    <span class="cha-ching-deco" style="top:2px;left:44%;font-size:54px">&#9733;</span>
+    <span class="cha-ching-deco" style="bottom:-16px;right:9%;font-size:66px">&#9670;</span>
+    <span class="cha-ching-deco" style="top:10px;right:22%;font-size:58px">&#9685;</span>
+    <div class="cha-ching-title">CHA CHING</div>
+    <div class="cha-ching-sub">{_mode_label} &nbsp;&middot;&nbsp; {_sub}</div>
+</div>
+""", unsafe_allow_html=True)
 
 # ── CSS ──────────────────────────────────────────────────────
 st.markdown("""
@@ -1504,25 +1534,13 @@ if predictions is None:
 max_season_rounds = int(game_df['Round_num'].max()) if game_df is not None and len(game_df) > 0 else 25
 rounds_played = int(game_df['Round_num'].nunique()) if game_df is not None and len(game_df) > 0 else 0
 
-# ── CHA CHING banner (global — top of every page) ─────────────
-_subtitle = f"Through Round {max_season_rounds - 1}" if is_2026 else f"{selected_season} Season"
-st.markdown(f"""
-<div class="cha-ching-banner">
-    <span class="cha-ching-deco" style="top:-12px;left:1%">&#9000;</span>
-    <span class="cha-ching-deco" style="top:6px;left:18%;font-size:60px">&#9651;</span>
-    <span class="cha-ching-deco" style="top:-8px;right:3%">&#9677;</span>
-    <span class="cha-ching-deco" style="bottom:-20px;left:8%;font-size:70px">&#11042;</span>
-    <span class="cha-ching-deco" style="top:2px;left:44%;font-size:54px">&#9733;</span>
-    <span class="cha-ching-deco" style="bottom:-16px;right:9%;font-size:66px">&#9670;</span>
-    <span class="cha-ching-deco" style="top:10px;right:22%;font-size:58px">&#9685;</span>
-    <div class="cha-ching-title">CHA CHING</div>
-    <div class="cha-ching-sub">Brownlow Predictor &amp; Betting Hub &nbsp;&middot;&nbsp; {_subtitle}</div>
-</div>
-""", unsafe_allow_html=True)
-
-# ── Dropdown navigation ────────────────────────────────────────
+# ── Hub switcher + banner ─────────────────────────────────────
+if 'active_hub' not in st.session_state:
+    st.session_state.active_hub = 'brownlow'
 if 'page' not in st.session_state:
     st.session_state.page = 'Landing'
+
+render_banner()
 
 _NAV_BROWNLOW = {
     "Overview": ["Home", "Leaderboard", "Live Tracker"],
@@ -1542,25 +1560,59 @@ def _nav_select(cat_key):
     if val is not None:
         st.session_state.page = val
 
-# ── Single nav row (Brownlow + Betting Hub) ───────────────────
-_ALL_NAV = {**_NAV_BROWNLOW, **_NAV_BETTING}
+# ── Hub switcher buttons ───────────────────────────────────────
+_sw_l, _sw_r, _sw_spacer = st.columns([1, 1, 8])
+with _sw_l:
+    if st.button("🏆 Brownlow", key="_hub_bl",
+                 use_container_width=True,
+                 type="primary" if st.session_state.active_hub == "brownlow" else "secondary"):
+        if st.session_state.active_hub != "brownlow":
+            st.session_state.active_hub = "brownlow"
+            if st.session_state.page in _BH_PAGES:
+                st.session_state.page = "Home"
+            st.rerun()
+with _sw_r:
+    if st.button("💰 Betting Hub", key="_hub_bh",
+                 use_container_width=True,
+                 type="primary" if st.session_state.active_hub == "betting" else "secondary"):
+        if st.session_state.active_hub != "betting":
+            st.session_state.active_hub = "betting"
+            if st.session_state.page not in _BH_PAGES:
+                st.session_state.page = "BH Dashboard"
+            st.rerun()
+
 _page = st.session_state.page
 
-# Reflect current page in the relevant dropdown before rendering
-for _cat, _pages in _ALL_NAV.items():
-    st.session_state[f"_nav_{_cat}"] = _page if _page in _pages else None
-
+# ── Gated nav dropdowns ────────────────────────────────────────
 st.markdown('<div class="nav-anchor"></div>', unsafe_allow_html=True)
-_nav_cols = st.columns(6)
-for _col, (_cat, _pages) in zip(_nav_cols, _ALL_NAV.items()):
-    with _col:
-        st.selectbox(
-            _cat, _pages,
-            placeholder=_cat,
-            key=f"_nav_{_cat}",
-            on_change=_nav_select,
-            args=(f"_nav_{_cat}",),
-        )
+if st.session_state.active_hub == "brownlow":
+    _active_nav = _NAV_BROWNLOW
+    for _cat, _pages in _active_nav.items():
+        st.session_state[f"_nav_{_cat}"] = _page if _page in _pages else None
+    _nav_cols = st.columns(4)
+    for _col, (_cat, _pages) in zip(_nav_cols, _active_nav.items()):
+        with _col:
+            st.selectbox(
+                _cat, _pages,
+                placeholder=_cat,
+                key=f"_nav_{_cat}",
+                on_change=_nav_select,
+                args=(f"_nav_{_cat}",),
+            )
+else:
+    _active_nav = _NAV_BETTING
+    for _cat, _pages in _active_nav.items():
+        st.session_state[f"_nav_{_cat}"] = _page if _page in _pages else None
+    _nav_cols = st.columns(2)
+    for _col, (_cat, _pages) in zip(_nav_cols, _active_nav.items()):
+        with _col:
+            st.selectbox(
+                _cat, _pages,
+                placeholder=_cat,
+                key=f"_nav_{_cat}",
+                on_change=_nav_select,
+                args=(f"_nav_{_cat}",),
+            )
 
 # ── Controls row (season + odds timestamp + run update) ──────
 # Only show controls for Brownlow pages, not Betting Hub or Landing
