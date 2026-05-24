@@ -1701,7 +1701,7 @@ for _hi, (_hkey, _hlabel) in enumerate([("brownlow", "🏆 Brownlow"), ("betting
         f"var c=a.closest('[data-testid=\"stVerticalBlock\"]');"
         f"if(!c)return;"
         f"var btns=c.querySelectorAll('button');"
-        f"if(btns[{_hi}])btns[{_hi}].click();"
+        f"if(btns[{_hi}])btns[{_hi}].dispatchEvent(new MouseEvent('click',{{bubbles:true,cancelable:true,view:window}}));"
         f"}})()"
     )
     _hub_pill_html += (
@@ -1727,7 +1727,7 @@ for _pi, _sp in enumerate(_snav_pages):
         f"var c=a.closest('[data-testid=\"stVerticalBlock\"]');"
         f"if(!c)return;"
         f"var btns=c.querySelectorAll('button');"
-        f"if(btns[{_pi}])btns[{_pi}].click();"
+        f"if(btns[{_pi}])btns[{_pi}].dispatchEvent(new MouseEvent('click',{{bubbles:true,cancelable:true,view:window}}));"
         f"}})()"
     )
     _page_strip_html += (
@@ -1744,14 +1744,14 @@ st.markdown(f"""
 <style>
 [data-testid="stVerticalBlock"]:has(> :first-child .hub-anchor),
 [data-testid="stVerticalBlock"]:has(> :first-child .snav-anchor) {{
-    height: 0 !important;
-    min-height: 0 !important;
-    max-height: 0 !important;
+    position: fixed !important;
+    top: -9999px !important;
+    left: -9999px !important;
+    width: 1px !important;
+    height: 1px !important;
     overflow: hidden !important;
-    padding: 0 !important;
-    margin: 0 !important;
-    border: none !important;
-    visibility: hidden !important;
+    pointer-events: none !important;
+    z-index: -9999 !important;
 }}
 </style>
 <div style="background:#0d1c2b;padding:7px 16px;
