@@ -1924,27 +1924,26 @@ if _page == 'Home':
 """, unsafe_allow_html=True)
 
     if not top5.empty:
-        _top5_rows_html = ""
+        _top5_rows = []
         _top5_max = top5["Exp_Total_Votes"].max()
         for _rank, (_, _row) in enumerate(top5.head(5).iterrows()):
             _pct = int(_row["Exp_Total_Votes"] / _top5_max * 100) if _top5_max > 0 else 0
-            _top5_rows_html += f"""
-    <div style="display:flex; align-items:center; gap:10px; background:#0f2035; border:0.5px solid rgba(255,255,255,0.06); border-radius:8px; padding:10px 12px; margin-bottom:6px;">
-      <div style="font-size:11px; color:rgba(255,255,255,0.25); width:16px; text-align:center;">{_rank+1}</div>
-      <div style="font-size:13px; font-weight:500; color:#fff; flex:2;">{_row['Player_Name']}</div>
-      <div style="font-size:11px; color:rgba(255,255,255,0.25); flex:2;"></div>
-      <div style="flex:3; height:4px; background:rgba(255,255,255,0.07); border-radius:100px; overflow:hidden;">
-        <div style="height:4px; background:#2d5016; border-radius:100px; width:{_pct}%;"></div>
-      </div>
-      <div style="font-size:13px; font-weight:500; color:#3ecfa0; width:36px; text-align:right;">{_row['Exp_Total_Votes']:.1f}</div>
-    </div>"""
-
-        st.markdown(f"""
-<div style="margin-top:16px;">
-  <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.25); margin-bottom:10px;">Top 5 predictions — 2026</div>
-  {_top5_rows_html}
-</div>
-""", unsafe_allow_html=True)
+            _top5_rows.append(
+                f'<div style="display:flex;align-items:center;gap:10px;background:#0f2035;border:0.5px solid rgba(255,255,255,0.06);border-radius:8px;padding:10px 12px;margin-bottom:6px;">'
+                f'<div style="font-size:11px;color:rgba(255,255,255,0.25);width:16px;text-align:center;">{_rank+1}</div>'
+                f'<div style="font-size:13px;font-weight:500;color:#fff;flex:2;">{_row["Player_Name"]}</div>'
+                f'<div style="flex:3;height:4px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;">'
+                f'<div style="height:4px;background:#2d5016;border-radius:100px;width:{_pct}%;"></div></div>'
+                f'<div style="font-size:13px;font-weight:500;color:#3ecfa0;width:36px;text-align:right;">{_row["Exp_Total_Votes"]:.1f}</div>'
+                f'</div>'
+            )
+        st.markdown(
+            '<div style="margin-top:16px;">'
+            '<div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:10px;">Top 5 predictions — 2026</div>'
+            + "".join(_top5_rows)
+            + '</div>',
+            unsafe_allow_html=True,
+        )
 
     st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
 
