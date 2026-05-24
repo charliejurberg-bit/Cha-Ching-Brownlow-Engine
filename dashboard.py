@@ -448,7 +448,12 @@ st.markdown("""
         );
         background-size: 300% 300%;
         animation: bannerShift 10s ease infinite;
-        padding: 252px 48px 44px 48px;
+        min-height: 420px;
+        padding: 200px 48px 0;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
         margin-bottom: 0;
         border-bottom: 1px solid #2a4a5a;
         text-align: center;
