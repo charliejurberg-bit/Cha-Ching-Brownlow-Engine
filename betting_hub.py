@@ -141,51 +141,71 @@ TIPS_COLS = [
     'notes', 'created_at', 'result', 'profit_loss',
 ]
 
+# ── Supabase client ────────────────────────────────────────────────────────────
+
+@st.cache_resource
+def _get_supabase():
+    from supabase import create_client
+    url = st.secrets["supabase"]["url"]
+    key = st.secrets["supabase"]["key"]
+    return create_client(url, key)
+
+
+def _sb_records(df: pd.DataFrame) -> list[dict]:
+    """Convert DataFrame rows to JSON-safe dicts (NaN/NaT → None)."""
+    rows = []
+    for row in df.to_dict('records'):
+        rows.append({
+            k: (None if (v is not None and isinstance(v, float) and pd.isna(v)) else v)
+            for k, v in row.items()
+        })
+    return rows
+
 
 def _ensure_dirs():
-    os.makedirs(DATA_DIR, exist_ok=True)
-    if not os.path.exists(BETS_CSV):
-        pd.DataFrame(columns=BETS_COLS).to_csv(BETS_CSV, index=False)
-    if not os.path.exists(TIPS_CSV):
-        pd.DataFrame(columns=TIPS_COLS).to_csv(TIPS_CSV, index=False)
-    if not os.path.exists(PROPS_CSV):
-        pd.DataFrame(columns=[
-            'game_key', 'player', 'market_type', 'line', 'bookmaker', 'odds', 'updated_at',
-        ]).to_csv(PROPS_CSV, index=False)
+    os.makedirs(DATA_DIR, exist_ok=True)  # for user_import.csv only
 
 
 def _load_bets() -> pd.DataFrame:
-    _ensure_dirs()
     try:
-        df = pd.read_csv(BETS_CSV)
+        resp = _get_supabase().table("bets").select("*").execute()
+        df = pd.DataFrame(resp.data) if resp.data else pd.DataFrame(columns=BETS_COLS)
         for c in BETS_COLS:
             if c not in df.columns:
                 df[c] = None
-        df['date']        = pd.to_datetime(df['date'], errors='coerce')
-        df['odds']        = pd.to_numeric(df['odds'], errors='coerce')
-        df['stake']       = pd.to_numeric(df['stake'], errors='coerce')
-        df['profit_loss'] = pd.to_numeric(df['profit_loss'], errors='coerce')
+        df['date']         = pd.to_datetime(df['date'], errors='coerce')
+        df['odds']         = pd.to_numeric(df['odds'], errors='coerce')
+        df['stake']        = pd.to_numeric(df['stake'], errors='coerce')
+        df['profit_loss']  = pd.to_numeric(df['profit_loss'], errors='coerce')
         df['is_cha_ching'] = df['is_cha_ching'].fillna(False).astype(bool)
         return df
-    except Exception:
+    except Exception as e:
+        st.error(f"Could not load bets from Supabase: {e}")
         return pd.DataFrame(columns=BETS_COLS)
 
 
+def _insert_bet(row: dict):
+    """Insert a single new bet row into Supabase."""
+    if 'date' in row and hasattr(row['date'], 'strftime'):
+        row['date'] = row['date'].strftime('%Y-%m-%d')
+    row = {k: (None if isinstance(v, float) and pd.isna(v) else v) for k, v in row.items()}
+    _get_supabase().table("bets").insert(row).execute()
+
+
 def _save_bets(df: pd.DataFrame):
-    _ensure_dirs()
+    """Upsert full DataFrame to Supabase — used for bulk CSV import."""
     df_save = df.copy()
     if 'date' in df_save.columns:
         df_save['date'] = pd.to_datetime(df_save['date'], errors='coerce').dt.strftime('%Y-%m-%d')
-    tmp = BETS_CSV + '.tmp'
-    df_save.to_csv(tmp, index=False)
-    os.replace(tmp, BETS_CSV)
+    records = _sb_records(df_save)
+    if records:
+        _get_supabase().table("bets").upsert(records, on_conflict="bet_id").execute()
 
 
 def _load_tips() -> pd.DataFrame:
-    _ensure_dirs()
     try:
-        file_size = os.path.getsize(TIPS_CSV) if os.path.exists(TIPS_CSV) else 0
-        df = pd.read_csv(TIPS_CSV)
+        resp = _get_supabase().table("cha_ching_tips").select("*").execute()
+        df = pd.DataFrame(resp.data) if resp.data else pd.DataFrame(columns=TIPS_COLS)
         for col in TIPS_COLS:
             if col not in df.columns:
                 df[col] = None
@@ -196,9 +216,7 @@ def _load_tips() -> pd.DataFrame:
         df['is_flagged'] = df['is_flagged'].fillna(False).astype(bool)
         return df
     except Exception as e:
-        if os.path.exists(TIPS_CSV) and os.path.getsize(TIPS_CSV) > 200:
-            # File exists and has real content but failed to parse — warn rather than silently empty
-            st.warning(f"Could not read tips file: {e}")
+        st.warning(f"Could not load tips from Supabase: {e}")
         return pd.DataFrame(columns=TIPS_COLS)
 
 
@@ -207,45 +225,32 @@ def _save_tip(game_key: str, player: str, market_type: str,
               stake: float = 0.0, odds: float = 0.0, bookmaker: str = '',
               line: float = 0.0):
     """Returns None on success, or an error string on failure."""
-    _log = os.path.join(os.path.dirname(os.path.abspath(__file__)), '_tip_debug.log')
     try:
-        import traceback
-        with open(_log, 'a') as _lf:
-            _lf.write(f"[{datetime.now()}] _save_tip called: player={player} game={game_key}\n")
-        _ensure_dirs()
-        df = _load_tips()
-        tip_id = str(uuid.uuid4())[:8]
         new_row = {
-            'tip_id':        tip_id,
+            'tip_id':        str(uuid.uuid4())[:8],
             'game_key':      game_key,
             'player':        player,
             'market_type':   market_type,
-            'line':          round(float(line), 1) if line else '',
-            'bookmaker':     bookmaker,
-            'odds':          round(float(odds), 2) if odds else '',
+            'line':          round(float(line), 1) if line else None,
+            'bookmaker':     bookmaker or None,
+            'odds':          round(float(odds), 2) if odds else None,
             'stake':         round(float(stake), 2) if stake else 0.0,
             'criteria_json': json.dumps(criteria),
             'is_flagged':    is_flagged,
-            'notes':         notes,
-            'created_at':    datetime.now().strftime('%Y-%m-%d %H:%M'),
+            'notes':         notes or None,
+            'created_at':    datetime.now().isoformat(),
             'result':        '',
-            'profit_loss':   '',
+            'profit_loss':   None,
         }
-        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
-        tmp = TIPS_CSV + '.tmp'
-        df.to_csv(tmp, index=False)
-        os.replace(tmp, TIPS_CSV)
-        with open(_log, 'a') as _lf:
-            _lf.write(f"[{datetime.now()}] SUCCESS: wrote to {os.path.abspath(TIPS_CSV)}\n")
-        return None  # success
+        _get_supabase().table("cha_ching_tips").insert(new_row).execute()
+        return None
     except Exception as e:
-        with open(_log, 'a') as _lf:
-            _lf.write(f"[{datetime.now()}] FAILED: {traceback.format_exc()}\n")
+        import traceback
         return f"{e}\n\n{traceback.format_exc()}"
 
 
 def _save_tip_result(tip_id: str, result: str):
-    df = _load_tips()  # _load_tips now guarantees string dtype for 'result'
+    df = _load_tips()
     mask = df['tip_id'].astype(str) == str(tip_id)
     pl = 0.0
     if mask.any():
@@ -254,27 +259,24 @@ def _save_tip_result(tip_id: str, result: str):
         stake = pd.to_numeric(row.get('stake', 0), errors='coerce') or 0.0
         if result and odds > 1 and stake > 0:
             pl = _compute_pl(float(odds), float(stake), result)
-        df.loc[mask, 'result']       = result
-        df.loc[mask, 'profit_loss']  = pl if result else float('nan')
-        tmp = TIPS_CSV + '.tmp'
-        df.to_csv(tmp, index=False)
-        os.replace(tmp, TIPS_CSV)
+        _get_supabase().table("cha_ching_tips").update({
+            'result':      result,
+            'profit_loss': pl if result else None,
+        }).eq('tip_id', tip_id).execute()
         try:
             _sync_tip_to_bets(tip_id, row, result, pl)
         except Exception as e:
             st.error(f"Tip result saved but failed to sync to bet history: {e}")
-    # else: tip_id not found — do not write to avoid wiping file on a failed load
 
 
 def _sync_tip_to_bets(tip_id: str, tip_row, result: str, pl: float):
-    """Write or remove a settled tip as a CC bet record in bets.csv."""
-    bets = _load_bets()
-    # Remove any existing record for this tip (identified by bet_id == tip_id)
-    bets = bets[bets['bet_id'] != tip_id].copy()
-    if result:  # empty result means clearing — just remove
+    """Write or remove a settled tip as a CC bet record."""
+    sb = _get_supabase()
+    sb.table("bets").delete().eq("bet_id", tip_id).execute()
+    if result:
         odds  = pd.to_numeric(tip_row.get('odds',  0), errors='coerce') or 0.0
         stake = pd.to_numeric(tip_row.get('stake', 0), errors='coerce') or 0.0
-        new_bet = {
+        sb.table("bets").insert({
             'bet_id':             tip_id,
             'date':               date.today().strftime('%Y-%m-%d'),
             'match':              str(tip_row.get('game_key', '')),
@@ -288,17 +290,28 @@ def _sync_tip_to_bets(tip_id: str, tip_row, result: str, pl: float):
             'is_cha_ching':       True,
             'cha_ching_criteria': str(tip_row.get('criteria_json', '') or ''),
             'notes':              str(tip_row.get('notes', '') or ''),
-        }
-        bets = pd.concat([bets, pd.DataFrame([new_bet])], ignore_index=True)
-    _save_bets(bets)
+        }).execute()
 
 
 def _load_props() -> pd.DataFrame:
-    _ensure_dirs()
     try:
-        return pd.read_csv(PROPS_CSV)
+        resp = _get_supabase().table("player_props").select("*").execute()
+        return pd.DataFrame(resp.data) if resp.data else pd.DataFrame()
     except Exception:
         return pd.DataFrame()
+
+
+def _save_prop(game_key: str, player: str, market_type: str,
+               line: float, bookmaker: str, odds: float):
+    _get_supabase().table("player_props").upsert({
+        'game_key':    game_key,
+        'player':      player,
+        'market_type': market_type,
+        'line':        line,
+        'bookmaker':   bookmaker,
+        'odds':        odds,
+        'updated_at':  datetime.now().isoformat(),
+    }, on_conflict="game_key,player,market_type").execute()
 
 
 def _load_user_import() -> pd.DataFrame | None:
@@ -367,22 +380,6 @@ def _load_user_import_as_bets() -> pd.DataFrame | None:
     out['profit_loss'] = pd.to_numeric(out['profit_loss'], errors='coerce')
     out['is_cha_ching'] = False
     return out
-
-
-def _save_prop(game_key: str, player: str, market_type: str,
-               line: float, bookmaker: str, odds: float):
-    df = _load_props()
-    mask = (df['game_key'] == game_key) & (df['player'] == player) & (df['market_type'] == market_type)
-    new_row = {
-        'game_key': game_key, 'player': player, 'market_type': market_type,
-        'line': line, 'bookmaker': bookmaker, 'odds': odds,
-        'updated_at': datetime.now().strftime('%Y-%m-%d %H:%M'),
-    }
-    if mask.any():
-        df.loc[mask, list(new_row.keys())] = list(new_row.values())
-    else:
-        df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
-    df.to_csv(PROPS_CSV, index=False)
 
 
 def _compute_pl(odds: float, stake: float, result: str) -> float:
@@ -950,9 +947,7 @@ def _add_bet_dialog():
                 'cha_ching_criteria': '',
                 'notes':            notes,
             }
-            bets = _load_bets()
-            bets = pd.concat([bets, pd.DataFrame([new_row])], ignore_index=True)
-            _save_bets(bets)
+            _insert_bet(new_row)
             st.session_state.pop('_bet_prefill', None)
             st.toast("Bet saved!")
             st.rerun()
@@ -1394,8 +1389,6 @@ def render_bet_tracker():
 
 def render_cha_ching_tips():
     _inject_css()
-    # DEBUG — remove after confirming paths
-    st.caption(f"DEBUG: cwd={os.getcwd()} | tips={os.path.abspath(TIPS_CSV)}")
 
     # ── Auth gate ─────────────────────────────────────────────────────────────
     editable = st.session_state.get('_cc_authed', False)
