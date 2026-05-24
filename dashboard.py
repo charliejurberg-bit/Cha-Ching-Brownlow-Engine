@@ -1637,7 +1637,7 @@ if predictions is None:
 max_season_rounds = int(game_df['Round_num'].max()) if game_df is not None and len(game_df) > 0 else 25
 rounds_played = int(game_df['Round_num'].nunique()) if game_df is not None and len(game_df) > 0 else 0
 
-# ── Hub switcher + banner ─────────────────────────────────────
+# ── State init + banner ───────────────────────────────────────
 if 'active_hub' not in st.session_state:
     st.session_state.active_hub = 'brownlow'
 if 'page' not in st.session_state:
@@ -1655,7 +1655,6 @@ _NAV_BETTING = {
     "BH Overview":  ["BH Dashboard", "Bet Tracker"],
     "BH Strategy":  ["Cha Ching Tips", "Trends & Analysis"],
 }
-
 _BH_PAGES = {'BH Dashboard', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis'}
 
 def _nav_select(cat_key):
@@ -1663,28 +1662,20 @@ def _nav_select(cat_key):
     if val is not None:
         st.session_state.page = val
 
-# ── Hub pill toggle ────────────────────────────────────────────
-_hub = st.session_state.get("active_hub", "brownlow")
-_pc1, _pc2, _pc3 = st.columns([2, 2.5, 6.5])
-with _pc1:
-    if st.button("🏆 Brownlow", key="pill_brownlow",
-                 type="primary" if _hub == "brownlow" else "secondary"):
-        st.session_state["active_hub"] = "brownlow"
-        if st.session_state.page in _BH_PAGES:
-            st.session_state.page = "Home"
-        st.rerun()
-with _pc2:
-    if st.button("💰 Betting Hub", key="pill_betting",
-                 type="primary" if _hub == "betting" else "secondary"):
-        st.session_state["active_hub"] = "betting"
-        if st.session_state.page not in _BH_PAGES:
-            st.session_state.page = "BH Dashboard"
-        st.rerun()
-
+_hub  = st.session_state.get("active_hub", "brownlow")
 _page = st.session_state.page
 
-# ── Subnav tab strip ──────────────────────────────────────────
-if st.session_state.active_hub == "brownlow":
+# ── Page list + icons for current hub ─────────────────────────
+_PAGE_ICONS = {
+    "Home": "🏠", "Leaderboard": "🏅", "Player Profile": "👤",
+    "Player Comparison": "⚖️", "Stat Filter": "🔍", "Coaches Votes": "📋",
+    "Game Analysis": "🎯", "Model Insights": "🧠", "Model Comparison": "📊",
+    "Live Tracker": "📡", "Betting Edge": "💡",
+    "BH Dashboard": "📈", "Bet Tracker": "📒",
+    "Cha Ching Tips": "🎰", "Trends & Analysis": "📉",
+}
+
+if _hub == "brownlow":
     _snav_pages = [
         "Home", "Leaderboard", "Player Profile", "Player Comparison",
         "Stat Filter", "Coaches Votes", "Game Analysis",
@@ -1693,16 +1684,44 @@ if st.session_state.active_hub == "brownlow":
 else:
     _snav_pages = ["BH Dashboard", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis"]
 
-# ── Visual HTML tab strip (pure HTML; buttons below are hidden but still drive state) ──
-_snav_tab_items = []
-for _sp in _snav_pages:
-    _active = st.session_state.get("page") == _sp
-    _tab_style = (
-        "color:#3ecfa0;border:0.5px solid rgba(62,207,160,0.35);background:transparent;"
-        if _active else
-        "color:rgba(255,255,255,0.4);border:none;background:transparent;"
+# ── Build hub pill HTML ────────────────────────────────────────
+_hub_pill_html = ""
+for _hi, (_hkey, _hlabel) in enumerate([("brownlow", "🏆 Brownlow"), ("betting", "💰 Betting Hub")]):
+    _ha = _hub == _hkey
+    _hp_style = (
+        "background:#2d5016;color:#ffffff;font-weight:600;"
+        if _ha else
+        "background:transparent;color:rgba(255,255,255,0.45);font-weight:500;"
     )
-    _js_click = (
+    _js_hub = (
+        f"(function(){{"
+        f"var a=document.querySelector('.hub-anchor');"
+        f"if(!a)return;"
+        f"var c=a.closest('[data-testid=\"stMarkdownContainer\"]');"
+        f"if(!c)return;"
+        f"var b=c.nextElementSibling;"
+        f"if(!b)return;"
+        f"var btns=b.querySelectorAll('button');"
+        f"if(btns[{_hi}])btns[{_hi}].click();"
+        f"}})()"
+    )
+    _hub_pill_html += (
+        f'<span onclick="{_js_hub}" style="cursor:pointer;white-space:nowrap;'
+        f'padding:5px 16px;border-radius:6px;font-size:13px;border:none;{_hp_style}">'
+        f'{_hlabel}</span>'
+    )
+
+# ── Build page strip HTML ──────────────────────────────────────
+_page_strip_html = ""
+for _sp in _snav_pages:
+    _ap = _page == _sp
+    _icon = _PAGE_ICONS.get(_sp, "·")
+    _ps_style = (
+        "color:#3ecfa0;border:0.5px solid rgba(62,207,160,0.25);background:rgba(62,207,160,0.07);font-weight:600;"
+        if _ap else
+        "color:rgba(255,255,255,0.4);border:0.5px solid transparent;background:transparent;font-weight:500;"
+    )
+    _js_page = (
         f"(function(){{"
         f"var a=document.querySelector('.snav-anchor');"
         f"if(!a)return;"
@@ -1716,13 +1735,17 @@ for _sp in _snav_pages:
         f"}}"
         f"}})()"
     )
-    _snav_tab_items.append(
-        f'<span onclick="{_js_click}" style="cursor:pointer;white-space:nowrap;'
-        f'padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500;{_tab_style}">{_sp}</span>'
+    _page_strip_html += (
+        f'<span onclick="{_js_page}" style="cursor:pointer;white-space:nowrap;'
+        f'padding:4px 10px;border-radius:5px;font-size:12px;'
+        f'display:inline-flex;align-items:center;gap:5px;{_ps_style}">'
+        f'<span style="font-size:11px;line-height:1">{_icon}</span>{_sp}</span>'
     )
 
+# ── Render combined nav (two rows) ─────────────────────────────
 st.markdown(f"""
 <style>
+[data-testid="stMarkdownContainer"]:has(.hub-anchor) + [data-testid="stHorizontalBlock"],
 [data-testid="stMarkdownContainer"]:has(.snav-anchor) + [data-testid="stHorizontalBlock"] {{
     visibility: hidden !important;
     height: 0 !important;
@@ -1733,20 +1756,43 @@ st.markdown(f"""
     min-height: 0 !important;
 }}
 </style>
-<div style="background:#0d1c2b;padding:8px 16px;
+<div style="background:#0d1c2b;padding:7px 16px;
             border-bottom:0.5px solid rgba(255,255,255,0.06);
-            display:flex;flex-wrap:nowrap;gap:4px;align-items:center;overflow-x:auto;">
-  {"".join(_snav_tab_items)}
+            display:flex;flex-wrap:nowrap;gap:4px;align-items:center;">
+  {_hub_pill_html}
+</div>
+<div style="background:#0d1c2b;padding:6px 16px;
+            border-bottom:0.5px solid rgba(255,255,255,0.08);
+            display:flex;flex-wrap:nowrap;gap:3px;align-items:center;overflow-x:auto;">
+  {_page_strip_html}
 </div>
 """, unsafe_allow_html=True)
 
-# Anchor + functional buttons (visually collapsed by CSS above; click logic unchanged)
+# ── Hidden functional buttons: hub toggle ─────────────────────
+st.markdown('<div class="hub-anchor"></div>', unsafe_allow_html=True)
+_hc1, _hc2, _hc3 = st.columns([2, 2.5, 6.5])
+with _hc1:
+    if st.button("🏆 Brownlow", key="pill_brownlow",
+                 type="primary" if _hub == "brownlow" else "secondary"):
+        st.session_state["active_hub"] = "brownlow"
+        if st.session_state.page in _BH_PAGES:
+            st.session_state.page = "Home"
+        st.rerun()
+with _hc2:
+    if st.button("💰 Betting Hub", key="pill_betting",
+                 type="primary" if _hub == "betting" else "secondary"):
+        st.session_state["active_hub"] = "betting"
+        if st.session_state.page not in _BH_PAGES:
+            st.session_state.page = "BH Dashboard"
+        st.rerun()
+
+# ── Hidden functional buttons: page strip ─────────────────────
 st.markdown('<div class="snav-anchor"></div>', unsafe_allow_html=True)
 _snav_cols = st.columns(len(_snav_pages), gap="small")
 for _sc, _sp in zip(_snav_cols, _snav_pages):
     with _sc:
         if st.button(_sp, key=f"snav_{_sp}",
-                     type="primary" if st.session_state.get("page") == _sp else "secondary"):
+                     type="primary" if _page == _sp else "secondary"):
             st.session_state["page"] = _sp
             st.rerun()
 
