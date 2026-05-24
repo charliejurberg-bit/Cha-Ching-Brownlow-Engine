@@ -1749,12 +1749,14 @@ st.markdown(f"""
     display: none !important;
 }}
 </style>
-<div style="background:#0d1c2b;padding:7px 16px;margin:0 -1rem;
+<div style="background:#0d1c2b;padding:7px 16px;
+            position:relative;left:50%;width:100vw;margin-left:-50vw;
             border-bottom:0.5px solid rgba(255,255,255,0.06);
             display:flex;flex-wrap:nowrap;gap:4px;align-items:center;">
   {_hub_pill_html}
 </div>
-<div style="background:#0d1c2b;padding:6px 16px;margin:0 -1rem;
+<div style="background:#0d1c2b;padding:6px 16px;
+            position:relative;left:50%;width:100vw;margin-left:-50vw;
             border-bottom:0.5px solid rgba(255,255,255,0.08);
             display:flex;flex-wrap:nowrap;gap:3px;align-items:center;overflow-x:auto;">
   {_page_strip_html}
