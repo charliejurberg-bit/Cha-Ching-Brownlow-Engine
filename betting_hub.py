@@ -218,7 +218,6 @@ def _save_tip(game_key: str, player: str, market_type: str,
         }
         df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
         df.to_csv(TIPS_CSV, index=False)
-        _sync_tip_to_bets(tip_id, new_row, 'Pending', 0.0)
         return True
     except Exception as e:
         st.error(f"Failed to save tip: {e}")
@@ -407,7 +406,7 @@ def _betting_stats(df: pd.DataFrame) -> dict:
 
 # ── Fixture fetching ───────────────────────────────────────────────────────────
 
-@st.cache_data(ttl=86400, show_spinner=False)
+@st.cache_data(ttl=3600, show_spinner=False)
 def _fetch_fixtures() -> pd.DataFrame:
     """Fetch upcoming AFL fixtures from Squiggle API, cached 24 hours."""
     try:
@@ -423,7 +422,14 @@ def _fetch_fixtures() -> pd.DataFrame:
         if not games:
             return pd.DataFrame()
         df = pd.DataFrame(games)
-        df['date_parsed'] = pd.to_datetime(df['date'], errors='coerce', utc=True)
+        # Squiggle returns timezone-naive local Australian time (AEST/AEDT = UTC+10/+11).
+        # Localise correctly so kickoff comparisons work — using utc=True alone would
+        # treat the strings as already UTC and make games appear ~10h later than real kickoff.
+        _raw = pd.to_datetime(df['date'], errors='coerce')
+        try:
+            df['date_parsed'] = _raw.dt.tz_localize('Australia/Melbourne', ambiguous='infer').dt.tz_convert('UTC')
+        except Exception:
+            df['date_parsed'] = _raw.dt.tz_localize('UTC')
         now   = pd.Timestamp.now(tz='UTC')
         ahead = now + pd.Timedelta(days=7)
         mask  = (df['date_parsed'] >= now) & (df['date_parsed'] <= ahead)
@@ -1403,12 +1409,6 @@ def render_cha_ching_tips():
                     else:
                         st.error('Incorrect password')
 
-    # ── Quick-add CC tip (edit mode, bypasses props/checklist flow) ──────────
-    if editable:
-        if st.button('+ Log Cha Ching Tip', key='_cc_quick_add', type='secondary'):
-            st.session_state['_bet_prefill'] = {'is_cha_ching': True}
-            _add_bet_dialog()
-
     # ── Historical CC bets ────────────────────────────────────────────────────
     cc_bets = _load_bets()
     cc_bets = cc_bets[cc_bets['is_cha_ching'] == True].copy()
@@ -1648,18 +1648,7 @@ def render_cha_ching_tips():
 
     # ── Manual game entry — edit mode only ───────────────────────────────────
     if '_manual_games' not in st.session_state:
-        # Reconstruct from props/tips that fell out of the Squiggle fixture window
-        fixture_keys = {_game_key(row) for _, row in fixtures.iterrows()} if not fixtures.empty else set()
-        prop_keys    = set(props_df['game_key'].dropna().unique()) if not props_df.empty else set()
-        unsettled_tip_keys = (
-            set(tips_df.loc[tips_df['result'] == '', 'game_key'].dropna().unique())
-            if not tips_df.empty else set()
-        )
-        orphan_keys = (prop_keys | unsettled_tip_keys) - fixture_keys
-        st.session_state['_manual_games'] = [
-            {'roundname': gk, 'hteam': '', 'ateam': '', 'gkey': gk}
-            for gk in sorted(orphan_keys) if gk
-        ]
+        st.session_state['_manual_games'] = []
     if '_mg_n' not in st.session_state:
         st.session_state['_mg_n'] = 0
 
