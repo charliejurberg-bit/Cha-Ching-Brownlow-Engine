@@ -305,8 +305,12 @@ st.markdown("""
 <style>
     /* ── Structural ── */
     body { overflow-x: hidden !important; }
-    [data-testid="stToolbar"]       { display: none !important; }
-    [data-testid="collapsedControl"]{ display: none !important; }
+    [data-testid="stAppViewContainer"]          { padding-top: 0 !important; }
+    [data-testid="stHeader"]                    { display: none !important; }
+    section[data-testid="stSidebarContent"]     { padding-top: 0 !important; }
+    [data-testid="stToolbar"]                   { display: none !important; }
+    div[data-testid="stToolbar"]                { display: none !important; }
+    [data-testid="collapsedControl"]            { display: none !important; }
     * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; box-sizing: border-box; }
     .main .block-container {
         padding-top: 0 !important;

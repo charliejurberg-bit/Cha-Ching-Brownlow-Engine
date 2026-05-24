@@ -96,6 +96,10 @@ hr { border: none !important; border-top: 1px solid #2a4a5a !important; }
 ::-webkit-scrollbar-track { background: #0f1923; }
 ::-webkit-scrollbar-thumb { background: #2a4a5a; border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #34d399; }
+[data-testid="stAppViewContainer"]      { padding-top: 0 !important; }
+[data-testid="stHeader"]                { display: none !important; }
+section[data-testid="stSidebarContent"] { padding-top: 0 !important; }
+div[data-testid="stToolbar"]            { display: none !important; }
 </style>
 """, unsafe_allow_html=True)
 
