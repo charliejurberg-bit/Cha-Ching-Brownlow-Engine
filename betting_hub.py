@@ -1403,6 +1403,12 @@ def render_cha_ching_tips():
                     else:
                         st.error('Incorrect password')
 
+    # ── Quick-add CC tip (edit mode, bypasses props/checklist flow) ──────────
+    if editable:
+        if st.button('+ Log Cha Ching Tip', key='_cc_quick_add', type='secondary'):
+            st.session_state['_bet_prefill'] = {'is_cha_ching': True}
+            _add_bet_dialog()
+
     # ── Historical CC bets ────────────────────────────────────────────────────
     cc_bets = _load_bets()
     cc_bets = cc_bets[cc_bets['is_cha_ching'] == True].copy()
@@ -1642,7 +1648,18 @@ def render_cha_ching_tips():
 
     # ── Manual game entry — edit mode only ───────────────────────────────────
     if '_manual_games' not in st.session_state:
-        st.session_state['_manual_games'] = []
+        # Reconstruct from props/tips that fell out of the Squiggle fixture window
+        fixture_keys = {_game_key(row) for _, row in fixtures.iterrows()} if not fixtures.empty else set()
+        prop_keys    = set(props_df['game_key'].dropna().unique()) if not props_df.empty else set()
+        unsettled_tip_keys = (
+            set(tips_df.loc[tips_df['result'] == '', 'game_key'].dropna().unique())
+            if not tips_df.empty else set()
+        )
+        orphan_keys = (prop_keys | unsettled_tip_keys) - fixture_keys
+        st.session_state['_manual_games'] = [
+            {'roundname': gk, 'hteam': '', 'ateam': '', 'gkey': gk}
+            for gk in sorted(orphan_keys) if gk
+        ]
     if '_mg_n' not in st.session_state:
         st.session_state['_mg_n'] = 0
 
