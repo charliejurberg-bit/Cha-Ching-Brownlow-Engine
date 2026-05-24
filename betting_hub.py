@@ -207,7 +207,11 @@ def _save_tip(game_key: str, player: str, market_type: str,
               stake: float = 0.0, odds: float = 0.0, bookmaker: str = '',
               line: float = 0.0):
     """Returns None on success, or an error string on failure."""
+    _log = os.path.join(os.path.dirname(os.path.abspath(__file__)), '_tip_debug.log')
     try:
+        import traceback
+        with open(_log, 'a') as _lf:
+            _lf.write(f"[{datetime.now()}] _save_tip called: player={player} game={game_key}\n")
         _ensure_dirs()
         df = _load_tips()
         tip_id = str(uuid.uuid4())[:8]
@@ -231,13 +235,12 @@ def _save_tip(game_key: str, player: str, market_type: str,
         tmp = TIPS_CSV + '.tmp'
         df.to_csv(tmp, index=False)
         os.replace(tmp, TIPS_CSV)
-        # DEBUG — remove once path is confirmed
-        debug_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data_betting', '_debug_save.txt')
-        with open(debug_path, 'w') as _f:
-            _f.write(f"cwd={os.getcwd()}\nfile={os.path.abspath(TIPS_CSV)}\n")
+        with open(_log, 'a') as _lf:
+            _lf.write(f"[{datetime.now()}] SUCCESS: wrote to {os.path.abspath(TIPS_CSV)}\n")
         return None  # success
     except Exception as e:
-        import traceback
+        with open(_log, 'a') as _lf:
+            _lf.write(f"[{datetime.now()}] FAILED: {traceback.format_exc()}\n")
         return f"{e}\n\n{traceback.format_exc()}"
 
 
