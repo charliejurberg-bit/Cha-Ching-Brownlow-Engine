@@ -1745,23 +1745,17 @@ for _sp in _snav_pages:
 # ── Render combined nav (two rows) ─────────────────────────────
 st.markdown(f"""
 <style>
-[data-testid="stMarkdownContainer"]:has(.hub-anchor) + [data-testid="stHorizontalBlock"],
-[data-testid="stMarkdownContainer"]:has(.snav-anchor) + [data-testid="stHorizontalBlock"] {{
-    visibility: hidden !important;
-    height: 0 !important;
-    max-height: 0 !important;
-    overflow: hidden !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    min-height: 0 !important;
+[data-testid="element-container"]:has(.hub-anchor) + *,
+[data-testid="element-container"]:has(.snav-anchor) + * {{
+    display: none !important;
 }}
 </style>
-<div style="background:#0d1c2b;padding:7px 16px;
+<div style="background:#0d1c2b;padding:7px 16px;margin:0 -1rem;
             border-bottom:0.5px solid rgba(255,255,255,0.06);
             display:flex;flex-wrap:nowrap;gap:4px;align-items:center;">
   {_hub_pill_html}
 </div>
-<div style="background:#0d1c2b;padding:6px 16px;
+<div style="background:#0d1c2b;padding:6px 16px;margin:0 -1rem;
             border-bottom:0.5px solid rgba(255,255,255,0.08);
             display:flex;flex-wrap:nowrap;gap:3px;align-items:center;overflow-x:auto;">
   {_page_strip_html}
