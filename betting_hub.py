@@ -231,6 +231,10 @@ def _save_tip(game_key: str, player: str, market_type: str,
         tmp = TIPS_CSV + '.tmp'
         df.to_csv(tmp, index=False)
         os.replace(tmp, TIPS_CSV)
+        # DEBUG — remove once path is confirmed
+        debug_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'data_betting', '_debug_save.txt')
+        with open(debug_path, 'w') as _f:
+            _f.write(f"cwd={os.getcwd()}\nfile={os.path.abspath(TIPS_CSV)}\n")
         return None  # success
     except Exception as e:
         import traceback
