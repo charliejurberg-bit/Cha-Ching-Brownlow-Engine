@@ -1744,8 +1744,8 @@ for _sp in _snav_pages:
 # st.container() guarantees each button group renders as its own stVerticalBlock.
 st.markdown(f"""
 <style>
-[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.hub-anchor),
-[data-testid="stVerticalBlock"] > [data-testid="stVerticalBlock"]:has(.snav-anchor) {{
+[data-testid="stVerticalBlock"]:has(> :first-child .hub-anchor),
+[data-testid="stVerticalBlock"]:has(> :first-child .snav-anchor) {{
     display: none !important;
 }}
 </style>
