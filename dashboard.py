@@ -319,23 +319,57 @@ section[data-testid="stSidebar"] + section { padding-top: 0 !important; }
   height: auto !important;
   line-height: 1.4 !important;
 }
-/* ── Subnav tab strip — override pill shape ── */
-/* :has() is supported in Chrome/Edge 105+, Safari 15.4+, Firefox 121+ */
+/* ── Subnav tab strip ── */
+/* :has() — Chrome/Edge 105+, Safari 15.4+, Firefox 121+ */
+
+/* Row: no equal-width columns, scroll horizontally if needed */
+.stMarkdown:has(.snav-anchor) + [data-testid="stHorizontalBlock"] {
+  flex-wrap: nowrap !important;
+  overflow-x: auto !important;
+  gap: 3px !important;
+  align-items: center !important;
+  padding: 0 0 4px 0 !important;
+  scrollbar-width: none !important;
+}
+.stMarkdown:has(.snav-anchor) + [data-testid="stHorizontalBlock"]::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Columns: shrink to content width instead of equal division */
+.stMarkdown:has(.snav-anchor) + [data-testid="stHorizontalBlock"] > [data-testid="stColumn"] {
+  flex: 0 0 auto !important;
+  width: auto !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+}
+.stMarkdown:has(.snav-anchor) + [data-testid="stHorizontalBlock"] [data-testid="stColumn"] > div,
+.stMarkdown:has(.snav-anchor) + [data-testid="stHorizontalBlock"] [data-testid="stVerticalBlock"],
+.stMarkdown:has(.snav-anchor) + [data-testid="stHorizontalBlock"] [data-testid="stButton"] {
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+/* Buttons: no wrapping, auto width */
 .stMarkdown:has(.snav-anchor) + [data-testid="stHorizontalBlock"] button {
-  font-size: 10px !important;
-  padding: 5px 8px !important;
   white-space: nowrap !important;
+  width: auto !important;
+  font-size: 10px !important;
+  padding: 5px 10px !important;
   min-height: unset !important;
   height: auto !important;
   border-radius: 6px !important;
   letter-spacing: 0.2px !important;
 }
+
+/* Active: teal text + subtle teal outline */
 .stMarkdown:has(.snav-anchor) + [data-testid="stHorizontalBlock"] [data-testid="stBaseButton-primary"] {
   background: transparent !important;
   color: #3ecfa0 !important;
   border: 0.5px solid rgba(62,207,160,0.35) !important;
   border-radius: 6px !important;
 }
+
+/* Inactive: muted white, no visible border */
 .stMarkdown:has(.snav-anchor) + [data-testid="stHorizontalBlock"] [data-testid="stBaseButton-secondary"] {
   background: transparent !important;
   color: rgba(255,255,255,0.35) !important;
