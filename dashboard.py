@@ -263,20 +263,14 @@ hr {
 .mt-card:nth-child(2) { animation-delay: 60ms; }
 .mt-card:nth-child(3) { animation-delay: 120ms; }
 .mt-card:nth-child(4) { animation-delay: 180ms; }
-#root > div:first-child {
-    padding-top: 0 !important;
-}
-[data-testid="stHeader"] {
-    display: none !important;
-}
-[data-testid="stToolbar"] {
-    display: none !important;
-}
-.block-container {
-    padding-top: 0 !important;
-}
-.stApp > header { display: none; }
-[data-testid="stAppViewContainer"] > .main { padding-top: 0 !important; }
+#root > div:first-child { padding-top: 0 !important; }
+.stApp > header { display: none !important; }
+[data-testid="stHeader"] { display: none !important; }
+[data-testid="stToolbar"] { display: none !important; }
+.stDecoration { display: none !important; }
+.block-container { padding-top: 0 !important; margin-top: 0 !important; }
+[data-testid="stAppViewContainer"] { padding-top: 0 !important; }
+section.main > div { padding-top: 0 !important; }
 :root {
   --cc-bg:      #0b1520;
   --cc-surface: #0f2035;
@@ -292,39 +286,45 @@ hr {
 .stApp, [data-testid="stAppViewContainer"] {
   background: var(--cc-bg) !important;
 }
-[data-testid="stBaseButton-primary"] {
-  background: #2d5016 !important;
-  color: #fff !important;
-  border: none !important;
+[data-testid="stBaseButton-primary"],
+[data-testid="stBaseButton-secondary"] {
   border-radius: 100px !important;
   font-size: 12px !important;
+  font-weight: 500 !important;
   padding: 6px 18px !important;
+  border: none !important;
+  min-height: unset !important;
+  height: auto !important;
+  line-height: 1.4 !important;
+}
+[data-testid="stBaseButton-primary"] {
+  background: #2d5016 !important;
+  color: #ffffff !important;
 }
 [data-testid="stBaseButton-secondary"] {
   background: transparent !important;
   color: rgba(255,255,255,0.4) !important;
-  border: none !important;
-  border-radius: 100px !important;
-  font-size: 12px !important;
-  padding: 6px 18px !important;
 }
-[data-testid="stHorizontalBlock"] [data-testid="stBaseButton-secondary"] {
-  font-size: 10px !important;
-  letter-spacing: 0.3px !important;
-  padding: 4px 10px !important;
+.snav-anchor + [data-testid="stHorizontalBlock"] { margin-top: 0 !important; }
+.snav-anchor + [data-testid="stHorizontalBlock"] button {
+  font-size: 11px !important;
+  padding: 5px 10px !important;
   white-space: nowrap !important;
-  color: rgba(255,255,255,0.4) !important;
-  border: 0.5px solid transparent !important;
+  min-height: unset !important;
+  height: auto !important;
+  border-radius: 6px !important;
+  letter-spacing: 0.2px !important;
+}
+.snav-anchor + [data-testid="stHorizontalBlock"] [data-testid="stBaseButton-primary"] {
+  background: rgba(62,207,160,0.08) !important;
+  color: #3ecfa0 !important;
+  border: 0.5px solid rgba(62,207,160,0.3) !important;
   border-radius: 6px !important;
 }
-[data-testid="stHorizontalBlock"] [data-testid="stBaseButton-primary"] {
-  font-size: 10px !important;
-  letter-spacing: 0.3px !important;
-  padding: 4px 10px !important;
-  white-space: nowrap !important;
-  color: #3ecfa0 !important;
-  background: rgba(62,207,160,0.07) !important;
-  border: 0.5px solid rgba(62,207,160,0.25) !important;
+.snav-anchor + [data-testid="stHorizontalBlock"] [data-testid="stBaseButton-secondary"] {
+  background: transparent !important;
+  color: rgba(255,255,255,0.35) !important;
+  border: 0.5px solid transparent !important;
   border-radius: 6px !important;
 }
 </style>
@@ -1644,7 +1644,7 @@ st.markdown("""
   <div style="display:inline-flex; background:rgba(255,255,255,0.05); border-radius:100px; padding:3px; gap:2px;">
 """, unsafe_allow_html=True)
 
-_pc1, _pc2, _pc3 = st.columns([1, 1, 8])
+_pc1, _pc2, _pc3 = st.columns([1.2, 1.5, 7.3])
 with _pc1:
     if st.button("🏆 Brownlow", key="pill_brownlow",
                  type="primary" if st.session_state.get("active_hub", "brownlow") == "brownlow" else "secondary"):
@@ -1674,7 +1674,8 @@ if st.session_state.active_hub == "brownlow":
 else:
     _snav_pages = ["BH Dashboard", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis"]
 
-_snav_cols = st.columns(len(_snav_pages))
+st.markdown('<div class="snav-anchor"></div>', unsafe_allow_html=True)
+_snav_cols = st.columns(len(_snav_pages), gap="small")
 for _sc, _sp in zip(_snav_cols, _snav_pages):
     with _sc:
         if st.button(_sp, key=f"snav_{_sp}",
