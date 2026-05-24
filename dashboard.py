@@ -275,6 +275,58 @@ hr {
 .block-container {
     padding-top: 0 !important;
 }
+.stApp > header { display: none; }
+[data-testid="stAppViewContainer"] > .main { padding-top: 0 !important; }
+:root {
+  --cc-bg:      #0b1520;
+  --cc-surface: #0f2035;
+  --cc-nav:     #0d1c2b;
+  --cc-border:  rgba(255,255,255,0.07);
+  --cc-green:   #3ecfa0;
+  --cc-gold:    #f5c542;
+  --cc-primary: #2d5016;
+  --cc-text:    #ffffff;
+  --cc-muted:   rgba(255,255,255,0.35);
+  --cc-hint:    rgba(255,255,255,0.25);
+}
+.stApp, [data-testid="stAppViewContainer"] {
+  background: var(--cc-bg) !important;
+}
+[data-testid="stBaseButton-primary"] {
+  background: #2d5016 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 100px !important;
+  font-size: 12px !important;
+  padding: 6px 18px !important;
+}
+[data-testid="stBaseButton-secondary"] {
+  background: transparent !important;
+  color: rgba(255,255,255,0.4) !important;
+  border: none !important;
+  border-radius: 100px !important;
+  font-size: 12px !important;
+  padding: 6px 18px !important;
+}
+[data-testid="stHorizontalBlock"] [data-testid="stBaseButton-secondary"] {
+  font-size: 10px !important;
+  letter-spacing: 0.3px !important;
+  padding: 4px 10px !important;
+  white-space: nowrap !important;
+  color: rgba(255,255,255,0.4) !important;
+  border: 0.5px solid transparent !important;
+  border-radius: 6px !important;
+}
+[data-testid="stHorizontalBlock"] [data-testid="stBaseButton-primary"] {
+  font-size: 10px !important;
+  letter-spacing: 0.3px !important;
+  padding: 4px 10px !important;
+  white-space: nowrap !important;
+  color: #3ecfa0 !important;
+  background: rgba(62,207,160,0.07) !important;
+  border: 0.5px solid rgba(62,207,160,0.25) !important;
+  border-radius: 6px !important;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -1587,60 +1639,48 @@ def _nav_select(cat_key):
         st.session_state.page = val
 
 # ── Hub pill toggle ────────────────────────────────────────────
-st.markdown('<div class="pill-switcher"></div>', unsafe_allow_html=True)
-col1, col2, col3 = st.columns([2, 6, 2])
-with col1:
-    st.markdown('<div class="pill-track">', unsafe_allow_html=True)
-    brownlow_btn = st.button("🏆 Brownlow", key="pill_brownlow",
-                             type="primary" if st.session_state.get("active_hub") == "brownlow" else "secondary")
-    betting_btn  = st.button("💰 Betting Hub", key="pill_betting",
-                             type="primary" if st.session_state.get("active_hub") == "betting"  else "secondary")
-    st.markdown('</div>', unsafe_allow_html=True)
-    if brownlow_btn:
-        if st.session_state.active_hub != "brownlow":
-            st.session_state.active_hub = "brownlow"
-            if st.session_state.page in _BH_PAGES:
-                st.session_state.page = "Home"
-            st.rerun()
-    if betting_btn:
-        if st.session_state.active_hub != "betting":
-            st.session_state.active_hub = "betting"
-            if st.session_state.page not in _BH_PAGES:
-                st.session_state.page = "BH Dashboard"
-            st.rerun()
+st.markdown("""
+<div style="background:#0d1c2b; padding:10px 20px; border-bottom:0.5px solid rgba(255,255,255,0.06); display:flex; align-items:center; gap:8px;">
+  <div style="display:inline-flex; background:rgba(255,255,255,0.05); border-radius:100px; padding:3px; gap:2px;">
+""", unsafe_allow_html=True)
+
+_pc1, _pc2, _pc3 = st.columns([1, 1, 8])
+with _pc1:
+    if st.button("🏆 Brownlow", key="pill_brownlow",
+                 type="primary" if st.session_state.get("active_hub", "brownlow") == "brownlow" else "secondary"):
+        st.session_state["active_hub"] = "brownlow"
+        if st.session_state.page in _BH_PAGES:
+            st.session_state.page = "Home"
+        st.rerun()
+with _pc2:
+    if st.button("💰 Betting Hub", key="pill_betting",
+                 type="primary" if st.session_state.get("active_hub", "brownlow") == "betting" else "secondary"):
+        st.session_state["active_hub"] = "betting"
+        if st.session_state.page not in _BH_PAGES:
+            st.session_state.page = "BH Dashboard"
+        st.rerun()
+
+st.markdown("</div></div>", unsafe_allow_html=True)
 
 _page = st.session_state.page
 
-# ── Gated nav dropdowns ────────────────────────────────────────
-st.markdown('<div class="nav-anchor"></div>', unsafe_allow_html=True)
+# ── Subnav tab strip ──────────────────────────────────────────
 if st.session_state.active_hub == "brownlow":
-    _active_nav = _NAV_BROWNLOW
-    for _cat, _pages in _active_nav.items():
-        st.session_state[f"_nav_{_cat}"] = _page if _page in _pages else None
-    _nav_cols = st.columns(4)
-    for _col, (_cat, _pages) in zip(_nav_cols, _active_nav.items()):
-        with _col:
-            st.selectbox(
-                _cat, _pages,
-                placeholder=_cat,
-                key=f"_nav_{_cat}",
-                on_change=_nav_select,
-                args=(f"_nav_{_cat}",),
-            )
+    _snav_pages = [
+        "Home", "Leaderboard", "Player Profile", "Player Comparison",
+        "Stat Filter", "Coaches Votes", "Game Analysis",
+        "Model Insights", "Model Comparison", "Live Tracker", "Betting Edge",
+    ]
 else:
-    _active_nav = _NAV_BETTING
-    for _cat, _pages in _active_nav.items():
-        st.session_state[f"_nav_{_cat}"] = _page if _page in _pages else None
-    _nav_cols = st.columns(2)
-    for _col, (_cat, _pages) in zip(_nav_cols, _active_nav.items()):
-        with _col:
-            st.selectbox(
-                _cat, _pages,
-                placeholder=_cat,
-                key=f"_nav_{_cat}",
-                on_change=_nav_select,
-                args=(f"_nav_{_cat}",),
-            )
+    _snav_pages = ["BH Dashboard", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis"]
+
+_snav_cols = st.columns(len(_snav_pages))
+for _sc, _sp in zip(_snav_cols, _snav_pages):
+    with _sc:
+        if st.button(_sp, key=f"snav_{_sp}",
+                     type="primary" if st.session_state.get("page") == _sp else "secondary"):
+            st.session_state["page"] = _sp
+            st.rerun()
 
 # ── Controls row (season + odds timestamp + run update) ──────
 # Only show controls for Brownlow pages, not Betting Hub or Landing
@@ -1858,86 +1898,53 @@ if _page == 'Home':
 </div>
 """, unsafe_allow_html=True)
 
-    c1, c2, c3, c4 = st.columns(4)
-    with c1:
-        st.markdown(f"""
-<div class="mt-card" style="background:#152533;border:1px solid rgba(240,180,41,0.3);border-radius:10px;padding:16px 18px;">
-  <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
-              color:#94a3b8;margin-bottom:6px;">Predicted winner</div>
-  <div style="font-size:20px;font-weight:700;color:#f0b429;
-              font-family:'Sora',sans-serif;letter-spacing:-0.02em;">{leader_name}</div>
-  <div style="font-size:12px;color:#94a3b8;margin-top:4px;">{leader_votes:.1f} pred. votes</div>
-</div>""", unsafe_allow_html=True)
-
-    with c2:
-        st.markdown(f"""
-<div class="mt-card" style="background:#152533;border:1px solid rgba(52,211,153,0.3);border-radius:10px;padding:16px 18px;">
-  <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
-              color:#94a3b8;margin-bottom:6px;">Best odds</div>
-  <div style="font-size:20px;font-weight:700;color:#34d399;
-              font-family:'Sora',sans-serif;letter-spacing:-0.02em;">{leader_odds}</div>
-  <div style="font-size:12px;color:#94a3b8;margin-top:4px;">{leader_name} to win</div>
-</div>""", unsafe_allow_html=True)
-
-    with c3:
-        st.markdown(f"""
-<div class="mt-card" style="background:#152533;border:1px solid #2a4a5a;border-radius:10px;padding:16px 18px;">
-  <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
-              color:#94a3b8;margin-bottom:6px;">Model accuracy</div>
-  <div style="font-size:20px;font-weight:700;color:#e8f0f8;
-              font-family:'Sora',sans-serif;letter-spacing:-0.02em;">86%</div>
-  <div style="font-size:12px;color:#94a3b8;margin-top:4px;">top-10 · MAE 0.09</div>
-</div>""", unsafe_allow_html=True)
-
-    with c4:
-        st.markdown(f"""
-<div class="mt-card" style="background:#152533;border:1px solid #2a4a5a;border-radius:10px;padding:16px 18px;">
-  <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
-              color:#94a3b8;margin-bottom:6px;">Round</div>
-  <div style="font-size:20px;font-weight:700;color:#e8f0f8;
-              font-family:'Sora',sans-serif;letter-spacing:-0.02em;">
-    {CURRENT_ROUND} <span style="font-size:13px;color:#4a5a6a;">/ 23</span>
+    st.markdown(f"""
+<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:16px 0;">
+  <div style="background:#0f2035; border:0.5px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px;">
+    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:8px;">Predicted winner</div>
+    <div style="font-size:20px; font-weight:600; color:#f5c542;">{leader_name}</div>
+    <div style="font-size:11px; color:rgba(255,255,255,0.3);">{leader_votes:.1f} pred. votes</div>
   </div>
-  <div style="font-size:12px;color:#94a3b8;margin-top:4px;">{rounds_remaining} rounds remaining</div>
-</div>""", unsafe_allow_html=True)
-
-    st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
-
-    st.markdown("""
-<div style="font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;
-            color:#4a5a6a;padding-bottom:10px;border-bottom:1px solid #2a4a5a;margin-bottom:14px;">
-  Top 5 predictions · 2026
-</div>""", unsafe_allow_html=True)
-
-    medals = ["🥇", "🥈", "🥉", "4", "5"]
-    medal_colors = ["#f0b429", "#94a3b8", "#a0632a", "#4a5a6a", "#4a5a6a"]
+  <div style="background:#0f2035; border:0.5px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px;">
+    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:8px;">Best odds</div>
+    <div style="font-size:20px; font-weight:600; color:#3ecfa0;">{leader_odds}</div>
+    <div style="font-size:11px; color:rgba(255,255,255,0.3);">{leader_name} to win</div>
+  </div>
+  <div style="background:#0f2035; border:0.5px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px;">
+    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:8px;">Model accuracy</div>
+    <div style="font-size:20px; font-weight:600; color:#ffffff;">86%</div>
+    <div style="font-size:11px; color:rgba(255,255,255,0.3);">top-10 · MAE 0.09</div>
+  </div>
+  <div style="background:#0f2035; border:0.5px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px;">
+    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:8px;">Round</div>
+    <div style="font-size:20px; font-weight:600; color:#ffffff;">{CURRENT_ROUND}<span style="font-size:13px; color:rgba(255,255,255,0.3); font-weight:400"> /23</span></div>
+    <div style="font-size:11px; color:rgba(255,255,255,0.3);">{rounds_remaining} rounds remaining</div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
     if not top5.empty:
-        max_votes = top5["Exp_Total_Votes"].max()
-        for i, (_, row) in enumerate(top5.iterrows()):
-            pct = int((row["Exp_Total_Votes"] / max_votes) * 100) if max_votes > 0 else 0
-            delay = 240 + i * 50
-            color = medal_colors[i]
-            st.markdown(f"""
-<div style="display:flex;align-items:center;gap:12px;padding:10px 14px;
-            background:{'#1a3a2a' if i == 0 else '#152533'};
-            border:1px solid {'#34d399' if i == 0 else '#2a4a5a'};
-            border-radius:8px;margin-bottom:6px;
-            animation:fadeSlideUp 350ms {delay}ms cubic-bezier(0.23,1,0.32,1) both;">
-  <span style="font-size:{'16px' if i < 3 else '12px'};min-width:22px;text-align:center;
-               color:{color};font-weight:700;">{medals[i]}</span>
-  <span style="flex:1;font-size:13px;font-weight:{'600' if i < 2 else '400'};
-               color:{'#e8f0f8' if i < 2 else '#94a3b8'};font-family:'Sora',sans-serif;">
-    {row['Player_Name']}
-  </span>
-  <div style="width:140px;height:4px;background:#1e3a4a;border-radius:2px;overflow:hidden;">
-    <div style="height:100%;width:{pct}%;background:{color};border-radius:2px;opacity:0.8;"></div>
-  </div>
-  <span style="font-size:13px;font-weight:600;min-width:36px;text-align:right;
-               color:{color};font-family:'DM Mono',monospace;">
-    {row['Exp_Total_Votes']:.1f}
-  </span>
-</div>""", unsafe_allow_html=True)
+        _top5_rows_html = ""
+        _top5_max = top5["Exp_Total_Votes"].max()
+        for _rank, (_, _row) in enumerate(top5.head(5).iterrows()):
+            _pct = int(_row["Exp_Total_Votes"] / _top5_max * 100) if _top5_max > 0 else 0
+            _top5_rows_html += f"""
+    <div style="display:flex; align-items:center; gap:10px; background:#0f2035; border:0.5px solid rgba(255,255,255,0.06); border-radius:8px; padding:10px 12px; margin-bottom:6px;">
+      <div style="font-size:11px; color:rgba(255,255,255,0.25); width:16px; text-align:center;">{_rank+1}</div>
+      <div style="font-size:13px; font-weight:500; color:#fff; flex:2;">{_row['Player_Name']}</div>
+      <div style="font-size:11px; color:rgba(255,255,255,0.25); flex:2;"></div>
+      <div style="flex:3; height:4px; background:rgba(255,255,255,0.07); border-radius:100px; overflow:hidden;">
+        <div style="height:4px; background:#2d5016; border-radius:100px; width:{_pct}%;"></div>
+      </div>
+      <div style="font-size:13px; font-weight:500; color:#3ecfa0; width:36px; text-align:right;">{_row['Exp_Total_Votes']:.1f}</div>
+    </div>"""
+
+        st.markdown(f"""
+<div style="margin-top:16px;">
+  <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.25); margin-bottom:10px;">Top 5 predictions — 2026</div>
+  {_top5_rows_html}
+</div>
+""", unsafe_allow_html=True)
 
     st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
 
