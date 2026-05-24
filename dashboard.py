@@ -43,8 +43,8 @@ def inject_global_css():
 iframe[title="streamlit_app"] { margin-top: -60px !important; }
 </style>
 """, unsafe_allow_html=True)
+    st.markdown('<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">', unsafe_allow_html=True)
     st.markdown("""
-<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 html, body, [data-testid="stAppViewContainer"] {
     background-color: #0f1923 !important;
@@ -269,16 +269,6 @@ hr {
 .mt-card:nth-child(2) { animation-delay: 60ms; }
 .mt-card:nth-child(3) { animation-delay: 120ms; }
 .mt-card:nth-child(4) { animation-delay: 180ms; }
-#root { padding-top: 0 !important; }
-.stApp > header { display: none !important; visibility: hidden !important; height: 0 !important; }
-[data-testid="stHeader"] { display: none !important; height: 0 !important; }
-[data-testid="stToolbar"] { display: none !important; height: 0 !important; }
-[data-testid="stDecoration"] { display: none !important; }
-.stDecoration { display: none !important; }
-.viewerBadge_container__r5tak { display: none !important; }
-.main .block-container { padding-top: 0 !important; margin-top: 0 !important; }
-section[data-testid="stSidebar"] + section { padding-top: 0 !important; }
-[data-testid="stAppViewContainer"] > section { padding-top: 0 !important; }
 :root {
   --cc-bg:      #0b1520;
   --cc-surface: #0f2035;
