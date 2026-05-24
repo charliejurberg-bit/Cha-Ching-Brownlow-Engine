@@ -1693,6 +1693,54 @@ if st.session_state.active_hub == "brownlow":
 else:
     _snav_pages = ["BH Dashboard", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis"]
 
+# ── Visual HTML tab strip (pure HTML; buttons below are hidden but still drive state) ──
+_snav_tab_items = []
+for _sp in _snav_pages:
+    _active = st.session_state.get("page") == _sp
+    _tab_style = (
+        "color:#3ecfa0;border:0.5px solid rgba(62,207,160,0.35);background:transparent;"
+        if _active else
+        "color:rgba(255,255,255,0.4);border:none;background:transparent;"
+    )
+    _js_click = (
+        f"(function(){{"
+        f"var a=document.querySelector('.snav-anchor');"
+        f"if(!a)return;"
+        f"var c=a.closest('[data-testid=\"stMarkdownContainer\"]');"
+        f"if(!c)return;"
+        f"var b=c.nextElementSibling;"
+        f"if(!b)return;"
+        f"var btns=b.querySelectorAll('button');"
+        f"for(var i=0;i<btns.length;i++){{"
+        f"if(btns[i].innerText.trim()==='{_sp}'){{btns[i].click();break;}}"
+        f"}}"
+        f"}})()"
+    )
+    _snav_tab_items.append(
+        f'<span onclick="{_js_click}" style="cursor:pointer;white-space:nowrap;'
+        f'padding:4px 10px;border-radius:6px;font-size:12px;font-weight:500;{_tab_style}">{_sp}</span>'
+    )
+
+st.markdown(f"""
+<style>
+[data-testid="stMarkdownContainer"]:has(.snav-anchor) + [data-testid="stHorizontalBlock"] {{
+    visibility: hidden !important;
+    height: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+}}
+</style>
+<div style="background:#0d1c2b;padding:8px 16px;
+            border-bottom:0.5px solid rgba(255,255,255,0.06);
+            display:flex;flex-wrap:nowrap;gap:4px;align-items:center;overflow-x:auto;">
+  {"".join(_snav_tab_items)}
+</div>
+""", unsafe_allow_html=True)
+
+# Anchor + functional buttons (visually collapsed by CSS above; click logic unchanged)
 st.markdown('<div class="snav-anchor"></div>', unsafe_allow_html=True)
 _snav_cols = st.columns(len(_snav_pages), gap="small")
 for _sc, _sp in zip(_snav_cols, _snav_pages):
