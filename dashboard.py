@@ -1684,121 +1684,127 @@ if _hub == "brownlow":
 else:
     _snav_pages = ["BH Dashboard", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis"]
 
-# ── Build hub pill HTML ────────────────────────────────────────
-# data-navhub attribute is read by the iframe click-handler below.
-_hub_pill_html = ""
-for _hkey, _hlabel in [("brownlow", "🏆 Brownlow"), ("betting", "💰 Betting Hub")]:
-    _ha = _hub == _hkey
-    _hp_style = (
-        "background:#2d5016;color:#ffffff;font-weight:600;"
-        if _ha else
-        "background:transparent;color:rgba(255,255,255,0.45);font-weight:500;"
-    )
-    _hub_pill_html += (
-        f'<span data-navhub="{_hkey}" style="cursor:pointer;white-space:nowrap;'
-        f'padding:5px 16px;border-radius:6px;font-size:13px;border:none;{_hp_style}">'
-        f'<span style="pointer-events:none">{_hlabel}</span></span>'
-    )
-
-# ── Build page strip HTML ──────────────────────────────────────
-_page_strip_html = ""
-for _sp in _snav_pages:
-    _ap = _page == _sp
-    _icon = _PAGE_ICONS.get(_sp, "·")
-    _ps_style = (
-        "color:#3ecfa0;border:0.5px solid rgba(62,207,160,0.25);background:rgba(62,207,160,0.07);font-weight:600;"
-        if _ap else
-        "color:rgba(255,255,255,0.4);border:0.5px solid transparent;background:transparent;font-weight:500;"
-    )
-    _page_strip_html += (
-        f'<span data-navpage="{_sp}" style="cursor:pointer;white-space:nowrap;'
-        f'padding:4px 10px;border-radius:5px;font-size:12px;'
-        f'display:inline-flex;align-items:center;gap:5px;{_ps_style}">'
-        f'<span style="font-size:11px;line-height:1;pointer-events:none">{_icon}</span>'
-        f'<span style="pointer-events:none">{_sp}</span></span>'
-    )
-
-# ── Render combined nav (two rows) ─────────────────────────────
-# CSS pushes the hidden text-input container off-screen.
-st.markdown(f"""
+# ── Nav CSS (injected once before containers) ─────────────────
+st.markdown("""
 <style>
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-inp-anchor) {{
-    position: fixed !important;
-    top: -9999px !important;
-    left: -9999px !important;
-    width: 1px !important;
-    height: 1px !important;
-    overflow: hidden !important;
-    z-index: -9999 !important;
-}}
+/* ── Hub row container ───────────────────────────────────────── */
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) {
+    background: #0d1c2b !important;
+    position: relative !important;
+    left: 50% !important;
+    width: 100vw !important;
+    margin-left: -50vw !important;
+    padding: 5px 16px !important;
+    border-bottom: 0.5px solid rgba(255,255,255,0.06) !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    gap: 0 !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) > :first-child {
+    display: none !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stHorizontalBlock"] {
+    gap: 4px !important; padding: 0 !important; align-items: center !important; flex-wrap: nowrap !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="column"] {
+    flex: 0 0 auto !important; min-width: max-content !important; padding: 0 !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button {
+    background: transparent !important; border: none !important;
+    color: rgba(255,255,255,0.45) !important; font-size: 13px !important;
+    font-weight: 500 !important; padding: 5px 16px !important;
+    border-radius: 6px !important; white-space: nowrap !important;
+    box-shadow: none !important; line-height: 1.4 !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-primary"] {
+    background: #2d5016 !important; color: #ffffff !important;
+    font-weight: 600 !important; border: none !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button:hover {
+    background: rgba(255,255,255,0.07) !important; border: none !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-primary"]:hover {
+    background: #3a6b1e !important;
+}
+
+/* ── Page strip container ────────────────────────────────────── */
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) {
+    background: #0d1c2b !important;
+    position: relative !important;
+    left: 50% !important;
+    width: 100vw !important;
+    margin-left: -50vw !important;
+    padding: 4px 16px !important;
+    border-bottom: 0.5px solid rgba(255,255,255,0.08) !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    gap: 0 !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) > :first-child {
+    display: none !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stHorizontalBlock"] {
+    flex-wrap: nowrap !important; overflow-x: auto !important;
+    scrollbar-width: none !important; gap: 3px !important;
+    padding: 0 !important; align-items: center !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stHorizontalBlock"]::-webkit-scrollbar {
+    display: none !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="column"] {
+    flex: 0 0 auto !important; min-width: max-content !important; padding: 0 !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) button {
+    background: transparent !important; border: 0.5px solid transparent !important;
+    color: rgba(255,255,255,0.4) !important; font-size: 12px !important;
+    font-weight: 500 !important; padding: 4px 10px !important;
+    border-radius: 5px !important; white-space: nowrap !important;
+    box-shadow: none !important; width: auto !important; min-width: auto !important;
+    line-height: 1.4 !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-primary"] {
+    color: #3ecfa0 !important; border-color: rgba(62,207,160,0.25) !important;
+    background: rgba(62,207,160,0.07) !important; font-weight: 600 !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) button:hover {
+    background: rgba(255,255,255,0.06) !important; border-color: rgba(255,255,255,0.1) !important;
+    color: rgba(255,255,255,0.7) !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-primary"]:hover {
+    background: rgba(62,207,160,0.14) !important;
+}
 </style>
-<div style="background:#0d1c2b;padding:7px 16px;
-            position:relative;left:50%;width:100vw;margin-left:-50vw;
-            border-bottom:0.5px solid rgba(255,255,255,0.06);
-            display:flex;flex-wrap:nowrap;gap:4px;align-items:center;">
-  {_hub_pill_html}
-</div>
-<div style="background:#0d1c2b;padding:6px 16px;
-            position:relative;left:50%;width:100vw;margin-left:-50vw;
-            border-bottom:0.5px solid rgba(255,255,255,0.08);
-            display:flex;flex-wrap:nowrap;gap:3px;align-items:center;overflow-x:auto;">
-  {_page_strip_html}
-</div>
 """, unsafe_allow_html=True)
 
-# ── Navigation trigger: hidden text input ──────────────────────
-# The iframe script below sets this input's value + dispatches events to
-# trigger Streamlit's onChange, which reruns Python with the new nav command.
+# ── Hub toggle row ─────────────────────────────────────────────
 with st.container():
-    st.markdown('<span class="nav-inp-anchor"></span>', unsafe_allow_html=True)
-    _nav_cmd = st.text_input("nav", key="_nav_cmd", value="", label_visibility="collapsed")
-
-if _nav_cmd:
-    _cmd_parts = _nav_cmd.split(":", 1)
-    if len(_cmd_parts) == 2:
-        _cmd_type, _cmd_val = _cmd_parts
-        if _cmd_type == "hub":
-            st.session_state["active_hub"] = _cmd_val
-            if _cmd_val == "betting" and st.session_state.page not in _BH_PAGES:
-                st.session_state.page = "BH Dashboard"
-            elif _cmd_val == "brownlow" and st.session_state.page in _BH_PAGES:
+    st.markdown('<div class="nav-hub-anchor"></div>', unsafe_allow_html=True)
+    _hc1, _hc2, _hc3 = st.columns([2, 2.5, 6.5])
+    with _hc1:
+        if st.button("🏆 Brownlow", key="pill_brownlow",
+                     type="primary" if _hub == "brownlow" else "secondary"):
+            st.session_state["active_hub"] = "brownlow"
+            if st.session_state.page in _BH_PAGES:
                 st.session_state.page = "Home"
-        elif _cmd_type == "page":
-            st.session_state.page = _cmd_val
-    st.session_state["_nav_cmd"] = ""
-    st.rerun()
+            st.rerun()
+    with _hc2:
+        if st.button("💰 Betting Hub", key="pill_betting",
+                     type="primary" if _hub == "betting" else "secondary"):
+            st.session_state["active_hub"] = "betting"
+            if st.session_state.page not in _BH_PAGES:
+                st.session_state.page = "BH Dashboard"
+            st.rerun()
 
-# ── iframe: nav click handler ──────────────────────────────────
-# Runs in its own JS context (bypasses parent-page CSP / React event restrictions).
-# Listens for clicks on [data-navhub] / [data-navpage] spans, then sets the hidden
-# text input value using the native setter trick that Streamlit's React picks up.
-_components.html("""
-<script>
-(function(){
-  function setNav(cmd){
-    var pdoc=window.parent.document;
-    var a=pdoc.querySelector('.nav-inp-anchor');
-    if(!a)return;
-    var c=a.closest('[data-testid="stVerticalBlock"]');
-    if(!c)return;
-    var inp=c.querySelector('input[type="text"]');
-    if(!inp)return;
-    var setter=Object.getOwnPropertyDescriptor(window.parent.HTMLInputElement.prototype,'value').set;
-    setter.call(inp,cmd);
-    inp.dispatchEvent(new window.parent.Event('input',{bubbles:true}));
-    inp.dispatchEvent(new window.parent.KeyboardEvent('keydown',{key:'Enter',code:'Enter',keyCode:13,which:13,bubbles:true,cancelable:true}));
-  }
-  window.parent.document.addEventListener('click',function(e){
-    var el=e.target;
-    while(el&&el.tagName!=='BODY'){
-      if(el.dataset&&el.dataset.navhub){setNav('hub:'+el.dataset.navhub);return;}
-      if(el.dataset&&el.dataset.navpage){setNav('page:'+el.dataset.navpage);return;}
-      el=el.parentElement;
-    }
-  });
-})();
-</script>
-""", height=0, scrolling=False)
+# ── Page strip row ─────────────────────────────────────────────
+with st.container():
+    st.markdown('<div class="nav-page-anchor"></div>', unsafe_allow_html=True)
+    _pcols = st.columns(len(_snav_pages), gap="small")
+    for _pc, _sp in zip(_pcols, _snav_pages):
+        with _pc:
+            if st.button(f"{_PAGE_ICONS.get(_sp,'·')} {_sp}", key=f"nav_{_sp}",
+                         type="primary" if _page == _sp else "secondary"):
+                st.session_state.page = _sp
+                st.rerun()
 
 # ── Controls row (season + odds timestamp + run update) ──────
 # Only show controls for Brownlow pages, not Betting Hub or Landing
