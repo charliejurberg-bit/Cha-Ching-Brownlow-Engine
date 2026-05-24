@@ -218,6 +218,7 @@ def _save_tip(game_key: str, player: str, market_type: str,
         }
         df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
         df.to_csv(TIPS_CSV, index=False)
+        _sync_tip_to_bets(tip_id, new_row, 'Pending', 0.0)
         return True
     except Exception as e:
         st.error(f"Failed to save tip: {e}")
