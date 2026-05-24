@@ -1685,34 +1685,24 @@ else:
     _snav_pages = ["BH Dashboard", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis"]
 
 # ── Build hub pill HTML ────────────────────────────────────────
-# JS walks UP from the anchor to its stVerticalBlock container, then queries buttons inside it.
+# data-navhub attribute is read by the iframe click-handler below.
 _hub_pill_html = ""
-for _hi, (_hkey, _hlabel) in enumerate([("brownlow", "🏆 Brownlow"), ("betting", "💰 Betting Hub")]):
+for _hkey, _hlabel in [("brownlow", "🏆 Brownlow"), ("betting", "💰 Betting Hub")]:
     _ha = _hub == _hkey
     _hp_style = (
         "background:#2d5016;color:#ffffff;font-weight:600;"
         if _ha else
         "background:transparent;color:rgba(255,255,255,0.45);font-weight:500;"
     )
-    _js_hub = (
-        f"(function(){{"
-        f"var a=document.querySelector('.hub-anchor');"
-        f"if(!a)return;"
-        f"var c=a.closest('[data-testid=\"stVerticalBlock\"]');"
-        f"if(!c)return;"
-        f"var btns=c.querySelectorAll('button');"
-        f"if(btns[{_hi}])btns[{_hi}].dispatchEvent(new MouseEvent('click',{{bubbles:true,cancelable:true,view:window}}));"
-        f"}})()"
-    )
     _hub_pill_html += (
-        f'<span onclick="{_js_hub}" style="cursor:pointer;white-space:nowrap;'
+        f'<span data-navhub="{_hkey}" style="cursor:pointer;white-space:nowrap;'
         f'padding:5px 16px;border-radius:6px;font-size:13px;border:none;{_hp_style}">'
-        f'{_hlabel}</span>'
+        f'<span style="pointer-events:none">{_hlabel}</span></span>'
     )
 
 # ── Build page strip HTML ──────────────────────────────────────
 _page_strip_html = ""
-for _pi, _sp in enumerate(_snav_pages):
+for _sp in _snav_pages:
     _ap = _page == _sp
     _icon = _PAGE_ICONS.get(_sp, "·")
     _ps_style = (
@@ -1720,37 +1710,25 @@ for _pi, _sp in enumerate(_snav_pages):
         if _ap else
         "color:rgba(255,255,255,0.4);border:0.5px solid transparent;background:transparent;font-weight:500;"
     )
-    _js_page = (
-        f"(function(){{"
-        f"var a=document.querySelector('.snav-anchor');"
-        f"if(!a)return;"
-        f"var c=a.closest('[data-testid=\"stVerticalBlock\"]');"
-        f"if(!c)return;"
-        f"var btns=c.querySelectorAll('button');"
-        f"if(btns[{_pi}])btns[{_pi}].dispatchEvent(new MouseEvent('click',{{bubbles:true,cancelable:true,view:window}}));"
-        f"}})()"
-    )
     _page_strip_html += (
-        f'<span onclick="{_js_page}" style="cursor:pointer;white-space:nowrap;'
+        f'<span data-navpage="{_sp}" style="cursor:pointer;white-space:nowrap;'
         f'padding:4px 10px;border-radius:5px;font-size:12px;'
         f'display:inline-flex;align-items:center;gap:5px;{_ps_style}">'
-        f'<span style="font-size:11px;line-height:1">{_icon}</span>{_sp}</span>'
+        f'<span style="font-size:11px;line-height:1;pointer-events:none">{_icon}</span>'
+        f'<span style="pointer-events:none">{_sp}</span></span>'
     )
 
 # ── Render combined nav (two rows) ─────────────────────────────
-# CSS hides the stVerticalBlock containers that hold the functional buttons.
-# st.container() guarantees each button group renders as its own stVerticalBlock.
+# CSS pushes the hidden text-input container off-screen.
 st.markdown(f"""
 <style>
-[data-testid="stVerticalBlock"]:has(> :first-child .hub-anchor),
-[data-testid="stVerticalBlock"]:has(> :first-child .snav-anchor) {{
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-inp-anchor) {{
     position: fixed !important;
     top: -9999px !important;
     left: -9999px !important;
     width: 1px !important;
     height: 1px !important;
     overflow: hidden !important;
-    pointer-events: none !important;
     z-index: -9999 !important;
 }}
 </style>
@@ -1768,36 +1746,59 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# ── Hidden functional buttons: hub toggle ─────────────────────
-# Wrapped in st.container() so the stVerticalBlock:has(.hub-anchor) selector can target it.
+# ── Navigation trigger: hidden text input ──────────────────────
+# The iframe script below sets this input's value + dispatches events to
+# trigger Streamlit's onChange, which reruns Python with the new nav command.
 with st.container():
-    st.markdown('<div class="hub-anchor"></div>', unsafe_allow_html=True)
-    _hc1, _hc2, _hc3 = st.columns([2, 2.5, 6.5])
-    with _hc1:
-        if st.button("🏆 Brownlow", key="pill_brownlow",
-                     type="primary" if _hub == "brownlow" else "secondary"):
-            st.session_state["active_hub"] = "brownlow"
-            if st.session_state.page in _BH_PAGES:
-                st.session_state.page = "Home"
-            st.rerun()
-    with _hc2:
-        if st.button("💰 Betting Hub", key="pill_betting",
-                     type="primary" if _hub == "betting" else "secondary"):
-            st.session_state["active_hub"] = "betting"
-            if st.session_state.page not in _BH_PAGES:
-                st.session_state.page = "BH Dashboard"
-            st.rerun()
+    st.markdown('<span class="nav-inp-anchor"></span>', unsafe_allow_html=True)
+    _nav_cmd = st.text_input("nav", key="_nav_cmd", value="", label_visibility="collapsed")
 
-# ── Hidden functional buttons: page strip ─────────────────────
-with st.container():
-    st.markdown('<div class="snav-anchor"></div>', unsafe_allow_html=True)
-    _snav_cols = st.columns(len(_snav_pages), gap="small")
-    for _sc, _sp in zip(_snav_cols, _snav_pages):
-        with _sc:
-            if st.button(_sp, key=f"snav_{_sp}",
-                         type="primary" if _page == _sp else "secondary"):
-                st.session_state["page"] = _sp
-                st.rerun()
+if _nav_cmd:
+    _cmd_parts = _nav_cmd.split(":", 1)
+    if len(_cmd_parts) == 2:
+        _cmd_type, _cmd_val = _cmd_parts
+        if _cmd_type == "hub":
+            st.session_state["active_hub"] = _cmd_val
+            if _cmd_val == "betting" and st.session_state.page not in _BH_PAGES:
+                st.session_state.page = "BH Dashboard"
+            elif _cmd_val == "brownlow" and st.session_state.page in _BH_PAGES:
+                st.session_state.page = "Home"
+        elif _cmd_type == "page":
+            st.session_state.page = _cmd_val
+    st.session_state["_nav_cmd"] = ""
+    st.rerun()
+
+# ── iframe: nav click handler ──────────────────────────────────
+# Runs in its own JS context (bypasses parent-page CSP / React event restrictions).
+# Listens for clicks on [data-navhub] / [data-navpage] spans, then sets the hidden
+# text input value using the native setter trick that Streamlit's React picks up.
+_components.html("""
+<script>
+(function(){
+  function setNav(cmd){
+    var pdoc=window.parent.document;
+    var a=pdoc.querySelector('.nav-inp-anchor');
+    if(!a)return;
+    var c=a.closest('[data-testid="stVerticalBlock"]');
+    if(!c)return;
+    var inp=c.querySelector('input[type="text"]');
+    if(!inp)return;
+    var setter=Object.getOwnPropertyDescriptor(window.parent.HTMLInputElement.prototype,'value').set;
+    setter.call(inp,cmd);
+    inp.dispatchEvent(new window.parent.Event('input',{bubbles:true}));
+    inp.dispatchEvent(new window.parent.KeyboardEvent('keydown',{key:'Enter',code:'Enter',keyCode:13,which:13,bubbles:true,cancelable:true}));
+  }
+  window.parent.document.addEventListener('click',function(e){
+    var el=e.target;
+    while(el&&el.tagName!=='BODY'){
+      if(el.dataset&&el.dataset.navhub){setNav('hub:'+el.dataset.navhub);return;}
+      if(el.dataset&&el.dataset.navpage){setNav('page:'+el.dataset.navpage);return;}
+      el=el.parentElement;
+    }
+  });
+})();
+</script>
+""", height=0, scrolling=False)
 
 # ── Controls row (season + odds timestamp + run update) ──────
 # Only show controls for Brownlow pages, not Betting Hub or Landing
