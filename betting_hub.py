@@ -1394,6 +1394,8 @@ def render_bet_tracker():
 
 def render_cha_ching_tips():
     _inject_css()
+    # DEBUG — remove after confirming paths
+    st.caption(f"DEBUG: cwd={os.getcwd()} | tips={os.path.abspath(TIPS_CSV)}")
 
     # ── Auth gate ─────────────────────────────────────────────────────────────
     editable = st.session_state.get('_cc_authed', False)
