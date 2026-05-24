@@ -172,7 +172,9 @@ def _save_bets(df: pd.DataFrame):
     df_save = df.copy()
     if 'date' in df_save.columns:
         df_save['date'] = pd.to_datetime(df_save['date'], errors='coerce').dt.strftime('%Y-%m-%d')
-    df_save.to_csv(BETS_CSV, index=False)
+    tmp = BETS_CSV + '.tmp'
+    df_save.to_csv(tmp, index=False)
+    os.replace(tmp, BETS_CSV)
 
 
 def _load_tips() -> pd.DataFrame:
@@ -217,7 +219,9 @@ def _save_tip(game_key: str, player: str, market_type: str,
             'profit_loss':   '',
         }
         df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
-        df.to_csv(TIPS_CSV, index=False)
+        tmp = TIPS_CSV + '.tmp'
+        df.to_csv(tmp, index=False)
+        os.replace(tmp, TIPS_CSV)
         return True
     except Exception as e:
         st.error(f"Failed to save tip: {e}")
@@ -236,13 +240,17 @@ def _save_tip_result(tip_id: str, result: str):
             pl = _compute_pl(float(odds), float(stake), result)
         df.loc[mask, 'result']       = result
         df.loc[mask, 'profit_loss']  = pl if result else float('nan')
-        df.to_csv(TIPS_CSV, index=False)
+        tmp = TIPS_CSV + '.tmp'
+        df.to_csv(tmp, index=False)
+        os.replace(tmp, TIPS_CSV)
         try:
             _sync_tip_to_bets(tip_id, row, result, pl)
         except Exception as e:
             st.error(f"Tip result saved but failed to sync to bet history: {e}")
     else:
-        df.to_csv(TIPS_CSV, index=False)
+        tmp = TIPS_CSV + '.tmp'
+        df.to_csv(tmp, index=False)
+        os.replace(tmp, TIPS_CSV)
 
 
 def _sync_tip_to_bets(tip_id: str, tip_row, result: str, pl: float):
