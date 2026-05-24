@@ -440,7 +440,7 @@ st.markdown("""
         left: 50%;
         width: 100vw;
         margin-left: -50vw;
-        margin-top: -80px;
+        margin-top: -200px;
         overflow: hidden;
         background: linear-gradient(
             135deg,
@@ -448,7 +448,7 @@ st.markdown("""
         );
         background-size: 300% 300%;
         animation: bannerShift 10s ease infinite;
-        padding: 132px 48px 44px 48px;
+        padding: 252px 48px 44px 48px;
         margin-bottom: 0;
         border-bottom: 1px solid #2a4a5a;
         text-align: center;
