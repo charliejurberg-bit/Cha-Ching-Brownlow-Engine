@@ -184,6 +184,7 @@ def _save_bets(df: pd.DataFrame):
 def _load_tips() -> pd.DataFrame:
     _ensure_dirs()
     try:
+        file_size = os.path.getsize(TIPS_CSV) if os.path.exists(TIPS_CSV) else 0
         df = pd.read_csv(TIPS_CSV)
         for col in TIPS_COLS:
             if col not in df.columns:
@@ -194,7 +195,10 @@ def _load_tips() -> pd.DataFrame:
             df[col] = df[col].fillna('').astype(str)
         df['is_flagged'] = df['is_flagged'].fillna(False).astype(bool)
         return df
-    except Exception:
+    except Exception as e:
+        if os.path.exists(TIPS_CSV) and os.path.getsize(TIPS_CSV) > 200:
+            # File exists and has real content but failed to parse — warn rather than silently empty
+            st.warning(f"Could not read tips file: {e}")
         return pd.DataFrame(columns=TIPS_COLS)
 
 
@@ -251,10 +255,7 @@ def _save_tip_result(tip_id: str, result: str):
             _sync_tip_to_bets(tip_id, row, result, pl)
         except Exception as e:
             st.error(f"Tip result saved but failed to sync to bet history: {e}")
-    else:
-        tmp = TIPS_CSV + '.tmp'
-        df.to_csv(tmp, index=False)
-        os.replace(tmp, TIPS_CSV)
+    # else: tip_id not found — do not write to avoid wiping file on a failed load
 
 
 def _sync_tip_to_bets(tip_id: str, tip_row, result: str, pl: float):
