@@ -205,7 +205,8 @@ def _load_tips() -> pd.DataFrame:
 def _save_tip(game_key: str, player: str, market_type: str,
               criteria: list[str], is_flagged: bool, notes: str = '',
               stake: float = 0.0, odds: float = 0.0, bookmaker: str = '',
-              line: float = 0.0) -> bool:
+              line: float = 0.0):
+    """Returns None on success, or an error string on failure."""
     try:
         _ensure_dirs()
         df = _load_tips()
@@ -230,10 +231,10 @@ def _save_tip(game_key: str, player: str, market_type: str,
         tmp = TIPS_CSV + '.tmp'
         df.to_csv(tmp, index=False)
         os.replace(tmp, TIPS_CSV)
-        return True
+        return None  # success
     except Exception as e:
-        st.error(f"Failed to save tip: {e}")
-        return False
+        import traceback
+        return f"{e}\n\n{traceback.format_exc()}"
 
 
 def _save_tip_result(tip_id: str, result: str):
@@ -855,13 +856,15 @@ def _checklist_dialog():
     with col1:
         if st.button("Save Tip", type="primary", use_container_width=True):
             criteria = [k for k, _ in CHECKLIST_ITEMS if st.session_state.get(f"{pfx}{k}", False)]
-            saved = _save_tip(game_key, player, market, criteria,
-                              ticked >= CC_THRESHOLD, notes,
-                              stake=float(stake), odds=odds, bookmaker=bookmaker, line=line)
-            if saved:
+            err = _save_tip(game_key, player, market, criteria,
+                            ticked >= CC_THRESHOLD, notes,
+                            stake=float(stake), odds=odds, bookmaker=bookmaker, line=line)
+            if err is None:
                 st.session_state['_cl_open'] = False
                 st.toast(f"Tip saved — {'Cha Ching flagged!' if ticked >= CC_THRESHOLD else 'not yet flagged'}")
                 st.rerun()
+            else:
+                st.error(f"**Save failed** — {err}")
     with col2:
         if st.button("Cancel", use_container_width=True):
             st.session_state['_cl_open'] = False
