@@ -1712,7 +1712,7 @@ for _hi, (_hkey, _hlabel) in enumerate([("brownlow", "🏆 Brownlow"), ("betting
 
 # ── Build page strip HTML ──────────────────────────────────────
 _page_strip_html = ""
-for _sp in _snav_pages:
+for _pi, _sp in enumerate(_snav_pages):
     _ap = _page == _sp
     _icon = _PAGE_ICONS.get(_sp, "·")
     _ps_style = (
@@ -1727,9 +1727,7 @@ for _sp in _snav_pages:
         f"var c=a.closest('[data-testid=\"stVerticalBlock\"]');"
         f"if(!c)return;"
         f"var btns=c.querySelectorAll('button');"
-        f"for(var i=0;i<btns.length;i++){{"
-        f"if(btns[i].innerText.trim()==='{_sp}'){{btns[i].click();break;}}"
-        f"}}"
+        f"if(btns[{_pi}])btns[{_pi}].click();"
         f"}})()"
     )
     _page_strip_html += (
@@ -1746,7 +1744,14 @@ st.markdown(f"""
 <style>
 [data-testid="stVerticalBlock"]:has(> :first-child .hub-anchor),
 [data-testid="stVerticalBlock"]:has(> :first-child .snav-anchor) {{
-    display: none !important;
+    height: 0 !important;
+    min-height: 0 !important;
+    max-height: 0 !important;
+    overflow: hidden !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    visibility: hidden !important;
 }}
 </style>
 <div style="background:#0d1c2b;padding:7px 16px;
