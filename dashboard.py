@@ -824,6 +824,32 @@ st.markdown("""
         to   { opacity: 1; transform: translateY(0); }
     }
 
+    /* ── Banner gap removal ── */
+    .stApp > header { display: none; }
+    [data-testid="stAppViewContainer"] > .main { padding-top: 0 !important; }
+
+    /* ── Hub pill switcher ── */
+    div[data-testid="stHorizontalBlock"] { gap: 0 !important; }
+    .pill-track {
+        display: inline-flex;
+        background: rgba(255,255,255,0.06);
+        border-radius: 100px;
+        padding: 3px;
+        gap: 2px;
+    }
+    .pill-switcher + [data-testid="stHorizontalBlock"] [data-testid="stBaseButton-primary"] {
+        background: #2d5016 !important;
+        color: #ffffff !important;
+        border-radius: 100px !important;
+        border: none !important;
+    }
+    .pill-switcher + [data-testid="stHorizontalBlock"] [data-testid="stBaseButton-secondary"] {
+        background: transparent !important;
+        color: rgba(255,255,255,0.5) !important;
+        border-radius: 100px !important;
+        border: none !important;
+    }
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -1560,21 +1586,23 @@ def _nav_select(cat_key):
     if val is not None:
         st.session_state.page = val
 
-# ── Hub switcher buttons ───────────────────────────────────────
-_sw_l, _sw_r, _sw_spacer = st.columns([1, 1, 8])
-with _sw_l:
-    if st.button("🏆 Brownlow", key="_hub_bl",
-                 use_container_width=True,
-                 type="primary" if st.session_state.active_hub == "brownlow" else "secondary"):
+# ── Hub pill toggle ────────────────────────────────────────────
+st.markdown('<div class="pill-switcher"></div>', unsafe_allow_html=True)
+col1, col2, col3 = st.columns([2, 6, 2])
+with col1:
+    st.markdown('<div class="pill-track">', unsafe_allow_html=True)
+    brownlow_btn = st.button("🏆 Brownlow", key="pill_brownlow",
+                             type="primary" if st.session_state.get("active_hub") == "brownlow" else "secondary")
+    betting_btn  = st.button("💰 Betting Hub", key="pill_betting",
+                             type="primary" if st.session_state.get("active_hub") == "betting"  else "secondary")
+    st.markdown('</div>', unsafe_allow_html=True)
+    if brownlow_btn:
         if st.session_state.active_hub != "brownlow":
             st.session_state.active_hub = "brownlow"
             if st.session_state.page in _BH_PAGES:
                 st.session_state.page = "Home"
             st.rerun()
-with _sw_r:
-    if st.button("💰 Betting Hub", key="_hub_bh",
-                 use_container_width=True,
-                 type="primary" if st.session_state.active_hub == "betting" else "secondary"):
+    if betting_btn:
         if st.session_state.active_hub != "betting":
             st.session_state.active_hub = "betting"
             if st.session_state.page not in _BH_PAGES:
