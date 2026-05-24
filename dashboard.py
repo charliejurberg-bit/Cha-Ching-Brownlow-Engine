@@ -55,7 +55,7 @@ html, body, [data-testid="stAppViewContainer"] {
     background-color: #0f1923 !important;
 }
 [data-testid="block-container"] {
-    padding-top: 1.5rem !important;
+    padding-top: 0 !important;
     max-width: 1200px;
 }
 [data-testid="stSidebar"] {
@@ -293,39 +293,49 @@ section[data-testid="stSidebar"] + section { padding-top: 0 !important; }
 .stApp, [data-testid="stAppViewContainer"] {
   background: var(--cc-bg) !important;
 }
-.pill-buttons-anchor + [data-testid="stHorizontalBlock"] {
-  margin: 0 !important;
-  padding: 0 !important;
-}
-.pill-buttons-anchor + [data-testid="stHorizontalBlock"] button {
-  opacity: 0 !important;
-  height: 2px !important;
-  min-height: 0 !important;
-  max-height: 2px !important;
-  padding: 0 !important;
-  overflow: hidden !important;
-  pointer-events: all !important;
+/* ── Pill toggle buttons (global default) ── */
+[data-testid="stBaseButton-primary"] {
+  background: #2d5016 !important;
+  color: #ffffff !important;
   border: none !important;
+  border-radius: 100px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  padding: 7px 20px !important;
+  min-height: unset !important;
+  height: auto !important;
+  line-height: 1.4 !important;
 }
-.snav-anchor + [data-testid="stHorizontalBlock"] { margin-top: 0 !important; }
-.snav-anchor + [data-testid="stHorizontalBlock"] button {
-  font-size: 11px !important;
-  padding: 5px 10px !important;
+[data-testid="stBaseButton-secondary"] {
+  background: rgba(255,255,255,0.05) !important;
+  color: rgba(255,255,255,0.45) !important;
+  border: none !important;
+  border-radius: 100px !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  padding: 7px 20px !important;
+  min-height: unset !important;
+  height: auto !important;
+  line-height: 1.4 !important;
+}
+/* ── Subnav tab strip — override pill shape ── */
+/* :has() is supported in Chrome/Edge 105+, Safari 15.4+, Firefox 121+ */
+.stMarkdown:has(.snav-anchor) + [data-testid="stHorizontalBlock"] button {
+  font-size: 10px !important;
+  padding: 5px 8px !important;
   white-space: nowrap !important;
   min-height: unset !important;
   height: auto !important;
   border-radius: 6px !important;
   letter-spacing: 0.2px !important;
 }
-.snav-anchor + [data-testid="stHorizontalBlock"] [data-testid="stBaseButton-primary"] {
+.stMarkdown:has(.snav-anchor) + [data-testid="stHorizontalBlock"] [data-testid="stBaseButton-primary"] {
   background: transparent !important;
   color: #3ecfa0 !important;
   border: 0.5px solid rgba(62,207,160,0.35) !important;
   border-radius: 6px !important;
-  font-size: 11px !important;
-  padding: 5px 10px !important;
 }
-.snav-anchor + [data-testid="stHorizontalBlock"] [data-testid="stBaseButton-secondary"] {
+.stMarkdown:has(.snav-anchor) + [data-testid="stHorizontalBlock"] [data-testid="stBaseButton-secondary"] {
   background: transparent !important;
   color: rgba(255,255,255,0.35) !important;
   border: 0.5px solid transparent !important;
@@ -1622,28 +1632,17 @@ def _nav_select(cat_key):
 
 # ── Hub pill toggle ────────────────────────────────────────────
 _hub = st.session_state.get("active_hub", "brownlow")
-_bl_style = "background:#2d5016;color:#fff;" if _hub == "brownlow" else "background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);"
-_bh_style = "background:#2d5016;color:#fff;" if _hub == "betting"  else "background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.4);"
-
-st.markdown(f"""
-<div style="background:#0d1c2b; padding:10px 20px; border-bottom:0.5px solid rgba(255,255,255,0.06); display:flex; align-items:center;">
-  <div style="display:inline-flex; background:rgba(255,255,255,0.05); border-radius:100px; padding:3px; gap:2px;">
-    <span style="{_bl_style} border-radius:100px; padding:7px 20px; font-size:13px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:7px; transition:background 150ms ease;">🏆 Brownlow</span>
-    <span style="{_bh_style} border-radius:100px; padding:7px 20px; font-size:13px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; gap:7px; transition:background 150ms ease;">💰 Betting Hub</span>
-  </div>
-</div>
-""", unsafe_allow_html=True)
-
-st.markdown('<div class="pill-buttons-anchor"></div>', unsafe_allow_html=True)
-_pc1, _pc2, _pc3 = st.columns([1, 1, 8])
+_pc1, _pc2, _pc3 = st.columns([2, 2.5, 6.5])
 with _pc1:
-    if st.button("Brownlow", key="pill_brownlow"):
+    if st.button("🏆 Brownlow", key="pill_brownlow",
+                 type="primary" if _hub == "brownlow" else "secondary"):
         st.session_state["active_hub"] = "brownlow"
         if st.session_state.page in _BH_PAGES:
             st.session_state.page = "Home"
         st.rerun()
 with _pc2:
-    if st.button("Betting Hub", key="pill_betting"):
+    if st.button("💰 Betting Hub", key="pill_betting",
+                 type="primary" if _hub == "betting" else "secondary"):
         st.session_state["active_hub"] = "betting"
         if st.session_state.page not in _BH_PAGES:
             st.session_state.page = "BH Dashboard"
