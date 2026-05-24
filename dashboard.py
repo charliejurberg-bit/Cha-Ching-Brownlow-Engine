@@ -1862,7 +1862,7 @@ if _page == 'Home':
             .sum()
             .reset_index()
             .sort_values("Exp_Total_Votes", ascending=False)
-            .head(5)
+            .head(10)
         )
     else:
         top5 = pd.DataFrame(columns=["Player_Name", "Exp_Total_Votes"])
@@ -1882,7 +1882,7 @@ if _page == 'Home':
     season_pct = int((CURRENT_ROUND / 23) * 100)
 
     st.markdown(f"""
-<div style="padding:40px 0 32px;animation:fadeSlideUp 500ms cubic-bezier(0.23,1,0.32,1) both;">
+<div style="padding:20px 0 12px;animation:fadeSlideUp 500ms cubic-bezier(0.23,1,0.32,1) both;">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
     <div style="width:8px;height:8px;border-radius:50%;background:#34d399;
                 animation:pulse 2s ease-in-out infinite;"></div>
@@ -1904,7 +1904,7 @@ if _page == 'Home':
 """, unsafe_allow_html=True)
 
     st.markdown(f"""
-<div style="margin-bottom:32px;animation:fadeSlideUp 500ms 80ms cubic-bezier(0.23,1,0.32,1) both;">
+<div style="margin-bottom:16px;animation:fadeSlideUp 500ms 80ms cubic-bezier(0.23,1,0.32,1) both;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
     <span style="font-size:11px;font-weight:500;letter-spacing:0.08em;
                  text-transform:uppercase;color:#4a5a6a;">Season progress</span>
@@ -1943,29 +1943,66 @@ if _page == 'Home':
 </div>
 """, unsafe_allow_html=True)
 
-    if not top5.empty:
-        _top5_rows = []
-        _top5_max = top5["Exp_Total_Votes"].max()
-        for _rank, (_, _row) in enumerate(top5.head(5).iterrows()):
-            _pct = int(_row["Exp_Total_Votes"] / _top5_max * 100) if _top5_max > 0 else 0
-            _top5_rows.append(
-                f'<div style="display:flex;align-items:center;gap:10px;background:#0f2035;border:0.5px solid rgba(255,255,255,0.06);border-radius:8px;padding:10px 12px;margin-bottom:6px;">'
-                f'<div style="font-size:11px;color:rgba(255,255,255,0.25);width:16px;text-align:center;">{_rank+1}</div>'
-                f'<div style="font-size:13px;font-weight:500;color:#fff;flex:2;">{_row["Player_Name"]}</div>'
-                f'<div style="flex:3;height:4px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;">'
-                f'<div style="height:4px;background:#2d5016;border-radius:100px;width:{_pct}%;"></div></div>'
-                f'<div style="font-size:13px;font-weight:500;color:#3ecfa0;width:36px;text-align:right;">{_row["Exp_Total_Votes"]:.1f}</div>'
-                f'</div>'
-            )
-        st.markdown(
-            '<div style="margin-top:16px;">'
-            '<div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:10px;">Top 5 predictions — 2026</div>'
-            + "".join(_top5_rows)
-            + '</div>',
-            unsafe_allow_html=True,
-        )
+    _home_left, _home_right = st.columns([3, 2])
 
-    st.markdown("<div style='height:20px'></div>", unsafe_allow_html=True)
+    with _home_left:
+        if not top5.empty:
+            _top10_rows = []
+            _top10_max = top5["Exp_Total_Votes"].max()
+            for _rank, (_, _row) in enumerate(top5.iterrows()):
+                _pct = int(_row["Exp_Total_Votes"] / _top10_max * 100) if _top10_max > 0 else 0
+                _top10_rows.append(
+                    f'<div style="display:flex;align-items:center;gap:10px;background:#0f2035;border:0.5px solid rgba(255,255,255,0.06);border-radius:8px;padding:10px 12px;margin-bottom:6px;">'
+                    f'<div style="font-size:11px;color:rgba(255,255,255,0.25);width:16px;text-align:center;">{_rank+1}</div>'
+                    f'<div style="font-size:13px;font-weight:500;color:#fff;flex:2;">{_row["Player_Name"]}</div>'
+                    f'<div style="flex:3;height:4px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;">'
+                    f'<div style="height:4px;background:#2d5016;border-radius:100px;width:{_pct}%;"></div></div>'
+                    f'<div style="font-size:13px;font-weight:500;color:#3ecfa0;width:36px;text-align:right;">{_row["Exp_Total_Votes"]:.1f}</div>'
+                    f'</div>'
+                )
+            st.markdown(
+                '<div style="margin-top:8px;">'
+                '<div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:10px;">Top 10 predictions — 2026</div>'
+                + "".join(_top10_rows)
+                + '</div>',
+                unsafe_allow_html=True,
+            )
+
+    with _home_right:
+        _odds_has_data = (
+            odds_df is not None
+            and not odds_df.empty
+            and "player" in odds_df.columns
+            and "best_odds" in odds_df.columns
+        )
+        if _odds_has_data:
+            _odds_top10 = odds_df.nsmallest(10, "best_odds")[["player", "best_odds", "best_bookie"]].copy()
+            _odds_rows = []
+            for _i, (_, _or) in enumerate(_odds_top10.iterrows()):
+                _bookie = str(_or.get("best_bookie", "")) if pd.notna(_or.get("best_bookie")) else ""
+                _odds_rows.append(
+                    f'<div style="display:flex;align-items:center;justify-content:space-between;'
+                    f'background:#0f2035;border:0.5px solid rgba(255,255,255,0.06);border-radius:8px;'
+                    f'padding:10px 12px;margin-bottom:6px;">'
+                    f'<div style="display:flex;align-items:center;gap:10px;">'
+                    f'<div style="font-size:11px;color:rgba(255,255,255,0.25);width:16px;text-align:center;">{_i+1}</div>'
+                    f'<div>'
+                    f'<div style="font-size:13px;font-weight:500;color:#fff;">{_or["player"]}</div>'
+                    f'<div style="font-size:10px;color:rgba(255,255,255,0.3);">{_bookie}</div>'
+                    f'</div>'
+                    f'</div>'
+                    f'<div style="font-size:14px;font-weight:600;color:#f5c542;">${float(_or["best_odds"]):.2f}</div>'
+                    f'</div>'
+                )
+            st.markdown(
+                '<div style="margin-top:8px;">'
+                '<div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:10px;">Market odds — favourites</div>'
+                + "".join(_odds_rows)
+                + '</div>',
+                unsafe_allow_html=True,
+            )
+
+    st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
 
     st.markdown("""
 <div style="font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;
