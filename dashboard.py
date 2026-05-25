@@ -1672,12 +1672,21 @@ _page = st.session_state.page
 
 # ── Page list + icons for current hub ─────────────────────────
 _PAGE_ICONS = {
-    "Home": "🏠", "Leaderboard": "🏅", "Player Profile": "👤",
-    "Player Comparison": "⚖️", "Stat Filter": "🔍", "Coaches Votes": "📋",
-    "Game Analysis": "🎯", "Model Insights": "🧠", "Model Comparison": "📊",
-    "Live Tracker": "📡", "Betting Edge": "💡",
-    "BH Dashboard": "📈", "Bet Tracker": "📒",
-    "Cha Ching Tips": "🎰", "Trends & Analysis": "📉",
+    "Home":             "ti-home",
+    "Leaderboard":      "ti-list-numbers",
+    "Player Profile":   "ti-user",
+    "Player Comparison":"ti-users",
+    "Stat Filter":      "ti-filter",
+    "Coaches Votes":    "ti-award",
+    "Game Analysis":    "ti-chart-bar",
+    "Model Insights":   "ti-brain",
+    "Model Comparison": "ti-layout-columns",
+    "Live Tracker":     "ti-radio",
+    "Betting Edge":     "ti-currency-dollar",
+    "BH Dashboard":     "ti-chart-bar",
+    "Bet Tracker":      "ti-list-numbers",
+    "Cha Ching Tips":   "ti-trophy",
+    "Trends & Analysis":"ti-chart-bar",
 }
 
 if _hub == "brownlow":
@@ -1692,6 +1701,7 @@ else:
 # ── Nav CSS (injected once before containers) ─────────────────
 st.markdown("""
 <style>
+@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
 /* ── Collapse flex gaps above/between nav rows ───────────────── */
 [data-testid="stLayoutWrapper"]:has(.nav-hub-anchor) {
     margin-top: -32px !important;
@@ -1732,6 +1742,8 @@ st.markdown("""
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stButton"] {
     width: 100% !important; flex: 1 !important;
 }
+/* Hide icon marker divs (used for ::before icon injection) */
+.ni { display: none !important; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button {
     background: transparent !important; border: none !important;
     color: rgba(255,255,255,0.45) !important; font-size: 13px !important;
@@ -1740,6 +1752,15 @@ st.markdown("""
     box-shadow: none !important; line-height: 1.4 !important;
     width: 100% !important; display: flex !important;
     align-items: center !important; justify-content: center !important;
+}
+/* Hub icons injected before the <p> text node so they stay inline with the label */
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stColumn"]:nth-child(1) button p::before {
+    content: "\edd9"; font-family: tabler-icons, sans-serif !important;
+    margin-right: 6px;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stColumn"]:nth-child(2) button p::before {
+    content: "\eb82"; font-family: tabler-icons, sans-serif !important;
+    margin-right: 6px;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-primary"] {
     background: rgba(62,207,160,0.07) !important; color: #3ecfa0 !important;
@@ -1779,7 +1800,7 @@ st.markdown("""
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stHorizontalBlock"]::-webkit-scrollbar {
     display: none !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="column"] {
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"] {
     flex: 0 0 auto !important; min-width: max-content !important; padding: 0 !important;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) button {
@@ -1790,6 +1811,24 @@ st.markdown("""
     box-shadow: none !important; width: auto !important; min-width: auto !important;
     line-height: 1.4 !important;
 }
+/* Page strip icons via ::before — keyed by hidden .ni marker class */
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ni) button::before {
+    font-family: tabler-icons, sans-serif !important;
+    margin-right: 4px; display: inline-block !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-home) button::before         { content: "\ea6c"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-list-numbers) button::before  { content: "\ebb4"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-user) button::before          { content: "\ea8f"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-users) button::before         { content: "\eb64"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-filter) button::before        { content: "\eaa5"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-award) button::before         { content: "\ea2c"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-chart-bar) button::before     { content: "\ea59"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-brain) button::before         { content: "\\f59f"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-layout-columns) button::before { content: "\eb83"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-radio) button::before         { content: "\ecc3"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-currency-dollar) button::before { content: "\eb84"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-trophy) button::before        { content: "\edd9"; }
+
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-primary"] {
     color: #3ecfa0 !important; border-color: rgba(62,207,160,0.25) !important;
     background: rgba(62,207,160,0.07) !important; font-weight: 600 !important;
@@ -1809,14 +1848,14 @@ with st.container():
     st.markdown('<div class="nav-hub-anchor"></div>', unsafe_allow_html=True)
     _hc1, _hc2 = st.columns(2)
     with _hc1:
-        if st.button("🏆 Brownlow", key="pill_brownlow",
+        if st.button("Brownlow", key="pill_brownlow",
                      type="primary" if _hub == "brownlow" else "secondary"):
             st.session_state["active_hub"] = "brownlow"
             if st.session_state.page in _BH_PAGES:
                 st.session_state.page = "Home"
             st.rerun()
     with _hc2:
-        if st.button("💰 Betting Hub", key="pill_betting",
+        if st.button("Betting Hub", key="pill_betting",
                      type="primary" if _hub == "betting" else "secondary"):
             st.session_state["active_hub"] = "betting"
             if st.session_state.page not in _BH_PAGES:
@@ -1829,7 +1868,10 @@ with st.container():
     _pcols = st.columns(len(_snav_pages), gap="small")
     for _pc, _sp in zip(_pcols, _snav_pages):
         with _pc:
-            if st.button(f"{_PAGE_ICONS.get(_sp,'·')} {_sp}", key=f"nav_{_sp}",
+            _icon_cls = _PAGE_ICONS.get(_sp, '')
+            if _icon_cls:
+                st.markdown(f'<div class="ni {_icon_cls}"></div>', unsafe_allow_html=True)
+            if st.button(_sp, key=f"nav_{_sp}",
                          type="primary" if _page == _sp else "secondary"):
                 st.session_state.page = _sp
                 st.rerun()
