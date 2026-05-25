@@ -1710,7 +1710,7 @@ st.markdown("""
     min-width: 100vw !important;
     flex-shrink: 0 !important;
     margin-left: 0 !important;
-    padding: 5px 16px !important;
+    padding: 0 !important;
     border-bottom: 0.5px solid rgba(255,255,255,0.06) !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
@@ -1720,17 +1720,19 @@ st.markdown("""
     display: none !important;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stHorizontalBlock"] {
-    gap: 4px !important; padding: 0 !important; align-items: center !important; flex-wrap: nowrap !important;
+    display: grid !important; grid-template-columns: 1fr 1fr !important;
+    gap: 0 !important; padding: 0 !important; align-items: stretch !important;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="column"] {
-    flex: 0 0 auto !important; min-width: max-content !important; padding: 0 !important;
+    width: 100% !important; min-width: 0 !important; padding: 0 !important;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button {
     background: transparent !important; border: none !important;
     color: rgba(255,255,255,0.45) !important; font-size: 13px !important;
     font-weight: 500 !important; padding: 5px 16px !important;
-    border-radius: 6px !important; white-space: nowrap !important;
+    border-radius: 0 !important; white-space: nowrap !important;
     box-shadow: none !important; line-height: 1.4 !important;
+    width: 100% !important;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-primary"] {
     background: rgba(62,207,160,0.07) !important; color: #3ecfa0 !important;
@@ -1798,7 +1800,7 @@ st.markdown("""
 # ── Hub toggle row ─────────────────────────────────────────────
 with st.container():
     st.markdown('<div class="nav-hub-anchor"></div>', unsafe_allow_html=True)
-    _hc1, _hc2, _hc3 = st.columns([2, 2.5, 6.5])
+    _hc1, _hc2 = st.columns(2)
     with _hc1:
         if st.button("🏆 Brownlow", key="pill_brownlow",
                      type="primary" if _hub == "brownlow" else "secondary"):
