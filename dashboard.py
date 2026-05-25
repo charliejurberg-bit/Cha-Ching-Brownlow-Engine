@@ -480,8 +480,8 @@ st.markdown("""
         );
         background-size: 300% 300%;
         animation: bannerShift 10s ease infinite;
-        height: 420px;
-        padding: 200px 48px 0;
+        height: 273px;
+        padding: 130px 48px 0;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -500,7 +500,7 @@ st.markdown("""
     .cha-ching-deco {
         position: absolute;
         color: #ffffff;
-        font-size: 80px;
+        font-size: 52px;
         opacity: 0.05;
         pointer-events: none;
         user-select: none;
@@ -509,19 +509,19 @@ st.markdown("""
     /* Solid color — gradient text is banned */
     .cha-ching-title {
         position: relative;
-        font-size: 108px;
+        font-size: 70px;
         font-weight: 900;
-        letter-spacing: -4px;
-        margin: 0 0 18px 0;
+        letter-spacing: -3px;
+        margin: 0 0 12px 0;
         line-height: 1;
         color: #e8f0f8;
     }
     .cha-ching-sub {
         position: relative;
         color: #34d399;
-        font-size: 15px;
+        font-size: 10px;
         font-weight: 700;
-        letter-spacing: 6px;
+        letter-spacing: 4px;
         text-transform: uppercase;
         margin: 0;
         opacity: 0.9;
