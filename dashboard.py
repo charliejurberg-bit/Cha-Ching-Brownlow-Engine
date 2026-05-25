@@ -426,6 +426,10 @@ st.markdown("""
 <style>
     /* ── Structural ── */
     body { overflow-x: hidden !important; }
+    html, body, .stApp, .main,
+    [data-testid="stAppViewContainer"],
+    [data-testid="stMainBlockContainer"],
+    [data-testid="block-container"] { overflow-x: visible !important; }
     [data-testid="stAppViewContainer"]          { padding-top: 0 !important; }
     [data-testid="stHeader"]                    { display: none !important; }
     section[data-testid="stSidebarContent"]     { padding-top: 0 !important; }
@@ -1692,7 +1696,7 @@ st.markdown("""
     background: #0d1c2b !important;
     position: relative !important;
     left: 50% !important;
-    width: calc(100vw + 100px) !important;
+    width: 100vw !important;
     margin-left: -50vw !important;
     padding: 5px 16px !important;
     border-bottom: 0.5px solid rgba(255,255,255,0.06) !important;
@@ -1732,7 +1736,7 @@ st.markdown("""
     background: #0d1c2b !important;
     position: relative !important;
     left: 50% !important;
-    width: calc(100vw + 100px) !important;
+    width: 100vw !important;
     margin-left: -50vw !important;
     padding: 4px 16px !important;
     border-bottom: 0.5px solid rgba(255,255,255,0.08) !important;
