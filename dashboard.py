@@ -1732,7 +1732,8 @@ st.markdown("""
     font-weight: 500 !important; padding: 5px 16px !important;
     border-radius: 0 !important; white-space: nowrap !important;
     box-shadow: none !important; line-height: 1.4 !important;
-    width: 100% !important;
+    width: 100% !important; text-align: center !important;
+    justify-content: center !important;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-primary"] {
     background: rgba(62,207,160,0.07) !important; color: #3ecfa0 !important;
