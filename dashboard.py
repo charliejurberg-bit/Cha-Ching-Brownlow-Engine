@@ -1692,7 +1692,7 @@ st.markdown("""
     background: #0d1c2b !important;
     position: relative !important;
     left: 50% !important;
-    width: 100vw !important;
+    width: calc(100vw + 100px) !important;
     margin-left: -50vw !important;
     padding: 5px 16px !important;
     border-bottom: 0.5px solid rgba(255,255,255,0.06) !important;
@@ -1732,7 +1732,7 @@ st.markdown("""
     background: #0d1c2b !important;
     position: relative !important;
     left: 50% !important;
-    width: 100vw !important;
+    width: calc(100vw + 100px) !important;
     margin-left: -50vw !important;
     padding: 4px 16px !important;
     border-bottom: 0.5px solid rgba(255,255,255,0.08) !important;
