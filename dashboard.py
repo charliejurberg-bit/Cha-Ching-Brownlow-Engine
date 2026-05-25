@@ -1733,14 +1733,14 @@ st.markdown("""
     box-shadow: none !important; line-height: 1.4 !important;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-primary"] {
-    background: #2d5016 !important; color: #ffffff !important;
-    font-weight: 600 !important; border: none !important;
+    background: rgba(62,207,160,0.07) !important; color: #3ecfa0 !important;
+    font-weight: 600 !important; border: 0.5px solid rgba(62,207,160,0.25) !important;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button:hover {
     background: rgba(255,255,255,0.07) !important; border: none !important;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-primary"]:hover {
-    background: #3a6b1e !important;
+    background: rgba(62,207,160,0.14) !important;
 }
 
 /* ── Page strip container ────────────────────────────────────── */
