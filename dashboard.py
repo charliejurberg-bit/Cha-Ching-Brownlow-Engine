@@ -1692,6 +1692,14 @@ else:
 # ── Nav CSS (injected once before containers) ─────────────────
 st.markdown("""
 <style>
+/* ── Collapse flex gaps above/between nav rows ───────────────── */
+[data-testid="stLayoutWrapper"]:has(.nav-hub-anchor) {
+    margin-top: -32px !important;
+}
+[data-testid="stLayoutWrapper"]:has(.nav-page-anchor) {
+    margin-top: -16px !important;
+}
+
 /* ── Hub row container ───────────────────────────────────────── */
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) {
     background: #0d1c2b !important;
