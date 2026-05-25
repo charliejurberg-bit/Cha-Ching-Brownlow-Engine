@@ -1723,8 +1723,14 @@ st.markdown("""
     display: grid !important; grid-template-columns: 1fr 1fr !important;
     gap: 0 !important; padding: 0 !important; align-items: stretch !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="column"] {
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stColumn"] {
     width: 100% !important; min-width: 0 !important; padding: 0 !important;
+    display: flex !important; flex-direction: column !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stColumn"] > div,
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stElementContainer"],
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stButton"] {
+    width: 100% !important; flex: 1 !important;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button {
     background: transparent !important; border: none !important;
@@ -1732,8 +1738,8 @@ st.markdown("""
     font-weight: 500 !important; padding: 5px 16px !important;
     border-radius: 0 !important; white-space: nowrap !important;
     box-shadow: none !important; line-height: 1.4 !important;
-    width: 100% !important; text-align: center !important;
-    justify-content: center !important;
+    width: 100% !important; display: flex !important;
+    align-items: center !important; justify-content: center !important;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-primary"] {
     background: rgba(62,207,160,0.07) !important; color: #3ecfa0 !important;
