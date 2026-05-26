@@ -4297,7 +4297,7 @@ if _page == 'Live Tracker':
     st.markdown(
         f'<div class="title-bar" style="display:flex;align-items:center;justify-content:space-between">'
         f'<div style="display:flex;align-items:center;gap:12px">'
-        f'<h2 style="color:#2c2c2c;margin:0">Live Tracker</h2>'
+        f'<h2 style="color:#e8f0f8;margin:0">Live Tracker</h2>'
         f'<span class="{_badge_class}">{_dot_lbl}</span>'
         f'</div>'
         f'<p style="color:#94a3b8;margin:0;font-size:13px">{_lt_sn}</p>'
@@ -4404,9 +4404,9 @@ if _page == 'Live Tracker':
             def _lt_row_style(row):
                 base = "background-color:{bg};color:{fg};font-weight:{fw};"
                 if row["#"] == 1:
-                    return [base.format(bg="#34d399", fg="#e8f0f8", fw="700")] * len(row)
+                    return [base.format(bg="#34d399", fg="#0f1923", fw="700")] * len(row)
                 elif row["#"] <= 3:
-                    return [base.format(bg="#e8f0dd", fg="#2c2c2c", fw="600")] * len(row)
+                    return [base.format(bg="rgba(52,211,153,0.15)", fg="#34d399", fw="600")] * len(row)
                 return [""] * len(row)
 
             st.dataframe(
@@ -4424,8 +4424,8 @@ if _page == 'Live Tracker':
             if _lt_feed:
                 for _fi in _lt_feed:
                     st.markdown(
-                        f'<div style="background:#f0ece4;border:1px solid #ddd5c5;border-radius:6px;'
-                        f'padding:8px 12px;margin-bottom:6px;font-size:13px;color:#2c2c2c">'
+                        f'<div style="background:#1e3a4a;border:1px solid rgba(255,255,255,0.08);border-radius:6px;'
+                        f'padding:8px 12px;margin-bottom:6px;font-size:13px;color:#e8f0f8">'
                         f'{_fi}</div>',
                         unsafe_allow_html=True,
                     )
@@ -4452,15 +4452,14 @@ if _page == 'Live Tracker':
             marker_color=_lt_colours[::-1],
             text=[str(int(v)) for v in _lt_top10["Total_Votes"].tolist()[::-1]],
             textposition="outside",
-            textfont=dict(color="#2c2c2c", size=12),
+            textfont=dict(color="#94a3b8", size=12),
             hovertemplate="%{y}: %{x} votes<extra></extra>",
         ))
         _fig_lt_bar.update_layout(
             height=340,
-            paper_bgcolor="#e8f0f8", plot_bgcolor="#e8f0f8",
             margin=dict(l=0, r=40, t=10, b=10),
-            xaxis=dict(showgrid=True, gridcolor="#ede8df", tickfont=dict(color="#6c6c6c")),
-            yaxis=dict(tickfont=dict(color="#2c2c2c", size=12)),
+            xaxis=dict(showgrid=True, gridcolor="#1e3a4a", tickfont=dict(color="#94a3b8")),
+            yaxis=dict(tickfont=dict(color="#94a3b8", size=12)),
             font=dict(family="sans-serif"),
         )
         _fig_lt_bar = apply_chart_theme(_fig_lt_bar)
