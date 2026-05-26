@@ -1755,15 +1755,6 @@ st.markdown("""
     width: 100% !important; display: flex !important;
     align-items: center !important; justify-content: center !important;
 }
-/* Hub icons injected before the <p> text node so they stay inline with the label */
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stColumn"]:nth-child(1) button p::before {
-    content: "\edd9"; font-family: tabler-icons, sans-serif !important;
-    margin-right: 6px;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stColumn"]:nth-child(2) button p::before {
-    content: "\eb82"; font-family: tabler-icons, sans-serif !important;
-    margin-right: 6px;
-}
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stBaseButton-primary"],
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-primary"] {
     background: rgba(62,207,160,0.07) !important; color: #3ecfa0 !important;
