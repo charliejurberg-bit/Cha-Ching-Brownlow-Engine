@@ -1685,10 +1685,10 @@ _PAGE_ICONS = {
     "Model Comparison": "ti-chart-bar",
     "Live Tracker":     "ti-live-photo",
     "Betting Edge":     "ti-currency-dollar",
-    "BH Dashboard":     "ti-chart-bar",
-    "Bet Tracker":      "ti-list-numbers",
-    "Cha Ching Tips":   "ti-trophy",
-    "Trends & Analysis":"ti-chart-bar",
+    "BH Dashboard":     "ti-layout-dashboard",
+    "Bet Tracker":      "ti-list-check",
+    "Cha Ching Tips":   "ti-bulb",
+    "Trends & Analysis":"ti-trending-up",
 }
 
 if _hub == "brownlow":
@@ -1831,7 +1831,10 @@ st.markdown("""
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-brain) button::before                  { content: "\\f59f"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-live-photo) button::before              { content: "\\f54d"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-currency-dollar) button::before        { content: "\eb84"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-trophy) button::before                 { content: "\edd9"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-layout-dashboard) button::before       { content: "\ea92"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-list-check) button::before             { content: "\eaa5"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-bulb) button::before                   { content: "\ea51"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-trending-up) button::before            { content: "\ea9f"; }
 
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stBaseButton-primary"],
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-primary"] {
