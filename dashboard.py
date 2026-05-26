@@ -1676,7 +1676,7 @@ _page = st.session_state.page
 _PAGE_ICONS = {
     "Home":             "ti-home",
     "Leaderboard":      "ti-list-numbers",
-    "Player Profile":   "ti-user",
+    "Player Profile":   "ti-user-circle",
     "Player Comparison":"ti-users",
     "Stat Filter":      "ti-filter",
     "Coaches Votes":    "ti-award",
@@ -1822,7 +1822,7 @@ st.markdown("""
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-home) button::before         { content: "\ea6c"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-list-numbers) button::before  { content: "\ebb4"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-user) button::before          { content: "\ea8f"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-user-circle) button::before    { content: "\ed8c"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-users) button::before         { content: "\eb64"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-filter) button::before        { content: "\eaa5"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-award) button::before         { content: "\ea2c"; }
