@@ -1675,7 +1675,7 @@ _page = st.session_state.page
 # ── Page list + icons for current hub ─────────────────────────
 _PAGE_ICONS = {
     "Home":             "ti-home",
-    "Leaderboard":      "ti-trophy",
+    "Leaderboard":      "ti-laurel-wreath-1",
     "Player Profile":   "ti-user",
     "Player Comparison":"ti-users",
     "Stat Filter":      "ti-adjustments-horizontal",
@@ -1821,7 +1821,7 @@ st.markdown("""
     margin-right: 4px; display: inline-block !important;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-home) button::before                   { content: "\eac1"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-trophy) button::before              { content: "\edd9"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-laurel-wreath-1) button::before      { content: "\\ff48"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-user) button::before                   { content: "\eb4d"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-users) button::before                  { content: "\ebf2"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-adjustments-horizontal) button::before { content: "\ec38"; }
