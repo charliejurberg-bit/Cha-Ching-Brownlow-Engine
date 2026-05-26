@@ -1480,7 +1480,11 @@ def render_cha_ching_tips():
             (sc5, "W/L",      f"{fs['wins']}W / {fs['losses']}L"),
             (sc6, "Pending",  str(fs['pending'])),
         ]:
-            col.metric(lbl, val)
+            col.markdown(
+                f'<div class="metric-card"><div class="metric-label">{lbl}</div>'
+                f'<div class="metric-value">{val}</div></div>',
+                unsafe_allow_html=True,
+            )
 
         # Table
         if not cc_filt.empty:
