@@ -2660,38 +2660,6 @@ if _page == 'Model Insights':
         f'<p style="color:#94a3b8;margin:4px 0 0 0">Feature importance · XGBoost v4.0 · Out-of-sample accuracy {_BT_MIN}–{_BT_MAX}</p></div>',
         unsafe_allow_html=True,
     )
-    st.markdown('<div class="section-header">What Drives Brownlow Votes?</div>', unsafe_allow_html=True)
-
-    if importance is None:
-        st.error("Run brownlow_model.py first.")
-    else:
-        imp = importance.copy()
-        imp['Importance %'] = (imp['Importance'] * 100).round(2)
-        tab_all, tab_top = st.tabs(["All Features", "Top 20"])
-        with tab_top:
-            top20 = imp.head(20).sort_values('Importance %', ascending=True)
-            fig3 = go.Figure(go.Bar(x=top20['Importance %'], y=top20['Feature'], orientation='h',
-                                    marker=dict(color=top20['Importance %'],
-                                                colorscale=[[0, '#1e3a4a'], [1, '#34d399']],
-                                                showscale=False)))
-            fig3 = apply_chart_theme(fig3)
-            fig3.update_layout(xaxis_title='Importance (%)', height=500, margin=dict(l=220, r=16, t=20, b=16))
-            st.plotly_chart(fig3, width='stretch', key="chart_007")
-        with tab_all:
-            all_imp = imp.sort_values('Importance %', ascending=True)
-            fig4 = go.Figure(go.Bar(x=all_imp['Importance %'], y=all_imp['Feature'], orientation='h',
-                                    marker=dict(color=all_imp['Importance %'],
-                                                colorscale=[[0, '#1e3a4a'], [1, '#34d399']],
-                                                showscale=False)))
-            fig4 = apply_chart_theme(fig4)
-            fig4.update_layout(xaxis_title='Importance (%)', height=1400, margin=dict(l=250, r=16, t=20, b=16))
-            st.plotly_chart(fig4, width='stretch', key="chart_008")
-
-        c1, c2 = st.columns(2)
-        with c1:
-            st.markdown("**Top signals:**\n- Coaches Votes (raw + relative z-score)\n- Top 3 coaches votes flag\n- Disposals relative to game\n- Impact Score relative to game\n- Is_Loss / Is_Win / Margin")
-        with c2:
-            st.markdown("**v4.0 improvements:**\n- Late-season form: rolling EWMA (span=5) of prior 5 rounds\n- Season momentum: last-6 vs first-6 avg\n- Late-season game weighting: last 5 rounds = 2× sample weight")
 
 # ════════════════════════════════════════════════════════════
 # COACHES VOTES
@@ -3635,6 +3603,38 @@ Positive = improving trajectory, negative = declining.
         )
         st.plotly_chart(fig_scatter, width='stretch', key="chart_016")
         st.caption("Gold dot = Actual winner   Blue dot = Other top 10 predicted   Dashed line = perfect prediction")
+
+        st.markdown('<div class="section-header">What Drives Brownlow Votes?</div>', unsafe_allow_html=True)
+        if importance is None:
+            st.error("Run brownlow_model.py first.")
+        else:
+            imp = importance.copy()
+            imp['Importance %'] = (imp['Importance'] * 100).round(2)
+            tab_all, tab_top = st.tabs(["All Features", "Top 20"])
+            with tab_top:
+                top20 = imp.head(20).sort_values('Importance %', ascending=True)
+                fig3 = go.Figure(go.Bar(x=top20['Importance %'], y=top20['Feature'], orientation='h',
+                                        marker=dict(color=top20['Importance %'],
+                                                    colorscale=[[0, '#1e3a4a'], [1, '#34d399']],
+                                                    showscale=False)))
+                fig3 = apply_chart_theme(fig3)
+                fig3.update_layout(xaxis_title='Importance (%)', height=500, margin=dict(l=220, r=16, t=20, b=16))
+                st.plotly_chart(fig3, width='stretch', key="chart_007")
+            with tab_all:
+                all_imp = imp.sort_values('Importance %', ascending=True)
+                fig4 = go.Figure(go.Bar(x=all_imp['Importance %'], y=all_imp['Feature'], orientation='h',
+                                        marker=dict(color=all_imp['Importance %'],
+                                                    colorscale=[[0, '#1e3a4a'], [1, '#34d399']],
+                                                    showscale=False)))
+                fig4 = apply_chart_theme(fig4)
+                fig4.update_layout(xaxis_title='Importance (%)', height=1400, margin=dict(l=250, r=16, t=20, b=16))
+                st.plotly_chart(fig4, width='stretch', key="chart_008")
+
+            c1, c2 = st.columns(2)
+            with c1:
+                st.markdown("**Top signals:**\n- Coaches Votes (raw + relative z-score)\n- Top 3 coaches votes flag\n- Disposals relative to game\n- Impact Score relative to game\n- Is_Loss / Is_Win / Margin")
+            with c2:
+                st.markdown("**v4.0 improvements:**\n- Late-season form: rolling EWMA (span=5) of prior 5 rounds\n- Season momentum: last-6 vs first-6 avg\n- Late-season game weighting: last 5 rounds = 2× sample weight")
 
 # ════════════════════════════════════════════════════════════
 # PLAYER COMPARISON
