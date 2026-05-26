@@ -1679,7 +1679,7 @@ _PAGE_ICONS = {
     "Player Profile":   "ti-user",
     "Player Comparison":"ti-users",
     "Stat Filter":      "ti-adjustments-horizontal",
-    "Coaches Votes":    "ti-trophy",
+    "Coaches Votes":    "ti-user-star",
     "Game Analysis":    "ti-chart-dots",
     "Model Insights":   "ti-brain",
     "Model Comparison": "ti-chart-bar",
@@ -1827,6 +1827,7 @@ st.markdown("""
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-adjustments-horizontal) button::before { content: "\ec38"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-award) button::before                  { content: "\ea2c"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-trophy) button::before              { content: "\edd9"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-user-star) button::before           { content: "\\f8c9"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-chart-bar) button::before               { content: "\ea59"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-chart-dots) button::before              { content: "\ee2f"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-brain) button::before                  { content: "\\f59f"; }
