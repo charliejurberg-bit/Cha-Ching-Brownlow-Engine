@@ -400,7 +400,9 @@ def apply_chart_theme(fig):
         ),
         margin=dict(l=16, r=16, t=40, b=16),
     )
-    fig.update_traces(marker_line_width=0)
+    for trace in fig.data:
+        if trace.type not in ('heatmap', 'contour', 'choropleth'):
+            trace.update(marker_line_width=0)
     return fig
 
 def render_banner():
