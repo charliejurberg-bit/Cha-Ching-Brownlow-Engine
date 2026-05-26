@@ -1674,10 +1674,10 @@ _page = st.session_state.page
 
 # ── Page list + icons for current hub ─────────────────────────
 _PAGE_ICONS = {
-    "Home":             "ti-layout-dashboard",
-    "Leaderboard":      "ti-podium",
-    "Player Profile":   "ti-shirt",
-    "Player Comparison":"ti-arrows-diff",
+    "Home":             "ti-home",
+    "Leaderboard":      "ti-list-numbers",
+    "Player Profile":   "ti-user",
+    "Player Comparison":"ti-users",
     "Stat Filter":      "ti-filter",
     "Coaches Votes":    "ti-award",
     "Game Analysis":    "ti-chart-bar",
@@ -1820,10 +1820,10 @@ st.markdown("""
     font-family: tabler-icons, sans-serif !important;
     margin-right: 4px; display: inline-block !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-layout-dashboard) button::before { content: "\f02c"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-podium) button::before        { content: "\f1d8"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-shirt) button::before         { content: "\ec0a"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-arrows-diff) button::before   { content: "\f296"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-home) button::before         { content: "\ea6c"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-list-numbers) button::before  { content: "\ebb4"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-user) button::before          { content: "\ea8f"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-users) button::before         { content: "\eb64"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-filter) button::before        { content: "\eaa5"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-award) button::before         { content: "\ea2c"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-chart-bar) button::before     { content: "\ea59"; }
