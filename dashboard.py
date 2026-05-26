@@ -1703,7 +1703,7 @@ else:
 # ── Nav CSS (injected once before containers) ─────────────────
 st.markdown("""
 <style>
-@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.44.0/tabler-icons.min.css');
+@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
 /* ── Collapse flex gaps above/between nav rows ───────────────── */
 [data-testid="stLayoutWrapper"]:has(.nav-hub-anchor) {
     margin-top: -32px !important;
@@ -1745,7 +1745,7 @@ st.markdown("""
     width: 100% !important; flex: 1 !important;
 }
 /* Hide icon marker divs (used for ::before icon injection) */
-.ni { display: none !important; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"] div.ti { display: none !important; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button {
     background: transparent !important; border: none !important;
     color: rgba(255,255,255,0.45) !important; font-size: 13px !important;
@@ -1815,8 +1815,8 @@ st.markdown("""
     justify-content: center !important; display: flex !important;
     align-items: center !important;
 }
-/* Page strip icons via ::before — keyed by hidden .ni marker class */
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ni) button::before {
+/* Page strip icons via ::before — keyed by hidden .ti marker div */
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti) button::before {
     font-family: tabler-icons, sans-serif !important;
     margin-right: 4px; display: inline-block !important;
 }
@@ -1879,7 +1879,7 @@ with st.container():
         with _pc:
             _icon_cls = _PAGE_ICONS.get(_sp, '')
             if _icon_cls:
-                st.markdown(f'<div class="ni {_icon_cls}"></div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="ti {_icon_cls}"></div>', unsafe_allow_html=True)
             if st.button(_sp, key=f"nav_{_sp}",
                          type="primary" if _page == _sp else "secondary"):
                 st.session_state.page = _sp
