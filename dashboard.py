@@ -1656,13 +1656,12 @@ _NAV_BROWNLOW = {
     "Overview": ["Home", "Leaderboard", "Live Tracker"],
     "Players":  ["Player Profile", "Player Comparison"],
     "Analysis": ["Stat Filter", "Coaches Votes", "Game Analysis", "Model Insights", "Model Comparison"],
-    "Betting":  ["Betting Edge"],
 }
 _NAV_BETTING = {
-    "BH Overview":  ["BH Dashboard", "Bet Tracker"],
+    "BH Overview":  ["BH Dashboard", "Brownlow Betting", "Bet Tracker"],
     "BH Strategy":  ["Cha Ching Tips", "Trends & Analysis", "Polls a Vote"],
 }
-_BH_PAGES = {'BH Dashboard', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis', 'Polls a Vote'}
+_BH_PAGES = {'BH Dashboard', 'Brownlow Betting', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis', 'Polls a Vote'}
 
 def _nav_select(cat_key):
     val = st.session_state.get(cat_key)
@@ -1684,7 +1683,7 @@ _PAGE_ICONS = {
     "Model Insights":   "ti-brain",
     "Model Comparison": "ti-chart-bar",
     "Live Tracker":     "ti-live-photo",
-    "Betting Edge":     "ti-currency-dollar",
+    "Brownlow Betting": "ti-currency-dollar",
     "BH Dashboard":     "ti-layout-dashboard",
     "Bet Tracker":      "ti-list-check",
     "Cha Ching Tips":   "ti-bulb",
@@ -1696,10 +1695,10 @@ if _hub == "brownlow":
     _snav_pages = [
         "Home", "Leaderboard", "Player Profile", "Player Comparison",
         "Stat Filter", "Coaches Votes", "Game Analysis",
-        "Model Insights", "Model Comparison", "Live Tracker", "Betting Edge",
+        "Model Insights", "Model Comparison", "Live Tracker",
     ]
 else:
-    _snav_pages = ["BH Dashboard", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis", "Polls a Vote"]
+    _snav_pages = ["BH Dashboard", "Brownlow Betting", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis", "Polls a Vote"]
 
 # ── Nav CSS (injected once before containers) ─────────────────
 st.markdown("""
@@ -1896,7 +1895,7 @@ def _season_changed():
     st.session_state.selected_season = st.session_state._ctrl_season
 
 _SEASON_PAGES = {
-    'Leaderboard', 'Player Profile', 'Game Analysis', 'Model Insights', 'Betting Edge',
+    'Leaderboard', 'Player Profile', 'Game Analysis', 'Model Insights',
 }
 
 if _show_controls:
@@ -2029,7 +2028,7 @@ if _page == 'Landing':
 # ════════════════════════════════════════════════════════════
 # BETTING HUB pages
 # ════════════════════════════════════════════════════════════
-elif _page in _BH_PAGES:
+elif _page in _BH_PAGES and _page != 'Brownlow Betting':
     betting_hub.render_page(_page)
 
 # ════════════════════════════════════════════════════════════
@@ -2992,9 +2991,9 @@ if _page == 'Game Analysis':
 # ════════════════════════════════════════════════════════════
 # BETTING EDGE
 # ════════════════════════════════════════════════════════════
-if _page == 'Betting Edge':
+if _page == 'Brownlow Betting':
     st.markdown(
-        f'<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Betting Edge — {selected_season}</h2>'
+        f'<div class="title-bar"><h2 style="color:#2c2c2c;margin:0">Brownlow Betting — {selected_season}</h2>'
         f'<p style="color:#94a3b8;margin:4px 0 0 0">Season projection with floor/ceiling · EV analysis against bookmaker odds</p></div>',
         unsafe_allow_html=True,
     )
