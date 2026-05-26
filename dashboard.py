@@ -1675,7 +1675,7 @@ _page = st.session_state.page
 # ── Page list + icons for current hub ─────────────────────────
 _PAGE_ICONS = {
     "Home":             "ti-home",
-    "Leaderboard":      "ti-medal",
+    "Leaderboard":      "ti-award",
     "Player Profile":   "ti-user",
     "Player Comparison":"ti-users",
     "Stat Filter":      "ti-adjustments-horizontal",
