@@ -1764,6 +1764,7 @@ st.markdown("""
     content: "\eb82"; font-family: tabler-icons, sans-serif !important;
     margin-right: 6px;
 }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stBaseButton-primary"],
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-primary"] {
     background: rgba(62,207,160,0.07) !important; color: #3ecfa0 !important;
     font-weight: 600 !important; border: 0.5px solid rgba(62,207,160,0.25) !important;
@@ -1771,6 +1772,7 @@ st.markdown("""
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button:hover {
     background: rgba(255,255,255,0.07) !important; border: none !important;
 }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stBaseButton-primary"]:hover,
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-primary"]:hover {
     background: rgba(62,207,160,0.14) !important;
 }
@@ -1831,6 +1833,7 @@ st.markdown("""
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-currency-dollar) button::before { content: "\eb84"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-trophy) button::before        { content: "\edd9"; }
 
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stBaseButton-primary"],
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-primary"] {
     color: #3ecfa0 !important; border-color: rgba(62,207,160,0.25) !important;
     background: rgba(62,207,160,0.07) !important; font-weight: 600 !important;
@@ -1839,6 +1842,7 @@ st.markdown("""
     background: rgba(255,255,255,0.06) !important; border-color: rgba(255,255,255,0.1) !important;
     color: rgba(255,255,255,0.7) !important;
 }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stBaseButton-primary"]:hover,
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-primary"]:hover {
     background: rgba(62,207,160,0.14) !important;
 }
