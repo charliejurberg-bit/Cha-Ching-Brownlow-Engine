@@ -4736,8 +4736,11 @@ if _page == 'Model Comparison':
                     _err = _MC_ERRS.get(_mlabel, '')
                     _top1 = f"Unavail. — {_err[:40]}" if _err else "Data unavailable"
                     _color, _chg, _ts = "#6c6c6c", '', _file_ts(_mcsv) if _mcsv else ''
-                _ts_html = (f'<div style="font-size:10px;color:#aaaaaa;margin-top:4px">'
-                            f'Updated {_ts}</div>') if _ts else ''
+                _ts_html = (
+                    f'<div style="font-size:10px;color:#aaaaaa;margin-top:4px">Updated {_ts}</div>'
+                    if _ts else
+                    '<div style="font-size:10px;margin-top:4px">&nbsp;</div>'
+                )
                 st.markdown(
                     f'<div class="{_mcls}">'
                     f'<div class="metric-label">{_mlabel}</div>'
