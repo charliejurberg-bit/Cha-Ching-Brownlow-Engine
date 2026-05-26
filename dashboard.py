@@ -1703,7 +1703,7 @@ else:
 # ── Nav CSS (injected once before containers) ─────────────────
 st.markdown("""
 <style>
-@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
+@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.44.0/tabler-icons.min.css');
 /* ── Collapse flex gaps above/between nav rows ───────────────── */
 [data-testid="stLayoutWrapper"]:has(.nav-hub-anchor) {
     margin-top: -32px !important;
@@ -1820,21 +1820,21 @@ st.markdown("""
     font-family: tabler-icons, sans-serif !important;
     margin-right: 4px; display: inline-block !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-home) button::before                   { content: "\ea6c"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-laurel-wreath) button::before          { content: "\\f1eb"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-user) button::before                   { content: "\ea8f"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-users) button::before                  { content: "\eb64"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-home) button::before                   { content: "\eac1"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-laurel-wreath) button::before          { content: "\\ff45"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-user) button::before                   { content: "\eb4d"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-users) button::before                  { content: "\ebf2"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-adjustments-horizontal) button::before { content: "\ec38"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-award) button::before                  { content: "\ea2c"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-chart-bar) button::before               { content: "\ea59"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-chart-dots) button::before              { content: "\ee2f"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-brain) button::before                  { content: "\\f59f"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-live-photo) button::before              { content: "\\f54d"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-live-photo) button::before              { content: "\eadf"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-currency-dollar) button::before        { content: "\eb84"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-layout-dashboard) button::before       { content: "\ea92"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-list-check) button::before             { content: "\eaa5"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-layout-dashboard) button::before       { content: "\\f02c"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-list-check) button::before             { content: "\eb6a"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-bulb) button::before                   { content: "\ea51"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-trending-up) button::before            { content: "\ea9f"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-trending-up) button::before            { content: "\eb43"; }
 
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stBaseButton-primary"],
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-primary"] {
