@@ -3054,22 +3054,22 @@ if _page == 'Betting Edge':
             fig_proj = go.Figure()
             fig_proj.add_trace(go.Bar(
                 name='Expected (played rounds)', x=top30_sp['Player'], y=top30_sp['Exp_Total_Votes'],
-                marker_color='#34d399', opacity=0.9,
+                marker_color='#4a7a28', opacity=0.9,
                 error_y=dict(type='data', array=err_upper.tolist(), arrayminus=err_lower.tolist(),
-                             visible=True, color='rgba(45,80,22,0.55)', thickness=1.5, width=4),
+                             visible=True, color='rgba(139,111,71,0.7)', thickness=1.5, width=4),
                 hovertemplate='<b>%{x}</b><br>Expected so far: %{y:.1f}<br>'
                               'Floor: ' + top30_sp['Floor_Projection'].round(1).astype(str) + '<br>'
                               'Ceiling: ' + top30_sp['Ceiling_Projection'].round(1).astype(str) + '<extra></extra>',
             ))
             fig_proj.add_trace(go.Bar(
                 name='Projected Remaining', x=top30_sp['Player'], y=top30_sp['Projected_Remaining'],
-                marker_color='#94a3b8', opacity=0.9,
+                marker_color='#c9a84c', opacity=0.85,
                 hovertemplate='<b>%{x}</b><br>Projected remaining: %{y:.1f}<extra></extra>',
             ))
             fig_proj.update_layout(
-                barmode='stack', plot_bgcolor='#e8f0f8', paper_bgcolor='#e8f0f8', font_color='#2c2c2c',
-                yaxis=dict(title='Votes', gridcolor='#ede8df'), xaxis=dict(tickangle=-35),
-                legend=dict(orientation='h', y=1.08, bgcolor='rgba(0,0,0,0)'),
+                barmode='stack', plot_bgcolor='#f0ece4', paper_bgcolor='#f0ece4', font_color='#2c2c2c',
+                yaxis=dict(title='Votes', gridcolor='#ddd5c5'), xaxis=dict(tickangle=-35),
+                legend=dict(orientation='h', y=1.08, bgcolor='rgba(0,0,0,0)', font=dict(color='#2c2c2c')),
                 margin=dict(t=20, b=130), height=480,
             )
             fig_proj = apply_chart_theme(fig_proj)
