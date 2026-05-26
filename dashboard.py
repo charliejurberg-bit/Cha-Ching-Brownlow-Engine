@@ -1675,15 +1675,15 @@ _page = st.session_state.page
 # ── Page list + icons for current hub ─────────────────────────
 _PAGE_ICONS = {
     "Home":             "ti-home",
-    "Leaderboard":      "ti-list-numbers",
-    "Player Profile":   "ti-user-circle",
+    "Leaderboard":      "ti-laurel-wreath",
+    "Player Profile":   "ti-user",
     "Player Comparison":"ti-users",
-    "Stat Filter":      "ti-filter",
+    "Stat Filter":      "ti-adjustments-horizontal",
     "Coaches Votes":    "ti-award",
-    "Game Analysis":    "ti-chart-bar",
+    "Game Analysis":    "ti-chart-dots",
     "Model Insights":   "ti-brain",
-    "Model Comparison": "ti-layout-columns",
-    "Live Tracker":     "ti-radio",
+    "Model Comparison": "ti-chart-bar",
+    "Live Tracker":     "ti-live-photo",
     "Betting Edge":     "ti-currency-dollar",
     "BH Dashboard":     "ti-chart-bar",
     "Bet Tracker":      "ti-list-numbers",
@@ -1820,18 +1820,18 @@ st.markdown("""
     font-family: tabler-icons, sans-serif !important;
     margin-right: 4px; display: inline-block !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-home) button::before         { content: "\ea6c"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-list-numbers) button::before  { content: "\ebb4"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-user-circle) button::before    { content: "\ed8c"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-users) button::before         { content: "\eb64"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-filter) button::before        { content: "\eaa5"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-award) button::before         { content: "\ea2c"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-chart-bar) button::before     { content: "\ea59"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-brain) button::before         { content: "\\f59f"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-layout-columns) button::before { content: "\eb83"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-radio) button::before         { content: "\ecc3"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-currency-dollar) button::before { content: "\eb84"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-trophy) button::before        { content: "\edd9"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-home) button::before                   { content: "\ea6c"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-laurel-wreath) button::before          { content: "\\f1eb"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-user) button::before                   { content: "\ea8f"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-users) button::before                  { content: "\eb64"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-adjustments-horizontal) button::before { content: "\ec38"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-award) button::before                  { content: "\ea2c"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-chart-bar) button::before               { content: "\ea59"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-chart-dots) button::before              { content: "\ee2f"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-brain) button::before                  { content: "\\f59f"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-live-photo) button::before              { content: "\\f54d"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-currency-dollar) button::before        { content: "\eb84"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-trophy) button::before                 { content: "\edd9"; }
 
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stBaseButton-primary"],
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-primary"] {
