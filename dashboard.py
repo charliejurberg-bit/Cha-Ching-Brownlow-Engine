@@ -3027,16 +3027,23 @@ if _page == 'Betting Edge':
         if proj is None:
             st.error("No season projection found. Run predict_2026.py first.")
         else:
-            _be_rounds_played = int(proj['Games_Played'].max())
-            _be_remaining = int(proj['Remaining_Rounds'].iloc[0])
-            _be_total_rounds = _be_rounds_played + _be_remaining
-            _be_leader = proj.iloc[0]
+            _be_rounds_played = max_season_rounds
+            _be_total_rounds = 24
+            _be_remaining = _be_total_rounds - _be_rounds_played
+            # Leader from season_2026.csv — matches leaderboard
+            if predictions is not None and not predictions.empty:
+                _be_lead_row = predictions.sort_values('Exp_Total_Votes', ascending=False).iloc[0]
+                _be_leader_name = _be_lead_row['Player_Name']
+                _be_leader_votes = _be_lead_row['Exp_Total_Votes']
+                _be_leader_avg = _be_lead_row['Exp_Total_Votes'] / max(_be_lead_row['Games'], 1)
+            else:
+                _be_leader_name, _be_leader_votes, _be_leader_avg = '—', 0.0, 0.0
 
             c1, c2, c3, c4 = st.columns(4)
             with c1: st.markdown(f'<div class="metric-card"><div class="metric-label">Rounds Played</div><div class="metric-value">{_be_rounds_played}</div><div class="metric-sub">of {_be_total_rounds} H&A rounds</div></div>', unsafe_allow_html=True)
             with c2: st.markdown(f'<div class="metric-card"><div class="metric-label">Remaining Rounds</div><div class="metric-value">{_be_remaining}</div><div class="metric-sub">to be projected</div></div>', unsafe_allow_html=True)
-            with c3: st.markdown(f'<div class="metric-card"><div class="metric-label">Projected Leader</div><div class="metric-value" style="font-size:18px">{_be_leader["Player"]}</div><div class="metric-sub">{_be_leader["Season_Total_Projected"]:.1f} projected votes</div></div>', unsafe_allow_html=True)
-            with c4: st.markdown(f'<div class="metric-card"><div class="metric-label">Avg Per Game (Leader)</div><div class="metric-value">{_be_leader["Avg_Predicted_Per_Game"]:.2f}</div><div class="metric-sub">expected votes per game</div></div>', unsafe_allow_html=True)
+            with c3: st.markdown(f'<div class="metric-card"><div class="metric-label">Projected Leader</div><div class="metric-value">{_be_leader_name}</div><div class="metric-sub">{_be_leader_votes:.1f} projected votes</div></div>', unsafe_allow_html=True)
+            with c4: st.markdown(f'<div class="metric-card"><div class="metric-label">Avg Per Game (Leader)</div><div class="metric-value">{_be_leader_avg:.2f}</div><div class="metric-sub">expected votes per game</div></div>', unsafe_allow_html=True)
 
             st.markdown('<div class="section-header">Top 30 — Projected Season Total</div>', unsafe_allow_html=True)
             top30_sp = proj.head(30).copy()
