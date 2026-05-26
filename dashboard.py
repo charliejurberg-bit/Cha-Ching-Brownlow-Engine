@@ -1660,9 +1660,9 @@ _NAV_BROWNLOW = {
 }
 _NAV_BETTING = {
     "BH Overview":  ["BH Dashboard", "Bet Tracker"],
-    "BH Strategy":  ["Cha Ching Tips", "Trends & Analysis"],
+    "BH Strategy":  ["Cha Ching Tips", "Trends & Analysis", "Polls a Vote"],
 }
-_BH_PAGES = {'BH Dashboard', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis'}
+_BH_PAGES = {'BH Dashboard', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis', 'Polls a Vote'}
 
 def _nav_select(cat_key):
     val = st.session_state.get(cat_key)
@@ -1679,7 +1679,7 @@ _PAGE_ICONS = {
     "Player Profile":   "ti-user",
     "Player Comparison":"ti-users",
     "Stat Filter":      "ti-adjustments-horizontal",
-    "Coaches Votes":    "ti-user-star",
+    "Coaches Votes":    "ti-user-pentagon",
     "Game Analysis":    "ti-chart-dots",
     "Model Insights":   "ti-brain",
     "Model Comparison": "ti-chart-bar",
@@ -1689,6 +1689,7 @@ _PAGE_ICONS = {
     "Bet Tracker":      "ti-list-check",
     "Cha Ching Tips":   "ti-bulb",
     "Trends & Analysis":"ti-trending-up",
+    "Polls a Vote":     "ti-eye-check",
 }
 
 if _hub == "brownlow":
@@ -1698,7 +1699,7 @@ if _hub == "brownlow":
         "Model Insights", "Model Comparison", "Live Tracker", "Betting Edge",
     ]
 else:
-    _snav_pages = ["BH Dashboard", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis"]
+    _snav_pages = ["BH Dashboard", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis", "Polls a Vote"]
 
 # ── Nav CSS (injected once before containers) ─────────────────
 st.markdown("""
@@ -1827,7 +1828,7 @@ st.markdown("""
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-adjustments-horizontal) button::before { content: "\ec38"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-award) button::before                  { content: "\ea2c"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-trophy) button::before              { content: "\edd9"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-user-star) button::before           { content: "\\f8c9"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-user-pentagon) button::before       { content: "\\fc4f"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-chart-bar) button::before               { content: "\ea59"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-chart-dots) button::before              { content: "\ee2f"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-brain) button::before                  { content: "\\f59f"; }
@@ -4527,6 +4528,119 @@ if _page == 'Live Tracker':
             )
         else:
             st.info("Run predict_2026.py to enable model comparison.")
+
+        # ── polls-a-vote watchlist alerts ────────────────────
+        _pav_path = "data_betting/polls_a_vote.csv"
+        if os.path.exists(_pav_path):
+            try:
+                _pav_wl = pd.read_csv(_pav_path)
+            except Exception:
+                _pav_wl = pd.DataFrame()
+            _pav_gdf = load_game(2026)
+            if not _pav_wl.empty and _pav_gdf is not None:
+                _pav_round = _lt_last + 1
+
+                def _pav_parse_rounds(raw):
+                    rds = set()
+                    for _t in str(raw).split(','):
+                        _t = _t.strip()
+                        if _t.lstrip('-').isdigit():
+                            rds.add(int(_t))
+                    return rds
+
+                _pav_cards = []
+                for _, _pav_row in _pav_wl.iterrows():
+                    if bool(_pav_row.get('Settled', False)):
+                        continue
+                    _pav_player = str(_pav_row.get('Player', ''))
+                    _pav_team   = str(_pav_row.get('Team', ''))
+                    _pav_my_rds = _pav_parse_rounds(_pav_row.get('My_Rounds', ''))
+
+                    _pav_pg = _pav_gdf[_pav_gdf['Player'].str.lower() == _pav_player.lower()]
+                    if not _pav_pg.empty:
+                        _pav_prev = _pav_pg[_pav_pg['Round_num'] < _pav_round]
+                        if not _pav_prev.empty and (_pav_prev['Brownlow.Votes'] > 0).any():
+                            continue  # already polled a vote in a prior round
+
+                    _pav_model_rds = set()
+                    if not _pav_pg.empty:
+                        _pav_model_rds = set(
+                            _pav_pg.nlargest(3, 'Poll_Prob')['Round_num'].astype(int).tolist()
+                        )
+
+                    _in_mine  = _pav_round in _pav_my_rds
+                    _in_model = _pav_round in _pav_model_rds
+                    if not _in_mine and not _in_model:
+                        continue
+
+                    # get game-level data for this round
+                    _pav_this = _pav_pg[_pav_pg['Round_num'] == _pav_round]
+                    _pav_exp_votes = '—'
+                    _pav_poll_pct  = '—'
+                    _pav_opponent  = '—'
+                    if not _pav_this.empty:
+                        _pg_r = _pav_this.iloc[0]
+                        _ev = _pg_r.get('Exp_Votes')
+                        _pp = _pg_r.get('Poll_Prob')
+                        _pav_exp_votes = f"{float(_ev):.2f}" if pd.notna(_ev) else '—'
+                        _pav_poll_pct  = f"{float(_pp)*100:.1f}%" if pd.notna(_pp) else '—'
+                        _ha = str(_pg_r.get('Home.Away', ''))
+                        if _ha == 'Home':
+                            _pav_opponent = str(_pg_r.get('Away.team', '—'))
+                        elif _ha == 'Away':
+                            _pav_opponent = str(_pg_r.get('Home.team', '—'))
+
+                    _pav_cards.append({
+                        'player':    _pav_player,
+                        'team':      _pav_team,
+                        'in_mine':   _in_mine,
+                        'in_model':  _in_model,
+                        'exp_votes': _pav_exp_votes,
+                        'poll_pct':  _pav_poll_pct,
+                        'opponent':  _pav_opponent,
+                        'odds':      _pav_row.get('Odds'),
+                        'stake':     _pav_row.get('Stake'),
+                    })
+
+                st.markdown('<div class="section-header">Players to Watch</div>', unsafe_allow_html=True)
+                if not _pav_cards:
+                    st.markdown(
+                        f'<div style="color:#94a3b8;font-size:13px;padding:8px 0">'
+                        f'No watchlist players flagged for Round {_pav_round}.</div>',
+                        unsafe_allow_html=True,
+                    )
+                else:
+                    _pav_cols = st.columns(min(len(_pav_cards), 3))
+                    for _ci, _card in enumerate(_pav_cards):
+                        _agree = _card['in_mine'] and _card['in_model']
+                        _border = '#34d399' if _agree else ('#4a90d9' if _card['in_mine'] else '#94a3b8')
+                        _agree_lbl = '★ Both agree' if _agree else ('Your pick' if _card['in_mine'] else 'Model pick')
+                        _agree_col = '#34d399' if _agree else ('#4a90d9' if _card['in_mine'] else '#94a3b8')
+                        _odds_str  = f"{float(_card['odds']):.2f}"  if pd.notna(_card['odds'])  else '—'
+                        _stake_str = f"{float(_card['stake']):.2f}u" if pd.notna(_card['stake']) else '—'
+                        with _pav_cols[_ci % 3]:
+                            st.markdown(
+                                f'<div style="background:#1e3a4a;border:2px solid {_border};border-radius:10px;'
+                                f'padding:14px 16px;margin-bottom:8px">'
+                                f'<div style="font-size:15px;font-weight:700;color:#e8f0f8;margin-bottom:1px">'
+                                f'{_card["player"]}</div>'
+                                f'<div style="font-size:12px;color:#94a3b8;margin-bottom:8px">'
+                                f'{_card["team"]}</div>'
+                                f'<div style="font-size:11px;font-weight:800;letter-spacing:1px;'
+                                f'text-transform:uppercase;color:{_agree_col};margin-bottom:10px">'
+                                f'{_agree_lbl}</div>'
+                                f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
+                                f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px">Exp Votes</div>'
+                                f'<div style="font-size:18px;font-weight:700;color:#e8f0f8">{_card["exp_votes"]}</div></div>'
+                                f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px">Poll Prob</div>'
+                                f'<div style="font-size:18px;font-weight:700;color:#e8f0f8">{_card["poll_pct"]}</div></div>'
+                                f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px">Opponent</div>'
+                                f'<div style="font-size:13px;font-weight:600;color:#94a3b8">{_card["opponent"]}</div></div>'
+                                f'<div><div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:0.8px">Odds / Stake</div>'
+                                f'<div style="font-size:13px;font-weight:600;color:#f0b429">{_odds_str} · {_stake_str}</div></div>'
+                                f'</div></div>',
+                                unsafe_allow_html=True,
+                            )
 
     # ── auto-refresh ─────────────────────────────────────────
     if _lt_auto:
