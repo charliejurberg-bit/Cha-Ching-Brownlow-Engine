@@ -2064,7 +2064,7 @@ if _page == 'Home':
             if num_cols:
                 leader_odds = f"${float(match.iloc[0][num_cols[0]]):.2f}"
 
-    rounds_remaining = 24 - CURRENT_ROUND
+    rounds_remaining = 24 - (CURRENT_ROUND - 1)
     season_pct = int((CURRENT_ROUND / 24) * 100)
 
     st.markdown(f"""
