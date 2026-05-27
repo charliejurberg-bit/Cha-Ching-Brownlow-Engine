@@ -2281,8 +2281,8 @@ def render_polls_a_vote():
                     if ev is not None:
                         ev_color = '#f0b429' if ev > 0.35 else '#94a3b8'
                         st.markdown(
-                            f'<div style="font-size:12px;color:{ev_color};margin-top:-10px;'
-                            f'padding-left:26px;line-height:1">{ev:.2f}</div>',
+                            f'<div style="font-size:12px;color:{ev_color} !important;margin-top:-10px;'
+                            f'padding-left:26px;line-height:1 !important">{ev:.2f}</div>',
                             unsafe_allow_html=True,
                         )
 
