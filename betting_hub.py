@@ -2585,7 +2585,11 @@ def render_polls_a_vote():
         f'<tbody>{_rows_html}</tbody>'
         f'</table>'
         f'<div style="font-size:11px;color:#4a5a6a;margin-top:8px">'
-        f'★ both agree &nbsp;·&nbsp; ● my pick only &nbsp;·&nbsp; · model only</div>'
+        f'<span style="color:#f0b429">★</span> 5/5 models agree &nbsp;·&nbsp;'
+        f'<span style="color:#34d399">★</span> 3–4/5 agree &nbsp;·&nbsp;'
+        f'<span style="color:#e06060">★</span> 0–2/5 agree &nbsp;·&nbsp;'
+        f'<span style="color:#4a90d9">●</span> my pick only &nbsp;·&nbsp;'
+        f'<span style="color:#94a3b8">·</span> model only</div>'
         f'</div>',
         unsafe_allow_html=True,
     )
