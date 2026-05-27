@@ -2064,8 +2064,8 @@ if _page == 'Home':
             if num_cols:
                 leader_odds = f"${float(match.iloc[0][num_cols[0]]):.2f}"
 
-    rounds_remaining = 23 - CURRENT_ROUND
-    season_pct = int((CURRENT_ROUND / 23) * 100)
+    rounds_remaining = 24 - CURRENT_ROUND
+    season_pct = int((CURRENT_ROUND / 24) * 100)
 
     st.markdown(f"""
 <div style="padding:20px 0 12px;animation:fadeSlideUp 500ms cubic-bezier(0.23,1,0.32,1) both;">
@@ -2095,7 +2095,7 @@ if _page == 'Home':
     <span style="font-size:11px;font-weight:500;letter-spacing:0.08em;
                  text-transform:uppercase;color:#4a5a6a;">Season progress</span>
     <span style="font-size:12px;color:#94a3b8;font-family:'DM Mono',monospace;">
-      R{CURRENT_ROUND - 1} of 23 &nbsp;·&nbsp; {rounds_remaining} rounds to go
+      R{CURRENT_ROUND - 1} of 24 &nbsp;·&nbsp; {rounds_remaining} rounds to go
     </span>
   </div>
   <div style="height:6px;background:#1e3a4a;border-radius:3px;overflow:hidden;">
