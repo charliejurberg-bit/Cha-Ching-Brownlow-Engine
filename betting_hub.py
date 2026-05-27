@@ -2230,13 +2230,31 @@ def render_polls_a_vote():
     # ── Entry form ────────────────────────────────────────────────────────────
     st.markdown('<div class="section-header">Add Player</div>', unsafe_allow_html=True)
 
-    with st.form("pav_add_form", clear_on_submit=True):
-        fc1, fc2 = st.columns(2)
-        with fc1:
-            pav_player = st.text_input("Player name")
-        with fc2:
-            pav_team = st.text_input("Team")
+    # Player inputs outside form so each keystroke reruns and refreshes the round lookup
+    fc1, fc2 = st.columns(2)
+    with fc1:
+        pav_player = st.text_input("Player name")
+    with fc2:
+        pav_team = st.text_input("Team")
 
+    # ── Per-round Exp_Votes lookup ─────────────────────────────────────────────
+    _pav_round_votes: dict[int, float] = {}
+    if pav_player.strip():
+        try:
+            if os.path.exists("predictions/game_level_2026.csv"):
+                _gdf_lookup = pd.read_csv(
+                    "predictions/game_level_2026.csv",
+                    usecols=['Player', 'Round_num', 'Exp_Votes'],
+                )
+                _lk_match = _gdf_lookup[
+                    _gdf_lookup['Player'].str.lower() == pav_player.strip().lower()
+                ]
+                for _, _lk_r in _lk_match.iterrows():
+                    _pav_round_votes[int(_lk_r['Round_num'])] = float(_lk_r['Exp_Votes'])
+        except Exception:
+            pass
+
+    with st.form("pav_add_form", clear_on_submit=True):
         st.markdown(
             '<div style="font-size:11px;color:#94a3b8;font-weight:700;text-transform:uppercase;'
             'letter-spacing:1px;margin:12px 0 6px 0">Rounds to watch (select all that apply)</div>',
@@ -2249,7 +2267,17 @@ def render_polls_a_vote():
             for _ci in range(5):
                 _rn = _ri + _ci
                 with _rcols[_ci]:
-                    _rnd_checks[_rn] = st.checkbox(_rnd_labels[_rn], key=f"pav_rnd_{_rn}")
+                    ev = _pav_round_votes.get(_rn)
+                    base_lbl = _rnd_labels[_rn]
+                    lbl = f"**{base_lbl}**" if (ev is not None and ev > 0.35) else base_lbl
+                    _rnd_checks[_rn] = st.checkbox(lbl, key=f"pav_rnd_{_rn}")
+                    if ev is not None:
+                        ev_color = '#94a3b8' if ev > 0.35 else '#4a5a6a'
+                        st.markdown(
+                            f'<div style="font-size:10px;color:{ev_color};margin-top:-10px;'
+                            f'padding-left:26px;line-height:1">{ev:.2f}</div>',
+                            unsafe_allow_html=True,
+                        )
 
         fo1, fo2 = st.columns(2)
         with fo1:
