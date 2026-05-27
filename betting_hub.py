@@ -2257,7 +2257,7 @@ def render_polls_a_vote():
                     _gdf_lookup['Player'].str.lower() == pav_player.strip().lower()
                 ]
                 for _, _lk_r in _lk_match.iterrows():
-                    _pav_round_votes[int(_lk_r['Round_num'])] = float(_lk_r['Exp_Votes'])
+                    _pav_round_votes[int(_lk_r['Round_num']) - 1] = float(_lk_r['Exp_Votes'])
         except Exception:
             pass
 
@@ -2281,7 +2281,7 @@ def render_polls_a_vote():
                     if ev is not None:
                         ev_color = '#94a3b8' if ev > 0.35 else '#4a5a6a'
                         st.markdown(
-                            f'<div style="font-size:10px;color:{ev_color};margin-top:-10px;'
+                            f'<div style="font-size:12px;color:{ev_color};margin-top:-10px;'
                             f'padding-left:26px;line-height:1">{ev:.2f}</div>',
                             unsafe_allow_html=True,
                         )
