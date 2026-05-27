@@ -2347,7 +2347,7 @@ def render_polls_a_vote():
         sub = _gdf[_gdf['Player'].str.lower() == player.lower()]
         if sub.empty:
             return []
-        return sub.nlargest(3, 'Poll_Prob')['Round_num'].astype(int).tolist()
+        return (sub.nlargest(3, 'Poll_Prob')['Round_num'].astype(int) - 1).tolist()
 
     def _pill(text: str, style: str) -> str:
         cls = {'green': 'pav-pill-green', 'blue': 'pav-pill-blue', 'grey': 'pav-pill-grey'}.get(style, 'pav-pill-grey')
