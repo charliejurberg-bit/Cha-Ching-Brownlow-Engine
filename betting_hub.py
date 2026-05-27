@@ -2341,6 +2341,81 @@ def render_polls_a_vote():
         except Exception:
             pass
 
+    # ── Consensus data — loaded once, used per card ────────────────────────────
+    _con_max_prob:  dict[str, float] = {}
+    _con_exp_total: dict[str, float] = {}
+    _con_wheelo:    dict[str, float] = {}
+    _con_bf:   dict[str, float] | None = None
+    _con_espn: dict[str, float] | None = None
+    _norm_name = None
+    try:
+        from dashboard import (  # lazy — both modules fully loaded by call time
+            normalise_name as _norm_name,
+            fetch_betfair_brownlow as _fbf,
+            fetch_espn_brownlow as _fespn,
+        )
+        # 1. Cha Ching: max Poll_Prob per player from game_level
+        if _gdf is not None:
+            for _cp, _cg in _gdf.groupby('Player'):
+                _con_max_prob[_norm_name(_cp)] = float(_cg['Poll_Prob'].max())
+        # 2. AFL Predictor: Exp_Total_Votes from season_2026.csv
+        _s26 = "predictions/season_2026.csv"
+        if os.path.exists(_s26):
+            _sdf = pd.read_csv(_s26, usecols=['Player_Name', 'Exp_Total_Votes'])
+            for _, _sr in _sdf.iterrows():
+                _con_exp_total[_norm_name(_sr['Player_Name'])] = float(_sr['Exp_Total_Votes'] or 0)
+        # 3. Wheelo
+        _wh26 = "data_wheelo/wheelo_2026.csv"
+        if os.path.exists(_wh26):
+            _whdf = pd.read_csv(_wh26)
+            _wh_col = next((c for c in ['ExpVotes', 'RatingPoints'] if c in _whdf.columns), None)
+            if _wh_col:
+                for _wp, _wg in _whdf.groupby('Player'):
+                    _con_wheelo[_norm_name(_wp)] = float(_wg[_wh_col].sum())
+        # 4. Betfair
+        _bf_df, _ = _fbf()
+        if not _bf_df.empty and 'BF_Votes' in _bf_df.columns:
+            _con_bf = {
+                _norm_name(r['Player']): float(r.get('BF_Votes', 0) or 0)
+                for _, r in _bf_df.iterrows()
+            }
+        # 5. ESPN
+        _espn_df, _ = _fespn()
+        if not _espn_df.empty and 'ESPN_Votes' in _espn_df.columns:
+            _con_espn = {
+                _norm_name(r['Player']): float(r.get('ESPN_Votes', 0) or 0)
+                for _, r in _espn_df.iterrows()
+            }
+    except Exception:
+        pass
+
+    def _consensus(player: str) -> str:
+        if _norm_name is None:
+            return ''
+        key = _norm_name(player)
+        agree, total = 0, 0
+        if _con_max_prob:
+            total += 1
+            if _con_max_prob.get(key, 0) >= 0.35:
+                agree += 1
+        if _con_exp_total:
+            total += 1
+            if _con_exp_total.get(key, 0) > 0:
+                agree += 1
+        if _con_wheelo:
+            total += 1
+            if _con_wheelo.get(key, 0) >= 0.65:
+                agree += 1
+        if _con_bf is not None:
+            total += 1
+            if _con_bf.get(key, 0) > 0:
+                agree += 1
+        if _con_espn is not None:
+            total += 1
+            if _con_espn.get(key, 0) > 0:
+                agree += 1
+        return f'{agree}/{total} models agree' if total else ''
+
     def _model_top3(player: str) -> list[int]:
         if _gdf is None:
             return []
@@ -2397,6 +2472,11 @@ def render_polls_a_vote():
             'padding:2px 8px;border-radius:12px;font-size:10px;font-weight:800;margin-left:8px">SETTLED</span>'
             if settled else ''
         )
+        _con_txt = _consensus(player)
+        consensus_badge = (
+            f'<div style="font-size:11px;font-weight:600;color:#94a3b8;margin-top:4px">{_con_txt}</div>'
+            if _con_txt else ''
+        )
 
         st.markdown(
             f'<div style="background:#152533;border:1px solid #2a4a5a;border-radius:8px;'
@@ -2406,6 +2486,7 @@ def render_polls_a_vote():
             f'<div style="min-width:150px">'
             f'<div style="font-size:14px;font-weight:700;color:#e8f0f8">{player}{settled_badge}</div>'
             f'<div style="font-size:12px;color:#94a3b8;margin-top:2px">{team}</div>'
+            f'{consensus_badge}'
             f'</div>'
 
             f'<div style="flex:1;min-width:200px">'
