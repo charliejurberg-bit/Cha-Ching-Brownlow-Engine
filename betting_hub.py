@@ -2393,7 +2393,7 @@ def render_polls_a_vote():
     except Exception:
         pass
 
-    def _consensus(player: str) -> str:
+    def _consensus_score(player: str) -> tuple[int, int]:
         key = _norm(player)
         agree, total = 0, 0
         if _con_max_prob:
@@ -2416,6 +2416,10 @@ def render_polls_a_vote():
             total += 1
             if _con_espn.get(key, 0) > 0:
                 agree += 1
+        return agree, total
+
+    def _consensus(player: str) -> str:
+        agree, total = _consensus_score(player)
         return f'{agree}/{total} models agree' if total else ''
 
     def _model_top3(player: str) -> list[int]:
@@ -2554,11 +2558,18 @@ def render_polls_a_vote():
         player    = str(row['Player'])
         my_rounds = _parse_rounds(row['My_Rounds'])
         model_set = set(_model_top3(player))
+        _cs_agree, _cs_total = _consensus_score(player)
+        if _cs_total > 0 and _cs_agree == _cs_total:
+            _star_style = f'background:#3d2b00;color:#f0b429;{_cell_css}'   # gold  — 5/5
+        elif _cs_agree >= 3:
+            _star_style = f'background:#1a5c40;color:#34d399;{_cell_css}'   # green — 3-4/5
+        else:
+            _star_style = f'background:#3d1010;color:#e06060;{_cell_css}'   # red   — 0-2/5
         cells = f'<td style="{_player_css}">{player}</td>'
         for rn in range(25):
             in_m, in_mod = rn in my_rounds, rn in model_set
             if in_m and in_mod:
-                cells += f'<td class="pav-matrix-both" style="{_cell_css}">★</td>'
+                cells += f'<td style="{_star_style}">★</td>'
             elif in_m:
                 cells += f'<td class="pav-matrix-mine" style="{_cell_css}">●</td>'
             elif in_mod:
