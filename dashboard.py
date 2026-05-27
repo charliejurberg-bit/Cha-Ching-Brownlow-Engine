@@ -2123,7 +2123,7 @@ if _page == 'Home':
   </div>
   <div style="background:#0f2035; border:0.5px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px;">
     <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:8px;">Round</div>
-    <div style="font-size:20px; font-weight:600; color:#ffffff;">{CURRENT_ROUND}<span style="font-size:13px; color:rgba(255,255,255,0.3); font-weight:400"> /23</span></div>
+    <div style="font-size:20px; font-weight:600; color:#ffffff;">{CURRENT_ROUND - 1}<span style="font-size:13px; color:rgba(255,255,255,0.3); font-weight:400"> /24</span></div>
     <div style="font-size:11px; color:rgba(255,255,255,0.3);">{rounds_remaining} rounds remaining</div>
   </div>
 </div>
