@@ -1976,7 +1976,7 @@ if _page == 'Landing':
 <div class="land-ribbon">
   <div class="land-stat">
     <div class="land-stat-label">Round</div>
-    <div class="land-stat-value">{max_season_rounds}</div>
+    <div class="land-stat-value">{max_season_rounds - 1}</div>
   </div>
   <div class="land-stat">
     <div class="land-stat-label">Current Leader</div>
@@ -2074,7 +2074,7 @@ if _page == 'Home':
                 animation:pulse 2s ease-in-out infinite;"></div>
     <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:500;
                  letter-spacing:0.1em;text-transform:uppercase;color:#34d399;">
-      Live · Round {CURRENT_ROUND}
+      Live · Round {CURRENT_ROUND - 1}
     </span>
   </div>
   <h1 style="font-family:'Sora',sans-serif;font-size:2.6rem;font-weight:700;
@@ -2095,7 +2095,7 @@ if _page == 'Home':
     <span style="font-size:11px;font-weight:500;letter-spacing:0.08em;
                  text-transform:uppercase;color:#4a5a6a;">Season progress</span>
     <span style="font-size:12px;color:#94a3b8;font-family:'DM Mono',monospace;">
-      R{CURRENT_ROUND} of 23 &nbsp;·&nbsp; {rounds_remaining} rounds to go
+      R{CURRENT_ROUND - 1} of 23 &nbsp;·&nbsp; {rounds_remaining} rounds to go
     </span>
   </div>
   <div style="height:6px;background:#1e3a4a;border-radius:3px;overflow:hidden;">
@@ -3203,7 +3203,7 @@ if _page == 'Stat Filter':
             if has_2026:
                 n_2026_games = int((filtered_sf['Season'] == 2026).sum())
                 max_rnd_2026 = int(filtered_sf[filtered_sf['Season'] == 2026]['Round_num'].max())
-                st.info(f"2026 data included — {n_2026_games:,} games through Round {max_rnd_2026} (Brownlow votes not yet assigned). Poll rates from {season_range[0]}–2025 only.")
+                st.info(f"2026 data included — {n_2026_games:,} games through Round {max_rnd_2026 - 1} (Brownlow votes not yet assigned). Poll rates from {season_range[0]}–2025 only.")
                 vote_data = filtered_sf[filtered_sf['Season'] < 2026]
             else:
                 vote_data = filtered_sf
@@ -4347,7 +4347,7 @@ if _page == 'Live Tracker':
 
     if not _lt_df.empty:
         # ── metrics strip ────────────────────────────────────
-        _lt_rlabel = "OR" if _lt_last == 0 else f"Round {_lt_last}"
+        _lt_rlabel = "OR" if _lt_last == 0 else f"Round {_lt_last - 1}"
         _lt_leader = _lt_df.iloc[0]["Player"] if len(_lt_df) else "—"
         _lt_leader_votes = int(_lt_df.iloc[0]["Total_Votes"]) if len(_lt_df) else 0
         _lt_margin = (
@@ -4606,7 +4606,7 @@ if _page == 'Live Tracker':
                 if not _pav_cards:
                     st.markdown(
                         f'<div style="color:#94a3b8;font-size:13px;padding:8px 0">'
-                        f'No watchlist players flagged for Round {_pav_round}.</div>',
+                        f'No watchlist players flagged for Round {_pav_round - 1}.</div>',
                         unsafe_allow_html=True,
                     )
                 else:
