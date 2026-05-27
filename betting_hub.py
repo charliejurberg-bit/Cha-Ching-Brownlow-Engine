@@ -2241,12 +2241,22 @@ def render_polls_a_vote():
     # ── Entry form ────────────────────────────────────────────────────────────
     st.markdown('<div class="section-header">Add Player</div>', unsafe_allow_html=True)
 
-    # Player inputs outside form so each keystroke reruns and refreshes the round lookup
-    fc1, fc2 = st.columns(2)
-    with fc1:
-        pav_player = st.text_input("Player name")
-    with fc2:
-        pav_team = st.text_input("Team")
+    # Load player list from predictions CSV for dropdown
+    _pav_all_players: list[str] = []
+    _pav_player_team: dict[str, str] = {}
+    if os.path.exists("predictions/game_level_2026.csv"):
+        try:
+            _pav_plist = pd.read_csv("predictions/game_level_2026.csv", usecols=['Player', 'Team'])
+            _pav_player_team = (
+                _pav_plist.drop_duplicates('Player').set_index('Player')['Team'].to_dict()
+            )
+            _pav_all_players = sorted(_pav_player_team.keys())
+        except Exception:
+            pass
+
+    # Player selectbox outside form so selection reruns and refreshes the round lookup
+    pav_player = st.selectbox("Player name", options=[""] + _pav_all_players, index=0) or ""
+    pav_team = _pav_player_team.get(pav_player, "")
 
     # ── Per-round Exp_Votes lookup ─────────────────────────────────────────────
     _pav_round_votes: dict[int, float] = {}
