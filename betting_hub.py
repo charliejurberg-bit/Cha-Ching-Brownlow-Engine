@@ -196,6 +196,13 @@ def _mark_poll_settled(idx: int):
         df.to_csv(POLLS_CSV, index=False)
 
 
+def _delete_poll_row(idx: int):
+    df = _load_polls()
+    if idx < len(df):
+        df = df.drop(index=idx).reset_index(drop=True)
+        df.to_csv(POLLS_CSV, index=False)
+
+
 def _load_bets() -> pd.DataFrame:
     try:
         resp = _get_supabase().table("bets").select("*").execute()
@@ -2411,12 +2418,16 @@ def render_polls_a_vote():
             unsafe_allow_html=True,
         )
 
+        _bcols = st.columns([1, 1, 5])
         if not settled:
-            _btn_col, _ = st.columns([1, 6])
-            with _btn_col:
+            with _bcols[0]:
                 if st.button("Mark settled", key=f"pav_settle_{idx}", use_container_width=True):
                     _mark_poll_settled(idx)
                     st.rerun()
+        with _bcols[1]:
+            if st.button("Delete", key=f"pav_delete_{idx}", use_container_width=True):
+                _delete_poll_row(idx)
+                st.rerun()
 
     # ── Matrix view ───────────────────────────────────────────────────────────
     st.markdown('<div class="section-header">Round Matrix</div>', unsafe_allow_html=True)
