@@ -760,6 +760,10 @@ BH_CSS = """
     margin: 24px 0 14px 0;
 }
 
+/* ── Polls-a-Vote Exp_Votes numbers ── */
+.pav-ev-gold { color:#f0b429 !important; }
+.pav-ev-muted { color:#94a3b8 !important; }
+
 /* ── Polls-a-Vote round pills ── */
 .pav-pill-green { background:rgba(52,211,153,0.18); color:#34d399; border:1px solid rgba(52,211,153,0.4); }
 .pav-pill-blue  { background:rgba(74,144,217,0.18); color:#4a90d9; border:1px solid rgba(74,144,217,0.4); }
@@ -2279,10 +2283,10 @@ def render_polls_a_vote():
                     lbl = f"**{base_lbl}**" if (ev is not None and ev > 0.35) else base_lbl
                     _rnd_checks[_rn] = st.checkbox(lbl, key=f"pav_rnd_{_rn}")
                     if ev is not None:
-                        ev_color = '#f0b429' if ev > 0.35 else '#94a3b8'
+                        ev_cls = 'pav-ev-gold' if ev > 0.35 else 'pav-ev-muted'
                         st.markdown(
-                            f'<div style="font-size:12px;color:{ev_color} !important;margin-top:-10px;'
-                            f'padding-left:26px;line-height:1 !important">{ev:.2f}</div>',
+                            f'<div class="{ev_cls}" style="font-size:12px;margin-top:-10px;'
+                            f'padding-left:26px;line-height:1">{ev:.2f}</div>',
                             unsafe_allow_html=True,
                         )
 
