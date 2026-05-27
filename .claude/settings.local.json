@@ -42,7 +42,30 @@
       "PowerShell(Stop-Process *)",
       "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:8501)",
       "Bash(git push *)",
-      "Bash(python3 *)"
+      "Bash(python3 *)",
+      "Bash(where Rscript)",
+      "Read(//c/Program Files/R/**)",
+      "Bash(\"/c/Program Files/R/R-4.5.3/bin/Rscript.exe\" data_2026/fetch_stats_2026.R)",
+      "Bash(\"/c/Program Files/R/R-4.5.3/bin/Rscript.exe\" data_2026/fetch_coaches.R)",
+      "Bash(pip install *)",
+      "WebFetch(domain:cdn.jsdelivr.net)",
+      "Bash(curl -s \"https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.css\")",
+      "WebFetch(domain:unpkg.com)",
+      "WebFetch(domain:data.jsdelivr.com)",
+      "Bash(curl -s \"https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.44.0/dist/tabler-icons.scss\" -o /tmp/tabler-icons.scss)",
+      "Read(//tmp/**)",
+      "Bash(grep *)",
+      "Bash(echo \"Exit: $?\")",
+      "Bash(curl -s \"https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/package.json\")",
+      "WebFetch(domain:tabler.io)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "Bash(curl -s \"https://cdn.jsdelivr.net/npm/@tabler/icons@latest/tags.json\")",
+      "Bash(curl -s \"https://cdn.jsdelivr.net/npm/@tabler/icons@latest/icons.json\")",
+      "WebFetch(domain:api.github.com)",
+      "WebFetch(domain:registry.npmjs.org)",
+      "Bash(curl -s \"https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.44.0/dist/tabler-icons.css\")",
+      "Bash(pkill -f \"streamlit run dashboard.py\")"
     ]
   }
 }

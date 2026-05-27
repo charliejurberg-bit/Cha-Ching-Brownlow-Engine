@@ -20,6 +20,8 @@ TIPS_CSV        = f"{DATA_DIR}/cha_ching_tips.csv"
 FIXTURES_CSV    = f"{DATA_DIR}/fixtures_cache.csv"
 PROPS_CSV       = f"{DATA_DIR}/player_props_cache.csv"
 USER_IMPORT_CSV = f"{DATA_DIR}/user_import.csv"
+POLLS_CSV       = f"{DATA_DIR}/polls_a_vote.csv"
+POLLS_COLS      = ['Player', 'Team', 'My_Rounds', 'Odds', 'Stake', 'Notes', 'Settled']
 
 BETS_COLS = [
     'bet_id', 'date', 'match', 'market_type', 'selection',
@@ -164,6 +166,34 @@ def _sb_records(df: pd.DataFrame) -> list[dict]:
 
 def _ensure_dirs():
     os.makedirs(DATA_DIR, exist_ok=True)  # for user_import.csv only
+
+
+def _load_polls() -> pd.DataFrame:
+    if os.path.exists(POLLS_CSV):
+        df = pd.read_csv(POLLS_CSV)
+        for c in POLLS_COLS:
+            if c not in df.columns:
+                df[c] = None
+        df['Odds']      = pd.to_numeric(df['Odds'],  errors='coerce')
+        df['Stake']     = pd.to_numeric(df['Stake'], errors='coerce')
+        df['Settled']   = df['Settled'].fillna(False).astype(bool)
+        df['My_Rounds'] = df['My_Rounds'].fillna('').astype(str)
+        return df
+    return pd.DataFrame(columns=POLLS_COLS)
+
+
+def _save_polls_row(row: dict):
+    df = _load_polls()
+    df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
+    os.makedirs(DATA_DIR, exist_ok=True)
+    df.to_csv(POLLS_CSV, index=False)
+
+
+def _mark_poll_settled(idx: int):
+    df = _load_polls()
+    if idx < len(df):
+        df.at[idx, 'Settled'] = True
+        df.to_csv(POLLS_CSV, index=False)
 
 
 def _load_bets() -> pd.DataFrame:
@@ -721,6 +751,26 @@ BH_CSS = """
     border-bottom: 1px solid #2a4a5a;
     padding-bottom: 6px;
     margin: 24px 0 14px 0;
+}
+
+/* ── Polls-a-Vote round pills ── */
+.pav-pill-green { background:rgba(52,211,153,0.18); color:#34d399; border:1px solid rgba(52,211,153,0.4); }
+.pav-pill-blue  { background:rgba(74,144,217,0.18); color:#4a90d9; border:1px solid rgba(74,144,217,0.4); }
+.pav-pill-grey  { background:rgba(148,163,184,0.12); color:#94a3b8; border:1px solid #2a4a5a; }
+.pav-pill-green, .pav-pill-blue, .pav-pill-grey {
+    padding:2px 8px; border-radius:12px; font-size:11px; font-weight:700;
+    white-space:nowrap; display:inline-block; margin:2px 1px;
+}
+
+/* ── Polls-a-Vote matrix cell ── */
+.pav-matrix-both  { background:#1a5c40; color:#34d399; }
+.pav-matrix-mine  { background:rgba(74,144,217,0.25); color:#4a90d9; }
+.pav-matrix-model { background:rgba(148,163,184,0.1); color:#94a3b8; }
+
+/* ── Polls-a-Vote round checkbox grid ── */
+[data-testid="stCheckbox"] > label {
+    font-size: 12px !important;
+    font-weight: 600 !important;
 }
 
 </style>
@@ -2166,6 +2216,233 @@ def render_trends_analysis():
     )
 
 
+# ── Page 5: Polls a Vote Watchlist ────────────────────────────────────────────
+
+def render_polls_a_vote():
+    _inject_css()
+    st.markdown(
+        '<div class="title-bar"><h2 style="color:#e8f0f8;margin:0">Polls a Vote Watchlist</h2>'
+        '<p style="color:#94a3b8;margin:4px 0 0 0">'
+        'Track your "polls a vote" bets — alerts surface in the Live Tracker on count night</p></div>',
+        unsafe_allow_html=True,
+    )
+
+    # ── Entry form ────────────────────────────────────────────────────────────
+    st.markdown('<div class="section-header">Add Player</div>', unsafe_allow_html=True)
+
+    with st.form("pav_add_form", clear_on_submit=True):
+        fc1, fc2 = st.columns(2)
+        with fc1:
+            pav_player = st.text_input("Player name")
+        with fc2:
+            pav_team = st.text_input("Team")
+
+        st.markdown(
+            '<div style="font-size:11px;color:#94a3b8;font-weight:700;text-transform:uppercase;'
+            'letter-spacing:1px;margin:12px 0 6px 0">Rounds to watch (select all that apply)</div>',
+            unsafe_allow_html=True,
+        )
+        _rnd_labels = ['OR'] + [f'R{i}' for i in range(1, 25)]
+        _rnd_checks: dict[int, bool] = {}
+        for _ri in range(0, 25, 5):
+            _rcols = st.columns(5)
+            for _ci in range(5):
+                _rn = _ri + _ci
+                with _rcols[_ci]:
+                    _rnd_checks[_rn] = st.checkbox(_rnd_labels[_rn], key=f"pav_rnd_{_rn}")
+
+        fo1, fo2 = st.columns(2)
+        with fo1:
+            pav_odds = st.number_input("Odds", min_value=1.01, value=2.0, step=0.05, format="%.2f")
+        with fo2:
+            pav_stake = st.number_input("Stake (u)", min_value=0.0, value=1.0, step=0.5, format="%.2f")
+        pav_notes = st.text_input("Notes (optional)")
+
+        if st.form_submit_button("Add to Watchlist", type="primary", use_container_width=True):
+            if not pav_player.strip():
+                st.error("Player name is required.")
+            else:
+                _sel = sorted(r for r, chk in _rnd_checks.items() if chk)
+                _save_polls_row({
+                    'Player':    pav_player.strip(),
+                    'Team':      pav_team.strip(),
+                    'My_Rounds': ','.join(str(r) for r in _sel),
+                    'Odds':      round(float(pav_odds), 2),
+                    'Stake':     round(float(pav_stake), 2),
+                    'Notes':     pav_notes.strip(),
+                    'Settled':   False,
+                })
+                st.success(f"Added {pav_player.strip()} to watchlist.")
+                st.rerun()
+
+    # ── Load data ─────────────────────────────────────────────────────────────
+    polls = _load_polls()
+    if polls.empty:
+        st.info("No players in watchlist yet — add one above.")
+        return
+
+    _gdf = None
+    if os.path.exists("predictions/game_level_2026.csv"):
+        try:
+            _gdf = pd.read_csv(
+                "predictions/game_level_2026.csv",
+                usecols=['Player', 'Team', 'Round_num', 'Poll_Prob'],
+            )
+        except Exception:
+            pass
+
+    def _model_top3(player: str) -> list[int]:
+        if _gdf is None:
+            return []
+        sub = _gdf[_gdf['Player'].str.lower() == player.lower()]
+        if sub.empty:
+            return []
+        return sub.nlargest(3, 'Poll_Prob')['Round_num'].astype(int).tolist()
+
+    def _pill(text: str, style: str) -> str:
+        cls = {'green': 'pav-pill-green', 'blue': 'pav-pill-blue', 'grey': 'pav-pill-grey'}.get(style, 'pav-pill-grey')
+        return f'<span class="{cls}">{text}</span>'
+
+    def _parse_rounds(raw: str) -> set[int]:
+        rounds = set()
+        for t in str(raw).split(','):
+            t = t.strip()
+            if t.lstrip('-').isdigit():
+                rounds.add(int(t))
+        return rounds
+
+    # ── Watchlist table ───────────────────────────────────────────────────────
+    st.markdown('<div class="section-header">Watchlist</div>', unsafe_allow_html=True)
+
+    for idx, row in polls.iterrows():
+        player    = str(row['Player'])
+        team      = str(row['Team'])
+        my_rounds = _parse_rounds(row['My_Rounds'])
+        top3      = _model_top3(player)
+        model_set = set(top3)
+        agreement = len(my_rounds & model_set)
+        settled   = bool(row.get('Settled', False))
+
+        _rnd_lbl = lambda r: 'OR' if r == 0 else f'R{r}'
+
+        pills_html = ''
+        for r in sorted(my_rounds | model_set):
+            in_m, in_mod = r in my_rounds, r in model_set
+            if in_m and in_mod:
+                pills_html += _pill(f'★ {_rnd_lbl(r)}', 'green')
+            elif in_m:
+                pills_html += _pill(_rnd_lbl(r), 'blue')
+            else:
+                pills_html += _pill(_rnd_lbl(r), 'grey')
+
+        model_pills = ''.join(_pill(_rnd_lbl(r), 'grey') for r in top3) or '<span style="color:#4a5a6a;font-size:12px">—</span>'
+        pills_html  = pills_html or '<span style="color:#4a5a6a;font-size:12px">—</span>'
+
+        odds_str  = f"{float(row['Odds']):.2f}"  if pd.notna(row.get('Odds'))  else '—'
+        stake_str = f"{float(row['Stake']):.2f}u" if pd.notna(row.get('Stake')) else '—'
+        agree_col = '#34d399' if agreement >= 2 else ('#f0b429' if agreement == 1 else '#4a5a6a')
+        opacity   = '0.5' if settled else '1'
+        settled_badge = (
+            '<span style="background:rgba(52,211,153,0.18);color:#34d399;border:1px solid rgba(52,211,153,0.4);'
+            'padding:2px 8px;border-radius:12px;font-size:10px;font-weight:800;margin-left:8px">SETTLED</span>'
+            if settled else ''
+        )
+
+        st.markdown(
+            f'<div style="background:#152533;border:1px solid #2a4a5a;border-radius:8px;'
+            f'padding:14px 16px;margin-bottom:6px;opacity:{opacity}">'
+            f'<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">'
+
+            f'<div style="min-width:150px">'
+            f'<div style="font-size:14px;font-weight:700;color:#e8f0f8">{player}{settled_badge}</div>'
+            f'<div style="font-size:12px;color:#94a3b8;margin-top:2px">{team}</div>'
+            f'</div>'
+
+            f'<div style="flex:1;min-width:200px">'
+            f'<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">My Rounds</div>'
+            f'<div>{pills_html}</div>'
+            f'</div>'
+
+            f'<div style="min-width:180px">'
+            f'<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Model Top 3</div>'
+            f'<div>{model_pills}</div>'
+            f'</div>'
+
+            f'<div style="display:flex;gap:20px;align-items:center">'
+            f'<div style="text-align:center">'
+            f'<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px">Agreement</div>'
+            f'<div style="font-size:22px;font-weight:800;color:{agree_col}">{agreement}</div>'
+            f'</div>'
+            f'<div>'
+            f'<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px">Odds / Stake</div>'
+            f'<div style="font-size:13px;font-weight:700;color:#f0b429">{odds_str} / {stake_str}</div>'
+            f'</div>'
+            f'</div>'
+
+            f'</div></div>',
+            unsafe_allow_html=True,
+        )
+
+        if not settled:
+            _btn_col, _ = st.columns([1, 6])
+            with _btn_col:
+                if st.button("Mark settled", key=f"pav_settle_{idx}", use_container_width=True):
+                    _mark_poll_settled(idx)
+                    st.rerun()
+
+    # ── Matrix view ───────────────────────────────────────────────────────────
+    st.markdown('<div class="section-header">Round Matrix</div>', unsafe_allow_html=True)
+
+    _cell_css = (
+        'padding:4px 0;text-align:center;font-size:12px;font-weight:700;'
+        'border:1px solid #1e3040;min-width:32px;'
+    )
+    _th_css = (
+        'background:#1e3a4a;color:#94a3b8;font-size:10px;font-weight:700;'
+        'text-transform:uppercase;letter-spacing:0.5px;padding:5px 4px;'
+        'border:1px solid #2a4a5a;text-align:center;min-width:32px;'
+    )
+    _player_css = (
+        'background:#1e3a4a;color:#e8f0f8;font-size:12px;font-weight:600;'
+        'padding:5px 10px;border:1px solid #2a4a5a;white-space:nowrap;'
+    )
+
+    _rnd_labels_m = ['OR'] + [str(i) for i in range(1, 25)]
+    _header = f'<th style="{_th_css}">Player</th>' + ''.join(
+        f'<th style="{_th_css}">{lbl}</th>' for lbl in _rnd_labels_m
+    )
+
+    _rows_html = ''
+    for _, row in polls.iterrows():
+        player    = str(row['Player'])
+        my_rounds = _parse_rounds(row['My_Rounds'])
+        model_set = set(_model_top3(player))
+        cells = f'<td style="{_player_css}">{player}</td>'
+        for rn in range(25):
+            in_m, in_mod = rn in my_rounds, rn in model_set
+            if in_m and in_mod:
+                cells += f'<td class="pav-matrix-both" style="{_cell_css}">★</td>'
+            elif in_m:
+                cells += f'<td class="pav-matrix-mine" style="{_cell_css}">●</td>'
+            elif in_mod:
+                cells += f'<td class="pav-matrix-model" style="{_cell_css}">·</td>'
+            else:
+                cells += f'<td style="background:#0f1923;{_cell_css}"></td>'
+        _rows_html += f'<tr>{cells}</tr>'
+
+    st.markdown(
+        f'<div style="overflow-x:auto;margin-top:8px">'
+        f'<table style="border-collapse:collapse;width:100%">'
+        f'<thead><tr>{_header}</tr></thead>'
+        f'<tbody>{_rows_html}</tbody>'
+        f'</table>'
+        f'<div style="font-size:11px;color:#4a5a6a;margin-top:8px">'
+        f'★ both agree &nbsp;·&nbsp; ● my pick only &nbsp;·&nbsp; · model only</div>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
+
 # ── Public dispatch ────────────────────────────────────────────────────────────
 
 def render_page(page: str):
@@ -2180,3 +2457,5 @@ def render_page(page: str):
         render_cha_ching_tips()
     elif page == 'Trends & Analysis':
         render_trends_analysis()
+    elif page == 'Polls a Vote':
+        render_polls_a_vote()
