@@ -2279,7 +2279,7 @@ def render_polls_a_vote():
                     lbl = f"**{base_lbl}**" if (ev is not None and ev > 0.35) else base_lbl
                     _rnd_checks[_rn] = st.checkbox(lbl, key=f"pav_rnd_{_rn}")
                     if ev is not None:
-                        ev_color = '#94a3b8' if ev > 0.35 else '#4a5a6a'
+                        ev_color = '#f0b429' if ev > 0.35 else '#94a3b8'
                         st.markdown(
                             f'<div style="font-size:12px;color:{ev_color};margin-top:-10px;'
                             f'padding-left:26px;line-height:1">{ev:.2f}</div>',
