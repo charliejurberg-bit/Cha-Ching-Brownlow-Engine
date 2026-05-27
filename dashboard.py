@@ -3018,8 +3018,8 @@ if _page == 'Brownlow Betting':
                 _be_leader_name, _be_leader_votes, _be_leader_avg = '—', 0.0, 0.0
 
             c1, c2, c3, c4 = st.columns(4)
-            with c1: st.markdown(f'<div class="metric-card"><div class="metric-label">Rounds Played</div><div class="metric-value">{_be_rounds_played}</div><div class="metric-sub">of {_be_total_rounds} H&A rounds</div></div>', unsafe_allow_html=True)
-            with c2: st.markdown(f'<div class="metric-card"><div class="metric-label">Remaining Rounds</div><div class="metric-value">{_be_remaining}</div><div class="metric-sub">to be projected</div></div>', unsafe_allow_html=True)
+            with c1: st.markdown(f'<div class="metric-card"><div class="metric-label">Rounds Played</div><div class="metric-value">{_be_rounds_played - 1}</div><div class="metric-sub">of {_be_total_rounds} H&A rounds</div></div>', unsafe_allow_html=True)
+            with c2: st.markdown(f'<div class="metric-card"><div class="metric-label">Remaining Rounds</div><div class="metric-value">{_be_remaining + 1}</div><div class="metric-sub">to be projected</div></div>', unsafe_allow_html=True)
             with c3: st.markdown(f'<div class="metric-card"><div class="metric-label">Projected Leader</div><div class="metric-value">{_be_leader_name}</div><div class="metric-sub">{_be_leader_votes:.1f} projected votes</div></div>', unsafe_allow_html=True)
             with c4: st.markdown(f'<div class="metric-card"><div class="metric-label">Avg Per Game (Leader)</div><div class="metric-value">{_be_leader_avg:.2f}</div><div class="metric-sub">expected votes per game</div></div>', unsafe_allow_html=True)
 
