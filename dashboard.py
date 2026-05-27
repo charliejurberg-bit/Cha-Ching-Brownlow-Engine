@@ -1688,7 +1688,7 @@ _PAGE_ICONS = {
     "Bet Tracker":      "ti-list-check",
     "Cha Ching Tips":   "ti-bulb",
     "Trends & Analysis":"ti-trending-up",
-    "Polls a Vote":     "ti-tag-starred",
+    "Polls a Vote":     "ti-tag",
 }
 
 if _hub == "brownlow":
@@ -1837,7 +1837,7 @@ st.markdown("""
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-list-check) button::before             { content: "\eb6a"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-bulb) button::before                   { content: "\ea51"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-trending-up) button::before            { content: "\eb43"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-tag-starred) button::before            { content: "\\f9f4"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-tag) button::before                   { content: "\eaa9"; }
 
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stBaseButton-primary"],
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-primary"] {
