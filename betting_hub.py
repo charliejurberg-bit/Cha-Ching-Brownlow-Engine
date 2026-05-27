@@ -2342,28 +2342,32 @@ def render_polls_a_vote():
             pass
 
     # ── Consensus data — loaded once, used per card ────────────────────────────
+    import re as _re
+    _NAME_SUFFIX_RE = _re.compile(r'\s+(Jr\.?|Sr\.?|II|III|IV)$', _re.IGNORECASE)
+
+    def _norm(name) -> str:
+        if pd.isna(name):
+            return ''
+        s = str(name).title().strip().replace("'", '').replace('-', ' ')
+        s = _re.sub(r'\s+', ' ', s).strip()
+        return _NAME_SUFFIX_RE.sub('', s).strip()
+
     _con_max_prob:  dict[str, float] = {}
     _con_exp_total: dict[str, float] = {}
     _con_wheelo:    dict[str, float] = {}
     _con_bf:   dict[str, float] | None = None
     _con_espn: dict[str, float] | None = None
-    _norm_name = None
     try:
-        from dashboard import (  # lazy — both modules fully loaded by call time
-            normalise_name as _norm_name,
-            fetch_betfair_brownlow as _fbf,
-            fetch_espn_brownlow as _fespn,
-        )
         # 1. Cha Ching: max Poll_Prob per player from game_level
         if _gdf is not None:
             for _cp, _cg in _gdf.groupby('Player'):
-                _con_max_prob[_norm_name(_cp)] = float(_cg['Poll_Prob'].max())
+                _con_max_prob[_norm(_cp)] = float(_cg['Poll_Prob'].max())
         # 2. AFL Predictor: Exp_Total_Votes from season_2026.csv
         _s26 = "predictions/season_2026.csv"
         if os.path.exists(_s26):
             _sdf = pd.read_csv(_s26, usecols=['Player_Name', 'Exp_Total_Votes'])
             for _, _sr in _sdf.iterrows():
-                _con_exp_total[_norm_name(_sr['Player_Name'])] = float(_sr['Exp_Total_Votes'] or 0)
+                _con_exp_total[_norm(_sr['Player_Name'])] = float(_sr['Exp_Total_Votes'] or 0)
         # 3. Wheelo
         _wh26 = "data_wheelo/wheelo_2026.csv"
         if os.path.exists(_wh26):
@@ -2371,28 +2375,26 @@ def render_polls_a_vote():
             _wh_col = next((c for c in ['ExpVotes', 'RatingPoints'] if c in _whdf.columns), None)
             if _wh_col:
                 for _wp, _wg in _whdf.groupby('Player'):
-                    _con_wheelo[_norm_name(_wp)] = float(_wg[_wh_col].sum())
-        # 4. Betfair
-        _bf_df, _ = _fbf()
-        if not _bf_df.empty and 'BF_Votes' in _bf_df.columns:
-            _con_bf = {
-                _norm_name(r['Player']): float(r.get('BF_Votes', 0) or 0)
-                for _, r in _bf_df.iterrows()
-            }
-        # 5. ESPN
-        _espn_df, _ = _fespn()
-        if not _espn_df.empty and 'ESPN_Votes' in _espn_df.columns:
-            _con_espn = {
-                _norm_name(r['Player']): float(r.get('ESPN_Votes', 0) or 0)
-                for _, r in _espn_df.iterrows()
-            }
+                    _con_wheelo[_norm(_wp)] = float(_wg[_wh_col].sum())
+        # 4. Betfair — read cached CSV written by dashboard's scrape function
+        _bf_csv = "data_2026/betfair_predictions.csv"
+        if os.path.exists(_bf_csv):
+            _bfdf = pd.read_csv(_bf_csv)
+            if 'Total_Votes' in _bfdf.columns:
+                _con_bf = {_norm(r['Player']): float(r['Total_Votes'] or 0)
+                           for _, r in _bfdf.iterrows()}
+        # 5. ESPN — read cached CSV written by dashboard's scrape function
+        _espn_csv = "data_2026/espn_predictions.csv"
+        if os.path.exists(_espn_csv):
+            _espndf = pd.read_csv(_espn_csv)
+            if 'Total_Votes' in _espndf.columns:
+                _con_espn = {_norm(r['Player']): float(r['Total_Votes'] or 0)
+                             for _, r in _espndf.iterrows()}
     except Exception:
         pass
 
     def _consensus(player: str) -> str:
-        if _norm_name is None:
-            return ''
-        key = _norm_name(player)
+        key = _norm(player)
         agree, total = 0, 0
         if _con_max_prob:
             total += 1
