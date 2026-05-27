@@ -2247,6 +2247,7 @@ def render_polls_a_vote():
     if os.path.exists("predictions/game_level_2026.csv"):
         try:
             _pav_plist = pd.read_csv("predictions/game_level_2026.csv", usecols=['Player', 'Team'])
+            _pav_plist = _pav_plist.dropna(subset=['Player'])
             _pav_player_team = (
                 _pav_plist.drop_duplicates('Player').set_index('Player')['Team'].to_dict()
             )
