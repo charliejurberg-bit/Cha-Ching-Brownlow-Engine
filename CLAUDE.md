@@ -2,6 +2,8 @@
 
 Personal AFL Brownlow Medal prediction + betting tracker. XGBoost model (v4.0) trained on 2015–2025 data. Dashboard runs live during the 2026 season.
 
+> **Read `project_brief.md` first.** It contains the current page structure, accurate line numbers for every function, the correct file sizes, the Midnight Turf colour tokens, and up-to-date known issues. The sections below cover architecture and constraints that change rarely.
+
 ## Quick start
 
 ```bash
