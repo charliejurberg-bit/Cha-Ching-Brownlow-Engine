@@ -3,16 +3,19 @@ Brownlow Odds Scraper — Oddschecker
 Scrapes multi-bookmaker Brownlow winner odds from Oddschecker's comparison table.
 Output: data_2026/bookmaker_odds.csv  (wide: Player | Bookie1 | Bookie2 | …)
         data_2026/best_odds.csv       (long: player, best_odds, implied_prob, best_bookie)
-Uses playwright instead of undetected-chromedriver for more reliable anti-bot evasion.
 """
 
 import os
 import re
+import time
 from datetime import datetime
 
 import pandas as pd
+import undetected_chromedriver as uc
 from bs4 import BeautifulSoup
-from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeout
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 os.makedirs("data_2026", exist_ok=True)
 
@@ -20,52 +23,45 @@ DEBUG = False  # When True: save page source to oddschecker_debug.html and exit
 
 URL = "https://www.oddschecker.com/australian-rules/afl/afl-brownlow-medal/winner"
 
-_UA = (
+BROWSER_UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) "
-    "Chrome/131.0.0.0 Safari/537.36"
+    "Chrome/124.0.0.0 Safari/537.36"
 )
 
-# Injected into every page to mask automation fingerprint
-_STEALTH_JS = """
-    Object.defineProperty(navigator, 'webdriver',  {get: () => undefined});
-    Object.defineProperty(navigator, 'plugins',    {get: () => [1, 2, 3, 4, 5]});
-    Object.defineProperty(navigator, 'languages',  {get: () => ['en-AU', 'en']});
-    Object.defineProperty(navigator, 'platform',   {get: () => 'Win32'});
-    window.chrome = {runtime: {}};
-"""
+
+def _chrome_major_version() -> int | None:
+    """Read the installed Chrome major version from the Windows registry."""
+    try:
+        import subprocess
+        for key in [
+            r"HKLM\Software\Google\Chrome\BLBeacon",
+            r"HKCU\Software\Google\Chrome\BLBeacon",
+            r"HKLM\Software\Wow6432Node\Google\Chrome\BLBeacon",
+        ]:
+            r = subprocess.run(
+                ["reg", "query", key, "/v", "version"],
+                capture_output=True, text=True,
+            )
+            if r.returncode == 0:
+                ver = r.stdout.strip().split()[-1]
+                return int(ver.split(".")[0])
+    except Exception:
+        pass
+    return None
 
 
-def _new_context(pw):
-    """Launch Chromium with stealth settings; return (browser, page)."""
-    browser = pw.chromium.launch(
-        headless=True,
-        args=[
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-blink-features=AutomationControlled',
-            '--disable-dev-shm-usage',
-        ],
-    )
-    ctx = browser.new_context(
-        viewport={'width': 1920, 'height': 1080},
-        locale='en-AU',
-        timezone_id='Australia/Melbourne',
-        user_agent=_UA,
-        extra_http_headers={
-            'Accept-Language': 'en-AU,en;q=0.9',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Sec-Fetch-Dest': 'document',
-            'Sec-Fetch-Mode': 'navigate',
-            'Sec-Fetch-Site': 'none',
-            'Sec-Fetch-User': '?1',
-            'Upgrade-Insecure-Requests': '1',
-        },
-    )
-    ctx.add_init_script(_STEALTH_JS)
-    page = ctx.new_page()
-    return browser, page
+def get_driver():
+    options = uc.ChromeOptions()
+    options.add_argument("--headless=new")
+    options.add_argument("--window-size=1920,1080")
+    options.add_argument("--lang=en-AU")
+    options.add_argument(f"--user-agent={BROWSER_UA}")
+    version_main = _chrome_major_version()
+    if version_main:
+        print(f"  Detected Chrome {version_main} — requesting matching ChromeDriver")
+    driver = uc.Chrome(options=options, use_subprocess=True, version_main=version_main)
+    return driver
 
 
 def parse_odds(text: str) -> float | None:
@@ -85,56 +81,62 @@ def parse_odds(text: str) -> float | None:
         return None
 
 
-def _dismiss_overlays(page):
-    """Click cookie / consent banners if present."""
-    for sel in [
-        '#onetrust-accept-btn-handler',
-        'button:text-matches("accept all", "i")',
-        'button:text-matches("accept cookies", "i")',
-        'button:text-matches("^accept$", "i")',
-        'button[aria-label="Close"]',
-    ]:
+def dismiss_overlays(driver):
+    xpaths = [
+        "//*[@id='onetrust-accept-btn-handler']",
+        "//button[contains(translate(., 'ACCEPT ALL', 'accept all'), 'accept all')]",
+        "//button[contains(translate(., 'ACCEPT COOKIES', 'accept cookies'), 'accept cookies')]",
+        "//button[contains(translate(., 'ACCEPT', 'accept'), 'accept')]",
+        "//button[@aria-label='Close']",
+    ]
+    for xpath in xpaths:
         try:
-            page.locator(sel).first.click(timeout=3000)
-            page.wait_for_timeout(800)
+            btn = WebDriverWait(driver, 3).until(
+                EC.element_to_be_clickable((By.XPATH, xpath))
+            )
+            btn.click()
+            time.sleep(1)
             return
         except Exception:
             continue
 
 
-def scrape_oddschecker(page) -> pd.DataFrame:
+def scrape_oddschecker(driver) -> pd.DataFrame:
     print(f"  Loading: {URL}")
-    page.goto(URL, wait_until='domcontentloaded', timeout=30000)
+    driver.get(URL)
 
-    # Wait for odds table — try progressively broader selectors
+    # Wait for odds rows — try progressively broader selectors
     for sel in ["tr[data-bname]", "tbody#t1", "table.eventTable", ".bc", "table"]:
         try:
-            page.wait_for_selector(sel, timeout=15000)
+            WebDriverWait(driver, 20).until(
+                EC.presence_of_element_located((By.CSS_SELECTOR, sel))
+            )
             print(f"  Page ready (matched '{sel}')")
             break
-        except PlaywrightTimeout:
+        except Exception:
             continue
     else:
-        print("  Warning: timed out waiting for table — continuing with current state")
+        print("  Warning: timed out waiting for table")
 
-    # Let bookmaker columns finish rendering
-    page.wait_for_timeout(6000)
+    time.sleep(6)  # Let all bookmaker columns finish rendering
 
     if DEBUG:
         with open("oddschecker_debug.html", "w", encoding="utf-8") as f:
-            f.write(page.content())
+            f.write(driver.page_source)
         print("  DEBUG: page source saved to oddschecker_debug.html — exiting.")
         return pd.DataFrame()
 
-    _dismiss_overlays(page)
+    dismiss_overlays(driver)
 
-    # Scroll to trigger lazy-loaded odds columns
-    page.evaluate("window.scrollTo(0, document.body.scrollHeight)")
-    page.wait_for_timeout(2000)
-    page.evaluate("window.scrollTo(0, 0)")
-    page.wait_for_timeout(1000)
+    # Scroll to trigger any lazy-loaded odds
+    driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+    time.sleep(2)
+    driver.execute_script("window.scrollTo(0, 0);")
+    time.sleep(1)
 
-    soup = BeautifulSoup(page.content(), "html.parser")
+    html = driver.page_source
+
+    soup = BeautifulSoup(html, "html.parser")
 
     # ── Locate the odds table ────────────────────────────────────
     table = (
@@ -175,6 +177,7 @@ def scrape_oddschecker(page) -> pd.DataFrame:
     # Player rows carry data-bname on the <tr>; search the whole document
     # rather than a specific tbody since ew_bookie_content may split headers/rows.
     for tr in soup.find_all("tr", attrs={"data-bname": True}):
+        # Player name lives on data-bname of the <tr>, or data-name of a child <a>
         player = tr.get("data-bname", "").strip()
         if not player:
             a_el = tr.find("a", attrs={"data-name": True})
@@ -218,18 +221,17 @@ if __name__ == "__main__":
     print(f"Run time: {now}")
     print("=" * 60)
 
-    print("\nStarting browser (playwright/chromium)...")
-    with sync_playwright() as pw:
-        browser, page = _new_context(pw)
-        try:
-            df = scrape_oddschecker(page)
-        finally:
-            browser.close()
-            print("Browser closed.\n")
+    print("\nStarting browser (undetected-chromedriver)...")
+    driver = get_driver()
+    try:
+        df = scrape_oddschecker(driver)
+    finally:
+        driver.quit()
+        print("Browser closed.\n")
 
     if df.empty:
         print("No odds found — the page may have blocked the scraper.")
-        print("Set DEBUG=True to inspect the captured HTML.")
+        print("Try running without --headless or check if the market is listed.")
     else:
         bookie_cols = [c for c in df.columns if c != "Player"]
         n_players = len(df)
@@ -244,7 +246,7 @@ if __name__ == "__main__":
             vals = {b: row[b] for b in bookie_cols if pd.notna(row.get(b))}
             if not vals:
                 continue
-            best_bookie = max(vals, key=vals.get)
+            best_bookie = max(vals, key=vals.get)   # highest decimal = best payout
             best_price = vals[best_bookie]
             best_rows.append({
                 "player": row["Player"],
@@ -261,12 +263,14 @@ if __name__ == "__main__":
         )
         best_df.to_csv("data_2026/best_odds.csv", index=False)
 
-        print(f"Players found   : {n_players}")
+        # ── Summary ──────────────────────────────────────────────
+        print(f"Players found  : {n_players}")
         print(f"Bookmakers found: {n_bookies}")
-        print(f"Bookmakers      : {', '.join(bookie_cols)}")
-        print(f"\nSaved -> data_2026/bookmaker_odds.csv  ({n_players} players × {n_bookies} bookmakers)")
+        print(f"Bookmakers     : {', '.join(bookie_cols)}")
+        print(f"\nSaved -> data_2026/bookmaker_odds.csv  ({n_players} players x {n_bookies} bookmakers)")
         print(f"Saved -> data_2026/best_odds.csv")
+
         print(f"\nTop 15 shortest-priced (best odds available):")
         print(best_df.head(15).to_string(index=False))
 
-    print("\nDone.")
+print("\nDone.")
