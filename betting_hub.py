@@ -40,7 +40,7 @@ CHECKLIST_ITEMS = [
 
 BOOKMAKERS   = ["Sportsbet", "TAB", "Betfair", "Ladbrokes", "Neds", "PointsBet", "Unibet", "Other"]
 MARKET_TYPES = ["Disposals O/U", "Goals O/U", "Kicks O/U", "Handballs O/U", "Marks O/U",
-                "Match Result", "Line", "Other"]
+                "Match Result", "Line", "Multi", "Other"]
 RESULTS      = ["Pending", "Win", "Loss", "Void/Refund"]
 CC_THRESHOLD = 3   # checklist items needed to auto-flag a Cha Ching tip
 
@@ -865,6 +865,70 @@ def _pl_tone(v: float) -> str:
     return 'positive' if v > 0 else ('negative' if v < 0 else 'neutral')
 
 
+# ── Add Multi Tip dialog ───────────────────────────────────────────────────────
+
+@st.dialog("Add Multi Tip", width="large")
+def _add_multi_dialog():
+    st.caption("Enter each leg on its own line, or comma-separated (e.g. Daicos 29.5+ disp / Oliver BTTS)")
+    legs_text = st.text_area("Legs", height=80, placeholder="Daicos 29.5+ Disposals\nOliver 25.5+ Disposals\nNeale BTTS")
+    games_text = st.text_input("Games (optional)", placeholder="e.g. GWS v Melbourne / Cats v Lions")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        bookmaker = st.selectbox("Bookmaker", BOOKMAKERS)
+        odds  = st.number_input("Combined odds (decimal)", min_value=1.01, max_value=500.0,
+                                value=3.0, step=0.05, format="%.2f")
+    with col2:
+        stake = st.number_input("Stake (units)", min_value=0.01, max_value=1000.0,
+                                value=1.0, step=0.5, format="%.2f")
+        bet_date = st.date_input("Date", value=date.today())
+
+    st.markdown('<hr style="margin:8px 0">', unsafe_allow_html=True)
+    st.markdown('<div style="font-size:11px;color:#94a3b8;font-weight:600;letter-spacing:0.8px;'
+                'text-transform:uppercase;margin-bottom:6px">CHA CHING CHECKLIST</div>',
+                unsafe_allow_html=True)
+
+    pfx    = "_multi_cl_"
+    ticked = 0
+    for item_key, item_label in CHECKLIST_ITEMS:
+        sk = f"{pfx}{item_key}"
+        if st.checkbox(item_label, value=st.session_state.get(sk, False), key=sk):
+            ticked += 1
+
+    is_flagged = ticked >= CC_THRESHOLD
+    if is_flagged:
+        st.success(f"**Cha Ching!** {ticked}/6 criteria met — will be auto-flagged")
+    else:
+        st.info(f"{ticked}/6 criteria met — tick {CC_THRESHOLD - ticked} more to auto-flag")
+
+    notes = st.text_area("Notes", height=60, placeholder="Any extra context...")
+
+    ca, cb = st.columns(2)
+    with ca:
+        if st.button("Save Multi Tip", type="primary", use_container_width=True):
+            if not legs_text.strip():
+                st.error("Enter at least one leg.")
+            else:
+                player_label = legs_text.strip().replace("\n", " / ")
+                game_key     = games_text.strip() or "Multi"
+                criteria     = [k for k, _ in CHECKLIST_ITEMS if st.session_state.get(f"{pfx}{k}", False)]
+                err = _save_tip(
+                    game_key, player_label, "Multi",
+                    criteria, is_flagged, notes,
+                    stake=float(stake), odds=float(odds), bookmaker=bookmaker,
+                )
+                if err is None:
+                    for item_key, _ in CHECKLIST_ITEMS:
+                        st.session_state.pop(f"{pfx}{item_key}", None)
+                    st.toast(f"Multi tip saved — {'Cha Ching flagged!' if is_flagged else 'not yet flagged'}")
+                    st.rerun()
+                else:
+                    st.error(f"Save failed — {err}")
+    with cb:
+        if st.button("Cancel", use_container_width=True):
+            st.rerun()
+
+
 # ── Checklist dialog ───────────────────────────────────────────────────────────
 
 @st.dialog("Cha Ching Checklist", width="small")
@@ -1599,6 +1663,13 @@ def render_cha_ching_tips():
             + f'</span></div>',
             unsafe_allow_html=True,
         )
+
+    # ── Add Multi Tip ─────────────────────────────────────────────────────────
+    if editable:
+        multi_col, _ = st.columns([2, 5])
+        with multi_col:
+            if st.button("➕ Add Multi Tip", use_container_width=True):
+                _add_multi_dialog()
 
     # ── Fixture fetch ─────────────────────────────────────────────────────────
     with st.spinner("Loading fixtures..."):
