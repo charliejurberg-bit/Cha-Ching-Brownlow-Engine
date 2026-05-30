@@ -1722,17 +1722,8 @@ def render_cha_ching_tips():
         settled_tips = flagged_all[~flagged_all['game_key'].isin(upcoming_keys) & (flagged_all['result'] != '')]
 
         # Split unsettled into recent-live vs stale (>48h since created_at)
-        _cutoff = pd.Timestamp.now() - pd.Timedelta(hours=48)
-        def _created_at(tip):
-            raw = tip.get('created_at', '')
-            if not raw:
-                return pd.NaT
-            try:
-                t = pd.Timestamp(raw)
-                return t.tz_localize(None) if t.tzinfo else t
-            except Exception:
-                return pd.NaT
-        _ages = all_live.apply(_created_at, axis=1)
+        _cutoff = pd.Timestamp.now(tz='UTC') - pd.Timedelta(hours=48)
+        _ages   = pd.to_datetime(all_live['created_at'].fillna(''), errors='coerce', utc=True)
         live_tips      = all_live[_ages.isna() | (_ages >= _cutoff)]
         unsettled_tips = all_live[_ages.notna() & (_ages < _cutoff)]
 
