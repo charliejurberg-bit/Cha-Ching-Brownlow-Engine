@@ -44,6 +44,14 @@ MARKET_TYPES = ["Disposals O/U", "Goals O/U", "Fantasy Points O/U", "Kicks O/U",
 RESULTS      = ["Pending", "Win", "Loss", "Void/Refund"]
 CC_THRESHOLD = 3   # checklist items needed to auto-flag a Cha Ching tip
 
+STAT_COL_MAP = {
+    "Disposals O/U": "Disposals",
+    "Goals O/U":     "Goals",
+    "Kicks O/U":     "Kicks",
+    "Handballs O/U": "Handballs",
+    "Marks O/U":     "Marks",
+}
+
 C = dict(
     green='#34d399', lgreen='#1a5c40', gold='#f0b429', lgold='#f5c842',
     brown='#94a3b8', red='#e05252', bg='#152533', card='#1e3a4a',
@@ -166,6 +174,18 @@ def _sb_records(df: pd.DataFrame) -> list[dict]:
 
 def _ensure_dirs():
     os.makedirs(DATA_DIR, exist_ok=True)  # for user_import.csv only
+
+
+@st.cache_data(ttl=3600)
+def _load_player_avgs() -> pd.DataFrame:
+    path = os.path.join(os.path.dirname(__file__), "data_2026", "afltables_2026.csv")
+    if not os.path.exists(path):
+        return pd.DataFrame()
+    df = pd.read_csv(path)
+    avail = [c for c in STAT_COL_MAP.values() if c in df.columns]
+    if 'Player' not in df.columns or not avail:
+        return pd.DataFrame()
+    return df.groupby('Player')[avail].mean().reset_index()
 
 
 def _load_polls() -> pd.DataFrame:
@@ -1698,64 +1718,88 @@ def render_cha_ching_tips():
         st.caption("No Cha Ching tips flagged yet — use the checklist in Upcoming Games below to create one.")
     else:
         flagged_all['result'] = flagged_all['result'].fillna('')
-        live_tips    = flagged_all[~flagged_all['game_key'].isin(upcoming_keys) & (flagged_all['result'] == '')]
+        all_live     = flagged_all[~flagged_all['game_key'].isin(upcoming_keys) & (flagged_all['result'] == '')]
         settled_tips = flagged_all[~flagged_all['game_key'].isin(upcoming_keys) & (flagged_all['result'] != '')]
+
+        # Split unsettled into recent-live vs stale (>48h since created_at)
+        _cutoff = pd.Timestamp.now() - pd.Timedelta(hours=48)
+        def _created_at(tip):
+            raw = tip.get('created_at', '')
+            if not raw:
+                return pd.NaT
+            try:
+                t = pd.Timestamp(raw)
+                return t.tz_localize(None) if t.tzinfo else t
+            except Exception:
+                return pd.NaT
+        _ages = all_live.apply(_created_at, axis=1)
+        live_tips      = all_live[_ages.isna() | (_ages >= _cutoff)]
+        unsettled_tips = all_live[_ages.notna() & (_ages < _cutoff)]
+
+        def _render_tip_card(tip, label_badge: str = '● LIVE', badge_class: str = 'live-badge'):
+            tip_id    = str(tip['tip_id'])
+            player    = str(tip.get('player', ''))
+            gkey      = str(tip.get('game_key', ''))
+            mtype     = str(tip.get('market_type', ''))
+            line_raw  = pd.to_numeric(tip.get('line', ''), errors='coerce')
+            odds_raw  = pd.to_numeric(tip.get('odds', ''), errors='coerce')
+            stake_raw = pd.to_numeric(tip.get('stake', ''), errors='coerce')
+            bookie    = str(tip.get('bookmaker', '') or '')
+            bet_parts = []
+            if not pd.isna(line_raw):
+                bet_parts.append(f"O/U {line_raw:.1f}")
+            if not pd.isna(odds_raw) and odds_raw > 1:
+                bet_parts.append(f"@ {odds_raw:.2f}")
+            if bookie:
+                bet_parts.append(f"({bookie})")
+            if not pd.isna(stake_raw) and stake_raw > 0:
+                bet_parts.append(f"— {stake_raw:.2f}u")
+            bet_detail = '&nbsp;&nbsp;'.join(bet_parts)
+            card_col, btn_col = st.columns([3, 2])
+            with card_col:
+                st.markdown(
+                    f'<div style="background:#152533;border:1px solid #2a4a5a;border-radius:10px;'
+                    f'padding:12px 16px;margin-bottom:4px">'
+                    f'<div style="display:flex;align-items:center;gap:0;margin-bottom:4px">'
+                    f'<span style="font-weight:700;color:#e8f0f8;font-size:14px">{player}</span>'
+                    f'<span class="{badge_class}">{label_badge}</span></div>'
+                    f'<div style="font-size:12px;color:#94a3b8;margin-bottom:2px">{gkey}'
+                    f'&nbsp;&nbsp;·&nbsp;&nbsp;{mtype}</div>'
+                    + (f'<div style="font-size:12px;font-family:DM Mono,monospace;color:#f0b429">'
+                       f'{bet_detail}</div>' if bet_detail else '')
+                    + f'</div>',
+                    unsafe_allow_html=True,
+                )
+            if editable:
+                with btn_col:
+                    b1, b2, b3 = st.columns(3)
+                    with b1:
+                        if st.button('✅ Win', key=f'tip_win_{tip_id}', use_container_width=True):
+                            _save_tip_result(tip_id, 'Win')
+                            st.toast('Tip settled as Win — synced to Bet History', icon='✅')
+                            st.rerun()
+                    with b2:
+                        if st.button('❌ Loss', key=f'tip_loss_{tip_id}', use_container_width=True):
+                            _save_tip_result(tip_id, 'Loss')
+                            st.toast('Tip settled as Loss — synced to Bet History', icon='❌')
+                            st.rerun()
+                    with b3:
+                        if st.button('↩️ Void', key=f'tip_void_{tip_id}', use_container_width=True):
+                            _save_tip_result(tip_id, 'Void/Refund')
+                            st.toast('Tip voided — synced to Bet History', icon='↩️')
+                            st.rerun()
 
         # ── Live ──────────────────────────────────────────────────────────────
         if not live_tips.empty:
             st.markdown('<div class="section-header">Live Tips</div>', unsafe_allow_html=True)
             for _, tip in live_tips.iterrows():
-                tip_id   = str(tip['tip_id'])
-                player   = str(tip.get('player', ''))
-                gkey     = str(tip.get('game_key', ''))
-                mtype    = str(tip.get('market_type', ''))
-                line_raw = pd.to_numeric(tip.get('line', ''), errors='coerce')
-                odds_raw = pd.to_numeric(tip.get('odds', ''), errors='coerce')
-                stake_raw= pd.to_numeric(tip.get('stake', ''), errors='coerce')
-                bookie   = str(tip.get('bookmaker', '') or '')
-                bet_parts = []
-                if not pd.isna(line_raw):
-                    bet_parts.append(f"O/U {line_raw:.1f}")
-                if not pd.isna(odds_raw) and odds_raw > 1:
-                    bet_parts.append(f"@ {odds_raw:.2f}")
-                if bookie:
-                    bet_parts.append(f"({bookie})")
-                if not pd.isna(stake_raw) and stake_raw > 0:
-                    bet_parts.append(f"— {stake_raw:.2f}u")
-                bet_detail = '&nbsp;&nbsp;'.join(bet_parts)
-                card_col, btn_col = st.columns([3, 2])
-                with card_col:
-                    st.markdown(
-                        f'<div style="background:#152533;border:1px solid #2a4a5a;border-radius:10px;'
-                        f'padding:12px 16px;margin-bottom:4px">'
-                        f'<div style="display:flex;align-items:center;gap:0;margin-bottom:4px">'
-                        f'<span style="font-weight:700;color:#e8f0f8;font-size:14px">{player}</span>'
-                        f'<span class="live-badge">● LIVE</span></div>'
-                        f'<div style="font-size:12px;color:#94a3b8;margin-bottom:2px">{gkey}'
-                        f'&nbsp;&nbsp;·&nbsp;&nbsp;{mtype}</div>'
-                        + (f'<div style="font-size:12px;font-family:DM Mono,monospace;color:#f0b429">'
-                           f'{bet_detail}</div>' if bet_detail else '')
-                        + f'</div>',
-                        unsafe_allow_html=True,
-                    )
-                if editable:
-                    with btn_col:
-                        b1, b2, b3 = st.columns(3)
-                        with b1:
-                            if st.button('✅ Win', key=f'tip_win_{tip_id}', use_container_width=True):
-                                _save_tip_result(tip_id, 'Win')
-                                st.toast('Tip settled as Win — synced to Bet History', icon='✅')
-                                st.rerun()
-                        with b2:
-                            if st.button('❌ Loss', key=f'tip_loss_{tip_id}', use_container_width=True):
-                                _save_tip_result(tip_id, 'Loss')
-                                st.toast('Tip settled as Loss — synced to Bet History', icon='❌')
-                                st.rerun()
-                        with b3:
-                            if st.button('↩️ Void', key=f'tip_void_{tip_id}', use_container_width=True):
-                                _save_tip_result(tip_id, 'Void/Refund')
-                                st.toast('Tip voided — synced to Bet History', icon='↩️')
-                                st.rerun()
+                _render_tip_card(tip)
+
+        # ── Unsettled (stale — >48h, no result) ───────────────────────────────
+        if not unsettled_tips.empty:
+            with st.expander(f"Unsettled Tips ({len(unsettled_tips)}) — awaiting result", expanded=False):
+                for _, tip in unsettled_tips.iterrows():
+                    _render_tip_card(tip, label_badge='⏳ UNSETTLED', badge_class='live-badge')
 
         # ── Settled ───────────────────────────────────────────────────────────
         if not settled_tips.empty:
@@ -1791,6 +1835,16 @@ def render_cha_ching_tips():
                                      type='secondary', use_container_width=False):
                             _save_tip_result(tip_id, '')
                             st.rerun()
+
+        # ── Pending Multis ─────────────────────────────────────────────────────
+        pending_multis = tips_df[
+            (tips_df['market_type'] == 'Multi') &
+            (tips_df['result'].fillna('') == '')
+        ].copy() if not tips_df.empty else pd.DataFrame()
+        if not pending_multis.empty:
+            with st.expander(f"Pending Multis ({len(pending_multis)})", expanded=False):
+                for _, tip in pending_multis.iterrows():
+                    _render_tip_card(tip, label_badge='🎯 MULTI', badge_class='live-badge')
 
     # ── Upcoming games ────────────────────────────────────────────────────────
     if fixtures.empty:
@@ -1872,7 +1926,7 @@ def render_cha_ching_tips():
 
 def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
                        tips_df: pd.DataFrame, editable: bool = True):
-    """Render a disposals or goals market tab for a game."""
+    """Render a market tab for a game."""
     game_props = props_df[
         (props_df['game_key'] == game_key) &
         (props_df['market_type'] == market_type)
@@ -1881,6 +1935,9 @@ def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
     if not game_props.empty:
         # Show existing props
         st.caption(f"Updated: {game_props['updated_at'].max()}")
+
+        stat_col   = STAT_COL_MAP.get(market_type)
+        plyr_avgs  = _load_player_avgs() if stat_col else pd.DataFrame()
 
         rows_html = ''
         for _, row in game_props.iterrows():
@@ -1896,6 +1953,20 @@ def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
             ] if not tips_df.empty else pd.DataFrame()
             is_flagged = not tip_match.empty and tip_match['is_flagged'].any()
             cc_html = ' <span class="cc-badge">CC</span>' if is_flagged else ''
+
+            edge_html = '—'
+            if stat_col and not plyr_avgs.empty:
+                pmatch = plyr_avgs[plyr_avgs['Player'] == player]
+                if not pmatch.empty:
+                    avg  = pmatch[stat_col].iloc[0]
+                    diff = avg - float(line)
+                    clr  = '#34d399' if diff >= 0 else '#e05252'
+                    edge_html = (
+                        f'<span style="color:#94a3b8">avg {avg:.1f}</span>'
+                        f'&nbsp;<span style="color:{clr};font-weight:700">'
+                        f'({diff:+.1f})</span>'
+                    )
+
             rows_html += (
                 f'<tr>'
                 f'<td style="padding:6px 10px;font-weight:600">{player}{cc_html}</td>'
@@ -1903,7 +1974,7 @@ def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
                 f'<td style="padding:6px 10px;text-align:center">{bookie}</td>'
                 f'<td style="padding:6px 10px;text-align:center;font-weight:700">{odds:.2f}</td>'
                 f'<td style="padding:6px 10px;text-align:center">{impl:.1f}%</td>'
-                f'<td style="padding:6px 10px;text-align:center">—</td>'
+                f'<td style="padding:6px 10px;text-align:center">{edge_html}</td>'
                 f'</tr>'
             )
 
