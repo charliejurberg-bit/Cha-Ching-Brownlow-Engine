@@ -1962,8 +1962,10 @@ def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
             with pc1:
                 p_player = st.text_input("Player name", key=f"pp_{game_key}_{market_type}_player")
             with pc2:
-                p_line = st.number_input("Line", min_value=0.5, max_value=99.5,
-                                         value=29.5, step=0.5, format='%.1f',
+                _line_max = 200.0 if market_type == "Fantasy Points O/U" else 99.5
+                _line_val = 100.5 if market_type == "Fantasy Points O/U" else 29.5
+                p_line = st.number_input("Line", min_value=0.5, max_value=_line_max,
+                                         value=_line_val, step=0.5, format='%.1f',
                                          key=f"pp_{game_key}_{market_type}_line")
             with pc3:
                 p_bookie = st.selectbox("Bookmaker", BOOKMAKERS,
