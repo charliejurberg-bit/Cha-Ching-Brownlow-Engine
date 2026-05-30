@@ -1649,9 +1649,29 @@ def render_cha_ching_tips():
 
         st.divider()
 
-    # ── Pending/flagged tips banner ───────────────────────────────────────────
+    # ── Fixture fetch ─────────────────────────────────────────────────────────
+    with st.spinner("Loading fixtures..."):
+        fixtures = _fetch_fixtures()
+
+    props_df = _load_props()
+
+    # Re-evaluate against current time — fixtures may be cached up to 24h old,
+    # so a game that was upcoming at cache time may have since kicked off.
+    _now_utc = pd.Timestamp.now(tz='UTC')
+    upcoming_keys = set()
+    for _, _g in fixtures.iterrows():
+        _dp = _g.get('date_parsed')
+        if pd.notna(_dp) and pd.Timestamp(_dp) > _now_utc:
+            upcoming_keys.add(_game_key(_g))
+
+    # ── Pending/flagged tips banner (upcoming only) ───────────────────────────
     tips_df  = _load_tips()
-    flagged  = tips_df[tips_df['is_flagged'] == True] if not tips_df.empty else pd.DataFrame()
+    if 'result' not in tips_df.columns:
+        tips_df['result'] = ''
+    flagged  = tips_df[
+        (tips_df['is_flagged'] == True) &
+        (tips_df['game_key'].isin(upcoming_keys))
+    ] if not tips_df.empty else pd.DataFrame()
     if not flagged.empty:
         st.markdown(
             f'<div style="background:linear-gradient(135deg,#c9a84c,#e8c96d);'
@@ -1671,25 +1691,7 @@ def render_cha_ching_tips():
             if st.button("➕ Add Multi Tip", use_container_width=True):
                 _add_multi_dialog()
 
-    # ── Fixture fetch ─────────────────────────────────────────────────────────
-    with st.spinner("Loading fixtures..."):
-        fixtures = _fetch_fixtures()
-
-    props_df = _load_props()
-
     # ── Live & Settled flagged tips ───────────────────────────────────────────
-    # Re-evaluate against current time — fixtures may be cached up to 24h old,
-    # so a game that was upcoming at cache time may have since kicked off.
-    _now_utc = pd.Timestamp.now(tz='UTC')
-    upcoming_keys = set()
-    for _, _g in fixtures.iterrows():
-        _dp = _g.get('date_parsed')
-        if pd.notna(_dp) and pd.Timestamp(_dp) > _now_utc:
-            upcoming_keys.add(_game_key(_g))
-
-    if 'result' not in tips_df.columns:
-        tips_df['result'] = ''
-
     flagged_all = tips_df[tips_df['is_flagged'] == True].copy() if not tips_df.empty else pd.DataFrame()
 
     if flagged_all.empty:
