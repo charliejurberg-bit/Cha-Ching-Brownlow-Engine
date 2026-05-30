@@ -39,8 +39,8 @@ CHECKLIST_ITEMS = [
 ]
 
 BOOKMAKERS   = ["Sportsbet", "TAB", "Betfair", "Ladbrokes", "Neds", "PointsBet", "Unibet", "Other"]
-MARKET_TYPES = ["Disposals O/U", "Goals O/U", "Kicks O/U", "Handballs O/U", "Marks O/U",
-                "Match Result", "Line", "Multi", "Other"]
+MARKET_TYPES = ["Disposals O/U", "Goals O/U", "Fantasy Points O/U", "Kicks O/U", "Handballs O/U",
+                "Marks O/U", "Match Result", "Line", "Multi", "Other"]
 RESULTS      = ["Pending", "Win", "Loss", "Void/Refund"]
 CC_THRESHOLD = 3   # checklist items needed to auto-flag a Cha Ching tip
 
@@ -1840,8 +1840,8 @@ def render_cha_ching_tips():
             col_exp, col_del = st.columns([9, 1])
             with col_exp:
                 with st.expander(f"**{mgkey}**", expanded=True):
-                    tab_disp, tab_goals = st.tabs(["Disposals", "Goals"])
-                    for tab, mtype in [(tab_disp, "Disposals O/U"), (tab_goals, "Goals O/U")]:
+                    tab_disp, tab_goals, tab_fpts = st.tabs(["Disposals", "Goals", "Fantasy Points"])
+                    for tab, mtype in [(tab_disp, "Disposals O/U"), (tab_goals, "Goals O/U"), (tab_fpts, "Fantasy Points O/U")]:
                         with tab:
                             _render_market_tab(mgkey, mtype, props_df, tips_df, editable=editable)
             with col_del:
@@ -1861,9 +1861,9 @@ def render_cha_ching_tips():
         rname  = str(game.get('roundname', ''))
 
         with st.expander(f"**{gkey}**  —  {glabel}"):
-            tab_disp, tab_goals = st.tabs(["Disposals", "Goals"])
+            tab_disp, tab_goals, tab_fpts = st.tabs(["Disposals", "Goals", "Fantasy Points"])
 
-            for tab, mtype in [(tab_disp, "Disposals O/U"), (tab_goals, "Goals O/U")]:
+            for tab, mtype in [(tab_disp, "Disposals O/U"), (tab_goals, "Goals O/U"), (tab_fpts, "Fantasy Points O/U")]:
                 with tab:
                     _render_market_tab(gkey, mtype, props_df, tips_df, editable=editable)
 
