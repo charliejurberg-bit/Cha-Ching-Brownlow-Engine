@@ -407,7 +407,7 @@ def apply_chart_theme(fig):
 
 def render_banner():
     _hub = st.session_state.get("active_hub", "brownlow")
-    _sub = f"Through Round {max_season_rounds - 1}" if is_2026 else f"{selected_season} Season"
+    _sub = f"Through Round {max_season_rounds}" if is_2026 else f"{selected_season} Season"
     _mode_label = "Brownlow Predictor" if _hub == "brownlow" else "Betting Hub"
     st.markdown(f"""
 <div class="cha-ching-banner">
@@ -1976,7 +1976,7 @@ if _page == 'Landing':
 <div class="land-ribbon">
   <div class="land-stat">
     <div class="land-stat-label">Round</div>
-    <div class="land-stat-value">{max_season_rounds - 1}</div>
+    <div class="land-stat-value">{max_season_rounds}</div>
   </div>
   <div class="land-stat">
     <div class="land-stat-label">Current Leader</div>
@@ -2064,8 +2064,8 @@ if _page == 'Home':
             if num_cols:
                 leader_odds = f"${float(match.iloc[0][num_cols[0]]):.2f}"
 
-    rounds_remaining = 24 - (CURRENT_ROUND - 1)
-    season_pct = int((CURRENT_ROUND / 24) * 100)
+    rounds_remaining = 23 - CURRENT_ROUND
+    season_pct = int((CURRENT_ROUND / 23) * 100)
 
     st.markdown(f"""
 <div style="padding:20px 0 12px;animation:fadeSlideUp 500ms cubic-bezier(0.23,1,0.32,1) both;">
@@ -2074,7 +2074,7 @@ if _page == 'Home':
                 animation:pulse 2s ease-in-out infinite;"></div>
     <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:500;
                  letter-spacing:0.1em;text-transform:uppercase;color:#34d399;">
-      Live · Round {CURRENT_ROUND - 1}
+      Live · Round {CURRENT_ROUND}
     </span>
   </div>
   <h1 style="font-family:'Sora',sans-serif;font-size:2.6rem;font-weight:700;
@@ -2095,7 +2095,7 @@ if _page == 'Home':
     <span style="font-size:11px;font-weight:500;letter-spacing:0.08em;
                  text-transform:uppercase;color:#4a5a6a;">Season progress</span>
     <span style="font-size:12px;color:#94a3b8;font-family:'DM Mono',monospace;">
-      R{CURRENT_ROUND - 1} of 24 &nbsp;·&nbsp; {rounds_remaining} rounds to go
+      R{CURRENT_ROUND} of 23 &nbsp;·&nbsp; {rounds_remaining} rounds to go
     </span>
   </div>
   <div style="height:6px;background:#1e3a4a;border-radius:3px;overflow:hidden;">
@@ -2820,7 +2820,7 @@ if _page == 'Game Analysis':
             with sel_col:
                 selected_round = st.selectbox(
                     "Select Round", available_rounds,
-                    format_func=lambda r: f"Round {r - 1}",
+                    format_func=lambda r: f"Round {r}",
                     index=max(0, len(available_rounds) - 1),
                     key="rbr_round",
                 )
@@ -2828,7 +2828,7 @@ if _page == 'Game Analysis':
             with info_col:
                 st.markdown(
                     f'<div style="line-height:38px;color:#94a3b8;font-size:14px;">'
-                    f'Round {selected_round - 1} &nbsp;·&nbsp; {rnd["Match"].nunique()} matches &nbsp;·&nbsp; {len(rnd)} players'
+                    f'Round {selected_round} &nbsp;·&nbsp; {rnd["Match"].nunique()} matches &nbsp;·&nbsp; {len(rnd)} players'
                     f'</div>',
                     unsafe_allow_html=True,
                 )
@@ -2931,7 +2931,7 @@ if _page == 'Game Analysis':
                 _delay = f'{game_idx * 0.07:.2f}'
                 st.markdown(
                     f'<div class="game-card" style="animation-delay:{_delay}s">'
-                    f'<div class="game-card-eyebrow">Game {game_idx + 1} &nbsp;·&nbsp; Round {selected_round - 1}</div>'
+                    f'<div class="game-card-eyebrow">Game {game_idx + 1} &nbsp;·&nbsp; Round {selected_round}</div>'
                     f'<div class="game-card-title">{result_html}{score_pill}</div>'
                     f'</div>',
                     unsafe_allow_html=True,
@@ -3018,7 +3018,7 @@ if _page == 'Brownlow Betting':
                 _be_leader_name, _be_leader_votes, _be_leader_avg = '—', 0.0, 0.0
 
             c1, c2, c3, c4 = st.columns(4)
-            with c1: st.markdown(f'<div class="metric-card"><div class="metric-label">Rounds Played</div><div class="metric-value">{_be_rounds_played - 1}</div><div class="metric-sub">of {_be_total_rounds} H&A rounds</div></div>', unsafe_allow_html=True)
+            with c1: st.markdown(f'<div class="metric-card"><div class="metric-label">Rounds Played</div><div class="metric-value">{_be_rounds_played}</div><div class="metric-sub">of {_be_total_rounds} H&A rounds</div></div>', unsafe_allow_html=True)
             with c2: st.markdown(f'<div class="metric-card"><div class="metric-label">Remaining Rounds</div><div class="metric-value">{_be_remaining + 1}</div><div class="metric-sub">to be projected</div></div>', unsafe_allow_html=True)
             with c3: st.markdown(f'<div class="metric-card"><div class="metric-label">Projected Leader</div><div class="metric-value">{_be_leader_name}</div><div class="metric-sub">{_be_leader_votes:.1f} projected votes</div></div>', unsafe_allow_html=True)
             with c4: st.markdown(f'<div class="metric-card"><div class="metric-label">Avg Per Game (Leader)</div><div class="metric-value">{_be_leader_avg:.2f}</div><div class="metric-sub">expected votes per game</div></div>', unsafe_allow_html=True)
@@ -3203,7 +3203,7 @@ if _page == 'Stat Filter':
             if has_2026:
                 n_2026_games = int((filtered_sf['Season'] == 2026).sum())
                 max_rnd_2026 = int(filtered_sf[filtered_sf['Season'] == 2026]['Round_num'].max())
-                st.info(f"2026 data included — {n_2026_games:,} games through Round {max_rnd_2026 - 1} (Brownlow votes not yet assigned). Poll rates from {season_range[0]}–2025 only.")
+                st.info(f"2026 data included — {n_2026_games:,} games through Round {max_rnd_2026} (Brownlow votes not yet assigned). Poll rates from {season_range[0]}–2025 only.")
                 vote_data = filtered_sf[filtered_sf['Season'] < 2026]
             else:
                 vote_data = filtered_sf
@@ -3301,7 +3301,7 @@ if False:  # merged into Game Analysis
         with sel_col:
             selected_round = st.selectbox(
                 "Select Round", available_rounds,
-                format_func=lambda r: f"Round {r - 1}",
+                format_func=lambda r: f"Round {r}",
                 index=max(0, len(available_rounds) - 1),
                 key="rbr_round",
             )
@@ -3309,7 +3309,7 @@ if False:  # merged into Game Analysis
         with info_col:
             st.markdown(
                 f'<div style="line-height:38px;color:#94a3b8;font-size:14px;">'
-                f'Round {selected_round - 1} &nbsp;·&nbsp; {rnd["Match"].nunique()} matches &nbsp;·&nbsp; {len(rnd)} players'
+                f'Round {selected_round} &nbsp;·&nbsp; {rnd["Match"].nunique()} matches &nbsp;·&nbsp; {len(rnd)} players'
                 f'</div>',
                 unsafe_allow_html=True,
             )
@@ -3376,7 +3376,7 @@ if False:  # merged into Game Analysis
                 f'border-radius:0 8px 8px 0;margin:36px 0 8px 0;box-shadow:0 1px 4px rgba(45,80,22,0.08);'
                 f'border:1px solid #ddd5c5;border-left:6px solid {colour};">'
                 f'<div style="color:{colour};font-size:10px;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px">'
-                f'Game {game_idx + 1} &nbsp;·&nbsp; Round {selected_round - 1}</div>'
+                f'Game {game_idx + 1} &nbsp;·&nbsp; Round {selected_round}</div>'
                 f'<div>{header_body}</div></div>',
                 unsafe_allow_html=True,
             )
@@ -3784,7 +3784,7 @@ if _page == 'Player Comparison':
                     _fig_rbr = go.Figure()
                     if not _g1.empty:
                         _fig_rbr.add_trace(go.Scatter(
-                            x=(_g1['Round_num'] - 1), y=_g1['Exp_Votes'].round(1),
+                            x=_g1['Round_num'], y=_g1['Exp_Votes'].round(1),
                             name=_p1, mode='lines+markers',
                             line=dict(color='#34d399', width=2.5),
                             marker=dict(size=7, color='#34d399'),
@@ -3792,7 +3792,7 @@ if _page == 'Player Comparison':
                         ))
                     if not _g2.empty:
                         _fig_rbr.add_trace(go.Scatter(
-                            x=(_g2['Round_num'] - 1), y=_g2['Exp_Votes'].round(1),
+                            x=_g2['Round_num'], y=_g2['Exp_Votes'].round(1),
                             name=_p2, mode='lines+markers',
                             line=dict(color='#94a3b8', width=2.5),
                             marker=dict(size=7, color='#94a3b8'),
@@ -3961,14 +3961,14 @@ if _page == 'Player Comparison':
                     _fig_h2h_rbr = go.Figure()
                     if not _hg1.empty:
                         _fig_h2h_rbr.add_trace(go.Scatter(
-                            x=(_hg1['Round_num'] - 1), y=_hg1['Exp_Votes'].round(1),
+                            x=_hg1['Round_num'], y=_hg1['Exp_Votes'].round(1),
                             name=_p1, mode='lines+markers',
                             line=dict(color='#34d399', width=2.5), marker=dict(size=7, color='#34d399'),
                             hovertemplate='<b>' + _p1 + '</b><br>Round %{x}<br>%{y:.1f} exp votes<extra></extra>',
                         ))
                     if not _hg2.empty:
                         _fig_h2h_rbr.add_trace(go.Scatter(
-                            x=(_hg2['Round_num'] - 1), y=_hg2['Exp_Votes'].round(1),
+                            x=_hg2['Round_num'], y=_hg2['Exp_Votes'].round(1),
                             name=_p2, mode='lines+markers',
                             line=dict(color='#94a3b8', width=2.5), marker=dict(size=7, color='#94a3b8'),
                             hovertemplate='<b>' + _p2 + '</b><br>Round %{x}<br>%{y:.1f} exp votes<extra></extra>',
@@ -4218,7 +4218,7 @@ if False:  # merged into Player Comparison
                         _fig_h2h = go.Figure()
                         if not _hg1.empty:
                             _fig_h2h.add_trace(go.Scatter(
-                                x=(_hg1['Round_num'] - 1), y=_hg1['Exp_Votes'].round(1),
+                                x=_hg1['Round_num'], y=_hg1['Exp_Votes'].round(1),
                                 name=_ha, mode='lines+markers',
                                 line=dict(color='#34d399', width=2.5),
                                 marker=dict(size=7, color='#34d399'),
@@ -4226,7 +4226,7 @@ if False:  # merged into Player Comparison
                             ))
                         if not _hg2.empty:
                             _fig_h2h.add_trace(go.Scatter(
-                                x=(_hg2['Round_num'] - 1), y=_hg2['Exp_Votes'].round(1),
+                                x=_hg2['Round_num'], y=_hg2['Exp_Votes'].round(1),
                                 name=_hb, mode='lines+markers',
                                 line=dict(color='#94a3b8', width=2.5),
                                 marker=dict(size=7, color='#94a3b8'),
@@ -4347,7 +4347,7 @@ if _page == 'Live Tracker':
 
     if not _lt_df.empty:
         # ── metrics strip ────────────────────────────────────
-        _lt_rlabel = "OR" if _lt_last == 0 else f"Round {_lt_last - 1}"
+        _lt_rlabel = f"Round {_lt_last}"
         _lt_leader = _lt_df.iloc[0]["Player"] if len(_lt_df) else "—"
         _lt_leader_votes = int(_lt_df.iloc[0]["Total_Votes"]) if len(_lt_df) else 0
         _lt_margin = (
@@ -4606,7 +4606,7 @@ if _page == 'Live Tracker':
                 if not _pav_cards:
                     st.markdown(
                         f'<div style="color:#94a3b8;font-size:13px;padding:8px 0">'
-                        f'No watchlist players flagged for Round {_pav_round - 1}.</div>',
+                        f'No watchlist players flagged for Round {_pav_round}.</div>',
                         unsafe_allow_html=True,
                     )
                 else:

@@ -149,6 +149,7 @@ Market types: Disposals O/U, Goals O/U, Kicks O/U, Handballs O/U, Marks O/U, Mat
 
 ## Key decisions & constraints
 
+- **Round numbering (2026)**: The AFL 2026 season has a "Round 0" (opening/pre-season round) that is **not tracked by AFLTables or fitzRoy**. AFLTables starts at Round 1 = AFL official Round 1. There is **no display offset** — show the AFLTables round number directly. Do not subtract 1 anywhere in the display code. Total H&A rounds tracked by AFLTables = 23 (Rounds 1–23).
 - **Finals excluded**: Rounds with string labels (QF/EF/SF/PF/GF) are coerced to NaN and dropped in both training and prediction. Max H&A round detected dynamically per season (2023 and prior seasons had 24 rounds; current code handles any count).
 - **No lookahead in form**: `late_form_ewm` uses `.shift(1)` before the EWMA so current-round data is never included.
 - **Same-name disambiguation**: Players sharing a name but on different teams get `Name (Team)` appended.
