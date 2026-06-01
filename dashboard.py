@@ -2820,7 +2820,7 @@ if _page == 'Game Analysis':
             with sel_col:
                 selected_round = st.selectbox(
                     "Select Round", available_rounds,
-                    format_func=lambda r: f"Round {r}",
+                    format_func=lambda r: f"Round {r - 1}",
                     index=max(0, len(available_rounds) - 1),
                     key="rbr_round",
                 )
@@ -2828,7 +2828,7 @@ if _page == 'Game Analysis':
             with info_col:
                 st.markdown(
                     f'<div style="line-height:38px;color:#94a3b8;font-size:14px;">'
-                    f'Round {selected_round} &nbsp;·&nbsp; {rnd["Match"].nunique()} matches &nbsp;·&nbsp; {len(rnd)} players'
+                    f'Round {selected_round - 1} &nbsp;·&nbsp; {rnd["Match"].nunique()} matches &nbsp;·&nbsp; {len(rnd)} players'
                     f'</div>',
                     unsafe_allow_html=True,
                 )
@@ -2931,7 +2931,7 @@ if _page == 'Game Analysis':
                 _delay = f'{game_idx * 0.07:.2f}'
                 st.markdown(
                     f'<div class="game-card" style="animation-delay:{_delay}s">'
-                    f'<div class="game-card-eyebrow">Game {game_idx + 1} &nbsp;·&nbsp; Round {selected_round}</div>'
+                    f'<div class="game-card-eyebrow">Game {game_idx + 1} &nbsp;·&nbsp; Round {selected_round - 1}</div>'
                     f'<div class="game-card-title">{result_html}{score_pill}</div>'
                     f'</div>',
                     unsafe_allow_html=True,
