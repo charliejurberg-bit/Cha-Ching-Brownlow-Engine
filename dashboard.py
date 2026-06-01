@@ -3424,7 +3424,7 @@ if False:  # merged into Betting Edge
     if proj is None:
         st.error("No season projection found. Run predict_2026.py first.")
     else:
-        rounds_played = int(proj['Games_Played'].max())
+        rounds_played = max_season_rounds
         remaining_sp = int(proj['Remaining_Rounds'].iloc[0])
         total_rounds_sp = rounds_played + remaining_sp
         leader_sp = proj.iloc[0]
