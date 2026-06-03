@@ -410,24 +410,10 @@ def render_banner():
     _sub = f"Through Round {max_season_rounds}" if is_2026 else f"{selected_season} Season"
     _mode_label = "Brownlow Predictor" if _hub == "brownlow" else "Betting Hub"
     st.markdown(f"""
-<style>
-@keyframes orbDrift1 {{
-    0%   {{ transform: translate(-8%, -5%) scale(1.0); }}
-    100% {{ transform: translate(8%, 5%) scale(1.08); }}
-}}
-@keyframes orbDrift2 {{
-    0%   {{ transform: translate(5%, 8%) scale(1.05); }}
-    100% {{ transform: translate(-10%, -4%) scale(0.95); }}
-}}
-@keyframes orbDrift3 {{
-    0%   {{ transform: translate(3%, -10%) scale(0.95); }}
-    100% {{ transform: translate(-5%, 8%) scale(1.1); }}
-}}
-</style>
 <div class="cha-ching-banner">
-    <div class="banner-orb" style="animation:orbDrift1 9s ease-in-out infinite alternate;background:radial-gradient(ellipse 70% 40% at 50% 50%,rgba(32,178,120,0.13) 0%,transparent 70%);"></div>
-    <div class="banner-orb" style="animation:orbDrift2 13s ease-in-out infinite alternate;background:radial-gradient(ellipse 50% 35% at 30% 60%,rgba(20,110,180,0.09) 0%,transparent 65%);"></div>
-    <div class="banner-orb" style="animation:orbDrift3 7s ease-in-out infinite alternate;background:radial-gradient(ellipse 40% 30% at 75% 40%,rgba(80,200,150,0.07) 0%,transparent 60%);"></div>
+    <div class="banner-orb" id="cc-orb-0" style="background:radial-gradient(ellipse 70% 40% at 50% 50%,rgba(32,178,120,0.13) 0%,transparent 70%);"></div>
+    <div class="banner-orb" id="cc-orb-1" style="background:radial-gradient(ellipse 50% 35% at 30% 60%,rgba(20,110,180,0.09) 0%,transparent 65%);"></div>
+    <div class="banner-orb" id="cc-orb-2" style="background:radial-gradient(ellipse 40% 30% at 75% 40%,rgba(80,200,150,0.07) 0%,transparent 60%);"></div>
     <div class="banner-vignette"></div>
     <div class="banner-corner banner-corner-tl"></div>
     <div class="banner-corner banner-corner-tr"></div>
@@ -441,6 +427,26 @@ def render_banner():
     <div class="cha-ching-title">CHA CHING</div>
     <div class="cha-ching-sub">{_mode_label} &nbsp;&middot;&nbsp; {_sub}</div>
 </div>
+<script>
+(function() {{
+    var orbs = [
+        document.getElementById('cc-orb-0'),
+        document.getElementById('cc-orb-1'),
+        document.getElementById('cc-orb-2')
+    ];
+    if (!orbs[0]) return;
+    function tick(t) {{
+        var x0 = Math.sin(t * 0.0007) * 8,  y0 = Math.cos(t * 0.0005) * 5;
+        var x1 = Math.cos(t * 0.0005) * 10, y1 = Math.sin(t * 0.0003) * 8;
+        var x2 = Math.sin(t * 0.001)  * 5,  y2 = Math.cos(t * 0.0008) * 10;
+        orbs[0].style.transform = 'translate(' + x0 + '%, ' + y0 + '%)';
+        orbs[1].style.transform = 'translate(' + x1 + '%, ' + y1 + '%)';
+        orbs[2].style.transform = 'translate(' + x2 + '%, ' + y2 + '%)';
+        requestAnimationFrame(tick);
+    }}
+    requestAnimationFrame(tick);
+}})();
+</script>
 """, unsafe_allow_html=True)
 
 # ── CSS ──────────────────────────────────────────────────────
