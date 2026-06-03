@@ -448,6 +448,7 @@ def render_banner():
 }})();
 </script>
 """, unsafe_allow_html=True)
+st.markdown('<div id="cc-test" style="display:none">ok</div>', unsafe_allow_html=True)
 
 # ── CSS ──────────────────────────────────────────────────────
 st.markdown("""
