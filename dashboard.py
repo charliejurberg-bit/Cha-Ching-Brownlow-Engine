@@ -2290,12 +2290,12 @@ if _page == 'Leaderboard':
     display['Exp Votes'] = display['Exp_Total_Votes'].round(1)
     display['3-vote games'] = display['Exp_3vote_games'].round(1)
     if _move_map:
-        def _fmt_move(n):
-            if pd.isna(n) or n == 0: return '—'
-            return f'▲{int(n)}' if n > 0 else f'▼{int(abs(n))}'
-        display['Move'] = display['Player_Name'].map(_move_map).apply(
-            lambda x: _fmt_move(x) if x is not None else '—'
-        )
+        def _fmt_rank(row):
+            n = _move_map.get(row['Player_Name'], 0)
+            r = int(row['Rank'])
+            if pd.isna(n) or n == 0: return str(r)
+            return f'{r} ▲{int(n)}' if n > 0 else f'{r} ▼{int(abs(n))}'
+        display['Rank'] = display.apply(_fmt_rank, axis=1)
 
     if is_2026:
         _proj = load_season_projection()
@@ -2318,15 +2318,13 @@ if _page == 'Leaderboard':
             )
             display['Best Odds'] = display['best_odds'].apply(lambda x: f"${x:.1f}" if pd.notna(x) else "—")
             display['Mkt %'] = display['implied_prob'].apply(lambda x: f"{x:.0f}%" if pd.notna(x) else "—")
-            _mv = ['Move'] if _move_map else []
-            base = ['Rank'] + _mv + ['Player_Name', 'Team', 'Games', 'Exp Votes', 'Poll %', '3-vote games']
+            base = ['Rank', 'Player_Name', 'Team', 'Games', 'Exp Votes', 'Poll %', '3-vote games']
             fc = ['Floor', 'Ceiling'] if has_floor_ceiling else []
-            cols_show = base[:5 + len(_mv)] + fc + base[5 + len(_mv):] + ['Best Odds', 'Mkt %']
+            cols_show = base[:5] + fc + base[5:] + ['Best Odds', 'Mkt %']
         else:
-            _mv = ['Move'] if _move_map else []
-            base = ['Rank'] + _mv + ['Player_Name', 'Team', 'Games', 'Exp Votes', 'Poll %', '3-vote games']
+            base = ['Rank', 'Player_Name', 'Team', 'Games', 'Exp Votes', 'Poll %', '3-vote games']
             fc = ['Floor', 'Ceiling'] if has_floor_ceiling else []
-            cols_show = base[:5 + len(_mv)] + fc + base[5 + len(_mv):]
+            cols_show = base[:5] + fc + base[5:]
     else:
         display['Actual'] = display['Actual_Votes'].astype(int)
         display['Diff'] = (display['Exp Votes'] - display['Actual']).round(1)
@@ -2343,7 +2341,15 @@ if _page == 'Leaderboard':
     _lb_disp = display[cols_show].rename(columns={'Player_Name': 'Player'})
     for col in _lb_disp.select_dtypes(include='float').columns:
         _lb_disp[col] = _lb_disp[col].round(1)
-    st.dataframe(_style_leaderboard_table(_lb_disp), width='stretch', hide_index=True)
+    _lb_styled = _style_leaderboard_table(_lb_disp)
+    if _move_map and 'Rank' in _lb_disp.columns:
+        _lb_styled = _lb_styled.map(
+            lambda v: ('color:#34d399!important;font-weight:700!important;' if '▲' in str(v)
+                       else 'color:#e63946!important;font-weight:700!important;' if '▼' in str(v)
+                       else ''),
+            subset=['Rank']
+        )
+    st.dataframe(_lb_styled, width='stretch', hide_index=True)
     if is_2026 and _fg:
         st.caption("Form: 🟢 predicted to poll (≥30% chance) · ⚫ not predicted · ▫ did not play — last 3 rounds")
 
