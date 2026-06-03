@@ -407,7 +407,7 @@ def apply_chart_theme(fig):
 
 def render_banner():
     _hub = st.session_state.get("active_hub", "brownlow")
-    _sub = f"Through Round {max_season_rounds}" if is_2026 else f"{selected_season} Season"
+    _sub = f"Through Round {max_season_rounds - 1}" if is_2026 else f"{selected_season} Season"
     _mode_label = "Brownlow Predictor" if _hub == "brownlow" else "Betting Hub"
     st.markdown(f"""
 <div class="cha-ching-banner">
@@ -2049,7 +2049,7 @@ if _page == 'Landing':
 <div class="land-ribbon">
   <div class="land-stat">
     <div class="land-stat-label">Round</div>
-    <div class="land-stat-value">{max_season_rounds}</div>
+    <div class="land-stat-value">{max_season_rounds - 1}</div>
   </div>
   <div class="land-stat">
     <div class="land-stat-label">Current Leader</div>
@@ -3144,7 +3144,7 @@ if _page == 'Brownlow Betting':
                 _be_leader_name, _be_leader_votes, _be_leader_avg = '—', 0.0, 0.0
 
             c1, c2, c3, c4 = st.columns(4)
-            with c1: st.markdown(f'<div class="metric-card"><div class="metric-label">Rounds Played</div><div class="metric-value">{_be_rounds_played}</div><div class="metric-sub">of {_be_total_rounds} H&A rounds</div></div>', unsafe_allow_html=True)
+            with c1: st.markdown(f'<div class="metric-card"><div class="metric-label">Rounds Played</div><div class="metric-value">{_be_rounds_played - 1}</div><div class="metric-sub">of {_be_total_rounds - 1} H&A rounds</div></div>', unsafe_allow_html=True)
             with c2: st.markdown(f'<div class="metric-card"><div class="metric-label">Remaining Rounds</div><div class="metric-value">{_be_remaining + 1}</div><div class="metric-sub">to be projected</div></div>', unsafe_allow_html=True)
             with c3: st.markdown(f'<div class="metric-card"><div class="metric-label">Projected Leader</div><div class="metric-value">{_be_leader_name}</div><div class="metric-sub">{_be_leader_votes:.1f} projected votes</div></div>', unsafe_allow_html=True)
             with c4: st.markdown(f'<div class="metric-card"><div class="metric-label">Avg Per Game (Leader)</div><div class="metric-value">{_be_leader_avg:.2f}</div><div class="metric-sub">expected votes per game</div></div>', unsafe_allow_html=True)
@@ -3556,7 +3556,7 @@ if False:  # merged into Betting Edge
         leader_sp = proj.iloc[0]
 
         c1, c2, c3, c4 = st.columns(4)
-        with c1: st.markdown(f'<div class="metric-card"><div class="metric-label">Rounds Played</div><div class="metric-value">{rounds_played}</div><div class="metric-sub">of {total_rounds_sp} H&A rounds</div></div>', unsafe_allow_html=True)
+        with c1: st.markdown(f'<div class="metric-card"><div class="metric-label">Rounds Played</div><div class="metric-value">{rounds_played - 1}</div><div class="metric-sub">of {total_rounds_sp - 1} H&A rounds</div></div>', unsafe_allow_html=True)
         with c2: st.markdown(f'<div class="metric-card"><div class="metric-label">Remaining Rounds</div><div class="metric-value">{remaining_sp}</div><div class="metric-sub">to be projected</div></div>', unsafe_allow_html=True)
         with c3: st.markdown(f'<div class="metric-card"><div class="metric-label">Projected Leader</div><div class="metric-value" style="font-size:18px">{leader_sp["Player"]}</div><div class="metric-sub">{leader_sp["Season_Total_Projected"]:.1f} projected votes</div></div>', unsafe_allow_html=True)
         with c4: st.markdown(f'<div class="metric-card"><div class="metric-label">Avg Per Game (Leader)</div><div class="metric-value">{leader_sp["Avg_Predicted_Per_Game"]:.2f}</div><div class="metric-sub">expected votes per game</div></div>', unsafe_allow_html=True)
