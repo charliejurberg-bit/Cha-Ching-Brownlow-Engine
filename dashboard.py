@@ -2352,11 +2352,13 @@ if _page == 'Leaderboard':
                 _r = int(_val) if not pd.isna(_val) else _idx + 1
                 _n = _move_map.get(str(_row.get('Player', '')), 0) if _move_map else 0
                 if not pd.isna(_n) and _n > 0:
-                    _td += 'color:#34d399;font-weight:700;'
-                    _cell_val = f'{_r} ▲{int(_n)}'
+                    _badge = (f'<span style="font-size:10px;font-weight:500;opacity:0.75;'
+                              f'color:#34d399;margin-left:3px">▲{int(_n)}</span>')
+                    _cell_val = f'{_r}{_badge}'
                 elif not pd.isna(_n) and _n < 0:
-                    _td += 'color:#e63946;font-weight:700;'
-                    _cell_val = f'{_r} ▼{int(abs(_n))}'
+                    _badge = (f'<span style="font-size:10px;font-weight:500;opacity:0.75;'
+                              f'color:#e63946;margin-left:3px">▼{int(abs(_n))}</span>')
+                    _cell_val = f'{_r}{_badge}'
                 else:
                     _cell_val = str(_r)
             else:
