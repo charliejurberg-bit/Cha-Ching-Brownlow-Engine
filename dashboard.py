@@ -2335,28 +2335,42 @@ if _page == 'Leaderboard':
     for col in _lb_disp.select_dtypes(include='float').columns:
         _lb_disp[col] = _lb_disp[col].round(1)
     # Build rank+arrow strings after all merges so dtype survives
-    if _move_map and 'Rank' in _lb_disp.columns:
-        _rank_strs = []
-        for _, _row in _lb_disp[['Rank', 'Player']].iterrows():
-            _r = int(_row['Rank'])
-            _n = _move_map.get(_row['Player'], 0)
-            if pd.isna(_n) or _n == 0:
-                _rank_strs.append(str(_r))
-            elif _n > 0:
-                _rank_strs.append(f'{_r} ▲{int(_n)}')
+    # Render as HTML table — bypasses Arrow/Styler limitations for coloured rank+arrow
+    _hdr_style = 'background:#0f1e2b;color:#94a3b8;font-weight:600;font-size:11px;letter-spacing:0.5px;padding:8px 10px;border-bottom:2px solid #2a4a5a;text-align:left;white-space:nowrap'
+    _hdrs = ''.join(f'<th style="{_hdr_style}">{c}</th>' for c in _lb_disp.columns)
+    _tbl_rows = []
+    for _idx, (_, _row) in enumerate(_lb_disp.iterrows()):
+        _bg   = '#152533' if _idx % 2 == 0 else '#1a2d3d'
+        _tcol = _TEAM_COLOURS.get(str(_row.get('Team', '')), '#2a4a5a')
+        _cells = []
+        for _ci, _col in enumerate(_lb_disp.columns):
+            _val = _row[_col]
+            _td  = f'padding:7px 10px;font-size:13px;white-space:nowrap;color:#e8f0f8;'
+            if _ci == 0:
+                _td += f'border-left:3px solid {_tcol};'
+            if _col == 'Rank':
+                _r = int(_val) if not pd.isna(_val) else _idx + 1
+                _n = _move_map.get(str(_row.get('Player', '')), 0) if _move_map else 0
+                if not pd.isna(_n) and _n > 0:
+                    _td += 'color:#34d399;font-weight:700;'
+                    _cell_val = f'{_r} ▲{int(_n)}'
+                elif not pd.isna(_n) and _n < 0:
+                    _td += 'color:#e63946;font-weight:700;'
+                    _cell_val = f'{_r} ▼{int(abs(_n))}'
+                else:
+                    _cell_val = str(_r)
             else:
-                _rank_strs.append(f'{_r} ▼{int(abs(_n))}')
-        _lb_disp['Rank'] = pd.array(_rank_strs, dtype=pd.StringDtype())
-    _lb_styled = _style_leaderboard_table(_lb_disp)
-    if _move_map and 'Rank' in _lb_disp.columns:
-        _lb_styled = _lb_styled.map(
-            lambda v: ('color:#34d399!important;font-weight:700!important;' if pd.notna(v) and '▲' in str(v)
-                       else 'color:#e63946!important;font-weight:700!important;' if pd.notna(v) and '▼' in str(v)
-                       else ''),
-            subset=['Rank']
-        )
-    _lb_col_cfg = {'Rank': st.column_config.TextColumn('Rank', width='small')} if _move_map else {}
-    st.dataframe(_lb_styled, column_config=_lb_col_cfg, width='stretch', hide_index=True)
+                _cell_val = '' if pd.isna(_val) else (f'{_val:.1f}' if isinstance(_val, float) else str(_val))
+            _cells.append(f'<td style="{_td}">{_cell_val}</td>')
+        _tbl_rows.append(f'<tr style="background:{_bg}">{"".join(_cells)}</tr>')
+    st.markdown(
+        f'<div style="overflow-x:auto;border-radius:8px;border:1px solid #2a4a5a">'
+        f'<table style="border-collapse:collapse;width:100%">'
+        f'<thead><tr>{ _hdrs}</tr></thead>'
+        f'<tbody>{"".join(_tbl_rows)}</tbody>'
+        f'</table></div>',
+        unsafe_allow_html=True,
+    )
     if is_2026 and _fg:
         st.caption("Form: 🟢 predicted to poll (≥30% chance) · ⚫ not predicted · ▫ did not play — last 3 rounds")
 
