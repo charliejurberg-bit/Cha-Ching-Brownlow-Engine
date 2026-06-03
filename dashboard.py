@@ -2990,11 +2990,7 @@ if _page == 'Game Analysis':
                                 'background-color:#1a2d3d!important;color:#e8f0f8!important;')
                     result = []
                     for col in df.columns:
-                        if col == 'Rank' and i in _rank_cell:
-                            result.append(base + _rank_cell[i])
-                        elif col == 'Rank':
-                            result.append(base + 'text-align:center!important;')
-                        elif col == 'P(3v) %' and i >= 3:
+                        if col == 'P(3v) %' and i >= 3:
                             v = float(row[col]) if row[col] != '' else 0.0
                             norm = v / max_p3v if max_p3v > 0 else 0.0
                             a = 0.07 + norm * 0.40
@@ -3013,7 +3009,6 @@ if _page == 'Game Analysis':
             col_cfg = {
                 'Player': st.column_config.TextColumn('Player'),
                 'Team': st.column_config.TextColumn('Team', width='small'),
-                'Rank': st.column_config.NumberColumn('Rank', width='small'),
                 'Votes (exp)': st.column_config.NumberColumn('Votes (exp)', format='%.2f'),
                 'P(3v) %': st.column_config.NumberColumn('P(3v) %', format='%.2f'),
                 'P(2v) %': st.column_config.NumberColumn('P(2v) %', format='%.2f'),
@@ -3064,11 +3059,9 @@ if _page == 'Game Analysis':
                 )
 
                 gp = rnd[rnd['Match'] == match].copy().sort_values('Exp_Votes', ascending=False).reset_index(drop=True)
-                gp['Rank'] = range(1, len(gp) + 1)
                 disp = pd.DataFrame({
                     'Player':     gp['Player_Name'],
                     'Team':       gp['Team'],
-                    'Rank':       gp['Rank'].astype(int),
                     'Votes (exp)': gp['Exp_Votes'].round(2),
                     'P(3v) %':   (gp['P_3'] * 100).round(2),
                     'P(2v) %':   (gp['P_2'] * 100).round(2),
