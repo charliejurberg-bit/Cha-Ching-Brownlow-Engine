@@ -427,28 +427,31 @@ def render_banner():
     <div class="cha-ching-title">CHA CHING</div>
     <div class="cha-ching-sub">{_mode_label} &nbsp;&middot;&nbsp; {_sub}</div>
 </div>
-<script>
-(function() {{
-    var orbs = [
-        document.getElementById('cc-orb-0'),
-        document.getElementById('cc-orb-1'),
-        document.getElementById('cc-orb-2')
-    ];
-    if (!orbs[0]) return;
-    function tick(t) {{
-        var x0 = Math.sin(t * 0.0007) * 8,  y0 = Math.cos(t * 0.0005) * 5;
-        var x1 = Math.cos(t * 0.0005) * 10, y1 = Math.sin(t * 0.0003) * 8;
-        var x2 = Math.sin(t * 0.001)  * 5,  y2 = Math.cos(t * 0.0008) * 10;
-        orbs[0].style.transform = 'translate(' + x0 + '%, ' + y0 + '%)';
-        orbs[1].style.transform = 'translate(' + x1 + '%, ' + y1 + '%)';
-        orbs[2].style.transform = 'translate(' + x2 + '%, ' + y2 + '%)';
-        requestAnimationFrame(tick);
-    }}
-    requestAnimationFrame(tick);
-}})();
-</script>
 """, unsafe_allow_html=True)
-st.markdown('<div id="cc-test" style="display:none">ok</div>', unsafe_allow_html=True)
+_components.html("""
+<script>
+(function() {
+  function animate() {
+    var t = Date.now();
+    var orbs = [
+      {id: 'cc-orb-0', fx: 0.0007, fy: 0.0005, ax: 8,  ay: 5},
+      {id: 'cc-orb-1', fx: 0.0005, fy: 0.0003, ax: 10, ay: 8},
+      {id: 'cc-orb-2', fx: 0.001,  fy: 0.0008, ax: 5,  ay: 10}
+    ];
+    orbs.forEach(function(o) {
+      var el = window.parent.document.getElementById(o.id);
+      if (el) {
+        var x = Math.sin(t * o.fx) * o.ax;
+        var y = Math.cos(t * o.fy) * o.ay;
+        el.style.transform = 'translate(' + x + '%, ' + y + '%)';
+      }
+    });
+    requestAnimationFrame(animate);
+  }
+  animate();
+})();
+</script>
+""", height=0)
 
 # ── CSS ──────────────────────────────────────────────────────
 st.markdown("""
