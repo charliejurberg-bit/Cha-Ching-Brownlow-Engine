@@ -2137,8 +2137,8 @@ if _page == 'Home':
             if num_cols:
                 leader_odds = f"${float(match.iloc[0][num_cols[0]]):.2f}"
 
-    rounds_remaining = 23 - CURRENT_ROUND
-    season_pct = int((CURRENT_ROUND / 23) * 100)
+    rounds_remaining = 24 - CURRENT_ROUND
+    season_pct = int((CURRENT_ROUND / 24) * 100)
 
     st.markdown(f"""
 <div style="padding:20px 0 12px;animation:fadeSlideUp 500ms cubic-bezier(0.23,1,0.32,1) both;">
@@ -2168,7 +2168,7 @@ if _page == 'Home':
     <span style="font-size:11px;font-weight:500;letter-spacing:0.08em;
                  text-transform:uppercase;color:#4a5a6a;">Season progress</span>
     <span style="font-size:12px;color:#94a3b8;font-family:'DM Mono',monospace;">
-      R{CURRENT_ROUND} of 23 &nbsp;·&nbsp; {rounds_remaining} rounds to go
+      R{CURRENT_ROUND} of 24 &nbsp;·&nbsp; {rounds_remaining} rounds to go
     </span>
   </div>
   <div style="height:6px;background:#1e3a4a;border-radius:3px;overflow:hidden;">
@@ -2196,7 +2196,7 @@ if _page == 'Home':
   </div>
   <div style="background:#0f2035; border:0.5px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px;">
     <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:8px;">Round</div>
-    <div style="font-size:20px; font-weight:600; color:#ffffff;">{CURRENT_ROUND}<span style="font-size:13px; color:rgba(255,255,255,0.3); font-weight:400"> /23</span></div>
+    <div style="font-size:20px; font-weight:600; color:#ffffff;">{CURRENT_ROUND}<span style="font-size:13px; color:rgba(255,255,255,0.3); font-weight:400"> /24</span></div>
     <div style="font-size:11px; color:rgba(255,255,255,0.3);">{rounds_remaining} rounds remaining</div>
   </div>
 </div>
