@@ -1017,17 +1017,17 @@ def _fix_team_names(df: pd.DataFrame) -> pd.DataFrame:
             df[col] = df[col].replace('Footscray', 'Western Bulldogs')
     return df
 
-@st.cache_data
+@st.cache_data(ttl=300)
 def load_season(season):
     path = f"{PRED_DIR}/season_{season}.csv"
     return _fix_team_names(pd.read_csv(path)) if os.path.exists(path) else None
 
-@st.cache_data
+@st.cache_data(ttl=300)
 def load_game(season):
     path = f"{PRED_DIR}/game_level_{season}.csv"
     return _fix_team_names(pd.read_csv(path)) if os.path.exists(path) else None
 
-@st.cache_data
+@st.cache_data(ttl=300)
 def load_importance():
     path = f"{PRED_DIR}/feature_importance.csv"
     return pd.read_csv(path) if os.path.exists(path) else None
@@ -1037,12 +1037,12 @@ def load_backtest():
     path = f"{PRED_DIR}/backtest_results.csv"
     return pd.read_csv(path) if os.path.exists(path) else None
 
-@st.cache_data
+@st.cache_data(ttl=300)
 def load_season_projection():
     path = f"{PRED_DIR}/season_projection_2026.csv"
     return _fix_team_names(pd.read_csv(path)) if os.path.exists(path) else None
 
-@st.cache_data
+@st.cache_data(ttl=300)
 def load_all_historical():
     frames = []
     for season in sorted(AVAILABLE_SEASONS):
