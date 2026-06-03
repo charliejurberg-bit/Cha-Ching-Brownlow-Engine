@@ -410,10 +410,24 @@ def render_banner():
     _sub = f"Through Round {max_season_rounds}" if is_2026 else f"{selected_season} Season"
     _mode_label = "Brownlow Predictor" if _hub == "brownlow" else "Betting Hub"
     st.markdown(f"""
+<style>
+@keyframes orbDrift1 {{
+    0%,100% {{ transform: translate(0,0) scale(1); }}
+    50%     {{ transform: translate(22px,-14px) scale(1.10); }}
+}}
+@keyframes orbDrift2 {{
+    0%,100% {{ transform: translate(0,0) scale(1); }}
+    50%     {{ transform: translate(-26px,11px) scale(0.91); }}
+}}
+@keyframes orbDrift3 {{
+    0%,100% {{ transform: translate(0,0) scale(1); }}
+    50%     {{ transform: translate(14px,20px) scale(1.07); }}
+}}
+</style>
 <div class="cha-ching-banner">
-    <div class="banner-orb banner-orb-1"></div>
-    <div class="banner-orb banner-orb-2"></div>
-    <div class="banner-orb banner-orb-3"></div>
+    <div class="banner-orb" style="background:radial-gradient(ellipse 65% 55% at 28% 55%,rgba(32,178,120,0.13),transparent 70%);animation:orbDrift1 9s ease-in-out infinite;"></div>
+    <div class="banner-orb" style="background:radial-gradient(ellipse 55% 65% at 72% 42%,rgba(74,144,196,0.09),transparent 70%);animation:orbDrift2 13s ease-in-out infinite;"></div>
+    <div class="banner-orb" style="background:radial-gradient(ellipse 70% 45% at 52% 72%,rgba(32,196,178,0.07),transparent 70%);animation:orbDrift3 7s ease-in-out infinite;"></div>
     <div class="banner-vignette"></div>
     <div class="banner-corner banner-corner-tl"></div>
     <div class="banner-corner banner-corner-tr"></div>
@@ -514,23 +528,11 @@ st.markdown("""
         background: linear-gradient(90deg, transparent 0%, rgba(32,178,120,0.7) 50%, transparent 100%);
         animation: borderPulse 6s ease-in-out infinite;
     }
-    /* radial-gradient orbs */
+    /* radial-gradient orbs — animation injected inline via render_banner() */
     .banner-orb {
         position: absolute;
         inset: 0;
         pointer-events: none;
-    }
-    .banner-orb-1 {
-        background: radial-gradient(ellipse 65% 55% at 28% 55%, rgba(32,178,120,0.13), transparent 70%);
-        animation: orbFloat1 9s ease-in-out infinite;
-    }
-    .banner-orb-2 {
-        background: radial-gradient(ellipse 55% 65% at 72% 42%, rgba(74,144,196,0.09), transparent 70%);
-        animation: orbFloat2 13s ease-in-out infinite;
-    }
-    .banner-orb-3 {
-        background: radial-gradient(ellipse 70% 45% at 52% 72%, rgba(32,196,178,0.07), transparent 70%);
-        animation: orbFloat3 7s ease-in-out infinite;
     }
     /* L-bracket corner accents */
     .banner-corner {
@@ -926,18 +928,6 @@ st.markdown("""
     [data-testid="stDataFrame"] tbody tr:nth-child(1) td:first-child { font-weight: 800 !important; }
 
     /* ── Animations ── */
-    @keyframes orbFloat1 {
-        0%,100% { transform: translate(0,0) scale(1); }
-        50%     { transform: translate(22px,-14px) scale(1.10); }
-    }
-    @keyframes orbFloat2 {
-        0%,100% { transform: translate(0,0) scale(1); }
-        50%     { transform: translate(-26px,11px) scale(0.91); }
-    }
-    @keyframes orbFloat3 {
-        0%,100% { transform: translate(0,0) scale(1); }
-        50%     { transform: translate(14px,20px) scale(1.07); }
-    }
     @keyframes borderPulse {
         0%,100% { opacity: 0.4; }
         50%     { opacity: 0.9; }
