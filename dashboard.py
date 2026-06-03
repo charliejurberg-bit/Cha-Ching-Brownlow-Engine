@@ -411,9 +411,6 @@ def render_banner():
     _mode_label = "Brownlow Predictor" if _hub == "brownlow" else "Betting Hub"
     st.markdown(f"""
 <div class="cha-ching-banner">
-    <div class="banner-orb" id="cc-orb-0" style="background:radial-gradient(ellipse 70% 40% at 50% 50%,rgba(32,178,120,0.13) 0%,transparent 70%);"></div>
-    <div class="banner-orb" id="cc-orb-1" style="background:radial-gradient(ellipse 50% 35% at 30% 60%,rgba(20,110,180,0.09) 0%,transparent 65%);"></div>
-    <div class="banner-orb" id="cc-orb-2" style="background:radial-gradient(ellipse 40% 30% at 75% 40%,rgba(80,200,150,0.07) 0%,transparent 60%);"></div>
     <div class="banner-vignette"></div>
     <div class="banner-corner banner-corner-tl"></div>
     <div class="banner-corner banner-corner-tr"></div>
@@ -428,30 +425,6 @@ def render_banner():
     <div class="cha-ching-sub">{_mode_label} &nbsp;&middot;&nbsp; {_sub}</div>
 </div>
 """, unsafe_allow_html=True)
-_components.html("""
-<script>
-(function() {
-  function animate() {
-    var t = Date.now();
-    var orbs = [
-      {id: 'cc-orb-0', fx: 0.0007, fy: 0.0005, ax: 8,  ay: 5},
-      {id: 'cc-orb-1', fx: 0.0005, fy: 0.0003, ax: 10, ay: 8},
-      {id: 'cc-orb-2', fx: 0.001,  fy: 0.0008, ax: 5,  ay: 10}
-    ];
-    orbs.forEach(function(o) {
-      var el = window.parent.document.getElementById(o.id);
-      if (el) {
-        var x = Math.sin(t * o.fx) * o.ax;
-        var y = Math.cos(t * o.fy) * o.ay;
-        el.style.transform = 'translate(' + x + '%, ' + y + '%)';
-      }
-    });
-    requestAnimationFrame(animate);
-  }
-  animate();
-})();
-</script>
-""", height=0)
 
 # ── CSS ──────────────────────────────────────────────────────
 st.markdown("""
@@ -506,10 +479,13 @@ st.markdown("""
         margin-left: -50vw;
         margin-top: -200px;
         overflow: hidden;
-        background: linear-gradient(
-            135deg,
-            #0f1923 0%, #152533 25%, #1e3a4a 50%, #152533 75%, #0f1923 100%
-        );
+        background:
+            radial-gradient(ellipse 60% 50% at 50% 50%, rgba(32,178,120,0.12) 0%, transparent 65%),
+            radial-gradient(ellipse 40% 35% at 20% 70%, rgba(20,110,180,0.08) 0%, transparent 60%),
+            radial-gradient(ellipse 35% 30% at 80% 30%, rgba(80,200,150,0.06) 0%, transparent 55%),
+            linear-gradient(135deg, #0f1923 0%, #152533 25%, #1e3a4a 50%, #152533 75%, #0f1923 100%);
+        background-size: 200% 200%, 180% 180%, 160% 160%, 100% 100%;
+        animation: orbShift 12s ease-in-out infinite alternate;
         height: 273px;
         padding: 130px 48px 0;
         display: flex;
@@ -938,6 +914,11 @@ st.markdown("""
     [data-testid="stDataFrame"] tbody tr:nth-child(1) td:first-child { font-weight: 800 !important; }
 
     /* ── Animations ── */
+    @keyframes orbShift {
+        0%   { background-position: 0% 50%,   100% 0%,   0% 100%,  0% 0%; }
+        50%  { background-position: 100% 50%,  0% 100%,   100% 0%,  0% 0%; }
+        100% { background-position: 50% 0%,    50% 50%,   50% 50%,  0% 0%; }
+    }
     @keyframes borderPulse {
         0%, 100% { opacity: 0.4; }
         50%       { opacity: 1; }
