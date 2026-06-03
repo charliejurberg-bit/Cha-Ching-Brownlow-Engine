@@ -414,13 +414,6 @@ def render_banner():
     <div class="banner-vignette"></div>
     <div class="banner-corner banner-corner-tl"></div>
     <div class="banner-corner banner-corner-tr"></div>
-    <span class="cha-ching-deco" style="top:-12px;left:1%">&#9000;</span>
-    <span class="cha-ching-deco" style="top:6px;left:18%;font-size:60px">&#9651;</span>
-    <span class="cha-ching-deco" style="top:-8px;right:3%">&#9677;</span>
-    <span class="cha-ching-deco" style="bottom:-20px;left:8%;font-size:70px">&#11042;</span>
-    <span class="cha-ching-deco" style="top:2px;left:44%;font-size:54px">&#9733;</span>
-    <span class="cha-ching-deco" style="bottom:-16px;right:9%;font-size:66px">&#9670;</span>
-    <span class="cha-ching-deco" style="top:10px;right:22%;font-size:58px">&#9685;</span>
     <div class="cha-ching-title">CHA CHING</div>
     <div class="cha-ching-sub">{_mode_label} &nbsp;&middot;&nbsp; {_sub}</div>
 </div>
