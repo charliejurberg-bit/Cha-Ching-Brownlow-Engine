@@ -2289,18 +2289,6 @@ if _page == 'Leaderboard':
     display['Poll %'] = (display['Avg_Poll_Prob'] * 100).round(1)
     display['Exp Votes'] = display['Exp_Total_Votes'].round(1)
     display['3-vote games'] = display['Exp_3vote_games'].round(1)
-    # Embed movement arrows into Rank as StringDtype so Arrow doesn't coerce to int
-    if _move_map:
-        _rank_strs = []
-        for _, _row in display[['Rank', 'Player_Name']].iterrows():
-            _r, _n = int(_row['Rank']), _move_map.get(_row['Player_Name'], 0)
-            if pd.isna(_n) or _n == 0:
-                _rank_strs.append(str(_r))
-            elif _n > 0:
-                _rank_strs.append(f'{_r} ▲{int(_n)}')
-            else:
-                _rank_strs.append(f'{_r} ▼{int(abs(_n))}')
-        display['Rank'] = pd.array(_rank_strs, dtype=pd.StringDtype())
 
     if is_2026:
         _proj = load_season_projection()
@@ -2343,18 +2331,32 @@ if _page == 'Leaderboard':
             _fg_idx = cols_show.index('Games') + 1 if 'Games' in cols_show else 3
             cols_show = cols_show[:_fg_idx] + ['Form'] + cols_show[_fg_idx:]
 
-    _lb_disp = display[cols_show].rename(columns={'Player_Name': 'Player'})
+    _lb_disp = display[cols_show].rename(columns={'Player_Name': 'Player'}).copy()
     for col in _lb_disp.select_dtypes(include='float').columns:
         _lb_disp[col] = _lb_disp[col].round(1)
+    # Build rank+arrow strings after all merges so dtype survives
+    if _move_map and 'Rank' in _lb_disp.columns:
+        _rank_strs = []
+        for _, _row in _lb_disp[['Rank', 'Player']].iterrows():
+            _r = int(_row['Rank'])
+            _n = _move_map.get(_row['Player'], 0)
+            if pd.isna(_n) or _n == 0:
+                _rank_strs.append(str(_r))
+            elif _n > 0:
+                _rank_strs.append(f'{_r} ▲{int(_n)}')
+            else:
+                _rank_strs.append(f'{_r} ▼{int(abs(_n))}')
+        _lb_disp['Rank'] = pd.array(_rank_strs, dtype=pd.StringDtype())
     _lb_styled = _style_leaderboard_table(_lb_disp)
     if _move_map and 'Rank' in _lb_disp.columns:
         _lb_styled = _lb_styled.map(
-            lambda v: ('color:#34d399!important;font-weight:700!important;' if '▲' in str(v)
-                       else 'color:#e63946!important;font-weight:700!important;' if '▼' in str(v)
+            lambda v: ('color:#34d399!important;font-weight:700!important;' if pd.notna(v) and '▲' in str(v)
+                       else 'color:#e63946!important;font-weight:700!important;' if pd.notna(v) and '▼' in str(v)
                        else ''),
             subset=['Rank']
         )
-    st.dataframe(_lb_styled, width='stretch', hide_index=True)
+    _lb_col_cfg = {'Rank': st.column_config.TextColumn('Rank', width='small')} if _move_map else {}
+    st.dataframe(_lb_styled, column_config=_lb_col_cfg, width='stretch', hide_index=True)
     if is_2026 and _fg:
         st.caption("Form: 🟢 predicted to poll (≥30% chance) · ⚫ not predicted · ▫ did not play — last 3 rounds")
 
