@@ -491,7 +491,7 @@ st.markdown("""
             ),
             linear-gradient(135deg, #0f1923 0%, #152533 25%, #1e3a4a 50%, #152533 75%, #0f1923 100%);
         background-size: 300% 100%, 100% 100%;
-        animation: auroraPulse 10s ease-in-out infinite alternate;
+        animation: auroraPulse 22s ease-in-out infinite alternate;
         height: 273px;
         padding: 130px 48px 0;
         display: flex;
@@ -563,7 +563,7 @@ st.markdown("""
         margin: 0 0 12px 0;
         line-height: 1;
         color: #e8f0f8;
-        animation: titleShimmer 10s ease-in-out infinite alternate;
+        animation: titleShimmer 22s ease-in-out infinite alternate;
     }
     @keyframes titleShimmer {
         0%   { text-shadow: none; color: #e8f0f8; }
