@@ -412,22 +412,22 @@ def render_banner():
     st.markdown(f"""
 <style>
 @keyframes orbDrift1 {{
-    0%,100% {{ transform: translate(0,0) scale(1); }}
-    50%     {{ transform: translate(22px,-14px) scale(1.10); }}
+    0%   {{ transform: translate(-8%, -5%) scale(1.0); }}
+    100% {{ transform: translate(8%, 5%) scale(1.08); }}
 }}
 @keyframes orbDrift2 {{
-    0%,100% {{ transform: translate(0,0) scale(1); }}
-    50%     {{ transform: translate(-26px,11px) scale(0.91); }}
+    0%   {{ transform: translate(5%, 8%) scale(1.05); }}
+    100% {{ transform: translate(-10%, -4%) scale(0.95); }}
 }}
 @keyframes orbDrift3 {{
-    0%,100% {{ transform: translate(0,0) scale(1); }}
-    50%     {{ transform: translate(14px,20px) scale(1.07); }}
+    0%   {{ transform: translate(3%, -10%) scale(0.95); }}
+    100% {{ transform: translate(-5%, 8%) scale(1.1); }}
 }}
 </style>
 <div class="cha-ching-banner">
-    <div class="banner-orb" style="background:radial-gradient(ellipse 65% 55% at 28% 55%,rgba(32,178,120,0.13),transparent 70%);animation:orbDrift1 9s ease-in-out infinite;"></div>
-    <div class="banner-orb" style="background:radial-gradient(ellipse 55% 65% at 72% 42%,rgba(74,144,196,0.09),transparent 70%);animation:orbDrift2 13s ease-in-out infinite;"></div>
-    <div class="banner-orb" style="background:radial-gradient(ellipse 70% 45% at 52% 72%,rgba(32,196,178,0.07),transparent 70%);animation:orbDrift3 7s ease-in-out infinite;"></div>
+    <div class="banner-orb" style="animation:orbDrift1 9s ease-in-out infinite alternate;background:radial-gradient(ellipse 70% 40% at 50% 50%,rgba(32,178,120,0.13) 0%,transparent 70%);"></div>
+    <div class="banner-orb" style="animation:orbDrift2 13s ease-in-out infinite alternate;background:radial-gradient(ellipse 50% 35% at 30% 60%,rgba(20,110,180,0.09) 0%,transparent 65%);"></div>
+    <div class="banner-orb" style="animation:orbDrift3 7s ease-in-out infinite alternate;background:radial-gradient(ellipse 40% 30% at 75% 40%,rgba(80,200,150,0.07) 0%,transparent 60%);"></div>
     <div class="banner-vignette"></div>
     <div class="banner-corner banner-corner-tl"></div>
     <div class="banner-corner banner-corner-tr"></div>
@@ -929,8 +929,20 @@ st.markdown("""
 
     /* ── Animations ── */
     @keyframes borderPulse {
-        0%,100% { opacity: 0.4; }
-        50%     { opacity: 0.9; }
+        0%, 100% { opacity: 0.4; }
+        50%       { opacity: 1; }
+    }
+    @keyframes orbDrift1 {
+        0%   { transform: translate(-8%, -5%) scale(1.0); }
+        100% { transform: translate(8%, 5%) scale(1.08); }
+    }
+    @keyframes orbDrift2 {
+        0%   { transform: translate(5%, 8%) scale(1.05); }
+        100% { transform: translate(-10%, -4%) scale(0.95); }
+    }
+    @keyframes orbDrift3 {
+        0%   { transform: translate(3%, -10%) scale(0.95); }
+        100% { transform: translate(-5%, 8%) scale(1.1); }
     }
     @keyframes columnEnter {
         from { opacity: 0; transform: translateY(10px); }
