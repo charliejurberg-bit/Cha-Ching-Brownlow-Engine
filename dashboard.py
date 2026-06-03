@@ -414,7 +414,7 @@ def render_banner():
     <div class="banner-vignette"></div>
     <div class="banner-corner banner-corner-tl"></div>
     <div class="banner-corner banner-corner-tr"></div>
-    <div class="cha-ching-title">CHA CHING</div>
+    <div class="cha-ching-title"><span>C</span><span>H</span><span>A</span><span>&nbsp;</span><span>C</span><span>H</span><span>I</span><span>N</span><span>G</span></div>
     <div class="cha-ching-sub">{_mode_label} &nbsp;&middot;&nbsp; {_sub}</div>
 </div>
 """, unsafe_allow_html=True)
@@ -563,6 +563,25 @@ st.markdown("""
         0%,  44% { transform: perspective(400px) rotateX(0deg);  }
         50%       { transform: perspective(400px) rotateX(12deg); }
         56%, 100% { transform: perspective(400px) rotateX(0deg);  }
+    }
+    .cha-ching-title span {
+        display: inline-block;
+        animation: letterWave 22s ease-in-out infinite alternate;
+    }
+    .cha-ching-title span:nth-child(1) { animation-delay: 0.00s; }
+    .cha-ching-title span:nth-child(2) { animation-delay: 0.10s; }
+    .cha-ching-title span:nth-child(3) { animation-delay: 0.20s; }
+    .cha-ching-title span:nth-child(4) { animation-delay: 0.30s; }
+    .cha-ching-title span:nth-child(5) { animation-delay: 0.40s; }
+    .cha-ching-title span:nth-child(6) { animation-delay: 0.50s; }
+    .cha-ching-title span:nth-child(7) { animation-delay: 0.60s; }
+    .cha-ching-title span:nth-child(8) { animation-delay: 0.70s; }
+    .cha-ching-title span:nth-child(9) { animation-delay: 0.80s; }
+    @keyframes letterWave {
+        0%,  46% { transform: translateY(0px);  }
+        49%       { transform: translateY(-7px); }
+        52%       { transform: translateY(4px);  }
+        55%, 100% { transform: translateY(0px);  }
     }
     .cha-ching-sub {
         position: relative;
