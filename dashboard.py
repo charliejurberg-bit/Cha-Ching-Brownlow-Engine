@@ -480,12 +480,18 @@ st.markdown("""
         margin-top: -200px;
         overflow: hidden;
         background:
-            radial-gradient(ellipse 60% 50% at 50% 50%, rgba(32,178,120,0.12) 0%, transparent 65%),
-            radial-gradient(ellipse 40% 35% at 20% 70%, rgba(20,110,180,0.08) 0%, transparent 60%),
-            radial-gradient(ellipse 35% 30% at 80% 30%, rgba(80,200,150,0.06) 0%, transparent 55%),
+            linear-gradient(180deg,
+                transparent 0%,
+                rgba(32,178,120,0.0) 20%,
+                rgba(32,178,120,0.15) 45%,
+                rgba(20,210,150,0.2) 50%,
+                rgba(32,178,120,0.15) 55%,
+                rgba(20,110,180,0.08) 70%,
+                transparent 100%
+            ),
             linear-gradient(135deg, #0f1923 0%, #152533 25%, #1e3a4a 50%, #152533 75%, #0f1923 100%);
-        background-size: 200% 200%, 180% 180%, 160% 160%, 100% 100%;
-        animation: orbShift 12s ease-in-out infinite alternate;
+        background-size: 100% 300%, 100% 100%;
+        animation: auroraPulse 8s ease-in-out infinite alternate;
         height: 273px;
         padding: 130px 48px 0;
         display: flex;
@@ -914,10 +920,10 @@ st.markdown("""
     [data-testid="stDataFrame"] tbody tr:nth-child(1) td:first-child { font-weight: 800 !important; }
 
     /* ── Animations ── */
-    @keyframes orbShift {
-        0%   { background-position: 0% 50%,   100% 0%,   0% 100%,  0% 0%; }
-        50%  { background-position: 100% 50%,  0% 100%,   100% 0%,  0% 0%; }
-        100% { background-position: 50% 0%,    50% 50%,   50% 50%,  0% 0%; }
+    @keyframes auroraPulse {
+        0%   { background-position: 0% -100%, 0% 0%; }
+        50%  { background-position: 0% 50%,   0% 0%; }
+        100% { background-position: 0% 200%,  0% 0%; }
     }
     @keyframes borderPulse {
         0%, 100% { opacity: 0.4; }
