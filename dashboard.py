@@ -556,14 +556,13 @@ st.markdown("""
         margin: 0 0 12px 0;
         line-height: 1;
         color: #e8f0f8;
-        animation: titleShimmer 22s ease-in-out infinite alternate;
+        animation: titleRoll 22s ease-in-out infinite alternate;
+        transform-origin: center center;
     }
-    @keyframes titleShimmer {
-        0%   { text-shadow: none; color: #e8f0f8; }
-        45%  { text-shadow: none; color: #e8f0f8; }
-        50%  { text-shadow: 0 0 30px rgba(32,178,120,0.5), 0 0 60px rgba(32,178,120,0.2); color: #ffffff; }
-        55%  { text-shadow: none; color: #e8f0f8; }
-        100% { text-shadow: none; color: #e8f0f8; }
+    @keyframes titleRoll {
+        0%,  44% { transform: perspective(400px) rotateX(0deg);  }
+        50%       { transform: perspective(400px) rotateX(12deg); }
+        56%, 100% { transform: perspective(400px) rotateX(0deg);  }
     }
     .cha-ching-sub {
         position: relative;
