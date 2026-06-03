@@ -241,9 +241,12 @@ if __name__ == "__main__":
         df.to_csv("data_2026/bookmaker_odds.csv", index=False)
 
         # ── Best-odds CSV (dashboard compat) ─────────────────────
+        # Exclude Betfair — exchange lay prices appear as back odds on Oddschecker
+        EXCLUDE_FROM_BEST = {"Betfair"}
+        back_cols = [b for b in bookie_cols if b not in EXCLUDE_FROM_BEST]
         best_rows = []
         for _, row in df.iterrows():
-            vals = {b: row[b] for b in bookie_cols if pd.notna(row.get(b))}
+            vals = {b: row[b] for b in back_cols if pd.notna(row.get(b))}
             if not vals:
                 continue
             best_bookie = max(vals, key=vals.get)   # highest decimal = best payout
