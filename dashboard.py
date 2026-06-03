@@ -2264,6 +2264,23 @@ if _page == 'Leaderboard':
     with col1: search = st.text_input("Search player", "")
     with col2: show_n = st.selectbox("Show", [20, 50, 100, 200], index=0)
 
+    # ── Round-on-round movement (2026 only) ──────────────────
+    _move_map = {}
+    if is_2026 and game_df is not None:
+        _max_rnd = int(game_df['Round_num'].max())
+        _cur_rnd_votes = (
+            game_df[game_df['Round_num'] == _max_rnd]
+            .groupby('Player_Name')['Exp_Votes'].sum()
+        )
+        _all = predictions[['Player_Name', 'Exp_Total_Votes']].copy()
+        _all['Prev_Total'] = _all['Exp_Total_Votes'] - _all['Player_Name'].map(_cur_rnd_votes).fillna(0)
+        _all['Curr_Rank'] = range(1, len(_all) + 1)
+        _prev_ranks = _all.sort_values('Prev_Total', ascending=False).reset_index(drop=True)
+        _prev_ranks['Prev_Rank'] = range(1, len(_prev_ranks) + 1)
+        _merged = _all.merge(_prev_ranks[['Player_Name', 'Prev_Rank']], on='Player_Name')
+        _merged['Move'] = _merged['Prev_Rank'] - _merged['Curr_Rank']
+        _move_map = dict(zip(_merged['Player_Name'], _merged['Move']))
+
     display = predictions.copy()
     if search:
         display = display[display['Player_Name'].str.contains(search, case=False)]
@@ -2272,6 +2289,13 @@ if _page == 'Leaderboard':
     display['Poll %'] = (display['Avg_Poll_Prob'] * 100).round(1)
     display['Exp Votes'] = display['Exp_Total_Votes'].round(1)
     display['3-vote games'] = display['Exp_3vote_games'].round(1)
+    if _move_map:
+        def _fmt_move(n):
+            if pd.isna(n) or n == 0: return '—'
+            return f'▲{int(n)}' if n > 0 else f'▼{int(abs(n))}'
+        display['Move'] = display['Player_Name'].map(_move_map).apply(
+            lambda x: _fmt_move(x) if x is not None else '—'
+        )
 
     if is_2026:
         _proj = load_season_projection()
@@ -2294,13 +2318,15 @@ if _page == 'Leaderboard':
             )
             display['Best Odds'] = display['best_odds'].apply(lambda x: f"${x:.1f}" if pd.notna(x) else "—")
             display['Mkt %'] = display['implied_prob'].apply(lambda x: f"{x:.0f}%" if pd.notna(x) else "—")
-            base = ['Rank', 'Player_Name', 'Team', 'Games', 'Exp Votes', 'Poll %', '3-vote games']
+            _mv = ['Move'] if _move_map else []
+            base = ['Rank'] + _mv + ['Player_Name', 'Team', 'Games', 'Exp Votes', 'Poll %', '3-vote games']
             fc = ['Floor', 'Ceiling'] if has_floor_ceiling else []
-            cols_show = base[:5] + fc + base[5:] + ['Best Odds', 'Mkt %']
+            cols_show = base[:5 + len(_mv)] + fc + base[5 + len(_mv):] + ['Best Odds', 'Mkt %']
         else:
-            base = ['Rank', 'Player_Name', 'Team', 'Games', 'Exp Votes', 'Poll %', '3-vote games']
+            _mv = ['Move'] if _move_map else []
+            base = ['Rank'] + _mv + ['Player_Name', 'Team', 'Games', 'Exp Votes', 'Poll %', '3-vote games']
             fc = ['Floor', 'Ceiling'] if has_floor_ceiling else []
-            cols_show = base[:5] + fc + base[5:]
+            cols_show = base[:5 + len(_mv)] + fc + base[5 + len(_mv):]
     else:
         display['Actual'] = display['Actual_Votes'].astype(int)
         display['Diff'] = (display['Exp Votes'] - display['Actual']).round(1)
