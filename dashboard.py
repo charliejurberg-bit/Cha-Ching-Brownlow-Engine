@@ -556,13 +556,6 @@ st.markdown("""
         margin: 0 0 12px 0;
         line-height: 1;
         color: #e8f0f8;
-        animation: titleRoll 22s ease-in-out infinite alternate;
-        transform-origin: center center;
-    }
-    @keyframes titleRoll {
-        0%,  44% { transform: perspective(400px) rotateX(0deg);  }
-        50%       { transform: perspective(400px) rotateX(12deg); }
-        56%, 100% { transform: perspective(400px) rotateX(0deg);  }
     }
     .cha-ching-title span {
         display: inline-block;
