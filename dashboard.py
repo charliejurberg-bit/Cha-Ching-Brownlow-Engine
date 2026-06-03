@@ -411,6 +411,12 @@ def render_banner():
     _mode_label = "Brownlow Predictor" if _hub == "brownlow" else "Betting Hub"
     st.markdown(f"""
 <div class="cha-ching-banner">
+    <div class="banner-orb banner-orb-1"></div>
+    <div class="banner-orb banner-orb-2"></div>
+    <div class="banner-orb banner-orb-3"></div>
+    <div class="banner-vignette"></div>
+    <div class="banner-corner banner-corner-tl"></div>
+    <div class="banner-corner banner-corner-tr"></div>
     <span class="cha-ching-deco" style="top:-12px;left:1%">&#9000;</span>
     <span class="cha-ching-deco" style="top:6px;left:18%;font-size:60px">&#9651;</span>
     <span class="cha-ching-deco" style="top:-8px;right:3%">&#9677;</span>
@@ -480,8 +486,6 @@ st.markdown("""
             135deg,
             #0f1923 0%, #152533 25%, #1e3a4a 50%, #152533 75%, #0f1923 100%
         );
-        background-size: 300% 300%;
-        animation: bannerShift 10s ease infinite;
         height: 273px;
         padding: 130px 48px 0;
         display: flex;
@@ -489,14 +493,62 @@ st.markdown("""
         justify-content: center;
         align-items: center;
         margin-bottom: 0;
-        border-bottom: 1px solid #2a4a5a;
         text-align: center;
     }
+    /* fractalNoise grain texture at 4% */
     .cha-ching-banner::before {
         content: '';
         position: absolute;
         inset: 0;
-        background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg stroke='%23ffffff' stroke-width='0.5' opacity='0.05'%3E%3Cline x1='0' y1='60' x2='60' y2='0'/%3E%3Cline x1='30' y1='60' x2='60' y2='30'/%3E%3Cline x1='0' y1='30' x2='30' y2='0'/%3E%3C/g%3E%3C/svg%3E");
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+        background-size: 200px 200px;
+        opacity: 0.04;
+        pointer-events: none;
+    }
+    /* bottom border with slow opacity pulse */
+    .cha-ching-banner::after {
+        content: '';
+        position: absolute;
+        bottom: 0; left: 0; right: 0;
+        height: 1px;
+        background: linear-gradient(90deg, transparent 0%, rgba(32,178,120,0.7) 50%, transparent 100%);
+        animation: borderPulse 6s ease-in-out infinite;
+    }
+    /* radial-gradient orbs */
+    .banner-orb {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+    }
+    .banner-orb-1 {
+        background: radial-gradient(ellipse 65% 55% at 28% 55%, rgba(32,178,120,0.13), transparent 70%);
+        animation: orbFloat1 9s ease-in-out infinite;
+    }
+    .banner-orb-2 {
+        background: radial-gradient(ellipse 55% 65% at 72% 42%, rgba(74,144,196,0.09), transparent 70%);
+        animation: orbFloat2 13s ease-in-out infinite;
+    }
+    .banner-orb-3 {
+        background: radial-gradient(ellipse 70% 45% at 52% 72%, rgba(32,196,178,0.07), transparent 70%);
+        animation: orbFloat3 7s ease-in-out infinite;
+    }
+    /* L-bracket corner accents */
+    .banner-corner {
+        position: absolute;
+        width: 22px; height: 22px;
+        border-color: rgba(32,178,120,0.2);
+        border-style: solid;
+        pointer-events: none;
+    }
+    .banner-corner-tl { top: 14px; left: 18px; border-width: 1px 0 0 1px; }
+    .banner-corner-tr { top: 14px; right: 18px; border-width: 1px 1px 0 0; }
+    /* left/right vignette */
+    .banner-vignette {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg,
+            rgba(0,0,0,0.35) 0%, transparent 22%,
+            transparent 78%, rgba(0,0,0,0.35) 100%);
         pointer-events: none;
     }
     .cha-ching-deco {
@@ -874,10 +926,21 @@ st.markdown("""
     [data-testid="stDataFrame"] tbody tr:nth-child(1) td:first-child { font-weight: 800 !important; }
 
     /* ── Animations ── */
-    @keyframes bannerShift {
-        0%   { background-position: 0% 50%; }
-        50%  { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
+    @keyframes orbFloat1 {
+        0%,100% { transform: translate(0,0) scale(1); }
+        50%     { transform: translate(22px,-14px) scale(1.10); }
+    }
+    @keyframes orbFloat2 {
+        0%,100% { transform: translate(0,0) scale(1); }
+        50%     { transform: translate(-26px,11px) scale(0.91); }
+    }
+    @keyframes orbFloat3 {
+        0%,100% { transform: translate(0,0) scale(1); }
+        50%     { transform: translate(14px,20px) scale(1.07); }
+    }
+    @keyframes borderPulse {
+        0%,100% { opacity: 0.4; }
+        50%     { opacity: 0.9; }
     }
     @keyframes columnEnter {
         from { opacity: 0; transform: translateY(10px); }
