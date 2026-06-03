@@ -2289,19 +2289,18 @@ if _page == 'Leaderboard':
     display['Poll %'] = (display['Avg_Poll_Prob'] * 100).round(1)
     display['Exp Votes'] = display['Exp_Total_Votes'].round(1)
     display['3-vote games'] = display['Exp_3vote_games'].round(1)
-    # Build per-rank display string and direction for styling (Rank stays integer)
-    _rank_label = {}   # rank int -> display string e.g. "4 ▲3"
-    _rank_dir   = {}   # rank int -> 'up' | 'down' | 'none'
+    # Embed movement arrows into Rank as StringDtype so Arrow doesn't coerce to int
     if _move_map:
+        _rank_strs = []
         for _, _row in display[['Rank', 'Player_Name']].iterrows():
-            _r = int(_row['Rank'])
-            _n = _move_map.get(_row['Player_Name'], 0)
+            _r, _n = int(_row['Rank']), _move_map.get(_row['Player_Name'], 0)
             if pd.isna(_n) or _n == 0:
-                _rank_label[_r] = str(_r);  _rank_dir[_r] = 'none'
+                _rank_strs.append(str(_r))
             elif _n > 0:
-                _rank_label[_r] = f'{_r} ▲{int(_n)}';  _rank_dir[_r] = 'up'
+                _rank_strs.append(f'{_r} ▲{int(_n)}')
             else:
-                _rank_label[_r] = f'{_r} ▼{int(abs(_n))}';  _rank_dir[_r] = 'down'
+                _rank_strs.append(f'{_r} ▼{int(abs(_n))}')
+        display['Rank'] = pd.array(_rank_strs, dtype=pd.StringDtype())
 
     if is_2026:
         _proj = load_season_projection()
@@ -2348,11 +2347,10 @@ if _page == 'Leaderboard':
     for col in _lb_disp.select_dtypes(include='float').columns:
         _lb_disp[col] = _lb_disp[col].round(1)
     _lb_styled = _style_leaderboard_table(_lb_disp)
-    if _rank_label and 'Rank' in _lb_disp.columns:
-        _lb_styled = _lb_styled.format({'Rank': lambda v: _rank_label.get(int(v), str(int(v)))})
+    if _move_map and 'Rank' in _lb_disp.columns:
         _lb_styled = _lb_styled.map(
-            lambda v: ('color:#34d399!important;font-weight:700!important;' if _rank_dir.get(int(v)) == 'up'
-                       else 'color:#e63946!important;font-weight:700!important;' if _rank_dir.get(int(v)) == 'down'
+            lambda v: ('color:#34d399!important;font-weight:700!important;' if '▲' in str(v)
+                       else 'color:#e63946!important;font-weight:700!important;' if '▼' in str(v)
                        else ''),
             subset=['Rank']
         )
