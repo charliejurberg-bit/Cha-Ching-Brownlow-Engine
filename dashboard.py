@@ -480,18 +480,18 @@ st.markdown("""
         margin-top: -200px;
         overflow: hidden;
         background:
-            linear-gradient(180deg,
+            linear-gradient(90deg,
                 transparent 0%,
-                rgba(32,178,120,0.0) 20%,
-                rgba(32,178,120,0.15) 45%,
-                rgba(20,210,150,0.2) 50%,
-                rgba(32,178,120,0.15) 55%,
-                rgba(20,110,180,0.08) 70%,
+                rgba(32,178,120,0.0) 30%,
+                rgba(32,178,120,0.08) 45%,
+                rgba(20,210,150,0.12) 50%,
+                rgba(32,178,120,0.08) 55%,
+                transparent 70%,
                 transparent 100%
             ),
             linear-gradient(135deg, #0f1923 0%, #152533 25%, #1e3a4a 50%, #152533 75%, #0f1923 100%);
-        background-size: 100% 300%, 100% 100%;
-        animation: auroraPulse 8s ease-in-out infinite alternate;
+        background-size: 300% 100%, 100% 100%;
+        animation: auroraPulse 10s ease-in-out infinite alternate;
         height: 273px;
         padding: 130px 48px 0;
         display: flex;
@@ -563,6 +563,14 @@ st.markdown("""
         margin: 0 0 12px 0;
         line-height: 1;
         color: #e8f0f8;
+        animation: titleShimmer 10s ease-in-out infinite alternate;
+    }
+    @keyframes titleShimmer {
+        0%   { text-shadow: none; color: #e8f0f8; }
+        45%  { text-shadow: none; color: #e8f0f8; }
+        50%  { text-shadow: 0 0 30px rgba(32,178,120,0.5), 0 0 60px rgba(32,178,120,0.2); color: #ffffff; }
+        55%  { text-shadow: none; color: #e8f0f8; }
+        100% { text-shadow: none; color: #e8f0f8; }
     }
     .cha-ching-sub {
         position: relative;
@@ -921,9 +929,8 @@ st.markdown("""
 
     /* ── Animations ── */
     @keyframes auroraPulse {
-        0%   { background-position: 0% -100%, 0% 0%; }
-        50%  { background-position: 0% 50%,   0% 0%; }
-        100% { background-position: 0% 200%,  0% 0%; }
+        0%   { background-position: -100% 0%, 0% 0%; }
+        100% { background-position: 200% 0%,  0% 0%; }
     }
     @keyframes borderPulse {
         0%, 100% { opacity: 0.4; }
