@@ -2346,8 +2346,6 @@ if _page == 'Leaderboard':
         for _ci, _col in enumerate(_lb_disp.columns):
             _val = _row[_col]
             _td  = f'padding:7px 10px;font-size:13px;white-space:nowrap;color:#e8f0f8;'
-            if _ci == 0:
-                _td += f'border-left:3px solid {_tcol};'
             if _col == 'Rank':
                 _r = int(_val) if not pd.isna(_val) else _idx + 1
                 _n = _move_map.get(str(_row.get('Player', '')), 0) if _move_map else 0
