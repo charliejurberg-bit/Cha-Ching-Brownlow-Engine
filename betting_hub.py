@@ -284,7 +284,7 @@ def _save_tip(game_key: str, player: str, market_type: str,
     """Returns None on success, or an error string on failure."""
     try:
         new_row = {
-            'tip_id':        str(uuid.uuid4())[:8],
+            'tip_id':        str(uuid.uuid4()),
             'game_key':      game_key,
             'player':        player,
             'market_type':   market_type,
@@ -1718,6 +1718,7 @@ def render_cha_ching_tips():
         st.caption("No Cha Ching tips flagged yet — use the checklist in Upcoming Games below to create one.")
     else:
         flagged_all['result'] = flagged_all['result'].fillna('')
+        flagged_all = flagged_all.drop_duplicates(subset=['tip_id'])
         all_live     = flagged_all[~flagged_all['game_key'].isin(upcoming_keys) & (flagged_all['result'] == '') & (flagged_all['market_type'].fillna('') != 'Multi')]
         settled_tips = flagged_all[~flagged_all['game_key'].isin(upcoming_keys) & (flagged_all['result'] != '')]
 
@@ -1831,7 +1832,7 @@ def render_cha_ching_tips():
         pending_multis = tips_df[
             (tips_df['market_type'] == 'Multi') &
             (tips_df['result'].fillna('') == '')
-        ].copy() if not tips_df.empty else pd.DataFrame()
+        ].drop_duplicates(subset=['tip_id']).copy() if not tips_df.empty else pd.DataFrame()
         if not pending_multis.empty:
             with st.expander(f"Pending Multis ({len(pending_multis)})", expanded=False):
                 for _, tip in pending_multis.iterrows():
