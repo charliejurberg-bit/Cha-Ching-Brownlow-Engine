@@ -1718,7 +1718,7 @@ def render_cha_ching_tips():
         st.caption("No Cha Ching tips flagged yet — use the checklist in Upcoming Games below to create one.")
     else:
         flagged_all['result'] = flagged_all['result'].fillna('')
-        all_live     = flagged_all[~flagged_all['game_key'].isin(upcoming_keys) & (flagged_all['result'] == '')]
+        all_live     = flagged_all[~flagged_all['game_key'].isin(upcoming_keys) & (flagged_all['result'] == '') & (flagged_all['market_type'].fillna('') != 'Multi')]
         settled_tips = flagged_all[~flagged_all['game_key'].isin(upcoming_keys) & (flagged_all['result'] != '')]
 
         # Split unsettled into recent-live vs stale (>48h since created_at)
