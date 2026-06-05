@@ -38,6 +38,11 @@ CHECKLIST_ITEMS = [
     ("custom_note",   "Custom note"),
 ]
 
+NEW_CHECKLIST_KEYS = [
+    "promo_scan", "dvp_check", "opposition_stats", "stat_split",
+    "tagger_risk", "role_cba", "statmate_trends", "value_read",
+]
+
 BOOKMAKERS   = ["Sportsbet", "TAB", "Betfair", "Ladbrokes", "Neds", "PointsBet", "Unibet", "Other"]
 MARKET_TYPES = ["Disposals O/U", "Goals O/U", "Fantasy Points O/U", "Kicks O/U", "Handballs O/U",
                 "Marks O/U", "Match Result", "Line", "Multi", "Other"]
@@ -951,63 +956,240 @@ def _add_multi_dialog():
 
 # ── Checklist dialog ───────────────────────────────────────────────────────────
 
-@st.dialog("Cha Ching Checklist", width="small")
+@st.dialog("Cha Ching Checklist", width="large")
 def _checklist_dialog():
-    player     = st.session_state.get('_cl_player', 'Player')
-    market     = st.session_state.get('_cl_market', 'Market')
-    game_key   = st.session_state.get('_cl_game', '')
-    odds       = float(st.session_state.get('_cl_odds', 0.0) or 0.0)
-    bookmaker  = str(st.session_state.get('_cl_bookmaker', ''))
-    line       = float(st.session_state.get('_cl_line', 0.0) or 0.0)
-    pfx        = f"_clv_{game_key}_{player}_{market}_"
+    player_orig = st.session_state.get('_cl_player', '')
+    market_orig = st.session_state.get('_cl_market', '')
+    game_key    = st.session_state.get('_cl_game', '')
+    odds_orig   = float(st.session_state.get('_cl_odds', 0.0) or 0.0)
+    bookmaker   = str(st.session_state.get('_cl_bookmaker', ''))
+    line_orig   = float(st.session_state.get('_cl_line', 0.0) or 0.0)
+    pfx         = f"_clv_{game_key}_{player_orig}_{market_orig}_"
 
-    st.markdown(f'<div style="font-weight:700;font-size:15px;color:{C["green"]};margin-bottom:4px">'
-                f'{player}</div>', unsafe_allow_html=True)
-    st.caption(f'{market}  ·  {game_key}')
-    st.markdown('<hr style="margin:8px 0">', unsafe_allow_html=True)
-
-    ticked = 0
-    for item_key, item_label in CHECKLIST_ITEMS:
-        sk = f"{pfx}{item_key}"
-        checked = st.checkbox(item_label, value=st.session_state.get(sk, False), key=sk)
-        if checked:
-            ticked += 1
-
-    if ticked >= CC_THRESHOLD:
-        st.success(f"**Cha Ching!** {ticked}/6 criteria — auto-flagged as a tip")
-    else:
-        remaining = CC_THRESHOLD - ticked
-        st.info(f"{ticked}/6 criteria met — tick {remaining} more to auto-flag")
-
-    st.markdown('<hr style="margin:8px 0">', unsafe_allow_html=True)
-
-    oc1, oc2 = st.columns(2)
-    with oc1:
-        stake = st.number_input(
-            "Unit size", min_value=0.0, max_value=100.0,
-            value=float(st.session_state.get(f'{pfx}stake', 1.0)),
-            step=0.5, format='%.2f', key=f'{pfx}stake',
+    # ── Header inputs ──────────────────────────────────────────────────────────
+    h1, h2, h3 = st.columns([2, 2, 1])
+    with h1:
+        player = st.text_input(
+            "Player",
+            value=player_orig,
+            key=f"{pfx}h_player",
+            placeholder="e.g. Nick Daicos",
         )
-    with oc2:
-        line_str     = f"O/U {line:.1f}  " if line > 0 else ""
-        odds_display = f"{odds:.2f}" if odds > 1 else "—"
-        bookie_str   = f" ({bookmaker})" if bookmaker else ""
+    with h2:
+        line_sfx     = f" {line_orig:.1f}" if line_orig > 0 else ""
+        market_line  = st.text_input(
+            "Market / Line",
+            value=f"{market_orig}{line_sfx}".strip(),
+            key=f"{pfx}h_market_line",
+            placeholder="e.g. Disposals O/U 29.5",
+        )
+    with h3:
+        odds_default = odds_orig if odds_orig > 1.01 else 2.0
+        odds_val = st.number_input(
+            "Odds",
+            min_value=1.01, max_value=100.0,
+            value=odds_default,
+            step=0.05, format="%.2f",
+            key=f"{pfx}h_odds",
+        )
+
+    # ── Progress indicator ─────────────────────────────────────────────────────
+    ticked = sum(1 for k in NEW_CHECKLIST_KEYS
+                 if st.session_state.get(f"{pfx}{k}_chk", False))
+    total  = len(NEW_CHECKLIST_KEYS)
+    pct    = ticked / total
+    if ticked >= CC_THRESHOLD:
+        bar_col  = C["green"]
+        prog_msg = f"Cha Ching! {ticked}/{total} criteria — will be auto-flagged"
+        msg_col  = C["green"]
+    else:
+        bar_col  = C["gold"]
+        prog_msg = f"{ticked}/{total} criteria — tick {CC_THRESHOLD - ticked} more to flag"
+        msg_col  = C["gold"]
+
+    st.markdown(
+        f'<div style="margin:8px 0 4px;font-size:12px;font-weight:600;color:{msg_col}">'
+        f'{prog_msg}</div>'
+        f'<div style="background:{C["border"]};border-radius:4px;height:6px">'
+        f'<div style="background:{bar_col};height:6px;width:{pct * 100:.0f}%;'
+        f'border-radius:4px"></div></div>',
+        unsafe_allow_html=True,
+    )
+    st.markdown('<hr style="margin:10px 0 4px">', unsafe_allow_html=True)
+
+    # ── Helpers ────────────────────────────────────────────────────────────────
+    _SIGS = ["—", "Positive", "Neutral", "Negative"]
+
+    def _row(key, label, sig_opts=None):
+        opts    = sig_opts or _SIGS
+        sk_chk  = f"{pfx}{key}_chk"
+        sk_sig  = f"{pfx}{key}_sig"
+        sk_note = f"{pfx}{key}_note"
+        checked = st.checkbox(label, value=st.session_state.get(sk_chk, False), key=sk_chk)
+        if checked:
+            c1, c2 = st.columns([1, 2])
+            with c1:
+                cur = st.session_state.get(sk_sig, opts[0])
+                st.selectbox("signal", opts,
+                             index=opts.index(cur) if cur in opts else 0,
+                             key=sk_sig, label_visibility="collapsed")
+            with c2:
+                st.text_input("notes", value=st.session_state.get(sk_note, ''),
+                              key=sk_note, placeholder="Notes…",
+                              label_visibility="collapsed")
+
+    def _hdr(title):
         st.markdown(
-            f'<div style="margin-top:28px;font-family:DM Mono,monospace;font-size:14px;'
-            f'color:#f0b429;font-weight:700">{line_str}{odds_display}{bookie_str}</div>',
+            f'<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;'
+            f'text-transform:uppercase;color:{C["gold"]};'
+            f'border-left:3px solid {C["gold"]};padding-left:8px;margin:12px 0 4px">'
+            f'{title}</div>',
             unsafe_allow_html=True,
         )
 
-    notes = st.text_area("Notes", value=st.session_state.get(f'{pfx}notes', ''),
-                         key=f'{pfx}notes', height=60, placeholder='Any extra context...')
+    # ── Market & Promo ─────────────────────────────────────────────────────────
+    _hdr("Market & Promo")
+    _row("promo_scan", "Promo / odds scan (bookie, promo type, line, odds)")
+
+    # ── Matchup ────────────────────────────────────────────────────────────────
+    _hdr("Matchup")
+    _row("dvp_check",        "DVP check",
+         ["—", "Favourable", "Neutral", "Tough"])
+    _row("opposition_stats", "Opposition allowed stats via Wheelo",
+         ["—", "Favourable", "Neutral", "Tough"])
+    _row("stat_split",       "Stat split check — contested vs uncontested suits matchup (AFL.com)")
+    _row("tagger_risk",      "Tagger risk",
+         ["—", "No risk", "Possible", "Likely tagged"])
+    _row("role_cba",         "Role / CBA % (mids only)",
+         ["—", "High", "Moderate", "Low", "Changed"])
+
+    # ── Player Form ────────────────────────────────────────────────────────────
+    _hdr("Player Form")
+    _row("statmate_trends", "Statmate trends — hitrate last 5/10, venue, opponent, home/away")
+    _row("value_read",      "Value read",
+         ["—", "Value", "Fair", "Overpriced"])
+
+    # ── Reasoning & Fault Check ────────────────────────────────────────────────
+    _hdr("Reasoning & Fault Check")
+
+    sk_reasoning = f"{pfx}reasoning"
+    st.text_area(
+        "Walk me through your reasoning for this pick",
+        value=st.session_state.get(sk_reasoning, ''),
+        key=sk_reasoning,
+        height=80,
+        placeholder="What makes this a good bet?",
+    )
+
+    rc1, rc2 = st.columns(2)
+    with rc1:
+        role_opts = ["Coach confirmed", "Named position", "Inference", "Gut feel"]
+        sk_role   = f"{pfx}role_certainty"
+        cur_role  = st.session_state.get(sk_role, role_opts[0])
+        st.selectbox("Role certainty", role_opts,
+                     index=role_opts.index(cur_role) if cur_role in role_opts else 0,
+                     key=sk_role)
+    with rc2:
+        sk_absorb = f"{pfx}absorb"
+        st.text_input("Who else could absorb this role?",
+                      value=st.session_state.get(sk_absorb, ''),
+                      key=sk_absorb,
+                      placeholder="e.g. Brayshaw if Petracca out")
+
+    sk_zero = f"{pfx}zero_sum"
+    st.toggle(
+        "Zero-sum risk — two picks depending on the same vacancy",
+        value=st.session_state.get(sk_zero, False),
+        key=sk_zero,
+    )
+
+    sk_weather = f"{pfx}weather"
+    st.text_input("Weather check",
+                  value=st.session_state.get(sk_weather, ''),
+                  key=sk_weather,
+                  placeholder="e.g. Fine, 22 °C, slight wind")
+
+    # ── Verdict ────────────────────────────────────────────────────────────────
+    _hdr("Verdict")
+
+    sk_decision = f"{pfx}decision"
+    decision    = st.session_state.get(sk_decision)
+    d1, d2, d3  = st.columns(3)
+    with d1:
+        if st.button("✓  Take it", use_container_width=True, key=f"{pfx}btn_take"):
+            st.session_state[sk_decision] = "Take it"
+            st.rerun()
+    with d2:
+        if st.button("~  Unsure", use_container_width=True, key=f"{pfx}btn_unsure"):
+            st.session_state[sk_decision] = "Unsure"
+            st.rerun()
+    with d3:
+        if st.button("✕  Pass", use_container_width=True, key=f"{pfx}btn_pass"):
+            st.session_state[sk_decision] = "Pass"
+            st.rerun()
+
+    if decision:
+        dec_color = (C["green"] if decision == "Take it"
+                     else C["gold"] if decision == "Unsure"
+                     else C["red"])
+        st.markdown(
+            f'<div style="text-align:center;font-size:13px;font-weight:600;'
+            f'color:{dec_color};margin:4px 0 0">→ {decision}</div>',
+            unsafe_allow_html=True,
+        )
+
+    sk_final_notes = f"{pfx}final_notes"
+    final_notes = st.text_area(
+        "Final reasoning notes",
+        value=st.session_state.get(sk_final_notes, ''),
+        key=sk_final_notes,
+        height=60,
+        placeholder="Any final thoughts...",
+    )
+
+    st.markdown('<hr style="margin:10px 0 8px">', unsafe_allow_html=True)
+
+    # ── Stake / save ───────────────────────────────────────────────────────────
+    s1, s2 = st.columns(2)
+    with s1:
+        stake = st.number_input(
+            "Unit size",
+            min_value=0.0, max_value=100.0,
+            value=float(st.session_state.get(f'{pfx}stake', 1.0)),
+            step=0.5, format='%.2f',
+            key=f'{pfx}stake',
+        )
+    with s2:
+        odds_disp  = f"{odds_val:.2f}" if odds_val > 1 else "—"
+        bookie_str = f" ({bookmaker})" if bookmaker else ""
+        st.markdown(
+            f'<div style="margin-top:28px;font-family:DM Mono,monospace;'
+            f'font-size:14px;color:{C["gold"]};font-weight:700">'
+            f'{odds_disp}{bookie_str}</div>',
+            unsafe_allow_html=True,
+        )
 
     col1, col2 = st.columns(2)
     with col1:
         if st.button("Save Tip", type="primary", use_container_width=True):
-            criteria = [k for k, _ in CHECKLIST_ITEMS if st.session_state.get(f"{pfx}{k}", False)]
-            err = _save_tip(game_key, player, market, criteria,
-                            ticked >= CC_THRESHOLD, notes,
-                            stake=float(stake), odds=odds, bookmaker=bookmaker, line=line)
+            criteria = [k for k in NEW_CHECKLIST_KEYS
+                        if st.session_state.get(f"{pfx}{k}_chk", False)]
+
+            parts = [s for s in [
+                final_notes,
+                f"Reasoning: {st.session_state.get(sk_reasoning, '')}" if st.session_state.get(sk_reasoning) else '',
+                f"Decision: {decision}" if decision else '',
+            ] if s]
+            combined = " | ".join(parts)
+
+            h_player = st.session_state.get(f"{pfx}h_player", player_orig) or player_orig
+            h_odds   = float(st.session_state.get(f"{pfx}h_odds", odds_orig))
+
+            err = _save_tip(
+                game_key, h_player, market_orig, criteria,
+                ticked >= CC_THRESHOLD, combined,
+                stake=float(stake), odds=h_odds, bookmaker=bookmaker, line=line_orig,
+            )
             if err is None:
                 st.session_state['_cl_open'] = False
                 st.toast(f"Tip saved — {'Cha Ching flagged!' if ticked >= CC_THRESHOLD else 'not yet flagged'}")
