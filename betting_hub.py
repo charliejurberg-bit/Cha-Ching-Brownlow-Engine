@@ -1006,14 +1006,9 @@ def _checklist_dialog():
                  if st.session_state.get(f"{pfx}{k}_chk", False))
     total  = len(NEW_CHECKLIST_KEYS)
     pct    = ticked / total
-    if ticked >= CC_THRESHOLD:
-        bar_col  = C["green"]
-        prog_msg = f"Cha Ching! {ticked}/{total} criteria — will be auto-flagged"
-        msg_col  = C["green"]
-    else:
-        bar_col  = C["gold"]
-        prog_msg = f"{ticked}/{total} criteria — tick {CC_THRESHOLD - ticked} more to flag"
-        msg_col  = C["gold"]
+    bar_col  = C["green"] if ticked >= CC_THRESHOLD else C["gold"]
+    msg_col  = C["green"] if ticked >= CC_THRESHOLD else C["gold"]
+    prog_msg = f"{ticked}/{total} criteria checked"
 
     st.markdown(
         f'<div style="margin:8px 0 4px;font-size:12px;font-weight:600;color:{msg_col}">'
@@ -1193,7 +1188,7 @@ def _checklist_dialog():
             h_player = st.session_state.get(f"{pfx}h_player", player_orig) or player_orig
             h_odds   = float(st.session_state.get(f"{pfx}h_odds", odds_orig))
 
-            is_flagged = ticked >= CC_THRESHOLD and decision not in ("Unsure", "Pass")
+            is_flagged = decision == "Take it"
             err = _save_tip(
                 game_key, h_player, market_orig, criteria,
                 is_flagged, combined,
