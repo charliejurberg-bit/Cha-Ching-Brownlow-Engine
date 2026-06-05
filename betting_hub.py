@@ -1973,6 +1973,57 @@ def render_cha_ching_tips():
                             st.toast('Tip deleted', icon='🗑')
                             st.rerun()
 
+        # ── Pending (upcoming games) ───────────────────────────────────────────
+        pending_tips = flagged_all[
+            flagged_all['game_key'].isin(upcoming_keys) &
+            (flagged_all['market_type'].fillna('') != 'Multi')
+        ]
+        if not pending_tips.empty:
+            st.markdown('<div class="section-header">Pending Tips</div>', unsafe_allow_html=True)
+            for _, tip in pending_tips.iterrows():
+                tip_id    = str(tip['tip_id'])
+                player    = str(tip.get('player', ''))
+                gkey      = str(tip.get('game_key', ''))
+                mtype     = str(tip.get('market_type', ''))
+                line_raw  = pd.to_numeric(tip.get('line', ''), errors='coerce')
+                odds_raw  = pd.to_numeric(tip.get('odds', ''), errors='coerce')
+                stake_raw = pd.to_numeric(tip.get('stake', ''), errors='coerce')
+                bookie    = str(tip.get('bookmaker', '') or '')
+                bet_parts = []
+                if not pd.isna(line_raw):
+                    bet_parts.append(f"O/U {line_raw:.1f}")
+                if not pd.isna(odds_raw) and odds_raw > 1:
+                    bet_parts.append(f"@ {odds_raw:.2f}")
+                if bookie:
+                    bet_parts.append(f"({bookie})")
+                if not pd.isna(stake_raw) and stake_raw > 0:
+                    bet_parts.append(f"— {stake_raw:.2f}u")
+                bet_detail = '&nbsp;&nbsp;'.join(bet_parts)
+                card_col, btn_col = st.columns([3, 1])
+                with card_col:
+                    st.markdown(
+                        f'<div style="background:#152533;border:1px solid #2a4a5a;border-radius:10px;'
+                        f'padding:12px 16px;margin-bottom:4px">'
+                        f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+                        f'<span style="font-weight:700;color:#e8f0f8;font-size:14px">{player}</span>'
+                        f'<span style="font-size:10px;font-weight:700;background:{C["gold"]}22;'
+                        f'color:{C["gold"]};border:1px solid {C["gold"]}55;border-radius:4px;'
+                        f'padding:1px 6px;letter-spacing:0.5px">PENDING</span></div>'
+                        f'<div style="font-size:12px;color:#94a3b8;margin-bottom:2px">'
+                        f'{gkey}&nbsp;&nbsp;·&nbsp;&nbsp;{mtype}</div>'
+                        + (f'<div style="font-size:12px;font-family:DM Mono,monospace;color:{C["gold"]}">'
+                           f'{bet_detail}</div>' if bet_detail else '')
+                        + '</div>',
+                        unsafe_allow_html=True,
+                    )
+                if editable:
+                    with btn_col:
+                        st.markdown('<div style="height:10px"></div>', unsafe_allow_html=True)
+                        if st.button('🗑 Delete', key=f'tip_del_{tip_id}', use_container_width=True):
+                            _delete_tip(tip_id)
+                            st.toast('Tip deleted', icon='🗑')
+                            st.rerun()
+
         # ── Live ──────────────────────────────────────────────────────────────
         if not live_tips.empty:
             st.markdown('<div class="section-header">Live Tips</div>', unsafe_allow_html=True)
