@@ -311,6 +311,14 @@ def _save_tip(game_key: str, player: str, market_type: str,
         return f"{e}\n\n{traceback.format_exc()}"
 
 
+def _delete_tip(tip_id: str):
+    try:
+        _get_supabase().table("cha_ching_tips").delete().eq('tip_id', tip_id).execute()
+        return None
+    except Exception as e:
+        return str(e)
+
+
 def _save_tip_result(tip_id: str, result: str):
     df = _load_tips()
     mask = df['tip_id'].astype(str) == str(tip_id)
@@ -1185,14 +1193,15 @@ def _checklist_dialog():
             h_player = st.session_state.get(f"{pfx}h_player", player_orig) or player_orig
             h_odds   = float(st.session_state.get(f"{pfx}h_odds", odds_orig))
 
+            is_flagged = ticked >= CC_THRESHOLD and decision not in ("Unsure", "Pass")
             err = _save_tip(
                 game_key, h_player, market_orig, criteria,
-                ticked >= CC_THRESHOLD, combined,
+                is_flagged, combined,
                 stake=float(stake), odds=h_odds, bookmaker=bookmaker, line=line_orig,
             )
             if err is None:
                 st.session_state['_cl_open'] = False
-                st.toast(f"Tip saved — {'Cha Ching flagged!' if ticked >= CC_THRESHOLD else 'not yet flagged'}")
+                st.toast(f"Tip saved — {'Cha Ching flagged!' if is_flagged else 'not flagged'}")
                 st.rerun()
             else:
                 st.error(f"**Save failed** — {err}")
@@ -1946,7 +1955,7 @@ def render_cha_ching_tips():
                 )
             if editable:
                 with btn_col:
-                    b1, b2, b3 = st.columns(3)
+                    b1, b2, b3, b4 = st.columns(4)
                     with b1:
                         if st.button('✅ Win', key=f'tip_win_{tip_id}', use_container_width=True):
                             _save_tip_result(tip_id, 'Win')
@@ -1961,6 +1970,12 @@ def render_cha_ching_tips():
                         if st.button('↩️ Void', key=f'tip_void_{tip_id}', use_container_width=True):
                             _save_tip_result(tip_id, 'Void/Refund')
                             st.toast('Tip voided — synced to Bet History', icon='↩️')
+                            st.rerun()
+                    with b4:
+                        if st.button('🗑', key=f'tip_del_{tip_id}', use_container_width=True,
+                                     help='Delete this tip'):
+                            _delete_tip(tip_id)
+                            st.toast('Tip deleted', icon='🗑')
                             st.rerun()
 
         # ── Live ──────────────────────────────────────────────────────────────
@@ -2005,10 +2020,18 @@ def render_cha_ching_tips():
                         unsafe_allow_html=True,
                     )
                     if editable:
-                        if st.button('Clear result', key=f'tip_clear_{tip_id}',
-                                     type='secondary', use_container_width=False):
-                            _save_tip_result(tip_id, '')
-                            st.rerun()
+                        sc1, sc2 = st.columns([2, 1])
+                        with sc1:
+                            if st.button('Clear result', key=f'tip_clear_{tip_id}',
+                                         type='secondary', use_container_width=True):
+                                _save_tip_result(tip_id, '')
+                                st.rerun()
+                        with sc2:
+                            if st.button('🗑 Delete', key=f'tip_del_{tip_id}',
+                                         use_container_width=True):
+                                _delete_tip(tip_id)
+                                st.toast('Tip deleted', icon='🗑')
+                                st.rerun()
 
         # ── Pending Multis ─────────────────────────────────────────────────────
         pending_multis = tips_df[
