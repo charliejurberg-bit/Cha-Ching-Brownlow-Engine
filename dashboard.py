@@ -1933,11 +1933,27 @@ st.markdown("""
 }
 
 /* ── Landing page: top anchor (collapse leading gap above hero) ── */
+[data-testid="stLayoutWrapper"]:has(.landing-top-anchor) {
+    margin-top: -32px !important;
+}
 [data-testid="stVerticalBlock"]:has(> :first-child .landing-top-anchor) {
-    margin-top: -1rem !important;
+    margin-top: -2rem !important;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .landing-top-anchor) > :first-child {
     display: none !important;
+}
+/* ── Landing page: ticker bar full-bleed, flush to viewport top ── */
+[data-testid="stVerticalBlock"]:has(> :first-child .landing-top-anchor) > :nth-child(2) {
+    position: relative !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    width: 100vw !important;
+    min-width: 100vw !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .landing-top-anchor) > :nth-child(2) iframe {
+    display: block !important;
 }
 
 </style>
