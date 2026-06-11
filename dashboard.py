@@ -710,129 +710,6 @@ st.markdown("""
     .dna-value { color: #34d399; font-size: 22px; font-weight: 700; line-height: 1.2; }
     .dna-sub   { color: #94a3b8; font-size: 12px; margin-top: 3px; line-height: 1.4; }
 
-    /* ── Landing page: destination cards (keyed containers) ── */
-    @keyframes tagDotPulse {
-        0%, 100% { opacity: 1; }
-        50%      { opacity: .35; }
-    }
-    :is(.st-key-card_brownlow, .st-key-card_betting) {
-        position: relative;
-        background: linear-gradient(180deg, #101a24 0%, #0d141d 100%) !important;
-        border: 1px solid rgba(140,165,185,.14) !important;
-        border-radius: 14px !important;
-        overflow: hidden;
-        margin-bottom: 10px;
-        transition: transform 180ms ease-out, box-shadow 180ms ease-out, border-color 180ms ease-out;
-    }
-    :is(.st-key-card_brownlow, .st-key-card_betting):hover {
-        transform: translateY(-2px);
-        box-shadow: 0 12px 32px rgba(0,0,0,.28);
-    }
-    .st-key-card_brownlow:hover { border-color: rgba(52,211,153,.35) !important; }
-    .st-key-card_betting:hover { border-color: rgba(240,180,41,.35) !important; }
-    :is(.st-key-card_brownlow, .st-key-card_betting)::before {
-        content: "";
-        position: absolute;
-        top: 0; left: 0; right: 0;
-        height: 2px;
-        z-index: 1;
-    }
-    .st-key-card_brownlow::before { background: linear-gradient(90deg, transparent, #34d399, transparent); }
-    .st-key-card_betting::before { background: linear-gradient(90deg, transparent, #f0b429, transparent); }
-    :is(.st-key-card_brownlow, .st-key-card_betting) > [data-testid="stVerticalBlock"] {
-        padding: 34px 32px;
-        min-height: 380px;
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 0 !important;
-    }
-    :is(.st-key-card_brownlow, .st-key-card_betting) > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:first-child {
-        flex: 1 1 auto;
-    }
-    .dest-tag {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
-        font-family: 'IBM Plex Mono', monospace;
-        font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 0.18em;
-        text-transform: uppercase;
-        padding: 4px 10px;
-        border-radius: 4px;
-        margin-bottom: 14px;
-    }
-    .dest-tag::before {
-        content: "";
-        width: 6px;
-        height: 6px;
-        border-radius: 50%;
-        background: currentColor;
-        animation: tagDotPulse 2.2s ease-in-out infinite;
-    }
-    .dest-tag.bw { background: rgba(52,211,153,0.12); color: #34d399; }
-    .dest-tag.bh { background: rgba(240,180,41,0.12); color: #f0b429; }
-    .dest-content h2 {
-        font-family: 'Archivo', sans-serif;
-        font-weight: 800;
-        font-size: 34px;
-        color: #e9eef3;
-        margin: 0 0 8px;
-    }
-    .dest-desc { color: #7e8c99; font-size: 13px; line-height: 1.6; margin-bottom: 18px; max-width: 42ch; }
-    .dest-data-row {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 8px 26px;
-        border-top: 1px solid rgba(140,165,185,.14);
-        padding-top: 16px;
-        font-family: 'IBM Plex Mono', monospace;
-    }
-    .dest-data-row > div { display: flex; flex-direction: column; gap: 5px; }
-    .dest-data-row .dr-label { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: #7e8c99; }
-    .dest-data-row .dr-value { font-size: 14px; font-weight: 600; color: #e9eef3; }
-
-    /* ── Landing page: destination buttons ── */
-    .st-key-land_bw button,
-    .st-key-land_bh button {
-        width: auto !important;
-        display: inline-flex !important;
-        align-items: center !important;
-        padding: 12px 22px !important;
-        border-radius: 9px !important;
-        font-weight: 700 !important;
-    }
-    .st-key-land_bw button::after,
-    .st-key-land_bh button::after {
-        content: "→";
-        display: inline-block;
-        margin-left: 8px;
-        transition: transform 150ms ease-out;
-    }
-    .st-key-land_bw button:hover::after,
-    .st-key-land_bh button:hover::after {
-        transform: translateX(3px);
-    }
-    .st-key-land_bw button {
-        background: #34d399 !important;
-        color: #062b1d !important;
-        border: none !important;
-        transition: filter 150ms ease-out !important;
-    }
-    .st-key-land_bw button p,
-    .st-key-land_bw button span {
-        color: #062b1d !important;
-        font-weight: 700 !important;
-    }
-    .st-key-land_bw button:hover { filter: brightness(1.1); }
-    .st-key-land_bh button {
-        background: transparent !important;
-        color: #f0b429 !important;
-        border: 1px solid rgba(240,180,41,.5) !important;
-        transition: background-color 150ms ease-out !important;
-    }
-    .st-key-land_bh button:hover { background: rgba(240,180,41,.12) !important; }
-
     /* ── Secondary button ── */
     [data-testid="stBaseButton-secondary"] {
         background-color: #1e3a4a !important;
@@ -1981,7 +1858,20 @@ st.markdown("""
     background: rgba(62,207,160,0.14) !important;
 }
 
-/* ── Landing page: top anchor (collapse leading gap above hero) ── */
+/* ════════════════════════════════════════════════════════════
+   LANDING PAGE
+   ════════════════════════════════════════════════════════════ */
+
+/* App background + block-container padding, scoped to landing */
+.stApp:has(.landing-top-anchor),
+.stApp:has(.landing-top-anchor) [data-testid="stAppViewContainer"] {
+    background: #0a1017 !important;
+}
+.stApp:has(.landing-top-anchor) .block-container {
+    padding-top: 0 !important;
+}
+
+/* Collapse leading gap above hero / ticker */
 [data-testid="stLayoutWrapper"]:has(.landing-top-anchor) {
     margin-top: -32px !important;
 }
@@ -1991,7 +1881,8 @@ st.markdown("""
 [data-testid="stVerticalBlock"]:has(> :first-child .landing-top-anchor) > :first-child {
     display: none !important;
 }
-/* ── Landing page: ticker bar full-bleed, flush to viewport top ── */
+
+/* Ticker bar: full-bleed, flush to viewport top */
 [data-testid="stVerticalBlock"]:has(> :first-child .landing-top-anchor) > :nth-child(2),
 [data-testid="stLayoutWrapper"]:has(.landing-top-anchor) + [data-testid="stLayoutWrapper"] {
     position: relative !important;
@@ -2008,6 +1899,140 @@ st.markdown("""
     display: block !important;
     width: 100vw !important;
 }
+
+/* Destination panels (keyed containers) */
+@keyframes tagDotPulse {
+    0%, 100% { opacity: 1; }
+    50%      { opacity: .35; }
+}
+:is(.st-key-card_brownlow, .st-key-card_betting) > [data-testid="stVerticalBlock"] {
+    position: relative;
+    background: linear-gradient(180deg, #101a24 0%, #0d141d 100%) !important;
+    border: 1px solid rgba(140,165,185,.14) !important;
+    border-radius: 14px !important;
+    overflow: hidden;
+    padding: 34px 32px 30px !important;
+    min-height: 360px;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0 !important;
+    transition: transform 220ms cubic-bezier(0.23,1,0.32,1),
+                border-color 220ms cubic-bezier(0.23,1,0.32,1),
+                box-shadow 220ms cubic-bezier(0.23,1,0.32,1);
+}
+@media (hover: hover) {
+    .st-key-card_brownlow:hover > [data-testid="stVerticalBlock"] {
+        transform: translateY(-4px);
+        border-color: rgba(52,211,153,.35) !important;
+        box-shadow: 0 12px 32px rgba(52,211,153,.10);
+    }
+    .st-key-card_betting:hover > [data-testid="stVerticalBlock"] {
+        transform: translateY(-4px);
+        border-color: rgba(240,180,41,.35) !important;
+        box-shadow: 0 12px 32px rgba(240,180,41,.10);
+    }
+}
+:is(.st-key-card_brownlow, .st-key-card_betting) > [data-testid="stVerticalBlock"]::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    z-index: 1;
+}
+.st-key-card_brownlow > [data-testid="stVerticalBlock"]::before { background: linear-gradient(90deg, transparent, #34d399, transparent); }
+.st-key-card_betting > [data-testid="stVerticalBlock"]::before { background: linear-gradient(90deg, transparent, #f0b429, transparent); }
+:is(.st-key-card_brownlow, .st-key-card_betting) > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:first-child {
+    flex: 1 1 auto;
+}
+.dest-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 5px 11px;
+    border-radius: 99px;
+    margin-bottom: 16px;
+}
+.dest-tag::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: tagDotPulse 2.2s ease-in-out infinite;
+}
+.dest-tag.bw { background: rgba(52,211,153,0.12); color: #34d399; }
+.dest-tag.bh { background: rgba(240,180,41,0.12); color: #f0b429; }
+.dest-content h2 {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: 30px;
+    color: #e9eef3;
+    margin: 0 0 8px;
+}
+.dest-desc { color: #7e8c99; font-size: 14px; line-height: 1.6; margin-bottom: 18px; max-width: 42ch; }
+.dest-data-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 26px;
+    border-top: 1px solid rgba(140,165,185,.14);
+    padding-top: 18px;
+    font-family: 'IBM Plex Mono', monospace;
+}
+.dest-data-row > div { display: flex; flex-direction: column; gap: 5px; }
+.dest-data-row .dr-label { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: #7e8c99; }
+.dest-data-row .dr-value { font-size: 14px; font-weight: 600; color: #e9eef3; }
+
+/* Destination buttons */
+.st-key-land_bw button,
+.st-key-land_bh button {
+    width: auto !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    padding: 12px 22px !important;
+    border-radius: 9px !important;
+    font-family: 'Archivo', sans-serif !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    margin-top: 16px !important;
+    transition: filter 150ms ease-out, background-color 150ms ease-out, transform 100ms ease-out !important;
+}
+.st-key-land_bw button:active,
+.st-key-land_bh button:active {
+    transform: scale(.97);
+}
+.st-key-land_bw button::after,
+.st-key-land_bh button::after {
+    content: "→";
+    display: inline-block;
+    margin-left: 8px;
+    transition: transform 150ms ease-out;
+}
+.st-key-land_bw button:hover::after,
+.st-key-land_bh button:hover::after {
+    transform: translateX(3px);
+}
+.st-key-land_bw button {
+    background: #34d399 !important;
+    color: #062b1d !important;
+    border: none !important;
+}
+.st-key-land_bw button p,
+.st-key-land_bw button span {
+    color: #062b1d !important;
+    font-weight: 700 !important;
+}
+.st-key-land_bw button:hover { filter: brightness(1.1); }
+.st-key-land_bh button {
+    background: transparent !important;
+    color: #f0b429 !important;
+    border: 1px solid rgba(240,180,41,.5) !important;
+}
+.st-key-land_bh button:hover { background: rgba(240,180,41,.12) !important; }
 
 </style>
 """, unsafe_allow_html=True)
@@ -2194,13 +2219,9 @@ if _page == 'Landing':
         # TODO: wire to live bet results once the current round has settled bets
         _ticker_bet_items = ['<span style="color:#34d399">DUURSMA 16+ DISP &#10003; WIN</span>']
 
-    # TODO: wire to live fade-signal model output
-    _fade_signal_count = 3
-
     _ticker_items_html = _ticker_bet_items + [
         f'SEASON P&amp;L <span style="color:{_pl_color}">{_pl_str}</span>',
         f'BROWNLOW LEADER <span style="color:#f0b429">{_initial_surname(_land_leader).upper()} {_land_votes:.1f}</span>',
-        f'FADE SIGNALS LIVE: {_fade_signal_count}',
         'MODEL V4.0 &middot; MAE 0.0904',
     ]
     _ticker_sep = ' &nbsp;&nbsp;&middot;&nbsp;&nbsp; '
@@ -2209,8 +2230,8 @@ if _page == 'Landing':
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{background:transparent;height:36px;overflow:hidden;}
-.bar{height:36px;background:#0d141d;border-bottom:1px solid rgba(140,165,185,.14);overflow:hidden;display:flex;align-items:center;}
+html,body{background:transparent;height:40px;overflow:hidden;}
+.bar{height:40px;background:#0d141d;border-bottom:1px solid rgba(140,165,185,.14);overflow:hidden;display:flex;align-items:center;}
 .ticker-track{
   display:inline-block;
   white-space:nowrap;
@@ -2219,7 +2240,7 @@ html,body{background:transparent;height:36px;overflow:hidden;}
   text-transform:uppercase;
   letter-spacing:.08em;
   color:#7e8c99;
-  padding-left:24px;
+  padding:11px 0;
   animation:ticker 38s linear infinite;
   will-change:transform;
 }
@@ -2235,7 +2256,7 @@ if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 </script>
 </body></html>"""
     _ticker_html = _ticker_html.replace("__SEG__", _ticker_segment)
-    _components.html(_ticker_html, height=36, scrolling=False)
+    _components.html(_ticker_html, height=40, scrolling=False)
 
     # ── Hero ──
     _hero_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
@@ -2263,7 +2284,7 @@ text-transform:uppercase;color:#34d399;margin-bottom:8px;}
 font-size:clamp(56px,9vw,110px);line-height:.94;white-space:nowrap;margin:0;}
 .cha{background:linear-gradient(180deg,#ffffff,#9fb3c4);-webkit-background-clip:text;background-clip:text;color:transparent;}
 .ching{background:linear-gradient(120deg,#34d399,#f0b429);-webkit-background-clip:text;background-clip:text;color:transparent;}
-.subtitle{font-size:15px;color:#7e8c99;margin:14px 0 18px;}
+.subtitle{font-size:15px;color:#7e8c99;margin:14px 0 26px;}
 @keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
 .rise{opacity:0;animation:rise 650ms cubic-bezier(0.23,1,0.32,1) forwards;}
 .r1{animation-delay:.2s;}
@@ -2276,13 +2297,13 @@ border-radius:999px;padding:10px 18px 10px 10px;opacity:0;animation:chipIn 500ms
 .chip-1{animation-delay:.6s;}
 .chip-2{animation-delay:1.0s;}
 .chip-3{animation-delay:1.5s;}
-.badge{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;
-font-family:'Archivo',sans-serif;font-weight:800;font-size:13px;flex-shrink:0;}
+.badge{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;
+font-family:'Archivo',sans-serif;font-weight:800;font-size:14px;flex-shrink:0;}
 .badge-3{background:#34d399;color:#0a1017;}
 .badge-2{background:#3a4753;color:#e9eef3;}
 .badge-1{background:#1c2530;color:#7e8c99;}
 .chip-name{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:#e9eef3;}
-.chip-stats{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7e8c99;}
+.chip-stats{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7e8c99;}
 @media (max-width:700px){
   .chips{flex-wrap:wrap;}
   .chip{white-space:normal;}
@@ -2336,9 +2357,9 @@ font-family:'Archivo',sans-serif;font-weight:800;font-size:13px;flex-shrink:0;}
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{background:transparent;height:130px;overflow:hidden;font-family:'IBM Plex Mono',monospace;}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;height:130px;background:rgba(140,165,185,.14);}
-.cell{background:#101a24;padding:26px 30px;display:flex;flex-direction:column;justify-content:center;gap:8px;}
+html,body{background:transparent;height:110px;overflow:hidden;font-family:'IBM Plex Mono',monospace;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;height:110px;max-width:1180px;margin:0 auto;background:rgba(140,165,185,.14);}
+.cell{background:#0a1017;padding:26px 30px;display:flex;flex-direction:column;justify-content:center;gap:8px;}
 .label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#7e8c99;}
 .value{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:28px;color:#e9eef3;letter-spacing:.02em;}
 .value.leader{color:#34d399;}
@@ -2383,7 +2404,7 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
         .replace("__PL_PREFIX__", "+$" if _land_pl_val >= 0 else "-$")
         .replace("__PL_FALLBACK__", _pl_str)
     )
-    _components.html(_stat_html, height=130, scrolling=False)
+    _components.html(_stat_html, height=110, scrolling=False)
 
     # ── Destination panels ──
     _lc1, _lc2 = st.columns(2, gap="medium")
@@ -5622,11 +5643,21 @@ if _page == 'Model Comparison':
             st.info("Scatter plot requires both Cha Ching and AFL Predictor data.")
 
 # ── Global footer ────────────────────────────────────────────
-st.markdown(
-    '<div style="border-top:1px solid #ddd5c5;margin-top:40px;padding:14px 0;'
-    'color:#94a3b8;font-size:10px;letter-spacing:1.2px;text-align:center;'
-    'text-transform:uppercase;font-weight:600;">'
-    f'Model v4.0 &nbsp;&nbsp;·&nbsp;&nbsp; Data: {_TRAIN_MIN}–{_TRAIN_MAX} &nbsp;&nbsp;·&nbsp;&nbsp; 93 features &nbsp;&nbsp;·&nbsp;&nbsp; MAE 0.0904'
-    '</div>',
-    unsafe_allow_html=True,
-)
+if _page == 'Landing':
+    st.markdown(
+        '<div style="border-top:1px solid rgba(140,165,185,.14);margin-top:40px;padding:14px 0;'
+        'color:#7e8c99;font-family:\'IBM Plex Mono\',monospace;font-size:11px;letter-spacing:.18em;'
+        'text-align:center;text-transform:uppercase;font-weight:500;">'
+        f'MODEL V4.0 &nbsp;&nbsp;&middot;&nbsp;&nbsp; DATA {_TRAIN_MIN}–{_TRAIN_MAX} &nbsp;&nbsp;&middot;&nbsp;&nbsp; 93 FEATURES &nbsp;&nbsp;&middot;&nbsp;&nbsp; MAE 0.0904'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+else:
+    st.markdown(
+        '<div style="border-top:1px solid #ddd5c5;margin-top:40px;padding:14px 0;'
+        'color:#94a3b8;font-size:10px;letter-spacing:1.2px;text-align:center;'
+        'text-transform:uppercase;font-weight:600;">'
+        f'Model v4.0 &nbsp;&nbsp;·&nbsp;&nbsp; Data: {_TRAIN_MIN}–{_TRAIN_MAX} &nbsp;&nbsp;·&nbsp;&nbsp; 93 features &nbsp;&nbsp;·&nbsp;&nbsp; MAE 0.0904'
+        '</div>',
+        unsafe_allow_html=True,
+    )
