@@ -1940,131 +1940,13 @@ st.markdown("""
     display: none !important;
 }
 
-/* ── Landing page: section tabs (Brownlow / Betting Hub) ─────── */
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor-landing) {
-    background: #0d141d !important;
-    border-bottom: 1px solid rgba(140,165,185,.14) !important;
-    position: relative !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 100vw !important;
-    min-width: 100vw !important;
-    flex-shrink: 0 !important;
-    margin-left: 0 !important;
-    padding: 0 !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    gap: 0 !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor-landing) > :first-child {
-    display: none !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor-landing) [data-testid="stHorizontalBlock"] {
-    display: grid !important; grid-template-columns: 1fr 1fr !important;
-    gap: 0 !important; padding: 0 !important; align-items: stretch !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor-landing) [data-testid="stColumn"] {
-    width: 100% !important; min-width: 0 !important; padding: 0 !important;
-    display: flex !important; flex-direction: column !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor-landing) [data-testid="stColumn"] > div,
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor-landing) [data-testid="stElementContainer"],
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor-landing) [data-testid="stButton"] {
-    width: 100% !important; flex: 1 !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor-landing) button {
-    background: transparent !important; border: none !important;
-    border-bottom: 2px solid transparent !important;
-    color: #7e8c99 !important; font-family: 'IBM Plex Mono', monospace !important;
-    font-size: 12px !important; font-weight: 600 !important;
-    letter-spacing: .12em !important; text-transform: uppercase !important;
-    padding: 12px 16px !important; border-radius: 0 !important; box-shadow: none !important;
-    width: 100% !important; display: flex !important;
-    align-items: center !important; justify-content: center !important;
-    transition: color 150ms ease-out, border-color 150ms ease-out !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor-landing) [data-testid="stColumn"]:nth-child(1) [data-testid="stBaseButton-primary"] {
-    color: #34d399 !important; border-bottom-color: #34d399 !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor-landing) [data-testid="stColumn"]:nth-child(2) [data-testid="stBaseButton-primary"] {
-    color: #f0b429 !important; border-bottom-color: #f0b429 !important;
-}
-@media (hover:hover) {
-    [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor-landing) button:hover {
-        color: #e9eef3 !important;
-    }
-}
-
-/* ── Landing page: icon nav row (quiet strip) ────────────────── */
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor-landing) {
-    background: transparent !important;
-    position: relative !important;
-    left: 50% !important;
-    transform: translateX(-50%) !important;
-    width: 100vw !important;
-    min-width: 100vw !important;
-    flex-shrink: 0 !important;
-    margin-left: 0 !important;
-    padding: 4px 16px !important;
-    border-bottom: none !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-    gap: 0 !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor-landing) > :first-child {
-    display: none !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor-landing) [data-testid="stHorizontalBlock"] {
-    display: flex !important; flex-wrap: nowrap !important;
-    width: 100% !important; gap: 0 !important;
-    padding: 0 !important; align-items: stretch !important;
-    scrollbar-width: none !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor-landing) [data-testid="stHorizontalBlock"]::-webkit-scrollbar {
-    display: none !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor-landing) [data-testid="stColumn"] {
-    flex: 1 1 0 !important; min-width: 0 !important; padding: 0 !important;
-    display: flex !important; align-items: center !important; justify-content: center !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor-landing) [data-testid="stColumn"] > div,
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor-landing) [data-testid="stElementContainer"],
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor-landing) [data-testid="stButton"] {
-    width: 100% !important; padding: 0 !important; margin: 0 !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor-landing) [data-testid="stColumn"] div.ti {
-    display: none !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor-landing) button {
-    background: transparent !important; border: none !important;
-    border-bottom: 2px solid transparent !important;
-    color: #7e8c99 !important; font-family: 'IBM Plex Mono', monospace !important;
-    font-size: 11px !important; font-weight: 500 !important;
-    letter-spacing: .12em !important; text-transform: uppercase !important;
-    padding: 10px 6px !important; border-radius: 0 !important; box-shadow: none !important;
-    width: 100% !important; min-width: 0 !important; line-height: 1.4 !important;
-    text-align: center !important; justify-content: center !important;
-    display: flex !important; align-items: center !important;
-    transition: color 150ms ease-out !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor-landing) [data-testid="stBaseButton-primary"],
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor-landing) [data-testid="baseButton-primary"] {
-    color: #e9eef3 !important; border-bottom-color: #34d399 !important;
-    background: transparent !important; font-weight: 600 !important;
-}
-@media (hover:hover) {
-    [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor-landing) button:hover {
-        color: #e9eef3 !important;
-    }
-}
 </style>
 """, unsafe_allow_html=True)
 
-# ── Hub toggle row + page strip row (shared, reorderable) ──────
-def _render_hub_tabs(landing=False):
-    _anchor = "nav-hub-anchor-landing" if landing else "nav-hub-anchor"
+# ── Hub toggle row + page strip row ─────────────────────────────
+def _render_hub_tabs():
     with st.container():
-        st.markdown(f'<div class="{_anchor}"></div>', unsafe_allow_html=True)
+        st.markdown('<div class="nav-hub-anchor"></div>', unsafe_allow_html=True)
         _hc1, _hc2 = st.columns(2)
         with _hc1:
             if st.button("Brownlow", key="pill_brownlow",
@@ -2081,10 +1963,9 @@ def _render_hub_tabs(landing=False):
                     st.session_state.page = "BH Dashboard"
                 st.rerun()
 
-def _render_page_nav(landing=False):
-    _anchor = "nav-page-anchor-landing" if landing else "nav-page-anchor"
+def _render_page_nav():
     with st.container():
-        st.markdown(f'<div class="{_anchor}"></div>', unsafe_allow_html=True)
+        st.markdown('<div class="nav-page-anchor"></div>', unsafe_allow_html=True)
         _pcols = st.columns(len(_snav_pages), gap="small")
         for _pc, _sp in zip(_pcols, _snav_pages):
             with _pc:
@@ -2347,10 +2228,6 @@ font-family:'Archivo',sans-serif;font-weight:800;font-size:13px;flex-shrink:0;}
     )
     _components.html(_hero_html, height=560, scrolling=False)
 
-    # ── Navigation (section tabs + icon nav), moved below the hero ──
-    _render_hub_tabs(landing=True)
-    _render_page_nav(landing=True)
-
     # ── Stat strip ──
     _stat_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -2420,6 +2297,7 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
   </div>
 </div>""", unsafe_allow_html=True)
         if st.button("Open Leaderboard →", use_container_width=True, type="primary", key="land_bw"):
+            st.session_state["active_hub"] = "brownlow"
             st.session_state.page = 'Leaderboard'
             st.rerun()
     with _lc2:
@@ -2435,6 +2313,7 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
   </div>
 </div>""", unsafe_allow_html=True)
         if st.button("Open Betting Hub →", use_container_width=True, key="land_bh"):
+            st.session_state["active_hub"] = "betting"
             st.session_state.page = 'BH Dashboard'
             st.rerun()
 
