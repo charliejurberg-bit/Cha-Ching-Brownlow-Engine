@@ -710,27 +710,44 @@ st.markdown("""
     .dna-value { color: #34d399; font-size: 22px; font-weight: 700; line-height: 1.2; }
     .dna-sub   { color: #94a3b8; font-size: 12px; margin-top: 3px; line-height: 1.4; }
 
-    /* ── Landing page: destination cards ── */
-    .dest-card {
-        position: relative;
-        background: linear-gradient(180deg, #101a24 0%, #0d141d 100%);
-        border: 1px solid rgba(140,165,185,.14);
-        border-radius: 14px;
-        padding: 34px 32px;
-        margin-bottom: 10px;
-        overflow: hidden;
+    /* ── Landing page: destination cards (keyed containers) ── */
+    @keyframes tagDotPulse {
+        0%, 100% { opacity: 1; }
+        50%      { opacity: .35; }
     }
-    .dest-card::before {
+    :is(.st-key-card_brownlow, .st-key-card_betting) {
+        position: relative;
+        background: linear-gradient(180deg, #101a24 0%, #0d141d 100%) !important;
+        border: 1px solid rgba(140,165,185,.14) !important;
+        border-radius: 14px !important;
+        overflow: hidden;
+        margin-bottom: 10px;
+        transition: transform 180ms ease-out, box-shadow 180ms ease-out, border-color 180ms ease-out;
+    }
+    :is(.st-key-card_brownlow, .st-key-card_betting):hover {
+        transform: translateY(-2px);
+        box-shadow: 0 12px 32px rgba(0,0,0,.28);
+    }
+    .st-key-card_brownlow:hover { border-color: rgba(52,211,153,.35) !important; }
+    .st-key-card_betting:hover { border-color: rgba(240,180,41,.35) !important; }
+    :is(.st-key-card_brownlow, .st-key-card_betting)::before {
         content: "";
         position: absolute;
         top: 0; left: 0; right: 0;
         height: 2px;
+        z-index: 1;
     }
-    .dest-card.bw::before { background: linear-gradient(90deg, transparent, #34d399, transparent); }
-    .dest-card.bh::before { background: linear-gradient(90deg, transparent, #f0b429, transparent); }
-    @keyframes tagDotPulse {
-        0%, 100% { opacity: 1; }
-        50%      { opacity: .35; }
+    .st-key-card_brownlow::before { background: linear-gradient(90deg, transparent, #34d399, transparent); }
+    .st-key-card_betting::before { background: linear-gradient(90deg, transparent, #f0b429, transparent); }
+    :is(.st-key-card_brownlow, .st-key-card_betting) > [data-testid="stVerticalBlock"] {
+        padding: 34px 32px;
+        min-height: 380px;
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0 !important;
+    }
+    :is(.st-key-card_brownlow, .st-key-card_betting) > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:first-child {
+        flex: 1 1 auto;
     }
     .dest-tag {
         display: inline-flex;
@@ -755,7 +772,7 @@ st.markdown("""
     }
     .dest-tag.bw { background: rgba(52,211,153,0.12); color: #34d399; }
     .dest-tag.bh { background: rgba(240,180,41,0.12); color: #f0b429; }
-    .dest-card h2 {
+    .dest-content h2 {
         font-family: 'Archivo', sans-serif;
         font-weight: 800;
         font-size: 34px;
@@ -1975,17 +1992,21 @@ st.markdown("""
     display: none !important;
 }
 /* ── Landing page: ticker bar full-bleed, flush to viewport top ── */
-[data-testid="stVerticalBlock"]:has(> :first-child .landing-top-anchor) > :nth-child(2) {
+[data-testid="stVerticalBlock"]:has(> :first-child .landing-top-anchor) > :nth-child(2),
+[data-testid="stLayoutWrapper"]:has(.landing-top-anchor) + [data-testid="stLayoutWrapper"] {
     position: relative !important;
     left: 50% !important;
-    transform: translateX(-50%) !important;
+    right: 50% !important;
     width: 100vw !important;
-    min-width: 100vw !important;
+    margin-left: -50vw !important;
+    margin-right: -50vw !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .landing-top-anchor) > :nth-child(2) iframe {
+[data-testid="stVerticalBlock"]:has(> :first-child .landing-top-anchor) > :nth-child(2) iframe,
+[data-testid="stLayoutWrapper"]:has(.landing-top-anchor) + [data-testid="stLayoutWrapper"] iframe {
     display: block !important;
+    width: 100vw !important;
 }
 
 </style>
@@ -2367,8 +2388,9 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
     # ── Destination panels ──
     _lc1, _lc2 = st.columns(2, gap="medium")
     with _lc1:
-        st.markdown(f"""
-<div class="dest-card bw">
+        with st.container(key="card_brownlow"):
+            st.markdown(f"""
+<div class="dest-content">
   <span class="dest-tag bw">Prediction Engine</span>
   <h2>Brownlow Medal</h2>
   <div class="dest-desc">Live leaderboard, player profiles, game-by-game vote modelling and where the market has it wrong.</div>
@@ -2378,13 +2400,14 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
     <div><span class="dr-label">Top-10 Acc.</span><span class="dr-value">86%</span></div>
   </div>
 </div>""", unsafe_allow_html=True)
-        if st.button("Open Leaderboard", type="primary", key="land_bw"):
-            st.session_state["active_hub"] = "brownlow"
-            st.session_state.page = 'Leaderboard'
-            st.rerun()
+            if st.button("Open Leaderboard", type="primary", key="land_bw"):
+                st.session_state["active_hub"] = "brownlow"
+                st.session_state.page = 'Leaderboard'
+                st.rerun()
     with _lc2:
-        st.markdown(f"""
-<div class="dest-card bh">
+        with st.container(key="card_betting"):
+            st.markdown(f"""
+<div class="dest-content">
   <span class="dest-tag bh">Live Tracking</span>
   <h2>Betting Hub</h2>
   <div class="dest-desc">Track bets, log P&amp;L, flag Cha Ching tips and analyse hit rates and ROI across markets.</div>
@@ -2394,10 +2417,10 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
     <div><span class="dr-label">Fade Hit Rate</span><span class="dr-value">8/8</span></div>
   </div>
 </div>""", unsafe_allow_html=True)
-        if st.button("Open Betting Hub", key="land_bh"):
-            st.session_state["active_hub"] = "betting"
-            st.session_state.page = 'BH Dashboard'
-            st.rerun()
+            if st.button("Open Betting Hub", key="land_bh"):
+                st.session_state["active_hub"] = "betting"
+                st.session_state.page = 'BH Dashboard'
+                st.rerun()
 
 # ════════════════════════════════════════════════════════════
 # BETTING HUB pages
