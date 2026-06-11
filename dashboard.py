@@ -716,7 +716,7 @@ st.markdown("""
         background: linear-gradient(180deg, #101a24 0%, #0d141d 100%);
         border: 1px solid rgba(140,165,185,.14);
         border-radius: 14px;
-        padding: 28px 26px 22px;
+        padding: 34px 32px;
         margin-bottom: 10px;
         overflow: hidden;
     }
@@ -728,8 +728,14 @@ st.markdown("""
     }
     .dest-card.bw::before { background: linear-gradient(90deg, transparent, #34d399, transparent); }
     .dest-card.bh::before { background: linear-gradient(90deg, transparent, #f0b429, transparent); }
+    @keyframes tagDotPulse {
+        0%, 100% { opacity: 1; }
+        50%      { opacity: .35; }
+    }
     .dest-tag {
-        display: inline-block;
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
         font-family: 'IBM Plex Mono', monospace;
         font-size: 10px;
         font-weight: 700;
@@ -739,34 +745,61 @@ st.markdown("""
         border-radius: 4px;
         margin-bottom: 14px;
     }
+    .dest-tag::before {
+        content: "";
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: currentColor;
+        animation: tagDotPulse 2.2s ease-in-out infinite;
+    }
     .dest-tag.bw { background: rgba(52,211,153,0.12); color: #34d399; }
     .dest-tag.bh { background: rgba(240,180,41,0.12); color: #f0b429; }
     .dest-card h2 {
         font-family: 'Archivo', sans-serif;
         font-weight: 800;
-        font-size: 26px;
+        font-size: 34px;
         color: #e9eef3;
         margin: 0 0 8px;
     }
-    .dest-desc { color: #7e8c99; font-size: 13px; line-height: 1.6; margin-bottom: 18px; }
+    .dest-desc { color: #7e8c99; font-size: 13px; line-height: 1.6; margin-bottom: 18px; max-width: 42ch; }
     .dest-data-row {
         display: flex;
         flex-wrap: wrap;
-        gap: 8px 22px;
+        gap: 8px 26px;
         border-top: 1px solid rgba(140,165,185,.14);
-        padding-top: 12px;
+        padding-top: 16px;
         font-family: 'IBM Plex Mono', monospace;
-        font-size: 12px;
-        color: #7e8c99;
     }
-    .dest-data-row b { color: #e9eef3; font-weight: 600; }
+    .dest-data-row > div { display: flex; flex-direction: column; gap: 5px; }
+    .dest-data-row .dr-label { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: #7e8c99; }
+    .dest-data-row .dr-value { font-size: 14px; font-weight: 600; color: #e9eef3; }
 
     /* ── Landing page: destination buttons ── */
+    .st-key-land_bw button,
+    .st-key-land_bh button {
+        width: auto !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        padding: 12px 22px !important;
+        border-radius: 9px !important;
+        font-weight: 700 !important;
+    }
+    .st-key-land_bw button::after,
+    .st-key-land_bh button::after {
+        content: "→";
+        display: inline-block;
+        margin-left: 8px;
+        transition: transform 150ms ease-out;
+    }
+    .st-key-land_bw button:hover::after,
+    .st-key-land_bh button:hover::after {
+        transform: translateX(3px);
+    }
     .st-key-land_bw button {
         background: #34d399 !important;
         color: #062b1d !important;
         border: none !important;
-        font-weight: 700 !important;
         transition: filter 150ms ease-out !important;
     }
     .st-key-land_bw button p,
@@ -779,7 +812,6 @@ st.markdown("""
         background: transparent !important;
         color: #f0b429 !important;
         border: 1px solid rgba(240,180,41,.5) !important;
-        font-weight: 700 !important;
         transition: background-color 150ms ease-out !important;
     }
     .st-key-land_bh button:hover { background: rgba(240,180,41,.12) !important; }
@@ -2073,6 +2105,7 @@ if _page == 'Landing':
         _land_n = len(_land_bets)
         _land_pending = int((_land_bets["result"] == "Pending").sum()) if not _land_bets.empty else 0
     except Exception:
+        _land_bets = pd.DataFrame()
         _land_pl = None
         _land_n = 0
         _land_pending = 0
@@ -2083,6 +2116,18 @@ if _page == 'Landing':
     _land_round = max_season_rounds - 1
 
     # Latest round's predicted 3-2-1 vote read
+    _TEAM_ABBR = {
+        "Adelaide": "ADE", "Brisbane Lions": "BRI", "Carlton": "CAR", "Collingwood": "COL",
+        "Essendon": "ESS", "Fremantle": "FRE", "Geelong": "GEE", "Gold Coast": "GCS",
+        "Greater Western Sydney": "GWS", "GWS": "GWS", "GWS Giants": "GWS", "Hawthorn": "HAW",
+        "Melbourne": "MEL", "North Melbourne": "NTH", "Port Adelaide": "PTA", "Richmond": "RIC",
+        "St Kilda": "STK", "Sydney": "SYD", "West Coast": "WCE", "Western Bulldogs": "WB",
+    }
+
+    def _initial_surname(_name):
+        _parts = str(_name).split()
+        return f"{_parts[0][0]}. {' '.join(_parts[1:])}" if len(_parts) >= 2 else str(_name)
+
     _chip_fallback = [
         {"name": "Logan Morris", "team": "Brisbane Lions", "disposals": 24},
         {"name": "Kysaiah Pickett", "team": "Melbourne", "disposals": 28},
@@ -2108,16 +2153,37 @@ if _page == 'Landing':
     _chip3, _chip2, _chip1 = _chip_players[0], _chip_players[1], _chip_players[2]
 
     def _chip_stats(_c):
-        return f"{_c['disposals']} disposals &middot; {_c['team']}"
+        _abbr = _TEAM_ABBR.get(_c['team'], _c['team'][:3].upper())
+        return f"&middot; {_abbr} &middot; {_c['disposals']} disposals"
 
     # ── Ticker bar ──
-    _ticker_items_html = [
-        f'ROUND {_land_round} &middot; {_land_pending} TIP{"S" if _land_pending != 1 else ""} PENDING',
+    _ticker_bet_items = []
+    if not _land_bets.empty and "match" in _land_bets.columns:
+        _round_bets = _land_bets[
+            _land_bets["match"].astype(str).str.contains(f"Round {_land_round}", na=False)
+            & _land_bets["result"].isin(["Win", "Loss"])
+        ]
+        for _, _b in _round_bets.head(4).iterrows():
+            _sel = str(_b["selection"]).upper()
+            if _b["result"] == "Win":
+                _ticker_bet_items.append(f'<span style="color:#34d399">{_sel} &#10003; WIN</span>')
+            else:
+                _ticker_bet_items.append(f'{_sel} &#10007; LOSS')
+    if not _ticker_bet_items:
+        # TODO: wire to live bet results once the current round has settled bets
+        _ticker_bet_items = ['<span style="color:#34d399">DUURSMA 16+ DISP &#10003; WIN</span>']
+
+    # TODO: wire to live fade-signal model output
+    _fade_signal_count = 3
+
+    _ticker_items_html = _ticker_bet_items + [
         f'SEASON P&amp;L <span style="color:{_pl_color}">{_pl_str}</span>',
-        f'BROWNLOW LEADER <span style="color:#f0b429">{str(_land_leader).upper()} — {_land_votes:.1f} PROJ. VOTES</span>',
+        f'BROWNLOW LEADER <span style="color:#f0b429">{_initial_surname(_land_leader).upper()} {_land_votes:.1f}</span>',
+        f'FADE SIGNALS LIVE: {_fade_signal_count}',
         'MODEL V4.0 &middot; MAE 0.0904',
     ]
-    _ticker_segment = (' &middot; '.join(_ticker_items_html)) + ' &middot; '
+    _ticker_sep = ' &nbsp;&nbsp;&middot;&nbsp;&nbsp; '
+    _ticker_segment = (_ticker_sep.join(_ticker_items_html)) + _ticker_sep
     _ticker_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
@@ -2155,8 +2221,8 @@ if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{background:transparent;height:560px;overflow:hidden;}
-.hero{position:relative;width:100%;height:560px;display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;}
+html,body{background:transparent;height:440px;overflow:hidden;}
+.hero{position:relative;width:100%;height:440px;display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;}
 .oval{position:absolute;top:0;left:0;width:100%;height:100%;opacity:.5;}
 .oval ellipse,.oval path,.oval circle,.oval rect{
   fill:none;stroke:rgba(126,156,178,.32);stroke-width:1.1;
@@ -2169,22 +2235,22 @@ html,body{background:transparent;height:560px;overflow:hidden;}
 .g4 *{animation-delay:.75s;}
 @keyframes draw{to{stroke-dashoffset:0;}}
 .content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;
-text-align:center;gap:14px;padding:0 24px;max-width:900px;}
+text-align:center;padding:0 24px;max-width:900px;}
 .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.34em;
-text-transform:uppercase;color:#34d399;}
+text-transform:uppercase;color:#34d399;margin-bottom:8px;}
 .wordmark{font-family:'Archivo',sans-serif;font-weight:900;font-variation-settings:'wdth' 122;
-font-size:clamp(64px,11vw,128px);line-height:.94;margin:6px 0;}
+font-size:clamp(56px,9vw,110px);line-height:.94;white-space:nowrap;margin:0;}
 .cha{background:linear-gradient(180deg,#ffffff,#9fb3c4);-webkit-background-clip:text;background-clip:text;color:transparent;}
 .ching{background:linear-gradient(120deg,#34d399,#f0b429);-webkit-background-clip:text;background-clip:text;color:transparent;}
-.subtitle{font-size:15px;color:#7e8c99;margin-bottom:8px;}
+.subtitle{font-size:15px;color:#7e8c99;margin:14px 0 18px;}
 @keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
 .rise{opacity:0;animation:rise 650ms cubic-bezier(0.23,1,0.32,1) forwards;}
 .r1{animation-delay:.2s;}
 .r2{animation-delay:.32s;}
 .r3{animation-delay:.44s;}
-.chips{display:flex;gap:10px;flex-wrap:nowrap;justify-content:center;margin-top:8px;max-width:100%;}
+.chips{display:flex;gap:10px;flex-wrap:nowrap;justify-content:center;margin-top:0;max-width:100%;}
 .chip{display:flex;align-items:center;gap:8px;background:#101a24;border:1px solid rgba(140,165,185,.14);
-border-radius:999px;padding:6px 14px 6px 6px;opacity:0;animation:chipIn 500ms ease-out forwards;white-space:nowrap;}
+border-radius:999px;padding:10px 18px 10px 10px;opacity:0;animation:chipIn 500ms ease-out forwards;white-space:nowrap;}
 @keyframes chipIn{from{opacity:0;transform:translateY(10px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
 .chip-1{animation-delay:.6s;}
 .chip-2{animation-delay:1.0s;}
@@ -2238,22 +2304,22 @@ font-family:'Archivo',sans-serif;font-weight:800;font-size:13px;flex-shrink:0;}
     _hero_html = (
         _hero_html
         .replace("__ROUND__", str(_land_round))
-        .replace("__NAME3__", _chip3["name"]).replace("__STATS3__", _chip_stats(_chip3))
-        .replace("__NAME2__", _chip2["name"]).replace("__STATS2__", _chip_stats(_chip2))
-        .replace("__NAME1__", _chip1["name"]).replace("__STATS1__", _chip_stats(_chip1))
+        .replace("__NAME3__", _initial_surname(_chip3["name"])).replace("__STATS3__", _chip_stats(_chip3))
+        .replace("__NAME2__", _initial_surname(_chip2["name"])).replace("__STATS2__", _chip_stats(_chip2))
+        .replace("__NAME1__", _initial_surname(_chip1["name"])).replace("__STATS1__", _chip_stats(_chip1))
     )
-    _components.html(_hero_html, height=560, scrolling=False)
+    _components.html(_hero_html, height=440, scrolling=False)
 
     # ── Stat strip ──
     _stat_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{background:transparent;height:110px;overflow:hidden;font-family:'IBM Plex Mono',monospace;}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;height:110px;background:rgba(140,165,185,.14);}
-.cell{background:#101a24;padding:18px 22px;display:flex;flex-direction:column;justify-content:center;gap:8px;}
+html,body{background:transparent;height:130px;overflow:hidden;font-family:'IBM Plex Mono',monospace;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;height:130px;background:rgba(140,165,185,.14);}
+.cell{background:#101a24;padding:26px 30px;display:flex;flex-direction:column;justify-content:center;gap:8px;}
 .label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#7e8c99;}
-.value{font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;color:#e9eef3;letter-spacing:-.5px;}
+.value{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:28px;color:#e9eef3;letter-spacing:.02em;}
 .value.leader{color:#34d399;}
 .value.pl{color:#f0b429;}
 </style></head><body>
@@ -2296,7 +2362,7 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
         .replace("__PL_PREFIX__", "+$" if _land_pl_val >= 0 else "-$")
         .replace("__PL_FALLBACK__", _pl_str)
     )
-    _components.html(_stat_html, height=110, scrolling=False)
+    _components.html(_stat_html, height=130, scrolling=False)
 
     # ── Destination panels ──
     _lc1, _lc2 = st.columns(2, gap="medium")
@@ -2305,14 +2371,14 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
 <div class="dest-card bw">
   <span class="dest-tag bw">Prediction Engine</span>
   <h2>Brownlow Medal</h2>
-  <div class="dest-desc">Live leaderboard, player profiles, model predictions, and game-by-game analysis.</div>
+  <div class="dest-desc">Live leaderboard, player profiles, game-by-game vote modelling and where the market has it wrong.</div>
   <div class="dest-data-row">
-    <span>Leader <b>{_land_leader}</b></span>
-    <span>Proj. Votes <b>{_land_votes:.1f}</b></span>
-    <span>Top-10 Acc. <b>86%</b></span>
+    <div><span class="dr-label">Leader</span><span class="dr-value">{_land_leader}</span></div>
+    <div><span class="dr-label">Proj. Votes</span><span class="dr-value">{_land_votes:.1f}</span></div>
+    <div><span class="dr-label">Top-10 Acc.</span><span class="dr-value">86%</span></div>
   </div>
 </div>""", unsafe_allow_html=True)
-        if st.button("Open Leaderboard →", use_container_width=True, type="primary", key="land_bw"):
+        if st.button("Open Leaderboard", type="primary", key="land_bw"):
             st.session_state["active_hub"] = "brownlow"
             st.session_state.page = 'Leaderboard'
             st.rerun()
@@ -2321,14 +2387,14 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
 <div class="dest-card bh">
   <span class="dest-tag bh">Live Tracking</span>
   <h2>Betting Hub</h2>
-  <div class="dest-desc">Track bets, log P&amp;L, flag Cha Ching tips, and analyse hit rates across markets.</div>
+  <div class="dest-desc">Track bets, log P&amp;L, flag Cha Ching tips and analyse hit rates and ROI across markets.</div>
   <div class="dest-data-row">
-    <span>Season <b>{_land_n} bets</b></span>
-    <span>P&amp;L <b style="color:{_pl_color}">{_pl_str}</b></span>
-    <span>Fade Hit Rate <b>8/8</b></span>
+    <div><span class="dr-label">Season</span><span class="dr-value">{_land_n} bets</span></div>
+    <div><span class="dr-label">P&amp;L</span><span class="dr-value" style="color:{_pl_color}">{_pl_str}</span></div>
+    <div><span class="dr-label">Fade Hit Rate</span><span class="dr-value">8/8</span></div>
   </div>
 </div>""", unsafe_allow_html=True)
-        if st.button("Open Betting Hub →", use_container_width=True, key="land_bh"):
+        if st.button("Open Betting Hub", key="land_bh"):
             st.session_state["active_hub"] = "betting"
             st.session_state.page = 'BH Dashboard'
             st.rerun()
