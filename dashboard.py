@@ -764,10 +764,15 @@ st.markdown("""
     /* ── Landing page: destination buttons ── */
     .st-key-land_bw button {
         background: #34d399 !important;
-        color: #0a1017 !important;
+        color: #062b1d !important;
         border: none !important;
         font-weight: 700 !important;
         transition: filter 150ms ease-out !important;
+    }
+    .st-key-land_bw button p,
+    .st-key-land_bw button span {
+        color: #062b1d !important;
+        font-weight: 700 !important;
     }
     .st-key-land_bw button:hover { filter: brightness(1.1); }
     .st-key-land_bh button {
@@ -1723,7 +1728,8 @@ if 'active_hub' not in st.session_state:
 if 'page' not in st.session_state:
     st.session_state.page = 'Landing'
 
-render_banner()
+if st.session_state.page != 'Landing':
+    render_banner()
 
 _NAV_BROWNLOW = {
     "Overview": ["Home", "Leaderboard", "Live Tracker"],
@@ -2073,28 +2079,41 @@ if _page == 'Landing':
         return f"{_c['disposals']} disposals &middot; {_c['team']}"
 
     # ── Ticker bar ──
-    _ticker_segment = (
-        f'ROUND {_land_round} &middot; {_land_pending} TIP{"S" if _land_pending != 1 else ""} PENDING'
-        f'&nbsp;&nbsp;&nbsp;&#10022;&nbsp;&nbsp;&nbsp;'
-        f'SEASON P&amp;L <span style="color:{_pl_color}">{_pl_str}</span>'
-        f'&nbsp;&nbsp;&nbsp;&#10022;&nbsp;&nbsp;&nbsp;'
-        f'BROWNLOW LEADER <span style="color:#f0b429">{str(_land_leader).upper()} — {_land_votes:.1f} PROJ. VOTES</span>'
-        f'&nbsp;&nbsp;&nbsp;&#10022;&nbsp;&nbsp;&nbsp;'
-        f'MODEL V4.0 &middot; MAE 0.0904'
-    )
+    _ticker_items_html = [
+        f'ROUND {_land_round} &middot; {_land_pending} TIP{"S" if _land_pending != 1 else ""} PENDING',
+        f'SEASON P&amp;L <span style="color:{_pl_color}">{_pl_str}</span>',
+        f'BROWNLOW LEADER <span style="color:#f0b429">{str(_land_leader).upper()} — {_land_votes:.1f} PROJ. VOTES</span>',
+        'MODEL V4.0 &middot; MAE 0.0904',
+    ]
+    _ticker_segment = (' &middot; '.join(_ticker_items_html)) + ' &middot; '
     _ticker_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{background:#0d141d;height:36px;overflow:hidden;}
-body{display:flex;align-items:center;border-bottom:1px solid rgba(140,165,185,.14);}
-.track{display:inline-flex;white-space:nowrap;font-family:'IBM Plex Mono',monospace;font-size:11px;
-text-transform:uppercase;letter-spacing:.08em;color:#7e8c99;animation:scroll 38s linear infinite;will-change:transform;}
-.track span{padding-right:60px;}
-@keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-@media (prefers-reduced-motion: reduce){.track{animation:none;}}
+html,body{background:transparent;height:36px;overflow:hidden;}
+.bar{height:36px;background:#0d141d;border-bottom:1px solid rgba(140,165,185,.14);overflow:hidden;display:flex;align-items:center;}
+.ticker-track{
+  display:inline-block;
+  white-space:nowrap;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:#7e8c99;
+  padding-left:24px;
+  animation:ticker 38s linear infinite;
+  will-change:transform;
+}
+@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@media (prefers-reduced-motion: reduce){.ticker-track{animation:none;}}
 </style></head><body>
-<div class="track"><span>__SEG__</span><span>__SEG__</span></div>
+<div class="bar"><div class="ticker-track" id="track">__SEG__</div></div>
+<script>
+var track = document.getElementById('track');
+if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  track.innerHTML += track.innerHTML;
+}
+</script>
 </body></html>"""
     _ticker_html = _ticker_html.replace("__SEG__", _ticker_segment)
     _components.html(_ticker_html, height=36, scrolling=False)
@@ -2104,7 +2123,7 @@ text-transform:uppercase;letter-spacing:.08em;color:#7e8c99;animation:scroll 38s
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{background:#0a1017;height:560px;overflow:hidden;}
+html,body{background:transparent;height:560px;overflow:hidden;}
 .hero{position:relative;width:100%;height:560px;display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;}
 .oval{position:absolute;top:0;left:0;width:100%;height:100%;opacity:.5;}
 .oval ellipse,.oval path,.oval circle,.oval rect{
@@ -2131,20 +2150,24 @@ font-size:clamp(64px,11vw,128px);line-height:.94;margin:6px 0;}
 .r1{animation-delay:.2s;}
 .r2{animation-delay:.32s;}
 .r3{animation-delay:.44s;}
-.chips{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
-.chip{display:flex;align-items:center;gap:10px;background:#101a24;border:1px solid rgba(140,165,185,.14);
-border-radius:999px;padding:8px 18px 8px 8px;opacity:0;animation:chipIn 500ms ease-out forwards;}
+.chips{display:flex;gap:10px;flex-wrap:nowrap;justify-content:center;margin-top:8px;max-width:100%;}
+.chip{display:flex;align-items:center;gap:8px;background:#101a24;border:1px solid rgba(140,165,185,.14);
+border-radius:999px;padding:6px 14px 6px 6px;opacity:0;animation:chipIn 500ms ease-out forwards;white-space:nowrap;}
 @keyframes chipIn{from{opacity:0;transform:translateY(10px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
 .chip-1{animation-delay:.6s;}
 .chip-2{animation-delay:1.0s;}
 .chip-3{animation-delay:1.5s;}
-.badge{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;
-font-family:'Archivo',sans-serif;font-weight:800;font-size:15px;flex-shrink:0;}
+.badge{display:flex;align-items:center;justify-content:center;width:24px;height:24px;border-radius:6px;
+font-family:'Archivo',sans-serif;font-weight:800;font-size:13px;flex-shrink:0;}
 .badge-3{background:#34d399;color:#0a1017;}
 .badge-2{background:#3a4753;color:#e9eef3;}
 .badge-1{background:#1c2530;color:#7e8c99;}
-.chip-name{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#e9eef3;}
-.chip-stats{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7e8c99;}
+.chip-name{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:#e9eef3;}
+.chip-stats{font-family:'IBM Plex Mono',monospace;font-size:10px;color:#7e8c99;}
+@media (max-width:700px){
+  .chips{flex-wrap:wrap;}
+  .chip{white-space:normal;}
+}
 @media (prefers-reduced-motion: reduce){
   .oval ellipse,.oval path,.oval circle,.oval rect{animation:none;stroke-dashoffset:0;}
   .rise,.chip{animation:fade 400ms ease-out forwards;}
@@ -2194,8 +2217,8 @@ font-family:'Archivo',sans-serif;font-weight:800;font-size:15px;flex-shrink:0;}
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{background:rgba(140,165,185,.14);height:110px;overflow:hidden;font-family:'IBM Plex Mono',monospace;}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;height:110px;}
+html,body{background:transparent;height:110px;overflow:hidden;font-family:'IBM Plex Mono',monospace;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;height:110px;background:rgba(140,165,185,.14);}
 .cell{background:#101a24;padding:18px 22px;display:flex;flex-direction:column;justify-content:center;gap:8px;}
 .label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#7e8c99;}
 .value{font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;color:#e9eef3;letter-spacing:-.5px;}
