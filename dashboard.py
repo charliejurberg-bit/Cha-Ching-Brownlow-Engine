@@ -43,7 +43,7 @@ def inject_global_css():
 iframe[title="streamlit_app"] { margin-top: -60px !important; }
 </style>
 """, unsafe_allow_html=True)
-    st.markdown('<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">', unsafe_allow_html=True)
+    st.markdown('<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600;700&family=Archivo:wdth,wght@62.5..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">', unsafe_allow_html=True)
     st.markdown("""
 <style>
 html, body, [data-testid="stAppViewContainer"] {
@@ -710,74 +710,74 @@ st.markdown("""
     .dna-value { color: #34d399; font-size: 22px; font-weight: 700; line-height: 1.2; }
     .dna-sub   { color: #94a3b8; font-size: 12px; margin-top: 3px; line-height: 1.4; }
 
-    /* ── Landing page ── */
-    .land-ribbon {
-        display: flex;
-        background: #152533;
-        border: 1px solid #2a4a5a;
-        border-radius: 8px;
-        margin: 12px 0 24px;
+    /* ── Landing page: destination cards ── */
+    .dest-card {
+        position: relative;
+        background: linear-gradient(180deg, #101a24 0%, #0d141d 100%);
+        border: 1px solid rgba(140,165,185,.14);
+        border-radius: 14px;
+        padding: 28px 26px 22px;
+        margin-bottom: 10px;
         overflow: hidden;
     }
-    .land-stat {
-        flex: 1;
-        padding: 14px 20px;
-        border-right: 1px solid #2a4a5a;
+    .dest-card::before {
+        content: "";
+        position: absolute;
+        top: 0; left: 0; right: 0;
+        height: 2px;
     }
-    .land-stat:last-child { border-right: none; }
-    .land-stat-label {
+    .dest-card.bw::before { background: linear-gradient(90deg, transparent, #34d399, transparent); }
+    .dest-card.bh::before { background: linear-gradient(90deg, transparent, #f0b429, transparent); }
+    .dest-tag {
+        display: inline-block;
+        font-family: 'IBM Plex Mono', monospace;
         font-size: 10px;
-        font-weight: 600;
-        letter-spacing: 0.1em;
-        text-transform: uppercase;
-        color: #4a5a6a;
-        margin-bottom: 3px;
-    }
-    .land-stat-value {
-        font-size: 16px;
         font-weight: 700;
-        color: #e8f0f8;
-        font-family: 'DM Mono', monospace;
-        letter-spacing: -0.3px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        padding: 4px 10px;
+        border-radius: 4px;
+        margin-bottom: 14px;
     }
-    .land-tile {
-        background: #152533;
-        border: 1px solid #2a4a5a;
-        border-radius: 10px;
-        padding: 28px 24px 24px;
-        margin-bottom: 10px;
-        transition: background 200ms ease-out;
+    .dest-tag.bw { background: rgba(52,211,153,0.12); color: #34d399; }
+    .dest-tag.bh { background: rgba(240,180,41,0.12); color: #f0b429; }
+    .dest-card h2 {
+        font-family: 'Archivo', sans-serif;
+        font-weight: 800;
+        font-size: 26px;
+        color: #e9eef3;
+        margin: 0 0 8px;
     }
-    .land-tile:hover { background: #1a2d3d; }
-    .land-tile.bw { border-top: 3px solid #34d399; }
-    .land-tile.bh { border-top: 3px solid #f0b429; }
-    .land-tile-icon { font-size: 40px; line-height: 1; margin-bottom: 14px; }
-    .land-tile-name { font-size: 20px; font-weight: 800; letter-spacing: -0.4px; margin-bottom: 8px; }
-    .land-tile-name.bw { color: #34d399; }
-    .land-tile-name.bh { color: #f0b429; }
-    .land-tile-desc { color: #94a3b8; font-size: 13px; line-height: 1.6; margin-bottom: 16px; }
-    .land-tile-preview {
+    .dest-desc { color: #7e8c99; font-size: 13px; line-height: 1.6; margin-bottom: 18px; }
+    .dest-data-row {
         display: flex;
-        align-items: baseline;
-        gap: 6px;
-        padding: 9px 12px;
-        background: #1e3a4a;
-        border-radius: 6px;
+        flex-wrap: wrap;
+        gap: 8px 22px;
+        border-top: 1px solid rgba(140,165,185,.14);
+        padding-top: 12px;
+        font-family: 'IBM Plex Mono', monospace;
+        font-size: 12px;
+        color: #7e8c99;
     }
-    .land-tile-preview.gold { background: rgba(240,180,41,0.07); }
-    .land-preview-label {
-        font-size: 10px;
-        font-weight: 600;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        color: #4a5a6a;
+    .dest-data-row b { color: #e9eef3; font-weight: 600; }
+
+    /* ── Landing page: destination buttons ── */
+    .st-key-land_bw button {
+        background: #34d399 !important;
+        color: #0a1017 !important;
+        border: none !important;
+        font-weight: 700 !important;
+        transition: filter 150ms ease-out !important;
     }
-    .land-preview-val {
-        font-size: 14px;
-        font-weight: 700;
-        color: #e8f0f8;
-        font-family: 'DM Mono', monospace;
+    .st-key-land_bw button:hover { filter: brightness(1.1); }
+    .st-key-land_bh button {
+        background: transparent !important;
+        color: #f0b429 !important;
+        border: 1px solid rgba(240,180,41,.5) !important;
+        font-weight: 700 !important;
+        transition: background-color 150ms ease-out !important;
     }
+    .st-key-land_bh button:hover { background: rgba(240,180,41,.12) !important; }
 
     /* ── Secondary button ── */
     [data-testid="stBaseButton-secondary"] {
@@ -2015,7 +2015,7 @@ if _show_controls:
 # LANDING PAGE
 # ════════════════════════════════════════════════════════════
 if _page == 'Landing':
-    # Live context: compute leader from current season data
+    # ── Live context: leader, projections, betting P&L ──
     _land_df = load_season(selected_season)
     _land_leader = "—"
     _land_votes = 0.0
@@ -2029,70 +2029,247 @@ if _page == 'Landing':
             _land_leader = _land_top.index[0]
             _land_votes = float(_land_top.iloc[0])
 
-    # Betting P&L summary
     try:
         _land_bets = betting_hub._load_bets()
         _land_pl = float(_land_bets["profit_loss"].sum()) if not _land_bets.empty else None
         _land_n = len(_land_bets)
+        _land_pending = int((_land_bets["result"] == "Pending").sum()) if not _land_bets.empty else 0
     except Exception:
         _land_pl = None
         _land_n = 0
+        _land_pending = 0
 
-    if _land_pl is not None:
-        _pl_str = f"+${_land_pl:.2f}" if _land_pl >= 0 else f"-${abs(_land_pl):.2f}"
-    else:
-        _pl_str = "—"
-    _pl_color = "#34d399" if (_land_pl or 0) >= 0 else "#e05252"
+    _land_pl_val = _land_pl or 0.0
+    _pl_str = f"+${_land_pl_val:.2f}" if _land_pl_val >= 0 else f"-${abs(_land_pl_val):.2f}"
+    _pl_color = "#34d399" if _land_pl_val >= 0 else "#e0625a"
+    _land_round = max_season_rounds - 1
 
-    # Context ribbon
-    st.markdown(f"""
-<div class="land-ribbon">
-  <div class="land-stat">
-    <div class="land-stat-label">Round</div>
-    <div class="land-stat-value">{max_season_rounds - 1}</div>
-  </div>
-  <div class="land-stat">
-    <div class="land-stat-label">Current Leader</div>
-    <div class="land-stat-value" style="color:#34d399">{_land_leader}</div>
-  </div>
-  <div class="land-stat">
-    <div class="land-stat-label">Predicted Votes</div>
-    <div class="land-stat-value">{_land_votes:.1f}</div>
-  </div>
-  <div class="land-stat">
-    <div class="land-stat-label">Betting P&amp;L</div>
-    <div class="land-stat-value" style="color:{_pl_color}">{_pl_str}</div>
+    # Latest round's predicted 3-2-1 vote read
+    _chip_fallback = [
+        {"name": "Logan Morris", "team": "Brisbane Lions", "disposals": 24},
+        {"name": "Kysaiah Pickett", "team": "Melbourne", "disposals": 28},
+        {"name": "Lachie Neale", "team": "Brisbane Lions", "disposals": 31},
+    ]
+    _chip_players = []
+    if game_df is not None and len(game_df):
+        _latest_round = game_df['Round_num'].max()
+        _latest_df = (
+            game_df[game_df['Round_num'] == _latest_round]
+            .sort_values('Exp_Votes', ascending=False)
+            .head(3)
+        )
+        for _, _r in _latest_df.iterrows():
+            _chip_players.append({
+                "name": str(_r.get("Player_Name", "—")),
+                "team": str(_r.get("Team", "")),
+                "disposals": int(_r["Disposals"]) if pd.notna(_r.get("Disposals")) else 0,
+            })
+    # TODO: wire to predictions — fall back to placeholder leaders if the latest round has < 3 players
+    for _i in range(len(_chip_players), 3):
+        _chip_players.append(_chip_fallback[_i])
+    _chip3, _chip2, _chip1 = _chip_players[0], _chip_players[1], _chip_players[2]
+
+    def _chip_stats(_c):
+        return f"{_c['disposals']} disposals &middot; {_c['team']}"
+
+    # ── Ticker bar ──
+    _ticker_segment = (
+        f'ROUND {_land_round} &middot; {_land_pending} TIP{"S" if _land_pending != 1 else ""} PENDING'
+        f'&nbsp;&nbsp;&nbsp;&#10022;&nbsp;&nbsp;&nbsp;'
+        f'SEASON P&amp;L <span style="color:{_pl_color}">{_pl_str}</span>'
+        f'&nbsp;&nbsp;&nbsp;&#10022;&nbsp;&nbsp;&nbsp;'
+        f'BROWNLOW LEADER <span style="color:#f0b429">{str(_land_leader).upper()} — {_land_votes:.1f} PROJ. VOTES</span>'
+        f'&nbsp;&nbsp;&nbsp;&#10022;&nbsp;&nbsp;&nbsp;'
+        f'MODEL V4.0 &middot; MAE 0.0904'
+    )
+    _ticker_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:#0d141d;height:36px;overflow:hidden;}
+body{display:flex;align-items:center;border-bottom:1px solid rgba(140,165,185,.14);}
+.track{display:inline-flex;white-space:nowrap;font-family:'IBM Plex Mono',monospace;font-size:11px;
+text-transform:uppercase;letter-spacing:.08em;color:#7e8c99;animation:scroll 38s linear infinite;will-change:transform;}
+.track span{padding-right:60px;}
+@keyframes scroll{from{transform:translateX(0);}to{transform:translateX(-50%);}}
+@media (prefers-reduced-motion: reduce){.track{animation:none;}}
+</style></head><body>
+<div class="track"><span>__SEG__</span><span>__SEG__</span></div>
+</body></html>"""
+    _ticker_html = _ticker_html.replace("__SEG__", _ticker_segment)
+    _components.html(_ticker_html, height=36, scrolling=False)
+
+    # ── Hero ──
+    _hero_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:#0a1017;height:560px;overflow:hidden;}
+.hero{position:relative;width:100%;height:560px;display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;}
+.oval{position:absolute;top:0;left:0;width:100%;height:100%;opacity:.5;}
+.oval ellipse,.oval path,.oval circle,.oval rect{
+  fill:none;stroke:rgba(126,156,178,.32);stroke-width:1.1;
+  stroke-dasharray:2400;stroke-dashoffset:2400;
+  animation:draw 2.4s cubic-bezier(0.23,1,0.32,1) forwards;
+}
+.g1 *{animation-delay:0s;}
+.g2 *{animation-delay:.25s;}
+.g3 *{animation-delay:.5s;}
+.g4 *{animation-delay:.75s;}
+@keyframes draw{to{stroke-dashoffset:0;}}
+.content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;
+text-align:center;gap:14px;padding:0 24px;max-width:900px;}
+.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.34em;
+text-transform:uppercase;color:#34d399;}
+.wordmark{font-family:'Archivo',sans-serif;font-weight:900;font-variation-settings:'wdth' 122;
+font-size:clamp(64px,11vw,128px);line-height:.94;margin:6px 0;}
+.cha{background:linear-gradient(180deg,#ffffff,#9fb3c4);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.ching{background:linear-gradient(120deg,#34d399,#f0b429);-webkit-background-clip:text;background-clip:text;color:transparent;}
+.subtitle{font-size:15px;color:#7e8c99;margin-bottom:8px;}
+@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
+.rise{opacity:0;animation:rise 650ms cubic-bezier(0.23,1,0.32,1) forwards;}
+.r1{animation-delay:.2s;}
+.r2{animation-delay:.32s;}
+.r3{animation-delay:.44s;}
+.chips{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-top:8px;}
+.chip{display:flex;align-items:center;gap:10px;background:#101a24;border:1px solid rgba(140,165,185,.14);
+border-radius:999px;padding:8px 18px 8px 8px;opacity:0;animation:chipIn 500ms ease-out forwards;}
+@keyframes chipIn{from{opacity:0;transform:translateY(10px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+.chip-1{animation-delay:.6s;}
+.chip-2{animation-delay:1.0s;}
+.chip-3{animation-delay:1.5s;}
+.badge{display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:6px;
+font-family:'Archivo',sans-serif;font-weight:800;font-size:15px;flex-shrink:0;}
+.badge-3{background:#34d399;color:#0a1017;}
+.badge-2{background:#3a4753;color:#e9eef3;}
+.badge-1{background:#1c2530;color:#7e8c99;}
+.chip-name{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:#e9eef3;}
+.chip-stats{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7e8c99;}
+@media (prefers-reduced-motion: reduce){
+  .oval ellipse,.oval path,.oval circle,.oval rect{animation:none;stroke-dashoffset:0;}
+  .rise,.chip{animation:fade 400ms ease-out forwards;}
+}
+@keyframes fade{from{opacity:0;}to{opacity:1;}}
+</style></head><body>
+<div class="hero">
+  <svg class="oval" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
+    <g class="g1"><ellipse cx="500" cy="300" rx="460" ry="270"/></g>
+    <g class="g2">
+      <path d="M500 255 L545 300 L500 345 L455 300 Z"/>
+      <circle cx="500" cy="300" r="45"/>
+      <circle cx="500" cy="300" r="8"/>
+    </g>
+    <g class="g3">
+      <path d="M115 95 A235 235 0 0 0 115 505"/>
+      <path d="M885 95 A235 235 0 0 1 885 505"/>
+    </g>
+    <g class="g4">
+      <rect x="40" y="270" width="35" height="60"/>
+      <rect x="925" y="270" width="35" height="60"/>
+    </g>
+  </svg>
+  <div class="content">
+    <div class="eyebrow rise r1">BROWNLOW PREDICTOR &middot; THROUGH ROUND __ROUND__</div>
+    <h1 class="wordmark rise r2"><span class="cha">CHA</span> <span class="ching">CHING</span></h1>
+    <p class="subtitle rise r3">One model. Two games: the medal count, and the money.</p>
+    <div class="chips">
+      <div class="chip chip-3"><span class="badge badge-3">3</span><span class="chip-name">__NAME3__</span><span class="chip-stats">__STATS3__</span></div>
+      <div class="chip chip-2"><span class="badge badge-2">2</span><span class="chip-name">__NAME2__</span><span class="chip-stats">__STATS2__</span></div>
+      <div class="chip chip-1"><span class="badge badge-1">1</span><span class="chip-name">__NAME1__</span><span class="chip-stats">__STATS1__</span></div>
+    </div>
   </div>
 </div>
-""", unsafe_allow_html=True)
+</body></html>"""
+    _hero_html = (
+        _hero_html
+        .replace("__ROUND__", str(_land_round))
+        .replace("__NAME3__", _chip3["name"]).replace("__STATS3__", _chip_stats(_chip3))
+        .replace("__NAME2__", _chip2["name"]).replace("__STATS2__", _chip_stats(_chip2))
+        .replace("__NAME1__", _chip1["name"]).replace("__STATS1__", _chip_stats(_chip1))
+    )
+    _components.html(_hero_html, height=560, scrolling=False)
 
+    # ── Stat strip ──
+    _stat_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{background:rgba(140,165,185,.14);height:110px;overflow:hidden;font-family:'IBM Plex Mono',monospace;}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;height:110px;}
+.cell{background:#101a24;padding:18px 22px;display:flex;flex-direction:column;justify-content:center;gap:8px;}
+.label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#7e8c99;}
+.value{font-family:'Archivo',sans-serif;font-weight:800;font-size:30px;color:#e9eef3;letter-spacing:-.5px;}
+.value.leader{color:#34d399;}
+.value.pl{color:#f0b429;}
+</style></head><body>
+<div class="grid">
+  <div class="cell"><div class="label">Round</div><div class="value">__ROUND__</div></div>
+  <div class="cell"><div class="label">Current Leader</div><div class="value leader">__LEADER__</div></div>
+  <div class="cell"><div class="label">Predicted Votes</div><div class="value" id="votes">0.0</div></div>
+  <div class="cell"><div class="label">Betting P&amp;L</div><div class="value pl" id="pl">__PL_FALLBACK__</div></div>
+</div>
+<script>
+var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var votesTarget = __VOTES__;
+var plTarget = __PL_ABS__;
+var plPrefix = "__PL_PREFIX__";
+function easeOut(p){ return 1 - Math.pow(1 - p, 4); }
+function animate(el, target, formatter, duration, delay){
+  if(reduced){ el.textContent = formatter(target); return; }
+  setTimeout(function(){
+    var start = null;
+    function step(ts){
+      if(!start) start = ts;
+      var p = Math.min((ts - start) / duration, 1);
+      el.textContent = formatter(target * easeOut(p));
+      if(p < 1) requestAnimationFrame(step);
+      else el.textContent = formatter(target);
+    }
+    requestAnimationFrame(step);
+  }, delay);
+}
+animate(document.getElementById('votes'), votesTarget, function(v){ return v.toFixed(1); }, 1400, 700);
+animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + v.toFixed(2); }, 1400, 700);
+</script>
+</body></html>"""
+    _stat_html = (
+        _stat_html
+        .replace("__ROUND__", str(_land_round))
+        .replace("__LEADER__", str(_land_leader))
+        .replace("__VOTES__", f"{_land_votes:.4f}")
+        .replace("__PL_ABS__", f"{abs(_land_pl_val):.4f}")
+        .replace("__PL_PREFIX__", "+$" if _land_pl_val >= 0 else "-$")
+        .replace("__PL_FALLBACK__", _pl_str)
+    )
+    _components.html(_stat_html, height=110, scrolling=False)
+
+    # ── Destination panels ──
     _lc1, _lc2 = st.columns(2, gap="medium")
     with _lc1:
         st.markdown(f"""
-<div class="land-tile bw">
-  <div class="land-tile-icon">&#127942;</div>
-  <div class="land-tile-name bw">Brownlow Medal</div>
-  <div class="land-tile-desc">Live leaderboard, player profiles, model predictions, game-by-game analysis, and betting edge.</div>
-  <div class="land-tile-preview">
-    <span class="land-preview-label">Leader</span>
-    <span class="land-preview-val">{_land_leader}</span>
-    <span class="land-preview-label" style="margin-left:10px">Proj. votes</span>
-    <span class="land-preview-val">{_land_votes:.1f}</span>
+<div class="dest-card bw">
+  <span class="dest-tag bw">Prediction Engine</span>
+  <h2>Brownlow Medal</h2>
+  <div class="dest-desc">Live leaderboard, player profiles, model predictions, and game-by-game analysis.</div>
+  <div class="dest-data-row">
+    <span>Leader <b>{_land_leader}</b></span>
+    <span>Proj. Votes <b>{_land_votes:.1f}</b></span>
+    <span>Top-10 Acc. <b>86%</b></span>
   </div>
 </div>""", unsafe_allow_html=True)
-        if st.button("Leaderboard →", use_container_width=True, type="primary", key="land_bw"):
+        if st.button("Open Leaderboard →", use_container_width=True, type="primary", key="land_bw"):
             st.session_state.page = 'Leaderboard'
             st.rerun()
     with _lc2:
-        _bets_preview = f"{_land_n} bets &nbsp;&middot;&nbsp; {_pl_str}" if _land_n > 0 else "No bets logged yet"
         st.markdown(f"""
-<div class="land-tile bh">
-  <div class="land-tile-icon">&#128176;</div>
-  <div class="land-tile-name bh">Betting Hub</div>
-  <div class="land-tile-desc">Track bets, log P&amp;L, flag Cha Ching tips, analyse hit rates and ROI across markets.</div>
-  <div class="land-tile-preview gold">
-    <span class="land-preview-label">Season</span>
-    <span class="land-preview-val">{_bets_preview}</span>
+<div class="dest-card bh">
+  <span class="dest-tag bh">Live Tracking</span>
+  <h2>Betting Hub</h2>
+  <div class="dest-desc">Track bets, log P&amp;L, flag Cha Ching tips, and analyse hit rates across markets.</div>
+  <div class="dest-data-row">
+    <span>Season <b>{_land_n} bets</b></span>
+    <span>P&amp;L <b style="color:{_pl_color}">{_pl_str}</b></span>
+    <span>Fade Hit Rate <b>8/8</b></span>
   </div>
 </div>""", unsafe_allow_html=True)
         if st.button("Open Betting Hub →", use_container_width=True, key="land_bh"):
