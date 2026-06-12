@@ -156,14 +156,27 @@ TIPS_COLS = [
     'notes', 'created_at', 'result', 'profit_loss',
 ]
 
+PROPS_COLS = [
+    'game_key', 'player', 'market_type', 'line',
+    'bookmaker', 'odds', 'updated_at',
+]
+
 # ── Supabase client ────────────────────────────────────────────────────────────
 
 @st.cache_resource
 def _get_supabase():
-    from supabase import create_client
-    url = st.secrets["supabase"]["url"]
-    key = st.secrets["supabase"]["key"]
-    return create_client(url, key)
+    """Returns a Supabase client, or None if secrets are missing / connection fails."""
+    try:
+        from supabase import create_client
+        url = st.secrets["supabase"]["url"]
+        key = st.secrets["supabase"]["key"]
+        return create_client(url, key)
+    except Exception:
+        return None
+
+
+def _supabase_available() -> bool:
+    return _get_supabase() is not None
 
 
 def _sb_records(df: pd.DataFrame) -> list[dict]:
@@ -228,9 +241,22 @@ def _delete_poll_row(idx: int):
         df.to_csv(POLLS_CSV, index=False)
 
 
+def _empty_bets_df() -> pd.DataFrame:
+    df = pd.DataFrame(columns=BETS_COLS)
+    df['date']         = pd.to_datetime(df['date'], errors='coerce')
+    df['odds']         = pd.to_numeric(df['odds'], errors='coerce')
+    df['stake']        = pd.to_numeric(df['stake'], errors='coerce')
+    df['profit_loss']  = pd.to_numeric(df['profit_loss'], errors='coerce')
+    df['is_cha_ching'] = df['is_cha_ching'].fillna(False).astype(bool)
+    return df
+
+
 def _load_bets() -> pd.DataFrame:
+    sb = _get_supabase()
+    if sb is None:
+        return _empty_bets_df()
     try:
-        resp = _get_supabase().table("bets").select("*").execute()
+        resp = sb.table("bets").select("*").execute()
         df = pd.DataFrame(resp.data) if resp.data else pd.DataFrame(columns=BETS_COLS)
         for c in BETS_COLS:
             if c not in df.columns:
@@ -241,9 +267,8 @@ def _load_bets() -> pd.DataFrame:
         df['profit_loss']  = pd.to_numeric(df['profit_loss'], errors='coerce')
         df['is_cha_ching'] = df['is_cha_ching'].fillna(False).astype(bool)
         return df
-    except Exception as e:
-        st.error(f"Could not load bets from Supabase: {e}")
-        return pd.DataFrame(columns=BETS_COLS)
+    except Exception:
+        return _empty_bets_df()
 
 
 def _insert_bet(row: dict):
@@ -264,9 +289,22 @@ def _save_bets(df: pd.DataFrame):
         _get_supabase().table("bets").upsert(records, on_conflict="bet_id").execute()
 
 
+def _empty_tips_df() -> pd.DataFrame:
+    df = pd.DataFrame(columns=TIPS_COLS)
+    for col in ['odds', 'stake', 'line', 'profit_loss']:
+        df[col] = pd.to_numeric(df[col], errors='coerce')
+    for col in ['result', 'notes', 'bookmaker', 'player', 'market_type', 'game_key']:
+        df[col] = df[col].fillna('').astype(str)
+    df['is_flagged'] = df['is_flagged'].fillna(False).astype(bool)
+    return df
+
+
 def _load_tips() -> pd.DataFrame:
+    sb = _get_supabase()
+    if sb is None:
+        return _empty_tips_df()
     try:
-        resp = _get_supabase().table("cha_ching_tips").select("*").execute()
+        resp = sb.table("cha_ching_tips").select("*").execute()
         df = pd.DataFrame(resp.data) if resp.data else pd.DataFrame(columns=TIPS_COLS)
         for col in TIPS_COLS:
             if col not in df.columns:
@@ -277,9 +315,8 @@ def _load_tips() -> pd.DataFrame:
             df[col] = df[col].fillna('').astype(str)
         df['is_flagged'] = df['is_flagged'].fillna(False).astype(bool)
         return df
-    except Exception as e:
-        st.warning(f"Could not load tips from Supabase: {e}")
-        return pd.DataFrame(columns=TIPS_COLS)
+    except Exception:
+        return _empty_tips_df()
 
 
 def _save_tip(game_key: str, player: str, market_type: str,
@@ -364,11 +401,14 @@ def _sync_tip_to_bets(tip_id: str, tip_row, result: str, pl: float):
 
 
 def _load_props() -> pd.DataFrame:
+    sb = _get_supabase()
+    if sb is None:
+        return pd.DataFrame(columns=PROPS_COLS)
     try:
-        resp = _get_supabase().table("player_props").select("*").execute()
-        return pd.DataFrame(resp.data) if resp.data else pd.DataFrame()
+        resp = sb.table("player_props").select("*").execute()
+        return pd.DataFrame(resp.data) if resp.data else pd.DataFrame(columns=PROPS_COLS)
     except Exception:
-        return pd.DataFrame()
+        return pd.DataFrame(columns=PROPS_COLS)
 
 
 def _save_prop(game_key: str, player: str, market_type: str,
@@ -2990,6 +3030,8 @@ def render_page(page: str):
     """Called from dashboard.py for each Betting Hub page."""
     inject_global_css()
     _ensure_dirs()
+    if not _supabase_available():
+        st.caption("⚠ Supabase not connected — showing empty data")
     if page == 'BH Dashboard':
         render_bh_dashboard()
     elif page == 'Bet Tracker':
