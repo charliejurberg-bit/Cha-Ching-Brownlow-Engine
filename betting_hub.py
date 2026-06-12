@@ -63,6 +63,73 @@ C = dict(
     border='#2a4a5a', text='#e8f0f8',
 )
 
+def inject_global_theme():
+    """Shared design-token + global element styles. Called from both
+    dashboard.py and betting_hub.render_page() so every page (Brownlow
+    and Betting Hub) draws from the same token set."""
+    st.markdown("""
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:         #0a1017;
+  --surface:    #101a24;
+  --surface-2:  #0d141d;
+  --line:       rgba(140,165,185,.14);
+  --emerald:    #34d399;
+  --emerald-dim:rgba(52,211,153,.12);
+  --gold:       #f0b429;
+  --gold-dim:   rgba(240,180,41,.12);
+  --text:       #e9eef3;
+  --muted:      #7e8c99;
+  --ease-out:   cubic-bezier(0.23,1,0.32,1);
+}
+.stApp, html, body, [data-testid="stAppViewContainer"] {
+    background-color: var(--bg) !important;
+    color: var(--text) !important;
+}
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Archivo', sans-serif !important;
+    letter-spacing: -0.01em !important;
+    color: var(--text) !important;
+}
+[data-testid="stDataFrame"] th,
+[data-testid="stTable"] th {
+    font-family: 'IBM Plex Mono', monospace !important;
+    font-size: 10px !important;
+    text-transform: uppercase !important;
+    letter-spacing: .22em !important;
+    color: var(--muted) !important;
+    background: var(--surface-2) !important;
+}
+[data-testid="stMetricValue"] {
+    font-family: 'IBM Plex Mono', monospace !important;
+    font-weight: 600 !important;
+    color: var(--text) !important;
+}
+[data-testid="stMetricLabel"] { color: var(--muted) !important; }
+[data-testid="stExpander"],
+[data-testid="stTabs"],
+div[data-testid="stSelectbox"] > div > div,
+div[data-testid="stMultiSelect"] > div > div,
+[data-testid="stTextInput"] input,
+[data-testid="stNumberInput"] input,
+[data-testid="stDateInput"] input {
+    background: var(--surface) !important;
+    border: 1px solid var(--line) !important;
+    color: var(--text) !important;
+}
+[data-testid="stTabs"] [data-baseweb="tab"] { color: var(--muted) !important; }
+[data-testid="stTabs"] [aria-selected="true"] { color: var(--text) !important; }
+.stButton button, button[kind="primary"], button[kind="secondary"] {
+    border-radius: 9px !important;
+    font-family: 'Archivo', sans-serif !important;
+    font-weight: 700 !important;
+    padding: 10px 18px !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+
 def inject_global_css():
     st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -121,27 +188,27 @@ div[data-testid="stToolbar"]            { display: none !important; }
 def apply_chart_theme(fig):
     import plotly.graph_objects as _go
     fig.update_layout(
-        paper_bgcolor="#152533",
-        plot_bgcolor="#152533",
-        font=dict(family="Sora, sans-serif", color="#94a3b8", size=12),
-        title_font=dict(family="Sora, sans-serif", color="#e8f0f8", size=14),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        font=dict(family="Archivo, sans-serif", color="#7e8c99", size=12),
+        title_font=dict(family="Archivo, sans-serif", color="#e9eef3", size=14),
         xaxis=dict(
-            gridcolor="#1e3a4a",
-            linecolor="#2a4a5a",
-            tickcolor="#2a4a5a",
-            tickfont=dict(color="#94a3b8", size=11),
+            gridcolor="rgba(140,165,185,.14)",
+            linecolor="rgba(140,165,185,.14)",
+            tickcolor="rgba(140,165,185,.14)",
+            tickfont=dict(color="#7e8c99", size=11),
         ),
         yaxis=dict(
-            gridcolor="#1e3a4a",
-            linecolor="#2a4a5a",
-            tickcolor="#2a4a5a",
-            tickfont=dict(color="#94a3b8", size=11),
+            gridcolor="rgba(140,165,185,.14)",
+            linecolor="rgba(140,165,185,.14)",
+            tickcolor="rgba(140,165,185,.14)",
+            tickfont=dict(color="#7e8c99", size=11),
         ),
         legend=dict(
-            bgcolor="#1e3a4a",
-            bordercolor="#2a4a5a",
+            bgcolor="rgba(0,0,0,0)",
+            bordercolor="rgba(140,165,185,.14)",
             borderwidth=1,
-            font=dict(color="#94a3b8", size=11),
+            font=dict(color="#7e8c99", size=11),
         ),
         margin=dict(l=16, r=16, t=40, b=16),
     )
@@ -862,6 +929,7 @@ BH_CSS = """
 
 
 def _inject_css():
+    inject_global_theme()
     st.markdown(BH_CSS, unsafe_allow_html=True)
 
 
@@ -1769,8 +1837,8 @@ def render_cha_ching_tips():
     with title_col:
         st.markdown(
             '<div class="title-bar">'
-            '<h2 style="color:#2c2c2c;margin:0">Cha Ching Tips</h2>'
-            '<p style="color:#94a3b8;margin:4px 0 0 0">'
+            '<h2 style="color:var(--text);margin:0">Cha Ching Tips</h2>'
+            '<p style="color:var(--muted);margin:4px 0 0 0">'
             'Upcoming fixtures · Player prop markets · Cha Ching checklist</p></div>',
             unsafe_allow_html=True,
         )
@@ -1920,10 +1988,10 @@ def render_cha_ching_tips():
     ] if not tips_df.empty else pd.DataFrame()
     if not flagged.empty:
         st.markdown(
-            f'<div style="background:linear-gradient(135deg,#c9a84c,#e8c96d);'
+            f'<div style="background:linear-gradient(135deg,#f0b429,#f5c542);'
             f'border-radius:8px;padding:12px 16px;margin-bottom:16px">'
-            f'<span style="font-weight:800;font-size:13px;color:#2c2c2c">CHA CHING TIPS FLAGGED: {len(flagged)}</span>'
-            f'<span style="font-size:12px;color:#4a3a1a;margin-left:8px">'
+            f'<span style="font-weight:800;font-size:13px;color:#0a1017">CHA CHING TIPS FLAGGED: {len(flagged)}</span>'
+            f'<span style="font-size:12px;color:#3a2d08;margin-left:8px">'
             + ' &nbsp;·&nbsp; '.join(f"{r['player']} ({r['market_type']})" for _, r in flagged.head(4).iterrows())
             + ('…' if len(flagged) > 4 else '')
             + f'</span></div>',
@@ -2371,8 +2439,8 @@ def render_trends_analysis():
     _inject_css()
     st.markdown(
         '<div class="title-bar">'
-        '<h2 style="color:#2c2c2c;margin:0">Trends &amp; Analysis</h2>'
-        '<p style="color:#94a3b8;margin:4px 0 0 0">'
+        '<h2 style="color:var(--text);margin:0">Trends &amp; Analysis</h2>'
+        '<p style="color:var(--muted);margin:4px 0 0 0">'
         'Hit rate, ROI, and P&L breakdowns across markets, bookmakers, and odds ranges</p></div>',
         unsafe_allow_html=True,
     )
