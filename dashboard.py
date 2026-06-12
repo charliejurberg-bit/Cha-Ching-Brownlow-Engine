@@ -465,13 +465,13 @@ st.markdown("""
         left: 50%;
         width: 100vw;
         margin-left: -50vw;
-        margin-top: -200px;
+        margin-top: 0;
         overflow: hidden;
         background: linear-gradient(135deg, #0a1017 0%, #101a24 25%, #0d141d 50%, #101a24 75%, #0a1017 100%);
         background-size: 100% 100%;
         animation: auroraPulse 22s ease-in-out infinite alternate;
-        height: 273px;
-        padding: 130px 48px 0;
+        height: auto;
+        padding: 28px 48px;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -538,9 +538,10 @@ st.markdown("""
         font-size: 70px;
         font-weight: 900;
         letter-spacing: -3px;
-        margin: 0 0 12px 0;
+        margin: 0 0 8px 0;
         line-height: 1;
-        background: linear-gradient(135deg, #ffffff 0%, #9fb3c4 100%);
+        color: var(--text);
+        background: linear-gradient(180deg, #ffffff 0%, #9fb3c4 100%);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
@@ -1746,24 +1747,33 @@ st.markdown("""
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"] div.ti { display: none !important; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button {
     background: transparent !important; border: none !important;
-    color: rgba(255,255,255,0.45) !important; font-size: 13px !important;
+    border-bottom: 2px solid transparent !important;
+    color: var(--muted) !important; font-size: 13px !important;
     font-weight: 500 !important; padding: 5px 16px !important;
     border-radius: 0 !important; white-space: nowrap !important;
     box-shadow: none !important; line-height: 1.4 !important;
     width: 100% !important; display: flex !important;
     align-items: center !important; justify-content: center !important;
+    transition: color 160ms ease-out, border-color 160ms ease-out !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button p,
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button span {
+    color: inherit !important;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stBaseButton-primary"],
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-primary"] {
-    background: rgba(62,207,160,0.07) !important; color: #3ecfa0 !important;
-    font-weight: 600 !important; border: 0.5px solid rgba(62,207,160,0.25) !important;
+    color: var(--emerald) !important; border-bottom-color: var(--emerald) !important;
+    font-weight: 600 !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button:hover {
-    background: rgba(255,255,255,0.07) !important; border: none !important;
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor.bh) [data-testid="stBaseButton-primary"],
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor.bh) [data-testid="baseButton-primary"] {
+    color: var(--gold) !important; border-bottom-color: var(--gold) !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stBaseButton-primary"]:hover,
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-primary"]:hover {
-    background: rgba(62,207,160,0.14) !important;
+@media (hover: hover) {
+    [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stBaseButton-secondary"]:hover,
+    [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-secondary"]:hover {
+        color: var(--text) !important;
+    }
 }
 
 /* ── Page strip container ────────────────────────────────────── */
@@ -1804,14 +1814,20 @@ st.markdown("""
     width: 100% !important; padding: 0 !important; margin: 0 !important;
 }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) button {
-    background: transparent !important; border: 0.5px solid transparent !important;
-    color: rgba(255,255,255,0.4) !important; font-size: 12px !important;
+    background: transparent !important; border: none !important;
+    border-bottom: 2px solid transparent !important;
+    color: var(--muted) !important; font-size: 12px !important;
     font-weight: 500 !important; padding: 4px 6px !important;
-    border-radius: 5px !important; white-space: nowrap !important;
+    border-radius: 0 !important; white-space: nowrap !important;
     box-shadow: none !important; width: 100% !important; min-width: 0 !important;
     line-height: 1.4 !important; text-align: center !important;
     justify-content: center !important; display: flex !important;
     align-items: center !important;
+    transition: color 160ms ease-out, border-color 160ms ease-out !important;
+}
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) button p,
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) button span {
+    color: inherit !important;
 }
 /* Page strip icons via ::before — keyed by hidden .ti marker div */
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti) button::before {
@@ -1839,16 +1855,18 @@ st.markdown("""
 
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stBaseButton-primary"],
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-primary"] {
-    color: #3ecfa0 !important; border-color: rgba(62,207,160,0.25) !important;
-    background: rgba(62,207,160,0.07) !important; font-weight: 600 !important;
+    color: var(--text) !important; border-bottom-color: var(--emerald) !important;
+    font-weight: 600 !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) button:hover {
-    background: rgba(255,255,255,0.06) !important; border-color: rgba(255,255,255,0.1) !important;
-    color: rgba(255,255,255,0.7) !important;
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor.bh) [data-testid="stBaseButton-primary"],
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor.bh) [data-testid="baseButton-primary"] {
+    border-bottom-color: var(--gold) !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stBaseButton-primary"]:hover,
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-primary"]:hover {
-    background: rgba(62,207,160,0.14) !important;
+@media (hover: hover) {
+    [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stBaseButton-secondary"]:hover,
+    [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-secondary"]:hover {
+        color: var(--text) !important;
+    }
 }
 
 /* ════════════════════════════════════════════════════════════
@@ -2095,19 +2113,13 @@ div[data-testid="stHorizontalBlock"]:has(.lb-controls-marker) label {
     color: var(--muted) !important;
 }
 
-/* ── Primary button (Run Update etc.) ── */
-[data-testid="stBaseButton-primary"] {
-    background-color: var(--emerald) !important;
-    border: none !important;
-    color: #062b1d !important;
-}
-[data-testid="stBaseButton-primary"] p,
-[data-testid="stBaseButton-primary"] span {
+/* ── Run Update button (scoped) ── */
+.st-key-run_update_btn button p,
+.st-key-run_update_btn button span {
     color: #062b1d !important;
     font-family: 'Archivo', sans-serif !important;
     font-weight: 700 !important;
 }
-[data-testid="stBaseButton-primary"]:hover { filter: brightness(1.08); }
 
 /* Destination buttons */
 .st-key-land_bw button,
@@ -2167,7 +2179,8 @@ div[data-testid="stHorizontalBlock"]:has(.lb-controls-marker) label {
 # ── Hub toggle row + page strip row ─────────────────────────────
 def _render_hub_tabs():
     with st.container():
-        st.markdown('<div class="nav-hub-anchor"></div>', unsafe_allow_html=True)
+        _anchor_cls = "nav-hub-anchor bh" if _hub == "betting" else "nav-hub-anchor"
+        st.markdown(f'<div class="{_anchor_cls}"></div>', unsafe_allow_html=True)
         _hc1, _hc2 = st.columns(2)
         with _hc1:
             if st.button("Brownlow", key="pill_brownlow",
@@ -2186,7 +2199,8 @@ def _render_hub_tabs():
 
 def _render_page_nav():
     with st.container():
-        st.markdown('<div class="nav-page-anchor"></div>', unsafe_allow_html=True)
+        _anchor_cls = "nav-page-anchor bh" if _hub == "betting" else "nav-page-anchor"
+        st.markdown(f'<div class="{_anchor_cls}"></div>', unsafe_allow_html=True)
         _pcols = st.columns(len(_snav_pages), gap="small")
         for _pc, _sp in zip(_pcols, _snav_pages):
             with _pc:
@@ -2232,7 +2246,7 @@ if _show_controls:
                 label_visibility="collapsed",
             )
     with _cc4:
-        if st.button("Run Update", type="primary", use_container_width=True):
+        if st.button("Run Update", type="primary", use_container_width=True, key="run_update_btn"):
             _skel = st.empty()
             _skel.markdown(
                 '<div class="sk-card">'
