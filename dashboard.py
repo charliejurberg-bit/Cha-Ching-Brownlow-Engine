@@ -2219,7 +2219,7 @@ if _page == 'Landing':
 
     def _chip_stats(_c):
         _abbr = _TEAM_ABBR.get(_c['team'], _c['team'][:3].upper())
-        return f"&middot; {_abbr} &middot; {_c['exp_votes']:.1f} exp votes"
+        return f"&middot; {_abbr} &middot; {_c['exp_votes']:.1f}"
 
     # ── Ticker bar ──
     _ticker_bet_items = []
@@ -2314,9 +2314,10 @@ text-transform:uppercase;color:#7e8c99;margin-bottom:10px;opacity:0;animation:fa
 .chip{display:flex;align-items:center;gap:8px;background:#101a24;border:1px solid rgba(140,165,185,.14);
 border-radius:999px;padding:10px 18px 10px 10px;opacity:0;animation:chipIn 500ms ease-out forwards;white-space:nowrap;}
 @keyframes chipIn{from{opacity:0;transform:translateY(10px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
+@keyframes chipInDim{from{opacity:0;transform:translateY(10px) scale(.97);}to{opacity:.85;transform:translateY(0) scale(1);}}
 .chip-1{animation-delay:1.5s;}
-.chip-2{animation-delay:1.0s;}
-.chip-3{animation-delay:.6s;}
+.chip-2{animation-delay:1.0s;animation-name:chipInDim;}
+.chip-3{animation-delay:.6s;animation-name:chipInDim;}
 .badge{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;
 font-family:'Archivo',sans-serif;font-weight:800;font-size:14px;flex-shrink:0;}
 .badge-1{background:#34d399;color:#0a1017;}
