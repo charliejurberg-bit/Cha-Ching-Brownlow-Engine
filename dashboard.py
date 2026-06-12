@@ -406,15 +406,17 @@ def render_banner():
     _mode_label = "Brownlow Predictor" if _hub == "brownlow" else "Betting Hub"
     st.markdown(f"""
 <div class="cc-banner">
-    <svg class="cc-banner-oval" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-        <ellipse cx="500" cy="300" rx="460" ry="270"/>
-        <path d="M500 255 L545 300 L500 345 L455 300 Z"/>
-        <circle cx="500" cy="300" r="45"/>
-        <circle cx="500" cy="300" r="8"/>
-        <path d="M115 95 A235 235 0 0 0 115 505"/>
-        <path d="M885 95 A235 235 0 0 1 885 505"/>
-        <rect x="40" y="270" width="35" height="60"/>
-        <rect x="925" y="270" width="35" height="60"/>
+    <svg class="cc-banner-oval" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
+        <ellipse class="cc-oval-boundary" cx="500" cy="300" rx="460" ry="270"/>
+        <g class="cc-oval-inner">
+            <path d="M500 255 L545 300 L500 345 L455 300 Z"/>
+            <circle cx="500" cy="300" r="45"/>
+            <circle cx="500" cy="300" r="8"/>
+            <path d="M115 95 A235 235 0 0 0 115 505"/>
+            <path d="M885 95 A235 235 0 0 1 885 505"/>
+            <rect x="40" y="270" width="35" height="60"/>
+            <rect x="925" y="270" width="35" height="60"/>
+        </g>
     </svg>
     <div class="cc-banner-title"><span class="cha">CHA </span><span class="ching">CHING</span></div>
     <div class="cc-banner-eyebrow{' bh' if _hub != 'brownlow' else ''}">{_mode_label.upper()} &middot; {_sub.upper()}</div>
@@ -467,6 +469,17 @@ st.markdown("""
     }
 
     /* ── CHA CHING banner ── */
+    /* Collapse the leading gap above the banner: the global CSS/JS-injection
+       element containers (style/link tags + the animated-counter iframe) are
+       zero-height but each still adds a 16px flex gap in the outer
+       stVerticalBlock. Same fix as the landing page (.landing-top-anchor
+       rules), scoped to pages that render .cc-banner — landing never does. */
+    .stApp:has(.cc-banner) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > style:only-child),
+    .stApp:has(.cc-banner) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > link:only-child),
+    .stApp:has(.cc-banner) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > link:first-child + style:last-child),
+    .stApp:has(.cc-banner) div[data-testid="stElementContainer"]:has(> iframe[srcdoc*="_ccAnimated"]) {
+        display: none !important;
+    }
     .cc-banner {
         position: relative;
         background: var(--bg);
@@ -475,14 +488,17 @@ st.markdown("""
         text-align: center;
         overflow: hidden;
     }
+    /* preserveAspectRatio="none": the 1000x600 viewBox stretches to fill
+       620px x banner height, so the full boundary ellipse fits the banner
+       and cradles the wordmark instead of being clipped to a middle slice. */
     .cc-banner-oval {
         position: absolute;
-        top: 50%;
+        top: 6px;
         left: 50%;
         width: 620px;
         max-width: 90%;
-        height: auto;
-        transform: translate(-50%, -50%);
+        height: calc(100% - 12px);
+        transform: translateX(-50%);
         pointer-events: none;
     }
     .cc-banner-oval ellipse,
@@ -490,9 +506,11 @@ st.markdown("""
     .cc-banner-oval circle,
     .cc-banner-oval rect {
         fill: none;
-        stroke: rgba(126,156,178,.22);
         stroke-width: 1;
+        vector-effect: non-scaling-stroke;
     }
+    .cc-banner-oval .cc-oval-boundary { stroke: rgba(126,156,178,.25); }
+    .cc-banner-oval .cc-oval-inner *  { stroke: rgba(126,156,178,.14); }
     .cc-banner-title {
         position: relative;
         font-family: 'Archivo', sans-serif;
@@ -1645,9 +1663,12 @@ else:
 st.markdown("""
 <style>
 @import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
-/* ── Collapse flex gaps above/between nav rows ───────────────── */
+/* ── Collapse flex gaps above/between nav rows ─────────────────
+   The .cc-banner CSS hides the zero-height injection containers that
+   used to add 32px of stacked flex gap above this row, so the hub row
+   now sits flush against the banner with no negative pull. */
 [data-testid="stLayoutWrapper"]:has(.nav-hub-anchor) {
-    margin-top: -32px !important;
+    margin-top: 0 !important;
 }
 [data-testid="stLayoutWrapper"]:has(.nav-page-anchor) {
     margin-top: -16px !important;
