@@ -1900,12 +1900,13 @@ st.markdown("""
     width: 100vw !important;
 }
 
-/* Destination panels (keyed containers) */
+/* Destination panels (marker-div + :has() pattern) */
 @keyframes tagDotPulse {
     0%, 100% { opacity: 1; }
     50%      { opacity: .35; }
 }
-:is(.st-key-card_brownlow, .st-key-card_betting) > [data-testid="stVerticalBlock"] {
+.cc-card-marker { display: none; }
+div[data-testid="stVerticalBlock"]:has(.cc-card-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-card-marker)) {
     position: relative;
     background: linear-gradient(180deg, #101a24 0%, #0d141d 100%) !important;
     border: 1px solid rgba(140,165,185,.14) !important;
@@ -1921,27 +1922,27 @@ st.markdown("""
                 box-shadow 220ms cubic-bezier(0.23,1,0.32,1);
 }
 @media (hover: hover) {
-    .st-key-card_brownlow:hover > [data-testid="stVerticalBlock"] {
+    div[data-testid="stVerticalBlock"]:has(.cc-brownlow):not(:has(div[data-testid="stVerticalBlock"] .cc-brownlow)):hover {
         transform: translateY(-4px);
         border-color: rgba(52,211,153,.35) !important;
         box-shadow: 0 12px 32px rgba(52,211,153,.10);
     }
-    .st-key-card_betting:hover > [data-testid="stVerticalBlock"] {
+    div[data-testid="stVerticalBlock"]:has(.cc-betting):not(:has(div[data-testid="stVerticalBlock"] .cc-betting)):hover {
         transform: translateY(-4px);
         border-color: rgba(240,180,41,.35) !important;
         box-shadow: 0 12px 32px rgba(240,180,41,.10);
     }
 }
-:is(.st-key-card_brownlow, .st-key-card_betting) > [data-testid="stVerticalBlock"]::before {
+div[data-testid="stVerticalBlock"]:has(.cc-card-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-card-marker))::before {
     content: "";
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 2px;
     z-index: 1;
 }
-.st-key-card_brownlow > [data-testid="stVerticalBlock"]::before { background: linear-gradient(90deg, transparent, #34d399, transparent); }
-.st-key-card_betting > [data-testid="stVerticalBlock"]::before { background: linear-gradient(90deg, transparent, #f0b429, transparent); }
-:is(.st-key-card_brownlow, .st-key-card_betting) > [data-testid="stVerticalBlock"] > [data-testid="stElementContainer"]:first-child {
+div[data-testid="stVerticalBlock"]:has(.cc-brownlow):not(:has(div[data-testid="stVerticalBlock"] .cc-brownlow))::before { background: linear-gradient(90deg, transparent, #34d399, transparent); }
+div[data-testid="stVerticalBlock"]:has(.cc-betting):not(:has(div[data-testid="stVerticalBlock"] .cc-betting))::before { background: linear-gradient(90deg, transparent, #f0b429, transparent); }
+div[data-testid="stVerticalBlock"]:has(.cc-card-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-card-marker)) [data-testid="stElementContainer"]:first-child {
     flex: 1 1 auto;
 }
 .dest-tag {
@@ -2411,6 +2412,7 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
     with _lc1:
         with st.container(key="card_brownlow"):
             st.markdown(f"""
+<div class="cc-card-marker cc-brownlow">&#8203;</div>
 <div class="dest-content">
   <span class="dest-tag bw">Prediction Engine</span>
   <h2>Brownlow Medal</h2>
@@ -2428,6 +2430,7 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
     with _lc2:
         with st.container(key="card_betting"):
             st.markdown(f"""
+<div class="cc-card-marker cc-betting">&#8203;</div>
 <div class="dest-content">
   <span class="dest-tag bh">Live Tracking</span>
   <h2>Betting Hub</h2>
