@@ -1882,22 +1882,33 @@ st.markdown("""
     display: none !important;
 }
 
-/* Ticker bar: full-bleed, flush to viewport top */
-[data-testid="stVerticalBlock"]:has(> :first-child .landing-top-anchor) > :nth-child(2),
-[data-testid="stLayoutWrapper"]:has(.landing-top-anchor) + [data-testid="stLayoutWrapper"] {
+/* Ticker bar: kill the top gap and go full-bleed (landing only) */
+.stApp:has(.landing-top-anchor) header[data-testid="stHeader"] {
+    display: none !important;
+}
+.stApp:has(.landing-top-anchor) div[data-testid="stMainBlockContainer"] {
+    padding-top: 0 !important;
+}
+.cc-ticker-marker { display: none; }
+div[data-testid="stVerticalBlock"]:has(.cc-ticker-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-ticker-marker)) {
+    width: 100vw !important;
+    min-width: 100vw !important;
+    max-width: 100vw !important;
+    flex-shrink: 0 !important;
     position: relative !important;
     left: 50% !important;
-    right: 50% !important;
-    width: 100vw !important;
-    margin-left: -50vw !important;
-    margin-right: -50vw !important;
+    transform: translateX(-50%) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .landing-top-anchor) > :nth-child(2) iframe,
-[data-testid="stLayoutWrapper"]:has(.landing-top-anchor) + [data-testid="stLayoutWrapper"] iframe {
+div[data-testid="stVerticalBlock"]:has(.cc-ticker-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-ticker-marker)) [data-testid="stElementContainer"] {
+    margin: 0 !important;
+}
+div[data-testid="stVerticalBlock"]:has(.cc-ticker-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-ticker-marker)) iframe {
     display: block !important;
-    width: 100vw !important;
+    width: 100% !important;
 }
 
 /* Destination panels (marker-div + :has() pattern) */
@@ -2257,7 +2268,9 @@ if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
 </script>
 </body></html>"""
     _ticker_html = _ticker_html.replace("__SEG__", _ticker_segment)
-    _components.html(_ticker_html, height=40, scrolling=False)
+    with st.container():
+        st.markdown('<div class="cc-ticker-marker">&#8203;</div>', unsafe_allow_html=True)
+        _components.html(_ticker_html, height=40, scrolling=False)
 
     # ── Hero ──
     _hero_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
