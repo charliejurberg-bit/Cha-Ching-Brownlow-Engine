@@ -11,6 +11,7 @@ import plotly.graph_objects as go
 import os, json, uuid, time, requests
 from datetime import datetime, timedelta, date
 from io import StringIO, BytesIO
+from theme import inject_global_theme
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -59,124 +60,57 @@ STAT_COL_MAP = {
 
 C = dict(
     green='#34d399', lgreen='#1a5c40', gold='#f0b429', lgold='#f5c842',
-    brown='#94a3b8', red='#e05252', bg='#152533', card='#1e3a4a',
-    border='#2a4a5a', text='#e8f0f8',
+    brown='#7e8c99', red='#e05252', bg='#101a24', card='#0d141d',
+    border='rgba(140,165,185,.14)', text='#e9eef3',
 )
-
-def inject_global_theme():
-    """Shared design-token + global element styles. Called from both
-    dashboard.py and betting_hub.render_page() so every page (Brownlow
-    and Betting Hub) draws from the same token set."""
-    st.markdown("""
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-:root {
-  --bg:         #0a1017;
-  --surface:    #101a24;
-  --surface-2:  #0d141d;
-  --line:       rgba(140,165,185,.14);
-  --emerald:    #34d399;
-  --emerald-dim:rgba(52,211,153,.12);
-  --gold:       #f0b429;
-  --gold-dim:   rgba(240,180,41,.12);
-  --text:       #e9eef3;
-  --muted:      #7e8c99;
-  --ease-out:   cubic-bezier(0.23,1,0.32,1);
-}
-.stApp, html, body, [data-testid="stAppViewContainer"] {
-    background-color: var(--bg) !important;
-    color: var(--text) !important;
-}
-h1, h2, h3, h4, h5, h6 {
-    font-family: 'Archivo', sans-serif !important;
-    letter-spacing: -0.01em !important;
-    color: var(--text) !important;
-}
-[data-testid="stDataFrame"] th,
-[data-testid="stTable"] th {
-    font-family: 'IBM Plex Mono', monospace !important;
-    font-size: 10px !important;
-    text-transform: uppercase !important;
-    letter-spacing: .22em !important;
-    color: var(--muted) !important;
-    background: var(--surface-2) !important;
-}
-[data-testid="stMetricValue"] {
-    font-family: 'IBM Plex Mono', monospace !important;
-    font-weight: 600 !important;
-    color: var(--text) !important;
-}
-[data-testid="stMetricLabel"] { color: var(--muted) !important; }
-[data-testid="stExpander"],
-[data-testid="stTabs"],
-div[data-testid="stSelectbox"] > div > div,
-div[data-testid="stMultiSelect"] > div > div,
-[data-testid="stTextInput"] input,
-[data-testid="stNumberInput"] input,
-[data-testid="stDateInput"] input {
-    background: var(--surface) !important;
-    border: 1px solid var(--line) !important;
-    color: var(--text) !important;
-}
-[data-testid="stTabs"] [data-baseweb="tab"] { color: var(--muted) !important; }
-[data-testid="stTabs"] [aria-selected="true"] { color: var(--text) !important; }
-.stButton button, button[kind="primary"], button[kind="secondary"] {
-    border-radius: 9px !important;
-    font-family: 'Archivo', sans-serif !important;
-    font-weight: 700 !important;
-    padding: 10px 18px !important;
-}
-</style>
-""", unsafe_allow_html=True)
-
 
 def inject_global_css():
     st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 html, body, [data-testid="stAppViewContainer"] {
-    background-color: #0f1923 !important;
-    color: #e8f0f8;
+    background-color: var(--bg) !important;
+    color: var(--text);
     font-family: 'Sora', sans-serif;
 }
-[data-testid="stAppViewContainer"] > .main { background-color: #0f1923 !important; }
+[data-testid="stAppViewContainer"] > .main { background-color: var(--bg) !important; }
 [data-testid="block-container"] { padding-top: 1.5rem !important; max-width: 1200px; }
 [data-testid="stSidebar"] {
-    background-color: #0d1720 !important;
-    border-right: 1px solid #2a4a5a !important;
+    background-color: var(--surface-2) !important;
+    border-right: 1px solid var(--line) !important;
 }
 h1, h2, h3, h4 {
     font-family: 'Sora', sans-serif !important;
-    color: #e8f0f8 !important;
+    color: var(--text) !important;
 }
 [data-testid="stMetric"] {
-    background: #152533 !important;
-    border: 1px solid #2a4a5a !important;
+    background: var(--surface) !important;
+    border: 1px solid var(--line) !important;
     border-radius: 10px !important;
     padding: 16px !important;
 }
-[data-testid="stMetricLabel"] { color: #94a3b8 !important; font-size: 11px !important; text-transform: uppercase !important; }
-[data-testid="stMetricValue"] { color: #e8f0f8 !important; font-family: 'Sora', sans-serif !important; font-weight: 700 !important; }
+[data-testid="stMetricLabel"] { color: var(--muted) !important; font-size: 11px !important; text-transform: uppercase !important; }
+[data-testid="stMetricValue"] { color: var(--text) !important; font-family: 'Sora', sans-serif !important; font-weight: 700 !important; }
 [data-testid="stDataFrame"] th {
-    background: #1e3a4a !important; color: #94a3b8 !important;
+    background: var(--surface-2) !important; color: var(--muted) !important;
     font-size: 11px !important; text-transform: uppercase !important;
 }
-[data-testid="stDataFrame"] td { background: #152533 !important; color: #e8f0f8 !important; }
-[data-testid="stDataFrame"] tr:hover td { background: #1e3a4a !important; }
+[data-testid="stDataFrame"] td { background: var(--surface) !important; color: var(--text) !important; }
+[data-testid="stDataFrame"] tr:hover td { background: var(--surface-2) !important; }
 [data-testid="stSelectbox"] > div > div, [data-testid="stMultiSelect"] > div > div {
-    background: #152533 !important; border: 1px solid #2a4a5a !important; color: #e8f0f8 !important;
+    background: var(--surface) !important; border: 1px solid var(--line) !important; color: var(--text) !important;
 }
 [data-testid="stTextInput"] input, [data-testid="stNumberInput"] input {
-    background: #152533 !important; border: 1px solid #2a4a5a !important; color: #e8f0f8 !important;
+    background: var(--surface) !important; border: 1px solid var(--line) !important; color: var(--text) !important;
 }
 button[kind="primary"], [data-testid="baseButton-primary"] {
-    background: #34d399 !important; color: #0a1f14 !important;
+    background: var(--emerald) !important; color: #0a1f14 !important;
     border: none !important; font-family: 'Sora', sans-serif !important; font-weight: 600 !important;
 }
-hr { border: none !important; border-top: 1px solid #2a4a5a !important; }
+hr { border: none !important; border-top: 1px solid var(--line) !important; }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #0f1923; }
-::-webkit-scrollbar-thumb { background: #2a4a5a; border-radius: 3px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #34d399; }
 [data-testid="stAppViewContainer"]      { padding-top: 0 !important; }
 [data-testid="stHeader"]                { display: none !important; }
@@ -656,8 +590,8 @@ BH_CSS = """
 <style>
 /* ── Landing page cards ── */
 .landing-card {
-    background: #152533;
-    border: 1px solid #2a4a5a;
+    background: var(--surface);
+    border: 1px solid var(--line);
     border-radius: 12px;
     padding: 44px 36px 40px 36px;
     text-align: center;
@@ -679,7 +613,7 @@ BH_CSS = """
 .landing-title { font-size: 28px; font-weight: 900; letter-spacing: -0.5px; margin-bottom: 10px; }
 .landing-title.brownlow { color: #34d399; }
 .landing-title.betting  { color: #f0b429; }
-.landing-desc  { color: #94a3b8; font-size: 13px; line-height: 1.6; max-width: 320px; }
+.landing-desc  { color: var(--muted); font-size: 13px; line-height: 1.6; max-width: 320px; }
 
 /* ── Nav section pills ── */
 .nav-section-pill {
@@ -696,13 +630,13 @@ BH_CSS = """
     transition: opacity 0.15s ease, transform 0.15s ease;
 }
 .nav-section-pill:hover { opacity: 0.85; transform: translateY(-1px); }
-.nav-pill-brownlow { background: #34d399; color: #0f1923; }
-.nav-pill-betting  { background: #f0b429; color: #0f1923; }
+.nav-pill-brownlow { background: #34d399; color: var(--bg); }
+.nav-pill-betting  { background: #f0b429; color: var(--bg); }
 
 /* ── Betting metric cards ── */
 .bh-metric {
-    background: #152533;
-    border: 1px solid #2a4a5a;
+    background: var(--surface);
+    border: 1px solid var(--line);
     border-radius: 8px;
     padding: 16px 20px;
     text-align: center;
@@ -716,24 +650,24 @@ BH_CSS = """
 .bh-metric.negative { border-top: 3px solid #e05252; }
 .bh-metric.neutral  { border-top: 3px solid #4a5a6a; }
 .bh-metric.gold     { border-top: 3px solid #f0b429; }
-.bh-label { color: #94a3b8; font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
+.bh-label { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
 .bh-value { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; }
 .bh-value.pos  { color: #34d399; }
 .bh-value.neg  { color: #e05252; }
-.bh-value.neu  { color: #e8f0f8; }
+.bh-value.neu  { color: var(--text); }
 .bh-value.gold { color: #f0b429; }
-.bh-sub   { color: #94a3b8; font-size: 11px; margin-top: 4px; line-height: 1.4; }
+.bh-sub   { color: var(--muted); font-size: 11px; margin-top: 4px; line-height: 1.4; }
 
 /* ── Bet result badges ── */
 .bet-win     { background: rgba(52,211,153,0.18);  color: #34d399; border: 1px solid rgba(52,211,153,0.4);  padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; }
 .bet-loss    { background: rgba(224,82,82,0.18);   color: #e05252; border: 1px solid rgba(224,82,82,0.4);   padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; }
 .bet-pending { background: rgba(240,180,41,0.15);  color: #f0b429; border: 1px solid rgba(240,180,41,0.4);  padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; }
-.bet-void    { background: rgba(74,90,106,0.25);   color: #94a3b8; border: 1px solid #2a4a5a;               padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; }
+.bet-void    { background: rgba(74,90,106,0.25);   color: var(--muted); border: 1px solid var(--line);               padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; }
 
 /* ── Cha Ching tip badge ── */
 .cc-badge {
     background: #f0b429;
-    color: #0f1923;
+    color: var(--bg);
     padding: 2px 10px;
     border-radius: 12px;
     font-size: 10px;
@@ -744,8 +678,8 @@ BH_CSS = """
 
 /* ── Fixture card ── */
 .fixture-card {
-    background: #152533;
-    border: 1px solid #2a4a5a;
+    background: var(--surface);
+    border: 1px solid var(--line);
     border-top: 2px solid #34d399;
     border-radius: 8px;
     padding: 14px 18px;
@@ -756,26 +690,26 @@ BH_CSS = """
     will-change: transform;
 }
 .fixture-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,0.3); transform: translateY(-2px); border-color: #34d399; }
-.fixture-teams { font-size: 15px; font-weight: 700; color: #e8f0f8; letter-spacing: -0.2px; }
-.fixture-meta  { font-size: 12px; color: #94a3b8; margin-top: 3px; line-height: 1.4; }
+.fixture-teams { font-size: 15px; font-weight: 700; color: var(--text); letter-spacing: -0.2px; }
+.fixture-meta  { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.4; }
 
 /* ── Checklist item ── */
-.cl-progress { font-size: 13px; color: #94a3b8; margin: 8px 0; line-height: 1.5; }
+.cl-progress { font-size: 13px; color: var(--muted); margin: 8px 0; line-height: 1.5; }
 
 /* ── Anti-aliasing & font rendering ── */
 * { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: #0f1923; }
-::-webkit-scrollbar-thumb { background: #2a4a5a; border-radius: 3px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: #34d399; }
 
 /* ── Trend section header ── */
 .trend-header {
     color: #34d399; font-size: 10px; font-weight: 800;
     letter-spacing: 2px; text-transform: uppercase;
-    border-bottom: 1px solid #2a4a5a; padding-bottom: 6px;
+    border-bottom: 1px solid var(--line); padding-bottom: 6px;
     margin: 24px 0 14px 0;
 }
 
@@ -835,15 +769,15 @@ BH_CSS = """
     100% { background-position: -200% center; }
 }
 .bh-sk-card {
-    background: #152533;
-    border: 1px solid #2a4a5a;
+    background: var(--surface);
+    border: 1px solid var(--line);
     border-radius: 8px;
     padding: 18px 22px;
     margin: 6px 0;
     overflow: hidden;
 }
 .bh-sk-title, .bh-sk-line {
-    background: linear-gradient(90deg, #1e3a4a 25%, #2a4a5a 50%, #1e3a4a 75%);
+    background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-2) 50%, var(--surface-2) 75%);
     background-size: 200% 100%;
     animation: bhShimmerSweep 1.4s linear infinite;
     border-radius: 4px;
@@ -895,19 +829,19 @@ BH_CSS = """
     font-weight: 800;
     letter-spacing: 2px;
     text-transform: uppercase;
-    border-bottom: 1px solid #2a4a5a;
+    border-bottom: 1px solid var(--line);
     padding-bottom: 6px;
     margin: 24px 0 14px 0;
 }
 
 /* ── Polls-a-Vote Exp_Votes numbers ── */
 .pav-ev-gold { color:#f0b429 !important; }
-.pav-ev-muted { color:#94a3b8 !important; }
+.pav-ev-muted { color:var(--muted) !important; }
 
 /* ── Polls-a-Vote round pills ── */
 .pav-pill-green { background:rgba(52,211,153,0.18); color:#34d399; border:1px solid rgba(52,211,153,0.4); }
 .pav-pill-blue  { background:rgba(74,144,217,0.18); color:#4a90d9; border:1px solid rgba(74,144,217,0.4); }
-.pav-pill-grey  { background:rgba(148,163,184,0.12); color:#94a3b8; border:1px solid #2a4a5a; }
+.pav-pill-grey  { background:rgba(148,163,184,0.12); color:var(--muted); border:1px solid var(--line); }
 .pav-pill-green, .pav-pill-blue, .pav-pill-grey {
     padding:2px 8px; border-radius:12px; font-size:11px; font-weight:700;
     white-space:nowrap; display:inline-block; margin:2px 1px;
@@ -916,7 +850,7 @@ BH_CSS = """
 /* ── Polls-a-Vote matrix cell ── */
 .pav-matrix-both  { background:#1a5c40; color:#34d399; }
 .pav-matrix-mine  { background:rgba(74,144,217,0.25); color:#4a90d9; }
-.pav-matrix-model { background:rgba(148,163,184,0.1); color:#94a3b8; }
+.pav-matrix-model { background:rgba(148,163,184,0.1); color:var(--muted); }
 
 /* ── Polls-a-Vote round checkbox grid ── */
 [data-testid="stCheckbox"] > label {
@@ -964,8 +898,8 @@ def _pl_chart(df: pd.DataFrame) -> go.Figure:
     fig.update_layout(
         paper_bgcolor=C['bg'], plot_bgcolor=C['bg'],
         font_color=C['text'], height=260, showlegend=False,
-        xaxis=dict(gridcolor='#1e3a4a', showgrid=True, title=''),
-        yaxis=dict(gridcolor='#1e3a4a', showgrid=True, zeroline=False, title='Units'),
+        xaxis=dict(gridcolor='rgba(140,165,185,.14)', showgrid=True, title=''),
+        yaxis=dict(gridcolor='rgba(140,165,185,.14)', showgrid=True, zeroline=False, title='Units'),
         margin=dict(l=60, r=20, t=10, b=40),
     )
     return fig
@@ -983,8 +917,8 @@ def _bar_chart(labels, values, title, color=None):
         paper_bgcolor=C['bg'], plot_bgcolor=C['bg'],
         font_color=C['text'], height=280, showlegend=False,
         title=dict(text=title, font=dict(size=12, color=C['brown'])),
-        xaxis=dict(gridcolor='#1e3a4a'),
-        yaxis=dict(gridcolor='#1e3a4a', zeroline=True, zerolinecolor=C['border']),
+        xaxis=dict(gridcolor='rgba(140,165,185,.14)'),
+        yaxis=dict(gridcolor='rgba(140,165,185,.14)', zeroline=True, zerolinecolor=C['border']),
         margin=dict(l=50, r=20, t=40, b=60),
     )
     return fig
@@ -1025,7 +959,7 @@ def _add_multi_dialog():
         bet_date = st.date_input("Date", value=date.today())
 
     st.markdown('<hr style="margin:8px 0">', unsafe_allow_html=True)
-    st.markdown('<div style="font-size:11px;color:#94a3b8;font-weight:600;letter-spacing:0.8px;'
+    st.markdown('<div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:0.8px;'
                 'text-transform:uppercase;margin-bottom:6px">CHA CHING CHECKLIST</div>',
                 unsafe_allow_html=True)
 
@@ -1596,8 +1530,8 @@ def _import_csv_dialog():
 def render_bh_dashboard():
     _inject_css()
     st.markdown(
-        '<div class="title-bar"><h2 style="color:#e8f0f8;margin:0">Betting Hub Dashboard</h2>'
-        '<p style="color:#94a3b8;margin:4px 0 0 0">P&L summary, hit rates, recent bets</p></div>',
+        '<div class="title-bar"><h2 style="color:var(--text);margin:0">Betting Hub Dashboard</h2>'
+        '<p style="color:var(--muted);margin:4px 0 0 0">P&L summary, hit rates, recent bets</p></div>',
         unsafe_allow_html=True,
     )
 
@@ -1689,8 +1623,8 @@ def render_bh_dashboard():
 def render_bet_tracker():
     _inject_css()
     st.markdown(
-        '<div class="title-bar"><h2 style="color:#e8f0f8;margin:0">Bet Tracker</h2>'
-        '<p style="color:#94a3b8;margin:4px 0 0 0">'
+        '<div class="title-bar"><h2 style="color:var(--text);margin:0">Bet Tracker</h2>'
+        '<p style="color:var(--muted);margin:4px 0 0 0">'
         'Your imported betting history — filters, stats, full table</p></div>',
         unsafe_allow_html=True,
     )
@@ -2044,12 +1978,12 @@ def render_cha_ching_tips():
             card_col, btn_col = st.columns([3, 2])
             with card_col:
                 st.markdown(
-                    f'<div style="background:#152533;border:1px solid #2a4a5a;border-radius:10px;'
+                    f'<div style="background:var(--surface);border:1px solid var(--line);border-radius:10px;'
                     f'padding:12px 16px;margin-bottom:4px">'
                     f'<div style="display:flex;align-items:center;gap:0;margin-bottom:4px">'
-                    f'<span style="font-weight:700;color:#e8f0f8;font-size:14px">{player}</span>'
+                    f'<span style="font-weight:700;color:var(--text);font-size:14px">{player}</span>'
                     f'<span class="{badge_class}">{label_badge}</span></div>'
-                    f'<div style="font-size:12px;color:#94a3b8;margin-bottom:2px">{gkey}'
+                    f'<div style="font-size:12px;color:var(--muted);margin-bottom:2px">{gkey}'
                     f'&nbsp;&nbsp;·&nbsp;&nbsp;{mtype}</div>'
                     + (f'<div style="font-size:12px;font-family:DM Mono,monospace;color:#f0b429">'
                        f'{bet_detail}</div>' if bet_detail else '')
@@ -2110,14 +2044,14 @@ def render_cha_ching_tips():
                 card_col, btn_col = st.columns([3, 1])
                 with card_col:
                     st.markdown(
-                        f'<div style="background:#152533;border:1px solid #2a4a5a;border-radius:10px;'
+                        f'<div style="background:var(--surface);border:1px solid var(--line);border-radius:10px;'
                         f'padding:12px 16px;margin-bottom:4px">'
                         f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
-                        f'<span style="font-weight:700;color:#e8f0f8;font-size:14px">{player}</span>'
+                        f'<span style="font-weight:700;color:var(--text);font-size:14px">{player}</span>'
                         f'<span style="font-size:10px;font-weight:700;background:{C["gold"]}22;'
                         f'color:{C["gold"]};border:1px solid {C["gold"]}55;border-radius:4px;'
                         f'padding:1px 6px;letter-spacing:0.5px">PENDING</span></div>'
-                        f'<div style="font-size:12px;color:#94a3b8;margin-bottom:2px">'
+                        f'<div style="font-size:12px;color:var(--muted);margin-bottom:2px">'
                         f'{gkey}&nbsp;&nbsp;·&nbsp;&nbsp;{mtype}</div>'
                         + (f'<div style="font-size:12px;font-family:DM Mono,monospace;color:{C["gold"]}">'
                            f'{bet_detail}</div>' if bet_detail else '')
@@ -2150,7 +2084,7 @@ def render_cha_ching_tips():
                 result_styles = {
                     'Win':         ('✅ Win',  '#34d399', 'rgba(52,211,153,0.12)'),
                     'Loss':        ('❌ Loss', '#e05252', 'rgba(224,82,82,0.12)'),
-                    'Void/Refund': ('↩️ Void', '#94a3b8', 'rgba(74,90,106,0.15)'),
+                    'Void/Refund': ('↩️ Void', '#7e8c99', 'rgba(74,90,106,0.15)'),
                 }
                 for _, tip in settled_tips.sort_values('game_key').iterrows():
                     tip_id = str(tip['tip_id'])
@@ -2160,13 +2094,13 @@ def render_cha_ching_tips():
                     result = str(tip.get('result', ''))
                     pl_raw = pd.to_numeric(tip.get('profit_loss', ''), errors='coerce')
                     pl_str = f" &nbsp;{pl_raw:+.2f}u" if not pd.isna(pl_raw) and pl_raw != 0 else ''
-                    label, color, bg = result_styles.get(result, (result, '#94a3b8', 'rgba(74,90,106,0.15)'))
+                    label, color, bg = result_styles.get(result, (result, '#7e8c99', 'rgba(74,90,106,0.15)'))
                     st.markdown(
                         f'<div style="background:{bg};border:1px solid {color}33;border-radius:10px;'
                         f'padding:10px 16px;margin-bottom:6px;display:flex;align-items:center;'
                         f'justify-content:space-between">'
-                        f'<div><span style="font-weight:700;color:#e8f0f8">{player}</span>'
-                        f'<span style="font-size:12px;color:#94a3b8;margin-left:10px">'
+                        f'<div><span style="font-weight:700;color:var(--text)">{player}</span>'
+                        f'<span style="font-size:12px;color:var(--muted);margin-left:10px">'
                         f'{gkey} &nbsp;·&nbsp; {mtype}</span></div>'
                         f'<span style="font-weight:800;color:{color};font-size:13px">'
                         f'{label}{pl_str}</span>'
@@ -2313,7 +2247,7 @@ def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
                     diff = avg - float(line)
                     clr  = '#34d399' if diff >= 0 else '#e05252'
                     edge_html = (
-                        f'<span style="color:#94a3b8">avg {avg:.1f}</span>'
+                        f'<span style="color:var(--muted)">avg {avg:.1f}</span>'
                         f'&nbsp;<span style="color:{clr};font-weight:700">'
                         f'({diff:+.1f})</span>'
                     )
@@ -2331,7 +2265,7 @@ def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
 
         st.markdown(
             f'<table style="width:100%;border-collapse:collapse;font-size:13px">'
-            f'<thead><tr style="background:#34d399;color:#e8f0f8">'
+            f'<thead><tr style="background:#34d399;color:var(--text)">'
             f'<th style="padding:7px 10px;text-align:left">Player</th>'
             f'<th style="padding:7px 10px">Line</th>'
             f'<th style="padding:7px 10px">Bookmaker</th>'
@@ -2347,7 +2281,7 @@ def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
         if editable:
             player_list = game_props['player'].tolist()
             if player_list:
-                st.markdown('<div style="font-size:11px;color:#94a3b8;font-weight:600;letter-spacing:0.8px;text-transform:uppercase;margin:8px 0 4px 0">CHECKLIST</div>', unsafe_allow_html=True)
+                st.markdown('<div style="font-size:11px;color:var(--muted);font-weight:600;letter-spacing:0.8px;text-transform:uppercase;margin:8px 0 4px 0">CHECKLIST</div>', unsafe_allow_html=True)
                 btn_cols = st.columns(min(len(player_list), 4))
                 for i, player in enumerate(player_list):
                     with btn_cols[i % 4]:
@@ -2452,7 +2386,7 @@ def render_trends_analysis():
         _strip_hdr, _strip_btn = st.columns([5, 1])
         with _strip_hdr:
             st.markdown(
-                f'<div style="font-size:12px;color:#94a3b8;padding:6px 0">'
+                f'<div style="font-size:12px;color:var(--muted);padding:6px 0">'
                 f'<span style="color:#34d399;font-weight:700">✓ Spreadsheet loaded</span>'
                 f' &nbsp;·&nbsp; {len(_imported_check):,} rows'
                 f' &nbsp;·&nbsp; {len(_imported_check.columns)} columns</div>',
@@ -2494,7 +2428,7 @@ def render_trends_analysis():
                     st.session_state.pop('_user_import_loaded', None)
                     st.rerun()
             st.markdown(
-                f'<div style="font-size:12px;color:#94a3b8;margin:4px 0 10px 0">'
+                f'<div style="font-size:12px;color:var(--muted);margin:4px 0 10px 0">'
                 f'{len(_imported):,} rows &nbsp;·&nbsp; {len(_imported.columns)} columns'
                 f' &nbsp;·&nbsp; <span style="color:#34d399">saved locally</span></div>',
                 unsafe_allow_html=True,
@@ -2729,8 +2663,8 @@ def render_trends_analysis():
 def render_polls_a_vote():
     _inject_css()
     st.markdown(
-        '<div class="title-bar"><h2 style="color:#e8f0f8;margin:0">Polls a Vote Watchlist</h2>'
-        '<p style="color:#94a3b8;margin:4px 0 0 0">'
+        '<div class="title-bar"><h2 style="color:var(--text);margin:0">Polls a Vote Watchlist</h2>'
+        '<p style="color:var(--muted);margin:4px 0 0 0">'
         'Track your "polls a vote" bets — alerts surface in the Live Tracker on count night</p></div>',
         unsafe_allow_html=True,
     )
@@ -2775,7 +2709,7 @@ def render_polls_a_vote():
 
     with st.form("pav_add_form", clear_on_submit=True):
         st.markdown(
-            '<div style="font-size:11px;color:#94a3b8;font-weight:700;text-transform:uppercase;'
+            '<div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;'
             'letter-spacing:1px;margin:12px 0 6px 0">Rounds to watch (select all that apply)</div>',
             unsafe_allow_html=True,
         )
@@ -2977,38 +2911,38 @@ def render_polls_a_vote():
         )
         _con_txt = _consensus(player)
         consensus_badge = (
-            f'<div style="font-size:11px;font-weight:600;color:#94a3b8;margin-top:4px">{_con_txt}</div>'
+            f'<div style="font-size:11px;font-weight:600;color:var(--muted);margin-top:4px">{_con_txt}</div>'
             if _con_txt else ''
         )
 
         st.markdown(
-            f'<div style="background:#152533;border:1px solid #2a4a5a;border-radius:8px;'
+            f'<div style="background:var(--surface);border:1px solid var(--line);border-radius:8px;'
             f'padding:14px 16px;margin-bottom:6px;opacity:{opacity}">'
             f'<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">'
 
             f'<div style="min-width:150px">'
-            f'<div style="font-size:14px;font-weight:700;color:#e8f0f8">{player}{settled_badge}</div>'
-            f'<div style="font-size:12px;color:#94a3b8;margin-top:2px">{team}</div>'
+            f'<div style="font-size:14px;font-weight:700;color:var(--text)">{player}{settled_badge}</div>'
+            f'<div style="font-size:12px;color:var(--muted);margin-top:2px">{team}</div>'
             f'{consensus_badge}'
             f'</div>'
 
             f'<div style="flex:1;min-width:200px">'
-            f'<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">My Rounds</div>'
+            f'<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">My Rounds</div>'
             f'<div>{pills_html}</div>'
             f'</div>'
 
             f'<div style="min-width:180px">'
-            f'<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Model Top 3</div>'
+            f'<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Model Top 3</div>'
             f'<div>{model_pills}</div>'
             f'</div>'
 
             f'<div style="display:flex;gap:20px;align-items:center">'
             f'<div style="text-align:center">'
-            f'<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px">Agreement</div>'
+            f'<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Agreement</div>'
             f'<div style="font-size:22px;font-weight:800;color:{agree_col}">{agreement}</div>'
             f'</div>'
             f'<div>'
-            f'<div style="font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px">Odds / Stake</div>'
+            f'<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Odds / Stake</div>'
             f'<div style="font-size:13px;font-weight:700;color:#f0b429">{odds_str} / {stake_str}</div>'
             f'</div>'
             f'</div>'
@@ -3036,13 +2970,13 @@ def render_polls_a_vote():
         'border:1px solid #1e3040;min-width:32px;'
     )
     _th_css = (
-        'background:#1e3a4a;color:#94a3b8;font-size:10px;font-weight:700;'
+        'background:var(--surface-2);color:var(--muted);font-size:10px;font-weight:700;'
         'text-transform:uppercase;letter-spacing:0.5px;padding:5px 4px;'
-        'border:1px solid #2a4a5a;text-align:center;min-width:32px;'
+        'border:1px solid var(--line);text-align:center;min-width:32px;'
     )
     _player_css = (
-        'background:#1e3a4a;color:#e8f0f8;font-size:12px;font-weight:600;'
-        'padding:5px 10px;border:1px solid #2a4a5a;white-space:nowrap;'
+        'background:var(--surface-2);color:var(--text);font-size:12px;font-weight:600;'
+        'padding:5px 10px;border:1px solid var(--line);white-space:nowrap;'
     )
 
     _rnd_labels_m = ['OR'] + [str(i) for i in range(1, 25)]
@@ -3072,7 +3006,7 @@ def render_polls_a_vote():
             elif in_mod:
                 cells += f'<td class="pav-matrix-model" style="{_cell_css}">·</td>'
             else:
-                cells += f'<td style="background:#0f1923;{_cell_css}"></td>'
+                cells += f'<td style="background:var(--bg);{_cell_css}"></td>'
         _rows_html += f'<tr>{cells}</tr>'
 
     st.markdown(
@@ -3086,7 +3020,7 @@ def render_polls_a_vote():
         f'<span style="color:#34d399">★</span> 3–4/5 agree &nbsp;·&nbsp;'
         f'<span style="color:#e06060">★</span> 0–2/5 agree &nbsp;·&nbsp;'
         f'<span style="color:#4a90d9">●</span> my pick only &nbsp;·&nbsp;'
-        f'<span style="color:#94a3b8">·</span> model only</div>'
+        f'<span style="color:var(--muted)">·</span> model only</div>'
         f'</div>',
         unsafe_allow_html=True,
     )
