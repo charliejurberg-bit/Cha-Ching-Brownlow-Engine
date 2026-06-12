@@ -2176,7 +2176,7 @@ if _page == 'Landing':
         _land_pending = 0
 
     _land_pl_val = _land_pl or 0.0
-    _pl_str = f"+U{_land_pl_val:.2f}" if _land_pl_val >= 0 else f"-U{abs(_land_pl_val):.2f}"
+    _pl_str = f"+{_land_pl_val:.2f}U" if _land_pl_val >= 0 else f"-{abs(_land_pl_val):.2f}U"
     _pl_color = "#34d399" if _land_pl_val >= 0 else "#e0625a"
     _land_round = max_season_rounds - 1
 
@@ -2414,7 +2414,7 @@ function animate(el, target, formatter, duration, delay){
   }, delay);
 }
 animate(document.getElementById('votes'), votesTarget, function(v){ return v.toFixed(1); }, 1400, 700);
-animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + v.toFixed(2); }, 1400, 700);
+animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + v.toFixed(2) + 'U'; }, 1400, 700);
 </script>
 </body></html>"""
     _stat_html = (
@@ -2423,7 +2423,7 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
         .replace("__LEADER__", str(_land_leader))
         .replace("__VOTES__", f"{_land_votes:.4f}")
         .replace("__PL_ABS__", f"{abs(_land_pl_val):.4f}")
-        .replace("__PL_PREFIX__", "+U" if _land_pl_val >= 0 else "-U")
+        .replace("__PL_PREFIX__", "+" if _land_pl_val >= 0 else "-")
         .replace("__PL_FALLBACK__", _pl_str)
     )
     _components.html(_stat_html, height=110, scrolling=False)
