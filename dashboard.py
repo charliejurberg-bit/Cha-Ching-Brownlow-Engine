@@ -1871,14 +1871,16 @@ st.markdown("""
     padding-top: 0 !important;
 }
 
-/* Collapse leading gap above hero / ticker */
-[data-testid="stLayoutWrapper"]:has(.landing-top-anchor) {
-    margin-top: -32px !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .landing-top-anchor) {
-    margin-top: -2rem !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .landing-top-anchor) > :first-child {
+/* Collapse leading gap above hero / ticker: the global CSS/JS-injection
+   element containers (style/link tags, the animated-counter iframe, and the
+   landing-top-anchor marker itself) are zero-height but each still adds a
+   16px flex `gap` in the outer stVerticalBlock. Removing them from layout
+   eliminates that stacked gap so the ticker sits flush at the top. */
+.stApp:has(.landing-top-anchor) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > style:only-child),
+.stApp:has(.landing-top-anchor) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > link:only-child),
+.stApp:has(.landing-top-anchor) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > div.landing-top-anchor:only-child),
+.stApp:has(.landing-top-anchor) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > div.cc-ticker-marker:only-child),
+.stApp:has(.landing-top-anchor) div[data-testid="stElementContainer"]:has(> iframe[srcdoc*="_ccAnimated"]) {
     display: none !important;
 }
 
