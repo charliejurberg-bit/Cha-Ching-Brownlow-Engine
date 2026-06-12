@@ -2259,14 +2259,11 @@ html,body{background:transparent;height:40px;overflow:hidden;}
   will-change:transform;
 }
 @keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-@media (prefers-reduced-motion: reduce){.ticker-track{animation:none;}}
 </style></head><body>
 <div class="bar"><div class="ticker-track" id="track">__SEG__</div></div>
 <script>
 var track = document.getElementById('track');
-if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-  track.innerHTML += track.innerHTML;
-}
+track.innerHTML += track.innerHTML;
 </script>
 </body></html>"""
     _ticker_html = _ticker_html.replace("__SEG__", _ticker_segment)
