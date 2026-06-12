@@ -2194,9 +2194,9 @@ if _page == 'Landing':
         return f"{_parts[0][0]}. {' '.join(_parts[1:])}" if len(_parts) >= 2 else str(_name)
 
     _chip_fallback = [
-        {"name": "Logan Morris", "team": "Brisbane Lions", "disposals": 24},
-        {"name": "Kysaiah Pickett", "team": "Melbourne", "disposals": 28},
-        {"name": "Lachie Neale", "team": "Brisbane Lions", "disposals": 31},
+        {"name": "Lachie Neale", "team": "Brisbane Lions", "exp_votes": 2.4},
+        {"name": "Kysaiah Pickett", "team": "Melbourne", "exp_votes": 1.8},
+        {"name": "Logan Morris", "team": "Brisbane Lions", "exp_votes": 1.3},
     ]
     _chip_players = []
     if game_df is not None and len(game_df):
@@ -2210,16 +2210,16 @@ if _page == 'Landing':
             _chip_players.append({
                 "name": str(_r.get("Player_Name", "—")),
                 "team": str(_r.get("Team", "")),
-                "disposals": int(_r["Disposals"]) if pd.notna(_r.get("Disposals")) else 0,
+                "exp_votes": float(_r["Exp_Votes"]) if pd.notna(_r.get("Exp_Votes")) else 0.0,
             })
     # TODO: wire to predictions — fall back to placeholder leaders if the latest round has < 3 players
     for _i in range(len(_chip_players), 3):
         _chip_players.append(_chip_fallback[_i])
-    _chip3, _chip2, _chip1 = _chip_players[0], _chip_players[1], _chip_players[2]
+    _chip1, _chip2, _chip3 = _chip_players[0], _chip_players[1], _chip_players[2]
 
     def _chip_stats(_c):
         _abbr = _TEAM_ABBR.get(_c['team'], _c['team'][:3].upper())
-        return f"&middot; {_abbr} &middot; {_c['disposals']} disposals"
+        return f"&middot; {_abbr} &middot; {_c['exp_votes']:.1f} exp votes"
 
     # ── Ticker bar ──
     _ticker_bet_items = []
@@ -2308,18 +2308,20 @@ font-size:clamp(56px,9vw,110px);line-height:.94;white-space:nowrap;margin:0;}
 .r1{animation-delay:.2s;}
 .r2{animation-delay:.32s;}
 .r3{animation-delay:.44s;}
+.chips-label{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.18em;
+text-transform:uppercase;color:#7e8c99;margin-bottom:10px;opacity:0;animation:fade 400ms ease-out .4s forwards;}
 .chips{display:flex;gap:10px;flex-wrap:nowrap;justify-content:center;margin-top:0;max-width:100%;}
 .chip{display:flex;align-items:center;gap:8px;background:#101a24;border:1px solid rgba(140,165,185,.14);
 border-radius:999px;padding:10px 18px 10px 10px;opacity:0;animation:chipIn 500ms ease-out forwards;white-space:nowrap;}
 @keyframes chipIn{from{opacity:0;transform:translateY(10px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
-.chip-1{animation-delay:.6s;}
+.chip-1{animation-delay:1.5s;}
 .chip-2{animation-delay:1.0s;}
-.chip-3{animation-delay:1.5s;}
+.chip-3{animation-delay:.6s;}
 .badge{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;
 font-family:'Archivo',sans-serif;font-weight:800;font-size:14px;flex-shrink:0;}
-.badge-3{background:#34d399;color:#0a1017;}
+.badge-1{background:#34d399;color:#0a1017;}
 .badge-2{background:#3a4753;color:#e9eef3;}
-.badge-1{background:#1c2530;color:#7e8c99;}
+.badge-3{background:#1c2530;color:#7e8c99;}
 .chip-name{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:#e9eef3;}
 .chip-stats{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7e8c99;}
 @media (max-width:700px){
@@ -2353,10 +2355,11 @@ font-family:'Archivo',sans-serif;font-weight:800;font-size:14px;flex-shrink:0;}
     <div class="eyebrow rise r1">BROWNLOW PREDICTOR &middot; THROUGH ROUND __ROUND__</div>
     <h1 class="wordmark rise r2"><span class="cha">CHA</span> <span class="ching">CHING</span></h1>
     <p class="subtitle rise r3">One model. Two games: the medal count, and the money.</p>
+    <div class="chips-label">ROUND __ROUND__ &middot; MOST LIKELY TO POLL</div>
     <div class="chips">
-      <div class="chip chip-3"><span class="badge badge-3">3</span><span class="chip-name">__NAME3__</span><span class="chip-stats">__STATS3__</span></div>
-      <div class="chip chip-2"><span class="badge badge-2">2</span><span class="chip-name">__NAME2__</span><span class="chip-stats">__STATS2__</span></div>
       <div class="chip chip-1"><span class="badge badge-1">1</span><span class="chip-name">__NAME1__</span><span class="chip-stats">__STATS1__</span></div>
+      <div class="chip chip-2"><span class="badge badge-2">2</span><span class="chip-name">__NAME2__</span><span class="chip-stats">__STATS2__</span></div>
+      <div class="chip chip-3"><span class="badge badge-3">3</span><span class="chip-name">__NAME3__</span><span class="chip-stats">__STATS3__</span></div>
     </div>
   </div>
 </div>
@@ -2364,9 +2367,9 @@ font-family:'Archivo',sans-serif;font-weight:800;font-size:14px;flex-shrink:0;}
     _hero_html = (
         _hero_html
         .replace("__ROUND__", str(_land_round))
-        .replace("__NAME3__", _initial_surname(_chip3["name"])).replace("__STATS3__", _chip_stats(_chip3))
-        .replace("__NAME2__", _initial_surname(_chip2["name"])).replace("__STATS2__", _chip_stats(_chip2))
         .replace("__NAME1__", _initial_surname(_chip1["name"])).replace("__STATS1__", _chip_stats(_chip1))
+        .replace("__NAME2__", _initial_surname(_chip2["name"])).replace("__STATS2__", _chip_stats(_chip2))
+        .replace("__NAME3__", _initial_surname(_chip3["name"])).replace("__STATS3__", _chip_stats(_chip3))
     )
     _components.html(_hero_html, height=440, scrolling=False)
 
