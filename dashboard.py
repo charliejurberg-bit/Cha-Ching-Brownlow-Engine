@@ -2042,11 +2042,16 @@ div[data-testid="stVerticalBlock"]:has(.cc-card-marker):not(:has(div[data-testid
 }
 .st-key-land_bw button:hover { filter: brightness(1.1); }
 .st-key-land_bh button {
-    background: transparent !important;
-    color: #f0b429 !important;
-    border: 1px solid rgba(240,180,41,.5) !important;
+    background: #f0b429 !important;
+    color: #3a2a05 !important;
+    border: none !important;
 }
-.st-key-land_bh button:hover { background: rgba(240,180,41,.12) !important; }
+.st-key-land_bh button p,
+.st-key-land_bh button span {
+    color: #3a2a05 !important;
+    font-weight: 700 !important;
+}
+.st-key-land_bh button:hover { filter: brightness(1.08); }
 
 </style>
 """, unsafe_allow_html=True)
