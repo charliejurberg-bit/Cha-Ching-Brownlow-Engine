@@ -452,22 +452,6 @@ st.markdown("""
         .main .block-container { padding-left: 0.4rem !important; padding-right: 0.4rem !important; }
     }
 
-    /* ── Nav dropdown bar ── */
-    .nav-anchor + div[data-testid="stHorizontalBlock"] {
-        background: #0d1720 !important;
-        padding: 2px 8px 6px 8px !important;
-        border-bottom: 1px solid var(--line) !important;
-        margin-bottom: 20px !important;
-        border-radius: 0 0 8px 8px !important;
-    }
-    .nav-anchor + div[data-testid="stHorizontalBlock"] label {
-        color: #4a5a6a !important;
-        font-size: 10px !important;
-        font-weight: 600 !important;
-        letter-spacing: 1.5px !important;
-        text-transform: uppercase !important;
-    }
-
     /* ── CHA CHING banner ── */
     /* Collapse the leading gap above the banner: the global CSS/JS-injection
        element containers (style/link tags + the animated-counter iframe) are
@@ -1676,7 +1660,7 @@ st.markdown("""
 
 /* ── Hub row container ───────────────────────────────────────── */
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) {
-    background: #0d1c2b !important;
+    background: var(--bg) !important;
     position: relative !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
@@ -1685,7 +1669,7 @@ st.markdown("""
     flex-shrink: 0 !important;
     margin-left: 0 !important;
     padding: 0 !important;
-    border-bottom: 0.5px solid rgba(255,255,255,0.06) !important;
+    border-bottom: 1px solid var(--line) !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
     gap: 0 !important;
@@ -1741,7 +1725,7 @@ st.markdown("""
 
 /* ── Page strip container ────────────────────────────────────── */
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) {
-    background: #0d1c2b !important;
+    background: var(--bg) !important;
     position: relative !important;
     left: 50% !important;
     transform: translateX(-50%) !important;
@@ -1750,7 +1734,7 @@ st.markdown("""
     flex-shrink: 0 !important;
     margin-left: 0 !important;
     padding: 4px 16px !important;
-    border-bottom: 0.5px solid rgba(255,255,255,0.08) !important;
+    border-bottom: 1px solid var(--line) !important;
     margin-top: 0 !important;
     margin-bottom: 0 !important;
     gap: 0 !important;
