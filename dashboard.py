@@ -405,12 +405,19 @@ def render_banner():
     _sub = f"Through Round {max_season_rounds - 1}" if is_2026 else f"{selected_season} Season"
     _mode_label = "Brownlow Predictor" if _hub == "brownlow" else "Betting Hub"
     st.markdown(f"""
-<div class="cha-ching-banner">
-    <div class="banner-vignette"></div>
-    <div class="banner-corner banner-corner-tl"></div>
-    <div class="banner-corner banner-corner-tr"></div>
-    <div class="cha-ching-title"><span>C</span><span>H</span><span>A</span><span>&nbsp;</span><span>C</span><span>H</span><span>I</span><span>N</span><span>G</span></div>
-    <div class="cha-ching-sub{' bh' if _hub != 'brownlow' else ''}">{_mode_label} &nbsp;&middot;&nbsp; {_sub}</div>
+<div class="cc-banner">
+    <svg class="cc-banner-oval" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+        <ellipse cx="500" cy="300" rx="460" ry="270"/>
+        <path d="M500 255 L545 300 L500 345 L455 300 Z"/>
+        <circle cx="500" cy="300" r="45"/>
+        <circle cx="500" cy="300" r="8"/>
+        <path d="M115 95 A235 235 0 0 0 115 505"/>
+        <path d="M885 95 A235 235 0 0 1 885 505"/>
+        <rect x="40" y="270" width="35" height="60"/>
+        <rect x="925" y="270" width="35" height="60"/>
+    </svg>
+    <div class="cc-banner-title"><span class="cha">CHA </span><span class="ching">CHING</span></div>
+    <div class="cc-banner-eyebrow{' bh' if _hub != 'brownlow' else ''}">{_mode_label.upper()} &middot; {_sub.upper()}</div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -460,124 +467,66 @@ st.markdown("""
     }
 
     /* ── CHA CHING banner ── */
-    .cha-ching-banner {
+    .cc-banner {
         position: relative;
-        left: 50%;
-        width: 100vw;
-        margin-left: -50vw;
-        margin-top: 0;
-        overflow: hidden;
-        background: linear-gradient(135deg, #0a1017 0%, #101a24 25%, #0d141d 50%, #101a24 75%, #0a1017 100%);
-        background-size: 100% 100%;
-        animation: auroraPulse 22s ease-in-out infinite alternate;
-        height: auto;
-        padding: 28px 48px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-        align-items: center;
-        margin-bottom: 0;
+        background: var(--bg);
+        border-bottom: 1px solid var(--line);
+        padding: 26px 0 18px;
         text-align: center;
+        overflow: hidden;
     }
-    /* fractalNoise grain texture at 4% */
-    .cha-ching-banner::before {
-        content: '';
+    .cc-banner-oval {
         position: absolute;
-        inset: 0;
-        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
-        background-size: 200px 200px;
-        opacity: 0.04;
+        top: 50%;
+        left: 50%;
+        width: 620px;
+        max-width: 90%;
+        height: auto;
+        transform: translate(-50%, -50%);
         pointer-events: none;
     }
-    /* bottom border with slow opacity pulse */
-    .cha-ching-banner::after {
-        content: '';
-        position: absolute;
-        bottom: 0; left: 0; right: 0;
-        height: 1px;
-        background: linear-gradient(90deg, transparent 0%, rgba(52,211,153,0.7) 50%, transparent 100%);
-        animation: borderPulse 6s ease-in-out infinite;
+    .cc-banner-oval ellipse,
+    .cc-banner-oval path,
+    .cc-banner-oval circle,
+    .cc-banner-oval rect {
+        fill: none;
+        stroke: rgba(126,156,178,.22);
+        stroke-width: 1;
     }
-    /* radial-gradient orbs — animation injected inline via render_banner() */
-    .banner-orb {
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-    }
-    /* L-bracket corner accents */
-    .banner-corner {
-        position: absolute;
-        width: 22px; height: 22px;
-        border-color: rgba(52,211,153,0.2);
-        border-style: solid;
-        pointer-events: none;
-    }
-    .banner-corner-tl { top: 14px; left: 18px; border-width: 1px 0 0 1px; }
-    .banner-corner-tr { top: 14px; right: 18px; border-width: 1px 1px 0 0; }
-    /* left/right vignette */
-    .banner-vignette {
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(90deg,
-            rgba(0,0,0,0.35) 0%, transparent 22%,
-            transparent 78%, rgba(0,0,0,0.35) 100%);
-        pointer-events: none;
-    }
-    .cha-ching-deco {
-        position: absolute;
-        color: #ffffff;
-        font-size: 52px;
-        opacity: 0.05;
-        pointer-events: none;
-        user-select: none;
-        line-height: 1;
-    }
-    .cha-ching-title {
+    .cc-banner-title {
         position: relative;
         font-family: 'Archivo', sans-serif;
-        font-size: 70px;
         font-weight: 900;
-        letter-spacing: -3px;
-        margin: 0 0 8px 0;
+        font-variation-settings: 'wdth' 122;
+        font-size: 44px;
         line-height: 1;
-        color: var(--text);
+        white-space: nowrap;
+        margin: 0 0 8px 0;
     }
-    .cha-ching-title span {
-        display: inline-block;
-        color: var(--text);
+    .cc-banner-title .cha {
         background: linear-gradient(180deg, #ffffff 0%, #9fb3c4 100%);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
         color: transparent;
-        animation: letterWave 22s ease-in-out infinite alternate;
     }
-    .cha-ching-title span:nth-child(1) { animation-delay: 0.80s; }
-    .cha-ching-title span:nth-child(2) { animation-delay: 0.70s; }
-    .cha-ching-title span:nth-child(3) { animation-delay: 0.60s; }
-    .cha-ching-title span:nth-child(4) { animation-delay: 0.50s; }
-    .cha-ching-title span:nth-child(5) { animation-delay: 0.40s; }
-    .cha-ching-title span:nth-child(6) { animation-delay: 0.30s; }
-    .cha-ching-title span:nth-child(7) { animation-delay: 0.20s; }
-    .cha-ching-title span:nth-child(8) { animation-delay: 0.10s; }
-    .cha-ching-title span:nth-child(9) { animation-delay: 0.00s; }
-    @keyframes letterWave {
-        0%,  46% { transform: translateY(0px);  }
-        49%       { transform: translateY(-7px); }
-        52%       { transform: translateY(4px);  }
-        55%, 100% { transform: translateY(0px);  }
+    .cc-banner-title .ching {
+        background: linear-gradient(120deg, var(--emerald), var(--gold));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
     }
-    .cha-ching-sub {
+    .cc-banner-eyebrow {
         position: relative;
-        color: var(--emerald);
+        font-family: 'IBM Plex Mono', monospace;
         font-size: 10px;
-        font-weight: 700;
-        letter-spacing: 4px;
+        letter-spacing: .3em;
         text-transform: uppercase;
+        color: var(--emerald);
         margin: 0;
-        opacity: 0.9;
     }
-    .cha-ching-sub.bh {
+    .cc-banner-eyebrow.bh {
         color: var(--gold);
     }
 
@@ -857,14 +806,6 @@ st.markdown("""
     [data-testid="stDataFrame"] tbody tr:nth-child(1) td:first-child { font-weight: 800 !important; }
 
     /* ── Animations ── */
-    @keyframes auroraPulse {
-        0%   { background-position: -100% 0%, 0% 0%; }
-        100% { background-position: 200% 0%,  0% 0%; }
-    }
-    @keyframes borderPulse {
-        0%, 100% { opacity: 0.4; }
-        50%       { opacity: 1; }
-    }
     @keyframes orbDrift1 {
         0%   { transform: translate(-8%, -5%) scale(1.0); }
         100% { transform: translate(8%, 5%) scale(1.08); }
