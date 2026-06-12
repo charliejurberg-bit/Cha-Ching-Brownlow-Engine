@@ -1994,6 +1994,121 @@ div[data-testid="stVerticalBlock"]:has(.cc-card-marker):not(:has(div[data-testid
 .dest-data-row .dr-label { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: #7e8c99; }
 .dest-data-row .dr-value { font-size: 14px; font-weight: 600; color: #e9eef3; }
 
+/* ── Leaderboard page ── */
+.lb-header { margin-bottom: 18px; }
+.lb-title {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 800;
+    font-size: 28px;
+    color: var(--text);
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+.lb-subtitle { color: var(--muted); font-size: 14px; margin: 6px 0 0 0; }
+.lb-live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    padding: 5px 11px;
+    border-radius: 99px;
+    background: var(--emerald-dim);
+    color: var(--emerald);
+}
+.lb-live-pill::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    animation: tagDotPulse 2.2s ease-in-out infinite;
+}
+.lb-odds-ts {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--muted);
+    text-align: right;
+    margin: 0 0 4px 0;
+}
+.lb-podium-card {
+    position: relative;
+    background: linear-gradient(180deg, var(--surface) 0%, var(--surface-2) 100%);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 20px 22px;
+    margin: 6px 0;
+    overflow: hidden;
+}
+.lb-podium-card::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+}
+.lb-podium-card.lb-rank1::before { background: linear-gradient(90deg, transparent, var(--emerald), transparent); }
+.lb-podium-card.lb-rank-other::before { background: linear-gradient(90deg, transparent, rgba(140,165,185,.35), transparent); }
+.lb-podium-eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+}
+.lb-podium-name {
+    font-family: 'Archivo', sans-serif;
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--text);
+    margin: 0 0 6px 0;
+    line-height: 1.2;
+}
+.lb-podium-name.lb-rank1-name {
+    font-weight: 800;
+    font-size: 24px;
+    color: var(--emerald);
+}
+.lb-podium-sub { color: var(--muted); font-size: 12px; line-height: 1.4; }
+.lb-section-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 16px;
+}
+.lb-controls-marker { display: none; }
+div[data-testid="stHorizontalBlock"]:has(.lb-controls-marker) label {
+    font-family: 'IBM Plex Mono', monospace !important;
+    font-size: 10px !important;
+    font-weight: 700 !important;
+    letter-spacing: 0.18em !important;
+    text-transform: uppercase !important;
+    color: var(--muted) !important;
+}
+
+/* ── Primary button (Run Update etc.) ── */
+[data-testid="stBaseButton-primary"] {
+    background-color: var(--emerald) !important;
+    border: none !important;
+    color: #062b1d !important;
+}
+[data-testid="stBaseButton-primary"] p,
+[data-testid="stBaseButton-primary"] span {
+    color: #062b1d !important;
+    font-family: 'Archivo', sans-serif !important;
+    font-weight: 700 !important;
+}
+[data-testid="stBaseButton-primary"]:hover { filter: brightness(1.08); }
+
 /* Destination buttons */
 .st-key-land_bw button,
 .st-key-land_bh button {
@@ -2103,7 +2218,10 @@ if _show_controls:
     with _cc2:
         _odds_ctrl = load_best_odds()
         if _odds_ctrl is not None and 'scraped_at' in _odds_ctrl.columns:
-            st.caption(f"Odds: {str(_odds_ctrl['scraped_at'].iloc[0])[:16]}")
+            st.markdown(
+                f'<div class="lb-odds-ts">Odds: {str(_odds_ctrl["scraped_at"].iloc[0])[:16]}</div>',
+                unsafe_allow_html=True,
+            )
     with _cc3:
         if _page in _SEASON_PAGES:
             st.selectbox(
@@ -2656,17 +2774,16 @@ if _page == 'Home':
 # LEADERBOARD
 # ════════════════════════════════════════════════════════════
 if _page == 'Leaderboard':
-    _lb_live_html = ' <span class="live-badge">LIVE</span>' if is_2026 else ""
+    _lb_live_html = ' <span class="lb-live-pill">LIVE</span>' if is_2026 else ""
     st.markdown(
-        f'<div class="title-bar" style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">'
-        f'<div>'
-        f'<div style="display:flex;align-items:center;gap:10px">'
-        f'<h2 style="color:var(--text);margin:0">{selected_season} Brownlow Leaderboard</h2>'
+        f'<div class="lb-header">'
+        f'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+        f'<h2 class="lb-title">{selected_season} Brownlow Leaderboard</h2>'
         f'{_lb_live_html}'
         f'</div>'
-        f'<p style="color:var(--muted);margin:4px 0 0 0">'
+        f'<p class="lb-subtitle">'
         f'{"Projected votes through current round" if is_2026 else "Model predicted vs actual results"}'
-        f'</p></div></div>',
+        f'</p></div>',
         unsafe_allow_html=True,
     )
 
@@ -2678,24 +2795,26 @@ if _page == 'Leaderboard':
         (col_center, 0, top3.iloc[0]),
         (col_right,  2, top3.iloc[2]),
     ]
-    rank_labels = ['#1 Predicted', '#2 Predicted', '#3 Predicted']
+    rank_labels = ['#1 PREDICTED', '#2 PREDICTED', '#3 PREDICTED']
     for col, idx, row in podium_order:
         actual_str = "TBC" if is_2026 else f"{int(row['Actual_Votes'])} actual"
-        card_class = "metric-card-primary" if idx == 0 else "metric-card"
-        value_class = "metric-value-lg" if idx == 0 else "metric-value"
+        card_class = "lb-podium-card lb-rank1" if idx == 0 else "lb-podium-card lb-rank-other"
+        name_class = "lb-podium-name lb-rank1-name" if idx == 0 else "lb-podium-name"
         with col:
             st.markdown(
                 f'<div class="{card_class}">'
-                f'<div class="metric-label">{rank_labels[idx]}</div>'
-                f'<div class="{value_class}">{row["Player_Name"]}</div>'
-                f'<div class="metric-sub">{row["Team"]} &nbsp;|&nbsp; {row["Exp_Total_Votes"]:.1f} exp &nbsp;|&nbsp; {actual_str}</div>'
+                f'<div class="lb-podium-eyebrow">{rank_labels[idx]}</div>'
+                f'<div class="{name_class}">{row["Player_Name"]}</div>'
+                f'<div class="lb-podium-sub">{row["Team"]} &nbsp;|&nbsp; {row["Exp_Total_Votes"]:.1f} exp &nbsp;|&nbsp; {actual_str}</div>'
                 f'</div>',
                 unsafe_allow_html=True,
             )
 
-    st.markdown('<div class="section-header">Full Leaderboard</div>', unsafe_allow_html=True)
+    st.markdown('<div class="lb-section-label">Full Leaderboard</div>', unsafe_allow_html=True)
     col1, col2 = st.columns([3, 1])
-    with col1: search = st.text_input("Search player", "")
+    with col1:
+        st.markdown('<div class="lb-controls-marker"></div>', unsafe_allow_html=True)
+        search = st.text_input("Search player", "")
     with col2: show_n = st.selectbox("Show", [20, 50, 100, 200], index=0)
 
     # ── Round-on-round movement (2026 only) ──────────────────
@@ -2770,26 +2889,30 @@ if _page == 'Leaderboard':
         _lb_disp[col] = _lb_disp[col].round(1)
     # Build rank+arrow strings after all merges so dtype survives
     # Render as HTML table — bypasses Arrow/Styler limitations for coloured rank+arrow
-    _hdr_style = 'background:#0f1e2b;color:var(--muted);font-weight:600;font-size:11px;letter-spacing:0.5px;padding:8px 10px;border-bottom:2px solid var(--line);text-align:left;white-space:nowrap'
+    _hdr_style = ('background:var(--surface-2);color:var(--muted);font-family:\'IBM Plex Mono\',monospace;'
+                   'font-weight:700;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;'
+                   'padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap')
     _hdrs = ''.join(f'<th style="{_hdr_style}">{c}</th>' for c in _lb_disp.columns)
     _tbl_rows = []
     for _idx, (_, _row) in enumerate(_lb_disp.iterrows()):
-        _bg   = 'var(--surface)' if _idx % 2 == 0 else '#1a2d3d'
+        _bg   = 'var(--bg)' if _idx % 2 == 0 else 'rgba(16,26,36,.5)'
         _tcol = _TEAM_COLOURS.get(str(_row.get('Team', '')), '#7e8c99')
         _cells = []
         for _ci, _col in enumerate(_lb_disp.columns):
             _val = _row[_col]
-            _td  = f'padding:7px 10px;font-size:13px;white-space:nowrap;color:var(--text);'
+            _td  = f'padding:7px 10px;font-size:13px;white-space:nowrap;color:var(--text);border-bottom:1px solid var(--line);'
+            if _col == 'Exp Votes':
+                _td += 'font-family:\'IBM Plex Mono\',monospace;font-weight:600;'
             if _col == 'Rank':
                 _r = int(_val) if not pd.isna(_val) else _idx + 1
                 _n = _move_map.get(str(_row.get('Player', '')), 0) if _move_map else 0
                 if not pd.isna(_n) and _n > 0:
                     _badge = (f'<span style="font-size:10px;font-weight:500;opacity:0.75;'
-                              f'color:#34d399;margin-left:3px">▲{int(_n)}</span>')
+                              f'color:var(--emerald);margin-left:3px">▲{int(_n)}</span>')
                     _cell_val = f'{_r}{_badge}'
                 elif not pd.isna(_n) and _n < 0:
                     _badge = (f'<span style="font-size:10px;font-weight:500;opacity:0.75;'
-                              f'color:#e63946;margin-left:3px">▼{int(abs(_n))}</span>')
+                              f'color:#f87171;margin-left:3px">▼{int(abs(_n))}</span>')
                     _cell_val = f'{_r}{_badge}'
                 else:
                     _cell_val = str(_r)
