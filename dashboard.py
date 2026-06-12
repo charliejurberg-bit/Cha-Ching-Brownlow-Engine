@@ -541,14 +541,15 @@ st.markdown("""
         margin: 0 0 8px 0;
         line-height: 1;
         color: var(--text);
+    }
+    .cha-ching-title span {
+        display: inline-block;
+        color: var(--text);
         background: linear-gradient(180deg, #ffffff 0%, #9fb3c4 100%);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
         color: transparent;
-    }
-    .cha-ching-title span {
-        display: inline-block;
         animation: letterWave 22s ease-in-out infinite alternate;
     }
     .cha-ching-title span:nth-child(1) { animation-delay: 0.80s; }
