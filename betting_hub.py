@@ -253,12 +253,7 @@ def _empty_bets_df() -> pd.DataFrame:
 
 
 def _load_bets() -> pd.DataFrame:
-    sb = _get_supabase()
-    if sb is None:
-        return _empty_bets_df()
-    try:
-        resp = sb.table("bets").select("*").execute()
-        df = pd.DataFrame(resp.data) if resp.data else pd.DataFrame(columns=BETS_COLS)
+    def _coerce(df):
         for c in BETS_COLS:
             if c not in df.columns:
                 df[c] = None
@@ -268,8 +263,23 @@ def _load_bets() -> pd.DataFrame:
         df['profit_loss']  = pd.to_numeric(df['profit_loss'], errors='coerce')
         df['is_cha_ching'] = df['is_cha_ching'].fillna(False).astype(bool)
         return df
-    except Exception:
-        return _empty_bets_df()
+
+    sb = _get_supabase()
+    if sb is not None:
+        try:
+            resp = sb.table("bets").select("*").execute()
+            df = pd.DataFrame(resp.data) if resp.data else pd.DataFrame(columns=BETS_COLS)
+            return _coerce(df)
+        except Exception:
+            pass
+
+    # Supabase unavailable — fall back to local CSV
+    if os.path.exists(BETS_CSV):
+        try:
+            return _coerce(pd.read_csv(BETS_CSV))
+        except Exception:
+            pass
+    return _empty_bets_df()
 
 
 def _insert_bet(row: dict):
