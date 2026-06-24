@@ -395,6 +395,10 @@ def apply_chart_theme(fig):
         ),
         margin=dict(l=16, r=16, t=40, b=16),
     )
+    # Plotly renders the literal string "undefined" as the title when title_font is
+    # set but title.text is not. Force an empty title unless one was set explicitly.
+    if not (fig.layout.title and fig.layout.title.text):
+        fig.update_layout(title_text="")
     for trace in fig.data:
         if trace.type not in ('heatmap', 'contour', 'choropleth'):
             trace.update(marker_line_width=0)
