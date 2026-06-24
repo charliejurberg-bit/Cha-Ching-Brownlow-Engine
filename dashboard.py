@@ -2561,35 +2561,152 @@ if _page == 'Leaderboard':
         unsafe_allow_html=True,
     )
 
-    # Podium: #2 left, #1 centre (larger), #3 right
-    top3 = predictions.head(3)
-    col_left, col_center, col_right = st.columns([1, 1.3, 1])
-    podium_order = [
-        (col_left,   1, top3.iloc[1]),
-        (col_center, 0, top3.iloc[0]),
-        (col_right,  2, top3.iloc[2]),
-    ]
-    rank_labels = ['#1 PREDICTED', '#2 PREDICTED', '#3 PREDICTED']
-    for col, idx, row in podium_order:
-        actual_str = "TBC" if is_2026 else f"{int(row['Actual_Votes'])} actual"
-        card_class = "lb-podium-card lb-rank1" if idx == 0 else "lb-podium-card lb-rank-other"
-        name_class = "lb-podium-name lb-rank1-name" if idx == 0 else "lb-podium-name"
-        with col:
-            st.markdown(
-                f'<div class="{card_class}">'
-                f'<div class="lb-podium-eyebrow">{rank_labels[idx]}</div>'
-                f'<div class="{name_class}">{row["Player_Name"]}</div>'
-                f'<div class="lb-podium-sub">{row["Team"]} &nbsp;|&nbsp; {row["Exp_Total_Votes"]:.1f} exp &nbsp;|&nbsp; {actual_str}</div>'
-                f'</div>',
-                unsafe_allow_html=True,
+    # ── Shared data: projection, odds, form, bar domain, helpers ──
+    _proj_floor, _proj_ceiling, has_fc = {}, {}, False
+    if is_2026:
+        _proj = load_season_projection()
+        if _proj is not None and 'Floor_Projection' in _proj.columns:
+            _proj_floor   = dict(zip(_proj['Player'], _proj['Floor_Projection']))
+            _proj_ceiling = dict(zip(_proj['Player'], _proj['Ceiling_Projection']))
+            has_fc = len(_proj_ceiling) > 0
+
+    _odds_best, _odds_impl, has_odds = {}, {}, False
+    if is_2026:
+        _odds = load_best_odds()
+        if _odds is not None and len(_odds) > 0:
+            _odds_best = dict(zip(_odds['player'], _odds['best_odds']))
+            _odds_impl = dict(zip(_odds['player'], _odds['implied_prob']))
+            has_odds = True
+
+    _fg = form_guide_dots(selected_season, n_rounds=3) if is_2026 else {}
+
+    if has_fc:
+        _ceil_vals = [float(v) for v in _proj_ceiling.values() if pd.notna(v)]
+        _max_ceil = max(_ceil_vals) if _ceil_vals else 1.0
+    else:
+        _max_ceil = float(predictions['Exp_Total_Votes'].max() or 1.0)
+    if _max_ceil <= 0:
+        _max_ceil = 1.0
+
+    _LB_ABBR = {
+        "Adelaide": "ADEL", "Brisbane Lions": "BRIS", "Carlton": "CARL",
+        "Collingwood": "COLL", "Essendon": "ESSE", "Fremantle": "FREO",
+        "Geelong": "GEEL", "Gold Coast": "GCFC", "Greater Western Sydney": "GWS",
+        "GWS": "GWS", "GWS Giants": "GWS", "Hawthorn": "HAWK", "Melbourne": "MELB",
+        "North Melbourne": "NMFC", "Port Adelaide": "PORT", "Richmond": "RICH",
+        "St Kilda": "STK", "Sydney": "SYD", "West Coast": "WCE",
+        "Western Bulldogs": "WBD",
+    }
+    def _lb_abbr(t):
+        return _LB_ABBR.get(str(t), str(t)[:4].upper())
+
+    def _form_html(s):
+        _m = {'🟢': 'lb-dot-on', '⚫': 'lb-dot-mid', '▫': 'lb-dot-off'}
+        _d = ''.join(f'<span class="lb-dot {_m.get(ch, "lb-dot-off")}"></span>' for ch in str(s))
+        return f'<span class="lb-form">{_d}</span>'
+
+    def _lb_bar(floor, ceiling, exp, mini=False, labels=False):
+        mc = _max_ceil if _max_ceil > 0 else 1.0
+        fl = 0.0 if pd.isna(floor) else float(floor)
+        ex = 0.0 if pd.isna(exp) else float(exp)
+        ce = ex if pd.isna(ceiling) else float(ceiling)
+        left  = max(0.0, min(100.0, fl / mc * 100))
+        right = max(0.0, min(100.0, ce / mc * 100))
+        width = max(0.6, right - left)
+        mark  = max(0.0, min(100.0, ex / mc * 100))
+        cls = 'lb-bar mini' if mini else 'lb-bar'
+        track = (f'<div class="lb-track"><div class="lb-fill" style="left:{left:.2f}%;width:{width:.2f}%"></div>'
+                 f'<div class="lb-marker" style="left:{mark:.2f}%"></div></div>')
+        if labels:
+            return (f'<div class="{cls}"><div class="lb-bar-wrap">'
+                    f'<span class="lb-bar-lo">{fl:.0f}</span>{track}'
+                    f'<span class="lb-bar-hi">{ce:.0f}</span></div></div>')
+        return f'<div class="{cls}">{track}</div>'
+
+    _LB_BAR_CSS_TMPL = """
+SCOPE .lb-bar{width:100%;}
+SCOPE .lb-track{position:relative;height:6px;background:var(--hairline-strong);border-radius:4px;}
+SCOPE .lb-bar.mini .lb-track{height:4px;}
+SCOPE .lb-fill{position:absolute;top:0;height:100%;background:var(--emerald-track);border-radius:4px;}
+SCOPE .lb-marker{position:absolute;top:-2px;width:2px;height:calc(100% + 4px);background:var(--emerald);border-radius:1px;}
+SCOPE .lb-bar-wrap{display:flex;align-items:center;gap:8px;}
+SCOPE .lb-bar-wrap .lb-track{flex:1;}
+SCOPE .lb-bar-lo,SCOPE .lb-bar-hi{font-size:10px;color:var(--muted);min-width:20px;font-family:'IBM Plex Mono',monospace;}
+SCOPE .lb-bar-lo{text-align:right;}
+"""
+    def _bar_css(scope):
+        return _LB_BAR_CSS_TMPL.replace('SCOPE', scope)
+
+    _LB_SPOT_CSS = ("""
+.lb-spotlight{font-family:'Archivo',sans-serif;margin:6px 0 26px 0;}
+.lb-spotlight .lb-hero{display:flex;align-items:flex-start;justify-content:space-between;gap:32px;flex-wrap:wrap;}
+.lb-spotlight .lb-hero-main{flex:1 1 280px;min-width:240px;}
+.lb-spotlight .lb-hero-overline{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.lb-spotlight .lb-hero-name{font-size:42px;font-weight:900;line-height:1.02;color:var(--emerald);letter-spacing:-.01em;}
+.lb-spotlight .lb-hero-meta{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-top:10px;}
+.lb-spotlight .lb-hero-proj{flex:0 0 300px;max-width:340px;}
+.lb-spotlight .lb-proj-label{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:6px;}
+.lb-spotlight .lb-proj-value{font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:600;color:var(--text);line-height:1;margin-bottom:14px;}
+.lb-spotlight .lb-hero-rule{height:1px;background:var(--line);margin:22px 0 18px 0;}
+.lb-spotlight .lb-chasers{display:grid;grid-template-columns:1fr 1fr;gap:30px;}
+.lb-spotlight .lb-chaser-top{display:flex;align-items:center;gap:9px;margin-bottom:5px;}
+.lb-spotlight .lb-badge{width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;background:rgba(159,176,191,.16);color:var(--steel);border:1px solid var(--hairline-strong);flex:none;}
+.lb-spotlight .lb-chaser-name{font-size:17px;font-weight:700;color:var(--text);}
+.lb-spotlight .lb-chaser-meta{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-bottom:9px;}
+""" + _bar_css('.lb-spotlight')).replace('\n', '')
+
+    # ── PART 1: leader spotlight ──
+    top3 = predictions.head(min(3, len(predictions)))
+    _r1 = top3.iloc[0]
+    _n1 = str(_r1['Player_Name']); _t1 = str(_r1['Team'])
+    _g1 = int(_r1['Games']) if pd.notna(_r1['Games']) else 0
+    _p1 = float(_r1['Avg_Poll_Prob']) * 100 if pd.notna(_r1['Avg_Poll_Prob']) else 0.0
+    _e1 = float(_r1['Exp_Total_Votes'])
+    _hero_bar = (_lb_bar(_proj_floor.get(_n1, 0), _proj_ceiling.get(_n1, _e1), _e1)
+                 if has_fc else _lb_bar(0, _e1, _e1))
+    _proj_lbl = "PROJECTED VOTES" if is_2026 else "EXPECTED VOTES"
+
+    _chasers = ''
+    for _i in (1, 2):
+        if _i < len(top3):
+            _rr = top3.iloc[_i]
+            _nm = str(_rr['Player_Name']); _tm = str(_rr['Team']); _ex = float(_rr['Exp_Total_Votes'])
+            _bar = (_lb_bar(_proj_floor.get(_nm, 0), _proj_ceiling.get(_nm, _ex), _ex, mini=True)
+                    if has_fc else _lb_bar(0, _ex, _ex, mini=True))
+            _chasers += (
+                f'<div class="lb-chaser">'
+                f'<div class="lb-chaser-top"><span class="lb-badge">{_i + 1}</span>'
+                f'<span class="lb-chaser-name">{_nm}</span></div>'
+                f'<div class="lb-chaser-meta">{_tm} · {_ex:.1f} exp</div>'
+                f'{_bar}</div>'
             )
 
+    st.markdown(
+        f'<div class="lb-spotlight"><style>{_LB_SPOT_CSS}</style>'
+        f'<div class="lb-hero">'
+        f'<div class="lb-hero-main">'
+        f'<div class="lb-hero-overline">★ #1 PREDICTED</div>'
+        f'<div class="lb-hero-name">{_n1}</div>'
+        f'<div class="lb-hero-meta">{_t1} · {_g1} games · {_p1:.0f}% poll rate</div>'
+        f'</div>'
+        f'<div class="lb-hero-proj">'
+        f'<div class="lb-proj-label">{_proj_lbl}</div>'
+        f'<div class="lb-proj-value">{_e1:.1f}</div>'
+        f'{_hero_bar}'
+        f'</div></div>'
+        f'<div class="lb-hero-rule"></div>'
+        f'<div class="lb-chasers">{_chasers}</div>'
+        f'</div>',
+        unsafe_allow_html=True,
+    )
+
     st.markdown('<div class="lb-section-label">Full Leaderboard</div>', unsafe_allow_html=True)
-    col1, col2 = st.columns([3, 1])
-    with col1:
+    _cc1, _cc2 = st.columns([5, 1])
+    with _cc1:
         st.markdown('<div class="lb-controls-marker"></div>', unsafe_allow_html=True)
-        search = st.text_input("Search player", "")
-    with col2: show_n = st.selectbox("Show", [20, 50, 100, 200], index=0)
+        search = st.text_input("SEARCH PLAYER", "")
+    with _cc2:
+        show_n = st.selectbox("SHOW", [20, 50, 100, 200], index=0)
 
     # ── Round-on-round movement (2026 only) ──────────────────
     _move_map = {}
@@ -2610,100 +2727,103 @@ if _page == 'Leaderboard':
 
     display = predictions.copy()
     if search:
-        display = display[display['Player_Name'].str.contains(search, case=False)]
+        display = display[display['Player_Name'].str.contains(search, case=False, na=False)]
     display = display.head(show_n).copy()
     display.insert(0, 'Rank', range(1, len(display) + 1))
-    display['Poll %'] = (display['Avg_Poll_Prob'] * 100).round(1)
-    display['Exp Votes'] = display['Exp_Total_Votes'].round(1)
-    display['3-vote games'] = display['Exp_3vote_games'].round(1)
+    _max_exp = float(display['Exp_Total_Votes'].max()) if len(display) else 1.0
+    if _max_exp <= 0:
+        _max_exp = 1.0
+
+    # ── PART 3: full leaderboard table ──
+    _LB_TBL_CSS = ("""
+.lb-table .lb-tbl-wrap{overflow-x:auto;}
+.lb-table .lb-tbl{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;}
+.lb-table .lb-tbl th{font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:9px 12px;border-bottom:1px solid var(--hairline-strong);text-align:right;white-space:nowrap;}
+.lb-table .lb-tbl th.lft{text-align:left;}
+.lb-table .lb-tbl td{font-size:13px;padding:8px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;color:var(--steel);}
+.lb-table .lb-tbl td.lft{text-align:left;}
+.lb-table .lb-tbl th.grp-start,.lb-table .lb-tbl td.grp-start{border-left:1px solid var(--hairline-strong);}
+.lb-table .lb-tbl tr.lb-leader{background:rgba(52,211,153,.04);}
+.lb-table .lb-rank{color:var(--text);font-weight:600;}
+.lb-table .lb-up{color:var(--emerald);font-size:10px;margin-left:4px;}
+.lb-table .lb-down{color:#f87171;font-size:10px;margin-left:4px;}
+.lb-table .lb-exp{font-weight:700;color:var(--text);}
+.lb-table .lb-pname{font-family:'Archivo',sans-serif;font-size:14px;font-weight:600;color:var(--text);}
+.lb-table .lb-ttag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-left:7px;}
+.lb-table .lb-form{display:inline-flex;gap:3px;align-items:center;}
+.lb-table .lb-dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
+.lb-table .lb-dot-on{background:var(--emerald);}
+.lb-table .lb-dot-mid{background:rgba(52,211,153,.45);}
+.lb-table .lb-dot-off{background:var(--muted);opacity:.4;}
+.lb-table .lb-tbl td.fc-cell{min-width:160px;}
+""" + _bar_css('.lb-table')).replace('\n', '')
 
     if is_2026:
-        _proj = load_season_projection()
-        if _proj is not None and 'Floor_Projection' in _proj.columns:
-            display = display.merge(
-                _proj[['Player', 'Floor_Projection', 'Ceiling_Projection']],
-                left_on='Player_Name', right_on='Player', how='left'
-            ).drop(columns=['Player'], errors='ignore')
-            display['Floor'] = display['Floor_Projection'].round(1)
-            display['Ceiling'] = display['Ceiling_Projection'].round(1)
-            has_floor_ceiling = True
-        else:
-            has_floor_ceiling = False
-
-        _odds = load_best_odds()
-        if _odds is not None and len(_odds) > 0:
-            display = display.merge(
-                _odds[['player', 'best_odds', 'implied_prob', 'best_bookie']],
-                left_on='Player_Name', right_on='player', how='left'
-            )
-            display['Best Odds'] = display['best_odds'].apply(lambda x: f"${x:.1f}" if pd.notna(x) else "—")
-            display['Mkt %'] = display['implied_prob'].apply(lambda x: f"{x:.0f}%" if pd.notna(x) else "—")
-            base = ['Rank', 'Player_Name', 'Team', 'Games', 'Exp Votes', 'Poll %', '3-vote games']
-            fc = ['Floor', 'Ceiling'] if has_floor_ceiling else []
-            cols_show = base[:5] + fc + base[5:] + ['Best Odds', 'Mkt %']
-        else:
-            base = ['Rank', 'Player_Name', 'Team', 'Games', 'Exp Votes', 'Poll %', '3-vote games']
-            fc = ['Floor', 'Ceiling'] if has_floor_ceiling else []
-            cols_show = base[:5] + fc + base[5:]
+        _heads = [('Rank', 'lft'), ('Player', 'lft'), ('GP', ''), ('Form', 'lft'), ('Exp Votes', '')]
+        if has_fc:
+            _heads.append(('Floor–Ceiling', 'lft'))
+        _heads += [('Poll %', ''), ('3V Games', '')]
+        if has_odds:
+            _heads += [('Best Odds', 'grp-start'), ('Mkt %', '')]
     else:
-        display['Actual'] = display['Actual_Votes'].astype(int)
-        display['Diff'] = (display['Exp Votes'] - display['Actual']).round(1)
-        cols_show = ['Rank', 'Player_Name', 'Team', 'Games', 'Actual', 'Exp Votes', 'Diff', 'Poll %', '3-vote games']
+        _heads = [('Rank', 'lft'), ('Player', 'lft'), ('GP', ''), ('Exp Votes', ''),
+                  ('Actual', ''), ('Diff', ''), ('Poll %', ''), ('3V Games', '')]
 
-    # ── Form guide (2026 only) ────────────────────────────────
-    if is_2026:
-        _fg = form_guide_dots(selected_season, n_rounds=3)
-        if _fg:
-            display['Form'] = display['Player_Name'].map(_fg).fillna('▫▫▫')
-            _fg_idx = cols_show.index('Games') + 1 if 'Games' in cols_show else 3
-            cols_show = cols_show[:_fg_idx] + ['Form'] + cols_show[_fg_idx:]
+    def _th(lbl, cls):
+        return f'<th class="{cls}">{lbl}</th>' if cls else f'<th>{lbl}</th>'
+    _ths = ''.join(_th(_l, _c) for _l, _c in _heads)
 
-    _lb_disp = display[cols_show].rename(columns={'Player_Name': 'Player'}).copy()
-    for col in _lb_disp.select_dtypes(include='float').columns:
-        _lb_disp[col] = _lb_disp[col].round(1)
-    # Build rank+arrow strings after all merges so dtype survives
-    # Render as HTML table — bypasses Arrow/Styler limitations for coloured rank+arrow
-    _hdr_style = ('background:var(--surface-2);color:var(--muted);font-family:\'IBM Plex Mono\',monospace;'
-                   'font-weight:700;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;'
-                   'padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap')
-    _hdrs = ''.join(f'<th style="{_hdr_style}">{c}</th>' for c in _lb_disp.columns)
-    _tbl_rows = []
-    for _idx, (_, _row) in enumerate(_lb_disp.iterrows()):
-        _bg   = 'var(--bg)' if _idx % 2 == 0 else 'rgba(16,26,36,.5)'
-        _tcol = _TEAM_COLOURS.get(str(_row.get('Team', '')), '#7e8c99')
-        _cells = []
-        for _ci, _col in enumerate(_lb_disp.columns):
-            _val = _row[_col]
-            _td  = f'padding:7px 10px;font-size:13px;white-space:nowrap;color:var(--text);border-bottom:1px solid var(--line);'
-            if _col == 'Exp Votes':
-                _td += 'font-family:\'IBM Plex Mono\',monospace;font-weight:600;'
-            if _col == 'Rank':
-                _r = int(_val) if not pd.isna(_val) else _idx + 1
-                _n = _move_map.get(str(_row.get('Player', '')), 0) if _move_map else 0
-                if not pd.isna(_n) and _n > 0:
-                    _badge = (f'<span style="font-size:10px;font-weight:500;opacity:0.75;'
-                              f'color:var(--emerald);margin-left:3px">▲{int(_n)}</span>')
-                    _cell_val = f'{_r}{_badge}'
-                elif not pd.isna(_n) and _n < 0:
-                    _badge = (f'<span style="font-size:10px;font-weight:500;opacity:0.75;'
-                              f'color:#f87171;margin-left:3px">▼{int(abs(_n))}</span>')
-                    _cell_val = f'{_r}{_badge}'
-                else:
-                    _cell_val = str(_r)
-            else:
-                _cell_val = '' if pd.isna(_val) else (f'{_val:.1f}' if isinstance(_val, float) else str(_val))
-            _cells.append(f'<td style="{_td}">{_cell_val}</td>')
-        _tbl_rows.append(f'<tr style="background:{_bg}">{"".join(_cells)}</tr>')
+    _rows = []
+    for _, _row in display.iterrows():
+        _name = str(_row['Player_Name']); _team = str(_row['Team'])
+        _rank = int(_row['Rank'])
+        _exp  = float(_row['Exp_Total_Votes'])
+        _poll = float(_row['Avg_Poll_Prob']) * 100 if pd.notna(_row['Avg_Poll_Prob']) else 0.0
+        _gp   = int(_row['Games']) if pd.notna(_row['Games']) else 0
+        _tvg  = float(_row['Exp_3vote_games']) if pd.notna(_row['Exp_3vote_games']) else 0.0
+        _mv = _move_map.get(_name, 0) if _move_map else 0
+        if _mv and _mv > 0:
+            _arrow = f'<span class="lb-up">▲{int(_mv)}</span>'
+        elif _mv and _mv < 0:
+            _arrow = f'<span class="lb-down">▼{int(abs(_mv))}</span>'
+        else:
+            _arrow = ''
+        _a = 0.22 * (_exp / _max_exp)
+        _cells = [
+            f'<td class="lft"><span class="lb-rank">{_rank}</span>{_arrow}</td>',
+            f'<td class="lft"><span class="lb-pname">{_name}</span><span class="lb-ttag">{_lb_abbr(_team)}</span></td>',
+            f'<td>{_gp}</td>',
+        ]
+        if is_2026:
+            _cells.append(f'<td class="lft">{_form_html(_fg.get(_name, "▫▫▫"))}</td>')
+        _cells.append(f'<td class="lb-exp" style="background:rgba(52,211,153,{_a:.3f})">{_exp:.1f}</td>')
+        if is_2026 and has_fc:
+            _fl = _proj_floor.get(_name, float("nan")); _ce = _proj_ceiling.get(_name, float("nan"))
+            _cells.append(f'<td class="lft fc-cell">{_lb_bar(_fl, _ce, _exp, labels=True)}</td>')
+        if not is_2026:
+            _act = int(_row['Actual_Votes']) if pd.notna(_row['Actual_Votes']) else 0
+            _cells.append(f'<td>{_act}</td>')
+            _cells.append(f'<td>{(_exp - _act):+.1f}</td>')
+        _cells.append(f'<td>{_poll:.1f}%</td>')
+        _cells.append(f'<td>{_tvg:.1f}</td>')
+        if is_2026 and has_odds:
+            _bo = _odds_best.get(_name); _mk = _odds_impl.get(_name)
+            _bo_s = f'${float(_bo):.1f}' if _bo is not None and pd.notna(_bo) else '—'
+            _mk_s = f'{float(_mk):.0f}%' if _mk is not None and pd.notna(_mk) else '—'
+            _cells.append(f'<td class="grp-start">{_bo_s}</td>')
+            _cells.append(f'<td>{_mk_s}</td>')
+        _tr_cls = ' class="lb-leader"' if _rank == 1 else ''
+        _rows.append(f'<tr{_tr_cls}>{"".join(_cells)}</tr>')
+
     st.markdown(
-        f'<div style="overflow-x:auto;border-radius:8px;border:1px solid var(--line)">'
-        f'<table style="border-collapse:collapse;width:100%">'
-        f'<thead><tr>{ _hdrs}</tr></thead>'
-        f'<tbody>{"".join(_tbl_rows)}</tbody>'
-        f'</table></div>',
+        f'<div class="lb-table"><style>{_LB_TBL_CSS}</style>'
+        f'<div class="lb-tbl-wrap"><table class="lb-tbl">'
+        f'<thead><tr>{_ths}</tr></thead><tbody>{"".join(_rows)}</tbody>'
+        f'</table></div></div>',
         unsafe_allow_html=True,
     )
     if is_2026 and _fg:
-        st.caption("Form: 🟢 predicted to poll (≥30% chance) · ⚫ not predicted · ▫ did not play — last 3 rounds")
+        st.caption("Form (last 3 rounds): emerald = predicted to poll (≥30%) · grey = quiet · faint = did not play")
 
     st.markdown(f'<div class="section-header">{"Projected — Top 20" if is_2026 else "Expected vs Actual — Top 20"}</div>', unsafe_allow_html=True)
     chart = predictions.head(20).copy()

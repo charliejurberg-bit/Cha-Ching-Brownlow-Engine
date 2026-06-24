@@ -22,6 +22,7 @@ def inject_global_theme():
   --line:       rgba(140,165,185,.14);
   --emerald:    #34d399;
   --emerald-dim:rgba(52,211,153,.12);
+  --emerald-track:rgba(52,211,153,.22);
   --gold:       #f0b429;
   --gold-dim:   rgba(240,180,41,.12);
   --text:       #e9eef3;
