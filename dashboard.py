@@ -2382,137 +2382,189 @@ if _page == 'Home':
     leader_name  = top5.iloc[0]["Player_Name"] if len(top5) else "—"
     leader_votes = top5.iloc[0]["Exp_Total_Votes"] if len(top5) else 0
 
-    leader_odds = "—"
-    if odds_df is not None and not odds_df.empty and "player" in odds_df.columns:
-        match = odds_df[odds_df["player"] == leader_name]
-        if not match.empty:
-            num_cols = odds_df.select_dtypes(include="number").columns.tolist()
-            if num_cols:
-                leader_odds = f"${float(match.iloc[0][num_cols[0]]):.2f}"
-
     rounds_remaining = 24 - CURRENT_ROUND
     season_pct = int((CURRENT_ROUND / 24) * 100)
 
     st.markdown(f"""
 <div style="padding:20px 0 12px;animation:fadeSlideUp 500ms cubic-bezier(0.23,1,0.32,1) both;">
-  <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
-    <div style="width:8px;height:8px;border-radius:50%;background:#34d399;
+  <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+    <div style="width:7px;height:7px;border-radius:50%;background:var(--emerald);
                 animation:pulse 2s ease-in-out infinite;"></div>
-    <span style="font-family:'Sora',sans-serif;font-size:11px;font-weight:500;
-                 letter-spacing:0.1em;text-transform:uppercase;color:#34d399;">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;
+                 letter-spacing:0.22em;text-transform:uppercase;color:var(--emerald);">
       Live · Round {CURRENT_ROUND}
     </span>
   </div>
-  <h1 style="font-family:'Sora',sans-serif;font-size:2.6rem;font-weight:700;
-             color:var(--text);letter-spacing:-0.03em;margin:0 0 8px;line-height:1.1;">
+  <h1 style="font-family:'Archivo',sans-serif;font-size:2.6rem;font-weight:900;
+             color:var(--text);letter-spacing:-0.02em;margin:0 0 8px;line-height:1.05;">
     Cha Ching
   </h1>
-  <p style="color:var(--muted);font-size:15px;margin:0;max-width:520px;line-height:1.6;">
+  <p style="font-family:'IBM Plex Mono',monospace;color:var(--muted);font-size:12px;
+            margin:0;max-width:560px;line-height:1.7;letter-spacing:0.02em;">
     Brownlow Medal predictor · 2026 season · XGBoost v4.0 &nbsp;·&nbsp;
-    <span style="color:var(--text);font-weight:500;">MAE 0.09</span> &nbsp;·&nbsp;
-    <span style="color:var(--text);font-weight:500;">86% top-10 accuracy</span>
+    <span style="color:var(--text);font-weight:600;">MAE 0.09</span> &nbsp;·&nbsp;
+    <span style="color:var(--text);font-weight:600;">86% top-10 accuracy</span>
   </p>
 </div>
 """, unsafe_allow_html=True)
 
     st.markdown(f"""
-<div style="margin-bottom:16px;animation:fadeSlideUp 500ms 80ms cubic-bezier(0.23,1,0.32,1) both;">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-    <span style="font-size:11px;font-weight:500;letter-spacing:0.08em;
-                 text-transform:uppercase;color:#4a5a6a;">Season progress</span>
-    <span style="font-size:12px;color:var(--muted);font-family:'DM Mono',monospace;">
+<div style="margin-bottom:18px;animation:fadeSlideUp 500ms 80ms cubic-bezier(0.23,1,0.32,1) both;">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;
+                 letter-spacing:0.18em;text-transform:uppercase;color:var(--muted);">Season progress</span>
+    <span style="font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);">
       R{CURRENT_ROUND} of 24 &nbsp;·&nbsp; {rounds_remaining} rounds to go
     </span>
   </div>
-  <div style="height:6px;background:var(--line);border-radius:3px;overflow:hidden;">
-    <div style="height:100%;width:{season_pct}%;background:#34d399;border-radius:3px;"></div>
+  <div style="height:6px;background:var(--hairline-strong);border-radius:3px;overflow:hidden;">
+    <div style="height:100%;width:{season_pct}%;background:var(--emerald);border-radius:3px;"></div>
   </div>
 </div>
 """, unsafe_allow_html=True)
 
-    st.markdown(f"""
-<div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:16px 0;">
-  <div style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px;">
-    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:8px;">Predicted winner</div>
-    <div style="font-size:20px; font-weight:600; color:var(--gold);">{leader_name}</div>
-    <div style="font-size:11px; color:var(--muted);">{leader_votes:.1f} pred. votes</div>
-  </div>
-  <div style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px;">
-    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:8px;">Best odds</div>
-    <div style="font-size:20px; font-weight:600; color:var(--emerald);">{leader_odds}</div>
-    <div style="font-size:11px; color:var(--muted);">{leader_name} to win</div>
-  </div>
-  <div style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px;">
-    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:8px;">Model accuracy</div>
-    <div style="font-size:20px; font-weight:600; color:var(--text);">86%</div>
-    <div style="font-size:11px; color:var(--muted);">top-10 · MAE 0.09</div>
-  </div>
-  <div style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px;">
-    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:8px;">Round</div>
-    <div style="font-size:20px; font-weight:600; color:var(--text);">{CURRENT_ROUND}<span style="font-size:13px; color:var(--muted); font-weight:400"> /24</span></div>
-    <div style="font-size:11px; color:var(--muted);">{rounds_remaining} rounds remaining</div>
-  </div>
-</div>
-""", unsafe_allow_html=True)
+    # ── Shared lookups (best odds, market rank, team) ──
+    _team_map = {}
+    if df is not None and not df.empty and "Team" in df.columns:
+        _team_map = dict(zip(df["Player_Name"], df["Team"]))
 
-    _home_left, _home_right = st.columns([3, 2])
+    _odds_best_map, _odds_bookie_map, _market_rank = {}, {}, {}
+    if (odds_df is not None and not odds_df.empty
+            and "player" in odds_df.columns and "best_odds" in odds_df.columns):
+        _od = (odds_df.dropna(subset=["best_odds"])
+                      .sort_values("best_odds", ascending=True)
+                      .reset_index(drop=True))
+        for _mr, _orow in _od.iterrows():
+            _pl = _orow["player"]
+            _odds_best_map[_pl] = float(_orow["best_odds"])
+            _bk = _orow.get("best_bookie")
+            _odds_bookie_map[_pl] = str(_bk) if pd.notna(_bk) else ""
+            _market_rank[_pl] = int(_mr) + 1
 
-    with _home_left:
-        if not top5.empty:
-            _top10_rows = []
-            _top10_max = top5["Exp_Total_Votes"].max()
-            for _rank, (_, _row) in enumerate(top5.iterrows()):
-                _pct = int(_row["Exp_Total_Votes"] / _top10_max * 100) if _top10_max > 0 else 0
-                _top10_rows.append(
-                    f'<div style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:6px;">'
-                    f'<div style="font-size:11px;color:var(--muted);width:16px;text-align:center;">{_rank+1}</div>'
-                    f'<div style="font-size:13px;font-weight:500;color:var(--text);flex:2;">{_row["Player_Name"]}</div>'
-                    f'<div style="flex:3;height:4px;background:var(--line);border-radius:100px;overflow:hidden;">'
-                    f'<div style="height:4px;background:var(--emerald);border-radius:100px;width:{_pct}%;"></div></div>'
-                    f'<div style="font-size:13px;font-weight:500;color:var(--emerald);width:36px;text-align:right;">{_row["Exp_Total_Votes"]:.1f}</div>'
-                    f'</div>'
-                )
-            st.markdown(
-                '<div style="margin-top:8px;">'
-                '<div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Top 10 predictions — 2026</div>'
-                + "".join(_top10_rows)
-                + '</div>',
-                unsafe_allow_html=True,
+    leader_team = str(_team_map.get(leader_name, "")) if leader_name != "—" else ""
+    leader_odds = f"${_odds_best_map[leader_name]:.2f}" if leader_name in _odds_best_map else "—"
+
+    # ── PART 1: hero winner + supporting metadata strip ──
+    _HOME_HERO_CSS = """
+.home-hero{font-family:'Archivo',sans-serif;margin:6px 0 0 0;animation:fadeSlideUp 500ms 140ms cubic-bezier(0.23,1,0.32,1) both;}
+.home-hero .hh-row{display:flex;align-items:flex-start;justify-content:space-between;gap:32px;flex-wrap:wrap;}
+.home-hero .hh-main{flex:1 1 320px;min-width:260px;}
+.home-hero .hh-overline{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.home-hero .hh-name{font-size:40px;font-weight:900;line-height:1.02;color:var(--gold);letter-spacing:-.01em;}
+.home-hero .hh-meta{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-top:12px;letter-spacing:.02em;}
+.home-hero .hh-meta b{color:var(--text);font-weight:600;}
+.home-hero .hh-strip{display:flex;align-items:stretch;flex:0 0 auto;}
+.home-hero .hh-stat{display:flex;flex-direction:column;justify-content:center;padding:2px 24px;border-left:1px solid var(--line);}
+.home-hero .hh-stat:first-child{border-left:none;padding-left:0;}
+.home-hero .hh-stat-val{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:var(--text);line-height:1;}
+.home-hero .hh-stat-lab{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:9px;}
+.home-hero .hh-rule{height:1px;background:var(--line);margin:26px 0 0 0;}
+"""
+    st.markdown(
+        f"<style>{_HOME_HERO_CSS}</style>"
+        '<div class="home-hero"><div class="hh-row">'
+        '<div class="hh-main">'
+        '<div class="hh-overline">★ Predicted Winner</div>'
+        f'<div class="hh-name">{leader_name}</div>'
+        f'<div class="hh-meta">{leader_team} · <b>{leader_votes:.1f}</b> projected votes · <b>{leader_odds}</b> to win</div>'
+        '</div>'
+        '<div class="hh-strip">'
+        '<div class="hh-stat"><div class="hh-stat-val">86%</div><div class="hh-stat-lab">Top-10 acc.</div></div>'
+        '<div class="hh-stat"><div class="hh-stat-val">0.09</div><div class="hh-stat-lab">MAE</div></div>'
+        f'<div class="hh-stat"><div class="hh-stat-val">{rounds_remaining}</div><div class="hh-stat-lab">Rounds left</div></div>'
+        '</div>'
+        '</div><div class="hh-rule"></div></div>',
+        unsafe_allow_html=True,
+    )
+
+    # ── PART 2: Model vs Market panel ──
+    _HOME_MM_CSS = """
+.home-mm{font-family:'Archivo',sans-serif;margin:22px 0 0 0;animation:fadeSlideUp 500ms 220ms cubic-bezier(0.23,1,0.32,1) both;}
+.home-mm .mm-title{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
+.home-mm .mm-grid{--mm-cols:34px 1fr 230px 116px 132px;}
+.home-mm .mm-head,.home-mm .mm-row{display:grid;grid-template-columns:var(--mm-cols);gap:16px;align-items:center;}
+.home-mm .mm-head{padding:0 4px 10px 4px;border-bottom:1px solid var(--hairline-strong);}
+.home-mm .mm-head span{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);}
+.home-mm .mm-head .r{text-align:right;}
+.home-mm .mm-row{min-height:52px;padding:0 4px;border-bottom:1px solid var(--line);}
+.home-mm .mm-rank{font-family:'IBM Plex Mono',monospace;font-size:13px;color:var(--muted);text-align:center;}
+.home-mm .mm-player{display:flex;flex-direction:column;gap:3px;min-width:0;}
+.home-mm .mm-name{font-family:'Archivo',sans-serif;font-weight:700;font-size:15px;color:var(--text);line-height:1.1;}
+.home-mm .mm-team{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);}
+.home-mm .mm-votes{display:flex;align-items:center;gap:10px;}
+.home-mm .mm-track{flex:1;height:6px;background:var(--hairline-strong);border-radius:4px;overflow:hidden;}
+.home-mm .mm-fill{height:100%;border-radius:4px;}
+.home-mm .mm-vval{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--text);min-width:32px;text-align:right;}
+.home-mm .mm-odds{display:flex;flex-direction:column;gap:3px;text-align:right;}
+.home-mm .mm-oval{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;color:var(--gold);}
+.home-mm .mm-obk{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);}
+.home-mm .mm-dash{font-family:'IBM Plex Mono',monospace;font-size:14px;color:var(--muted);text-align:right;}
+.home-mm .mm-chip{display:inline-flex;align-items:center;font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;padding:4px 10px;border-radius:99px;}
+.home-mm .mm-chip.up{background:var(--emerald-dim);color:var(--emerald);}
+.home-mm .mm-chip.flat{background:rgba(159,176,191,.12);color:var(--muted);}
+.home-mm .mm-foot{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-top:14px;line-height:1.7;letter-spacing:.02em;}
+"""
+    if not top5.empty:
+        _mm_max = top5["Exp_Total_Votes"].max()
+        _mm_rows = []
+        for _rank, (_, _row) in enumerate(top5.iterrows(), start=1):
+            _pname = _row["Player_Name"]
+            _proj = float(_row["Exp_Total_Votes"])
+            _pct = (_proj / _mm_max * 100) if _mm_max > 0 else 0
+            _fill = "var(--emerald)" if _rank <= 3 else "var(--emerald-pack)"
+            _team = str(_team_map.get(_pname, ""))
+            _team_html = f'<span class="mm-team">{_team}</span>' if _team else ""
+
+            # odds cell
+            if _pname in _odds_best_map:
+                _bk = _odds_bookie_map.get(_pname, "")
+                _bk_html = f'<span class="mm-obk">{_bk}</span>' if _bk else ""
+                _odds_html = (f'<div class="mm-odds"><span class="mm-oval">'
+                              f'${_odds_best_map[_pname]:.2f}</span>{_bk_html}</div>')
+            else:
+                _odds_html = '<div class="mm-dash">—</div>'
+
+            # edge chip: market_rank − model_rank
+            if _pname in _market_rank:
+                _edge = _market_rank[_pname] - _rank
+                if _edge >= 2:
+                    _chip = f'<span class="mm-chip up">▲ +{_edge} value</span>'
+                elif _edge <= -2:
+                    _chip = '<span class="mm-chip flat">▼ market</span>'
+                else:
+                    _chip = '<span class="mm-chip flat">in line</span>'
+            else:
+                _chip = ""  # no odds → skip edge chip
+
+            _mm_rows.append(
+                '<div class="mm-row">'
+                f'<div class="mm-rank">{_rank}</div>'
+                f'<div class="mm-player"><span class="mm-name">{_pname}</span>{_team_html}</div>'
+                '<div class="mm-votes"><div class="mm-track">'
+                f'<div class="mm-fill" style="width:{_pct:.1f}%;background:{_fill};"></div></div>'
+                f'<span class="mm-vval">{_proj:.1f}</span></div>'
+                f'{_odds_html}'
+                f'<div class="mm-edge">{_chip}</div>'
+                '</div>'
             )
-
-    with _home_right:
-        _odds_has_data = (
-            odds_df is not None
-            and not odds_df.empty
-            and "player" in odds_df.columns
-            and "best_odds" in odds_df.columns
+        st.markdown(
+            f"<style>{_HOME_MM_CSS}</style>"
+            '<div class="home-mm">'
+            '<div class="mm-title">Model vs Market — Top 10</div>'
+            '<div class="mm-grid">'
+            '<div class="mm-head">'
+            '<span style="text-align:center;">#</span><span>Player</span>'
+            '<span>Projected Votes</span><span class="r">Best Odds</span><span>Model Edge</span>'
+            '</div>'
+            + "".join(_mm_rows)
+            + '</div>'
+            '<div class="mm-foot">'
+            '▲ value — model rates higher than the market (potentially underpriced) &nbsp;·&nbsp; '
+            '▼ market — market rates shorter than the model &nbsp;·&nbsp; '
+            'in line — model and market agree'
+            '</div></div>',
+            unsafe_allow_html=True,
         )
-        if _odds_has_data:
-            _odds_top10 = odds_df.nsmallest(10, "best_odds")[["player", "best_odds", "best_bookie"]].copy()
-            _odds_rows = []
-            for _i, (_, _or) in enumerate(_odds_top10.iterrows()):
-                _bookie = str(_or.get("best_bookie", "")) if pd.notna(_or.get("best_bookie")) else ""
-                _odds_rows.append(
-                    f'<div style="display:flex;align-items:center;justify-content:space-between;'
-                    f'background:var(--surface);border:1px solid var(--line);border-radius:8px;'
-                    f'padding:10px 12px;margin-bottom:6px;">'
-                    f'<div style="display:flex;align-items:center;gap:10px;">'
-                    f'<div style="font-size:11px;color:var(--muted);width:16px;text-align:center;">{_i+1}</div>'
-                    f'<div>'
-                    f'<div style="font-size:13px;font-weight:500;color:var(--text);">{_or["player"]}</div>'
-                    f'<div style="font-size:10px;color:var(--muted);">{_bookie}</div>'
-                    f'</div>'
-                    f'</div>'
-                    f'<div style="font-size:14px;font-weight:600;color:var(--gold);">${float(_or["best_odds"]):.2f}</div>'
-                    f'</div>'
-                )
-            st.markdown(
-                '<div style="margin-top:8px;">'
-                '<div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Market odds — favourites</div>'
-                + "".join(_odds_rows)
-                + '</div>',
-                unsafe_allow_html=True,
-            )
 
     st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
 
