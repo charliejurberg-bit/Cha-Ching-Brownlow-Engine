@@ -1,6 +1,6 @@
 """Standalone Betfair Brownlow predictor scraper.
-Page uses HTML tables: player name in col 0, vote (1/2/3) in col 1.
-Plain requests is sufficient — no Playwright needed.
+Uses Playwright so the AG Grid leaderboard renders (plain requests can't see it).
+Leaderboard order used as tie-breaker when vote totals are equal.
 Saves to data_2026/betfair_predictions.csv (+ _prev backup).
 """
 
@@ -17,8 +17,15 @@ _UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
 )
+_STEALTH_JS = """
+    Object.defineProperty(navigator, 'webdriver',  {get: () => undefined});
+    Object.defineProperty(navigator, 'plugins',    {get: () => [1, 2, 3, 4, 5]});
+    Object.defineProperty(navigator, 'languages',  {get: () => ['en-AU', 'en']});
+    Object.defineProperty(navigator, 'platform',   {get: () => 'Win32'});
+    window.chrome = {runtime: {}};
+"""
 
-# Normalise unicode dashes/hyphens (en-dash, em-dash, etc.) → regular hyphen
+# Normalise unicode dashes/hyphens (en-dash, em-dash, minus-sign etc.) → ASCII hyphen
 _DASH_RE = re.compile(r'[‐-―−﹘﹣－­–—]')
 
 
@@ -31,19 +38,84 @@ def _save_with_backup(df, csv_path):
 
 
 def _clean_name(raw):
-    """Title-case, normalise dashes, require at least 2 words."""
+    """Title-case, normalise dashes/spaces-around-dashes, require at least 2 words."""
     name = _DASH_RE.sub('-', raw).title().strip()
+    name = re.sub(r'\s*-\s*', '-', name)  # "X - Y" → "X-Y"
     if len(name.split()) < 2:
         return None
     return name
 
 
-def _parse_html(html_text):
-    """Parse player-vote rows from Betfair's HTML table structure."""
-    soup = BeautifulSoup(html_text, 'html.parser')
-    votes = {}
-    three_vote_games = {}  # count of games where player got exactly 3 votes (tiebreaker)
+def _pw_get_html(url, wait_selector=None, extra_sleep_ms=6000, timeout_ms=30000):
+    from playwright.sync_api import sync_playwright, TimeoutError as _PWT
+    html = ''
+    with sync_playwright() as pw:
+        browser = pw.chromium.launch(
+            headless=True,
+            args=['--no-sandbox', '--disable-setuid-sandbox',
+                  '--disable-blink-features=AutomationControlled',
+                  '--disable-dev-shm-usage'],
+        )
+        ctx = browser.new_context(
+            viewport={'width': 1920, 'height': 1080},
+            locale='en-AU',
+            timezone_id='Australia/Melbourne',
+            user_agent=_UA,
+            extra_http_headers={
+                'Accept-Language': 'en-AU,en;q=0.9',
+                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+            },
+        )
+        ctx.add_init_script(_STEALTH_JS)
+        page = ctx.new_page()
+        try:
+            page.goto(url, wait_until='domcontentloaded', timeout=timeout_ms)
+            if wait_selector:
+                try:
+                    page.wait_for_selector(wait_selector, timeout=15000)
+                except _PWT:
+                    pass
+            page.wait_for_timeout(extra_sleep_ms)
+            html = page.content()
+        except Exception:
+            pass
+        finally:
+            browser.close()
+    return html
 
+
+def _parse_leaderboard_order(soup):
+    """Extract player rank order from the Betfair AG Grid widget.
+
+    The AG Grid renders up to ~31 visible rows in the DOM. That's enough for
+    tie-breaking purposes — lower-ranked players keep position 9999.
+    Returns dict {clean_name: position (1-based)}.
+    """
+    lb_order = {}
+    widget = soup.find(class_='brownlow-container')
+    if not widget:
+        return lb_order
+    player_rows = []
+    for row in widget.find_all('div', class_='ag-row'):
+        # Only rows in the left-pinned player-name pane have a col-id="0" cell
+        name_cell = row.find('div', attrs={'col-id': '0'})
+        if name_cell:
+            try:
+                idx = int(row.get('row-index', 9999))
+            except (ValueError, TypeError):
+                idx = 9999
+            name = _clean_name(name_cell.get_text(strip=True))
+            if name:
+                player_rows.append((idx, name))
+    player_rows.sort(key=lambda x: x[0])
+    for pos, (_, name) in enumerate(player_rows, start=1):
+        lb_order[name] = pos
+    return lb_order
+
+
+def _parse_votes(soup):
+    """Parse per-game vote rows from Betfair's ALL-CAPS HTML table structure."""
+    votes = {}
     for row in soup.find_all('tr'):
         cells = row.find_all('td')
         if len(cells) < 2:
@@ -60,46 +132,52 @@ def _parse_html(html_text):
         if not name:
             continue
         votes[name] = votes.get(name, 0) + vote
-        if vote == 3.0:
-            three_vote_games[name] = three_vote_games.get(name, 0) + 1
-
-    if not votes:
-        raise ValueError('No vote rows found in page tables')
-
-    df = pd.DataFrame([
-        {'Player': n, 'Total_Votes': v, '_3vg': three_vote_games.get(n, 0)}
-        for n, v in votes.items()
-    ])
-    # Primary: total votes desc. Tiebreaker: most 3-vote games desc (no leaderboard on Betfair).
-    df = df.sort_values(['Total_Votes', '_3vg'], ascending=[False, False])
-    df = df.drop(columns='_3vg').reset_index(drop=True)
-    df['Rank'] = df.index + 1
-    return df
+    return votes
 
 
 def fetch():
-    import requests
     try:
-        resp = requests.get(
+        print('[Betfair] Fetching page via Playwright...')
+        html = _pw_get_html(
             _BF_URL,
-            headers={
-                'User-Agent': _UA,
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language': 'en-AU,en;q=0.9',
-                'Referer': 'https://www.betfair.com.au/',
-            },
-            timeout=20,
+            wait_selector='.ag-row',
+            extra_sleep_ms=6000,
         )
-        resp.raise_for_status()
-        df = _parse_html(resp.text)
+        if not html:
+            raise ValueError('Playwright returned empty page')
+
+        soup = BeautifulSoup(html, 'html.parser')
+
+        lb_order = _parse_leaderboard_order(soup)
+        print(f'[Betfair] Leaderboard order: {len(lb_order)} players found')
+        if lb_order:
+            top5 = sorted(lb_order.items(), key=lambda x: x[1])[:5]
+            print(f'[Betfair] Top 5 from leaderboard: {top5}')
+
+        votes = _parse_votes(soup)
+        if not votes:
+            raise ValueError('No vote rows found in Betfair page')
+
+        df = pd.DataFrame([{'Player': n, 'Total_Votes': v} for n, v in votes.items()])
+        def _lb_pos(name):
+            # Try exact match first, then hyphen-free fallback
+            # (AG Grid may use space where tr/td uses hyphen, e.g. "Luke Davies Uniacke")
+            return lb_order.get(name, lb_order.get(name.replace('-', ' '), 9999))
+
+        df['_lb_pos'] = df['Player'].map(_lb_pos)
+        df = df.sort_values(['Total_Votes', '_lb_pos'], ascending=[False, True])
+        df = df.drop(columns='_lb_pos').reset_index(drop=True)
+        df['Rank'] = df.index + 1
+
         _save_with_backup(df, _BF_CSV)
-        print(f"[Betfair] OK ({len(df)} players)")
+        print(f'[Betfair] OK ({len(df)} players)')
         print(df.head(10).to_string(index=False))
         return True
+
     except Exception as e:
-        print(f"[Betfair] FAILED: {e}")
+        print(f'[Betfair] FAILED: {e}')
         if os.path.exists(_BF_CSV):
-            print("[Betfair] Existing cached CSV unchanged")
+            print('[Betfair] Using existing cached CSV (unchanged)')
         return False
 
 
