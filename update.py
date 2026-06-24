@@ -1,6 +1,6 @@
 """
 One-click update script
-Runs: R stats fetch -> R coaches votes -> odds scrape -> 2026 prediction -> done
+Runs: R stats fetch -> R coaches votes -> odds scrape -> Betfair predictions -> ESPN predictions -> 2026 prediction -> done
 """
 
 import subprocess
@@ -71,8 +71,10 @@ if __name__ == "__main__":
             print(f"\n! {r_script} not found — skipping")
 
     py_scripts = [
-        ("scraper_odds.py", "Scraping bookmaker odds"),
-        ("predict_2026.py", "Generating 2026 predictions"),
+        ("scraper_odds.py",   "Scraping bookmaker odds"),
+        ("scraper_betfair.py", "Scraping Betfair Brownlow predictions"),
+        ("scraper_espn.py",   "Scraping ESPN Brownlow predictions"),
+        ("predict_2026.py",   "Generating 2026 predictions"),
     ]
     for script, description in py_scripts:
         if os.path.exists(script):
