@@ -1,1 +1,8 @@
 tip_id,game_key,player,market_type,line,bookmaker,odds,stake,criteria_json,is_flagged,notes,created_at,result,profit_loss
+4b6f3844-0a24-4144-a6b6-b0cc53356d2f,Port Adelaide v Collingwood 2026-06-21,Logan Evans,Disposals O/U,18.0,Sportsbet,1.65,2.0,[],True,,2026-06-21T00:00:00,Win,1.3
+95e31f35-fa84-403c-8811-168d157d943d,Round 15 2026 Multi,Lawson Humphries 18+ AND Zach Guthrie 13+,Multi,,Sportsbet,1.63,2.0,[],True,,2026-06-21T00:00:00,Win,1.26
+44a9c3ca-1242-4896-adcd-ad76768da6fe,Australia v Turkey 2026-06-22,Australia,Goals O/U,0.5,Sportsbet,2.5,1.0,[],True,Australia 0.5 Goals,2026-06-22T00:00:00,Win,1.5
+56cdbf62-ae1d-46cf-993d-a08ec4d815e7,Australia v Turkey 2026-06-22,Arda Guler 1 SOT AND Turkey Most SOT,Multi,,Sportsbet,2.05,1.0,[],True,,2026-06-22T00:00:00,Win,1.05
+c82c6fba-6c65-4972-aea6-89d427fe3c6e,North Melbourne v West Coast 2026-06-22,Nick Larkey,Disposals O/U,10.0,Sportsbet,1.83,2.0,[],True,,2026-06-22T00:00:00,Win,1.66
+d0458184-ed3c-4d1d-8959-b24e0f323362,North Melbourne v West Coast 2026-06-22,Josh Lindsay 17+ AND E Hewett 12+,Multi,,Sportsbet,1.64,2.0,[],True,,2026-06-22T00:00:00,Loss,-2.0
+0af55447-2839-42a8-82c2-493fe2cddace,Geelong v Gold Coast 2026-06-21,Lawson Humphries,Disposals O/U,20.0,Sportsbet,1.95,1.5,[],True,,2026-06-21T00:00:00,Loss,-1.5

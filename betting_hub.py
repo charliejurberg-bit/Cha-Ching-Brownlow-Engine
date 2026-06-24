@@ -301,12 +301,7 @@ def _empty_tips_df() -> pd.DataFrame:
 
 
 def _load_tips() -> pd.DataFrame:
-    sb = _get_supabase()
-    if sb is None:
-        return _empty_tips_df()
-    try:
-        resp = sb.table("cha_ching_tips").select("*").execute()
-        df = pd.DataFrame(resp.data) if resp.data else pd.DataFrame(columns=TIPS_COLS)
+    def _coerce(df):
         for col in TIPS_COLS:
             if col not in df.columns:
                 df[col] = None
@@ -316,8 +311,24 @@ def _load_tips() -> pd.DataFrame:
             df[col] = df[col].fillna('').astype(str)
         df['is_flagged'] = df['is_flagged'].fillna(False).astype(bool)
         return df
-    except Exception:
-        return _empty_tips_df()
+
+    sb = _get_supabase()
+    if sb is not None:
+        try:
+            resp = sb.table("cha_ching_tips").select("*").execute()
+            df = pd.DataFrame(resp.data) if resp.data else pd.DataFrame(columns=TIPS_COLS)
+            return _coerce(df)
+        except Exception:
+            pass
+
+    # Supabase unavailable — fall back to local CSV
+    if os.path.exists(TIPS_CSV):
+        try:
+            df = pd.read_csv(TIPS_CSV)
+            return _coerce(df)
+        except Exception:
+            pass
+    return _empty_tips_df()
 
 
 def _save_tip(game_key: str, player: str, market_type: str,
