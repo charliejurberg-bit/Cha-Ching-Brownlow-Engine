@@ -1301,191 +1301,26 @@ def normalise_name(name):
     s = _NAME_SUFFIX_RE.sub('', s).strip()
     return s
 
-@st.cache_data(ttl=3600, show_spinner=False)
+@st.cache_data(ttl=120, show_spinner=False)
 def fetch_betfair_brownlow():
-    """Scrape Betfair Brownlow predictor. Tries plain requests first (fast); falls back to
-    Playwright if the page needs JS rendering. Returns (df, error_str).
-    Page has per-game tables: col 0 = player name, col 1 = vote value.
-    Saves to data_2026/betfair_predictions.csv. Returns BF_Votes / BF_Rank columns."""
-    _BF_URL = 'https://www.betfair.com.au/hub/sports/afl/brownlow-medal-predictor/'
-
+    """Load Betfair predictions from CSV (updated by scraper_betfair.py via Run Update)."""
     def _csv_to_internal(fb):
         return fb.rename(columns={'Total_Votes': 'BF_Votes', 'Rank': 'BF_Rank'}, errors='ignore')
-
-    def _parse_html(html_text):
-        from io import StringIO as _SIO
-        _raw = pd.read_html(_SIO(html_text))
-        if not _raw:
-            raise ValueError('No tables found on page')
-        _combined = pd.concat(_raw, ignore_index=True)
-        _combined.columns = ['Player', 'Votes']
-        _combined = _combined.dropna(subset=['Votes'])
-        _combined['Votes'] = pd.to_numeric(_combined['Votes'], errors='coerce')
-        _combined = _combined.dropna(subset=['Votes'])
-        _combined['Player'] = _combined['Player'].astype(str).str.title().str.strip()
-        # Rows without a space are match codes (e.g. 'Bl'), not player names
-        _combined = _combined[_combined['Player'].str.contains(' ', na=False)]
-        _agg = (
-            _combined.groupby('Player', as_index=False)['Votes'].sum()
-            .sort_values('Votes', ascending=False).reset_index(drop=True)
-        )
-        if _agg.empty:
-            raise ValueError('No vote rows after filtering')
-        _df = _agg.rename(columns={'Votes': 'Total_Votes'})
-        _df['Rank'] = _df.index + 1
-        return _df
-
-    # ── Attempt 1: plain requests (fast, works when page is server-rendered) ──
-    try:
-        import requests as _req
-        _resp = _req.get(
-            _BF_URL,
-            headers={
-                'User-Agent': _PW_UA,
-                'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
-                'Accept-Language': 'en-AU,en;q=0.9',
-                'Referer': 'https://www.betfair.com.au/',
-            },
-            timeout=20,
-        )
-        _resp.raise_for_status()
-        _df = _parse_html(_resp.text)
-        _save_with_backup(_df, _BF_CSV)
-        return _csv_to_internal(_df), None
-    except Exception:
-        pass
-
-    # ── Attempt 2: Playwright (handles JS-rendered content) ──────────────────
-    try:
-        _html = _pw_get_html(
-            _BF_URL,
-            wait_for=['table', 'article', 'main'],
-            extra_sleep_ms=4000,
-        )
-        if not _html:
-            raise ValueError('Playwright returned empty page')
-        _df = _parse_html(_html)
-        _save_with_backup(_df, _BF_CSV)
-        return _csv_to_internal(_df), None
-    except Exception as _exc:
-        _fb = _csv_to_internal(_load_csv_fallback(_BF_CSV, 'Rank'))
-        _msg = f"Scrape failed; using cached: {str(_exc)[:80]}"
-        return (_fb, _msg) if not _fb.empty else (pd.DataFrame(), str(_exc))
+    fb = _load_csv_fallback(_BF_CSV, 'Rank')
+    if fb.empty:
+        return pd.DataFrame(), "No data — click Run Update to refresh"
+    return _csv_to_internal(fb), None
 
 
-@st.cache_data(ttl=3600, show_spinner=False)
+@st.cache_data(ttl=120, show_spinner=False)
 def fetch_espn_brownlow():
-    """Scrape ESPN Brownlow per-game votes using Playwright (scroll to reveal lazy sections).
-    Saves to data_2026/espn_predictions.csv. Returns (df, error_str).
-    Internal DataFrame uses ESPN_Votes / ESPN_Rank columns.
-    """
-    _ESPN_URL = (
-        "https://www.espn.com.au/afl/story/_/page/POINTSBET20242/"
-        "afl-2026-brownlow-medal-predictor-tracker-leaderboard-odds-every-vote"
-    )
-    _ESPN_DEBUG = "espn_debug.html"
-
+    """Load ESPN predictions from CSV (updated by scraper_espn.py via Run Update)."""
     def _csv_to_internal(fb):
         return fb.rename(columns={'Total_Votes': 'ESPN_Votes', 'Rank': 'ESPN_Rank'}, errors='ignore')
-
-    try:
-        from bs4 import BeautifulSoup as _BS
-
-        # scroll=True reveals the lazy-loaded per-game vote sections
-        _html = _pw_get_html(
-            _ESPN_URL,
-            wait_for=['article', 'main', 'body'],
-            scroll=True,
-            extra_sleep_ms=6000,
-        )
-        if not _html:
-            raise ValueError('Playwright returned empty page')
-
-        # Save raw HTML on first run for structure inspection
-        if not os.path.exists(_ESPN_DEBUG):
-            with open(_ESPN_DEBUG, 'w', encoding='utf-8') as _f:
-                _f.write(_html)
-            print(f"[ESPN] Saved raw HTML to {_ESPN_DEBUG}")
-
-        _soup = _BS(_html, "html.parser")
-        _text = _soup.get_text(" ", strip=True)
-        _votes: dict = {}  # player_name → cumulative votes across all games
-
-        # Strategy A: "N - Player (TEAM)[, Player (TEAM), ...]"
-        # Each vote block can list multiple players at the same vote level (comma-separated).
-        _vote_block_re = re.compile(
-            r"(\d+\.?\d*)\s*[-–—]\s*"
-            r"((?:[A-Z][A-Za-z'\-]+(?:\s+[A-Z][A-Za-z'\-]+)+\s*\([A-Z]{1,4}\)(?:\s*,\s*)?)+)"
-        )
-        _player_re = re.compile(
-            r"([A-Z][A-Za-z'\-]+(?:\s+[A-Z][A-Za-z'\-]+)+)\s*\([A-Z]{1,4}\)"
-        )
-        for _m in _vote_block_re.finditer(_text):
-            try:
-                _val = float(_m.group(1))
-            except ValueError:
-                continue
-            if not (0 < _val <= 3):
-                continue
-            for _pm in _player_re.finditer(_m.group(2)):
-                _name = _pm.group(1).title().strip()
-                _votes[_name] = _votes.get(_name, 0) + _val
-
-        # Strategy B: pd.read_html table scan — detect per-round vote columns
-        # (numeric, all non-null values in [0, 3]; pre-totalled Votes column exceeds 3)
-        if not _votes:
-            from io import StringIO as _SIO
-            try:
-                _raw_tables = pd.read_html(_SIO(_html))
-            except Exception:
-                _raw_tables = []
-            for _tdf in _raw_tables:
-                _tdf.columns = [str(c).strip().upper() for c in _tdf.columns]
-                if 'PLAYER' not in _tdf.columns:
-                    continue
-                _vote_cols = []
-                for _c in _tdf.columns:
-                    if _c in ('PLAYER', 'TEAM', 'VOTES'):
-                        continue
-                    _num = pd.to_numeric(_tdf[_c], errors='coerce')
-                    _valid = _num.dropna()
-                    if len(_valid) > 0 and float(_valid.max()) <= 3.0 and float(_valid.min()) >= 0.0:
-                        _vote_cols.append(_c)
-                if not _vote_cols:
-                    continue
-                _tdf_v = _tdf[['PLAYER'] + _vote_cols].copy()
-                for _c in _vote_cols:
-                    _tdf_v[_c] = pd.to_numeric(_tdf_v[_c], errors='coerce').fillna(0)
-                _tdf_v['_total'] = _tdf_v[_vote_cols].sum(axis=1)
-                for _, _row in _tdf_v.iterrows():
-                    _player = str(_row['PLAYER']).title().strip()
-                    if not _player or _player in ('Nan', '') or _row['_total'] <= 0:
-                        continue
-                    _votes[_player] = _votes.get(_player, 0) + float(_row['_total'])
-
-        if not _votes:
-            _fb = _csv_to_internal(_load_csv_fallback(_ESPN_CSV, 'Rank'))
-            return (_fb, "No vote data found on ESPN page; using cached CSV") if not _fb.empty \
-                else (pd.DataFrame(), "No vote data found on ESPN page")
-
-        _df = (
-            pd.DataFrame([{"Player": _n, "Total_Votes": _v} for _n, _v in _votes.items()])
-            .sort_values("Total_Votes", ascending=False)
-            .reset_index(drop=True)
-        )
-        _df["Rank"] = _df.index + 1
-        _save_with_backup(_df, _ESPN_CSV)
-
-        print("\n[ESPN] Top 20:")
-        for _, _r in _df.head(20).iterrows():
-            print(f"  {int(_r['Rank']):<3} {_r['Player']:<30} {_r['Total_Votes']:.1f}")
-
-        return _csv_to_internal(_df), None
-
-    except Exception as _exc:
-        _fb = _csv_to_internal(_load_csv_fallback(_ESPN_CSV, 'Rank'))
-        _msg = f"Scrape failed; using cached: {str(_exc)[:80]}"
-        return (_fb, _msg) if not _fb.empty else (pd.DataFrame(), str(_exc))
+    fb = _load_csv_fallback(_ESPN_CSV, 'Rank')
+    if fb.empty:
+        return pd.DataFrame(), "No data — click Run Update to refresh"
+    return _csv_to_internal(fb), None
 
 
 _TABLE_STYLES = [
