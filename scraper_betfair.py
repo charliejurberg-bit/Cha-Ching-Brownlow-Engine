@@ -42,6 +42,8 @@ def _parse_html(html_text):
     """Parse player-vote rows from Betfair's HTML table structure."""
     soup = BeautifulSoup(html_text, 'html.parser')
     votes = {}
+    three_vote_games = {}  # count of games where player got exactly 3 votes (tiebreaker)
+
     for row in soup.find_all('tr'):
         cells = row.find_all('td')
         if len(cells) < 2:
@@ -58,15 +60,19 @@ def _parse_html(html_text):
         if not name:
             continue
         votes[name] = votes.get(name, 0) + vote
+        if vote == 3.0:
+            three_vote_games[name] = three_vote_games.get(name, 0) + 1
 
     if not votes:
         raise ValueError('No vote rows found in page tables')
 
-    df = (
-        pd.DataFrame([{'Player': n, 'Total_Votes': v} for n, v in votes.items()])
-        .sort_values('Total_Votes', ascending=False)
-        .reset_index(drop=True)
-    )
+    df = pd.DataFrame([
+        {'Player': n, 'Total_Votes': v, '_3vg': three_vote_games.get(n, 0)}
+        for n, v in votes.items()
+    ])
+    # Primary: total votes desc. Tiebreaker: most 3-vote games desc (no leaderboard on Betfair).
+    df = df.sort_values(['Total_Votes', '_3vg'], ascending=[False, False])
+    df = df.drop(columns='_3vg').reset_index(drop=True)
     df['Rank'] = df.index + 1
     return df
 
