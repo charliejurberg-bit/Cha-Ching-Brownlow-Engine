@@ -87,8 +87,22 @@ def _parse_votes(html_text):
     text = soup.get_text(" ", strip=True)
     votes = {}
 
-    # Strategy A: "N - Player (TEAM)[, Player (TEAM), ...]"
-    # Each vote block can list multiple players at the same vote level (comma-separated).
+    # Step 1: read ESPN's official leaderboard table for tie-break ordering.
+    # The table only covers the top ~17 players but its row order is authoritative.
+    lb_order: dict[str, int] = {}
+    lb_h2 = soup.find('h2', string=lambda s: s and 'LEADERBOARD' in s.upper())
+    if lb_h2:
+        lb_table = lb_h2.find_next('table')
+        if lb_table:
+            tbody = lb_table.find('tbody')
+            if tbody:
+                for pos, row in enumerate(tbody.find_all('tr'), start=1):
+                    cells = row.find_all('td')
+                    if len(cells) >= 2:
+                        player_name = cells[1].get_text(strip=True).title().strip()
+                        lb_order[player_name] = pos
+
+    # Step 2: accumulate votes from per-game text — "N - Player (TEAM)[, Player (TEAM), ...]"
     vote_block_re = re.compile(
         r"(\d+\.?\d*)\s*[-–—]\s*"
         r"((?:[A-Z][A-Za-z'\-]+(?:\s+[A-Z][A-Za-z'\-]+)+\s*\([A-Z]{1,4}\)(?:\s*,\s*)?)+)"
@@ -137,7 +151,7 @@ def _parse_votes(html_text):
                     continue
                 votes[player] = votes.get(player, 0) + float(row['_total'])
 
-    return votes
+    return votes, lb_order
 
 
 def fetch():
@@ -150,15 +164,16 @@ def fetch():
         if not html:
             raise ValueError('Playwright returned empty page')
 
-        votes = _parse_votes(html)
+        votes, lb_order = _parse_votes(html)
         if not votes:
             raise ValueError('No vote data found on ESPN page')
 
-        df = (
-            pd.DataFrame([{'Player': n, 'Total_Votes': v} for n, v in votes.items()])
-            .sort_values('Total_Votes', ascending=False)
-            .reset_index(drop=True)
-        )
+        df = pd.DataFrame([{'Player': n, 'Total_Votes': v} for n, v in votes.items()])
+        # Sort: total votes descending, then by ESPN leaderboard position for ties
+        # (players not in leaderboard table get position 9999)
+        df['_lb_pos'] = df['Player'].map(lambda n: lb_order.get(n, 9999))
+        df = df.sort_values(['Total_Votes', '_lb_pos'], ascending=[False, True])
+        df = df.drop(columns='_lb_pos').reset_index(drop=True)
         df['Rank'] = df.index + 1
         _save_with_backup(df, _ESPN_CSV)
 
