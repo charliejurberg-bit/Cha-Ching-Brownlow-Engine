@@ -4783,19 +4783,22 @@ if _page == 'Live Tracker':
             })
 
             def _lt_row_style(row):
+                # Literal hex only — st.dataframe's canvas grid does not resolve CSS vars
                 base = "background-color:{bg};color:{fg};font-weight:{fw};"
                 if row["#"] == 1:
-                    return [base.format(bg="#34d399", fg="var(--bg)", fw="700")] * len(row)
+                    return [base.format(bg="#34d399", fg="#0a1017", fw="700")] * len(row)
                 elif row["#"] <= 3:
                     return [base.format(bg="rgba(52,211,153,0.15)", fg="#34d399", fw="600")] * len(row)
-                return [""] * len(row)
+                # Midnight Turf alternating rows for the rest (--surface / --bg-subtle)
+                _bg = "#101a24" if row.name % 2 == 0 else "#1a2d3d"
+                return [base.format(bg=_bg, fg="#e9eef3", fw="400")] * len(row)
 
             st.dataframe(
                 _lt_disp.style
                     .apply(_lt_row_style, axis=1)
-                    .set_table_styles(_TABLE_STYLES)
-                    .hide(axis="index"),
+                    .set_table_styles(_TABLE_STYLES),
                 use_container_width=True,
+                hide_index=True,
                 height=min(600, 36 * len(_lt_disp) + 40),
                 key="lt_leaderboard_df",
             )
@@ -4874,23 +4877,27 @@ if _page == 'Live Tracker':
             })
 
             def _lt_cmp_style(row):
+                # Literal hex only — st.dataframe's canvas grid does not resolve CSS vars
+                _bg = "#101a24" if row.name % 2 == 0 else "#1a2d3d"
+                _cell = f"background-color:{_bg};color:#e9eef3;"
                 try:
                     raw = _lt_cmp.loc[_lt_cmp["Player"] == row["Player"], "Delta"].values
                     d = float(raw[0]) if len(raw) else 0
                 except Exception:
                     d = 0
+                styles = [_cell] * 5
                 if d > 2:
-                    return ["", "", "", "", "color:#34d399;font-weight:700"] * 1
+                    styles[4] = f"background-color:{_bg};color:#34d399;font-weight:700;"
                 elif d < -2:
-                    return ["", "", "", "", "color:#8b1a1a;font-weight:700"] * 1
-                return [""] * 5
+                    styles[4] = f"background-color:{_bg};color:#e05252;font-weight:700;"
+                return styles
 
             st.dataframe(
                 _lt_cmp_disp.style
                     .apply(_lt_cmp_style, axis=1)
-                    .set_table_styles(_TABLE_STYLES)
-                    .hide(axis="index"),
+                    .set_table_styles(_TABLE_STYLES),
                 use_container_width=True,
+                hide_index=True,
                 key="lt_cmp_df",
             )
             st.caption(
