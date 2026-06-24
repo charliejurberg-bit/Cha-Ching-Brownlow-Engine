@@ -2428,25 +2428,25 @@ if _page == 'Home':
 
     st.markdown(f"""
 <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:10px; margin:16px 0;">
-  <div style="background:#0f2035; border:0.5px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px;">
-    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:8px;">Predicted winner</div>
-    <div style="font-size:20px; font-weight:600; color:#f5c542;">{leader_name}</div>
-    <div style="font-size:11px; color:rgba(255,255,255,0.3);">{leader_votes:.1f} pred. votes</div>
+  <div style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px;">
+    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:8px;">Predicted winner</div>
+    <div style="font-size:20px; font-weight:600; color:var(--gold);">{leader_name}</div>
+    <div style="font-size:11px; color:var(--muted);">{leader_votes:.1f} pred. votes</div>
   </div>
-  <div style="background:#0f2035; border:0.5px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px;">
-    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:8px;">Best odds</div>
-    <div style="font-size:20px; font-weight:600; color:#3ecfa0;">{leader_odds}</div>
-    <div style="font-size:11px; color:rgba(255,255,255,0.3);">{leader_name} to win</div>
+  <div style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px;">
+    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:8px;">Best odds</div>
+    <div style="font-size:20px; font-weight:600; color:var(--emerald);">{leader_odds}</div>
+    <div style="font-size:11px; color:var(--muted);">{leader_name} to win</div>
   </div>
-  <div style="background:#0f2035; border:0.5px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px;">
-    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:8px;">Model accuracy</div>
-    <div style="font-size:20px; font-weight:600; color:#ffffff;">86%</div>
-    <div style="font-size:11px; color:rgba(255,255,255,0.3);">top-10 · MAE 0.09</div>
+  <div style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px;">
+    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:8px;">Model accuracy</div>
+    <div style="font-size:20px; font-weight:600; color:var(--text);">86%</div>
+    <div style="font-size:11px; color:var(--muted);">top-10 · MAE 0.09</div>
   </div>
-  <div style="background:#0f2035; border:0.5px solid rgba(255,255,255,0.07); border-radius:10px; padding:14px;">
-    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:rgba(255,255,255,0.3); margin-bottom:8px;">Round</div>
-    <div style="font-size:20px; font-weight:600; color:#ffffff;">{CURRENT_ROUND}<span style="font-size:13px; color:rgba(255,255,255,0.3); font-weight:400"> /24</span></div>
-    <div style="font-size:11px; color:rgba(255,255,255,0.3);">{rounds_remaining} rounds remaining</div>
+  <div style="background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:14px;">
+    <div style="font-size:9px; letter-spacing:1.5px; text-transform:uppercase; color:var(--muted); margin-bottom:8px;">Round</div>
+    <div style="font-size:20px; font-weight:600; color:var(--text);">{CURRENT_ROUND}<span style="font-size:13px; color:var(--muted); font-weight:400"> /24</span></div>
+    <div style="font-size:11px; color:var(--muted);">{rounds_remaining} rounds remaining</div>
   </div>
 </div>
 """, unsafe_allow_html=True)
@@ -2460,17 +2460,17 @@ if _page == 'Home':
             for _rank, (_, _row) in enumerate(top5.iterrows()):
                 _pct = int(_row["Exp_Total_Votes"] / _top10_max * 100) if _top10_max > 0 else 0
                 _top10_rows.append(
-                    f'<div style="display:flex;align-items:center;gap:10px;background:#0f2035;border:0.5px solid rgba(255,255,255,0.06);border-radius:8px;padding:10px 12px;margin-bottom:6px;">'
-                    f'<div style="font-size:11px;color:rgba(255,255,255,0.25);width:16px;text-align:center;">{_rank+1}</div>'
-                    f'<div style="font-size:13px;font-weight:500;color:#fff;flex:2;">{_row["Player_Name"]}</div>'
-                    f'<div style="flex:3;height:4px;background:rgba(255,255,255,0.07);border-radius:100px;overflow:hidden;">'
-                    f'<div style="height:4px;background:#34d399;border-radius:100px;width:{_pct}%;"></div></div>'
-                    f'<div style="font-size:13px;font-weight:500;color:#3ecfa0;width:36px;text-align:right;">{_row["Exp_Total_Votes"]:.1f}</div>'
+                    f'<div style="display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:6px;">'
+                    f'<div style="font-size:11px;color:var(--muted);width:16px;text-align:center;">{_rank+1}</div>'
+                    f'<div style="font-size:13px;font-weight:500;color:var(--text);flex:2;">{_row["Player_Name"]}</div>'
+                    f'<div style="flex:3;height:4px;background:var(--line);border-radius:100px;overflow:hidden;">'
+                    f'<div style="height:4px;background:var(--emerald);border-radius:100px;width:{_pct}%;"></div></div>'
+                    f'<div style="font-size:13px;font-weight:500;color:var(--emerald);width:36px;text-align:right;">{_row["Exp_Total_Votes"]:.1f}</div>'
                     f'</div>'
                 )
             st.markdown(
                 '<div style="margin-top:8px;">'
-                '<div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:10px;">Top 10 predictions — 2026</div>'
+                '<div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Top 10 predictions — 2026</div>'
                 + "".join(_top10_rows)
                 + '</div>',
                 unsafe_allow_html=True,
@@ -2490,21 +2490,21 @@ if _page == 'Home':
                 _bookie = str(_or.get("best_bookie", "")) if pd.notna(_or.get("best_bookie")) else ""
                 _odds_rows.append(
                     f'<div style="display:flex;align-items:center;justify-content:space-between;'
-                    f'background:#0f2035;border:0.5px solid rgba(255,255,255,0.06);border-radius:8px;'
+                    f'background:var(--surface);border:1px solid var(--line);border-radius:8px;'
                     f'padding:10px 12px;margin-bottom:6px;">'
                     f'<div style="display:flex;align-items:center;gap:10px;">'
-                    f'<div style="font-size:11px;color:rgba(255,255,255,0.25);width:16px;text-align:center;">{_i+1}</div>'
+                    f'<div style="font-size:11px;color:var(--muted);width:16px;text-align:center;">{_i+1}</div>'
                     f'<div>'
-                    f'<div style="font-size:13px;font-weight:500;color:#fff;">{_or["player"]}</div>'
-                    f'<div style="font-size:10px;color:rgba(255,255,255,0.3);">{_bookie}</div>'
+                    f'<div style="font-size:13px;font-weight:500;color:var(--text);">{_or["player"]}</div>'
+                    f'<div style="font-size:10px;color:var(--muted);">{_bookie}</div>'
                     f'</div>'
                     f'</div>'
-                    f'<div style="font-size:14px;font-weight:600;color:#f5c542;">${float(_or["best_odds"]):.2f}</div>'
+                    f'<div style="font-size:14px;font-weight:600;color:var(--gold);">${float(_or["best_odds"]):.2f}</div>'
                     f'</div>'
                 )
             st.markdown(
                 '<div style="margin-top:8px;">'
-                '<div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.25);margin-bottom:10px;">Market odds — favourites</div>'
+                '<div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;">Market odds — favourites</div>'
                 + "".join(_odds_rows)
                 + '</div>',
                 unsafe_allow_html=True,
