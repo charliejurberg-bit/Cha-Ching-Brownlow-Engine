@@ -1898,14 +1898,6 @@ div[data-testid="stHorizontalBlock"]:has(.lb-controls-marker) label {
     color: var(--muted) !important;
 }
 
-/* ── Run Update button (scoped) ── */
-.st-key-run_update_btn button p,
-.st-key-run_update_btn button span {
-    color: #062b1d !important;
-    font-family: 'Archivo', sans-serif !important;
-    font-weight: 700 !important;
-}
-
 /* Destination buttons */
 .st-key-land_bw button,
 .st-key-land_bh button {
@@ -2001,7 +1993,7 @@ if _page != 'Landing':
     _render_hub_tabs()
     _render_page_nav()
 
-# ── Controls row (season + odds timestamp + run update) ──────
+# ── Controls row (season + odds timestamp) ──────────────────
 # Only show controls for Brownlow pages, not Betting Hub or Landing
 _show_controls = _page not in _BH_PAGES and _page != 'Landing'
 
@@ -2013,7 +2005,7 @@ _SEASON_PAGES = {
 }
 
 if _show_controls:
-    _cc1, _cc2, _cc3, _cc4 = st.columns([2.5, 1.5, 0.7, 0.9])
+    _cc1, _cc2, _cc3 = st.columns([2.5, 1.5, 0.7])
     with _cc2:
         _odds_ctrl = load_best_odds()
         if _odds_ctrl is not None and 'scraped_at' in _odds_ctrl.columns:
@@ -2030,29 +2022,6 @@ if _show_controls:
                 on_change=_season_changed,
                 label_visibility="collapsed",
             )
-    with _cc4:
-        if st.button("Run Update", type="primary", use_container_width=True, key="run_update_btn"):
-            _skel = st.empty()
-            _skel.markdown(
-                '<div class="sk-card">'
-                '<div class="sk-title"></div>'
-                '<div class="sk-line wide"></div>'
-                '<div class="sk-line med"></div>'
-                '<div class="sk-line short"></div>'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-            _upd = subprocess.run([sys.executable, "update.py"],
-                                  capture_output=True, text=True, timeout=300)
-            _skel.empty()
-            st.cache_data.clear()
-            if _upd.returncode == 0:
-                st.toast("Update complete!")
-            else:
-                st.toast("Finished with warnings.")
-            if _upd.stdout:
-                with st.expander("Output log"):
-                    st.code(_upd.stdout[-2000:])
 
 # ════════════════════════════════════════════════════════════
 # LANDING PAGE
