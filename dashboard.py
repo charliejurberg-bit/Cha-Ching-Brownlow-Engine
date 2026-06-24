@@ -2623,6 +2623,28 @@ if _page == 'Leaderboard':
                     f'<span class="lb-bar-hi">{ce:.0f}</span></div></div>')
         return f'<div class="{cls}">{track}</div>'
 
+    def _lb_fc_bar(floor, ceiling, exp, max_ceil):
+        """Floor–Ceiling cell bar on a SHARED domain [0, max_ceil].
+        Dark track + emerald segment + emerald dot marker; floor/ceiling
+        labels sit under the segment ends, not the cell edges."""
+        mc = float(max_ceil) if max_ceil and max_ceil > 0 else 1.0
+        fl = 0.0 if pd.isna(floor) else float(floor)
+        ex = 0.0 if pd.isna(exp) else float(exp)
+        ce = ex if pd.isna(ceiling) else float(ceiling)
+        left  = max(0.0, min(100.0, fl / mc * 100))
+        right = max(0.0, min(100.0, ce / mc * 100))
+        width = max(0.0, right - left)
+        mark  = max(0.0, min(100.0, ex / mc * 100))
+        return (
+            f'<div class="lb-fc"><div class="lb-fc-track">'
+            f'<div class="lb-fc-seg" style="left:{left:.2f}%;width:{width:.2f}%"></div>'
+            f'<div class="lb-fc-dot" style="left:{mark:.2f}%"></div></div>'
+            f'<div class="lb-fc-labels">'
+            f'<span class="lb-fc-lo" style="left:{left:.2f}%">{fl:.0f}</span>'
+            f'<span class="lb-fc-hi" style="left:{right:.2f}%">{ce:.0f}</span>'
+            f'</div></div>'
+        )
+
     _LB_BAR_CSS_TMPL = """
 SCOPE .lb-bar{width:100%;}
 SCOPE .lb-track{position:relative;height:6px;background:var(--hairline-strong);border-radius:4px;}
@@ -2734,6 +2756,15 @@ SCOPE .lb-bar-lo{text-align:right;}
     if _max_exp <= 0:
         _max_exp = 1.0
 
+    # Shared Floor–Ceiling bar domain = max ceiling across the rows CURRENTLY
+    # displayed (after search + Show N), recomputed each render so bars rescale.
+    if is_2026 and has_fc:
+        _disp_ceils = [_proj_ceiling.get(p) for p in display['Player_Name']]
+        _disp_ceils = [float(c) for c in _disp_ceils if c is not None and pd.notna(c)]
+        _tbl_maxceil = max(_disp_ceils) if _disp_ceils else 1.0
+    else:
+        _tbl_maxceil = 1.0
+
     # ── PART 3: full leaderboard table ──
     _LB_TBL_CSS = ("""
 .lb-table .lb-tbl-wrap{overflow-x:auto;}
@@ -2756,7 +2787,13 @@ SCOPE .lb-bar-lo{text-align:right;}
 .lb-table .lb-dot-mid{background:rgba(52,211,153,.45);}
 .lb-table .lb-dot-off{background:var(--muted);opacity:.4;}
 .lb-table .lb-tbl td.fc-cell{min-width:160px;}
-""" + _bar_css('.lb-table')).replace('\n', '')
+.lb-table .lb-fc{width:100%;}
+.lb-table .lb-fc-track{position:relative;height:6px;background:var(--surface-2);border:1px solid var(--hairline-strong);border-radius:999px;box-sizing:border-box;}
+.lb-table .lb-fc-seg{position:absolute;top:0;height:100%;background:var(--emerald-track);border-radius:999px;}
+.lb-table .lb-fc-dot{position:absolute;top:50%;width:8px;height:8px;border-radius:50%;background:var(--emerald);transform:translate(-50%,-50%);box-shadow:0 0 0 2px var(--bg);}
+.lb-table .lb-fc-labels{position:relative;height:12px;margin-top:4px;}
+.lb-table .lb-fc-lo,.lb-table .lb-fc-hi{position:absolute;top:0;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);transform:translateX(-50%);white-space:nowrap;}
+""").replace('\n', '')
 
     if is_2026:
         _heads = [('Rank', 'lft'), ('Player', 'lft'), ('GP', ''), ('Form', 'lft'), ('Exp Votes', '')]
@@ -2799,7 +2836,7 @@ SCOPE .lb-bar-lo{text-align:right;}
         _cells.append(f'<td class="lb-exp" style="background:rgba(52,211,153,{_a:.3f})">{_exp:.1f}</td>')
         if is_2026 and has_fc:
             _fl = _proj_floor.get(_name, float("nan")); _ce = _proj_ceiling.get(_name, float("nan"))
-            _cells.append(f'<td class="lft fc-cell">{_lb_bar(_fl, _ce, _exp, labels=True)}</td>')
+            _cells.append(f'<td class="lft fc-cell">{_lb_fc_bar(_fl, _ce, _exp, _tbl_maxceil)}</td>')
         if not is_2026:
             _act = int(_row['Actual_Votes']) if pd.notna(_row['Actual_Votes']) else 0
             _cells.append(f'<td>{_act}</td>')
