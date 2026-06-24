@@ -3228,7 +3228,7 @@ if _page == 'Game Analysis':
 
             # Scoped style block — emitted inside each .ga-game wrapper so it can't leak.
             _GA_CSS = """
-.ga-game{font-family:'Archivo',sans-serif;margin:0 0 40px 0;}
+.ga-game{font-family:'Archivo',sans-serif;margin:0 0 40px 0;padding:0 24px;}
 .ga-game .ga-overline{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.22em;
   text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
 .ga-game .ga-result{display:flex;align-items:baseline;flex-wrap:wrap;gap:10px;}
