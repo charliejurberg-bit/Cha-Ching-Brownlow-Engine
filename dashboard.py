@@ -2761,20 +2761,20 @@ if _page == 'Player Profile':
                         elif v == 1: colors.append('#f0b429')
                         else: colors.append('#0d141d')
                     fig.add_trace(go.Bar(
-                        x=player_games['Round_num'], y=player_games['Brownlow.Votes'],
+                        x=player_games['Round_num'] - 1, y=player_games['Brownlow.Votes'],
                         name='Actual Votes', marker_color=colors, opacity=0.85,
                         text=player_games['Brownlow.Votes'].apply(lambda v: str(int(v)) if v > 0 else ''),
                         textposition='outside',
                     ), secondary_y=False)
 
                 fig.add_trace(go.Scatter(
-                    x=player_games['Round_num'], y=player_games['Exp_Votes'].round(2),
+                    x=player_games['Round_num'] - 1, y=player_games['Exp_Votes'].round(2),
                     name='Expected Votes', mode='lines+markers',
                     line=dict(color='#7e8c99', width=2, dash='dot'), marker=dict(size=6),
                 ), secondary_y=False)
 
                 fig.add_trace(go.Scatter(
-                    x=player_games['Round_num'], y=(player_games['Poll_Prob'] * 100).round(1),
+                    x=player_games['Round_num'] - 1, y=(player_games['Poll_Prob'] * 100).round(1),
                     name='Poll Probability %', mode='lines+markers',
                     line=dict(color='#e63946', width=2), marker=dict(size=7),
                     fill='tozeroy', fillcolor='rgba(230,57,70,0.07)',
@@ -2799,13 +2799,13 @@ if _page == 'Player Profile':
                 fig2 = go.Figure()
                 bar_colors = ['#34d399' if w else '#e63946' for w in player_games['Is_Win'].fillna(0).astype(int)]
                 fig2.add_trace(go.Bar(
-                    x=player_games['Round_num'], y=player_games[stat_choice],
+                    x=player_games['Round_num'] - 1, y=player_games[stat_choice],
                     name=stat_choice.replace('.', ' ').replace('_', ' '),
                     marker_color=bar_colors, opacity=0.85,
                     text=player_games[stat_choice].astype(int), textposition='outside',
                 ))
                 fig2.add_trace(go.Scatter(
-                    x=player_games['Round_num'], y=(player_games['Poll_Prob'] * 100).round(1),
+                    x=player_games['Round_num'] - 1, y=(player_games['Poll_Prob'] * 100).round(1),
                     name='Poll Probability %', mode='lines+markers',
                     line=dict(color='#e63946', width=2), yaxis='y2',
                 ))
@@ -2840,6 +2840,8 @@ if _page == 'Player Profile':
                     'Coaches_Votes': 'CV', 'Brownlow.Votes': 'BV',
                 })
                 _log_disp = log_display.sort_values('Rnd').copy()
+                # Display AFL round (AFLTables Round_num runs 1 ahead) — display only, order unchanged
+                _log_disp['Rnd'] = _log_disp['Rnd'] - 1
                 for col in _log_disp.select_dtypes(include='float').columns:
                     _log_disp[col] = _log_disp[col].round(1)
                 st.dataframe(_style_table(_log_disp), width='stretch', hide_index=True)
