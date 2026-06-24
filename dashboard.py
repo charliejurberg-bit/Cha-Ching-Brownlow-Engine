@@ -1371,11 +1371,13 @@ def _round_floats(df: pd.DataFrame, dp: int = 1) -> pd.DataFrame:
 
 def _apply_mt_rows(df: pd.DataFrame) -> pd.DataFrame:
     """Alternating MT dark row backgrounds. Required because st.dataframe uses canvas
-    rendering — CSS selectors on td/th don't reach inside it; only Styler .apply() does."""
+    rendering — CSS selectors on td/th don't reach inside it; only Styler .apply() does.
+    Must use literal hex (not CSS vars): the canvas grid does not resolve var() inside
+    inline cell styles, which renders the text invisible."""
     out = pd.DataFrame('', index=df.index, columns=df.columns)
     for i in range(len(df)):
-        out.iloc[i] = ('background-color: var(--surface); color: var(--text);' if i % 2 == 0
-                       else 'background-color: #1a2d3d; color: var(--text);')
+        out.iloc[i] = ('background-color: #101a24; color: #e9eef3;' if i % 2 == 0
+                       else 'background-color: #1a2d3d; color: #e9eef3;')
     return out
 
 def _style_table(df: pd.DataFrame) -> "pd.io.formats.style.Styler":
@@ -3225,11 +3227,11 @@ if _page == 'Game Analysis':
                 }
                 # Top-3 rows: subtle tint + neon inset border glow on every cell
                 _top3_row = {
-                    0: ('background-color:rgba(240,180,41,0.07)!important;color:var(--text)!important;font-weight:700!important;'
+                    0: ('background-color:rgba(240,180,41,0.07)!important;color:#e9eef3!important;font-weight:700!important;'
                         'box-shadow:inset 0 0 0 1px rgba(240,180,41,0.65),0 0 8px rgba(240,180,41,0.22)!important;'),
-                    1: ('background-color:rgba(52,211,153,0.06)!important;color:var(--text)!important;font-weight:700!important;'
+                    1: ('background-color:rgba(52,211,153,0.06)!important;color:#e9eef3!important;font-weight:700!important;'
                         'box-shadow:inset 0 0 0 1px rgba(52,211,153,0.65),0 0 8px rgba(52,211,153,0.22)!important;'),
-                    2: ('background-color:rgba(74,144,196,0.06)!important;color:var(--text)!important;font-weight:700!important;'
+                    2: ('background-color:rgba(74,144,196,0.06)!important;color:#e9eef3!important;font-weight:700!important;'
                         'box-shadow:inset 0 0 0 1px rgba(74,144,196,0.65),0 0 8px rgba(74,144,196,0.22)!important;'),
                 }
                 def _cell(row):
