@@ -1411,22 +1411,25 @@ def fetch_espn_brownlow():
         _text = _soup.get_text(" ", strip=True)
         _votes: dict = {}  # player_name → cumulative votes across all games
 
-        # Strategy A: per-game text pattern "N - Player Name (TEAM)"
-        # e.g. "3 - Nick Daicos (COLL)", "2.5 - Marcus Bontempelli (WB)"
-        _vote_re = re.compile(
+        # Strategy A: "N - Player (TEAM)[, Player (TEAM), ...]"
+        # Each vote block can list multiple players at the same vote level (comma-separated).
+        _vote_block_re = re.compile(
             r"(\d+\.?\d*)\s*[-–—]\s*"
-            r"([A-Z][A-Za-z'\-]+(?:\s+[A-Z][A-Za-z'\-]+)+)"
-            r"\s*\([A-Z]{1,4}\)",
+            r"((?:[A-Z][A-Za-z'\-]+(?:\s+[A-Z][A-Za-z'\-]+)+\s*\([A-Z]{1,4}\)(?:\s*,\s*)?)+)"
         )
-        for _m in _vote_re.finditer(_text):
+        _player_re = re.compile(
+            r"([A-Z][A-Za-z'\-]+(?:\s+[A-Z][A-Za-z'\-]+)+)\s*\([A-Z]{1,4}\)"
+        )
+        for _m in _vote_block_re.finditer(_text):
             try:
                 _val = float(_m.group(1))
             except ValueError:
                 continue
             if not (0 < _val <= 3):
                 continue
-            _name = _m.group(2).title().strip()
-            _votes[_name] = _votes.get(_name, 0) + _val
+            for _pm in _player_re.finditer(_m.group(2)):
+                _name = _pm.group(1).title().strip()
+                _votes[_name] = _votes.get(_name, 0) + _val
 
         # Strategy B: pd.read_html table scan — detect per-round vote columns
         # (numeric, all non-null values in [0, 3]; pre-totalled Votes column exceeds 3)

@@ -87,21 +87,25 @@ def _parse_votes(html_text):
     text = soup.get_text(" ", strip=True)
     votes = {}
 
-    # Strategy A: per-game text pattern "N - Player Name (TEAM)"
-    vote_re = re.compile(
+    # Strategy A: "N - Player (TEAM)[, Player (TEAM), ...]"
+    # Each vote block can list multiple players at the same vote level (comma-separated).
+    vote_block_re = re.compile(
         r"(\d+\.?\d*)\s*[-–—]\s*"
-        r"([A-Z][A-Za-z'\-]+(?:\s+[A-Z][A-Za-z'\-]+)+)"
-        r"\s*\([A-Z]{1,4}\)",
+        r"((?:[A-Z][A-Za-z'\-]+(?:\s+[A-Z][A-Za-z'\-]+)+\s*\([A-Z]{1,4}\)(?:\s*,\s*)?)+)"
     )
-    for m in vote_re.finditer(text):
+    player_re = re.compile(
+        r"([A-Z][A-Za-z'\-]+(?:\s+[A-Z][A-Za-z'\-]+)+)\s*\([A-Z]{1,4}\)"
+    )
+    for m in vote_block_re.finditer(text):
         try:
             val = float(m.group(1))
         except ValueError:
             continue
         if not (0 < val <= 3):
             continue
-        name = m.group(2).title().strip()
-        votes[name] = votes.get(name, 0) + val
+        for pm in player_re.finditer(m.group(2)):
+            name = pm.group(1).title().strip()
+            votes[name] = votes.get(name, 0) + val
 
     # Strategy B: table scan for per-round vote columns
     if not votes:
