@@ -2057,7 +2057,7 @@ if _page == 'Landing':
         _land_pending = 0
 
     _land_pl_val = _land_pl or 0.0
-    _pl_str = f"+{_land_pl_val:.2f}U" if _land_pl_val >= 0 else f"-{abs(_land_pl_val):.2f}U"
+    _pl_str = f"+{_land_pl_val:.2f}u" if _land_pl_val >= 0 else f"-{abs(_land_pl_val):.2f}u"
     _pl_color = "#34d399" if _land_pl_val >= 0 else "#e0625a"
     _land_round = max_season_rounds - 1
 
@@ -2295,7 +2295,7 @@ function animate(el, target, formatter, duration, delay){
   }, delay);
 }
 animate(document.getElementById('votes'), votesTarget, function(v){ return v.toFixed(1); }, 1400, 700);
-animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + v.toFixed(2) + 'U'; }, 1400, 700);
+animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + v.toFixed(2) + 'u'; }, 1400, 700);
 </script>
 </body></html>"""
     _stat_html = (
@@ -2339,7 +2339,7 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
   <div class="dest-desc">Track bets, log P&amp;L, flag Cha Ching tips and analyse hit rates and ROI across markets.</div>
   <div class="dest-data-row">
     <div><span class="dr-label">Season</span><span class="dr-value">{_land_n} bets</span></div>
-    <div><span class="dr-label">P&amp;L</span><span class="dr-value" style="color:{_pl_color}">{_pl_str}</span></div>
+    <div><span class="dr-label">P&amp;L</span><span class="dr-value" style="color:var(--gold)">{_pl_str}</span></div>
     <div><span class="dr-label">Fade Hit Rate</span><span class="dr-value">8/8</span></div>
   </div>
 </div>""", unsafe_allow_html=True)
