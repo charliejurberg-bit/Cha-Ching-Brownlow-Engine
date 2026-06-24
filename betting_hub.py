@@ -264,22 +264,32 @@ def _load_bets() -> pd.DataFrame:
         df['is_cha_ching'] = df['is_cha_ching'].fillna(False).astype(bool)
         return df
 
+    frames = []
+
+    # Always load from local CSV first
+    if os.path.exists(BETS_CSV):
+        try:
+            frames.append(_coerce(pd.read_csv(BETS_CSV)))
+        except Exception:
+            pass
+
+    # Also load from Supabase and merge (deduplicates by bet_id)
     sb = _get_supabase()
     if sb is not None:
         try:
             resp = sb.table("bets").select("*").execute()
-            df = pd.DataFrame(resp.data) if resp.data else pd.DataFrame(columns=BETS_COLS)
-            return _coerce(df)
+            if resp.data:
+                frames.append(_coerce(pd.DataFrame(resp.data)))
         except Exception:
             pass
 
-    # Supabase unavailable — fall back to local CSV
-    if os.path.exists(BETS_CSV):
-        try:
-            return _coerce(pd.read_csv(BETS_CSV))
-        except Exception:
-            pass
-    return _empty_bets_df()
+    if not frames:
+        return _empty_bets_df()
+
+    combined = pd.concat(frames, ignore_index=True)
+    if 'bet_id' in combined.columns:
+        combined = combined.drop_duplicates(subset=['bet_id'], keep='first')
+    return combined.sort_values('date', ascending=True).reset_index(drop=True)
 
 
 def _insert_bet(row: dict):
@@ -322,23 +332,32 @@ def _load_tips() -> pd.DataFrame:
         df['is_flagged'] = df['is_flagged'].fillna(False).astype(bool)
         return df
 
+    frames = []
+
+    # Always load from local CSV first
+    if os.path.exists(TIPS_CSV):
+        try:
+            frames.append(_coerce(pd.read_csv(TIPS_CSV)))
+        except Exception:
+            pass
+
+    # Also load from Supabase and merge (deduplicates by tip_id)
     sb = _get_supabase()
     if sb is not None:
         try:
             resp = sb.table("cha_ching_tips").select("*").execute()
-            df = pd.DataFrame(resp.data) if resp.data else pd.DataFrame(columns=TIPS_COLS)
-            return _coerce(df)
+            if resp.data:
+                frames.append(_coerce(pd.DataFrame(resp.data)))
         except Exception:
             pass
 
-    # Supabase unavailable — fall back to local CSV
-    if os.path.exists(TIPS_CSV):
-        try:
-            df = pd.read_csv(TIPS_CSV)
-            return _coerce(df)
-        except Exception:
-            pass
-    return _empty_tips_df()
+    if not frames:
+        return _empty_tips_df()
+
+    combined = pd.concat(frames, ignore_index=True)
+    if 'tip_id' in combined.columns:
+        combined = combined.drop_duplicates(subset=['tip_id'], keep='first')
+    return combined.reset_index(drop=True)
 
 
 def _save_tip(game_key: str, player: str, market_type: str,
