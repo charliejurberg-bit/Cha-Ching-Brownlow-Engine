@@ -26,6 +26,8 @@ def inject_global_theme():
   --gold-dim:   rgba(240,180,41,.12);
   --text:       #e9eef3;
   --muted:      #7e8c99;
+  --steel:          #9fb0bf;
+  --hairline-strong:rgba(140,165,185,.22);
   --ease-out:   cubic-bezier(0.23,1,0.32,1);
 }
 .stApp, html, body, [data-testid="stAppViewContainer"] {
