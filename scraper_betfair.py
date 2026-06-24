@@ -49,10 +49,10 @@ def _parse_html(html_text):
         raw_player = cells[0].get_text(strip=True)
         raw_vote = cells[1].get_text(strip=True)
         try:
-            vote = int(raw_vote)
+            vote = float(raw_vote)
         except ValueError:
             continue
-        if vote not in (1, 2, 3):
+        if not (0 < vote <= 3):
             continue
         name = _clean_name(raw_player)
         if not name:
