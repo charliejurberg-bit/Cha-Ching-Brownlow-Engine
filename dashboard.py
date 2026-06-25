@@ -3007,7 +3007,7 @@ if _page == 'Player Profile':
         with _pp_ssel:
             # Season selector sits next to the player name (per-page state).
             # Player Profile alone offers "Career" — the whole-career view.
-            _pp_season_opts = AVAILABLE_SEASONS + [CAREER]
+            _pp_season_opts = [CAREER] + AVAILABLE_SEASONS
             st.selectbox(
                 "Season", _pp_season_opts,
                 index=_pp_season_opts.index(selected_season),
