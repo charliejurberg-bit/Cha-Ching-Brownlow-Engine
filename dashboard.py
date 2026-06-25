@@ -220,7 +220,7 @@ hr {
     border-top: 1px solid var(--line) !important;
     margin: 1.5rem 0 !important;
 }
-.js-plotly-plot .plotly .bg { fill: var(--surface) !important; }
+.js-plotly-plot .plotly .bg { fill: transparent !important; }
 .js-plotly-plot { border-radius: 10px !important; overflow: hidden; }
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: var(--bg); }
@@ -2962,6 +2962,12 @@ if _page == 'Player Profile':
 
                 st.markdown(f"""
 <style>
+/* Player Profile sits flush on the app background — neutralise the global
+   stTabs surface panel (theme.py) for this page only, keyed off .pp-identity. */
+[data-testid="stTabs"]:has(.pp-identity) {{
+    background:transparent !important;
+    border:none !important;
+}}
 .pp-identity {{
     display:flex; justify-content:space-between; align-items:flex-end;
     gap:24px; flex-wrap:wrap;
