@@ -1409,11 +1409,17 @@ def _style_leaderboard_table(df: pd.DataFrame) -> "pd.io.formats.style.Styler":
 if not AVAILABLE_SEASONS:
     st.error("No predictions found. Run brownlow_model.py first.")
     st.stop()
-if 'selected_season' not in st.session_state:
-    st.session_state.selected_season = AVAILABLE_SEASONS[0]
-if st.session_state.selected_season not in AVAILABLE_SEASONS:
-    st.session_state.selected_season = AVAILABLE_SEASONS[0]
-selected_season = st.session_state.selected_season
+# Season is remembered per page — changing the year on one page must NOT
+# affect any other page. Source of truth is a plain dict keyed by page (a
+# normal session_state value, so it survives navigation — unlike a widget
+# key, which Streamlit drops on any run where the widget isn't rendered).
+DEFAULT_SEASON = AVAILABLE_SEASONS[0]
+if 'season_by_page' not in st.session_state:
+    st.session_state.season_by_page = {}
+_season_page = st.session_state.get('page', 'Landing')
+selected_season = st.session_state.season_by_page.get(_season_page, DEFAULT_SEASON)
+if selected_season not in AVAILABLE_SEASONS:
+    selected_season = DEFAULT_SEASON
 is_2026 = (selected_season == 2026)
 
 # ── Data loading ─────────────────────────────────────────────
@@ -2003,8 +2009,9 @@ if _page != 'Landing':
 # Only show controls for Brownlow pages, not Betting Hub or Landing
 _show_controls = _page not in _BH_PAGES and _page != 'Landing'
 
-def _season_changed():
-    st.session_state.selected_season = st.session_state._ctrl_season
+def _season_changed(page):
+    # Persist this page's choice into the durable per-page store.
+    st.session_state.season_by_page[page] = st.session_state[f"_ctrl_season::{page}"]
 
 _SEASON_PAGES = {
     'Leaderboard', 'Player Profile', 'Game Analysis', 'Model Insights',
@@ -2021,11 +2028,14 @@ if _show_controls:
             )
     with _cc3:
         if _page in _SEASON_PAGES:
+            # Per-page widget key keeps pages independent; on_change mirrors the
+            # pick into season_by_page so it survives navigating away and back.
             st.selectbox(
                 "Season", AVAILABLE_SEASONS,
                 index=AVAILABLE_SEASONS.index(selected_season),
-                key="_ctrl_season",
+                key=f"_ctrl_season::{_page}",
                 on_change=_season_changed,
+                args=(_page,),
                 label_visibility="collapsed",
             )
 
