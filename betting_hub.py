@@ -174,7 +174,7 @@ def _get_supabase():
     try:
         from supabase import create_client
         url = st.secrets["supabase"]["url"]
-        key = st.secrets["supabase"]["key"]
+        key = st.secrets["supabase"]["secret_key"]  # server-side: full read/write
         return create_client(url, key)
     except Exception:
         return None
@@ -336,32 +336,26 @@ def _load_tips() -> pd.DataFrame:
         df['is_flagged'] = df['is_flagged'].fillna(False).astype(bool)
         return df
 
-    frames = []
-
-    # Always load from local CSV first
-    if os.path.exists(TIPS_CSV):
-        try:
-            frames.append(_coerce(pd.read_csv(TIPS_CSV)))
-        except Exception:
-            pass
-
-    # Also load from Supabase and merge (deduplicates by tip_id)
+    # Supabase is the source of truth. A successful query is authoritative even
+    # when it returns zero rows — only fall back to the CSV on a genuine
+    # connection/query failure (no client, or the query raises).
     sb = _get_supabase()
     if sb is not None:
         try:
             resp = sb.table("cha_ching_tips").select("*").execute()
-            if resp.data:
-                frames.append(_coerce(pd.DataFrame(resp.data)))
+            data = resp.data or []
+            return _coerce(pd.DataFrame(data)).reset_index(drop=True)
         except Exception:
             pass
 
-    if not frames:
-        return _empty_tips_df()
+    # Fallback: read the local CSV when Supabase couldn't supply data.
+    if os.path.exists(TIPS_CSV):
+        try:
+            return _coerce(pd.read_csv(TIPS_CSV)).reset_index(drop=True)
+        except Exception:
+            pass
 
-    combined = pd.concat(frames, ignore_index=True)
-    if 'tip_id' in combined.columns:
-        combined = combined.drop_duplicates(subset=['tip_id'], keep='first')
-    return combined.reset_index(drop=True)
+    return _empty_tips_df()
 
 
 def _save_tip(game_key: str, player: str, market_type: str,
