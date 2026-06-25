@@ -29,6 +29,7 @@ def inject_global_theme():
   --text:       #e9eef3;
   --muted:      #7e8c99;
   --steel:          #9fb0bf;
+  --muted-fill:     rgba(159,176,191,.22);
   --hairline-strong:rgba(140,165,185,.22);
   --ease-out:   cubic-bezier(0.23,1,0.32,1);
 }

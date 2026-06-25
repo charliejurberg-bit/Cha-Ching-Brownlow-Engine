@@ -2931,12 +2931,6 @@ SCOPE .lb-bar-lo{text-align:right;}
 # PLAYER PROFILE
 # ════════════════════════════════════════════════════════════
 if _page == 'Player Profile':
-    st.markdown(
-        f'<div class="title-bar"><h2 style="color:#e9eef3;margin:0">Player Profile — {selected_season}</h2>'
-        f'<p style="color:var(--muted);margin:4px 0 0 0">Round by round breakdown · vote probability · polling DNA</p></div>',
-        unsafe_allow_html=True,
-    )
-
     if game_df is None:
         st.error("No game-level data found.")
     else:
@@ -2953,85 +2947,160 @@ if _page == 'Player Profile':
 
             if not pred_row.empty:
                 row = pred_row.iloc[0]
-                c1, c2, c3, c4 = st.columns(4)
-                with c1: st.markdown(f'<div class="metric-card"><div class="metric-label">Team</div><div class="metric-value" style="font-size:18px">{row["Team"]}</div></div>', unsafe_allow_html=True)
-                with c2:
-                    val = int(row["Actual_Votes"]) if not is_2026 else int(row["Games"])
-                    lbl = "Actual Votes" if not is_2026 else "Games Played"
-                    st.markdown(f'<div class="metric-card"><div class="metric-label">{lbl}</div><div class="metric-value">{val}</div></div>', unsafe_allow_html=True)
-                with c3: st.markdown(f'<div class="metric-card"><div class="metric-label">{"Model Expected" if not is_2026 else "Projected Total"}</div><div class="metric-value">{row["Exp_Total_Votes"]:.1f}</div></div>', unsafe_allow_html=True)
-                with c4: st.markdown(f'<div class="metric-card"><div class="metric-label">Avg Poll Prob</div><div class="metric-value">{row["Avg_Poll_Prob"] * 100:.1f}%</div></div>', unsafe_allow_html=True)
+
+                # Strip stats computed from the player's real per-round columns
+                _games = len(player_games)
+                if _games:
+                    _avg_votes = player_games['Exp_Votes'].mean()
+                    _avg_poll = player_games['Poll_Prob'].mean() * 100
+                    _best_round = int(player_games.loc[player_games['Poll_Prob'].idxmax(), 'Round_num']) - 1
+                    _best_round_lbl = f"R{_best_round}"
+                else:
+                    _avg_votes = 0.0
+                    _avg_poll = 0.0
+                    _best_round_lbl = "—"
+
+                st.markdown(f"""
+<style>
+.pp-identity {{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    gap:24px; flex-wrap:wrap;
+    border-bottom:1px solid var(--line);
+    padding:4px 0 18px; margin-bottom:18px;
+}}
+.pp-identity .pp-name {{
+    font-family:'Archivo',sans-serif; font-size:42px; font-weight:900;
+    line-height:1; letter-spacing:-.02em; color:var(--text); margin:0;
+}}
+.pp-identity .pp-meta {{
+    font-family:'IBM Plex Mono',monospace; font-size:12px;
+    letter-spacing:.04em; color:var(--steel); margin-top:12px;
+}}
+.pp-strip {{ display:flex; align-items:stretch; }}
+.pp-strip .pp-item {{ padding:0 18px; text-align:right; }}
+.pp-strip .pp-item:first-child {{ padding-left:0; }}
+.pp-strip .pp-item:last-child {{ padding-right:0; }}
+.pp-strip .pp-item + .pp-item {{ border-left:1px solid var(--hairline-strong); }}
+.pp-strip .pp-val {{
+    font-family:'IBM Plex Mono',monospace; font-size:22px; font-weight:600;
+    line-height:1.1; color:var(--steel);
+}}
+.pp-strip .pp-item.pp-head .pp-val {{ color:var(--text); }}
+.pp-strip .pp-lbl {{
+    font-family:'IBM Plex Mono',monospace; font-size:9px; font-weight:500;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-top:6px;
+}}
+</style>
+<div class="pp-identity">
+  <div class="pp-id-left">
+    <div class="pp-name">{selected_player}</div>
+    <div class="pp-meta">{row["Team"]} · {selected_season} season</div>
+  </div>
+  <div class="pp-strip">
+    <div class="pp-item pp-head"><div class="pp-val">{_games}</div><div class="pp-lbl">Games</div></div>
+    <div class="pp-item"><div class="pp-val">{_avg_votes:.2f}</div><div class="pp-lbl">Avg Votes</div></div>
+    <div class="pp-item"><div class="pp-val">{_best_round_lbl}</div><div class="pp-lbl">Best Round</div></div>
+    <div class="pp-item"><div class="pp-val">{_avg_poll:.1f}%</div><div class="pp-lbl">Avg Poll</div></div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
 
             if not player_games.empty:
-                st.markdown('<div class="section-header">Round by Round — Votes and Poll Probability</div>', unsafe_allow_html=True)
-                fig = make_subplots(specs=[[{"secondary_y": True}]])
+                # Colour bars off the player's own poll-probability distribution:
+                # strongest rounds emerald, mid rounds emerald_pack, low faint steel.
+                _poll_pct = (player_games['Poll_Prob'] * 100)
+                _pmax = _poll_pct.max()
+                _pmed = _poll_pct.median()
 
-                if not is_2026 and 'Brownlow.Votes' in player_games.columns:
-                    colors = []
-                    for v in player_games['Brownlow.Votes']:
-                        if v == 3: colors.append('#7e8c99')
-                        elif v == 2: colors.append('#34d399')
-                        elif v == 1: colors.append('#f0b429')
-                        else: colors.append('#0d141d')
-                    fig.add_trace(go.Bar(
-                        x=player_games['Round_num'] - 1, y=player_games['Brownlow.Votes'],
-                        name='Actual Votes', marker_color=colors, opacity=0.85,
-                        text=player_games['Brownlow.Votes'].apply(lambda v: str(int(v)) if v > 0 else ''),
-                        textposition='outside',
-                    ), secondary_y=False)
+                def _vote_color(v):
+                    if _pmax <= 0:
+                        return 'rgba(159,176,191,.22)'
+                    if v >= 0.6 * _pmax:
+                        return '#34d399'
+                    if v >= _pmed:
+                        return 'rgba(52,211,153,.45)'
+                    return 'rgba(159,176,191,.22)'
 
-                fig.add_trace(go.Scatter(
-                    x=player_games['Round_num'] - 1, y=player_games['Exp_Votes'].round(2),
-                    name='Expected Votes', mode='lines+markers',
-                    line=dict(color='#7e8c99', width=2, dash='dot'), marker=dict(size=6),
-                ), secondary_y=False)
+                _vote_colors = [_vote_color(v) for v in _poll_pct]
 
-                fig.add_trace(go.Scatter(
-                    x=player_games['Round_num'] - 1, y=(player_games['Poll_Prob'] * 100).round(1),
-                    name='Poll Probability %', mode='lines+markers',
-                    line=dict(color='#e63946', width=2), marker=dict(size=7),
-                    fill='tozeroy', fillcolor='rgba(230,57,70,0.07)',
-                ), secondary_y=True)
-
-                fig.update_layout(
-                    plot_bgcolor='#101a24', paper_bgcolor='#101a24', font_color='#e9eef3',
-                    xaxis=dict(title='Round', dtick=1, gridcolor='#ede8df'),
-                    legend=dict(orientation='h', y=1.12, bgcolor='rgba(0,0,0,0)'),
-                    margin=dict(t=40, b=40), hovermode='x unified',
+                st.markdown(
+                    '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
+                    'font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--steel);'
+                    'border-bottom:1px solid var(--line);padding-bottom:8px;margin:8px 0 16px;'
+                    'display:flex;align-items:baseline;gap:12px;">VOTE TRAJECTORY'
+                    '<span style="font-size:9px;font-weight:400;letter-spacing:.04em;'
+                    'text-transform:none;color:var(--muted);">poll probability by round</span></div>',
+                    unsafe_allow_html=True,
                 )
-                fig.update_yaxes(title_text="Votes", secondary_y=False, range=[0, 4], gridcolor='#ede8df')
-                fig.update_yaxes(title_text="Poll Probability (%)", secondary_y=True, range=[0, 105], gridcolor='rgba(0,0,0,0)')
+
+                fig = go.Figure()
+                fig.add_trace(go.Bar(
+                    x=player_games['Round_num'] - 1, y=_poll_pct.round(1),
+                    name='Poll Probability %', marker_color=_vote_colors,
+                    hovertemplate='Round %{x}<br>Poll %{y:.1f}%<extra></extra>',
+                ))
+                fig.update_layout(
+                    xaxis=dict(title='Round', dtick=1),
+                    yaxis=dict(title='Poll Probability (%)', rangemode='tozero'),
+                    showlegend=False, margin=dict(t=20, b=40), bargap=0.35,
+                    hovermode='x unified',
+                )
                 fig = apply_chart_theme(fig)
+                fig.update_xaxes(tickfont=dict(family="IBM Plex Mono, monospace", color="#7e8c99", size=11))
+                fig.update_yaxes(tickfont=dict(family="IBM Plex Mono, monospace", color="#7e8c99", size=11))
                 st.plotly_chart(fig, width='stretch', key="chart_003")
 
-                st.markdown('<div class="section-header">Stat Context by Round</div>', unsafe_allow_html=True)
-                stat_choice = st.selectbox("Stat to overlay",
+                st.markdown(
+                    '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
+                    'font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--steel);'
+                    'border-bottom:1px solid var(--line);padding-bottom:8px;margin:8px 0 16px;'
+                    'display:flex;align-items:baseline;gap:12px;">STAT BY ROUND'
+                    '<span style="font-size:9px;font-weight:400;letter-spacing:.04em;'
+                    'text-transform:none;color:var(--muted);">colour marks above-average games</span></div>',
+                    unsafe_allow_html=True,
+                )
+                stat_choice = st.selectbox("Stat to show",
                     ['Disposals', 'Coaches_Votes', 'Goals', 'Contested.Possessions', 'Clearances', 'Kicks'],
                     key="profile_stat")
 
-                fig2 = go.Figure()
-                bar_colors = ['#34d399' if w else '#e63946' for w in player_games['Is_Win'].fillna(0).astype(int)]
-                fig2.add_trace(go.Bar(
-                    x=player_games['Round_num'] - 1, y=player_games[stat_choice],
-                    name=stat_choice.replace('.', ' ').replace('_', ' '),
-                    marker_color=bar_colors, opacity=0.85,
-                    text=player_games[stat_choice].astype(int), textposition='outside',
-                ))
-                fig2.add_trace(go.Scatter(
-                    x=player_games['Round_num'] - 1, y=(player_games['Poll_Prob'] * 100).round(1),
-                    name='Poll Probability %', mode='lines+markers',
-                    line=dict(color='#e63946', width=2), yaxis='y2',
-                ))
-                fig2.update_layout(
-                    plot_bgcolor='#101a24', paper_bgcolor='#101a24', font_color='#e9eef3',
-                    xaxis=dict(title='Round', dtick=1, gridcolor='#ede8df'),
-                    yaxis=dict(title=stat_choice.replace('.', ' '), gridcolor='#ede8df'),
-                    yaxis2=dict(title='Poll %', overlaying='y', side='right', range=[0, 105], gridcolor='rgba(0,0,0,0)'),
-                    legend=dict(orientation='h', y=1.12, bgcolor='rgba(0,0,0,0)'),
-                    margin=dict(t=40, b=40), hovermode='x unified',
+                # Season average of the selected stat; colour bars above/below it.
+                _stat_series = player_games[stat_choice]
+                _stat_avg = _stat_series.mean()
+                _stat_colors = ['#34d399' if v >= _stat_avg else 'rgba(159,176,191,.22)' for v in _stat_series]
+
+                st.markdown(
+                    '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:9px;'
+                    'letter-spacing:.08em;color:var(--muted);display:flex;gap:18px;margin:2px 0 12px;">'
+                    '<span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;'
+                    'background:#34d399;margin-right:6px;vertical-align:middle;"></span>above average</span>'
+                    '<span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;'
+                    'background:rgba(159,176,191,.22);margin-right:6px;vertical-align:middle;"></span>below average</span>'
+                    '<span><span style="display:inline-block;width:14px;height:0;border-top:2px dashed #f0b429;'
+                    'margin-right:6px;vertical-align:middle;"></span>season average</span></div>',
+                    unsafe_allow_html=True,
                 )
-                st.caption("Green = Win   Red = Loss")
+
+                _stat_label = stat_choice.replace('.', ' ').replace('_', ' ')
+                fig2 = go.Figure()
+                fig2.add_trace(go.Bar(
+                    x=player_games['Round_num'] - 1, y=_stat_series,
+                    name=_stat_label, marker_color=_stat_colors,
+                    hovertemplate='Round %{x}<br>%{y}<extra></extra>',
+                ))
+                fig2.add_hline(
+                    y=_stat_avg, line=dict(color='#f0b429', width=1.5, dash='dash'),
+                    annotation_text=f"avg {_stat_avg:.1f}", annotation_position="top left",
+                    annotation_font=dict(family="IBM Plex Mono, monospace", color="#f0b429", size=10),
+                )
+                fig2.update_layout(
+                    xaxis=dict(title='Round', dtick=1),
+                    yaxis=dict(title=_stat_label, rangemode='tozero'),
+                    showlegend=False, margin=dict(t=20, b=40), bargap=0.35,
+                    hovermode='x unified',
+                )
                 fig2 = apply_chart_theme(fig2)
+                fig2.update_xaxes(tickfont=dict(family="IBM Plex Mono, monospace", color="#7e8c99", size=11))
+                fig2.update_yaxes(tickfont=dict(family="IBM Plex Mono, monospace", color="#7e8c99", size=11))
                 st.plotly_chart(fig2, width='stretch', key="chart_004")
 
                 st.markdown('<div class="section-header">Game Log</div>', unsafe_allow_html=True)
@@ -3065,69 +3134,180 @@ if _page == 'Player Profile':
                 st.error("No game-level data found.")
             else:
                 eff_row = efficiency[efficiency['Player_Name'] == selected_player]
+
+                # ── Presentation-only formatting guard (kills "nan%") ──
+                # Undefined (no qualifying games / NaN denominator) → "—";
+                # defined-but-zero → "0.0%". Underlying maths untouched.
+                def _rate(val, denom=None):
+                    if denom is not None and (pd.isna(denom) or denom == 0):
+                        return "—"
+                    if pd.isna(val):
+                        return "—"
+                    return f"{val * 100:.1f}%"
+
                 if not eff_row.empty:
                     e = eff_row.iloc[0]
-                    st.markdown('<div class="section-header">Polling DNA</div>', unsafe_allow_html=True)
-                    c1, c2, c3, c4 = st.columns(4)
-                    with c1:
-                        st.markdown(f'<div class="dna-card"><div class="dna-label">Overall Poll Rate</div><div class="dna-value">{e["Poll_Rate"] * 100:.1f}%</div><div class="dna-sub">Polled in {e["Poll_Rate"] * e["Games"]:.0f} of {e["Games"]:.0f} games</div></div>', unsafe_allow_html=True)
-                    with c2:
-                        wr = e.get('Win_Poll_Rate', 0)
-                        st.markdown(f'<div class="dna-card"><div class="dna-label">Poll Rate in Wins</div><div class="dna-value">{wr * 100:.1f}%</div><div class="dna-sub">Avg {e.get("Win_Avg_Votes", 0):.2f} votes per win</div></div>', unsafe_allow_html=True)
-                    with c3:
-                        lr = e.get('Loss_Poll_Rate', 0)
-                        st.markdown(f'<div class="dna-card"><div class="dna-label">Poll Rate in Losses</div><div class="dna-value">{lr * 100:.1f}%</div><div class="dna-sub">Win/loss gap: {(wr - lr) * 100:.1f}pts</div></div>', unsafe_allow_html=True)
-                    with c4:
-                        hd = e.get('HD_Poll_Rate', 0)
-                        hd_g = e.get('HD_Games', 0)
-                        st.markdown(f'<div class="dna-card"><div class="dna-label">30+ Disposal Poll Rate</div><div class="dna-value">{hd * 100:.1f}%</div><div class="dna-sub">{hd_g:.0f} games with 30+ disposals</div></div>', unsafe_allow_html=True)
 
                     player_games_dna = game_df[game_df['Player_Name'] == selected_player].copy()
-                    if not player_games_dna.empty and 'Brownlow.Votes' in player_games_dna.columns:
-                        st.markdown('<div class="section-header">Vote Distribution</div>', unsafe_allow_html=True)
-                        vote_counts = player_games_dna['Brownlow.Votes'].value_counts().sort_index()
-                        c1, c2 = st.columns([1, 2])
-                        with c1:
-                            st.markdown(f"""
-| Votes | Games | Rate |
-|-------|-------|------|
-| 3 | {int(vote_counts.get(3, 0))} | {vote_counts.get(3, 0) / len(player_games_dna) * 100:.1f}% |
-| 2 | {int(vote_counts.get(2, 0))} | {vote_counts.get(2, 0) / len(player_games_dna) * 100:.1f}% |
-| 1 | {int(vote_counts.get(1, 0))} | {vote_counts.get(1, 0) / len(player_games_dna) * 100:.1f}% |
-| 0 | {int(vote_counts.get(0, 0))} | {vote_counts.get(0, 0) / len(player_games_dna) * 100:.1f}% |
-""")
-                        with c2:
-                            fig_pie = go.Figure(go.Pie(
-                                labels=['3 votes', '2 votes', '1 vote', '0 votes'],
-                                values=[vote_counts.get(3, 0), vote_counts.get(2, 0),
-                                        vote_counts.get(1, 0), vote_counts.get(0, 0)],
-                                marker_colors=['#7e8c99', '#34d399', '#f0b429', '#0d141d'],
-                                hole=0.4,
-                            ))
-                            fig_pie.update_layout(
-                                plot_bgcolor='#101a24', paper_bgcolor='#101a24',
-                                font_color='#e9eef3', margin=dict(t=10, b=10),
-                                showlegend=True, height=250,
-                                legend=dict(orientation='h', y=-0.1),
-                            )
-                            fig_pie = apply_chart_theme(fig_pie)
-                            st.plotly_chart(fig_pie, width='stretch', key="chart_005")
+                    has_votes = (not player_games_dna.empty) and ('Brownlow.Votes' in player_games_dna.columns)
 
-                        st.markdown('<div class="section-header">Disposal Threshold Analysis</div>', unsafe_allow_html=True)
-                        thresh_data = []
-                        for t in [15, 20, 25, 28, 30, 33, 35]:
-                            subset = player_games_dna[player_games_dna['Disposals'] >= t]
-                            if len(subset) >= 2:
-                                thresh_data.append({
-                                    'Min Disposals': t, 'Games': len(subset),
-                                    'Poll Rate': f"{(subset['Brownlow.Votes'] > 0).mean() * 100:.1f}%",
-                                    'Avg Votes': f"{subset['Brownlow.Votes'].mean():.2f}",
-                                    '3-vote Rate': f"{(subset['Brownlow.Votes'] == 3).mean() * 100:.1f}%",
-                                })
-                        if thresh_data:
-                            st.dataframe(pd.DataFrame(thresh_data), width='stretch', hide_index=True)
+                    games_total = int(e["Games"]) if not pd.isna(e["Games"]) else 0
+                    poll_rate   = e["Poll_Rate"]
+                    polled_n    = int(round((0 if pd.isna(poll_rate) else poll_rate) * games_total))
+                    wr   = e.get('Win_Poll_Rate', float('nan'))
+                    lr   = e.get('Loss_Poll_Rate', float('nan'))
+                    hd   = e.get('HD_Poll_Rate', float('nan'))
+                    hd_g = e.get('HD_Games', float('nan'))
+                    hd_g_int = 0 if pd.isna(hd_g) else int(hd_g)
+                    wr_w = 0.0 if pd.isna(wr) else max(0.0, min(100.0, wr * 100))
+                    lr_w = 0.0 if pd.isna(lr) else max(0.0, min(100.0, lr * 100))
 
-                st.markdown('<div class="section-header">League Efficiency Rankings</div>', unsafe_allow_html=True)
+                    # Lopsided win/loss insight, generated from the actual split.
+                    _insight = ""
+                    if not pd.isna(poll_rate) and poll_rate > 0:
+                        polled_wins   = (not pd.isna(wr)) and wr > 0
+                        polled_losses = (not pd.isna(lr)) and lr > 0
+                        if polled_wins and (not pd.isna(lr)) and lr == 0:
+                            _insight = "Every vote came in a win — a clean win-dependency."
+                        elif polled_losses and (not pd.isna(wr)) and wr == 0:
+                            _insight = "Every vote came in a loss — polls regardless of the result."
+                    _insight_html = f'<div class="dna-insight">{_insight}</div>' if _insight else ''
+
+                    st.markdown("""
+<style>
+.dna-poll-val{font-family:'IBM Plex Mono',monospace;font-size:38px;font-weight:600;color:var(--emerald);line-height:1;}
+.dna-poll-sub{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-top:8px;letter-spacing:.03em;}
+.dna-split{margin-top:22px;display:flex;flex-direction:column;gap:14px;}
+.dna-split-lbl{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--steel);margin-bottom:6px;}
+.dna-split-lbl b{color:var(--text);font-weight:600;}
+.dna-track{height:8px;background:var(--muted-fill);border-radius:4px;overflow:hidden;}
+.dna-fill{height:100%;border-radius:4px;}
+.dna-fill.win{background:var(--emerald);}
+.dna-fill.loss{background:var(--emerald-pack);}
+.dna-insight{font-family:'IBM Plex Mono',monospace;font-size:11px;font-style:italic;color:var(--gold);margin-top:16px;line-height:1.4;}
+.dna-readout{display:flex;align-items:baseline;gap:12px;margin-top:20px;padding-top:16px;border-top:1px solid var(--line);}
+.dna-readout-lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);}
+.dna-readout-val{font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;color:var(--text);margin-left:auto;}
+.dna-readout-note{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+.dna-mini-head{font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.16em;color:var(--muted);margin-bottom:2px;}
+.dna-find-val{font-family:'IBM Plex Mono',monospace;font-size:38px;font-weight:600;color:var(--gold);line-height:1;}
+.dna-find-cap{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-top:6px;letter-spacing:.03em;}
+.dna-find-sub{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-top:8px;}
+.dna-find-sentence{font-family:'Archivo',sans-serif;font-size:13px;color:var(--text);margin-top:14px;line-height:1.5;max-width:46ch;}
+.dna-find-strip{display:flex;margin-top:18px;}
+.dna-find-strip .dfs{padding:0 16px;}
+.dna-find-strip .dfs:first-child{padding-left:0;}
+.dna-find-strip .dfs + .dfs{border-left:1px solid var(--hairline-strong);}
+.dfs-v{font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600;color:var(--steel);}
+.dfs-l{font-family:'IBM Plex Mono',monospace;font-size:9px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin-top:5px;}
+.dna-vbar{display:flex;height:30px;border-radius:6px;overflow:hidden;background:var(--muted-fill);}
+.dna-vbar > div{height:100%;}
+.dna-vleg{display:flex;flex-wrap:wrap;gap:18px;margin-top:12px;font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--steel);}
+.dna-vleg .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:7px;vertical-align:middle;}
+.dna-vins{font-family:'IBM Plex Mono',monospace;font-size:11px;font-style:italic;color:var(--gold);margin-top:12px;}
+</style>
+""", unsafe_allow_html=True)
+
+                    st.markdown('<div class="section-header">Polling DNA</div>', unsafe_allow_html=True)
+                    dna_l, dna_r = st.columns(2)
+
+                    # ── Left: poll rate headline + win/loss split + 30+ readout ──
+                    with dna_l:
+                        st.markdown(f"""
+<div>
+  <div class="dna-poll-val">{_rate(poll_rate)}</div>
+  <div class="dna-poll-sub">overall poll rate · polled in {polled_n} of {games_total} games</div>
+  <div class="dna-split">
+    <div>
+      <div class="dna-split-lbl">In wins <b>{_rate(wr)}</b></div>
+      <div class="dna-track"><div class="dna-fill win" style="width:{wr_w:.1f}%"></div></div>
+    </div>
+    <div>
+      <div class="dna-split-lbl">In losses <b>{_rate(lr)}</b></div>
+      <div class="dna-track"><div class="dna-fill loss" style="width:{lr_w:.1f}%"></div></div>
+    </div>
+  </div>
+  {_insight_html}
+  <div class="dna-readout">
+    <span class="dna-readout-lbl">30+ disposal poll rate</span>
+    <span class="dna-readout-val">{_rate(hd, hd_g)}</span>
+    <span class="dna-readout-note">{hd_g_int} games</span>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+
+                    # ── Right: disposal-threshold finding (slider-driven) ──
+                    with dna_r:
+                        st.markdown('<div class="dna-mini-head">Disposal Threshold</div>', unsafe_allow_html=True)
+                        thr = st.slider("Min disposals", 10, 40, 30, key="dna_disp_thresh")
+                        if has_votes:
+                            subset = player_games_dna[player_games_dna['Disposals'] >= thr]
+                            n_sub = len(subset)
+                            n_tot = len(player_games_dna)
+                            if n_sub == 0:
+                                st.markdown(
+                                    f'<div class="dna-find-val">—</div>'
+                                    f'<div class="dna-find-sub">no games at {thr}+ disposals</div>',
+                                    unsafe_allow_html=True,
+                                )
+                            else:
+                                pr  = (subset['Brownlow.Votes'] > 0).mean()
+                                av  = subset['Brownlow.Votes'].mean()
+                                tvr = (subset['Brownlow.Votes'] == 3).mean()
+                                _ln = selected_player.split()[-1]
+                                if pr == 1.0:
+                                    _s = f"When {_ln} reaches {thr} touches he polls every time"
+                                    _s += " — and every one was a 3-vote game." if tvr == 1.0 else f" — averaging {av:.2f} votes."
+                                else:
+                                    _s = f"At {thr}+ disposals {_ln} polls {pr * 100:.0f}% of the time, averaging {av:.2f} votes."
+                                st.markdown(f"""
+<div>
+  <div class="dna-find-val">{_rate(pr, n_sub)}</div>
+  <div class="dna-find-cap">poll rate at {thr}+ disposals</div>
+  <div class="dna-find-sentence">{_s}</div>
+  <div class="dna-find-strip">
+    <div class="dfs"><div class="dfs-v">{n_sub} of {n_tot}</div><div class="dfs-l">Games</div></div>
+    <div class="dfs"><div class="dfs-v">{av:.2f}</div><div class="dfs-l">Avg Votes</div></div>
+    <div class="dfs"><div class="dfs-v">{_rate(tvr, n_sub)}</div><div class="dfs-l">3-Vote Rate</div></div>
+  </div>
+</div>
+""", unsafe_allow_html=True)
+                        else:
+                            st.markdown('<div class="dna-find-sub">No actual-vote data for this season.</div>',
+                                        unsafe_allow_html=True)
+
+                    # ── Vote distribution: one horizontal stacked bar ──
+                    if has_votes:
+                        vc = player_games_dna['Brownlow.Votes'].value_counts()
+                        n3, n2, n1, n0 = int(vc.get(3, 0)), int(vc.get(2, 0)), int(vc.get(1, 0)), int(vc.get(0, 0))
+                        tot = len(player_games_dna)
+                        def _w(n): return (n / tot * 100) if tot else 0
+                        polled = n3 + n2 + n1
+                        _vins = ""
+                        if polled > 0 and n3 == polled:
+                            _vins = f"Every time {selected_player.split()[-1]} polled, it was a 3-vote game."
+                        _vins_html = f'<div class="dna-vins">{_vins}</div>' if _vins else ''
+                        st.markdown(
+                            '<div class="section-header" style="margin-top:8px">Vote Distribution</div>',
+                            unsafe_allow_html=True,
+                        )
+                        st.markdown(f"""
+<div class="dna-vbar">
+  <div style="width:{_w(n3):.1f}%;background:var(--gold)"></div>
+  <div style="width:{_w(n2):.1f}%;background:var(--emerald-pack)"></div>
+  <div style="width:{_w(n1):.1f}%;background:rgba(159,176,191,.55)"></div>
+  <div style="width:{_w(n0):.1f}%;background:var(--muted-fill)"></div>
+</div>
+<div class="dna-vleg">
+  <span><span class="sw" style="background:var(--gold)"></span>3 votes · {n3}</span>
+  <span><span class="sw" style="background:var(--emerald-pack)"></span>2 votes · {n2}</span>
+  <span><span class="sw" style="background:rgba(159,176,191,.55)"></span>1 vote · {n1}</span>
+  <span><span class="sw" style="background:var(--muted-fill)"></span>0 votes · {n0}</span>
+</div>
+{_vins_html}
+""", unsafe_allow_html=True)
+
+                st.markdown('<div class="section-header" style="margin-top:8px">League Efficiency Rankings</div>', unsafe_allow_html=True)
                 min_g = st.slider("Minimum games", 1, max_season_rounds, min(10, max_season_rounds), key="dna_min_g")
                 sort_by = st.selectbox("Sort by", ['Poll_Rate', 'Win_Poll_Rate', 'HD_Poll_Rate', 'Three_Vote_Rate'],
                                        format_func=lambda x: {
@@ -3136,18 +3316,47 @@ if _page == 'Player Profile':
                                        }[x], key="dna_sort")
                 eff_display = efficiency[efficiency['Games'] >= min_g].copy()
                 eff_display = eff_display.sort_values(sort_by, ascending=False).head(30)
-                eff_display['Poll %'] = (eff_display['Poll_Rate'] * 100).round(1)
-                eff_display['Win Poll %'] = (eff_display['Win_Poll_Rate'] * 100).round(1)
-                eff_display['Loss Poll %'] = (eff_display['Loss_Poll_Rate'] * 100).round(1)
-                eff_display['30+ Poll %'] = (eff_display['HD_Poll_Rate'] * 100).round(1)
-                eff_display['3v Rate %'] = (eff_display['Three_Vote_Rate'] * 100).round(1)
                 eff_display.insert(0, 'Rank', range(1, len(eff_display) + 1))
-                _dna_disp = eff_display[['Rank', 'Player_Name', 'Games', 'Poll %', 'Win Poll %',
-                                 'Loss Poll %', '30+ Poll %', '3v Rate %', 'Avg_Disposals']].rename(
-                    columns={'Player_Name': 'Player', 'Avg_Disposals': 'Avg Disp'})
-                for col in _dna_disp.select_dtypes(include='float').columns:
-                    _dna_disp[col] = _dna_disp[col].round(1)
-                st.dataframe(_style_table(_dna_disp), width='stretch', hide_index=True)
+
+                # Custom HTML table (Leaderboard convention). Null rule via _rate:
+                # 30+ % shows "—" when the player has no 30+ games (HD_Games NaN/0),
+                # "0.0%" only when defined-but-zero. Sort logic above is untouched.
+                _rows = ""
+                for _, rr in eff_display.iterrows():
+                    _rows += (
+                        '<tr>'
+                        f'<td class="lft lb-rank">{int(rr["Rank"])}</td>'
+                        f'<td class="lft lb-pname">{rr["Player_Name"]}</td>'
+                        f'<td>{int(rr["Games"])}</td>'
+                        f'<td class="key">{_rate(rr["Poll_Rate"])}</td>'
+                        f'<td>{_rate(rr["Win_Poll_Rate"])}</td>'
+                        f'<td>{_rate(rr["Loss_Poll_Rate"])}</td>'
+                        f'<td>{_rate(rr["HD_Poll_Rate"], rr.get("HD_Games"))}</td>'
+                        f'<td>{_rate(rr["Three_Vote_Rate"])}</td>'
+                        f'<td>{rr["Avg_Disposals"]:.1f}</td>'
+                        '</tr>'
+                    )
+                st.markdown(f"""
+<style>
+.dna-rank .lb-tbl-wrap{{overflow-x:auto;}}
+.dna-rank table{{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;}}
+.dna-rank th{{font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:9px 12px;border-bottom:1px solid var(--hairline-strong);text-align:right;white-space:nowrap;}}
+.dna-rank th.lft{{text-align:left;}}
+.dna-rank td{{font-size:13px;padding:8px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;color:var(--steel);}}
+.dna-rank td.lft{{text-align:left;}}
+.dna-rank td.key{{color:var(--text);font-weight:600;}}
+.dna-rank td.lb-rank{{color:var(--text);font-weight:600;width:40px;}}
+.dna-rank td.lb-pname{{font-family:'Archivo',sans-serif;font-size:14px;font-weight:600;color:var(--text);}}
+.dna-rank tr:hover td{{background:rgba(255,255,255,.02);}}
+</style>
+<div class="dna-rank"><div class="lb-tbl-wrap"><table>
+<thead><tr>
+<th class="lft">Rank</th><th class="lft">Player</th><th>Games</th>
+<th>Poll %</th><th>Win %</th><th>Loss %</th><th>30+ %</th><th>3V %</th><th>Avg Disp</th>
+</tr></thead>
+<tbody>{_rows}</tbody>
+</table></div></div>
+""", unsafe_allow_html=True)
 
 # ════════════════════════════════════════════════════════════
 # PLAYER DNA — merged into Player Profile
