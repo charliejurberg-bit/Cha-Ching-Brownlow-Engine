@@ -406,7 +406,8 @@ def apply_chart_theme(fig):
 
 def render_banner():
     _hub = st.session_state.get("active_hub", "brownlow")
-    _sub = f"Through Round {max_season_rounds - 1}" if is_2026 else f"{selected_season} Season"
+    _sub = ("Through Round {}".format(max_season_rounds - 1) if is_2026
+            else "All Seasons" if is_career else f"{selected_season} Season")
     _mode_label = "Brownlow Predictor" if _hub == "brownlow" else "Betting Hub"
     st.markdown(f"""
 <div class="cc-banner">
@@ -999,11 +1000,40 @@ def load_all_historical():
             frames.append(df)
     return pd.concat(frames, ignore_index=True) if frames else None
 
-@st.cache_data
-def compute_player_efficiency(season):
-    df = load_game(season)
-    if df is None:
+# Sentinel season value meaning "all seasons combined" (career view).
+CAREER = "Career"
+
+@st.cache_data(ttl=300)
+def load_game_career():
+    """Per-game data across every season, with a clean Team column.
+    (Older season files only carry 'Playing.for'; 2026 carries 'Team'.)"""
+    g = load_all_historical()
+    if g is None:
         return None
+    g = g.copy()
+    if 'Playing.for' in g.columns:
+        if 'Team' in g.columns:
+            g['Team'] = g['Team'].fillna(g['Playing.for'])
+        else:
+            g['Team'] = g['Playing.for']
+    return _fix_team_names(g)
+
+@st.cache_data(ttl=300)
+def load_season_career():
+    """Career stand-in for a season_*.csv: one row per player (player list +
+    most-recent team), used by Player Profile for the picker and identity."""
+    g = load_game_career()
+    if g is None:
+        return None
+    g = g.sort_values(['Player_Name', 'Season', 'Round_num'])
+    agg = g.groupby('Player_Name').agg(
+        Team=('Team', 'last'),
+        Games=('Round_num', 'size'),
+    ).reset_index()
+    ev = g.groupby('Player_Name')['Exp_Votes'].sum().rename('Exp_Total_Votes').reset_index()
+    return agg.merge(ev, on='Player_Name', how='left')
+
+def _efficiency_from_df(df):
     overall = df.groupby('Player_Name').agg(
         Games=('Round_num', 'count'),
         Total_Votes=('Brownlow.Votes', 'sum'),
@@ -1032,6 +1062,22 @@ def compute_player_efficiency(season):
     eff = eff.merge(wins, on='Player_Name', how='left')
     eff = eff.merge(losses, on='Player_Name', how='left')
     return eff
+
+@st.cache_data
+def compute_player_efficiency(season):
+    df = load_game(season)
+    return _efficiency_from_df(df) if df is not None else None
+
+@st.cache_data
+def compute_player_efficiency_career():
+    """Polling DNA over a player's whole career. Seasons with no actual votes
+    yet (the in-progress 2026 season) are excluded so they don't deflate rates."""
+    g = load_game_career()
+    if g is None:
+        return None
+    voted = g.groupby('Season')['Brownlow.Votes'].transform('sum') > 0
+    df = g[voted]
+    return _efficiency_from_df(df) if not df.empty else None
 
 def load_best_odds():
     path = "data_2026/best_odds.csv"
@@ -1418,13 +1464,20 @@ if 'season_by_page' not in st.session_state:
     st.session_state.season_by_page = {}
 _season_page = st.session_state.get('page', 'Landing')
 selected_season = st.session_state.season_by_page.get(_season_page, DEFAULT_SEASON)
-if selected_season not in AVAILABLE_SEASONS:
+# CAREER is a valid selection (offered only on Player Profile); anything else
+# unknown falls back to the default season.
+if selected_season != CAREER and selected_season not in AVAILABLE_SEASONS:
     selected_season = DEFAULT_SEASON
 is_2026 = (selected_season == 2026)
+is_career = (selected_season == CAREER)
 
 # ── Data loading ─────────────────────────────────────────────
-predictions = load_season(selected_season)
-game_df = load_game(selected_season)
+if is_career:
+    predictions = load_season_career()
+    game_df = load_game_career()
+else:
+    predictions = load_season(selected_season)
+    game_df = load_game(selected_season)
 importance = load_importance()
 
 if predictions is None:
@@ -2946,16 +2999,18 @@ if _page == 'Player Profile':
     if game_df is None:
         st.error("No game-level data found.")
     else:
-        efficiency = compute_player_efficiency(selected_season)
+        efficiency = compute_player_efficiency_career() if is_career else compute_player_efficiency(selected_season)
         players = sorted(predictions['Player_Name'].tolist())
         _pp_psel, _pp_ssel = st.columns([4, 1])
         with _pp_psel:
             selected_player = st.selectbox("Select player", players, key="profile_player")
         with _pp_ssel:
             # Season selector sits next to the player name (per-page state).
+            # Player Profile alone offers "Career" — the whole-career view.
+            _pp_season_opts = AVAILABLE_SEASONS + [CAREER]
             st.selectbox(
-                "Season", AVAILABLE_SEASONS,
-                index=AVAILABLE_SEASONS.index(selected_season),
+                "Season", _pp_season_opts,
+                index=_pp_season_opts.index(selected_season),
                 key=f"_ctrl_season::{_page}",
                 on_change=_season_changed,
                 args=(_page,),
@@ -2965,7 +3020,11 @@ if _page == 'Player Profile':
 
         # ── Profile tab ───────────────────────────────────────
         with _tab_prof:
-            player_games = game_df[game_df['Player_Name'] == selected_player].copy().sort_values('Round_num')
+            player_games = game_df[game_df['Player_Name'] == selected_player].copy()
+            # Career view spans many seasons → order chronologically; a single
+            # season just orders by round.
+            _sort_keys = ['Season', 'Round_num'] if is_career else ['Round_num']
+            player_games = player_games.sort_values(_sort_keys)
             pred_row = predictions[predictions['Player_Name'] == selected_player]
 
             if not pred_row.empty:
@@ -2976,12 +3035,20 @@ if _page == 'Player Profile':
                 if _games:
                     _avg_votes = player_games['Exp_Votes'].mean()
                     _avg_poll = player_games['Poll_Prob'].mean() * 100
-                    _best_round = int(player_games.loc[player_games['Poll_Prob'].idxmax(), 'Round_num']) - 1
-                    _best_round_lbl = f"R{_best_round}"
+                    _best = player_games.loc[player_games['Poll_Prob'].idxmax()]
+                    if is_career:
+                        _best_round_lbl = f"{int(_best['Season'])} R{int(_best['Round_num']) - 1}"
+                    else:
+                        _best_round_lbl = f"R{int(_best['Round_num']) - 1}"
                 else:
                     _avg_votes = 0.0
                     _avg_poll = 0.0
                     _best_round_lbl = "—"
+                if is_career:
+                    _n_seasons = int(player_games['Season'].nunique())
+                    _meta_str = f'{row["Team"]} · Career · {_n_seasons} seasons'
+                else:
+                    _meta_str = f'{row["Team"]} · {selected_season} season'
 
                 st.markdown(f"""
 <style>
@@ -3023,7 +3090,7 @@ if _page == 'Player Profile':
 <div class="pp-identity">
   <div class="pp-id-left">
     <div class="pp-name">{selected_player}</div>
-    <div class="pp-meta">{row["Team"]} · {selected_season} season</div>
+    <div class="pp-meta">{_meta_str}</div>
   </div>
   <div class="pp-strip">
     <div class="pp-item pp-head"><div class="pp-val">{_games}</div><div class="pp-lbl">Games</div></div>
@@ -3052,24 +3119,52 @@ if _page == 'Player Profile':
 
                 _vote_colors = [_vote_color(v) for v in _poll_pct]
 
+                # X-axis differs by mode: a single season uses the AFL round
+                # number; career uses a chronological game index with season
+                # labels on the axis and Season·Round in the tooltip.
+                if is_career:
+                    _x = list(range(len(player_games)))
+                    _seasons_order = player_games['Season'].astype(int).tolist()
+                    _rounds_order = (player_games['Round_num'].astype(int) - 1).tolist()
+                    _seen = {}
+                    for _i, _s in enumerate(_seasons_order):
+                        _seen.setdefault(_s, _i)
+                    _xaxis_cfg = dict(title='Season', tickmode='array',
+                                      tickvals=list(_seen.values()),
+                                      ticktext=[str(s) for s in _seen])
+                    _customdata = list(zip(_seasons_order, _rounds_order))
+                    _hover_pp = 'Season %{customdata[0]} · R%{customdata[1]}<br>Poll %{y:.1f}%<extra></extra>'
+                    _hover_stat = 'Season %{customdata[0]} · R%{customdata[1]}<br>%{y}<extra></extra>'
+                    _traj_caption = 'poll probability across career'
+                    _avg_word = 'career'
+                else:
+                    _x = (player_games['Round_num'] - 1)
+                    _xaxis_cfg = dict(title='Round', dtick=1)
+                    _customdata = None
+                    _hover_pp = 'Round %{x}<br>Poll %{y:.1f}%<extra></extra>'
+                    _hover_stat = 'Round %{x}<br>%{y}<extra></extra>'
+                    _traj_caption = 'poll probability by round'
+                    _avg_word = 'season'
+
                 st.markdown(
                     '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
                     'font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--steel);'
                     'border-bottom:1px solid var(--line);padding-bottom:8px;margin:8px 0 16px;'
                     'display:flex;align-items:baseline;gap:12px;">VOTE TRAJECTORY'
                     '<span style="font-size:9px;font-weight:400;letter-spacing:.04em;'
-                    'text-transform:none;color:var(--muted);">poll probability by round</span></div>',
+                    f'text-transform:none;color:var(--muted);">{_traj_caption}</span></div>',
                     unsafe_allow_html=True,
                 )
 
                 fig = go.Figure()
                 fig.add_trace(go.Bar(
-                    x=player_games['Round_num'] - 1, y=_poll_pct.round(1),
+                    x=_x, y=_poll_pct.round(1),
                     name='Poll Probability %', marker_color=_vote_colors,
-                    hovertemplate='Round %{x}<br>Poll %{y:.1f}%<extra></extra>',
+                    customdata=_customdata,
+                    hovertemplate=_hover_pp,
                 ))
                 fig.update_layout(
-                    xaxis=dict(title='Round', dtick=1),
+                    xaxis=_xaxis_cfg,
                     yaxis=dict(title='Poll Probability (%)', rangemode='tozero'),
                     showlegend=False, margin=dict(t=20, b=40), bargap=0.35,
                     hovermode='x unified',
@@ -3083,7 +3178,7 @@ if _page == 'Player Profile':
                     '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
                     'font-weight:600;letter-spacing:.18em;text-transform:uppercase;color:var(--steel);'
                     'border-bottom:1px solid var(--line);padding-bottom:8px;margin:8px 0 16px;'
-                    'display:flex;align-items:baseline;gap:12px;">STAT BY ROUND'
+                    f'display:flex;align-items:baseline;gap:12px;">{"STAT OVER CAREER" if is_career else "STAT BY ROUND"}'
                     '<span style="font-size:9px;font-weight:400;letter-spacing:.04em;'
                     'text-transform:none;color:var(--muted);">colour marks above-average games</span></div>',
                     unsafe_allow_html=True,
@@ -3092,7 +3187,7 @@ if _page == 'Player Profile':
                     ['Disposals', 'Coaches_Votes', 'Goals', 'Contested.Possessions', 'Clearances', 'Kicks'],
                     key="profile_stat")
 
-                # Season average of the selected stat; colour bars above/below it.
+                # Average of the selected stat (career or season); colour bars above/below it.
                 _stat_series = player_games[stat_choice]
                 _stat_avg = _stat_series.mean()
                 _stat_colors = ['#34d399' if v >= _stat_avg else 'rgba(159,176,191,.22)' for v in _stat_series]
@@ -3105,16 +3200,17 @@ if _page == 'Player Profile':
                     '<span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;'
                     'background:rgba(159,176,191,.22);margin-right:6px;vertical-align:middle;"></span>below average</span>'
                     '<span><span style="display:inline-block;width:14px;height:0;border-top:2px dashed #f0b429;'
-                    'margin-right:6px;vertical-align:middle;"></span>season average</span></div>',
+                    f'margin-right:6px;vertical-align:middle;"></span>{_avg_word} average</span></div>',
                     unsafe_allow_html=True,
                 )
 
                 _stat_label = stat_choice.replace('.', ' ').replace('_', ' ')
                 fig2 = go.Figure()
                 fig2.add_trace(go.Bar(
-                    x=player_games['Round_num'] - 1, y=_stat_series,
+                    x=_x, y=_stat_series,
                     name=_stat_label, marker_color=_stat_colors,
-                    hovertemplate='Round %{x}<br>%{y}<extra></extra>',
+                    customdata=_customdata,
+                    hovertemplate=_hover_stat,
                 ))
                 fig2.add_hline(
                     y=_stat_avg, line=dict(color='#f0b429', width=1.5, dash='dash'),
@@ -3122,7 +3218,7 @@ if _page == 'Player Profile':
                     annotation_font=dict(family="IBM Plex Mono, monospace", color="#f0b429", size=10),
                 )
                 fig2.update_layout(
-                    xaxis=dict(title='Round', dtick=1),
+                    xaxis=_xaxis_cfg,
                     yaxis=dict(title=_stat_label, rangemode='tozero'),
                     showlegend=False, margin=dict(t=20, b=40), bargap=0.35,
                     hovermode='x unified',
@@ -3140,9 +3236,12 @@ if _page == 'Player Profile':
                 log['P(3)'] = (log['P_3'] * 100).round(1).astype(str) + '%'
                 log['P(2)'] = (log['P_2'] * 100).round(1).astype(str) + '%'
                 log['P(1)'] = (log['P_1'] * 100).round(1).astype(str) + '%'
-                display_cols = ['Round_num', 'Result', 'Disposals', 'Goals',
-                                'Contested.Possessions', 'Clearances', 'Coaches_Votes']
-                if not is_2026 and 'Brownlow.Votes' in log.columns:
+                display_cols = (['Season'] if is_career else []) + [
+                    'Round_num', 'Result', 'Disposals', 'Goals',
+                    'Contested.Possessions', 'Clearances', 'Coaches_Votes']
+                # Career mixes voted seasons with the in-progress one; show actual
+                # votes whenever the column carries them (hidden only for a lone 2026).
+                if (is_career or not is_2026) and 'Brownlow.Votes' in log.columns:
                     display_cols.append('Brownlow.Votes')
                 display_cols += ['ExpV', 'Poll%', 'P(3)', 'P(2)', 'P(1)']
                 available = [c for c in display_cols if c in log.columns]
@@ -3150,9 +3249,12 @@ if _page == 'Player Profile':
                     'Round_num': 'Rnd', 'Contested.Possessions': 'ContPoss',
                     'Coaches_Votes': 'CV', 'Brownlow.Votes': 'BV',
                 })
-                _log_disp = log_display.sort_values('Rnd').copy()
+                _sort_cols = ['Season', 'Rnd'] if is_career else ['Rnd']
+                _log_disp = log_display.sort_values(_sort_cols).copy()
                 # Display AFL round (AFLTables Round_num runs 1 ahead) — display only, order unchanged
                 _log_disp['Rnd'] = _log_disp['Rnd'] - 1
+                if is_career:
+                    _log_disp['Season'] = _log_disp['Season'].astype(int)
                 for col in _log_disp.select_dtypes(include='float').columns:
                     _log_disp[col] = _log_disp[col].round(1)
                 st.dataframe(_style_table(_log_disp), width='stretch', hide_index=True)
@@ -3178,6 +3280,12 @@ if _page == 'Player Profile':
                     e = eff_row.iloc[0]
 
                     player_games_dna = game_df[game_df['Player_Name'] == selected_player].copy()
+                    # Career polling stats only count seasons whose votes are in;
+                    # drop the in-progress season so it doesn't dilute the rates.
+                    if is_career and 'Season' in player_games_dna.columns:
+                        _voted_seasons = (game_df.groupby('Season')['Brownlow.Votes']
+                                          .sum().loc[lambda s: s > 0].index)
+                        player_games_dna = player_games_dna[player_games_dna['Season'].isin(_voted_seasons)]
                     has_votes = (not player_games_dna.empty) and ('Brownlow.Votes' in player_games_dna.columns)
 
                     games_total = int(e["Games"]) if not pd.isna(e["Games"]) else 0
@@ -3337,7 +3445,13 @@ if _page == 'Player Profile':
 """, unsafe_allow_html=True)
 
                 st.markdown('<div class="section-header" style="margin-top:8px">League Efficiency Rankings</div>', unsafe_allow_html=True)
-                min_g = st.slider("Minimum games", 1, max_season_rounds, min(10, max_season_rounds), key="dna_min_g")
+                # Career spans many seasons, so allow a higher minimum-games filter
+                # (separate key avoids a stored value falling outside the season range).
+                if is_career:
+                    _mg_max = max(int(efficiency['Games'].max()), 1)
+                    min_g = st.slider("Minimum games", 1, _mg_max, min(50, _mg_max), key="dna_min_g_career")
+                else:
+                    min_g = st.slider("Minimum games", 1, max_season_rounds, min(10, max_season_rounds), key="dna_min_g")
                 sort_by = st.selectbox("Sort by", ['Poll_Rate', 'Win_Poll_Rate', 'HD_Poll_Rate', 'Three_Vote_Rate'],
                                        format_func=lambda x: {
                                            'Poll_Rate': 'Overall Poll Rate', 'Win_Poll_Rate': 'Win Poll Rate',
