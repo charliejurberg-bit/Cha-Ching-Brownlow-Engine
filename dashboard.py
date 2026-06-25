@@ -2027,7 +2027,9 @@ if _show_controls:
                 unsafe_allow_html=True,
             )
     with _cc3:
-        if _page in _SEASON_PAGES:
+        # Player Profile renders its own Season selector inline (next to the
+        # player name); every other season page uses this top-right control.
+        if _page in _SEASON_PAGES and _page != 'Player Profile':
             # Per-page widget key keeps pages independent; on_change mirrors the
             # pick into season_by_page so it survives navigating away and back.
             st.selectbox(
@@ -2946,7 +2948,18 @@ if _page == 'Player Profile':
     else:
         efficiency = compute_player_efficiency(selected_season)
         players = sorted(predictions['Player_Name'].tolist())
-        selected_player = st.selectbox("Select player", players, key="profile_player")
+        _pp_psel, _pp_ssel = st.columns([4, 1])
+        with _pp_psel:
+            selected_player = st.selectbox("Select player", players, key="profile_player")
+        with _pp_ssel:
+            # Season selector sits next to the player name (per-page state).
+            st.selectbox(
+                "Season", AVAILABLE_SEASONS,
+                index=AVAILABLE_SEASONS.index(selected_season),
+                key=f"_ctrl_season::{_page}",
+                on_change=_season_changed,
+                args=(_page,),
+            )
 
         _tab_prof, _tab_dna = st.tabs(["Profile", "DNA"])
 
