@@ -5624,33 +5624,35 @@ if _page == 'Live Tracker':
     _lt_sn   = _lt.get("season_name", "")
     _lt_live = _lt.get("is_live", False)
 
-    # ── title bar ────────────────────────────────────────────
-    _badge_class = "live-badge" if _lt_live else "live-badge-off"
-    _dot_lbl     = "LIVE" if _lt_live else "OFF-SEASON"
-    st.markdown(
-        f'<div class="title-bar" style="display:flex;align-items:center;justify-content:space-between">'
-        f'<div style="display:flex;align-items:center;gap:12px">'
-        f'<h2 style="color:var(--text);margin:0">Live Tracker</h2>'
-        f'<span class="{_badge_class}">{_dot_lbl}</span>'
-        f'</div>'
-        f'<p style="color:var(--muted);margin:0;font-size:13px">{_lt_sn}</p>'
-        f'</div>',
-        unsafe_allow_html=True,
-    )
+    import streamlit.components.v1 as _stc
+    _lt_auto = False  # set in the utility line below; init so refresh guard is safe
 
-    # ── controls row ─────────────────────────────────────────
-    _ctrl_l, _ctrl_r = st.columns([3, 7])
-    with _ctrl_l:
-        _lt_auto = st.checkbox("Auto-refresh every 60 s", value=False, key="lt_auto_refresh")
-    with _ctrl_r:
-        _lt_ts = _time.strftime("%H:%M:%S")
-        st.markdown(
-            f'<p style="color:var(--muted);font-size:12px;margin:6px 0 0 0">'
-            f'Last fetched: {_lt_ts} &nbsp;·&nbsp; '
-            f'<a href="https://www.afl.com.au/brownlow-medal/live-tracker" target="_blank" '
-            f'style="color:#34d399">AFL.com.au tracker ↗</a></p>',
-            unsafe_allow_html=True,
-        )
+    # ── 1. Header (no box) — the LIVE pill pulses (@keyframes), so it is
+    #    rendered through a components.html iframe (Streamlit strips keyframes
+    #    from st.markdown). ─────────────────────────────────────
+    _pill_txt = "LIVE" if _lt_live else "OFF-SEASON"
+    _pill_col = "#34d399" if _lt_live else "#7e8c99"
+    _hdr_html = f"""<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@800&family=IBM+Plex+Mono:wght@600;800&display=swap" rel="stylesheet">
+<style>
+  *{{margin:0;box-sizing:border-box}}
+  body{{background:#0a1017;font-family:'Archivo',sans-serif;-webkit-font-smoothing:antialiased}}
+  .wrap{{display:flex;align-items:center;justify-content:space-between;gap:16px}}
+  .l{{display:flex;align-items:center;gap:14px}}
+  h1{{font-size:34px;font-weight:800;letter-spacing:-.01em;line-height:1;color:#e9eef3}}
+  .pill{{display:inline-flex;align-items:center;gap:7px;background:rgba(52,211,153,.12);
+    color:{_pill_col};font-size:11px;font-weight:800;letter-spacing:.18em;text-transform:uppercase;
+    padding:5px 11px;border-radius:999px;font-family:'IBM Plex Mono',monospace}}
+  .dot{{width:7px;height:7px;border-radius:50%;background:{_pill_col}}}
+  .live .dot{{animation:pulse 1.4s ease-in-out infinite}}
+  @keyframes pulse{{0%,100%{{opacity:1;transform:scale(1)}}50%{{opacity:.3;transform:scale(.65)}}}}
+  .comp{{color:#7e8c99;font-size:13px;font-family:'IBM Plex Mono',monospace;text-align:right}}
+</style></head><body><div class="wrap">
+  <div class="l"><h1>Live Tracker</h1>
+    <span class="pill {'live' if _lt_live else ''}"><span class="dot"></span>{_pill_txt}</span></div>
+  <div class="comp">{_lt_sn}</div>
+</div></body></html>"""
+    _stc.html(_hdr_html, height=54)
 
     if _lt_err:
         st.error(f"Could not fetch AFL tracker data: {_lt_err}")
@@ -5669,308 +5671,332 @@ if _page == 'Live Tracker':
         pass  # live — fall through to content
 
     if not _lt_df.empty:
-        # ── metrics strip ────────────────────────────────────
-        _lt_rlabel = f"Round {_lt_last}"
-        _lt_leader = _lt_df.iloc[0]["Player"] if len(_lt_df) else "—"
-        _lt_leader_votes = int(_lt_df.iloc[0]["Total_Votes"]) if len(_lt_df) else 0
-        _lt_margin = (
-            _lt_leader_votes - int(_lt_df.iloc[1]["Total_Votes"])
-            if len(_lt_df) > 1 else 0
+        _leader = _lt_df.iloc[0]
+        _leader_total = int(_leader["Total_Votes"])
+        _second_total = int(_lt_df.iloc[1]["Total_Votes"]) if len(_lt_df) > 1 else 0
+        _margin = _leader_total - _second_total
+        _scale_max = max(_leader_total + 2, 1)
+
+        # ── 2. Count-progress bar (replaces the four stat cards) ──
+        _rounds_total = 24
+        _n_counted = max(0, min(int(_lt_last), _rounds_total))
+        _pct = _n_counted / _rounds_total * 100
+        st.markdown(
+            f'<div style="margin:12px 0 8px">'
+            f'<div style="display:flex;justify-content:space-between;font-size:11px;color:#7e8c99;'
+            f'font-family:\'IBM Plex Mono\',monospace;margin-bottom:5px">'
+            f'<span style="text-transform:uppercase;letter-spacing:.12em">Count progress</span>'
+            f'<span>Round {_n_counted} of {_rounds_total} counted</span></div>'
+            f'<div style="height:4px;border-radius:2px;background:rgba(140,165,185,.14)">'
+            f'<div style="height:4px;border-radius:2px;width:{_pct:.1f}%;background:#34d399"></div>'
+            f'</div></div>',
+            unsafe_allow_html=True,
         )
-        _lt_with_votes = int((_lt_df["Total_Votes"] > 0).sum())
 
-        _mc1, _mc2, _mc3, _mc4 = st.columns(4)
-        with _mc1:
+        # ── 3. Race hero (replaces the rest of the cards) ─────
+        _chasers = [(_lt_df.iloc[_i]["Player"], int(_lt_df.iloc[_i]["Total_Votes"]))
+                    for _i in (1, 2) if len(_lt_df) > _i]
+        _chaser_line = '  ·  '.join(f'{_n} {_v}' for _n, _v in _chasers) or '—'
+        st.markdown(
+            f'<div style="display:flex;align-items:flex-end;justify-content:space-between;'
+            f'gap:24px;flex-wrap:wrap;margin:6px 0 2px">'
+            f'<div><div style="font-family:\'Archivo\',sans-serif;font-size:40px;font-weight:800;'
+            f'color:#e9eef3;line-height:1.02">{_leader["Player"]}</div>'
+            f'<div style="font-size:13px;color:#7e8c99;margin-top:5px">{_leader["Team"]}</div></div>'
+            f'<div style="display:flex;gap:38px">'
+            f'<div style="text-align:right"><div style="font-size:10px;font-weight:700;'
+            f'letter-spacing:1.5px;text-transform:uppercase;color:#7e8c99">Votes</div>'
+            f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:42px;font-weight:600;'
+            f'color:#34d399;line-height:1">{_leader_total}</div></div>'
+            f'<div style="text-align:right"><div style="font-size:10px;font-weight:700;'
+            f'letter-spacing:1.5px;text-transform:uppercase;color:#7e8c99">Lead</div>'
+            f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:42px;font-weight:600;'
+            f'color:#e9eef3;line-height:1">+{_margin}</div></div>'
+            f'</div></div>'
+            f'<div style="font-size:12px;color:#7e8c99;margin:2px 0 12px">Chasing &nbsp;{_chaser_line}</div>',
+            unsafe_allow_html=True,
+        )
+
+        # ── 4. Utility line: auto-refresh, last-fetched, source link ──
+        _ua, _ub = st.columns([1.25, 4])
+        with _ua:
+            _lt_auto = st.checkbox("Auto-refresh 60s", value=False, key="lt_auto_refresh")
+        with _ub:
             st.markdown(
-                f'<div class="metric-card"><div class="metric-label">Last Round Counted</div>'
-                f'<div class="metric-value">{_lt_rlabel}</div>'
-                f'<div class="metric-sub">{"Count in progress" if _count_night else "Prediction Mode — Live votes will appear on count night"}</div></div>',
-                unsafe_allow_html=True,
-            )
-        with _mc2:
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-label">Current Leader</div>'
-                f'<div class="metric-value" style="font-size:16px">{_lt_leader}</div>'
-                f'<div class="metric-sub"><span class="counter" data-target="{_lt_leader_votes}">{_lt_leader_votes}</span> votes</div></div>',
-                unsafe_allow_html=True,
-            )
-        with _mc3:
-            _margin_abs = abs(_lt_margin)
-            _margin_sign = "+" if _lt_margin >= 0 else "−"
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-label">Lead Margin</div>'
-                f'<div class="metric-value">{_margin_sign}<span class="counter" data-target="{_margin_abs}">{_margin_abs}</span></div>'
-                f'<div class="metric-sub">ahead of 2nd place</div></div>',
-                unsafe_allow_html=True,
-            )
-        with _mc4:
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-label">Players with Votes</div>'
-                f'<div class="metric-value"><span class="counter" data-target="{_lt_with_votes}">{_lt_with_votes}</span></div>'
-                f'<div class="metric-sub">of {len(_lt_df)} tracked</div></div>',
+                f'<div style="font-size:11px;color:#7e8c99;margin-top:9px;'
+                f'font-family:\'IBM Plex Mono\',monospace">'
+                f'Last fetched {_time.strftime("%H:%M:%S")} &nbsp;·&nbsp; '
+                f'{"Live count" if _count_night else "Prediction mode"} &nbsp;·&nbsp; '
+                f'<a href="https://www.afl.com.au/brownlow-medal/live-tracker" target="_blank" '
+                f'style="color:#34d399;text-decoration:none">AFL.com.au ↗</a></div>',
                 unsafe_allow_html=True,
             )
 
-        # ── leaderboard + feed ────────────────────────────────
-        st.markdown('<div class="section-header">Running Leaderboard</div>', unsafe_allow_html=True)
+        # ── Read-only data joins: model expected votes + projected pollers ──
+        # CC expected votes (Cha Ching season projection — same loader the page
+        # already used below). Keyed by normalised name.
+        _cc_exp = {}
+        _lt_proj = load_season_projection()
+        if _lt_proj is not None and {'Player', 'Exp_Total_Votes'} <= set(_lt_proj.columns):
+            for _, _pr in _lt_proj.iterrows():
+                try:
+                    _cc_exp[normalise_name(_pr['Player'])] = float(_pr['Exp_Total_Votes'])
+                except (TypeError, ValueError):
+                    pass
+
+        # Four non-CC models' expected vote totals (reuse the model-comparison
+        # loaders). Each value list feeds the consensus band. All guarded.
+        _other_exp = {}
+
+        def _lt_add_model(df, col):
+            if df is None or getattr(df, 'empty', True) or col not in getattr(df, 'columns', []):
+                return
+            if 'Player' not in df.columns:
+                return
+            for _, _r in df.iterrows():
+                try:
+                    _v = float(_r[col])
+                except (TypeError, ValueError):
+                    continue
+                if not pd.isna(_v):
+                    _other_exp.setdefault(normalise_name(_r['Player']), []).append(_v)
+
+        # AFL Predictor = the AFL API's own totals (its projection pre-count).
+        _lt_add_model(_lt_df.rename(columns={'Total_Votes': 'AFL_Votes'}), 'AFL_Votes')
+        try:
+            _bf_df, _ = fetch_betfair_brownlow()
+            _lt_add_model(_bf_df, 'BF_Votes')
+        except Exception:
+            pass
+        try:
+            _espn_df, _ = fetch_espn_brownlow()
+            _lt_add_model(_espn_df, 'ESPN_Votes')
+        except Exception:
+            pass
+        try:
+            if os.path.exists('data_wheelo/wheelo_2026.csv'):
+                _wh_raw = pd.read_csv('data_wheelo/wheelo_2026.csv')
+                # Only ExpVotes is on a Brownlow-vote scale; RatingPoints is not,
+                # so it is excluded from the band to keep the shared scale honest.
+                if 'ExpVotes' in _wh_raw.columns and 'Player' in _wh_raw.columns:
+                    _wh_agg = _wh_raw.groupby('Player')['ExpVotes'].sum().reset_index()
+                    _lt_add_model(_wh_agg.rename(columns={'ExpVotes': 'WH_Votes'}), 'WH_Votes')
+        except Exception:
+            pass
+
+        # Previous-round standings for movement arrows — derived from each
+        # player's per-round history (Round_Votes). Omitted if no history.
+        _prev_rank = {}
+        if int(_lt_last) > 0:
+            _prev_tot, _have_hist = {}, False
+            for _, _r in _lt_df.iterrows():
+                _rv = _r.get('Round_Votes', {})
+                if isinstance(_rv, dict) and _rv:
+                    _have_hist = True
+                    _prev_tot[_r['Player']] = sum(int(_p) for _rd, _p in _rv.items()
+                                                  if int(_rd) < int(_lt_last))
+                else:
+                    _prev_tot[_r['Player']] = 0
+            if _have_hist:
+                _order = sorted(_prev_tot, key=lambda _p: -_prev_tot[_p])
+                _prev_rank = {_p: _i + 1 for _i, _p in enumerate(_order)}
+
+        # Structured vote drops per round (rebuilt from Round_Votes).
+        _drops_by_round = {}
+        for _, _r in _lt_df.iterrows():
+            _rv = _r.get('Round_Votes', {})
+            if isinstance(_rv, dict):
+                for _rd, _pts in _rv.items():
+                    if _pts:
+                        _drops_by_round.setdefault(int(_rd), []).append(
+                            (_r['Player'], _r['Team'], int(_pts)))
+
+        # Per-game projected pollers (Cha Ching, the only per-game source) =
+        # top-3 Poll_Prob within each game. Keyed by AFL round (= game Round_num
+        # − 1, per the project's round-offset convention). None ⇒ unavailable.
+        _proj_pollers = {}
+        _lt_game = load_game(2026)
+        if _lt_game is not None and {'Poll_Prob', 'Round_num'} <= set(_lt_game.columns):
+            _gpcol = next((_c for _c in ('Player', 'Player_Name') if _c in _lt_game.columns), None)
+            if _gpcol:
+                _gkeys = [_c for _c in ('Round_num', 'Home.team', 'Away.team') if _c in _lt_game.columns]
+                _grpkeys = _gkeys if len(_gkeys) > 1 else ['Round_num']
+                for _gk, _grp in _lt_game.groupby(_grpkeys):
+                    _rn = int(_gk[0]) if isinstance(_gk, tuple) else int(_gk)
+                    _names = {normalise_name(_n) for _n in _grp.nlargest(3, 'Poll_Prob')[_gpcol]}
+                    _proj_pollers.setdefault(_rn - 1, set()).update(_names)
+
+        # ── 5. Two-column layout ──────────────────────────────
         _lb_col, _feed_col = st.columns([3, 2])
 
+        def _bx(v):
+            """Clamp a vote value to a 0–100% position on the shared bullet scale."""
+            return max(0.0, min(100.0, v / _scale_max * 100.0))
+
+        # ── 6. Running leaderboard — actual vs expected ───────
         with _lb_col:
-            _lt_show = _lt_df[_lt_df["Total_Votes"] > 0].head(25).copy()
+            st.markdown(
+                '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;'
+                'color:#7e8c99;margin:2px 0 8px">Running leaderboard '
+                '<span style="font-weight:400;letter-spacing:0;text-transform:none">— actual vs expected</span></div>'
+                '<div style="display:flex;gap:18px;font-size:11px;color:#7e8c99;margin:0 0 8px;'
+                'font-family:\'IBM Plex Mono\',monospace">'
+                '<span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;'
+                'background:#9fb0bf;vertical-align:middle;margin-right:5px"></span>actual</span>'
+                '<span><span style="display:inline-block;width:2px;height:11px;background:#34d399;'
+                'vertical-align:middle;margin-right:6px"></span>CC expected</span>'
+                '<span><span style="display:inline-block;width:16px;height:7px;border-radius:3px;'
+                'background:rgba(126,140,153,.22);vertical-align:middle;margin-right:5px"></span>model spread</span>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
+
+            _lt_show = _lt_df[_lt_df["Total_Votes"] > 0].head(25)
             if _lt_show.empty:
-                _lt_show = _lt_df.head(25).copy()
+                _lt_show = _lt_df.head(25)
 
-            # Format last-vote round label
-            def _fmt_rnd(v):
-                if pd.isna(v):
-                    return "—"
-                return "OR" if int(v) == 0 else f"Rd {int(v)}"
+            _rows_html = ''
+            for _i, (_, _row) in enumerate(_lt_show.iterrows()):
+                _nm, _tm = _row["Player"], _row["Team"]
+                _actual = int(_row["Total_Votes"])
+                _rank = int(_row["Rank"])
+                _nn = normalise_name(_nm)
+                _cc = _cc_exp.get(_nn)
+                _others = _other_exp.get(_nn, [])
 
-            _lt_disp = pd.DataFrame({
-                "#":        _lt_show["Rank"].astype(int),
-                "Player":   _lt_show["Player"],
-                "Team":     _lt_show["Team"],
-                "Votes":    _lt_show["Total_Votes"].astype(int),
-                "Last Rd":  _lt_show["Last_Vote_Round"].apply(_fmt_rnd),
-            })
+                # movement arrow (omitted when no prior standings)
+                _arrow = ''
+                if _prev_rank:
+                    _pr = _prev_rank.get(_nm)
+                    if _pr is not None and _pr != _rank:
+                        _mv = _pr - _rank
+                        if _mv > 0:
+                            _arrow = f'<span style="color:#34d399;font-size:11px;margin-left:6px">▲{_mv}</span>'
+                        else:
+                            _arrow = f'<span style="color:#f0b429;font-size:11px;margin-left:6px">▼{abs(_mv)}</span>'
 
-            def _lt_row_style(row):
-                # Literal hex only — st.dataframe's canvas grid does not resolve CSS vars
-                base = "background-color:{bg};color:{fg};font-weight:{fw};"
-                if row["#"] == 1:
-                    return [base.format(bg="#34d399", fg="#0a1017", fw="700")] * len(row)
-                elif row["#"] <= 3:
-                    return [base.format(bg="rgba(52,211,153,0.15)", fg="#34d399", fw="600")] * len(row)
-                # Midnight Turf alternating rows for the rest (--surface / --bg-subtle)
-                _bg = "#101a24" if row.name % 2 == 0 else "#1a2d3d"
-                return [base.format(bg=_bg, fg="#e9eef3", fw="400")] * len(row)
-
-            st.dataframe(
-                _lt_disp.style
-                    .apply(_lt_row_style, axis=1)
-                    .set_table_styles(_TABLE_STYLES),
-                use_container_width=True,
-                hide_index=True,
-                height=min(600, 36 * len(_lt_disp) + 40),
-                key="lt_leaderboard_df",
-            )
-
-        with _feed_col:
-            st.markdown('<div class="section-header">Latest Votes</div>', unsafe_allow_html=True)
-            if _lt_feed:
-                for _fi in _lt_feed:
-                    st.markdown(
-                        f'<div style="background:var(--line);border:1px solid rgba(255,255,255,0.08);border-radius:6px;'
-                        f'padding:8px 12px;margin-bottom:6px;font-size:13px;color:var(--text)">'
-                        f'{_fi}</div>',
-                        unsafe_allow_html=True,
-                    )
-            else:
-                st.markdown(
-                    '<div style="color:var(--muted);font-size:13px;padding:12px 0">'
-                    'No votes announced yet.</div>',
-                    unsafe_allow_html=True,
-                )
-
-        # ── top 10 bar chart ──────────────────────────────────
-        st.markdown('<div class="section-header">Top 10 — Votes Tally</div>', unsafe_allow_html=True)
-        _lt_top10 = _lt_df[_lt_df["Total_Votes"] > 0].head(10)
-        if _lt_top10.empty:
-            _lt_top10 = _lt_df.head(10)
-        _lt_colours = [
-            "#34d399" if i == 0 else ("#f0b429" if i < 3 else "#7e8c99")
-            for i in range(len(_lt_top10))
-        ]
-        _fig_lt_bar = go.Figure(go.Bar(
-            y=_lt_top10["Player"].tolist()[::-1],
-            x=_lt_top10["Total_Votes"].tolist()[::-1],
-            orientation="h",
-            marker_color=_lt_colours[::-1],
-            text=[str(int(v)) for v in _lt_top10["Total_Votes"].tolist()[::-1]],
-            textposition="outside",
-            textfont=dict(color="#7e8c99", size=12),
-            hovertemplate="%{y}: %{x} votes<extra></extra>",
-        ))
-        _fig_lt_bar.update_layout(
-            height=340,
-            margin=dict(l=0, r=40, t=10, b=10),
-            xaxis=dict(showgrid=True, gridcolor="rgba(140,165,185,.14)", tickfont=dict(color="#7e8c99")),
-            yaxis=dict(tickfont=dict(color="#7e8c99", size=12)),
-            font=dict(family="sans-serif"),
-        )
-        _fig_lt_bar = apply_chart_theme(_fig_lt_bar)
-        st.plotly_chart(_fig_lt_bar, use_container_width=True, key="lt_bar_chart")
-
-        # ── model vs tracker comparison ───────────────────────
-        st.markdown('<div class="section-header">Our Model vs AFL Tracker</div>', unsafe_allow_html=True)
-        _lt_proj = load_season_projection()
-        if _lt_proj is not None and "Exp_Total_Votes" in _lt_proj.columns:
-            _lt_cmp = _lt_df[_lt_df["Total_Votes"] > 0].head(30)[["Player", "Team", "Total_Votes"]].copy()
-            _lt_cmp = _lt_cmp.merge(
-                _lt_proj[["Player", "Exp_Total_Votes"]].rename(columns={"Exp_Total_Votes": "Model_Votes"}),
-                on="Player", how="left",
-            )
-            _lt_cmp["Model_Votes"] = _lt_cmp["Model_Votes"].round(1)
-            _lt_cmp["Delta"] = (_lt_cmp["Total_Votes"] - _lt_cmp["Model_Votes"]).round(1)
-
-            def _lt_delta_fmt(v):
-                if pd.isna(v):
-                    return "—"
-                return f"+{v:.1f}" if v >= 0 else f"{v:.1f}"
-
-            _lt_cmp_disp = pd.DataFrame({
-                "Player":       _lt_cmp["Player"],
-                "Team":         _lt_cmp["Team"],
-                "Tracker Votes": _lt_cmp["Total_Votes"].astype(int),
-                "Model Pred":   _lt_cmp["Model_Votes"].apply(
-                    lambda v: f"{v:.1f}" if pd.notna(v) else "—"
-                ),
-                "Delta":        _lt_cmp["Delta"].apply(_lt_delta_fmt),
-            })
-
-            def _lt_cmp_style(row):
-                # Literal hex only — st.dataframe's canvas grid does not resolve CSS vars
-                _bg = "#101a24" if row.name % 2 == 0 else "#1a2d3d"
-                _cell = f"background-color:{_bg};color:#e9eef3;"
-                try:
-                    raw = _lt_cmp.loc[_lt_cmp["Player"] == row["Player"], "Delta"].values
-                    d = float(raw[0]) if len(raw) else 0
-                except Exception:
-                    d = 0
-                styles = [_cell] * 5
-                if d > 2:
-                    styles[4] = f"background-color:{_bg};color:#34d399;font-weight:700;"
-                elif d < -2:
-                    styles[4] = f"background-color:{_bg};color:#e05252;font-weight:700;"
-                return styles
-
-            st.dataframe(
-                _lt_cmp_disp.style
-                    .apply(_lt_cmp_style, axis=1)
-                    .set_table_styles(_TABLE_STYLES),
-                use_container_width=True,
-                hide_index=True,
-                key="lt_cmp_df",
-            )
-            st.caption(
-                "Tracker Votes = AFL's current data · Model Pred = our XGBoost season projection · "
-                "Delta = Tracker minus Model (green = tracker ahead, red = model overestimated)"
-            )
-        else:
-            st.info("Run predict_2026.py to enable model comparison.")
-
-        # ── polls-a-vote watchlist alerts ────────────────────
-        _pav_path = "data_betting/polls_a_vote.csv"
-        if os.path.exists(_pav_path):
-            try:
-                _pav_wl = pd.read_csv(_pav_path)
-            except Exception:
-                _pav_wl = pd.DataFrame()
-            _pav_gdf = load_game(2026)
-            if not _pav_wl.empty and _pav_gdf is not None:
-                _pav_round = _lt_last + 1
-
-                def _pav_parse_rounds(raw):
-                    rds = set()
-                    for _t in str(raw).split(','):
-                        _t = _t.strip()
-                        if _t.lstrip('-').isdigit():
-                            rds.add(int(_t))
-                    return rds
-
-                _pav_cards = []
-                for _, _pav_row in _pav_wl.iterrows():
-                    if bool(_pav_row.get('Settled', False)):
-                        continue
-                    _pav_player = str(_pav_row.get('Player', ''))
-                    _pav_team   = str(_pav_row.get('Team', ''))
-                    _pav_my_rds = _pav_parse_rounds(_pav_row.get('My_Rounds', ''))
-
-                    _pav_pg = _pav_gdf[_pav_gdf['Player'].str.lower() == _pav_player.lower()]
-                    if not _pav_pg.empty:
-                        _pav_prev = _pav_pg[_pav_pg['Round_num'] < _pav_round]
-                        if not _pav_prev.empty and (_pav_prev['Brownlow.Votes'] > 0).any():
-                            continue  # already polled a vote in a prior round
-
-                    _pav_model_rds = set()
-                    if not _pav_pg.empty:
-                        _pav_model_rds = set(
-                            _pav_pg.nlargest(3, 'Poll_Prob')['Round_num'].astype(int).tolist()
-                        )
-
-                    _in_mine  = _pav_round in _pav_my_rds
-                    _in_model = _pav_round in _pav_model_rds
-                    if not _in_mine and not _in_model:
-                        continue
-
-                    # get game-level data for this round
-                    _pav_this = _pav_pg[_pav_pg['Round_num'] == _pav_round]
-                    _pav_exp_votes = '—'
-                    _pav_poll_pct  = '—'
-                    _pav_opponent  = '—'
-                    if not _pav_this.empty:
-                        _pg_r = _pav_this.iloc[0]
-                        _ev = _pg_r.get('Exp_Votes')
-                        _pp = _pg_r.get('Poll_Prob')
-                        _pav_exp_votes = f"{float(_ev):.2f}" if pd.notna(_ev) else '—'
-                        _pav_poll_pct  = f"{float(_pp)*100:.1f}%" if pd.notna(_pp) else '—'
-                        _ha = str(_pg_r.get('Home.Away', ''))
-                        if _ha == 'Home':
-                            _pav_opponent = str(_pg_r.get('Away.team', '—'))
-                        elif _ha == 'Away':
-                            _pav_opponent = str(_pg_r.get('Home.team', '—'))
-
-                    _pav_cards.append({
-                        'player':    _pav_player,
-                        'team':      _pav_team,
-                        'in_mine':   _in_mine,
-                        'in_model':  _in_model,
-                        'exp_votes': _pav_exp_votes,
-                        'poll_pct':  _pav_poll_pct,
-                        'opponent':  _pav_opponent,
-                        'odds':      _pav_row.get('Odds'),
-                        'stake':     _pav_row.get('Stake'),
-                    })
-
-                st.markdown('<div class="section-header">Players to Watch</div>', unsafe_allow_html=True)
-                if not _pav_cards:
-                    st.markdown(
-                        f'<div style="color:var(--muted);font-size:13px;padding:8px 0">'
-                        f'No watchlist players flagged for Round {_pav_round}.</div>',
-                        unsafe_allow_html=True,
-                    )
+                # bullet + delta chip (degrade gracefully if no expected data)
+                if _cc is not None or _others:
+                    _band = ''
+                    if _others:
+                        _bl, _bw = _bx(min(_others)), max(_bx(max(_others)) - _bx(min(_others)), 0.8)
+                        _band = (f'<div style="position:absolute;top:5px;height:6px;left:{_bl:.1f}%;'
+                                 f'width:{_bw:.1f}%;background:rgba(126,140,153,.22);border-radius:3px"></div>')
+                    _tick = ''
+                    if _cc is not None:
+                        _tick = (f'<div style="position:absolute;top:1px;height:14px;width:2px;'
+                                 f'left:{_bx(_cc):.1f}%;background:#34d399;transform:translateX(-1px)"></div>')
+                    if _cc is not None and _actual - _cc >= 2:
+                        _dotc = '#34d399'
+                    elif _cc is not None and _actual - _cc <= -2:
+                        _dotc = '#f0b429'
+                    else:
+                        _dotc = '#9fb0bf'
+                    _dot = (f'<div style="position:absolute;top:50%;left:{_bx(_actual):.1f}%;width:9px;height:9px;'
+                            f'border-radius:50%;background:{_dotc};transform:translate(-50%,-50%);'
+                            f'box-shadow:0 0 0 2px #0a1017"></div>')
+                    _bullet = (f'<div style="position:relative;height:16px">'
+                               f'<div style="position:absolute;top:50%;height:1px;width:100%;'
+                               f'background:rgba(140,165,185,.14)"></div>{_band}{_tick}{_dot}</div>')
+                    if _cc is not None:
+                        _d = _actual - _cc
+                        _chipc = '#34d399' if _d >= 2 else ('#f0b429' if _d <= -2 else '#7e8c99')
+                        _ds = f'+{_d:.1f}' if _d >= 0 else f'−{abs(_d):.1f}'
+                        _chip = (f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:12px;'
+                                 f'color:{_chipc}">{_ds}</span>')
+                    else:
+                        _chip = '<span style="color:#7e8c99">—</span>'
                 else:
-                    _pav_cols = st.columns(min(len(_pav_cards), 3))
-                    for _ci, _card in enumerate(_pav_cards):
-                        _agree = _card['in_mine'] and _card['in_model']
-                        _border = '#34d399' if _agree else ('#4a90d9' if _card['in_mine'] else 'var(--muted)')
-                        _agree_lbl = '★ Both agree' if _agree else ('Your pick' if _card['in_mine'] else 'Model pick')
-                        _agree_col = '#34d399' if _agree else ('#4a90d9' if _card['in_mine'] else 'var(--muted)')
-                        _odds_str  = f"{float(_card['odds']):.2f}"  if pd.notna(_card['odds'])  else '—'
-                        _stake_str = f"{float(_card['stake']):.2f}u" if pd.notna(_card['stake']) else '—'
-                        with _pav_cols[_ci % 3]:
-                            st.markdown(
-                                f'<div style="background:var(--line);border:2px solid {_border};border-radius:10px;'
-                                f'padding:14px 16px;margin-bottom:8px">'
-                                f'<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:1px">'
-                                f'{_card["player"]}</div>'
-                                f'<div style="font-size:12px;color:var(--muted);margin-bottom:8px">'
-                                f'{_card["team"]}</div>'
-                                f'<div style="font-size:11px;font-weight:800;letter-spacing:1px;'
-                                f'text-transform:uppercase;color:{_agree_col};margin-bottom:10px">'
-                                f'{_agree_lbl}</div>'
-                                f'<div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">'
-                                f'<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">Exp Votes</div>'
-                                f'<div style="font-size:18px;font-weight:700;color:var(--text)">{_card["exp_votes"]}</div></div>'
-                                f'<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">Poll Prob</div>'
-                                f'<div style="font-size:18px;font-weight:700;color:var(--text)">{_card["poll_pct"]}</div></div>'
-                                f'<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">Opponent</div>'
-                                f'<div style="font-size:13px;font-weight:600;color:var(--muted)">{_card["opponent"]}</div></div>'
-                                f'<div><div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:0.8px">Odds / Stake</div>'
-                                f'<div style="font-size:13px;font-weight:600;color:#f0b429">{_odds_str} · {_stake_str}</div></div>'
-                                f'</div></div>',
-                                unsafe_allow_html=True,
-                            )
+                    _bullet = '<div style="height:16px"></div>'
+                    _chip = '<span style="color:#7e8c99">—</span>'
+
+                _lead = (_i == 0)
+                _nsz, _nw, _nc = ('17px', '800', '#34d399') if _lead else ('14px', '600', '#e9eef3')
+                _vsz = '20px' if _lead else '15px'
+                _rows_html += (
+                    f'<div style="display:grid;grid-template-columns:26px 1.7fr 44px 2.3fr 56px;'
+                    f'align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(140,165,185,.14)">'
+                    f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:12px;color:#7e8c99;'
+                    f'text-align:right">{_rank}</div>'
+                    f'<div><span style="font-family:\'Archivo\',sans-serif;font-size:{_nsz};font-weight:{_nw};'
+                    f'color:{_nc}">{_nm}</span>{_arrow}'
+                    f'<div style="font-size:11px;color:#7e8c99">{_tm}</div></div>'
+                    f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:{_vsz};font-weight:600;'
+                    f'color:{_nc};text-align:right">{_actual}</div>'
+                    f'<div>{_bullet}</div>'
+                    f'<div style="text-align:right">{_chip}</div>'
+                    f'</div>'
+                )
+            st.markdown(f'<div>{_rows_html}</div>', unsafe_allow_html=True)
+
+        # ── 7. Latest-votes feed — called vs surprise ─────────
+        with _feed_col:
+            st.markdown(
+                '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;'
+                'color:#7e8c99;margin:2px 0 8px">Latest votes '
+                '<span style="font-weight:400;letter-spacing:0;text-transform:none">— called vs surprise</span></div>',
+                unsafe_allow_html=True,
+            )
+            _rounds_sorted = sorted(_drops_by_round.keys(), reverse=True)[:6]
+            if not _rounds_sorted:
+                st.markdown('<div style="color:#7e8c99;font-size:13px;padding:10px 0">'
+                            'No votes announced yet.</div>', unsafe_allow_html=True)
+            else:
+                _feed_html = ''
+                _newest_done = False
+                for _ri, _rnum in enumerate(_rounds_sorted):
+                    _drops = sorted(_drops_by_round[_rnum], key=lambda _x: -_x[2])
+                    _rlabel = 'Opening Round' if _rnum == 0 else f'Round {_rnum}'
+                    _proj_set = _proj_pollers.get(_rnum)  # None ⇒ unavailable
+                    if _proj_set is not None:
+                        _called = sum(1 for (_pn, _, _) in _drops if normalise_name(_pn) in _proj_set)
+                        _tally = (f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;'
+                                  f'color:#7e8c99">models called {_called} of {len(_drops)}</span>')
+                    else:
+                        _tally = ''
+                    _feed_html += (
+                        f'<div style="display:flex;justify-content:space-between;align-items:baseline;'
+                        f'margin:{"14px" if _ri else "0"} 0 6px;padding-bottom:5px;'
+                        f'border-bottom:1px solid rgba(140,165,185,.14)">'
+                        f'<span style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;'
+                        f'color:#e9eef3">{_rlabel}</span>{_tally}</div>'
+                    )
+                    for _di, (_pn, _pt, _pv) in enumerate(_drops):
+                        if _proj_set is None:
+                            _mark = '<span style="display:inline-block;width:14px"></span>'
+                        elif normalise_name(_pn) in _proj_set:
+                            _mark = '<span style="color:#34d399;width:14px;display:inline-block">✓</span>'
+                        else:
+                            _mark = '<span style="color:#f0b429;width:14px;display:inline-block">✗</span>'
+                        if _pv == 3:
+                            _pill = ('<span style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
+                                     'font-weight:700;background:#34d399;color:#0a1017;border-radius:4px;'
+                                     'padding:1px 7px">3</span>')
+                        elif _pv == 2:
+                            _pill = ('<span style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
+                                     'font-weight:700;border:1px solid #34d399;color:#34d399;border-radius:4px;'
+                                     'padding:1px 6px">2</span>')
+                        else:
+                            _pill = ('<span style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
+                                     'font-weight:700;border:1px solid #7e8c99;color:#7e8c99;border-radius:4px;'
+                                     'padding:1px 6px">1</span>')
+                        # Most-recent drop: static emerald glow dot (non-keyframe
+                        # fallback — st.markdown strips @keyframes).
+                        _pulse = ''
+                        if not _newest_done and _ri == 0 and _di == 0:
+                            _pulse = ('<span style="display:inline-block;width:7px;height:7px;border-radius:50%;'
+                                      'background:#34d399;box-shadow:0 0 0 3px rgba(52,211,153,.25);'
+                                      'margin-left:7px;vertical-align:middle"></span>')
+                            _newest_done = True
+                        _feed_html += (
+                            f'<div style="display:grid;grid-template-columns:18px 1fr auto;align-items:center;'
+                            f'gap:9px;padding:6px 0;border-bottom:1px solid rgba(140,165,185,.07)">'
+                            f'{_mark}'
+                            f'<div><span style="font-size:13px;color:#e9eef3">{_pn}</span>{_pulse}'
+                            f'<div style="font-size:10px;color:#7e8c99">{_pt}</div></div>'
+                            f'{_pill}</div>'
+                        )
+                st.markdown(_feed_html, unsafe_allow_html=True)
 
     # ── auto-refresh ─────────────────────────────────────────
     if _lt_auto:
