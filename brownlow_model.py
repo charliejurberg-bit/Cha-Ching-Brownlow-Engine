@@ -255,7 +255,8 @@ print(f"  Wheelo: {len(WHEELO_FEATURES)}")
 print(f"  Relative: {len(RELATIVE_FEATURES)}")
 print(f"  Form/Momentum: {len(FORM_FEATURES)}")
 
-model_df = df[FEATURES+[TARGET,'Player_Name','Playing.for','Round_num']]\
+_id_cols = ['ID'] if 'ID' in df.columns else []
+model_df = df[FEATURES+[TARGET,'Player_Name','Playing.for','Round_num']+_id_cols]\
     .dropna(subset=FEATURES+[TARGET]).reset_index(drop=True)
 
 print(f"Model dataset: {len(model_df):,} rows")
@@ -304,6 +305,28 @@ with open("predictions/rank_stats.pkl","wb") as f: pickle.dump(RANK_STATS, f)
 with open("predictions/wheelo_features.pkl","wb") as f: pickle.dump(WHEELO_FEATURES, f)
 with open("predictions/form_features.pkl","wb") as f: pickle.dump(FORM_FEATURES, f)
 print("OK Model artifacts saved")
+
+# ── Disambiguate same-name players for output ────────────────
+# Player_Name alone merges different people who share a name (the two Josh
+# Kennedys -> one 535-game row). fitzRoy's ID is the true identity: names carried
+# by more than one ID get that person's most-recent team appended. The suffix is
+# the player's GLOBAL last team (across all seasons), so it stays identical in
+# every season file — a single player who changed clubs (Tom Lynch: Gold Coast ->
+# Richmond) keeps ONE identity, while genuinely different people are split apart.
+if 'ID' in model_df.columns:
+    _idn = model_df.dropna(subset=['ID']).groupby('Player_Name')['ID'].nunique()
+    _collision = set(_idn[_idn > 1].index)
+    if _collision:
+        _sub = model_df[model_df['Player_Name'].isin(_collision)]
+        _last_team = (_sub.dropna(subset=['ID']).sort_values(['Season', 'Round_num'])
+                          .groupby('ID')['Playing.for'].last())
+        _mask = model_df['Player_Name'].isin(_collision)
+        _suffix = model_df.loc[_mask, 'ID'].map(_last_team).fillna(model_df.loc[_mask, 'Playing.for'])
+        model_df.loc[_mask, 'Player_Name'] = (model_df.loc[_mask, 'Player_Name']
+                                              + ' (' + _suffix.astype(str) + ')')
+        print(f"  Disambiguated {len(_collision)} shared name(s): {sorted(_collision)}")
+else:
+    print("  No ID column found — skipping same-name disambiguation")
 
 # ── Generate predictions for all seasons ─────────────────────
 print("\nGenerating predictions for all seasons...")

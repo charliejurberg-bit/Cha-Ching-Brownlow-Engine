@@ -958,21 +958,107 @@ def _read_backtest_range():
 _TRAIN_MIN, _TRAIN_MAX = _read_data_range()
 _BT_MIN, _BT_MAX = _read_backtest_range()
 
+# Canonical team names. Source files mix old/abbreviated labels (fitzRoy uses
+# 'GWS'/'Footscray'; older game files use 'Kangaroos'). Collapse them so the
+# player-ID join and every Team display agree on one spelling.
+_TEAM_ALIASES = {
+    'Footscray': 'Western Bulldogs',
+    'GWS': 'Greater Western Sydney',
+    'Kangaroos': 'North Melbourne',
+}
+
 def _fix_team_names(df: pd.DataFrame) -> pd.DataFrame:
     for col in ('Team', 'Playing.for'):
         if col in df.columns:
-            df[col] = df[col].replace('Footscray', 'Western Bulldogs')
+            df[col] = df[col].replace(_TEAM_ALIASES)
     return df
+
+@st.cache_data(ttl=300)
+def _player_id_map():
+    """(Player, Team, Season) -> fitzRoy player ID. fitzRoy's ID is the only
+    authoritative identity: it separates two different people who share a name
+    (the two Josh Kennedys) AND keeps one person together across a club move
+    (Tom Lynch: Gold Coast -> Richmond). Player_Name + Team alone can't do both."""
+    for path in ("fitzroy_stats_all.csv", "fitzroy_stats_2015_2025.csv"):
+        if os.path.exists(path):
+            try:
+                src = pd.read_csv(path, usecols=["Player", "Team", "Season", "ID"])
+            except Exception:
+                continue
+            src = _fix_team_names(src).dropna(subset=["Player", "Team", "Season", "ID"])
+            src["Season"] = src["Season"].astype(int)
+            src = src.drop_duplicates(["Player", "Team", "Season"])
+            return {(r.Player, r.Team, r.Season): r.ID for r in src.itertuples(index=False)}
+    return {}
+
+def _disambiguate_players(df: pd.DataFrame) -> pd.DataFrame:
+    """Split same-name players who are actually different people.
+
+    Two players are the same person only when fitzRoy gives them the same ID.
+    Names carried by more than one ID get rewritten to 'Name (Team)', where Team
+    is that person's most-recent team — so a single player who changed clubs keeps
+    ONE identity while genuinely different people who share a name are pulled apart.
+    Names with no clash (and seasons with no ID source, e.g. live 2026) are untouched.
+    Keeps the original name in '_base_name' for callers that need to re-aggregate."""
+    if 'Player_Name' not in df.columns or 'Season' not in df.columns:
+        return df
+    team_col = 'Team' if 'Team' in df.columns else ('Playing.for' if 'Playing.for' in df.columns else None)
+    if team_col is None:
+        return df
+    df = df.copy()
+    df['_base_name'] = df['Player_Name']
+    id_map = _player_id_map()
+    if not id_map:
+        return df
+    seasons = pd.to_numeric(df['Season'], errors='coerce').astype('Int64')
+    df['_pid'] = [
+        id_map.get((n, t, int(s))) if pd.notna(s) else None
+        for n, t, s in zip(df['_base_name'], df[team_col], seasons)
+    ]
+    nunique_id = df.dropna(subset=['_pid']).groupby('_base_name')['_pid'].nunique()
+    collision = set(nunique_id[nunique_id > 1].index)
+    if collision:
+        sub = df[df['_base_name'].isin(collision)]
+        sort_cols = [c for c in ('Season', 'Round_num') if c in sub.columns]
+        last_team = (sub.dropna(subset=['_pid']).sort_values(sort_cols)
+                        .groupby('_pid')[team_col].last())
+        mask = df['_base_name'].isin(collision)
+        suffix = df.loc[mask, '_pid'].map(last_team).fillna(df.loc[mask, team_col])
+        df.loc[mask, 'Player_Name'] = df.loc[mask, '_base_name'] + ' (' + suffix.astype(str) + ')'
+    return df.drop(columns=['_pid'])
 
 @st.cache_data(ttl=300)
 def load_season(season):
     path = f"{PRED_DIR}/season_{season}.csv"
-    return _fix_team_names(pd.read_csv(path)) if os.path.exists(path) else None
+    if not os.path.exists(path):
+        return None
+    sdf = _fix_team_names(pd.read_csv(path))
+    # season_*.csv was aggregated by name alone, so it merges same-name players
+    # (e.g. both Josh Kennedys into one 44-game row). Re-split those few players
+    # from the disambiguated game-level data; everyone else stays exactly as-is.
+    g = load_game(season)
+    if g is None or '_base_name' not in g.columns:
+        return sdf
+    split = set(g.loc[g['Player_Name'] != g['_base_name'], '_base_name'])
+    if not split:
+        return sdf
+    team_col = 'Team' if 'Team' in g.columns else 'Playing.for'
+    rebuilt = g[g['_base_name'].isin(split)].groupby('Player_Name').agg(
+        Team=(team_col, 'last'), Games=('Round_num', 'count'),
+        Actual_Votes=('Brownlow.Votes', 'sum'), Exp_Total_Votes=('Exp_Votes', 'sum'),
+        Avg_Poll_Prob=('Poll_Prob', 'mean'), Exp_3vote_games=('P_3', 'sum'),
+        Exp_2vote_games=('P_2', 'sum'), Exp_1vote_games=('P_1', 'sum'),
+    ).reset_index()
+    keep = sdf[~sdf['Player_Name'].isin(split)]
+    out = pd.concat([keep, rebuilt], ignore_index=True)
+    return out.sort_values('Exp_Total_Votes', ascending=False).reset_index(drop=True)
 
 @st.cache_data(ttl=300)
 def load_game(season):
     path = f"{PRED_DIR}/game_level_{season}.csv"
-    return _fix_team_names(pd.read_csv(path)) if os.path.exists(path) else None
+    if not os.path.exists(path):
+        return None
+    return _disambiguate_players(_fix_team_names(pd.read_csv(path)))
 
 @st.cache_data(ttl=300)
 def load_importance():
@@ -991,6 +1077,9 @@ def load_season_projection():
 
 @st.cache_data(ttl=300)
 def load_all_historical():
+    """Per-game data across every season, with a clean Team column and same-name
+    players split into distinct people. (Older season files only carry
+    'Playing.for'; 2026 carries 'Team'.)"""
     frames = []
     for season in sorted(AVAILABLE_SEASONS):
         path = f"{PRED_DIR}/game_level_{season}.csv"
@@ -998,25 +1087,23 @@ def load_all_historical():
             df = _fix_team_names(pd.read_csv(path))
             df['Season'] = season
             frames.append(df)
-    return pd.concat(frames, ignore_index=True) if frames else None
+    if not frames:
+        return None
+    g = pd.concat(frames, ignore_index=True)
+    if 'Playing.for' in g.columns:
+        if 'Team' in g.columns:
+            g['Team'] = g['Team'].fillna(g['Playing.for'])
+        else:
+            g['Team'] = g['Playing.for']
+    return _disambiguate_players(g)
 
 # Sentinel season value meaning "all seasons combined" (career view).
 CAREER = "Career"
 
 @st.cache_data(ttl=300)
 def load_game_career():
-    """Per-game data across every season, with a clean Team column.
-    (Older season files only carry 'Playing.for'; 2026 carries 'Team'.)"""
-    g = load_all_historical()
-    if g is None:
-        return None
-    g = g.copy()
-    if 'Playing.for' in g.columns:
-        if 'Team' in g.columns:
-            g['Team'] = g['Team'].fillna(g['Playing.for'])
-        else:
-            g['Team'] = g['Playing.for']
-    return _fix_team_names(g)
+    """Per-game data across every season (career view)."""
+    return load_all_historical()
 
 @st.cache_data(ttl=300)
 def load_season_career():
