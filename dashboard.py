@@ -3842,6 +3842,18 @@ if _page == 'Game Analysis':
 
     # ── Round by Round tab ────────────────────────────────────
     with _ga_rbr_tab:
+        # theme.py gives [data-testid="stTabs"] a --surface (#101a24) fill +
+        # border, which reads as a raised card. Neutralise it for this page only
+        # via :has(.ga-flush) — the marker below sits INSIDE the tabs so the
+        # selector matches. The tab-strip hairline and active-tab emerald
+        # underline live on [role="tablist"]/[role="tab"] and are untouched.
+        st.markdown(
+            '<style>[data-testid="stTabs"]:has(.ga-flush){'
+            'background:transparent !important;border:none !important;'
+            'box-shadow:none !important;}</style>'
+            '<span class="ga-flush" style="display:none"></span>',
+            unsafe_allow_html=True,
+        )
         rr = load_game(2026)
         if rr is None:
             st.error("No 2026 game-level predictions found. Run predict_2026.py first.")
