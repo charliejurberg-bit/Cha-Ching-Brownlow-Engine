@@ -4915,7 +4915,19 @@ if _page == 'Player Comparison':
                 )
 
             # ── 4. Tale of the tape (one HTML block) ──────────────
-            _html = '<div style="margin-top:2px">'
+            # theme.py gives [data-testid="stTabs"] a --surface (#101a24) fill +
+            # border, which reads as a raised card. Neutralise it for this page
+            # only via :has(.pc-flush) so the tabs sit flush on the app bg. The
+            # tab-strip hairline and active-tab emerald underline live on
+            # [role="tablist"]/[role="tab"] and are untouched.
+            _html = (
+                '<style>'
+                '[data-testid="stTabs"]:has(.pc-flush){'
+                'background:transparent !important;border:none !important;'
+                'box-shadow:none !important;}'
+                '</style>'
+                '<div class="pc-flush" style="margin-top:2px">'
+            )
             _html += _grp_header('Vote Projection')
             _html += _tot_row('Expected Votes', _d1['exp_votes'], _d2['exp_votes'], _f_num)
             _html += _tot_row('Floor', _d1['floor'], _d2['floor'], _f_num)
