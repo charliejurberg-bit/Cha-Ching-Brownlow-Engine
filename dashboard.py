@@ -5981,10 +5981,14 @@ if _page == 'Live Tracker':
 # MODEL COMPARISON
 # ════════════════════════════════════════════════════════════
 if _page == 'Model Comparison':
+    # ── 1. Header — no box ────────────────────────────────────
     st.markdown(
-        '<div class="title-bar"><h2 style="color:var(--text);margin:0">Model Comparison — 2026</h2>'
-        '<p style="color:var(--muted);margin:4px 0 0 0">'
-        'Cha Ching · AFL Predictor · Betfair · Wheelo · ESPN — five models, one view</p></div>',
+        '<div style="margin:2px 0 16px">'
+        '<div style="font-size:10px;font-weight:700;letter-spacing:2px;'
+        'text-transform:uppercase;color:#7e8c99">Model Comparison · 2026</div>'
+        '<h1 style="font-family:\'Archivo\',sans-serif;font-size:34px;font-weight:800;'
+        'color:#e9eef3;margin:4px 0 0;line-height:1.05">Five models, one view</h1>'
+        '</div>',
         unsafe_allow_html=True,
     )
 
@@ -6040,6 +6044,16 @@ if _page == 'Model Comparison':
             st.info('Historical comparison data not available.')
 
     with _mc_tab1:
+        # theme.py tints [data-testid="stTabs"] with --surface; neutralise it for
+        # this page only via :has(.mc-flush) so the content sits flush on
+        # #0a1017. Tab-strip hairline + active underline are untouched.
+        st.markdown(
+            '<style>[data-testid="stTabs"]:has(.mc-flush){'
+            'background:transparent !important;border:none !important;'
+            'box-shadow:none !important;}</style>'
+            '<span class="mc-flush" style="display:none"></span>',
+            unsafe_allow_html=True,
+        )
 
         # 1. Cha Ching
         _mc_cc_df = pd.DataFrame()
@@ -6164,50 +6178,9 @@ if _page == 'Model Comparison':
             ('Wheelo',        _mc_wh_df,   'WH_Rank',   _mc_wh_path,  'metric-card'),
             ('ESPN',          _mc_espn_df, 'ESPN_Rank',  _ESPN_CSV,    'metric-card'),
         ]
-        _MC_SUBS = {
-            'Cha Ching':     'Season XGBoost model',
-            'AFL Predictor': 'AFL live API' + (' · pre-count' if not _mc_afl_has_votes else ''),
-            'Betfair':       'Betfair vote predictor',
-            'Wheelo':        'Wheelo ratings system',
-            'ESPN':          'ESPN vote predictor',
-        }
-        _MC_ERRS = {
-            'Betfair': _mc_bf_err,
-            'ESPN':    _mc_espn_err,
-        }
-
-        # ── Five metric cards ─────────────────────────────────────
-        _mc_card_cols = st.columns(5)
-        for _cc, (_mlabel, _mdf, _mrc, _mcsv, _mcls) in zip(_mc_card_cols, _MC_MODELS):
-            with _cc:
-                if not _mdf.empty:
-                    _top1 = _mdf.iloc[0]['Player']
-                    _color = "#34d399" if _mcls == "metric-card-primary" else "var(--muted)"
-                    _chg = _rank_change_html(_mcsv, _top1) if _mcsv else ''
-                    _ts = _file_ts(_mcsv) if _mcsv else ''
-                else:
-                    _err = _MC_ERRS.get(_mlabel, '')
-                    _top1 = f"Unavail. — {_err[:40]}" if _err else "Data unavailable"
-                    _color, _chg, _ts = "#6c6c6c", '', _file_ts(_mcsv) if _mcsv else ''
-                _ts_html = (
-                    f'<div style="font-size:10px;color:#aaaaaa;margin-top:4px">Updated {_ts}</div>'
-                    if _ts else
-                    '<div style="font-size:10px;margin-top:4px">&nbsp;</div>'
-                )
-                st.markdown(
-                    f'<div class="{_mcls}">'
-                    f'<div class="metric-label">{_mlabel}</div>'
-                    f'<div class="metric-value" style="font-size:16px;color:{_color};line-height:1.2">'
-                    f'{_top1}{_chg}</div>'
-                    f'<div class="metric-sub">{_MC_SUBS[_mlabel]}</div>'
-                    f'{_ts_html}'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-
-        st.markdown('<hr>', unsafe_allow_html=True)
-        st.markdown('<div class="section-header">Consensus Ranking — Top 25 Players</div>',
-                    unsafe_allow_html=True)
+        # (Five model cards, summary cards, heatmap and scatter removed — the
+        #  redesign renders a consensus headline, metadata strip and one
+        #  consensus table below, after _pc_df is built.)
 
         # ── Player-centric consensus table ────────────────────────
         _MC_SEN = 40  # sentinel rank for "not in model's data"
@@ -6253,261 +6226,165 @@ if _page == 'Model Comparison':
             """True if v is a non-null, non-NaN rank value."""
             return v is not None and not (isinstance(v, float) and pd.isna(v))
 
-        _cmp_disp = pd.DataFrame({
-            'Consensus': _pc_df['Consensus'].astype(str),
-            'Player':    _pc_df['Player'],
-            'Cha Ching': _pc_df['_cc'].apply(_rk),
-            'AFL':       _pc_df['_afl'].apply(_rk),
-            'Betfair':   _pc_df['_bf'].apply(_rk),
-            'Wheelo':    _pc_df['_wh'].apply(_rk),
-            'ESPN':      _pc_df['_espn'].apply(_rk),
-            '_cc_r':     _pc_df['_cc'],
-            '_cons_f':   _pc_df['_cons'],
-        })
+        # ── Edge: how much higher Cha Ching ranks a player than the mean of
+        #    the other four models. Positive = Cha Ching bullish. Derived from
+        #    the same _pc_df ranks — no rank is re-sourced or recomputed.
+        def _edge_for(row):
+            cc = row['_cc']
+            if not _rk_valid(cc):
+                return None
+            others = [row[c] for c in ('_afl', '_bf', '_wh', '_espn') if _rk_valid(row[c])]
+            if not others:
+                return None
+            return int(round(sum(others) / len(others) - cc))
+        _pc_df['_edge'] = _pc_df.apply(_edge_for, axis=1)
 
-        _green_mask = _cmp_disp.apply(
-            lambda row: (
-                int(row['Consensus']) <= 10
-                and all(row[c] != '—' and int(row[c]) <= 10
-                        for c in ['Cha Ching', 'AFL', 'Betfair', 'Wheelo', 'ESPN']
-                        if row[c] != '—')
-                and sum(1 for c in ['Cha Ching', 'AFL', 'Betfair', 'Wheelo', 'ESPN']
-                        if row[c] != '—') == 5
-            ), axis=1
-        ).values
-        _brown_mask = _cmp_disp.apply(
-            lambda row: (
-                not bool(_green_mask[row.name])
-                and _rk_valid(row['_cc_r'])
-                and abs(int(row['Consensus']) - int(row['_cc_r'])) >= 5
-            ), axis=1
-        ).values
-
-        _cmp_show = _cmp_disp[['Consensus', 'Player', 'Cha Ching', 'AFL', 'Betfair', 'Wheelo', 'ESPN']].copy()
-
-        def _mc_cmp_style(row):
-            idx = row.name
-            if _green_mask[idx]:
-                return ['background-color:rgba(52,211,153,0.15);color:#34d399;font-weight:700'] * len(row)
-            if _brown_mask[idx]:
-                return ['background-color:rgba(240,180,41,0.12);color:#f0b429;font-weight:700'] * len(row)
-            return [''] * len(row)
-
-        st.dataframe(
-            _cmp_show.style.apply(_mc_cmp_style, axis=1).set_table_styles(_TABLE_STYLES).hide(axis='index'),
-            use_container_width=True,
-            key='mc_cmp_table',
-        )
-        st.markdown(
-            '<div style="display:flex;gap:20px;margin-top:6px;font-size:12px;color:var(--muted);">'
-            '<span><span style="display:inline-block;width:12px;height:12px;'
-            'background:rgba(52,211,153,0.20);border:1px solid #34d399;'
-            'border-radius:2px;vertical-align:middle;margin-right:5px"></span>'
-            'All 5 models agree — player top 10 in every model</span>'
-            '<span><span style="display:inline-block;width:12px;height:12px;'
-            'background:rgba(240,180,41,0.18);border:1px solid #f0b429;'
-            'border-radius:2px;vertical-align:middle;margin-right:5px"></span>'
-            'Cha Ching rank differs 5+ places from consensus</span>'
-            '</div>',
-            unsafe_allow_html=True,
-        )
-
-        # ── Summary stats ─────────────────────────────────────────
-        st.markdown('<hr>', unsafe_allow_html=True)
-        st.markdown('<div class="section-header">Consensus Summary</div>', unsafe_allow_html=True)
-
+        # ── Summary counts (same logic the old summary cards used) ──
         _avail_models = [(_mdf, _mrc) for _, _mdf, _mrc, _, _ in _MC_MODELS if not _mdf.empty]
         _n_models = len(_avail_models)
-
         def _in_top10(df, match_key, rc):
             r = _mc_lookup(df, match_key, rc)
             return r is not None and r <= 10
-
         _all_agree_count = sum(
             1 for _, row in _pc_df[_pc_df['Consensus'] <= 10].iterrows()
             if all(_in_top10(df, row['_mk'], rc) for df, rc in _avail_models)
         )
+        _agree_thr = max(3, _n_models - 1)
         _3of_agree_count = sum(
             1 for _, row in _pc_df[_pc_df['Consensus'] <= 10].iterrows()
-            if sum(_in_top10(df, row['_mk'], rc) for df, rc in _avail_models) >= max(3, _n_models - 1)
+            if sum(_in_top10(df, row['_mk'], rc) for df, rc in _avail_models) >= _agree_thr
         )
-        _cc_outlier_count = int(sum(_brown_mask))
+        # Cha Ching outliers = players whose edge magnitude is >= 5.
+        _cc_outlier_count = int((_pc_df['_edge'].dropna().abs() >= 5).sum())
 
-        _ss1, _ss2, _ss3 = st.columns(3)
-        with _ss1:
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-label">All {_n_models} models agree</div>'
-                f'<div class="metric-value">{_all_agree_count} of top 10</div>'
-                f'<div class="metric-sub">Players top 10 in every available model</div></div>',
-                unsafe_allow_html=True,
-            )
-        with _ss2:
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-label">{max(3,_n_models-1)} of {_n_models} agree</div>'
-                f'<div class="metric-value">{_3of_agree_count} of top 10</div>'
-                f'<div class="metric-sub">Top 10 in at least {max(3,_n_models-1)} models</div></div>',
-                unsafe_allow_html=True,
-            )
-        with _ss3:
-            st.markdown(
-                f'<div class="metric-card"><div class="metric-label">Cha Ching outliers</div>'
-                f'<div class="metric-value">{_cc_outlier_count} of top 25</div>'
-                f'<div class="metric-sub">CC rank differs 5+ from consensus rank</div></div>',
-                unsafe_allow_html=True,
-            )
-
-        # ── Rank heatmap with team colour dots ───────────────────
-        st.markdown('<hr>', unsafe_allow_html=True)
+        # ── 2. Consensus headline (replaces the five model cards) ──
+        _top = _pc_df.iloc[0]
+        _top_ranks = [('Cha Ching', _top['_cc']), ('AFL', _top['_afl']),
+                      ('Betfair', _top['_bf']), ('Wheelo', _top['_wh']), ('ESPN', _top['_espn'])]
+        _n_top1 = sum(1 for _, r in _top_ranks if _rk_valid(r) and int(r) == 1)
+        _agree_tag = ('unanimous across all five models' if _n_top1 == 5
+                      else f'tops {_n_top1} of 5 models')
         st.markdown(
-            '<div class="section-header">Rank Heatmap — Top 20 by Cha Ching (team colour dots)</div>',
+            f'<div style="margin:2px 0 12px;font-size:15px;color:#7e8c99">Consensus #1: '
+            f'<span style="color:#34d399;font-weight:700;font-size:19px">{_top["Player"]}</span>'
+            f'<span style="font-size:12px;color:#7e8c99"> · {_agree_tag}</span></div>',
             unsafe_allow_html=True,
         )
 
-        if not _mc_cc_df.empty and '_match_key' in _mc_cc_df.columns:
-            _hmap_top20   = _mc_cc_df.head(20)
-            _hmap_players = _hmap_top20['Player'].tolist()       # display labels
-            _hmap_mkeys   = _hmap_top20['_match_key'].tolist()   # lookup keys
-            _hmap_models  = ['Cha Ching', 'AFL', 'Betfair', 'Wheelo', 'ESPN']
-
-            def _mk_series(df, col):
-                """Build a _match_key → rank Series, deduped so .get() always returns a scalar."""
-                if df.empty or '_match_key' not in df.columns:
-                    return pd.Series(dtype=float)
-                s = df.set_index('_match_key')[col]
-                # Keep first occurrence when duplicate match keys exist
-                return s[~s.index.duplicated(keep='first')]
-
-            def _scalar_rank(series, key, sentinel):
-                """Return a plain float rank for key, never a Series."""
-                val = series.get(key, sentinel)
-                if isinstance(val, pd.Series):
-                    val = val.iloc[0] if not val.empty else sentinel
-                return float(pd.to_numeric(val, errors='coerce') if not isinstance(val, float) else val or sentinel)
-
-            _hmap_rank_s = [
-                _mk_series(_mc_cc_df,   'CC_Rank'),
-                _mk_series(_mc_afl_df,  'AFL_Rank'),
-                _mk_series(_mc_bf_df,   'BF_Rank'),
-                _mk_series(_mc_wh_df,   'WH_Rank'),
-                _mk_series(_mc_espn_df, 'ESPN_Rank'),
-            ]
-            _hmap_z_raw = np.array([
-                [_scalar_rank(_s, _mk, _MC_SEN) for _s in _hmap_rank_s]
-                for _mk in _hmap_mkeys
-            ])
-            _hmap_z_inv = float(_MC_SEN + 1) - _hmap_z_raw
-            _hmap_text  = [
-                [str(int(v)) if v < _MC_SEN else 'N/A' for v in row]
-                for row in _hmap_z_raw.tolist()
-            ]
-
-            _fig_hmap = go.Figure(data=go.Heatmap(
-                z=_hmap_z_inv,
-                x=_hmap_models,
-                y=_hmap_players,
-                colorscale=[[0, '#0a1017'], [0.3, '#0d141d'], [0.7, '#1a5c40'], [1, '#34d399']],
-                zmin=1, zmax=float(_MC_SEN),
-                showscale=False,
-                text=_hmap_text,
-                texttemplate='%{text}',
-                textfont=dict(size=11, color='#e9eef3'),
-                hovertemplate='%{y}<br>%{x}: Rank %{text}<extra></extra>',
-            ))
-
-            # Team colour dots to the left of each row (x=-0.6, categorical axis)
-            for _p, _pmk in zip(_hmap_players, _hmap_mkeys):
-                _tc = _TEAM_COLOURS.get(_mc_cc_team.get(_pmk, ''), '#aaaaaa')
-                _fig_hmap.add_annotation(
-                    x=-0.6, y=_p,
-                    xref='x', yref='y',
-                    text='⬤',
-                    showarrow=False,
-                    font=dict(size=14, color=_tc),
-                )
-
-            _fig_hmap = apply_chart_theme(_fig_hmap)
-            _fig_hmap.update_layout(
-                height=640,
-                margin=dict(l=200, r=30, t=50, b=40),
-                xaxis=dict(
-                    side='top',
-                    tickfont=dict(size=12, color='#34d399'),
-                    range=[-1, len(_hmap_models) - 0.5],
-                ),
-                yaxis=dict(autorange='reversed', tickfont=dict(size=11, color='#7e8c99')),
-            )
-            st.plotly_chart(_fig_hmap, use_container_width=True, key='mc_heatmap')
-            st.caption(
-                "Darker green = higher ranked. Numbers show rank position. "
-                "'N/A' = player not ranked by that model. Coloured dots = team colour."
-            )
-        else:
-            st.info("Heatmap requires Cha Ching predictions/season_2026.csv.")
-
-        # ── Scatter: Cha Ching vs AFL rank ───────────────────────
-        st.markdown('<hr>', unsafe_allow_html=True)
+        def _agree_cell(label, rank, first=False):
+            _v = _rk(rank)
+            _c = '#34d399' if (_rk_valid(rank) and int(rank) == 1) else ('#7e8c99' if _v == '—' else '#e9eef3')
+            _bd = '' if first else 'border-left:1px solid rgba(140,165,185,.14)'
+            return (f'<div style="{_bd};padding:8px 16px">'
+                    f'<div style="font-size:9px;font-weight:700;letter-spacing:1.2px;'
+                    f'text-transform:uppercase;color:#7e8c99">{label}</div>'
+                    f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:18px;font-weight:600;'
+                    f'color:{_c};text-align:right;font-variant-numeric:tabular-nums">{_v}</div></div>')
         st.markdown(
-            '<div class="section-header">Cha Ching vs AFL Predictor — Rank Scatter</div>',
+            '<div style="display:grid;grid-template-columns:repeat(5,1fr);margin:0 0 22px;'
+            'border-top:1px solid rgba(140,165,185,.14);border-bottom:1px solid rgba(140,165,185,.14)">' +
+            ''.join(_agree_cell(_l, _r, _i == 0) for _i, (_l, _r) in enumerate(_top_ranks)) +
+            '</div>',
             unsafe_allow_html=True,
         )
 
-        if not _mc_cc_df.empty and not _mc_afl_df.empty and '_match_key' in _mc_cc_df.columns:
-            _sc_cc  = _mc_cc_df.head(20).copy()
-            _sc_mrg = _sc_cc.merge(
-                _mc_afl_df[['_match_key', 'AFL_Rank']], on='_match_key', how='left'
-            )
-            _sc_mrg['AFL_Rank'] = _sc_mrg['AFL_Rank'].fillna(_MC_SEN)
-            _sc_mrg['CC_Votes'] = _sc_mrg['CC_Votes'].round(1)
+        # ── 4. Metadata strip (replaces the three summary cards) ──
+        def _meta_cell(label, value, value_colour, sub, first=False):
+            _pad = 'padding:0 22px 0 0' if first else 'padding:0 22px'
+            _bd = '' if first else 'border-left:1px solid rgba(140,165,185,.14)'
+            return (f'<div style="{_pad};{_bd}">'
+                    f'<div style="font-size:10px;font-weight:700;letter-spacing:1.2px;'
+                    f'text-transform:uppercase;color:#7e8c99">{label}</div>'
+                    f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:25px;font-weight:600;'
+                    f'color:{value_colour};text-align:right;line-height:1.2;'
+                    f'font-variant-numeric:tabular-nums">{value}</div>'
+                    f'<div style="font-size:11px;color:#7e8c99;text-align:right;margin-top:3px">{sub}</div></div>')
+        st.markdown(
+            '<div style="display:grid;grid-template-columns:repeat(3,1fr);margin:0 0 8px">' +
+            _meta_cell('Full consensus', _all_agree_count, '#e9eef3',
+                       'top 10 in every available model', first=True) +
+            _meta_cell('Strong consensus', _3of_agree_count, '#e9eef3',
+                       f'top 10 in at least {_agree_thr} models') +
+            _meta_cell('Cha Ching outliers', _cc_outlier_count, '#34d399',
+                       'edge of 5+ vs the field') +
+            '</div>',
+            unsafe_allow_html=True,
+        )
 
-            _fig_sc = go.Figure()
-            _sc_max = 22
-            _fig_sc.add_trace(go.Scatter(
-                x=list(range(1, _sc_max + 1)),
-                y=list(range(1, _sc_max + 1)),
-                mode='lines',
-                line=dict(color='#4a5a6a', dash='dash', width=1.5),
-                name='Perfect agreement',
-                hoverinfo='skip',
-            ))
-            _fig_sc.add_trace(go.Scatter(
-                x=_sc_mrg['CC_Rank'].tolist(),
-                y=_sc_mrg['AFL_Rank'].tolist(),
-                mode='markers+text',
-                text=_sc_mrg['Player'].tolist(),
-                textposition='top center',
-                textfont=dict(size=9, color='#e9eef3'),
-                marker=dict(size=10, color='#34d399', opacity=0.78,
-                            line=dict(color='#0d141d', width=1.2)),
-                name='Players',
-                hovertemplate='%{text}<br>CC Rank: %{x}<br>AFL Rank: %{y}<extra></extra>',
-            ))
-            _fig_sc = apply_chart_theme(_fig_sc)
-            _fig_sc.update_layout(
-                height=540,
-                xaxis=dict(
-                    title='Cha Ching Rank',
-                    zeroline=False,
-                    tickmode='linear', tick0=1, dtick=2,
-                    range=[0.5, _sc_max + 0.5],
-                ),
-                yaxis=dict(
-                    title='AFL Predictor Rank',
-                    autorange='reversed',
-                    zeroline=False,
-                    tickmode='linear', tick0=1, dtick=2,
-                ),
-                legend=dict(orientation='h', y=1.06),
-                margin=dict(l=70, r=30, t=60, b=70),
+        # ── 5. Consensus ranking table (replaces table + heatmap + scatter) ──
+        st.markdown(
+            '<div style="margin:18px 0 4px;font-size:10px;font-weight:700;letter-spacing:1.5px;'
+            'text-transform:uppercase;color:#7e8c99">Consensus ranking — top 25</div>',
+            unsafe_allow_html=True,
+        )
+
+        def _mc_cell(v, colour):
+            _t = _rk(v)
+            _c = '#7e8c99' if _t == '—' else colour
+            return (f'<td style="text-align:right;padding:7px 12px;color:{_c};'
+                    f'border-bottom:1px solid rgba(140,165,185,.14)">{_t}</td>')
+
+        _mc_th = ('text-align:right;padding:8px 12px;font-size:10px;letter-spacing:.12em;'
+                  'text-transform:uppercase;border-bottom:1px solid rgba(140,165,185,.22)')
+        _mc_head = (
+            '<tr>'
+            f'<th style="{_mc_th};color:#7e8c99">#</th>'
+            f'<th style="{_mc_th};color:#7e8c99;text-align:left">Player</th>'
+            f'<th style="{_mc_th};color:#34d399">Cha Ching</th>'
+            + ''.join(f'<th style="{_mc_th};color:#7e8c99">{_h}</th>'
+                      for _h in ('AFL', 'Betfair', 'Wheelo', 'ESPN'))
+            + f'<th style="{_mc_th};color:#7e8c99">Edge</th>'
+            '</tr>'
+        )
+
+        _mc_body = ''
+        for _, _r in _pc_df.iterrows():
+            _e = _r['_edge']
+            if _e is None or (isinstance(_e, float) and pd.isna(_e)):
+                _row_bg = ''
+                _edge_html = '<span style="color:#7e8c99">—</span>'
+            else:
+                _ev = int(_e)
+                if _ev >= 5:
+                    _row_bg = 'background:rgba(52,211,153,0.07)'
+                    _edge_html = f'<span style="color:#34d399;font-weight:600">value +{_ev}</span>'
+                elif _ev <= -5:
+                    _row_bg = 'background:rgba(240,180,41,0.07)'
+                    _edge_html = f'<span style="color:#f0b429;font-weight:600">fade −{abs(_ev)}</span>'
+                else:
+                    _row_bg = ''
+                    _edge_html = f'<span style="color:#7e8c99">±{abs(_ev)}</span>'
+            _tc = _TEAM_COLOURS.get(_mc_cc_team.get(_r['_mk'], ''), '#7e8c99')
+            _dot = (f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;'
+                    f'background:{_tc};margin-right:9px;vertical-align:middle"></span>')
+            _mc_body += (
+                f'<tr style="{_row_bg}">'
+                f'<td style="text-align:right;padding:7px 12px;color:#7e8c99;'
+                f'border-bottom:1px solid rgba(140,165,185,.14)">{_r["Consensus"]}</td>'
+                f'<td style="text-align:left;padding:7px 12px;color:#e9eef3;'
+                f'font-family:\'Archivo\',sans-serif;border-bottom:1px solid rgba(140,165,185,.14)">'
+                f'{_dot}{_r["Player"]}</td>'
+                + _mc_cell(_r['_cc'], '#34d399')
+                + _mc_cell(_r['_afl'], '#e9eef3')
+                + _mc_cell(_r['_bf'], '#e9eef3')
+                + _mc_cell(_r['_wh'], '#e9eef3')
+                + _mc_cell(_r['_espn'], '#e9eef3')
+                + f'<td style="text-align:right;padding:7px 12px;'
+                  f'border-bottom:1px solid rgba(140,165,185,.14)">{_edge_html}</td>'
+                + '</tr>'
             )
-            st.plotly_chart(_fig_sc, use_container_width=True, key='mc_scatter')
-            _afl_note_sc = (" Note: AFL predictor has no live votes yet — ranks not meaningful."
-                            if not _mc_afl_has_votes else "")
-            st.caption(
-                "Rank 1 (best) is at top-left. Points above the dashed line: AFL ranks that player "
-                "higher than Cha Ching. Points below: Cha Ching ranks them higher." + _afl_note_sc
-            )
-        else:
-            st.info("Scatter plot requires both Cha Ching and AFL Predictor data.")
+
+        st.markdown(
+            "<table style=\"width:100%;border-collapse:collapse;font-size:13px;margin-top:4px;"
+            "font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums\">"
+            + _mc_head + _mc_body + '</table>',
+            unsafe_allow_html=True,
+        )
+        st.caption('Edge = mean of the other four models’ ranks minus Cha Ching’s rank. '
+                   'Positive (emerald) = Cha Ching higher than the field; negative (gold) = lower.')
+
+        # (Summary cards, rank heatmap and CC-vs-AFL scatter removed — folded
+        #  into the consensus headline, metadata strip and table above.)
 
 # ── Global footer ────────────────────────────────────────────
 if _page == 'Landing':
