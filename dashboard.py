@@ -4262,9 +4262,16 @@ if _page == 'Brownlow Betting':
 # STAT FILTER
 # ════════════════════════════════════════════════════════════
 if _page == 'Stat Filter':
+    # ── 1. Header — no box ────────────────────────────────────
     st.markdown(
-        '<div class="title-bar"><h2 style="color:#e9eef3;margin:0">Stat Filter</h2>'
-        '<p style="color:var(--muted);margin:4px 0 0 0">Set thresholds and see historical poll rates — 2015–2026</p></div>',
+        '<div style="margin:2px 0 16px">'
+        '<div style="font-size:10px;font-weight:700;letter-spacing:2px;'
+        'text-transform:uppercase;color:#7e8c99">Stat Filter</div>'
+        '<h1 style="font-family:\'Archivo\',sans-serif;font-size:34px;font-weight:800;'
+        'color:#e9eef3;margin:4px 0 2px;line-height:1.05">Threshold to votes</h1>'
+        '<div style="color:#7e8c99;font-size:13px">How historical Brownlow polling '
+        'responds as you raise a stat threshold · 2015–2026</div>'
+        '</div>',
         unsafe_allow_html=True,
     )
     hist = load_all_historical()
@@ -4272,7 +4279,8 @@ if _page == 'Stat Filter':
         st.error("No historical game-level data found. Run brownlow_model.py first.")
     else:
         hist = hist[hist['Brownlow.Votes'].notna()].copy()
-        st.markdown('<div class="section-header">Filters</div>', unsafe_allow_html=True)
+
+        # ── 2. Filters — flush, no panel. Widgets + logic unchanged ──
         all_players_sf = sorted(hist['Player_Name'].dropna().unique().tolist())
         selected_players_sf = st.multiselect("Player (leave blank for all)", all_players_sf, default=[], placeholder="All players", key="sf_players")
 
@@ -4294,97 +4302,216 @@ if _page == 'Stat Filter':
             season_range = st.slider("Season range", int(hist['Season'].min()), int(hist['Season'].max()),
                                      (int(hist['Season'].min()), int(hist['Season'].max())), key="sf_seasons")
 
-        mask = (
+        # Assemble the filter mask from components so the active stat's own
+        # constraint can be dropped for the threshold sweep. The final `mask`
+        # is identical to the previous single-expression version.
+        _base_mask = (
             (hist['Season'] >= season_range[0]) & (hist['Season'] <= season_range[1]) &
-            (hist['Player_Name'].isin(selected_players_sf) if selected_players_sf else pd.Series(True, index=hist.index)) &
-            (hist['Disposals'] >= min_disp) & (hist['Goals'] >= min_goals) &
-            (hist['Kicks'] >= min_kicks) & (hist['Clearances'] >= min_clearances) &
-            (hist['Contested.Possessions'] >= min_contested) & (hist['Coaches_Votes'] >= min_coaches) &
-            (hist['Tackles'] >= min_tackles) & (hist['Score_Involvements'] >= min_score_inv)
+            (hist['Player_Name'].isin(selected_players_sf) if selected_players_sf else pd.Series(True, index=hist.index))
         )
-        if has_rating: mask &= (hist['RatingPoints'] >= min_rating)
-        if result_filter == "Win only": mask &= (hist['Is_Win'] == 1)
-        elif result_filter == "Loss only": mask &= (hist['Is_Loss'] == 1)
+        if result_filter == "Win only": _base_mask &= (hist['Is_Win'] == 1)
+        elif result_filter == "Loss only": _base_mask &= (hist['Is_Loss'] == 1)
+
+        # (label, column, current value, slider min, slider max)
+        _stat_sliders = [
+            ('Disposals', 'Disposals', min_disp, 0, 50),
+            ('Goals', 'Goals', min_goals, 0, 10),
+            ('Kicks', 'Kicks', min_kicks, 0, 40),
+            ('Clearances', 'Clearances', min_clearances, 0, 15),
+            ('Contested possessions', 'Contested.Possessions', min_contested, 0, 25),
+            ('Coaches votes', 'Coaches_Votes', min_coaches, 0, 10),
+            ('Tackles', 'Tackles', min_tackles, 0, 12),
+            ('Score involvements', 'Score_Involvements', min_score_inv, 0, 15),
+        ]
+        if has_rating:
+            _stat_sliders.append(('Wheelo rating pts', 'RatingPoints', min_rating, 0, 100))
+
+        mask = _base_mask.copy()
+        for _lab, _col, _val, _mn, _mx in _stat_sliders:
+            mask &= (hist[_col] >= _val)
 
         filtered_sf = hist[mask]
         total = len(filtered_sf)
-        st.markdown('<div class="section-header">Results</div>', unsafe_allow_html=True)
 
         if total == 0:
             st.warning("No games match these filters.")
         else:
-            has_2026 = season_range[1] >= 2026 and (filtered_sf['Season'] == 2026).any()
-            if has_2026:
-                n_2026_games = int((filtered_sf['Season'] == 2026).sum())
-                max_rnd_2026 = int(filtered_sf[filtered_sf['Season'] == 2026]['Round_num'].max())
-                st.info(f"2026 data included — {n_2026_games:,} games through Round {max_rnd_2026} (Brownlow votes not yet assigned). Poll rates from {season_range[0]}–2025 only.")
-                vote_data = filtered_sf[filtered_sf['Season'] < 2026]
+            # ── 3. Active stat — slider with the highest fraction-of-range
+            #    currently engaged; fall back to disposals if none set above min.
+            _engaged = [
+                (_lab, _col, _val, _mn, _mx, (_val - _mn) / (_mx - _mn) if _mx > _mn else 0.0)
+                for _lab, _col, _val, _mn, _mx in _stat_sliders if _val > _mn
+            ]
+            if _engaged:
+                _engaged.sort(key=lambda r: r[5], reverse=True)
+                active_label, active_col, active_val, active_min, active_max = _engaged[0][:5]
             else:
-                vote_data = filtered_sf
+                active_label, active_col, active_val, active_min, active_max = _stat_sliders[0][:5]
 
-            n3 = (vote_data['Brownlow.Votes'] == 3).sum()
-            n2 = (vote_data['Brownlow.Votes'] == 2).sum()
-            n1 = (vote_data['Brownlow.Votes'] == 1).sum()
-            n0 = (vote_data['Brownlow.Votes'] == 0).sum()
+            # ── 4. Threshold sweep — same poll/3-vote/avg formulas as the old
+            #    disposal table, with the active stat's own min filter dropped so
+            #    the full sweep shows. Votes only exist pre-2026.
+            _sweep_mask = _base_mask & (hist['Season'] < 2026)
+            for _lab, _col, _val, _mn, _mx in _stat_sliders:
+                if _col != active_col:
+                    _sweep_mask &= (hist[_col] >= _val)
+            _sweep_base = hist[_sweep_mask]
+
+            def _threshold_sweep(df, col, thresholds):
+                """Poll rate, 3-vote rate and avg votes at each threshold of `col`.
+                Identical formulas to the original disposal table (≥5-game guard)."""
+                rows = []
+                for t in thresholds:
+                    sub = df[df[col] >= t]
+                    if len(sub) >= 5:
+                        v = sub['Brownlow.Votes']
+                        rows.append({
+                            'threshold': t, 'games': int(len(sub)),
+                            'poll_rate': (v > 0).mean() * 100,
+                            'three_rate': (v == 3).mean() * 100,
+                            'avg_votes': v.mean(),
+                        })
+                return rows
+
+            _thresholds = list(range(int(active_min), int(active_max) + 1))
+            sweep = _threshold_sweep(_sweep_base, active_col, _thresholds)
+
+            # Current-threshold position (same formulas) + zero-threshold baseline.
+            _cur_sub = _sweep_base[_sweep_base[active_col] >= active_val]
+            _cur_v = _cur_sub['Brownlow.Votes']
+            cur_games = int(len(_cur_sub))
+            cur_poll = (_cur_v > 0).mean() * 100 if cur_games > 0 else 0.0
+            cur_three = (_cur_v == 3).mean() * 100 if cur_games > 0 else 0.0
+            cur_avg = _cur_v.mean() if cur_games > 0 else 0.0
+            base_poll = sweep[0]['poll_rate'] if sweep else cur_poll
+            base_three = sweep[0]['three_rate'] if sweep else cur_three
+
+            # Vote pool (pre-2026 only), reused for the breakdown strip.
+            vote_data = filtered_sf[filtered_sf['Season'] < 2026]
+            n3 = int((vote_data['Brownlow.Votes'] == 3).sum())
+            n2 = int((vote_data['Brownlow.Votes'] == 2).sum())
+            n1 = int((vote_data['Brownlow.Votes'] == 1).sum())
+            n0 = int((vote_data['Brownlow.Votes'] == 0).sum())
             vote_total = len(vote_data)
-            poll_rate = (vote_data['Brownlow.Votes'] > 0).mean() if vote_total > 0 else 0
-            avg_votes = vote_data['Brownlow.Votes'].mean() if vote_total > 0 else 0
-            player_sub = f"{len(selected_players_sf)} players" if selected_players_sf else "All players"
 
-            c1, c2, c3, c4, c5 = st.columns(5)
-            with c1: st.markdown(f'<div class="metric-card"><div class="metric-label">Matching Games</div><div class="metric-value">{total:,}</div><div class="metric-sub">{season_range[0]}–{season_range[1]} · {player_sub}</div></div>', unsafe_allow_html=True)
-            with c2: st.markdown(f'<div class="metric-card"><div class="metric-label">Poll Rate</div><div class="metric-value">{poll_rate * 100:.1f}%</div><div class="metric-sub">Any votes</div></div>', unsafe_allow_html=True)
-            with c3:
-                if vote_total > 0: st.markdown(f'<div class="metric-card"><div class="metric-label">3-Vote Rate</div><div class="metric-value">{n3 / vote_total * 100:.1f}%</div><div class="metric-sub">{n3:,} games</div></div>', unsafe_allow_html=True)
-            with c4:
-                if vote_total > 0: st.markdown(f'<div class="metric-card"><div class="metric-label">2-Vote Rate</div><div class="metric-value">{n2 / vote_total * 100:.1f}%</div><div class="metric-sub">{n2:,} games</div></div>', unsafe_allow_html=True)
-            with c5: st.markdown(f'<div class="metric-card"><div class="metric-label">Avg Votes</div><div class="metric-value">{avg_votes:.3f}</div><div class="metric-sub">per game</div></div>', unsafe_allow_html=True)
+            if (filtered_sf['Season'] == 2026).any():
+                _n26 = int((filtered_sf['Season'] == 2026).sum())
+                st.markdown(
+                    f'<div style="color:#7e8c99;font-size:12px;margin:2px 0 6px">'
+                    f'{_n26:,} of these are 2026 games — votes not yet assigned, so all '
+                    f'rates below use {season_range[0]}–2025.</div>',
+                    unsafe_allow_html=True,
+                )
 
-            col_chart, col_table = st.columns([2, 1])
-            with col_chart:
-                if vote_total > 0:
-                    fig_bar = go.Figure(go.Bar(
-                        x=['3 votes', '2 votes', '1 vote', '0 votes'],
-                        y=[n3 / vote_total * 100, n2 / vote_total * 100, n1 / vote_total * 100, n0 / vote_total * 100],
-                        marker_color=['#7e8c99', '#34d399', '#f0b429', '#0d141d'],
-                        text=[f"{v:.1f}%" for v in [n3 / vote_total * 100, n2 / vote_total * 100, n1 / vote_total * 100, n0 / vote_total * 100]],
-                        textposition='outside',
-                    ))
-                    fig_bar.update_layout(
-                        plot_bgcolor='#101a24', paper_bgcolor='#101a24', font_color='#e9eef3',
-                        yaxis=dict(title='% of games', gridcolor='#ede8df', range=[0, max(n0 / vote_total * 100 * 1.1, 10)]),
-                        xaxis=dict(gridcolor='#ede8df'), margin=dict(t=20, b=20), height=300, showlegend=False,
-                    )
-                    fig_bar = apply_chart_theme(fig_bar)
-                    st.plotly_chart(fig_bar, width='stretch', key="chart_013")
-            with col_table:
-                st.markdown("**Vote breakdown**")
-                if vote_total > 0:
-                    st.markdown(f"""
-| Votes | Games | Rate |
-|-------|------:|-----:|
-| 3 | {n3:,} | {n3 / vote_total * 100:.1f}% |
-| 2 | {n2:,} | {n2 / vote_total * 100:.1f}% |
-| 1 | {n1:,} | {n1 / vote_total * 100:.1f}% |
-| 0 | {n0:,} | {n0 / vote_total * 100:.1f}% |
-| **Total** | **{vote_total:,}** | |
-""")
+            # ── 5. Hero chart — poll rate by threshold ────────────
+            st.markdown(
+                f'<div style="margin:14px 0 0">'
+                f'<div style="font-family:\'Archivo\',sans-serif;font-size:18px;font-weight:700;'
+                f'color:#e9eef3">Poll rate rises with {active_label.lower()}</div>'
+                f'<div style="color:#7e8c99;font-size:12px;margin-top:2px">'
+                f'tracking your active filter, set to {active_val}</div></div>',
+                unsafe_allow_html=True,
+            )
+            if sweep:
+                _tx     = [r['threshold'] for r in sweep]
+                _poll   = [r['poll_rate'] for r in sweep]
+                _three  = [r['three_rate'] for r in sweep]
+                fig_sweep = go.Figure()
+                fig_sweep.add_trace(go.Scatter(
+                    x=_tx, y=_poll, name='Poll rate', mode='lines',
+                    line=dict(color='#34d399', width=2.5),
+                    fill='tozeroy', fillcolor='rgba(52,211,153,0.10)',
+                    hovertemplate='≥%{x}<br>%{y:.1f}% poll<extra></extra>',
+                ))
+                fig_sweep.add_trace(go.Scatter(
+                    x=_tx, y=_three, name='3-vote rate', mode='lines',
+                    line=dict(color='#f0b429', width=2),
+                    hovertemplate='≥%{x}<br>%{y:.1f}% 3-vote<extra></extra>',
+                ))
+                fig_sweep.add_vline(x=active_val, line=dict(color='#7e8c99', width=1, dash='dash'))
+                fig_sweep.add_trace(go.Scatter(
+                    x=[active_val], y=[cur_poll], mode='markers+text',
+                    marker=dict(color='#34d399', size=11),
+                    text=[f"{cur_poll:.1f}%"], textposition='top center',
+                    textfont=dict(color='#34d399', size=12, family='IBM Plex Mono'),
+                    showlegend=False, hoverinfo='skip',
+                ))
+                fig_sweep = apply_chart_theme(fig_sweep)
+                fig_sweep.update_layout(
+                    paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+                    xaxis=dict(title=active_label, showgrid=False, zeroline=False),
+                    yaxis=dict(title='%', rangemode='tozero',
+                               gridcolor='rgba(140,165,185,.14)', zeroline=False),
+                    legend=dict(orientation='h', y=1.14),
+                    margin=dict(t=20, b=40), height=320, hovermode='x unified',
+                )
+                st.plotly_chart(fig_sweep, width='stretch', key="sf_sweep_chart")
+            else:
+                st.markdown('<div style="color:#7e8c99;font-size:13px;margin:8px 0">'
+                            'Not enough games to draw a threshold curve.</div>',
+                            unsafe_allow_html=True)
 
-            st.markdown('<div class="section-header">Threshold Comparison</div>', unsafe_allow_html=True)
-            st.caption("Poll rate at each disposal threshold, holding all other filters fixed")
-            disp_rows = []
-            for t in [0, 15, 20, 25, 28, 30, 33, 35, 38, 40]:
-                sub_mask = mask & (hist['Disposals'] >= t) & (hist['Season'] < 2026)
-                sub = hist[sub_mask]
-                if len(sub) >= 5:
-                    disp_rows.append({'Min Disposals': t, 'Games': len(sub),
-                                      'Poll Rate': f"{(sub['Brownlow.Votes'] > 0).mean() * 100:.1f}%",
-                                      '3-vote Rate': f"{(sub['Brownlow.Votes'] == 3).mean() * 100:.1f}%",
-                                      'Avg Votes': f"{sub['Brownlow.Votes'].mean():.3f}"})
-            if disp_rows:
-                st.dataframe(pd.DataFrame(disp_rows), width='stretch', hide_index=True)
+            # ── 6. Current-position readout — 4-col strip, hairline rules ──
+            def _readout_cell(label, value, value_colour, sub, first=False):
+                _pad = 'padding:0 20px 0 0' if first else 'padding:0 20px'
+                _bord = '' if first else 'border-left:1px solid rgba(140,165,185,.14)'
+                _sub = (f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
+                        f'color:#7e8c99;text-align:right;margin-top:3px">{sub}</div>') if sub else ''
+                return (
+                    f'<div style="{_pad};{_bord}">'
+                    f'<div style="font-size:10px;font-weight:700;letter-spacing:1.2px;'
+                    f'text-transform:uppercase;color:#7e8c99">{label}</div>'
+                    f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:25px;font-weight:600;'
+                    f'color:{value_colour};text-align:right;line-height:1.2">{value}</div>{_sub}</div>'
+                )
 
-            st.markdown('<div class="section-header">Sample Games</div>', unsafe_allow_html=True)
+            st.markdown(
+                '<div style="display:grid;grid-template-columns:repeat(4,1fr);margin:18px 0 4px">' +
+                _readout_cell('Matching games', f'{cur_games:,}', '#e9eef3',
+                              f'≥ {active_val} {active_label.lower()}', first=True) +
+                _readout_cell('Poll rate', f'{cur_poll:.1f}%', '#34d399',
+                              f'vs {base_poll:.1f}% at zero') +
+                _readout_cell('3-vote rate', f'{cur_three:.1f}%', '#e9eef3',
+                              f'vs {base_three:.1f}% at zero') +
+                _readout_cell('Avg votes / game', f'{cur_avg:.3f}', '#e9eef3', '') +
+                '</div>',
+                unsafe_allow_html=True,
+            )
+
+            # ── 7. Vote breakdown — collapsed inline metadata strip ──
+            def _vb(value, label):
+                return (f'<span style="margin-right:24px">'
+                        f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:15px;'
+                        f'color:#e9eef3">{value:,}</span> '
+                        f'<span style="font-size:11px;color:#7e8c99">{label}</span></span>')
+            st.markdown(
+                '<div style="margin:16px 0 4px;padding-top:13px;'
+                'border-top:1px solid rgba(140,165,185,.14)">'
+                '<span style="font-size:10px;font-weight:700;letter-spacing:1.2px;'
+                'text-transform:uppercase;color:#7e8c99;margin-right:18px">Vote breakdown</span>' +
+                _vb(n3, '3-vote') + _vb(n2, '2-vote') + _vb(n1, '1-vote') +
+                _vb(n0, '0-vote') + _vb(vote_total, 'pool') +
+                '</div>',
+                unsafe_allow_html=True,
+            )
+
+            # ── 8. Sample games — de-emphasised quiet table footer ──
+            def _quiet_sf_table(df):
+                rounded = _round_floats(df)
+                float_fmt = {c: '{:.1f}' for c in rounded.select_dtypes(include=['float64', 'float32', 'float']).columns}
+                def _cells(d):
+                    out = pd.DataFrame('background-color:#0a1017; color:#7e8c99;', index=d.index, columns=d.columns)
+                    if 'Player' in d.columns:
+                        out['Player'] = 'background-color:#0a1017; color:#e9eef3;'
+                    if 'Result' in d.columns:
+                        out['Result'] = ['background-color:#0a1017; color:#34d399;' if v == 'W'
+                                         else 'background-color:#0a1017; color:#7e8c99;' for v in d['Result']]
+                    return out
+                s = rounded.style.apply(_cells, axis=None).set_table_styles(_TABLE_STYLES)
+                if float_fmt:
+                    s = s.format(float_fmt)
+                return s
+
             show_cols_sf = ['Season', 'Round_num', 'Player_Name', 'Playing.for',
                             'Disposals', 'Goals', 'Clearances', 'Contested.Possessions',
                             'Coaches_Votes', 'Is_Win', 'Brownlow.Votes']
@@ -4397,7 +4524,14 @@ if _page == 'Stat Filter':
             _sf_disp = sample_sf.sort_values(['Season', 'Rnd'], ascending=[False, False]).head(200).copy()
             for col in _sf_disp.select_dtypes(include='float').columns:
                 _sf_disp[col] = _sf_disp[col].round(1)
-            st.dataframe(_style_table(_sf_disp), width='stretch', hide_index=True)
+            st.markdown(
+                f'<div style="margin:22px 0 6px;font-size:10px;font-weight:700;letter-spacing:1.5px;'
+                f'text-transform:uppercase;color:#7e8c99">Sample games '
+                f'<span style="font-weight:400;letter-spacing:0;text-transform:none">— showing '
+                f'{len(_sf_disp):,} of {total:,} matching</span></div>',
+                unsafe_allow_html=True,
+            )
+            st.dataframe(_quiet_sf_table(_sf_disp), width='stretch', hide_index=True)
 
 # ════════════════════════════════════════════════════════════
 # ROUND BY ROUND
