@@ -4764,12 +4764,6 @@ Positive = improving trajectory, negative = declining.
 # PLAYER COMPARISON
 # ════════════════════════════════════════════════════════════
 if _page == 'Player Comparison':
-    st.markdown(
-        f'<div class="title-bar"><h2 style="color:var(--text);margin:0">Player Comparison — {selected_season}</h2>'
-        f'<p style="color:var(--muted);margin:4px 0 0 0">Head-to-head model comparison and betting analysis</p></div>',
-        unsafe_allow_html=True,
-    )
-
     _cmp_players = sorted(predictions['Player_Name'].tolist())
     _cmp_proj = load_season_projection()
     _cmp_odds = load_best_odds()
@@ -4777,16 +4771,14 @@ if _page == 'Player Comparison':
     _def1 = predictions.iloc[0]['Player_Name'] if len(predictions) > 0 else _cmp_players[0]
     _def2 = predictions.iloc[1]['Player_Name'] if len(predictions) > 1 else _cmp_players[1]
 
-    _sel_col1, _sel_col_vs, _sel_col2 = st.columns([5, 1, 5])
+    # The matchup header sits at the very top but needs the chosen players —
+    # reserve its slot now, then fill it once the selectboxes below resolve.
+    _hdr_slot = st.container()
+
+    _sel_col1, _sel_col2 = st.columns(2)
     with _sel_col1:
         _p1 = st.selectbox("Player 1", _cmp_players,
                            index=_cmp_players.index(_def1), key="cmp_p1")
-    with _sel_col_vs:
-        st.markdown(
-            '<div style="display:flex;align-items:center;justify-content:center;height:100%;'
-            'padding-top:28px;font-size:28px;font-weight:900;color:var(--muted);letter-spacing:2px">VS</div>',
-            unsafe_allow_html=True,
-        )
     with _sel_col2:
         _p2 = st.selectbox("Player 2", _cmp_players,
                            index=_cmp_players.index(_def2), key="cmp_p2")
@@ -4819,35 +4811,46 @@ if _page == 'Player Comparison':
                 d['market_pct'] = round(float(v2), 1) if pd.notna(v2) else None
         return d
 
-    def _render_cmp_card(d, colour):
-        floor_s = f"{d['floor']}" if d['floor'] is not None else "—"
-        ceil_s  = f"{d['ceiling']}" if d['ceiling'] is not None else "—"
-        odds_s  = f"${d['best_odds']}" if d['best_odds'] is not None else "—"
-        mkt_s   = f"{d['market_pct']}%" if d['market_pct'] is not None else "—"
-        st.markdown(
-            f'<div style="background:var(--surface);border:1px solid var(--line);border-top:3px solid {colour};'
-            f'border-radius:8px;padding:18px 22px;margin:6px 0;">'
-            f'<div class="metric-label">{d["team"]}</div>'
-            f'<div style="font-size:26px;font-weight:800;color:var(--text);margin:4px 0 14px 0;line-height:1.1">{d["name"]}</div>'
-            f'<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px 16px;">'
-            f'<div><div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Exp Votes</div>'
-            f'<div style="font-size:20px;font-weight:700;color:{colour}">{d["exp_votes"]}</div></div>'
-            f'<div><div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Floor</div>'
-            f'<div style="font-size:20px;font-weight:700;color:{colour}">{floor_s}</div></div>'
-            f'<div><div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Ceiling</div>'
-            f'<div style="font-size:20px;font-weight:700;color:{colour}">{ceil_s}</div></div>'
-            f'<div><div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Poll %</div>'
-            f'<div style="font-size:20px;font-weight:700;color:{colour}">{d["poll_pct"]}%</div></div>'
-            f'<div><div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">3-Vote Games</div>'
-            f'<div style="font-size:20px;font-weight:700;color:{colour}">{d["three_vote_games"]}</div></div>'
-            f'<div><div style="font-size:10px;color:#4a5a6a;text-transform:uppercase;font-weight:600;letter-spacing:0.8px">Best Odds / Mkt%</div>'
-            f'<div style="font-size:20px;font-weight:700;color:{colour}">{odds_s} <span style="font-size:13px;color:var(--muted)">/ {mkt_s}</span></div></div>'
-            f'</div></div>',
-            unsafe_allow_html=True,
-        )
-
     _d1 = _cmp_player_data(_p1)
     _d2 = _cmp_player_data(_p2)
+
+    # ── 1. Matchup header — no bordered box, hero exp-votes per player ──
+    with _hdr_slot:
+        _kick = (f'<div style="font-size:10px;font-weight:700;letter-spacing:2px;'
+                 f'text-transform:uppercase;color:#7e8c99;margin-bottom:14px">'
+                 f'Player Comparison · {selected_season}</div>')
+        if _d1 and _d2 and _p1 != _p2:
+            _hi1 = _d1['exp_votes'] >= _d2['exp_votes']
+            _hc1 = '#34d399' if _hi1 else '#e9eef3'
+            _hc2 = '#34d399' if not _hi1 else '#e9eef3'
+
+            def _hero_side(d, hc, align):
+                return (
+                    f'<div style="text-align:{align}">'
+                    f'<div style="font-size:11px;font-weight:700;letter-spacing:1.5px;'
+                    f'text-transform:uppercase;color:#7e8c99">{d["team"]}</div>'
+                    f'<div style="font-family:\'Archivo\',sans-serif;font-size:32px;font-weight:800;'
+                    f'color:#e9eef3;line-height:1.12;margin:2px 0 10px">{d["name"]}</div>'
+                    f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:40px;font-weight:600;'
+                    f'color:{hc};line-height:1">{d["exp_votes"]:.1f}</div>'
+                    f'<div style="font-size:9px;font-weight:700;letter-spacing:1.5px;'
+                    f'text-transform:uppercase;color:#7e8c99;margin-top:2px">exp votes</div>'
+                    f'</div>'
+                )
+
+            st.markdown(
+                _kick +
+                '<div style="display:grid;grid-template-columns:1fr auto 1fr;'
+                'align-items:center;gap:24px;margin-bottom:18px">' +
+                _hero_side(_d1, _hc1, 'right') +
+                '<div style="font-family:\'Archivo\',sans-serif;font-size:22px;font-weight:800;'
+                'letter-spacing:2px;color:#7e8c99">VS</div>' +
+                _hero_side(_d2, _hc2, 'left') +
+                '</div>',
+                unsafe_allow_html=True,
+            )
+        else:
+            st.markdown(_kick, unsafe_allow_html=True)
 
     if _p1 == _p2:
         st.warning("Select two different players to compare.")
@@ -4856,45 +4859,140 @@ if _page == 'Player Comparison':
 
         # ── Season Overview tab ───────────────────────────────
         with _tab_so:
-            _cc1, _cc2 = st.columns(2)
-            with _cc1:
-                _render_cmp_card(_d1, '#34d399')
-            with _cc2:
-                _render_cmp_card(_d2, 'var(--muted)')
+            _f_num  = lambda v: f"{v:.1f}"
+            _f_pct  = lambda v: f"{v:.1f}%"
+            _f_odds = lambda v: f"${v:.1f}"
 
-            st.markdown('<div class="section-header">Vote Projection Comparison</div>', unsafe_allow_html=True)
-            _proj_cats = ['Floor', 'Expected', 'Ceiling']
-            _p1_proj = [_d1['floor'] or 0, _d1['exp_votes'], _d1['ceiling'] or 0]
-            _p2_proj = [_d2['floor'] or 0, _d2['exp_votes'], _d2['ceiling'] or 0]
-            _fig_proj = go.Figure()
-            _fig_proj.add_trace(go.Bar(
-                name=_p1, y=_proj_cats, x=_p1_proj, orientation='h',
-                marker_color='#34d399', opacity=0.88,
-                text=[f'{v:.1f}' for v in _p1_proj], textposition='outside',
-                textfont=dict(color='#e9eef3', size=12),
-            ))
-            _fig_proj.add_trace(go.Bar(
-                name=_p2, y=_proj_cats, x=_p2_proj, orientation='h',
-                marker_color='#7e8c99', opacity=0.88,
-                text=[f'{v:.1f}' for v in _p2_proj], textposition='outside',
-                textfont=dict(color='#e9eef3', size=12),
-            ))
-            _fig_proj = apply_chart_theme(_fig_proj)
-            _fig_proj.update_layout(
-                barmode='group',
-                xaxis=dict(title='Votes', zeroline=False),
-                yaxis=dict(title='', tickfont=dict(size=12)),
-                legend=dict(orientation='h', y=1.12),
-                margin=dict(t=20, b=20, l=10, r=60),
-                height=240,
-            )
-            st.plotly_chart(_fig_proj, width='stretch', key="chart_017")
+            def _grp_header(title):
+                return (f'<div style="display:flex;align-items:center;gap:10px;margin:22px 0 8px">'
+                        f'<div style="font-size:10px;font-weight:700;letter-spacing:2px;'
+                        f'text-transform:uppercase;color:#7e8c99;white-space:nowrap">{title}</div>'
+                        f'<div style="flex:1;height:1px;background:rgba(140,165,185,.14)"></div></div>')
 
+            def _tot_row(label, v1, v2, fmt, lower_wins=False):
+                # Leader = higher value, except Best odds where lower wins. Bar
+                # widths are each player's value as a share of the pair's max
+                # (weighting inverted for odds so the favourite reads longest).
+                if v1 is None or v2 is None:
+                    s1 = fmt(v1) if v1 is not None else "—"
+                    s2 = fmt(v2) if v2 is not None else "—"
+                    w1 = w2 = 0.0
+                    lead1 = lead2 = False
+                else:
+                    lead1 = (v1 <= v2) if lower_wins else (v1 >= v2)
+                    lead2 = not lead1
+                    if lower_wins:
+                        ww1 = 1.0 / v1 if v1 else 0.0
+                        ww2 = 1.0 / v2 if v2 else 0.0
+                    else:
+                        ww1, ww2 = (v1 or 0.0), (v2 or 0.0)
+                    _mx = max(ww1, ww2) or 1.0
+                    w1 = ww1 / _mx * 100.0
+                    w2 = ww2 / _mx * 100.0
+                    s1, s2 = fmt(v1), fmt(v2)
+                _vc1 = '#34d399' if lead1 else '#7e8c99'
+                _vc2 = '#34d399' if lead2 else '#7e8c99'
+                _vw1 = '600' if lead1 else '400'
+                _vw2 = '600' if lead2 else '400'
+                _bb1 = '#34d399' if lead1 else 'rgba(126,140,153,0.45)'
+                _bb2 = '#34d399' if lead2 else 'rgba(126,140,153,0.45)'
+                return (
+                    f'<div style="margin:11px 0 0">'
+                    f'<div style="text-align:center;font-size:9px;font-weight:700;letter-spacing:1.5px;'
+                    f'text-transform:uppercase;color:#7e8c99;margin-bottom:4px">{label}</div>'
+                    f'<div style="display:grid;grid-template-columns:56px 1fr 1px 1fr 56px;'
+                    f'align-items:center;gap:8px">'
+                    f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:13px;text-align:right;'
+                    f'color:{_vc1};font-weight:{_vw1}">{s1}</div>'
+                    f'<div style="display:flex;justify-content:flex-end">'
+                    f'<div style="width:{w1:.1f}%;height:8px;border-radius:4px;background:{_bb1}"></div></div>'
+                    f'<div style="width:1px;height:20px;background:rgba(140,165,185,.14)"></div>'
+                    f'<div style="display:flex;justify-content:flex-start">'
+                    f'<div style="width:{w2:.1f}%;height:8px;border-radius:4px;background:{_bb2}"></div></div>'
+                    f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:13px;text-align:left;'
+                    f'color:{_vc2};font-weight:{_vw2}">{s2}</div>'
+                    f'</div></div>'
+                )
+
+            # ── 4. Tale of the tape (one HTML block) ──────────────
+            _html = '<div style="margin-top:2px">'
+            _html += _grp_header('Vote Projection')
+            _html += _tot_row('Expected Votes', _d1['exp_votes'], _d2['exp_votes'], _f_num)
+            _html += _tot_row('Floor', _d1['floor'], _d2['floor'], _f_num)
+            _html += _tot_row('Ceiling', _d1['ceiling'], _d2['ceiling'], _f_num)
+            _html += _tot_row('Poll %', _d1['poll_pct'], _d2['poll_pct'], _f_pct)
+            _html += _tot_row('3-Vote Games', _d1['three_vote_games'], _d2['three_vote_games'], _f_num)
+
+            # Per-game Form — same stats the radar fed, same labels.
+            _radar_candidates = [
+                ('Disposals',              'Disposals'),
+                ('Contested.Possessions',  'Cont. Poss'),
+                ('Clearances',             'Clearances'),
+                ('Tackles',                'Tackles'),
+                ('Inside.50s',             'Inside 50s'),
+                ('Coaches_Votes',          'Coaches Votes'),
+            ]
+            _radar_pairs = []
             if game_df is not None:
-                st.markdown('<div class="section-header">Round by Round — Predicted Votes</div>', unsafe_allow_html=True)
+                _radar_pairs = [(s, l) for s, l in _radar_candidates if s in game_df.columns]
+            if _radar_pairs:
+                _r_stats = [s for s, _ in _radar_pairs]
+                _g1_mean = game_df[game_df['Player_Name'] == _p1][_r_stats].mean()
+                _g2_mean = game_df[game_df['Player_Name'] == _p2][_r_stats].mean()
+                _html += _grp_header('Per-game Form')
+                for _s, _lab in _radar_pairs:
+                    _m1 = float(_g1_mean.get(_s)) if pd.notna(_g1_mean.get(_s)) else None
+                    _m2 = float(_g2_mean.get(_s)) if pd.notna(_g2_mean.get(_s)) else None
+                    _html += _tot_row(_lab, _m1, _m2, _f_num)
+
+            _html += _grp_header('Market')
+            _html += _tot_row('Best Odds', _d1['best_odds'], _d2['best_odds'], _f_odds, lower_wins=True)
+            _html += _tot_row('MVP %', _d1['market_pct'], _d2['market_pct'], _f_pct)
+
+            # ── 5. Projected range bars (inline SVG, same HTML block) ──
+            _rvals = [x for x in [_d1['floor'], _d1['ceiling'], _d1['exp_votes'],
+                                  _d2['floor'], _d2['ceiling'], _d2['exp_votes']] if x is not None]
+            if len(_rvals) >= 2:
+                _xmin, _xmax = min(_rvals), max(_rvals)
+                _span = (_xmax - _xmin) or 1.0
+
+                def _xp(v):
+                    return 70.0 + (v - _xmin) / _span * 860.0
+
+                _rows_svg = ''
+                for _rd, _rcol, _by in [(_d1, '#34d399', 56), (_d2, 'rgba(126,140,153,0.55)', 118)]:
+                    _rows_svg += (f'<text x="70" y="{_by-16}" font-family="Archivo,sans-serif" '
+                                  f'font-size="12" font-weight="700" fill="#e9eef3">{_rd["name"]}</text>')
+                    _rows_svg += (f'<line x1="70" y1="{_by}" x2="930" y2="{_by}" '
+                                  f'stroke="rgba(140,165,185,.14)" stroke-width="1" />')
+                    if _rd['floor'] is not None and _rd['ceiling'] is not None:
+                        _x0, _x1 = _xp(_rd['floor']), _xp(_rd['ceiling'])
+                        _rows_svg += (f'<rect x="{_x0:.1f}" y="{_by-6}" width="{max(_x1-_x0,2):.1f}" '
+                                      f'height="12" rx="6" fill="{_rcol}" />')
+                        _rows_svg += (f'<text x="{_x0-8:.1f}" y="{_by+4}" text-anchor="end" '
+                                      f'font-family="IBM Plex Mono,monospace" font-size="11" '
+                                      f'fill="#7e8c99">{_rd["floor"]:.1f}</text>')
+                        _rows_svg += (f'<text x="{_x1+8:.1f}" y="{_by+4}" text-anchor="start" '
+                                      f'font-family="IBM Plex Mono,monospace" font-size="11" '
+                                      f'fill="#7e8c99">{_rd["ceiling"]:.1f}</text>')
+                    if _rd['exp_votes'] is not None:
+                        _xe = _xp(_rd['exp_votes'])
+                        _rows_svg += (f'<line x1="{_xe:.1f}" y1="{_by-10}" x2="{_xe:.1f}" y2="{_by+10}" '
+                                      f'stroke="#ffffff" stroke-width="2" />')
+                _html += _grp_header('Projected Range')
+                _html += (f'<svg viewBox="0 0 1000 150" width="100%" '
+                          f'preserveAspectRatio="xMidYMid meet" style="display:block;margin-top:4px">'
+                          f'{_rows_svg}</svg>')
+
+            _html += '</div>'
+            st.markdown(_html, unsafe_allow_html=True)
+
+            # ── 6. Round by round — predicted votes (plotly) ──────
+            if game_df is not None:
                 _g1 = game_df[game_df['Player_Name'] == _p1].sort_values('Round_num')
                 _g2 = game_df[game_df['Player_Name'] == _p2].sort_values('Round_num')
                 if not _g1.empty or not _g2.empty:
+                    st.markdown(_grp_header('Round by Round — Predicted Votes'), unsafe_allow_html=True)
                     _fig_rbr = go.Figure()
                     if not _g1.empty:
                         _fig_rbr.add_trace(go.Scatter(
@@ -4908,67 +5006,20 @@ if _page == 'Player Comparison':
                         _fig_rbr.add_trace(go.Scatter(
                             x=_g2['Round_num'], y=_g2['Exp_Votes'].round(1),
                             name=_p2, mode='lines+markers',
-                            line=dict(color='#7e8c99', width=2.5),
-                            marker=dict(size=7, color='#7e8c99'),
+                            line=dict(color='rgba(126,140,153,0.55)', width=2.5),
+                            marker=dict(size=7, color='rgba(126,140,153,0.55)'),
                             hovertemplate='<b>' + _p2 + '</b><br>Round %{x}<br>%{y:.1f} exp votes<extra></extra>',
                         ))
                     _fig_rbr = apply_chart_theme(_fig_rbr)
                     _fig_rbr.update_layout(
-                        xaxis=dict(title='Round', dtick=1),
-                        yaxis=dict(title='Predicted Votes', rangemode='tozero'),
+                        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+                        xaxis=dict(title='Round', dtick=1, showgrid=False, zeroline=False),
+                        yaxis=dict(title='Predicted Votes', rangemode='tozero',
+                                   gridcolor='rgba(140,165,185,.14)', zeroline=False),
                         legend=dict(orientation='h', y=1.1),
                         margin=dict(t=20, b=40), height=300, hovermode='x unified',
                     )
-                    st.plotly_chart(_fig_rbr, width='stretch', key="chart_018")
-
-                st.markdown('<div class="section-header">Stat Comparison</div>', unsafe_allow_html=True)
-                _radar_candidates = [
-                    ('Disposals',              'Disposals'),
-                    ('Contested.Possessions',  'Cont. Poss'),
-                    ('Clearances',             'Clearances'),
-                    ('Tackles',                'Tackles'),
-                    ('Inside.50s',             'Inside 50s'),
-                    ('Coaches_Votes',          'Coaches Votes'),
-                ]
-                _radar_pairs = [(s, l) for s, l in _radar_candidates if s in game_df.columns]
-                if _radar_pairs:
-                    _r_stats  = [s for s, _ in _radar_pairs]
-                    _r_labels = [l for _, l in _radar_pairs]
-                    _all_means = game_df.groupby('Player_Name')[_r_stats].mean()
-                    _g1_mean   = game_df[game_df['Player_Name'] == _p1][_r_stats].mean()
-                    _g2_mean   = game_df[game_df['Player_Name'] == _p2][_r_stats].mean()
-                    _p1_norm, _p2_norm = [], []
-                    for _rs in _r_stats:
-                        _cmin = _all_means[_rs].min()
-                        _cmax = _all_means[_rs].max()
-                        _rng  = _cmax - _cmin if _cmax > _cmin else 1.0
-                        _p1_norm.append(round(float(((_g1_mean.get(_rs, _cmin) - _cmin) / _rng) * 100), 1))
-                        _p2_norm.append(round(float(((_g2_mean.get(_rs, _cmin) - _cmin) / _rng) * 100), 1))
-                    _fig_radar = go.Figure()
-                    _fig_radar.add_trace(go.Scatterpolar(
-                        r=_p1_norm + [_p1_norm[0]], theta=_r_labels + [_r_labels[0]],
-                        name=_p1, fill='toself', fillcolor='rgba(52,211,153,0.12)',
-                        line=dict(color='#34d399', width=2.5),
-                    ))
-                    _fig_radar.add_trace(go.Scatterpolar(
-                        r=_p2_norm + [_p2_norm[0]], theta=_r_labels + [_r_labels[0]],
-                        name=_p2, fill='toself', fillcolor='rgba(148,163,184,0.15)',
-                        line=dict(color='#7e8c99', width=2.5),
-                    ))
-                    _fig_radar.update_layout(
-                        polar=dict(
-                            bgcolor='#101a24',
-                            radialaxis=dict(visible=True, range=[0, 100], gridcolor='rgba(140,165,185,.14)',
-                                            tickfont=dict(size=9), tickvals=[25, 50, 75, 100]),
-                            angularaxis=dict(gridcolor='rgba(140,165,185,.14)', tickfont=dict(size=11)),
-                        ),
-                        paper_bgcolor='#101a24', font_color='#7e8c99',
-                        legend=dict(orientation='h', y=-0.08, bgcolor='rgba(0,0,0,0)'),
-                        margin=dict(t=30, b=60, l=60, r=60), height=420,
-                    )
-                    _fig_radar = apply_chart_theme(_fig_radar)
-                    st.plotly_chart(_fig_radar, width='stretch', key="chart_019")
-                    st.caption("Each axis normalised 0–100 relative to all players in the dataset")
+                    st.plotly_chart(_fig_rbr, width='stretch', key="cmp_so_rbr")
 
         # ── Head to Head Betting tab ──────────────────────────
         with _tab_h2h:
