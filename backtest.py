@@ -11,6 +11,7 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder
 import xgboost as xgb
 import os, warnings
+from brownlow_medallists import get_medallists
 warnings.filterwarnings('ignore')
 
 os.makedirs("predictions", exist_ok=True)
@@ -266,10 +267,19 @@ for target_season in BACKTEST_SEASONS:
                                  .rank(ascending=False, method='min').astype(int))
     all_results.append(season_agg)
 
-    winner = season_agg.loc[season_agg['Rank_Actual'] == 1, 'Player_Name'].iloc[0]
-    winner_pred_rank = int(season_agg.loc[season_agg['Player_Name'] == winner, 'Rank_Predicted'].values[0])
-    top3 = season_agg[season_agg['Rank_Predicted'] <= 3]['Player_Name'].tolist()
-    print(f"  Actual winner: {winner} | Predicted rank: {winner_pred_rank} | In top 3: {winner in top3}")
+    # Actual winner comes from the canonical medallist list, matched by name AND team
+    # (a max-vote derivation collides same-name players — the two Josh Kennedys etc.).
+    medallists = get_medallists(target_season)
+    winner_disp = ' & '.join(nm for nm, _tm in medallists) or '?'
+    winner_ranks = []
+    for _nm, _tm in medallists:
+        _row = season_agg[(season_agg['Player_Name'] == _nm) & (season_agg['Team'] == _tm)]
+        if not _row.empty:
+            winner_ranks.append(int(_row['Rank_Predicted'].iloc[0]))
+    winner_pred_rank = min(winner_ranks) if winner_ranks else None
+    in_top3 = any(r <= 3 for r in winner_ranks)
+    _wpr = winner_pred_rank if winner_pred_rank is not None else '—'
+    print(f"  Actual winner: {winner_disp} | Predicted rank: {_wpr} | In top 3: {in_top3}")
 
 # ── Save results ──────────────────────────────────────────────
 results = pd.concat(all_results, ignore_index=True)

@@ -15,6 +15,7 @@ import subprocess
 import sys
 import betting_hub
 from theme import inject_global_theme
+from brownlow_medallists import get_medallists
 
 st.set_page_config(page_title="Cha Ching", layout="wide", initial_sidebar_state="collapsed")
 
@@ -6130,23 +6131,38 @@ if _page == 'Model Comparison':
         if bt is None:
             st.error("No backtest results found. Run backtest.py first.")
         else:
-            # ── Backtest aggregation (unchanged — recompute nothing) ──
+            # ── Backtest aggregation ──
+            # Actual winner comes from the canonical medallist list (get_medallists),
+            # NOT from vote totals in the data: a name-only max-vote derivation collides
+            # same-name players (the two Josh Kennedys, two Scott Thompsons) and reports
+            # the wrong winner for 2012/2014/2015. Each medallist is matched back to a
+            # single player row by name AND team. 2012 is a joint medal (Mitchell &
+            # Cotchin); a season counts as a top-N hit if EITHER winner ranks within N,
+            # and "Pred. Rank" is the better (lower) of the two. The avg vote error does
+            # not depend on the winner, so it is unchanged.
             rows_bt = []
             for season in sorted(bt['Season'].unique()):
                 s = bt[bt['Season'] == season]
-                actual_winners = s[s['Rank_Actual'] == 1]['Player'].tolist()
-                pred_top3 = set(s[s['Rank_Predicted'] <= 3]['Player'])
-                pred_top5 = set(s[s['Rank_Predicted'] <= 5]['Player'])
-                pred_top10 = set(s[s['Rank_Predicted'] <= 10]['Player'])
                 top10_pred = s[s['Rank_Predicted'] <= 10].copy()
                 avg_err = (top10_pred['Predicted_Votes'] - top10_pred['Actual_Votes']).abs().mean()
-                winner = actual_winners[0] if actual_winners else '?'
-                pred_rank = int(s.loc[s['Player'] == winner, 'Rank_Predicted'].values[0]) if winner in s['Player'].values else '?'
+
+                medallists = get_medallists(season)
+                winner_names = [nm for nm, _tm in medallists] or ['?']
+                # Predicted rank of each medallist, matched on name AND team.
+                winner_ranks = []
+                for _nm, _tm in medallists:
+                    _row = s[(s['Player'] == _nm) & (s['Team'] == _tm)]
+                    if not _row.empty:
+                        winner_ranks.append(int(_row['Rank_Predicted'].iloc[0]))
+                # Better (lower) predicted rank; em-dash sentinel if no medallist matched.
+                pred_rank = min(winner_ranks) if winner_ranks else '?'
                 rows_bt.append({
-                    'Season': int(season), 'Actual Winner': winner, 'Pred. Rank': pred_rank,
-                    'In Top 3': any(w in pred_top3 for w in actual_winners),
-                    'In Top 5': any(w in pred_top5 for w in actual_winners),
-                    'In Top 10': any(w in pred_top10 for w in actual_winners),
+                    'Season': int(season),
+                    'Actual Winner': ' & '.join(winner_names),
+                    'Pred. Rank': pred_rank,
+                    'In Top 3': any(r <= 3 for r in winner_ranks),
+                    'In Top 5': any(r <= 5 for r in winner_ranks),
+                    'In Top 10': any(r <= 10 for r in winner_ranks),
                     'Avg Error Top 10': round(avg_err, 1),
                 })
             acc_df = pd.DataFrame(rows_bt)
@@ -6258,9 +6274,13 @@ if _page == 'Model Comparison':
             sel_s = st.selectbox("Season", seasons_avail, index=len(seasons_avail) - 1,
                                  key='acc_season_insights')
             s_data = bt[(bt['Season'] == sel_s) & (bt['Rank_Predicted'] <= 10)].copy().sort_values('Rank_Predicted')
+            # Gold-highlight the canonical medallist(s) matched on name AND team — not the
+            # data's max-vote row, which collides same-name players (see get_medallists).
+            _sel_medallists = {(nm, tm) for nm, tm in get_medallists(sel_s)}
+            _is_medallist = [(row['Player'], row['Team']) in _sel_medallists for _, row in s_data.iterrows()]
             fig_scatter = go.Figure()
-            _sc_colors = ['#f0b429' if row['Rank_Actual'] == 1 else '#34d399' for _, row in s_data.iterrows()]
-            _sc_sizes = [16 if row['Rank_Actual'] == 1 else 11 for _, row in s_data.iterrows()]
+            _sc_colors = ['#f0b429' if _m else '#34d399' for _m in _is_medallist]
+            _sc_sizes = [16 if _m else 11 for _m in _is_medallist]
             fig_scatter.add_trace(go.Scatter(
                 x=s_data['Actual_Votes'], y=s_data['Predicted_Votes'],
                 mode='markers+text', marker=dict(size=_sc_sizes, color=_sc_colors),
