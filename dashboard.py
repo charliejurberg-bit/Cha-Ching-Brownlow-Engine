@@ -1588,7 +1588,7 @@ if st.session_state.page != 'Landing':
 _NAV_BROWNLOW = {
     "Overview": ["Home", "Leaderboard", "Live Tracker"],
     "Players":  ["Player Profile", "Player Comparison"],
-    "Analysis": ["Stat Filter", "Coaches Votes", "Game Analysis", "Model Insights", "Model Comparison"],
+    "Analysis": ["Stat Filter", "Game Analysis", "Model Comparison"],
 }
 _NAV_BETTING = {
     "BH Overview":  ["BH Dashboard", "Brownlow Betting", "Bet Tracker"],
@@ -1611,9 +1611,7 @@ _PAGE_ICONS = {
     "Player Profile":   "ti-user",
     "Player Comparison":"ti-users",
     "Stat Filter":      "ti-adjustments-horizontal",
-    "Coaches Votes":    "ti-user-pentagon",
     "Game Analysis":    "ti-chart-dots",
-    "Model Insights":   "ti-brain",
     "Model Comparison": "ti-chart-bar",
     "Live Tracker":     "ti-live-photo",
     "Brownlow Betting": "ti-currency-dollar",
@@ -1627,8 +1625,8 @@ _PAGE_ICONS = {
 if _hub == "brownlow":
     _snav_pages = [
         "Home", "Leaderboard", "Player Profile", "Player Comparison",
-        "Stat Filter", "Coaches Votes", "Game Analysis",
-        "Model Insights", "Model Comparison", "Live Tracker",
+        "Stat Filter", "Game Analysis",
+        "Model Comparison", "Live Tracker",
     ]
 else:
     _snav_pages = ["BH Dashboard", "Brownlow Betting", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis", "Polls a Vote"]
@@ -2154,7 +2152,7 @@ def _season_changed(page):
     st.session_state.season_by_page[page] = st.session_state[f"_ctrl_season::{page}"]
 
 _SEASON_PAGES = {
-    'Leaderboard', 'Player Profile', 'Game Analysis', 'Model Insights',
+    'Leaderboard', 'Player Profile', 'Game Analysis',
 }
 
 if _show_controls:
@@ -3696,140 +3694,6 @@ if False:  # merged into Player Profile
         )
 
 # ════════════════════════════════════════════════════════════
-# MODEL INSIGHTS
-# ════════════════════════════════════════════════════════════
-if _page == 'Model Insights':
-    st.markdown(
-        f'<div class="title-bar"><h2 style="color:#e9eef3;margin:0">Model Insights</h2>'
-        f'<p style="color:var(--muted);margin:4px 0 0 0">Feature importance · XGBoost v4.0 · Out-of-sample accuracy {_BT_MIN}–{_BT_MAX}</p></div>',
-        unsafe_allow_html=True,
-    )
-
-# ════════════════════════════════════════════════════════════
-# COACHES VOTES
-# ════════════════════════════════════════════════════════════
-if _page == 'Coaches Votes':
-    st.markdown(
-        f'<div class="title-bar"><h2 style="color:#e9eef3;margin:0">Coaches Votes — {selected_season}</h2>'
-        f'<p style="color:var(--muted);margin:4px 0 0 0">Coaches award votes compared to Brownlow polling</p></div>',
-        unsafe_allow_html=True,
-    )
-
-    if game_df is None:
-        st.error("No game-level data found.")
-    else:
-        cv_df = game_df.copy()
-        has_cv = 'Coaches_Votes' in cv_df.columns and cv_df['Coaches_Votes'].sum() > 0
-
-        if not has_cv:
-            st.info("Coaches votes data not available for this season.")
-        else:
-            # ── Season leaderboard ───────────────────────────
-            st.markdown('<div class="section-header">Season Coaches Votes Leaderboard</div>', unsafe_allow_html=True)
-
-            cv_totals = cv_df.groupby('Player_Name').agg(
-                Team=('Playing.for', 'last'),
-                Games=('Round_num', 'count'),
-                Total_CV=('Coaches_Votes', 'sum'),
-                Avg_CV=('Coaches_Votes', 'mean'),
-                Max_CV=('Coaches_Votes', 'max'),
-                CV_Poll_Rate=('Coaches_Votes', lambda x: (x > 0).mean()),
-            ).reset_index().sort_values('Total_CV', ascending=False).reset_index(drop=True)
-            cv_totals.insert(0, 'Rank', range(1, len(cv_totals) + 1))
-            cv_totals['Avg CV'] = cv_totals['Avg_CV'].round(2)
-            cv_totals['CV Poll %'] = (cv_totals['CV_Poll_Rate'] * 100).round(1)
-
-            col1, col2 = st.columns([3, 1])
-            with col1: cv_search = st.text_input("Search player", "", key="cv_search")
-            with col2: cv_show = st.selectbox("Show", [20, 50, 100], index=0, key="cv_show")
-
-            cv_display = cv_totals.copy()
-            if cv_search:
-                cv_display = cv_display[cv_display['Player_Name'].str.contains(cv_search, case=False)]
-            cv_display = cv_display.head(cv_show)
-            _cv_disp = cv_display[['Rank', 'Player_Name', 'Team', 'Games', 'Total_CV', 'Avg CV', 'Max_CV', 'CV Poll %']].rename(
-                columns={'Player_Name': 'Player', 'Total_CV': 'Total', 'Max_CV': 'Best Game'})
-            for col in _cv_disp.select_dtypes(include='float').columns:
-                _cv_disp[col] = _cv_disp[col].round(1)
-            st.dataframe(_style_table(_cv_disp), width='stretch', hide_index=True)
-
-            # ── Top 20 bar chart ─────────────────────────────
-            st.markdown('<div class="section-header">Top 20 by Total Coaches Votes</div>', unsafe_allow_html=True)
-            top20_cv = cv_totals.head(20)
-            fig_cv = go.Figure(go.Bar(
-                x=top20_cv['Player_Name'], y=top20_cv['Total_CV'],
-                marker_color='#34d399', opacity=0.9,
-                text=top20_cv['Total_CV'].astype(int), textposition='outside',
-            ))
-            fig_cv.update_layout(
-                plot_bgcolor='#101a24', paper_bgcolor='#101a24', font_color='#e9eef3',
-                yaxis=dict(title='Total Coaches Votes', gridcolor='#ede8df'),
-                xaxis_tickangle=-35, margin=dict(t=20, b=120),
-            )
-            fig_cv = apply_chart_theme(fig_cv)
-            st.plotly_chart(fig_cv, width='stretch', key="chart_009")
-
-            # ── Coaches votes vs Brownlow correlation ────────
-            if 'Brownlow.Votes' in cv_df.columns and cv_df['Brownlow.Votes'].notna().any():
-                st.markdown('<div class="section-header">Coaches Votes vs Brownlow Votes — Game Level</div>', unsafe_allow_html=True)
-
-                min_cv_games = st.slider("Min games for correlation view", 5, max_season_rounds, min(8, max_season_rounds), key="cv_min_g")
-                eligible = cv_totals[cv_totals['Games'] >= min_cv_games]['Player_Name'].tolist()
-                cv_corr = cv_df[cv_df['Player_Name'].isin(eligible)].copy()
-
-                # Jitter to reduce overplotting
-                jitter = np.random.default_rng(42).uniform(-0.15, 0.15, size=len(cv_corr))
-                fig_scatter = go.Figure(go.Scatter(
-                    x=cv_corr['Coaches_Votes'] + jitter,
-                    y=cv_corr['Brownlow.Votes'],
-                    mode='markers',
-                    marker=dict(color='#34d399', size=5, opacity=0.35),
-                    text=cv_corr['Player_Name'],
-                    hovertemplate='<b>%{text}</b><br>Coaches V: %{x:.0f}<br>Brownlow V: %{y}<extra></extra>',
-                ))
-                corr_val = cv_corr[['Coaches_Votes', 'Brownlow.Votes']].corr().iloc[0, 1]
-                fig_scatter.update_layout(
-                    plot_bgcolor='#101a24', paper_bgcolor='#101a24', font_color='#e9eef3',
-                    xaxis=dict(title='Coaches Votes', gridcolor='#ede8df'),
-                    yaxis=dict(title='Brownlow Votes', gridcolor='#ede8df', dtick=1),
-                    margin=dict(t=20, b=40), height=380,
-                )
-                fig_scatter = apply_chart_theme(fig_scatter)
-                st.plotly_chart(fig_scatter, width='stretch', key="chart_010")
-                st.caption(f"Pearson correlation: {corr_val:.2f}   (game-level, {len(cv_corr):,} observations)")
-
-            # ── Per-player coaches votes round by round ──────
-            st.markdown('<div class="section-header">Player Round by Round</div>', unsafe_allow_html=True)
-            cv_players = sorted(cv_totals.head(50)['Player_Name'].tolist())
-            sel_cv_player = st.selectbox("Select player", cv_players, key="cv_player")
-            if sel_cv_player:
-                p_cv = cv_df[cv_df['Player_Name'] == sel_cv_player].sort_values('Round_num')
-                if not p_cv.empty:
-                    fig_cv_p = go.Figure()
-                    bar_col = ['#34d399' if w else '#e63946' for w in p_cv['Is_Win'].fillna(0).astype(int)]
-                    fig_cv_p.add_trace(go.Bar(
-                        x=p_cv['Round_num'], y=p_cv['Coaches_Votes'],
-                        name='Coaches Votes', marker_color=bar_col, opacity=0.85,
-                        text=p_cv['Coaches_Votes'].astype(int), textposition='outside',
-                    ))
-                    if 'Brownlow.Votes' in p_cv.columns:
-                        fig_cv_p.add_trace(go.Scatter(
-                            x=p_cv['Round_num'], y=p_cv['Brownlow.Votes'],
-                            name='Brownlow Votes', mode='lines+markers',
-                            line=dict(color='#7e8c99', width=2, dash='dot'), marker=dict(size=7),
-                        ))
-                    fig_cv_p.update_layout(
-                        plot_bgcolor='#101a24', paper_bgcolor='#101a24', font_color='#e9eef3',
-                        xaxis=dict(title='Round', dtick=1, gridcolor='#ede8df'),
-                        yaxis=dict(title='Votes', gridcolor='#ede8df'),
-                        legend=dict(orientation='h', y=1.1, bgcolor='rgba(0,0,0,0)'),
-                        margin=dict(t=30, b=40),
-                    )
-                    st.caption("Green = Win   Red = Loss")
-                    fig_cv_p = apply_chart_theme(fig_cv_p)
-                    st.plotly_chart(fig_cv_p, width='stretch', key="chart_011")
-
-# ════════════════════════════════════════════════════════════
 # GAME ANALYSIS
 # ════════════════════════════════════════════════════════════
 if _page == 'Game Analysis':
@@ -4746,165 +4610,6 @@ if False:  # merged into Betting Edge
         for col in _sp_disp.select_dtypes(include='float').columns:
             _sp_disp[col] = _sp_disp[col].round(1)
         st.dataframe(_style_table(_sp_disp), width='stretch', hide_index=True)
-
-# ════════════════════════════════════════════════════════════
-# MODEL INSIGHTS — accuracy section
-# ════════════════════════════════════════════════════════════
-if _page == 'Model Insights':
-    st.markdown(
-        '<div style="border-top:2px solid var(--line);margin:36px 0 28px 0;position:relative;">'
-        '<span style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);'
-        'background:var(--bg);padding:0 14px;color:var(--muted);font-size:11px;font-weight:700;'
-        'letter-spacing:2px;text-transform:uppercase;">Model Accuracy</span></div>',
-        unsafe_allow_html=True,
-    )
-    st.markdown(f'<div class="section-header">Out-of-Sample Back-Test — {_BT_MIN} to {_BT_MAX}</div>', unsafe_allow_html=True)
-    st.caption("Walk-forward: each season trained only on prior years")
-    bt = load_backtest()
-    if bt is None:
-        st.error("No backtest results found. Run backtest.py first.")
-    else:
-        rows_bt = []
-        for season in sorted(bt['Season'].unique()):
-            s = bt[bt['Season'] == season]
-            actual_winners = s[s['Rank_Actual'] == 1]['Player'].tolist()
-            pred_top3 = set(s[s['Rank_Predicted'] <= 3]['Player'])
-            pred_top5 = set(s[s['Rank_Predicted'] <= 5]['Player'])
-            pred_top10 = set(s[s['Rank_Predicted'] <= 10]['Player'])
-            top10_pred = s[s['Rank_Predicted'] <= 10].copy()
-            avg_err = (top10_pred['Predicted_Votes'] - top10_pred['Actual_Votes']).abs().mean()
-            winner = actual_winners[0] if actual_winners else '?'
-            pred_rank = int(s.loc[s['Player'] == winner, 'Rank_Predicted'].values[0]) if winner in s['Player'].values else '?'
-            rows_bt.append({
-                'Season': int(season), 'Actual Winner': winner, 'Pred. Rank': pred_rank,
-                'In Top 3': any(w in pred_top3 for w in actual_winners),
-                'In Top 5': any(w in pred_top5 for w in actual_winners),
-                'In Top 10': any(w in pred_top10 for w in actual_winners),
-                'Avg Error Top 10': round(avg_err, 1),
-            })
-        acc_df = pd.DataFrame(rows_bt)
-        n_seasons = len(acc_df)
-        top3_acc = acc_df['In Top 3'].sum()
-        top5_acc = acc_df['In Top 5'].sum()
-        top10_acc = acc_df['In Top 10'].sum()
-        avg_err_total = acc_df['Avg Error Top 10'].mean()
-
-        st.markdown(f'<div class="section-header">Out-of-Sample Accuracy — {_BT_MIN} to {_BT_MAX}</div>', unsafe_allow_html=True)
-        c1, c2, c3, c4 = st.columns(4)
-        with c1: st.markdown(f'<div class="metric-card"><div class="metric-label">Top 3 Accuracy</div><div class="metric-value">{top3_acc}/{n_seasons}</div><div class="metric-sub">Winner predicted top 3 · {top3_acc / n_seasons * 100:.0f}%</div></div>', unsafe_allow_html=True)
-        with c2: st.markdown(f'<div class="metric-card"><div class="metric-label">Top 5 Accuracy</div><div class="metric-value">{top5_acc}/{n_seasons}</div><div class="metric-sub">Winner predicted top 5 · {top5_acc / n_seasons * 100:.0f}%</div></div>', unsafe_allow_html=True)
-        with c3: st.markdown(f'<div class="metric-card"><div class="metric-label">Top 10 Accuracy</div><div class="metric-value">{top10_acc}/{n_seasons}</div><div class="metric-sub">Winner predicted top 10 · {top10_acc / n_seasons * 100:.0f}%</div></div>', unsafe_allow_html=True)
-        with c4: st.markdown(f'<div class="metric-card"><div class="metric-label">Avg Vote Error (Top 10)</div><div class="metric-value">{avg_err_total:.1f}</div><div class="metric-sub">votes · across predicted top 10</div></div>', unsafe_allow_html=True)
-
-        with st.expander("What's new in v4.0?", expanded=False):
-            col_a, col_b = st.columns(2)
-            with col_a:
-                st.markdown("""
-**Late-season form** (`late_form_ewm`)
-EWMA (span=5) of expected votes over prior 5 rounds. More recent rounds weighted higher.
-Uses Wheelo ExpVotes where available, otherwise Coaches Votes.
-Last 5 rounds of each season receive **2× sample weight** during training.
-""")
-            with col_b:
-                st.markdown("""
-**Season momentum** (`momentum_cv`, `momentum_disp`)
-Average coaches votes and disposals in last 6 games minus first 6 games.
-Positive = improving trajectory, negative = declining.
-""")
-
-        st.markdown('<div class="section-header">Season by Season Breakdown</div>', unsafe_allow_html=True)
-        display_acc = acc_df.copy()
-        display_acc['In Top 3'] = display_acc['In Top 3'].map({True: 'Yes', False: 'No'})
-        display_acc['In Top 5'] = display_acc['In Top 5'].map({True: 'Yes', False: 'No'})
-        display_acc['In Top 10'] = display_acc['In Top 10'].map({True: 'Yes', False: 'No'})
-        _acc_disp = display_acc.rename(columns={'Avg Error Top 10': 'Avg Error (Top 10)'})
-        for col in _acc_disp.select_dtypes(include='float').columns:
-            _acc_disp[col] = _acc_disp[col].round(1)
-        st.dataframe(_style_table(_acc_disp), width='stretch', hide_index=True)
-
-        st.markdown('<div class="section-header">Predicted Rank of Actual Winner by Season</div>', unsafe_allow_html=True)
-        fig_rank = go.Figure()
-        bar_colors_rank = ['#f0b429' if r <= 3 else ('#34d399' if r <= 5 else ('#4a90c4' if r <= 10 else '#4a5a6a'))
-                           for r in acc_df['Pred. Rank']]
-        fig_rank.add_trace(go.Bar(
-            x=acc_df['Season'].astype(str), y=acc_df['Pred. Rank'], marker_color=bar_colors_rank,
-            text=[f"#{r} — {w}" for r, w in zip(acc_df['Pred. Rank'], acc_df['Actual Winner'])],
-            textposition='outside', textfont=dict(color='#e9eef3', size=11),
-            hovertemplate='%{text}<extra></extra>',
-        ))
-        fig_rank.add_hline(y=3, line_dash='dot', line_color='#f0b429', annotation_text='Top 3',
-                           annotation_position='right', annotation_font_color='#f0b429')
-        fig_rank.add_hline(y=5, line_dash='dot', line_color='#34d399', annotation_text='Top 5',
-                           annotation_position='right', annotation_font_color='#34d399')
-        fig_rank.add_hline(y=10, line_dash='dot', line_color='#4a90c4', annotation_text='Top 10',
-                           annotation_position='right', annotation_font_color='#4a90c4')
-        fig_rank = apply_chart_theme(fig_rank)
-        fig_rank.update_layout(
-            yaxis=dict(title='Predicted Rank of Actual Winner', autorange='reversed',
-                       range=[max(acc_df['Pred. Rank']) + 2, 0]),
-            xaxis=dict(title='Season'),
-            margin=dict(t=40, b=40), showlegend=False,
-        )
-        st.plotly_chart(fig_rank, width='stretch', key="chart_015")
-        st.caption("Gold = Top 3   Green = Top 5   Blue = Top 10   Grey = Outside Top 10")
-
-        st.markdown('<div class="section-header">Predicted vs Actual Votes — Top 10 Predicted Players</div>', unsafe_allow_html=True)
-        seasons_avail = sorted(bt['Season'].unique().astype(int).tolist())
-        sel_s = st.selectbox("Season", seasons_avail, index=len(seasons_avail) - 1, key='acc_season')
-        s_data = bt[(bt['Season'] == sel_s) & (bt['Rank_Predicted'] <= 10)].copy().sort_values('Rank_Predicted')
-        fig_scatter = go.Figure()
-        marker_colors_sc = ['#f0b429' if row['Rank_Actual'] == 1 else '#4a90c4' for _, row in s_data.iterrows()]
-        fig_scatter.add_trace(go.Scatter(
-            x=s_data['Actual_Votes'], y=s_data['Predicted_Votes'],
-            mode='markers+text', marker=dict(size=12, color=marker_colors_sc),
-            text=s_data['Player'], textposition='top center', textfont=dict(size=11, color='#e9eef3'),
-            hovertemplate='<b>%{text}</b><br>Actual: %{x}<br>Predicted: %{y:.1f}<extra></extra>',
-        ))
-        max_v = max(s_data['Actual_Votes'].max(), s_data['Predicted_Votes'].max()) + 5
-        fig_scatter.add_trace(go.Scatter(
-            x=[0, max_v], y=[0, max_v], mode='lines',
-            line=dict(color='#4a5a6a', dash='dash', width=1), showlegend=False, hoverinfo='skip',
-        ))
-        fig_scatter = apply_chart_theme(fig_scatter)
-        fig_scatter.update_layout(
-            xaxis=dict(title='Actual Votes', range=[0, max_v]),
-            yaxis=dict(title='Predicted Votes', range=[0, max_v]),
-            margin=dict(t=20, b=40), height=420,
-        )
-        st.plotly_chart(fig_scatter, width='stretch', key="chart_016")
-        st.caption("Gold dot = Actual winner   Blue dot = Other top 10 predicted   Dashed line = perfect prediction")
-
-        st.markdown('<div class="section-header">What Drives Brownlow Votes?</div>', unsafe_allow_html=True)
-        if importance is None:
-            st.error("Run brownlow_model.py first.")
-        else:
-            imp = importance.copy()
-            imp['Importance %'] = (imp['Importance'] * 100).round(2)
-            tab_all, tab_top = st.tabs(["All Features", "Top 20"])
-            with tab_top:
-                top20 = imp.head(20).sort_values('Importance %', ascending=True)
-                fig3 = go.Figure(go.Bar(x=top20['Importance %'], y=top20['Feature'], orientation='h',
-                                        marker=dict(color=top20['Importance %'],
-                                                    colorscale=[[0, '#0d141d'], [1, '#34d399']],
-                                                    showscale=False)))
-                fig3 = apply_chart_theme(fig3)
-                fig3.update_layout(xaxis_title='Importance (%)', height=500, margin=dict(l=220, r=16, t=20, b=16))
-                st.plotly_chart(fig3, width='stretch', key="chart_007")
-            with tab_all:
-                all_imp = imp.sort_values('Importance %', ascending=True)
-                fig4 = go.Figure(go.Bar(x=all_imp['Importance %'], y=all_imp['Feature'], orientation='h',
-                                        marker=dict(color=all_imp['Importance %'],
-                                                    colorscale=[[0, '#0d141d'], [1, '#34d399']],
-                                                    showscale=False)))
-                fig4 = apply_chart_theme(fig4)
-                fig4.update_layout(xaxis_title='Importance (%)', height=1400, margin=dict(l=250, r=16, t=20, b=16))
-                st.plotly_chart(fig4, width='stretch', key="chart_008")
-
-            c1, c2 = st.columns(2)
-            with c1:
-                st.markdown("**Top signals:**\n- Coaches Votes (raw + relative z-score)\n- Top 3 coaches votes flag\n- Disposals relative to game\n- Impact Score relative to game\n- Is_Loss / Is_Win / Margin")
-            with c2:
-                st.markdown("**v4.0 improvements:**\n- Late-season form: rolling EWMA (span=5) of prior 5 rounds\n- Season momentum: last-6 vs first-6 avg\n- Late-season game weighting: last 5 rounds = 2× sample weight")
 
 # ════════════════════════════════════════════════════════════
 # PLAYER COMPARISON
@@ -6020,7 +5725,7 @@ if _page == 'Model Comparison':
 
     # ── Load all five data sources ────────────────────────────
 
-    _mc_tab1, _mc_tab2 = st.tabs(['2026 (Live)', 'Historical (2021–2025)'])
+    _mc_tab1, _mc_tab2, _mc_tab3 = st.tabs(['2026 (Live)', 'Historical (2021–2025)', 'Insights'])
 
     with _mc_tab2:
         _mc_hist_path = 'data_2026/historical_model_comparison.csv'
@@ -6411,6 +6116,168 @@ if _page == 'Model Comparison':
 
         # (Summary cards, rank heatmap and CC-vs-AFL scatter removed — folded
         #  into the consensus headline, metadata strip and table above.)
+
+    with _mc_tab3:
+        st.markdown(
+            f'<div class="title-bar"><h2 style="color:#e9eef3;margin:0">Model Insights</h2>'
+            f'<p style="color:var(--muted);margin:4px 0 0 0">Feature importance · XGBoost v4.0 · Out-of-sample accuracy {_BT_MIN}–{_BT_MAX}</p></div>',
+            unsafe_allow_html=True,
+        )
+
+        st.markdown(
+            '<div style="border-top:2px solid var(--line);margin:36px 0 28px 0;position:relative;">'
+            '<span style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);'
+            'background:var(--bg);padding:0 14px;color:var(--muted);font-size:11px;font-weight:700;'
+            'letter-spacing:2px;text-transform:uppercase;">Model Accuracy</span></div>',
+            unsafe_allow_html=True,
+        )
+        st.markdown(f'<div class="section-header">Out-of-Sample Back-Test — {_BT_MIN} to {_BT_MAX}</div>', unsafe_allow_html=True)
+        st.caption("Walk-forward: each season trained only on prior years")
+        bt = load_backtest()
+        if bt is None:
+            st.error("No backtest results found. Run backtest.py first.")
+        else:
+            rows_bt = []
+            for season in sorted(bt['Season'].unique()):
+                s = bt[bt['Season'] == season]
+                actual_winners = s[s['Rank_Actual'] == 1]['Player'].tolist()
+                pred_top3 = set(s[s['Rank_Predicted'] <= 3]['Player'])
+                pred_top5 = set(s[s['Rank_Predicted'] <= 5]['Player'])
+                pred_top10 = set(s[s['Rank_Predicted'] <= 10]['Player'])
+                top10_pred = s[s['Rank_Predicted'] <= 10].copy()
+                avg_err = (top10_pred['Predicted_Votes'] - top10_pred['Actual_Votes']).abs().mean()
+                winner = actual_winners[0] if actual_winners else '?'
+                pred_rank = int(s.loc[s['Player'] == winner, 'Rank_Predicted'].values[0]) if winner in s['Player'].values else '?'
+                rows_bt.append({
+                    'Season': int(season), 'Actual Winner': winner, 'Pred. Rank': pred_rank,
+                    'In Top 3': any(w in pred_top3 for w in actual_winners),
+                    'In Top 5': any(w in pred_top5 for w in actual_winners),
+                    'In Top 10': any(w in pred_top10 for w in actual_winners),
+                    'Avg Error Top 10': round(avg_err, 1),
+                })
+            acc_df = pd.DataFrame(rows_bt)
+            n_seasons = len(acc_df)
+            top3_acc = acc_df['In Top 3'].sum()
+            top5_acc = acc_df['In Top 5'].sum()
+            top10_acc = acc_df['In Top 10'].sum()
+            avg_err_total = acc_df['Avg Error Top 10'].mean()
+
+            st.markdown(f'<div class="section-header">Out-of-Sample Accuracy — {_BT_MIN} to {_BT_MAX}</div>', unsafe_allow_html=True)
+            c1, c2, c3, c4 = st.columns(4)
+            with c1: st.markdown(f'<div class="metric-card"><div class="metric-label">Top 3 Accuracy</div><div class="metric-value">{top3_acc}/{n_seasons}</div><div class="metric-sub">Winner predicted top 3 · {top3_acc / n_seasons * 100:.0f}%</div></div>', unsafe_allow_html=True)
+            with c2: st.markdown(f'<div class="metric-card"><div class="metric-label">Top 5 Accuracy</div><div class="metric-value">{top5_acc}/{n_seasons}</div><div class="metric-sub">Winner predicted top 5 · {top5_acc / n_seasons * 100:.0f}%</div></div>', unsafe_allow_html=True)
+            with c3: st.markdown(f'<div class="metric-card"><div class="metric-label">Top 10 Accuracy</div><div class="metric-value">{top10_acc}/{n_seasons}</div><div class="metric-sub">Winner predicted top 10 · {top10_acc / n_seasons * 100:.0f}%</div></div>', unsafe_allow_html=True)
+            with c4: st.markdown(f'<div class="metric-card"><div class="metric-label">Avg Vote Error (Top 10)</div><div class="metric-value">{avg_err_total:.1f}</div><div class="metric-sub">votes · across predicted top 10</div></div>', unsafe_allow_html=True)
+
+            with st.expander("What's new in v4.0?", expanded=False):
+                col_a, col_b = st.columns(2)
+                with col_a:
+                    st.markdown("""
+    **Late-season form** (`late_form_ewm`)
+    EWMA (span=5) of expected votes over prior 5 rounds. More recent rounds weighted higher.
+    Uses Wheelo ExpVotes where available, otherwise Coaches Votes.
+    Last 5 rounds of each season receive **2× sample weight** during training.
+    """)
+                with col_b:
+                    st.markdown("""
+    **Season momentum** (`momentum_cv`, `momentum_disp`)
+    Average coaches votes and disposals in last 6 games minus first 6 games.
+    Positive = improving trajectory, negative = declining.
+    """)
+
+            st.markdown('<div class="section-header">Season by Season Breakdown</div>', unsafe_allow_html=True)
+            display_acc = acc_df.copy()
+            display_acc['In Top 3'] = display_acc['In Top 3'].map({True: 'Yes', False: 'No'})
+            display_acc['In Top 5'] = display_acc['In Top 5'].map({True: 'Yes', False: 'No'})
+            display_acc['In Top 10'] = display_acc['In Top 10'].map({True: 'Yes', False: 'No'})
+            _acc_disp = display_acc.rename(columns={'Avg Error Top 10': 'Avg Error (Top 10)'})
+            for col in _acc_disp.select_dtypes(include='float').columns:
+                _acc_disp[col] = _acc_disp[col].round(1)
+            st.dataframe(_style_table(_acc_disp), width='stretch', hide_index=True)
+
+            st.markdown('<div class="section-header">Predicted Rank of Actual Winner by Season</div>', unsafe_allow_html=True)
+            fig_rank = go.Figure()
+            bar_colors_rank = ['#f0b429' if r <= 3 else ('#34d399' if r <= 5 else ('#4a90c4' if r <= 10 else '#4a5a6a'))
+                               for r in acc_df['Pred. Rank']]
+            fig_rank.add_trace(go.Bar(
+                x=acc_df['Season'].astype(str), y=acc_df['Pred. Rank'], marker_color=bar_colors_rank,
+                text=[f"#{r} — {w}" for r, w in zip(acc_df['Pred. Rank'], acc_df['Actual Winner'])],
+                textposition='outside', textfont=dict(color='#e9eef3', size=11),
+                hovertemplate='%{text}<extra></extra>',
+            ))
+            fig_rank.add_hline(y=3, line_dash='dot', line_color='#f0b429', annotation_text='Top 3',
+                               annotation_position='right', annotation_font_color='#f0b429')
+            fig_rank.add_hline(y=5, line_dash='dot', line_color='#34d399', annotation_text='Top 5',
+                               annotation_position='right', annotation_font_color='#34d399')
+            fig_rank.add_hline(y=10, line_dash='dot', line_color='#4a90c4', annotation_text='Top 10',
+                               annotation_position='right', annotation_font_color='#4a90c4')
+            fig_rank = apply_chart_theme(fig_rank)
+            fig_rank.update_layout(
+                yaxis=dict(title='Predicted Rank of Actual Winner', autorange='reversed',
+                           range=[max(acc_df['Pred. Rank']) + 2, 0]),
+                xaxis=dict(title='Season'),
+                margin=dict(t=40, b=40), showlegend=False,
+            )
+            st.plotly_chart(fig_rank, width='stretch', key="chart_015")
+            st.caption("Gold = Top 3   Green = Top 5   Blue = Top 10   Grey = Outside Top 10")
+
+            st.markdown('<div class="section-header">Predicted vs Actual Votes — Top 10 Predicted Players</div>', unsafe_allow_html=True)
+            seasons_avail = sorted(bt['Season'].unique().astype(int).tolist())
+            sel_s = st.selectbox("Season", seasons_avail, index=len(seasons_avail) - 1, key='acc_season')
+            s_data = bt[(bt['Season'] == sel_s) & (bt['Rank_Predicted'] <= 10)].copy().sort_values('Rank_Predicted')
+            fig_scatter = go.Figure()
+            marker_colors_sc = ['#f0b429' if row['Rank_Actual'] == 1 else '#4a90c4' for _, row in s_data.iterrows()]
+            fig_scatter.add_trace(go.Scatter(
+                x=s_data['Actual_Votes'], y=s_data['Predicted_Votes'],
+                mode='markers+text', marker=dict(size=12, color=marker_colors_sc),
+                text=s_data['Player'], textposition='top center', textfont=dict(size=11, color='#e9eef3'),
+                hovertemplate='<b>%{text}</b><br>Actual: %{x}<br>Predicted: %{y:.1f}<extra></extra>',
+            ))
+            max_v = max(s_data['Actual_Votes'].max(), s_data['Predicted_Votes'].max()) + 5
+            fig_scatter.add_trace(go.Scatter(
+                x=[0, max_v], y=[0, max_v], mode='lines',
+                line=dict(color='#4a5a6a', dash='dash', width=1), showlegend=False, hoverinfo='skip',
+            ))
+            fig_scatter = apply_chart_theme(fig_scatter)
+            fig_scatter.update_layout(
+                xaxis=dict(title='Actual Votes', range=[0, max_v]),
+                yaxis=dict(title='Predicted Votes', range=[0, max_v]),
+                margin=dict(t=20, b=40), height=420,
+            )
+            st.plotly_chart(fig_scatter, width='stretch', key="chart_016")
+            st.caption("Gold dot = Actual winner   Blue dot = Other top 10 predicted   Dashed line = perfect prediction")
+
+            st.markdown('<div class="section-header">What Drives Brownlow Votes?</div>', unsafe_allow_html=True)
+            if importance is None:
+                st.error("Run brownlow_model.py first.")
+            else:
+                imp = importance.copy()
+                imp['Importance %'] = (imp['Importance'] * 100).round(2)
+                tab_all, tab_top = st.tabs(["All Features", "Top 20"])
+                with tab_top:
+                    top20 = imp.head(20).sort_values('Importance %', ascending=True)
+                    fig3 = go.Figure(go.Bar(x=top20['Importance %'], y=top20['Feature'], orientation='h',
+                                            marker=dict(color=top20['Importance %'],
+                                                        colorscale=[[0, '#0d141d'], [1, '#34d399']],
+                                                        showscale=False)))
+                    fig3 = apply_chart_theme(fig3)
+                    fig3.update_layout(xaxis_title='Importance (%)', height=500, margin=dict(l=220, r=16, t=20, b=16))
+                    st.plotly_chart(fig3, width='stretch', key="chart_007")
+                with tab_all:
+                    all_imp = imp.sort_values('Importance %', ascending=True)
+                    fig4 = go.Figure(go.Bar(x=all_imp['Importance %'], y=all_imp['Feature'], orientation='h',
+                                            marker=dict(color=all_imp['Importance %'],
+                                                        colorscale=[[0, '#0d141d'], [1, '#34d399']],
+                                                        showscale=False)))
+                    fig4 = apply_chart_theme(fig4)
+                    fig4.update_layout(xaxis_title='Importance (%)', height=1400, margin=dict(l=250, r=16, t=20, b=16))
+                    st.plotly_chart(fig4, width='stretch', key="chart_008")
+
+                c1, c2 = st.columns(2)
+                with c1:
+                    st.markdown("**Top signals:**\n- Coaches Votes (raw + relative z-score)\n- Top 3 coaches votes flag\n- Disposals relative to game\n- Impact Score relative to game\n- Is_Loss / Is_Win / Margin")
+                with c2:
+                    st.markdown("**v4.0 improvements:**\n- Late-season form: rolling EWMA (span=5) of prior 5 rounds\n- Season momentum: last-6 vs first-6 avg\n- Late-season game weighting: last 5 rounds = 2× sample weight")
 
 # ── Global footer ────────────────────────────────────────────
 if _page == 'Landing':
