@@ -546,6 +546,7 @@ def _betting_stats(df: pd.DataFrame) -> dict:
         return dict(total_bets=0, wins=0, losses=0, pending=0,
                     total_staked=0.0, total_returned=0.0, total_pl=0.0,
                     roi=0.0, hit_rate=0.0,
+                    avg_odds=0.0, avg_stake=0.0, streak=0,
                     cc_bets=0, cc_hits=0, cc_pl=0.0, cc_hit_rate=0.0, cc_roi=0.0)
     settled  = df[df['result'].isin(['Win', 'Loss'])]
     wins     = len(settled[settled['result'] == 'Win'])
@@ -554,6 +555,25 @@ def _betting_stats(df: pd.DataFrame) -> dict:
     total_pl = df['profit_loss'].fillna(0).sum()
     roi      = total_pl / staked * 100 if staked > 0 else 0.0
     hit_rate = wins / len(settled) * 100 if len(settled) > 0 else 0.0
+
+    # Simple aggregates over the placed bets (guarded for empties).
+    _odds_vals  = df['odds'].where(df['odds'] > 0).dropna()
+    avg_odds    = float(_odds_vals.mean()) if len(_odds_vals) else 0.0
+    _stake_vals = df['stake'].where(df['stake'] > 0).dropna()
+    avg_stake   = float(_stake_vals.mean()) if len(_stake_vals) else 0.0
+    # Current streak: length of the latest run of same-result settled bets,
+    # signed (+ for a winning run, − for a losing run).
+    streak = 0
+    if len(settled) > 0:
+        _seq = settled.sort_values('date')['result'].tolist()
+        _last = _seq[-1]
+        _run = 0
+        for _r in reversed(_seq):
+            if _r == _last:
+                _run += 1
+            else:
+                break
+        streak = _run if _last == 'Win' else -_run
     cc       = df[df['is_cha_ching'] == True]
     cc_set   = cc[cc['result'].isin(['Win', 'Loss'])]
     cc_wins  = len(cc_set[cc_set['result'] == 'Win'])
@@ -566,6 +586,7 @@ def _betting_stats(df: pd.DataFrame) -> dict:
         pending=len(df[df['result'] == 'Pending']),
         total_staked=staked, total_returned=staked + total_pl,
         total_pl=total_pl, roi=roi, hit_rate=hit_rate,
+        avg_odds=avg_odds, avg_stake=avg_stake, streak=streak,
         cc_bets=len(cc), cc_hits=cc_wins,
         cc_pl=cc_pl, cc_hit_rate=cc_hit, cc_roi=cc_roi,
     )
@@ -1567,93 +1588,220 @@ def _import_csv_dialog():
 
 def render_bh_dashboard():
     _inject_css()
+    # Primary buttons on this page: emerald fill, dark text.
     st.markdown(
-        '<div class="title-bar"><h2 style="color:var(--text);margin:0">Betting Hub Dashboard</h2>'
-        '<p style="color:var(--muted);margin:4px 0 0 0">P&L summary, hit rates, recent bets</p></div>',
+        '<style>'
+        'div[data-testid="stButton"] button[kind="primary"]{'
+        'background:#34d399 !important;color:#0a1017 !important;border:none !important;'
+        'font-weight:700 !important;border-radius:8px !important;}'
+        'div[data-testid="stButton"] button[kind="primary"]:hover{'
+        'background:#2bbe89 !important;color:#0a1017 !important;}'
+        '</style>',
         unsafe_allow_html=True,
     )
 
     bets = _load_bets()
     s    = _betting_stats(bets)
 
-    # ── Stat row 1: main metrics ──────────────────────────────────────────────
-    st.markdown('<div class="section-header">Overall Performance</div>', unsafe_allow_html=True)
-    c1, c2, c3, c4, c5 = st.columns(5)
-    pl_tone = _pl_tone(s['total_pl'])
-    for col, label, val, sub, tone in [
-        (c1, "Total P&L",    f"{s['total_pl']:+.2f}u", f"{s['total_bets']} bets", pl_tone),
-        (c2, "ROI",          f"{s['roi']:+.1f}%",       f"{s['total_staked']:.1f}u staked", _pl_tone(s['roi'])),
-        (c3, "Hit Rate",     f"{s['hit_rate']:.1f}%",   f"{s['wins']}W / {s['losses']}L", 'neutral'),
-        (c4, "Units Staked", f"{s['total_staked']:.2f}u","", 'neutral'),
-        (c5, "Units Returned",f"{s['total_returned']:.2f}u","", _pl_tone(s['total_returned'] - s['total_staked'])),
-    ]:
-        with col:
-            st.markdown(_metric_card(label, val, sub, tone), unsafe_allow_html=True)
+    # ── 1. Header (no box) + Add bet ──────────────────────────────────────────
+    _h_left, _h_right = st.columns([4, 1])
+    with _h_left:
+        st.markdown(
+            '<div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;'
+            'color:#7e8c99">Betting Hub</div>'
+            '<h1 style="font-family:\'Sora\',sans-serif;font-size:34px;font-weight:800;color:#e9eef3;'
+            'margin:2px 0 0;line-height:1.05">Dashboard</h1>'
+            '<div style="font-size:13px;color:#7e8c99;margin-top:4px">'
+            'P&amp;L, hit rate and recent bets at a glance</div>',
+            unsafe_allow_html=True,
+        )
+    with _h_right:
+        st.markdown('<div style="height:18px"></div>', unsafe_allow_html=True)
+        if st.button("+ Add bet", type="primary", key="bh_add_bet_top"):
+            _add_bet_dialog()
 
-    # ── Stat row 2: Cha Ching performance ─────────────────────────────────────
-    st.markdown('<div class="section-header">Cha Ching Tips Performance</div>', unsafe_allow_html=True)
-    c1, c2, c3, c4 = st.columns(4)
-    for col, label, val, sub, tone in [
-        (c1, "CC P&L",    f"{s['cc_pl']:+.2f}u",    f"{s['cc_bets']} CC bets", _pl_tone(s['cc_pl'])),
-        (c2, "CC Hit Rate",f"{s['cc_hit_rate']:.1f}%",f"{s['cc_hits']} wins", 'gold'),
-        (c3, "CC ROI",    f"{s['cc_roi']:+.1f}%",    "vs CC staked",          _pl_tone(s['cc_roi'])),
-        (c4, "All vs CC", f"All {s['hit_rate']:.0f}% / CC {s['cc_hit_rate']:.0f}%","hit rate comparison",'neutral'),
-    ]:
-        with col:
-            st.markdown(_metric_card(label, val, sub, tone), unsafe_allow_html=True)
-
-    # ── P&L Chart ─────────────────────────────────────────────────────────────
-    st.markdown('<div class="section-header">P&L Over Time</div>', unsafe_allow_html=True)
-    settled = bets[bets['result'].isin(['Win', 'Loss'])].copy()
-    _bh_pl_fig = apply_chart_theme(_pl_chart(settled))
-    st.plotly_chart(_bh_pl_fig, use_container_width=True, key='bh_pl_chart')
-
-    # ── Recent bets ───────────────────────────────────────────────────────────
-    _hdr_col, _tog_col = st.columns([3, 1])
-    with _hdr_col:
-        st.markdown('<div class="section-header">Recent Bets</div>', unsafe_allow_html=True)
     if bets.empty:
         st.info("No bets logged yet. Use the Bet Tracker to add your first bet.")
-    else:
-        _show_all = st.session_state.get('_bh_show_all_bets', False)
-        with _tog_col:
-            _lbl = "Show less" if _show_all else f"Show all ({len(bets)})"
-            if st.button(_lbl, key='_bh_tog_bets', use_container_width=True):
-                st.session_state['_bh_show_all_bets'] = not _show_all
-                st.rerun()
-        recent = bets.sort_values('date', ascending=False)
-        if not _show_all:
-            recent = recent.head(10)
-        for _, row in recent.iterrows():
-            result = str(row.get('result', 'Pending'))
-            badge  = {'Win': 'bet-win', 'Loss': 'bet-loss', 'Pending': 'bet-pending',
-                      'Void/Refund': 'bet-void'}.get(result, 'bet-pending')
-            cc_html = ' <span class="cc-badge">CC</span>' if row.get('is_cha_ching') else ''
-            pl = row.get('profit_loss', 0) or 0
-            pl_col = C['green'] if pl > 0 else (C['red'] if pl < 0 else C['brown'])
-            date_str = pd.Timestamp(row['date']).strftime('%d %b') if pd.notna(row.get('date')) else '—'
-            odds_val = row.get('odds', 0) or 0
-            odds_str = f'{float(odds_val):.2f}' if float(odds_val) > 0 else '—'
+        return
+
+    pl   = s['total_pl']
+    roi  = s['roi']
+    n_settled = s['wins'] + s['losses']
+    _pos = '#34d399'; _neg = '#ef7a6d'; _mut = '#7e8c99'
+    pl_col  = _pos if pl > 0 else (_neg if pl < 0 else _mut)
+    roi_col = _pos if roi > 0 else (_neg if roi < 0 else _mut)
+
+    # ── 2. Hero: net P&L + ROI | cumulative chart ─────────────────────────────
+    _hero_l, _hero_r = st.columns([1, 2])
+    with _hero_l:
+        st.markdown(
+            '<div style="display:flex;flex-direction:column;justify-content:center;min-height:260px">'
+            f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:50px;font-weight:600;'
+            f'color:{pl_col};line-height:1">{pl:+.2f}u</div>'
+            '<div style="font-size:11px;color:#7e8c99;text-transform:uppercase;letter-spacing:1px;'
+            f'margin-top:8px">net profit · {n_settled} bets settled</div>'
+            f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:24px;font-weight:600;'
+            f'color:{roi_col};margin-top:18px">{roi:+.1f}%</div>'
+            '<div style="font-size:10px;color:#7e8c99;text-transform:uppercase;letter-spacing:1px;'
+            'margin-top:2px">return on investment</div>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+    with _hero_r:
+        settled_chart = bets[bets['result'].isin(['Win', 'Loss'])].copy()
+        _bh_pl_fig = apply_chart_theme(_pl_chart(settled_chart))
+        _bh_pl_fig.update_layout(paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+                                 height=260, margin=dict(l=48, r=12, t=10, b=30))
+        _bh_pl_fig.update_xaxes(tickfont=dict(family='IBM Plex Mono, monospace', color='#7e8c99', size=11))
+        _bh_pl_fig.update_yaxes(tickfont=dict(family='IBM Plex Mono, monospace', color='#7e8c99', size=11))
+        st.plotly_chart(_bh_pl_fig, use_container_width=True, key='bh_pl_chart')
+
+    # ── 3. Metadata strip (hit rate · avg odds · avg stake · streak) ──────────
+    def _strip_cell(value, sub, first=False, value_color='#e9eef3'):
+        bd  = '' if first else 'border-left:1px solid rgba(140,165,185,.14)'
+        pad = 'padding:0 22px 0 0' if first else 'padding:0 22px'
+        return (
+            f'<div style="{pad};{bd}">'
+            f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:24px;font-weight:600;'
+            f'color:{value_color};text-align:right">{value}</div>'
+            f'<div style="font-size:10px;color:#7e8c99;text-transform:uppercase;letter-spacing:1px;'
+            f'text-align:right;margin-top:4px">{sub}</div>'
+            '</div>'
+        )
+    _streak = s['streak']
+    _streak_col = _pos if _streak > 0 else (_neg if _streak < 0 else _mut)
+    _streak_txt = f'{_streak:+d}' if _streak != 0 else '0'
+    st.markdown(
+        '<div style="display:grid;grid-template-columns:repeat(4,1fr);margin:18px 0 4px">'
+        + _strip_cell(f"{s['hit_rate']:.1f}%", f"hit rate · {s['wins']}–{s['losses']}", first=True)
+        + _strip_cell(f"{s['avg_odds']:.2f}", "avg odds")
+        + _strip_cell(f"{s['avg_stake']:.2f}u", "avg stake")
+        + _strip_cell(_streak_txt, "current streak", value_color=_streak_col)
+        + '</div>',
+        unsafe_allow_html=True,
+    )
+
+    # ── 4. All vs Cha Ching (conditional) ─────────────────────────────────────
+    settled = bets[bets['result'].isin(['Win', 'Loss'])]
+    non_cc_settled = settled[settled['is_cha_ching'] != True]
+    if len(settled) > 0:
+        if non_cc_settled.empty:
             st.markdown(
-                f'<div class="bet-row-enter" style="display:flex;align-items:center;gap:12px;padding:8px 12px;'
-                f'background:{C["bg"]};border:1px solid {C["border"]};border-radius:6px;margin-bottom:4px;'
-                f'transition:box-shadow 0.15s ease,transform 0.15s ease;" '
-                f'onmouseenter="this.style.transform=\'translateX(3px)\';this.style.boxShadow=\'0 3px 10px rgba(0,0,0,0.07)\'" '
-                f'onmouseleave="this.style.transform=\'\';this.style.boxShadow=\'\'">'
-                f'<span style="color:{C["brown"]};font-size:12px;min-width:36px">{date_str}</span>'
-                f'<span style="flex:1;font-size:13px;font-weight:600;color:{C["text"]}">'
-                f'{str(row.get("selection","—"))[:40]}{cc_html}</span>'
-                f'<span style="color:{C["brown"]};font-size:12px">{str(row.get("bookmaker",""))}</span>'
-                f'<span style="font-size:12px;color:{C["brown"]};min-width:38px;text-align:right">{odds_str}</span>'
-                f'<span class="{badge}">{result}</span>'
-                f'<span style="font-size:13px;font-weight:700;color:{pl_col};min-width:52px;text-align:right">'
-                f'{pl:+.2f}u</span>'
-                f'</div>',
+                '<div style="margin:22px 0 4px;font-size:13px;color:#7e8c99">All '
+                f'{len(settled)} settled bets are '
+                '<span style="color:#f0b429;font-weight:700">Cha Ching</span> tips.</div>',
+                unsafe_allow_html=True,
+            )
+        else:
+            cc_s   = _betting_stats(bets[bets['is_cha_ching'] == True])
+            rest_s = _betting_stats(bets[bets['is_cha_ching'] != True])
+
+            def _cmp_col(title, title_color, cs, first=False):
+                bd  = '' if first else 'border-left:1px solid rgba(140,165,185,.14)'
+                pad = 'padding:0 28px 0 0' if first else 'padding:0 28px'
+
+                def _line(lbl, val, col):
+                    return (
+                        '<div style="display:flex;justify-content:space-between;align-items:baseline;'
+                        'padding:6px 0;border-bottom:1px solid rgba(140,165,185,.08)">'
+                        f'<span style="font-size:11px;color:#7e8c99;text-transform:uppercase;'
+                        f'letter-spacing:.5px">{lbl}</span>'
+                        f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:15px;'
+                        f'color:{col}">{val}</span></div>'
+                    )
+                _plc  = _pos if cs['total_pl'] > 0 else (_neg if cs['total_pl'] < 0 else _mut)
+                _roic = _pos if cs['roi'] > 0 else (_neg if cs['roi'] < 0 else _mut)
+                return (
+                    f'<div style="{pad};{bd}">'
+                    f'<div style="font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;'
+                    f'color:{title_color};margin-bottom:6px">{title}</div>'
+                    + _line('P&amp;L', f"{cs['total_pl']:+.2f}u", _plc)
+                    + _line('ROI', f"{cs['roi']:+.1f}%", _roic)
+                    + _line('Hit rate', f"{cs['hit_rate']:.1f}%", '#e9eef3')
+                    + '</div>'
+                )
+            st.markdown(
+                '<div style="margin:22px 0 4px;display:grid;grid-template-columns:1fr 1fr">'
+                + _cmp_col('Cha Ching tips', '#f0b429', cc_s, first=True)
+                + _cmp_col('Other bets', '#7e8c99', rest_s)
+                + '</div>',
                 unsafe_allow_html=True,
             )
 
-    if st.button("Add Bet", type="primary"):
-        _add_bet_dialog()
+    # ── 5. Recent bets ────────────────────────────────────────────────────────
+    _hdr_col, _tog_col = st.columns([3, 1])
+    with _hdr_col:
+        st.markdown(
+            '<div style="margin:30px 0 8px;font-size:10px;font-weight:700;letter-spacing:1.5px;'
+            'text-transform:uppercase;color:#7e8c99">Recent bets</div>',
+            unsafe_allow_html=True,
+        )
+    _show_all = st.session_state.get('_bh_show_all_bets', False)
+    with _tog_col:
+        _lbl = "Show less" if _show_all else f"Show all ({len(bets)})"
+        if st.button(_lbl, key='_bh_tog_bets', use_container_width=True):
+            st.session_state['_bh_show_all_bets'] = not _show_all
+            st.rerun()
+
+    recent = bets.sort_values('date', ascending=False)
+    if not _show_all:
+        recent = recent.head(10)
+
+    # CC badge inverts: shown only when non-CC bets exist anywhere, and only on CC rows.
+    _any_non_cc = bool((bets['is_cha_ching'] != True).any())
+
+    def _result_pill(result):
+        if result == 'Win':
+            _c, _bg = '#34d399', 'rgba(52,211,153,0.14)'
+        elif result == 'Loss':
+            _c, _bg = '#ef7a6d', 'rgba(239,122,109,0.14)'
+        else:
+            _c, _bg = '#7e8c99', 'rgba(140,165,185,0.10)'
+        return (f'<span style="display:inline-block;padding:2px 9px;border-radius:10px;font-size:10px;'
+                f'font-weight:700;color:{_c};background:{_bg}">{result}</span>')
+
+    _th = ('padding:7px 10px;font-size:10px;letter-spacing:.1em;text-transform:uppercase;'
+           'color:#7e8c99;border-bottom:1px solid rgba(140,165,185,.22)')
+    _td = 'padding:8px 10px;border-bottom:1px solid rgba(140,165,185,.14)'
+    _head = (
+        '<tr>'
+        f'<th style="{_th};text-align:left">Date</th>'
+        f'<th style="{_th};text-align:left">Selection</th>'
+        f'<th style="{_th};text-align:right">Bookmaker</th>'
+        f'<th style="{_th};text-align:right">Odds</th>'
+        f'<th style="{_th};text-align:right">Result</th>'
+        f'<th style="{_th};text-align:right">P&amp;L</th>'
+        '</tr>'
+    )
+    _rows = ''
+    for _, row in recent.iterrows():
+        result = str(row.get('result', 'Pending'))
+        pl_v = row.get('profit_loss', 0) or 0
+        pl_c = _pos if pl_v > 0 else (_neg if pl_v < 0 else _mut)
+        date_str = pd.Timestamp(row['date']).strftime('%d %b') if pd.notna(row.get('date')) else '—'
+        odds_val = row.get('odds', 0) or 0
+        odds_str = f'{float(odds_val):.2f}' if float(odds_val) > 0 else '—'
+        sel = str(row.get('selection', '—'))[:48]
+        cc_badge = ''
+        if _any_non_cc and row.get('is_cha_ching'):
+            cc_badge = ('<span style="color:#f0b429;background:rgba(240,180,41,0.14);font-size:9px;'
+                        'font-weight:700;border-radius:3px;padding:1px 5px;margin-left:7px">CC</span>')
+        _rows += (
+            '<tr>'
+            f'<td style="{_td};font-family:\'IBM Plex Mono\',monospace;color:#7e8c99;font-size:12px">{date_str}</td>'
+            f'<td style="{_td};color:#e9eef3">{sel}{cc_badge}</td>'
+            f'<td style="{_td};text-align:right;color:#7e8c99;font-size:12px">{str(row.get("bookmaker",""))}</td>'
+            f'<td style="{_td};text-align:right;font-family:\'IBM Plex Mono\',monospace;color:#e9eef3">{odds_str}</td>'
+            f'<td style="{_td};text-align:right">{_result_pill(result)}</td>'
+            f'<td style="{_td};text-align:right;font-family:\'IBM Plex Mono\',monospace;font-weight:600;'
+            f'color:{pl_c}">{pl_v:+.2f}u</td>'
+            '</tr>'
+        )
+    st.markdown(
+        '<table style="width:100%;border-collapse:collapse;font-size:13px">'
+        + _head + _rows + '</table>',
+        unsafe_allow_html=True,
+    )
 
 
 # ── Page 2: Bet Tracker ────────────────────────────────────────────────────────
