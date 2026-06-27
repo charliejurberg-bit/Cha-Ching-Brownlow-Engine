@@ -6118,25 +6118,19 @@ if _page == 'Model Comparison':
         #  into the consensus headline, metadata strip and table above.)
 
     with _mc_tab3:
+        # ── Header: one muted context line (boxed title + stacked banners removed) ──
         st.markdown(
-            f'<div class="title-bar"><h2 style="color:#e9eef3;margin:0">Model Insights</h2>'
-            f'<p style="color:var(--muted);margin:4px 0 0 0">Feature importance · XGBoost v4.0 · Out-of-sample accuracy {_BT_MIN}–{_BT_MAX}</p></div>',
+            '<div style="margin:2px 0 20px;font-size:13px;color:#7e8c99">'
+            f'Feature importance and out-of-sample accuracy · XGBoost v4.0 · walk-forward back-test · {_BT_MIN}–{_BT_MAX}'
+            '</div>',
             unsafe_allow_html=True,
         )
 
-        st.markdown(
-            '<div style="border-top:2px solid var(--line);margin:36px 0 28px 0;position:relative;">'
-            '<span style="position:absolute;top:-11px;left:50%;transform:translateX(-50%);'
-            'background:var(--bg);padding:0 14px;color:var(--muted);font-size:11px;font-weight:700;'
-            'letter-spacing:2px;text-transform:uppercase;">Model Accuracy</span></div>',
-            unsafe_allow_html=True,
-        )
-        st.markdown(f'<div class="section-header">Out-of-Sample Back-Test — {_BT_MIN} to {_BT_MAX}</div>', unsafe_allow_html=True)
-        st.caption("Walk-forward: each season trained only on prior years")
         bt = load_backtest()
         if bt is None:
             st.error("No backtest results found. Run backtest.py first.")
         else:
+            # ── Backtest aggregation (unchanged — recompute nothing) ──
             rows_bt = []
             for season in sorted(bt['Season'].unique()):
                 s = bt[bt['Season'] == season]
@@ -6162,122 +6156,215 @@ if _page == 'Model Comparison':
             top10_acc = acc_df['In Top 10'].sum()
             avg_err_total = acc_df['Avg Error Top 10'].mean()
 
-            st.markdown(f'<div class="section-header">Out-of-Sample Accuracy — {_BT_MIN} to {_BT_MAX}</div>', unsafe_allow_html=True)
-            c1, c2, c3, c4 = st.columns(4)
-            with c1: st.markdown(f'<div class="metric-card"><div class="metric-label">Top 3 Accuracy</div><div class="metric-value">{top3_acc}/{n_seasons}</div><div class="metric-sub">Winner predicted top 3 · {top3_acc / n_seasons * 100:.0f}%</div></div>', unsafe_allow_html=True)
-            with c2: st.markdown(f'<div class="metric-card"><div class="metric-label">Top 5 Accuracy</div><div class="metric-value">{top5_acc}/{n_seasons}</div><div class="metric-sub">Winner predicted top 5 · {top5_acc / n_seasons * 100:.0f}%</div></div>', unsafe_allow_html=True)
-            with c3: st.markdown(f'<div class="metric-card"><div class="metric-label">Top 10 Accuracy</div><div class="metric-value">{top10_acc}/{n_seasons}</div><div class="metric-sub">Winner predicted top 10 · {top10_acc / n_seasons * 100:.0f}%</div></div>', unsafe_allow_html=True)
-            with c4: st.markdown(f'<div class="metric-card"><div class="metric-label">Avg Vote Error (Top 10)</div><div class="metric-value">{avg_err_total:.1f}</div><div class="metric-sub">votes · across predicted top 10</div></div>', unsafe_allow_html=True)
+            def _ins_label(txt):
+                st.markdown(
+                    f'<div style="margin:30px 0 12px;font-size:10px;font-weight:700;letter-spacing:1.5px;'
+                    f'text-transform:uppercase;color:#7e8c99">{txt}</div>',
+                    unsafe_allow_html=True,
+                )
 
-            with st.expander("What's new in v4.0?", expanded=False):
-                col_a, col_b = st.columns(2)
-                with col_a:
-                    st.markdown("""
-    **Late-season form** (`late_form_ewm`)
-    EWMA (span=5) of expected votes over prior 5 rounds. More recent rounds weighted higher.
-    Uses Wheelo ExpVotes where available, otherwise Coaches Votes.
-    Last 5 rounds of each season receive **2× sample weight** during training.
-    """)
-                with col_b:
-                    st.markdown("""
-    **Season momentum** (`momentum_cv`, `momentum_disp`)
-    Average coaches votes and disposals in last 6 games minus first 6 games.
-    Positive = improving trajectory, negative = declining.
-    """)
+            # ── 1. Accuracy funnel + avg vote error (replaces 4 stat cards + 3 labels) ──
+            _ins_label('How accurate is the model')
 
-            st.markdown('<div class="section-header">Season by Season Breakdown</div>', unsafe_allow_html=True)
-            display_acc = acc_df.copy()
-            display_acc['In Top 3'] = display_acc['In Top 3'].map({True: 'Yes', False: 'No'})
-            display_acc['In Top 5'] = display_acc['In Top 5'].map({True: 'Yes', False: 'No'})
-            display_acc['In Top 10'] = display_acc['In Top 10'].map({True: 'Yes', False: 'No'})
-            _acc_disp = display_acc.rename(columns={'Avg Error Top 10': 'Avg Error (Top 10)'})
-            for col in _acc_disp.select_dtypes(include='float').columns:
-                _acc_disp[col] = _acc_disp[col].round(1)
-            st.dataframe(_style_table(_acc_disp), width='stretch', hide_index=True)
+            def _funnel_bar(label, count, total):
+                pct = (count / total * 100) if total else 0
+                return (
+                    '<div style="display:grid;grid-template-columns:112px 1fr 58px;align-items:center;'
+                    'gap:14px;margin:0 0 14px">'
+                    f'<div style="font-size:12px;color:#7e8c99">{label}</div>'
+                    '<div style="background:rgba(140,165,185,.08);border-radius:4px;height:32px">'
+                    f'<div style="height:100%;width:{pct:.0f}%;background:#34d399;border-radius:4px;'
+                    'display:flex;align-items:center;justify-content:flex-end;padding-right:11px;'
+                    'box-sizing:border-box">'
+                    f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:13px;font-weight:700;'
+                    f'color:#0a1017">{pct:.0f}%</span>'
+                    '</div></div>'
+                    f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:13px;color:#7e8c99;'
+                    f'text-align:right">{count}/{total}</div>'
+                    '</div>'
+                )
 
-            st.markdown('<div class="section-header">Predicted Rank of Actual Winner by Season</div>', unsafe_allow_html=True)
-            fig_rank = go.Figure()
-            bar_colors_rank = ['#f0b429' if r <= 3 else ('#34d399' if r <= 5 else ('#4a90c4' if r <= 10 else '#4a5a6a'))
-                               for r in acc_df['Pred. Rank']]
-            fig_rank.add_trace(go.Bar(
-                x=acc_df['Season'].astype(str), y=acc_df['Pred. Rank'], marker_color=bar_colors_rank,
-                text=[f"#{r} — {w}" for r, w in zip(acc_df['Pred. Rank'], acc_df['Actual Winner'])],
-                textposition='outside', textfont=dict(color='#e9eef3', size=11),
-                hovertemplate='%{text}<extra></extra>',
-            ))
-            fig_rank.add_hline(y=3, line_dash='dot', line_color='#f0b429', annotation_text='Top 3',
-                               annotation_position='right', annotation_font_color='#f0b429')
-            fig_rank.add_hline(y=5, line_dash='dot', line_color='#34d399', annotation_text='Top 5',
-                               annotation_position='right', annotation_font_color='#34d399')
-            fig_rank.add_hline(y=10, line_dash='dot', line_color='#4a90c4', annotation_text='Top 10',
-                               annotation_position='right', annotation_font_color='#4a90c4')
-            fig_rank = apply_chart_theme(fig_rank)
-            fig_rank.update_layout(
-                yaxis=dict(title='Predicted Rank of Actual Winner', autorange='reversed',
-                           range=[max(acc_df['Pred. Rank']) + 2, 0]),
-                xaxis=dict(title='Season'),
-                margin=dict(t=40, b=40), showlegend=False,
+            _funnel_html = (
+                _funnel_bar('Top 10', top10_acc, n_seasons)
+                + _funnel_bar('Top 5', top5_acc, n_seasons)
+                + _funnel_bar('Winner in top 3', top3_acc, n_seasons)
             )
-            st.plotly_chart(fig_rank, width='stretch', key="chart_015")
-            st.caption("Gold = Top 3   Green = Top 5   Blue = Top 10   Grey = Outside Top 10")
+            st.markdown(
+                '<div style="display:grid;grid-template-columns:1.7fr 1fr;gap:34px;align-items:center;'
+                'margin:6px 0 4px">'
+                f'<div>{_funnel_html}</div>'
+                '<div style="border-left:1px solid rgba(140,165,185,.14);padding-left:26px">'
+                '<div style="font-size:10px;font-weight:700;letter-spacing:1.2px;text-transform:uppercase;'
+                'color:#7e8c99">avg vote error · top 10</div>'
+                f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:46px;font-weight:600;'
+                f'color:#e9eef3;line-height:1.15">{avg_err_total:.1f}</div>'
+                '<div style="font-size:12px;color:#7e8c99;margin-top:8px;line-height:1.5">'
+                'Strong on the field, modest on the outright — the predicted top 10 is ranked tightly, '
+                'but pinning the exact medallist past the podium is closer to a coin-flip.</div>'
+                '</div>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
 
-            st.markdown('<div class="section-header">Predicted vs Actual Votes — Top 10 Predicted Players</div>', unsafe_allow_html=True)
+            # ── 2. Season-by-season table (replaces old table + winner-rank bar chart) ──
+            _ins_label('Season by season')
+            _acc_sorted = acc_df.sort_values('Season', ascending=False)
+            _th = ('padding:8px 12px;font-size:10px;letter-spacing:.12em;text-transform:uppercase;'
+                   'color:#7e8c99;border-bottom:1px solid rgba(140,165,185,.22)')
+            _tbl_head = (
+                '<tr>'
+                f'<th style="{_th};text-align:left">Season</th>'
+                f'<th style="{_th};text-align:left">Actual winner</th>'
+                f'<th style="{_th};text-align:right">Predicted rank</th>'
+                f'<th style="{_th};text-align:right">Avg error</th>'
+                '</tr>'
+            )
+            _tbl_body = ''
+            for _, _r in _acc_sorted.iterrows():
+                _rank = _r['Pred. Rank']
+                _is_num = isinstance(_rank, (int, float)) and not (isinstance(_rank, float) and pd.isna(_rank))
+                _outside = _is_num and _rank > 10
+                _row_bg = 'background:rgba(240,180,41,0.06)' if _outside else ''
+                if _is_num:
+                    _rk = int(_rank)
+                    _rc = '#34d399' if _rk <= 3 else ('#e9eef3' if _rk <= 10 else '#f0b429')
+                    _rank_disp = f'#{_rk}'
+                else:
+                    _rc = '#7e8c99'
+                    _rank_disp = '—'
+                _err = _r['Avg Error Top 10']
+                _td = 'padding:7px 12px;border-bottom:1px solid rgba(140,165,185,.14)'
+                _tbl_body += (
+                    f'<tr style="{_row_bg}">'
+                    f'<td style="{_td};color:#e9eef3;font-family:\'IBM Plex Mono\',monospace">{int(_r["Season"])}</td>'
+                    f'<td style="{_td};color:#e9eef3">{_r["Actual Winner"]}</td>'
+                    f'<td style="{_td};text-align:right;font-family:\'IBM Plex Mono\',monospace;'
+                    f'color:{_rc};font-weight:600">{_rank_disp}</td>'
+                    f'<td style="{_td};text-align:right;font-family:\'IBM Plex Mono\',monospace;'
+                    f'color:#7e8c99">{_err:.1f}</td>'
+                    '</tr>'
+                )
+            st.markdown(
+                '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:2px">'
+                + _tbl_head + _tbl_body + '</table>',
+                unsafe_allow_html=True,
+            )
+            st.caption('Predicted rank of the actual medallist. Emerald = top 3 · gold = outside top 10 '
+                       '(row tinted) · plain = 4–10.')
+
+            # ── 3. Predicted vs actual scatter (kept, restyled) ──
+            _ins_label('Predicted vs actual votes — top 10 predicted')
             seasons_avail = sorted(bt['Season'].unique().astype(int).tolist())
-            sel_s = st.selectbox("Season", seasons_avail, index=len(seasons_avail) - 1, key='acc_season')
+            sel_s = st.selectbox("Season", seasons_avail, index=len(seasons_avail) - 1,
+                                 key='acc_season_insights')
             s_data = bt[(bt['Season'] == sel_s) & (bt['Rank_Predicted'] <= 10)].copy().sort_values('Rank_Predicted')
             fig_scatter = go.Figure()
-            marker_colors_sc = ['#f0b429' if row['Rank_Actual'] == 1 else '#4a90c4' for _, row in s_data.iterrows()]
+            _sc_colors = ['#f0b429' if row['Rank_Actual'] == 1 else '#34d399' for _, row in s_data.iterrows()]
+            _sc_sizes = [16 if row['Rank_Actual'] == 1 else 11 for _, row in s_data.iterrows()]
             fig_scatter.add_trace(go.Scatter(
                 x=s_data['Actual_Votes'], y=s_data['Predicted_Votes'],
-                mode='markers+text', marker=dict(size=12, color=marker_colors_sc),
-                text=s_data['Player'], textposition='top center', textfont=dict(size=11, color='#e9eef3'),
+                mode='markers+text', marker=dict(size=_sc_sizes, color=_sc_colors),
+                text=s_data['Player'], textposition='top center',
+                textfont=dict(family="IBM Plex Mono, monospace", size=10, color='#e9eef3'),
                 hovertemplate='<b>%{text}</b><br>Actual: %{x}<br>Predicted: %{y:.1f}<extra></extra>',
             ))
             max_v = max(s_data['Actual_Votes'].max(), s_data['Predicted_Votes'].max()) + 5
             fig_scatter.add_trace(go.Scatter(
                 x=[0, max_v], y=[0, max_v], mode='lines',
-                line=dict(color='#4a5a6a', dash='dash', width=1), showlegend=False, hoverinfo='skip',
+                line=dict(color='rgba(140,165,185,0.35)', dash='dash', width=1),
+                showlegend=False, hoverinfo='skip',
             ))
             fig_scatter = apply_chart_theme(fig_scatter)
             fig_scatter.update_layout(
-                xaxis=dict(title='Actual Votes', range=[0, max_v]),
-                yaxis=dict(title='Predicted Votes', range=[0, max_v]),
-                margin=dict(t=20, b=40), height=420,
+                paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+                xaxis=dict(title='Actual votes', range=[0, max_v]),
+                yaxis=dict(title='Predicted votes', range=[0, max_v]),
+                margin=dict(t=20, b=40), height=440, showlegend=False,
             )
-            st.plotly_chart(fig_scatter, width='stretch', key="chart_016")
-            st.caption("Gold dot = Actual winner   Blue dot = Other top 10 predicted   Dashed line = perfect prediction")
+            fig_scatter.update_xaxes(tickfont=dict(family="IBM Plex Mono, monospace", color="#7e8c99", size=11))
+            fig_scatter.update_yaxes(tickfont=dict(family="IBM Plex Mono, monospace", color="#7e8c99", size=11))
+            st.plotly_chart(fig_scatter, width='stretch', key='pred_actual_scatter_insights')
+            st.caption('Gold = actual winner · emerald = other top-10 predicted · dashed line = perfect prediction')
 
-            st.markdown('<div class="section-header">What Drives Brownlow Votes?</div>', unsafe_allow_html=True)
+            # ── 4. Feature importance ──
+            _ins_label('What drives Brownlow votes')
             if importance is None:
                 st.error("Run brownlow_model.py first.")
             else:
                 imp = importance.copy()
                 imp['Importance %'] = (imp['Importance'] * 100).round(2)
-                tab_all, tab_top = st.tabs(["All Features", "Top 20"])
-                with tab_top:
-                    top20 = imp.head(20).sort_values('Importance %', ascending=True)
-                    fig3 = go.Figure(go.Bar(x=top20['Importance %'], y=top20['Feature'], orientation='h',
-                                            marker=dict(color=top20['Importance %'],
-                                                        colorscale=[[0, '#0d141d'], [1, '#34d399']],
-                                                        showscale=False)))
-                    fig3 = apply_chart_theme(fig3)
-                    fig3.update_layout(xaxis_title='Importance (%)', height=500, margin=dict(l=220, r=16, t=20, b=16))
-                    st.plotly_chart(fig3, width='stretch', key="chart_007")
-                with tab_all:
-                    all_imp = imp.sort_values('Importance %', ascending=True)
-                    fig4 = go.Figure(go.Bar(x=all_imp['Importance %'], y=all_imp['Feature'], orientation='h',
-                                            marker=dict(color=all_imp['Importance %'],
-                                                        colorscale=[[0, '#0d141d'], [1, '#34d399']],
-                                                        showscale=False)))
-                    fig4 = apply_chart_theme(fig4)
-                    fig4.update_layout(xaxis_title='Importance (%)', height=1400, margin=dict(l=250, r=16, t=20, b=16))
-                    st.plotly_chart(fig4, width='stretch', key="chart_008")
+                _imp_sorted = imp.sort_values('Importance %', ascending=False).reset_index(drop=True)
+                _top_feat = _imp_sorted.iloc[0]['Feature']
+                _top_pct = _imp_sorted.iloc[0]['Importance %']
+                st.markdown(
+                    '<div style="font-size:14px;color:#e9eef3;margin:0 0 14px">'
+                    f'<span style="color:#34d399;font-weight:700">{_top_feat}</span> is the single strongest '
+                    f'signal — <span style="font-family:\'IBM Plex Mono\',monospace">{_top_pct:.1f}%</span> '
+                    'of total feature importance.</div>',
+                    unsafe_allow_html=True,
+                )
 
-                c1, c2 = st.columns(2)
-                with c1:
-                    st.markdown("**Top signals:**\n- Coaches Votes (raw + relative z-score)\n- Top 3 coaches votes flag\n- Disposals relative to game\n- Impact Score relative to game\n- Is_Loss / Is_Win / Margin")
-                with c2:
-                    st.markdown("**v4.0 improvements:**\n- Late-season form: rolling EWMA (span=5) of prior 5 rounds\n- Season momentum: last-6 vs first-6 avg\n- Late-season game weighting: last 5 rounds = 2× sample weight")
+                def _imp_bar_fig(df_disp, n_emph=4):
+                    d = df_disp.copy().reset_index(drop=True)
+                    d['rank'] = range(1, len(d) + 1)
+                    d = d.sort_values('Importance %', ascending=True)
+                    colors = ['#34d399' if rk <= n_emph else 'rgba(52,211,153,0.4)' for rk in d['rank']]
+                    fig = go.Figure(go.Bar(
+                        x=d['Importance %'], y=d['Feature'], orientation='h',
+                        marker=dict(color=colors),
+                        text=[f"{v:.1f}%" for v in d['Importance %']],
+                        textposition='outside',
+                        textfont=dict(family="IBM Plex Mono, monospace", color="#7e8c99", size=11),
+                        hovertemplate='%{y}: %{x:.2f}%<extra></extra>',
+                    ))
+                    fig = apply_chart_theme(fig)
+                    fig.update_layout(
+                        paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+                        xaxis=dict(title='Importance (%)'),
+                        margin=dict(l=210, r=44, t=10, b=16),
+                        height=max(300, 26 * len(d)),
+                    )
+                    fig.update_xaxes(tickfont=dict(family="IBM Plex Mono, monospace", color="#7e8c99", size=11))
+                    return fig
+
+                _show_all = st.toggle("All features", value=False, key="show_all_feats_insights")
+                if not _show_all:
+                    st.plotly_chart(_imp_bar_fig(_imp_sorted.head(15)), width='stretch',
+                                    key="feat_top15_insights")
+                else:
+                    _n_bars = 25
+                    st.plotly_chart(_imp_bar_fig(_imp_sorted.head(_n_bars)), width='stretch',
+                                    key="feat_all_insights")
+                    _rest = _imp_sorted.iloc[_n_bars:].reset_index(drop=True)
+                    if not _rest.empty:
+                        _cells = ''
+                        for _i, _rr in _rest.iterrows():
+                            _cells += (
+                                '<div style="display:flex;justify-content:space-between;gap:10px;'
+                                'border-bottom:1px solid rgba(140,165,185,.08);padding:3px 0">'
+                                f'<span><span style="color:#7e8c99">{_n_bars + _i + 1}.</span> '
+                                f'<span style="color:#e9eef3">{_rr["Feature"]}</span></span>'
+                                f'<span style="font-family:\'IBM Plex Mono\',monospace;color:#7e8c99">'
+                                f'{_rr["Importance %"]:.1f}%</span>'
+                                '</div>'
+                            )
+                        st.markdown(
+                            '<div style="margin-top:10px;font-size:11px;display:grid;'
+                            'grid-template-columns:1fr 1fr;gap:0 32px">' + _cells + '</div>',
+                            unsafe_allow_html=True,
+                        )
+
+                with st.expander("What changed in v4.0", expanded=False):
+                    st.markdown(
+                        "**Late-season form** (`late_form_ewm`) — EWMA (span=5) of expected votes over the "
+                        "prior 5 rounds; recent rounds weighted higher. Uses Wheelo ExpVotes where available, "
+                        "otherwise Coaches Votes.\n\n"
+                        "**Season momentum** (`momentum_cv`, `momentum_disp`) — average coaches votes and "
+                        "disposals in the last 6 games minus the first 6. Positive = improving, negative = "
+                        "declining.\n\n"
+                        "**Late-season game weighting** — the last 5 rounds of each season receive 2× sample "
+                        "weight during training."
+                    )
 
 # ── Global footer ────────────────────────────────────────────
 if _page == 'Landing':
