@@ -975,6 +975,48 @@ BH_CSS = """
     font-weight: 600 !important;
 }
 
+/* ── Polls a Vote — Midnight Turf redesign ── */
+.title-bar:has(.pav-flush){background:transparent !important;border:none !important;box-shadow:none !important;padding:0 !important;}
+.pav-secthead{display:flex;align-items:baseline;gap:16px;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:6px;margin:26px 0 14px;}
+.pav-secthead .t{color:#34d399;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;}
+.pav-key{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);letter-spacing:.03em;}
+.pav-key b{font-weight:600;}
+.pav-empty{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);padding:10px 0;opacity:.7;}
+/* matrix — flush table */
+.pav-matrix{border-collapse:collapse;width:100%;}
+.pav-matrix th{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;color:var(--muted);letter-spacing:.03em;padding:5px 4px;border-bottom:1px solid var(--line);text-align:center;min-width:30px;}
+.pav-matrix th.pl{text-align:left;}
+.pav-matrix td{font-family:'IBM Plex Mono',monospace;font-size:14px;text-align:center;padding:6px 0;border-bottom:1px solid rgba(140,165,185,.07);min-width:30px;}
+.pav-matrix td.pl{text-align:left;white-space:nowrap;padding:6px 16px 6px 0;}
+.pav-matrix td.pl .nm{font-family:'Archivo',sans-serif;font-size:13px;font-weight:700;color:var(--text);}
+.pav-matrix td.pl .tm{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);}
+.pav-matrix tbody tr:hover td{background:rgba(140,165,185,.04);}
+/* card — intentional surface panel */
+.pav-card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px 18px;margin-bottom:10px;}
+.pav-card .nm{font-family:'Archivo',sans-serif;font-size:15px;font-weight:800;color:var(--text);}
+.pav-card .tm{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-top:2px;}
+.pav-card .con{font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;margin-top:5px;}
+.pav-card .lbl{font-family:'IBM Plex Mono',monospace;font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:5px;}
+.pav-card .agree{font-family:'IBM Plex Mono',monospace;font-size:30px;font-weight:600;color:#f0b429;line-height:1;}
+.pav-card .os{font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;color:#f0b429;}
+.pav-card .sbadge{background:rgba(52,211,153,0.18);color:#34d399;border:1px solid rgba(52,211,153,0.4);padding:1px 8px;border-radius:12px;font-family:'IBM Plex Mono',monospace;font-size:9px;font-weight:700;letter-spacing:.1em;margin-left:8px;}
+.pav-pill-star{background:rgba(52,211,153,0.16);color:#34d399;border:1px solid rgba(52,211,153,0.4);}
+.pav-pill-dash{background:transparent;color:var(--muted);border:1px dashed var(--line);}
+.pav-pill-star,.pav-pill-dash{padding:2px 9px;border-radius:12px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;white-space:nowrap;display:inline-block;margin:2px 2px 2px 0;}
+/* borderless bottom-border fields inside the Add expander only */
+.stApp:has(.pav-page) [data-testid="stExpander"] [data-baseweb="select"]>div,
+.stApp:has(.pav-page) [data-testid="stExpander"] [data-testid="stTextInput"] input,
+.stApp:has(.pav-page) [data-testid="stExpander"] [data-testid="stNumberInput"] input{
+    background:transparent !important;border:none !important;border-bottom:1px solid var(--line) !important;border-radius:0 !important;}
+/* quiet mono text-link buttons at card foot (innermost-match scoping) */
+.stApp:has(.pav-page) div[data-testid="stVerticalBlock"]:has(.pav-settle-marker):not(:has(div[data-testid="stVerticalBlock"] .pav-settle-marker)) button,
+.stApp:has(.pav-page) div[data-testid="stVerticalBlock"]:has(.pav-delete-marker):not(:has(div[data-testid="stVerticalBlock"] .pav-delete-marker)) button{
+    background:transparent !important;border:none !important;color:var(--muted) !important;
+    font-family:'IBM Plex Mono',monospace !important;font-size:11px !important;font-weight:500 !important;
+    letter-spacing:.06em;padding:4px 0 !important;min-height:unset !important;box-shadow:none !important;}
+.stApp:has(.pav-page) div[data-testid="stVerticalBlock"]:has(.pav-settle-marker):not(:has(div[data-testid="stVerticalBlock"] .pav-settle-marker)) button:hover{color:#34d399 !important;}
+.stApp:has(.pav-page) div[data-testid="stVerticalBlock"]:has(.pav-delete-marker):not(:has(div[data-testid="stVerticalBlock"] .pav-delete-marker)) button:hover{color:#ef7a6d !important;}
+
 </style>
 """
 
@@ -3045,17 +3087,41 @@ def render_trends_analysis():
 
 def render_polls_a_vote():
     _inject_css()
+    # STEP 1 — masthead flushed onto #0a1017 via the innermost .pav-flush marker;
+    # .pav-page marker scopes the field/button restyles below (no global override).
     st.markdown(
-        '<div class="title-bar"><h2 style="color:var(--text);margin:0">Polls a Vote Watchlist</h2>'
+        '<span class="pav-page" style="display:none"></span>'
+        '<div class="title-bar"><span class="pav-flush" style="display:none"></span>'
+        '<h2 style="color:var(--text);margin:0">Polls a Vote Watchlist</h2>'
         '<p style="color:var(--muted);margin:4px 0 0 0">'
-        'Track your "polls a vote" bets — alerts surface in the Live Tracker on count night</p></div>',
+        'Track your "polls a vote" targets — alerts surface in the Live Tracker on count night</p></div>',
         unsafe_allow_html=True,
     )
 
-    # ── Entry form ────────────────────────────────────────────────────────────
-    st.markdown('<div class="section-header">Add Player</div>', unsafe_allow_html=True)
+    # ── Data + consensus helpers (loaded once, used by matrix, cards, form) ─────
+    polls = _load_polls()
 
-    # Load player list from predictions CSV for dropdown
+    _gdf = None  # per-round Poll_Prob source for the grid (the gold numbers)
+    if os.path.exists("predictions/game_level_2026.csv"):
+        try:
+            _gdf = pd.read_csv(
+                "predictions/game_level_2026.csv",
+                usecols=['Player', 'Team', 'Round_num', 'Poll_Prob'],
+            )
+        except Exception:
+            pass
+
+    # Current round anchor — latest round present in the predictions source (NOT
+    # hardcoded). Matrix column index = Round_num - 1 (same convention as
+    # _model_top3 and the round labels OR..R24). Degrades to None if unavailable.
+    _cur_idx = None
+    if _gdf is not None and not _gdf.empty and 'Round_num' in _gdf.columns:
+        try:
+            _cur_idx = int(_gdf['Round_num'].max()) - 1
+        except Exception:
+            _cur_idx = None
+
+    # Player list for the Add form dropdown
     _pav_all_players: list[str] = []
     _pav_player_team: dict[str, str] = {}
     if os.path.exists("predictions/game_level_2026.csv"):
@@ -3069,93 +3135,6 @@ def render_polls_a_vote():
         except Exception:
             pass
 
-    # Player selectbox outside form so selection reruns and refreshes the round lookup
-    pav_player = st.selectbox("Player name", options=[""] + _pav_all_players, index=0) or ""
-    pav_team = _pav_player_team.get(pav_player, "")
-
-    # ── Per-round Exp_Votes lookup ─────────────────────────────────────────────
-    _pav_round_votes: dict[int, float] = {}
-    if pav_player.strip():
-        try:
-            if os.path.exists("predictions/game_level_2026.csv"):
-                _gdf_lookup = pd.read_csv(
-                    "predictions/game_level_2026.csv",
-                    usecols=['Player', 'Round_num', 'Exp_Votes'],
-                )
-                _lk_match = _gdf_lookup[
-                    _gdf_lookup['Player'].str.lower() == pav_player.strip().lower()
-                ]
-                for _, _lk_r in _lk_match.iterrows():
-                    _pav_round_votes[int(_lk_r['Round_num']) - 1] = float(_lk_r['Exp_Votes'])
-        except Exception:
-            pass
-
-    with st.form("pav_add_form", clear_on_submit=True):
-        st.markdown(
-            '<div style="font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;'
-            'letter-spacing:1px;margin:12px 0 6px 0">Rounds to watch (select all that apply)</div>',
-            unsafe_allow_html=True,
-        )
-        _rnd_labels = ['OR'] + [f'R{i}' for i in range(1, 25)]
-        _rnd_checks: dict[int, bool] = {}
-        for _ri in range(0, 25, 5):
-            _rcols = st.columns(5)
-            for _ci in range(5):
-                _rn = _ri + _ci
-                with _rcols[_ci]:
-                    ev = _pav_round_votes.get(_rn)
-                    base_lbl = _rnd_labels[_rn]
-                    lbl = f"**{base_lbl}**" if (ev is not None and ev > 0.35) else base_lbl
-                    _rnd_checks[_rn] = st.checkbox(lbl, key=f"pav_rnd_{_rn}")
-                    if ev is not None:
-                        ev_cls = 'pav-ev-gold' if ev > 0.35 else 'pav-ev-muted'
-                        st.markdown(
-                            f'<div class="{ev_cls}" style="font-size:12px;margin-top:-10px;'
-                            f'padding-left:26px;line-height:1">{ev:.2f}</div>',
-                            unsafe_allow_html=True,
-                        )
-
-        fo1, fo2 = st.columns(2)
-        with fo1:
-            pav_odds = st.number_input("Odds", min_value=1.01, value=2.0, step=0.05, format="%.2f")
-        with fo2:
-            pav_stake = st.number_input("Stake (u)", min_value=0.0, value=1.0, step=0.5, format="%.2f")
-        pav_notes = st.text_input("Notes (optional)")
-
-        if st.form_submit_button("Add to Watchlist", type="primary", use_container_width=True):
-            if not pav_player.strip():
-                st.error("Player name is required.")
-            else:
-                _sel = sorted(r for r, chk in _rnd_checks.items() if chk)
-                _save_polls_row({
-                    'Player':    pav_player.strip(),
-                    'Team':      pav_team.strip(),
-                    'My_Rounds': ','.join(str(r) for r in _sel),
-                    'Odds':      round(float(pav_odds), 2),
-                    'Stake':     round(float(pav_stake), 2),
-                    'Notes':     pav_notes.strip(),
-                    'Settled':   False,
-                })
-                st.success(f"Added {pav_player.strip()} to watchlist.")
-                st.rerun()
-
-    # ── Load data ─────────────────────────────────────────────────────────────
-    polls = _load_polls()
-    if polls.empty:
-        st.info("No players in watchlist yet — add one above.")
-        return
-
-    _gdf = None
-    if os.path.exists("predictions/game_level_2026.csv"):
-        try:
-            _gdf = pd.read_csv(
-                "predictions/game_level_2026.csv",
-                usecols=['Player', 'Team', 'Round_num', 'Poll_Prob'],
-            )
-        except Exception:
-            pass
-
-    # ── Consensus data — loaded once, used per card ────────────────────────────
     import re as _re
     _NAME_SUFFIX_RE = _re.compile(r'\s+(Jr\.?|Sr\.?|II|III|IV)$', _re.IGNORECASE)
 
@@ -3232,10 +3211,6 @@ def render_polls_a_vote():
                 agree += 1
         return agree, total
 
-    def _consensus(player: str) -> str:
-        agree, total = _consensus_score(player)
-        return f'{agree}/{total} models agree' if total else ''
-
     def _model_top3(player: str) -> list[int]:
         if _gdf is None:
             return []
@@ -3243,10 +3218,6 @@ def render_polls_a_vote():
         if sub.empty:
             return []
         return (sub.nlargest(3, 'Poll_Prob')['Round_num'].astype(int) - 1).tolist()
-
-    def _pill(text: str, style: str) -> str:
-        cls = {'green': 'pav-pill-green', 'blue': 'pav-pill-blue', 'grey': 'pav-pill-grey'}.get(style, 'pav-pill-grey')
-        return f'<span class="{cls}">{text}</span>'
 
     def _parse_rounds(raw: str) -> set[int]:
         rounds = set()
@@ -3256,8 +3227,69 @@ def render_polls_a_vote():
                 rounds.add(int(t))
         return rounds
 
-    # ── Watchlist table ───────────────────────────────────────────────────────
-    st.markdown('<div class="section-header">Watchlist</div>', unsafe_allow_html=True)
+    _rl = lambda r: 'OR' if r == 0 else f'R{r}'
+
+    # ── STEP 2 — Round Matrix (hero, flush) ────────────────────────────────────
+    st.markdown(
+        '<div class="pav-secthead"><span class="t">Round Matrix</span>'
+        '<span class="pav-key"><b style="color:#f0b429">★</b> you + model'
+        ' &nbsp; <b style="color:#34d399">★</b> your pick'
+        ' &nbsp; <b style="color:var(--muted)">·</b> model only</span></div>',
+        unsafe_allow_html=True,
+    )
+
+    if polls.empty:
+        st.markdown('<div class="pav-empty">No targets yet — add one below.</div>',
+                    unsafe_allow_html=True)
+    else:
+        _rnd_labels_m = ['OR'] + [str(i) for i in range(1, 25)]
+        _header = '<th class="pl">Player</th>'
+        for _ci, _lbl in enumerate(_rnd_labels_m):
+            _w = 'background:rgba(52,211,153,.10);' if _ci == _cur_idx else ''
+            _header += f'<th style="{_w}">{_lbl}</th>'
+
+        _rows_html = ''
+        for _, row in polls.iterrows():
+            player    = str(row['Player'])
+            team      = str(row['Team'])
+            my_rounds = _parse_rounds(row['My_Rounds'])
+            model_set = set(_model_top3(player))
+            settled   = bool(row.get('Settled', False))
+            _op       = 'opacity:.45;' if settled else ''
+            cells = (f'<td class="pl"><span class="nm">{player}</span><br>'
+                     f'<span class="tm">{team}</span></td>')
+            for rn in range(25):
+                # Current-round wash anchors "now"; encoding bg layers on top.
+                _w = 'background:rgba(52,211,153,.08);' if rn == _cur_idx else ''
+                # TODO(suppression): no round-suppression logic exists in this
+                # codebase yet (no "Brownlow.Votes>0 in a prior round" rule). When
+                # it lands, grey/blank suppressed (player, round) cells here.
+                in_m, in_mod = rn in my_rounds, rn in model_set
+                if in_m and in_mod:
+                    cells += f'<td style="{_w}background:rgba(240,180,41,.16);color:#f0b429">★</td>'
+                elif in_m:
+                    cells += f'<td style="{_w}color:#34d399">★</td>'
+                elif in_mod:
+                    cells += f'<td style="{_w}color:var(--muted)">·</td>'
+                else:
+                    cells += f'<td style="{_w}"></td>'
+            _rows_html += f'<tr style="{_op}">{cells}</tr>'
+
+        st.markdown(
+            f'<div style="overflow-x:auto">'
+            f'<table class="pav-matrix">'
+            f'<thead><tr>{_header}</tr></thead>'
+            f'<tbody>{_rows_html}</tbody>'
+            f'</table></div>',
+            unsafe_allow_html=True,
+        )
+
+    # ── STEP 3 — Active Watchlist monitoring cards ─────────────────────────────
+    st.markdown('<div class="pav-secthead"><span class="t">Active Watchlist</span></div>',
+                unsafe_allow_html=True)
+
+    if polls.empty:
+        st.markdown('<div class="pav-empty">No targets yet.</div>', unsafe_allow_html=True)
 
     for idx, row in polls.iterrows():
         player    = str(row['Player'])
@@ -3268,145 +3300,146 @@ def render_polls_a_vote():
         agreement = len(my_rounds & model_set)
         settled   = bool(row.get('Settled', False))
 
-        _rnd_lbl = lambda r: 'OR' if r == 0 else f'R{r}'
+        _cs_agree, _cs_total = _consensus_score(player)
+        _con_full = _cs_total > 0 and _cs_agree == _cs_total
+        _con_color = '#34d399' if _con_full else '#f0b429'
+        _con_line = f'{_cs_agree}/{_cs_total} models agree' if _cs_total else ''
 
-        pills_html = ''
-        for r in sorted(my_rounds | model_set):
-            in_m, in_mod = r in my_rounds, r in model_set
-            if in_m and in_mod:
-                pills_html += _pill(f'★ {_rnd_lbl(r)}', 'green')
-            elif in_m:
-                pills_html += _pill(_rnd_lbl(r), 'blue')
-            else:
-                pills_html += _pill(_rnd_lbl(r), 'grey')
-
-        model_pills = ''.join(_pill(_rnd_lbl(r), 'grey') for r in top3) or '<span style="color:#4a5a6a;font-size:12px">—</span>'
-        pills_html  = pills_html or '<span style="color:#4a5a6a;font-size:12px">—</span>'
+        my_chips = ''.join(f'<span class="pav-pill-star">★ {_rl(r)}</span>'
+                           for r in sorted(my_rounds))
+        model_chips = ''.join(f'<span class="pav-pill-dash">{_rl(r)}</span>' for r in top3)
+        chips = (my_chips + model_chips) or '<span style="color:var(--muted);font-size:12px">—</span>'
 
         odds_str  = f"{float(row['Odds']):.2f}"  if pd.notna(row.get('Odds'))  else '—'
         stake_str = f"{float(row['Stake']):.2f}u" if pd.notna(row.get('Stake')) else '—'
-        agree_col = '#34d399' if agreement >= 2 else ('#f0b429' if agreement == 1 else '#4a5a6a')
-        opacity   = '0.5' if settled else '1'
-        settled_badge = (
-            '<span style="background:rgba(52,211,153,0.18);color:#34d399;border:1px solid rgba(52,211,153,0.4);'
-            'padding:2px 8px;border-radius:12px;font-size:10px;font-weight:800;margin-left:8px">SETTLED</span>'
-            if settled else ''
-        )
-        _con_txt = _consensus(player)
-        consensus_badge = (
-            f'<div style="font-size:11px;font-weight:600;color:var(--muted);margin-top:4px">{_con_txt}</div>'
-            if _con_txt else ''
-        )
+        _op = 'opacity:.55;' if settled else ''
+        sbadge = '<span class="sbadge">SETTLED</span>' if settled else ''
+        con_html = (f'<div class="con" style="color:{_con_color}">{_con_line}</div>'
+                    if _con_line else '')
 
         st.markdown(
-            f'<div style="background:var(--surface);border:1px solid var(--line);border-radius:8px;'
-            f'padding:14px 16px;margin-bottom:6px;opacity:{opacity}">'
-            f'<div style="display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px">'
+            f'<div class="pav-card" style="{_op}">'
+            f'<div style="display:flex;justify-content:space-between;align-items:flex-start;'
+            f'flex-wrap:wrap;gap:18px">'
 
-            f'<div style="min-width:150px">'
-            f'<div style="font-size:14px;font-weight:700;color:var(--text)">{player}{settled_badge}</div>'
-            f'<div style="font-size:12px;color:var(--muted);margin-top:2px">{team}</div>'
-            f'{consensus_badge}'
-            f'</div>'
-
-            f'<div style="flex:1;min-width:200px">'
-            f'<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">My Rounds</div>'
-            f'<div>{pills_html}</div>'
+            f'<div style="min-width:160px">'
+            f'<div class="nm">{player}{sbadge}</div>'
+            f'<div class="tm">{team}</div>'
+            f'{con_html}'
             f'</div>'
 
-            f'<div style="min-width:180px">'
-            f'<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">Model Top 3</div>'
-            f'<div>{model_pills}</div>'
+            f'<div style="flex:1;min-width:220px">'
+            f'<div class="lbl">My rounds / model top 3</div>'
+            f'<div>{chips}</div>'
             f'</div>'
 
-            f'<div style="display:flex;gap:20px;align-items:center">'
-            f'<div style="text-align:center">'
-            f'<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Agreement</div>'
-            f'<div style="font-size:22px;font-weight:800;color:{agree_col}">{agreement}</div>'
+            f'<div style="text-align:center;min-width:56px">'
+            f'<div class="agree">{agreement}</div>'
+            f'<div class="lbl" style="margin-top:5px">Agree</div>'
             f'</div>'
-            f'<div>'
-            f'<div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px">Odds / Stake</div>'
-            f'<div style="font-size:13px;font-weight:700;color:#f0b429">{odds_str} / {stake_str}</div>'
-            f'</div>'
+
+            f'<div style="min-width:96px">'
+            f'<div class="lbl">Odds / Stake</div>'
+            f'<div class="os">{odds_str} / {stake_str}</div>'
             f'</div>'
 
             f'</div></div>',
             unsafe_allow_html=True,
         )
 
-        _bcols = st.columns([1, 1, 5])
+        _bcols = st.columns([1, 1, 6])
         if not settled:
             with _bcols[0]:
-                if st.button("Mark settled", key=f"pav_settle_{idx}", use_container_width=True):
+                st.markdown('<span class="pav-settle-marker" style="display:none"></span>',
+                            unsafe_allow_html=True)
+                if st.button("Mark settled", key=f"pav_settle_{idx}"):
                     _mark_poll_settled(idx)
                     st.rerun()
         with _bcols[1]:
-            if st.button("Delete", key=f"pav_delete_{idx}", use_container_width=True):
+            st.markdown('<span class="pav-delete-marker" style="display:none"></span>',
+                        unsafe_allow_html=True)
+            if st.button("Delete", key=f"pav_delete_{idx}"):
                 _delete_poll_row(idx)
                 st.rerun()
 
-    # ── Matrix view ───────────────────────────────────────────────────────────
-    st.markdown('<div class="section-header">Round Matrix</div>', unsafe_allow_html=True)
+    # ── STEP 4 — Add-target form, collapsed disclosure ─────────────────────────
+    with st.expander("+ Add a watchlist target", expanded=False):
+        # Selectbox outside the form so selection reruns and refreshes the round
+        # lookup; the form below keeps the existing checkbox state + submit callback.
+        pav_player = st.selectbox("Player name", options=[""] + _pav_all_players, index=0) or ""
+        pav_team = _pav_player_team.get(pav_player, "")
 
-    _cell_css = (
-        'padding:4px 0;text-align:center;font-size:12px;font-weight:700;'
-        'border:1px solid #1e3040;min-width:32px;'
-    )
-    _th_css = (
-        'background:var(--surface-2);color:var(--muted);font-size:10px;font-weight:700;'
-        'text-transform:uppercase;letter-spacing:0.5px;padding:5px 4px;'
-        'border:1px solid var(--line);text-align:center;min-width:32px;'
-    )
-    _player_css = (
-        'background:var(--surface-2);color:var(--text);font-size:12px;font-weight:600;'
-        'padding:5px 10px;border:1px solid var(--line);white-space:nowrap;'
-    )
+        # Per-round Exp_Votes (the gold poll-prob numbers driving which rounds tick)
+        _pav_round_votes: dict[int, float] = {}
+        if pav_player.strip():
+            try:
+                if os.path.exists("predictions/game_level_2026.csv"):
+                    _gdf_lookup = pd.read_csv(
+                        "predictions/game_level_2026.csv",
+                        usecols=['Player', 'Round_num', 'Exp_Votes'],
+                    )
+                    _lk_match = _gdf_lookup[
+                        _gdf_lookup['Player'].str.lower() == pav_player.strip().lower()
+                    ]
+                    for _, _lk_r in _lk_match.iterrows():
+                        _pav_round_votes[int(_lk_r['Round_num']) - 1] = float(_lk_r['Exp_Votes'])
+            except Exception:
+                pass
 
-    _rnd_labels_m = ['OR'] + [str(i) for i in range(1, 25)]
-    _header = f'<th style="{_th_css}">Player</th>' + ''.join(
-        f'<th style="{_th_css}">{lbl}</th>' for lbl in _rnd_labels_m
-    )
+        _form_top3 = set(_model_top3(pav_player)) if pav_player.strip() else set()
 
-    _rows_html = ''
-    for _, row in polls.iterrows():
-        player    = str(row['Player'])
-        my_rounds = _parse_rounds(row['My_Rounds'])
-        model_set = set(_model_top3(player))
-        _cs_agree, _cs_total = _consensus_score(player)
-        if _cs_total > 0 and _cs_agree == _cs_total:
-            _star_style = f'background:#3d2b00;color:#f0b429;{_cell_css}'   # gold  — 5/5
-        elif _cs_agree >= 3:
-            _star_style = f'background:#1a5c40;color:#34d399;{_cell_css}'   # green — 3-4/5
-        else:
-            _star_style = f'background:#3d1010;color:#e06060;{_cell_css}'   # red   — 0-2/5
-        cells = f'<td style="{_player_css}">{player}</td>'
-        for rn in range(25):
-            in_m, in_mod = rn in my_rounds, rn in model_set
-            if in_m and in_mod:
-                cells += f'<td style="{_star_style}">★</td>'
-            elif in_m:
-                cells += f'<td class="pav-matrix-mine" style="{_cell_css}">●</td>'
-            elif in_mod:
-                cells += f'<td class="pav-matrix-model" style="{_cell_css}">·</td>'
-            else:
-                cells += f'<td style="background:var(--bg);{_cell_css}"></td>'
-        _rows_html += f'<tr>{cells}</tr>'
+        with st.form("pav_add_form", clear_on_submit=True):
+            st.markdown(
+                '<div class="lbl" style="margin:8px 0 6px">Rounds to watch'
+                ' &nbsp;·&nbsp; <span style="color:#f0b429">gold</span> = high poll prob'
+                ' &nbsp;·&nbsp; ◆ = model top 3</div>',
+                unsafe_allow_html=True,
+            )
+            _rnd_labels = ['OR'] + [f'R{i}' for i in range(1, 25)]
+            _rnd_checks: dict[int, bool] = {}
+            for _ri in range(0, 25, 5):
+                _rcols = st.columns(5)
+                for _ci in range(5):
+                    _rn = _ri + _ci
+                    with _rcols[_ci]:
+                        ev = _pav_round_votes.get(_rn)
+                        base_lbl = _rnd_labels[_rn]
+                        if _rn in _form_top3:
+                            base_lbl = f'◆ {base_lbl}'
+                        lbl = f"**{base_lbl}**" if (ev is not None and ev > 0.35) else base_lbl
+                        _rnd_checks[_rn] = st.checkbox(lbl, key=f"pav_rnd_{_rn}")
+                        if ev is not None:
+                            ev_cls = 'pav-ev-gold' if ev > 0.35 else 'pav-ev-muted'
+                            st.markdown(
+                                f'<div class="{ev_cls}" style="font-size:12px;margin-top:-10px;'
+                                f'padding-left:26px;line-height:1;'
+                                f'font-family:\'IBM Plex Mono\',monospace">{ev:.2f}</div>',
+                                unsafe_allow_html=True,
+                            )
 
-    st.markdown(
-        f'<div style="overflow-x:auto;margin-top:8px">'
-        f'<table style="border-collapse:collapse;width:100%">'
-        f'<thead><tr>{_header}</tr></thead>'
-        f'<tbody>{_rows_html}</tbody>'
-        f'</table>'
-        f'<div style="font-size:11px;color:#4a5a6a;margin-top:8px">'
-        f'<span style="color:#f0b429">★</span> 5/5 models agree &nbsp;·&nbsp;'
-        f'<span style="color:#34d399">★</span> 3–4/5 agree &nbsp;·&nbsp;'
-        f'<span style="color:#e06060">★</span> 0–2/5 agree &nbsp;·&nbsp;'
-        f'<span style="color:#4a90d9">●</span> my pick only &nbsp;·&nbsp;'
-        f'<span style="color:var(--muted)">·</span> model only</div>'
-        f'</div>',
-        unsafe_allow_html=True,
-    )
+            fo1, fo2 = st.columns(2)
+            with fo1:
+                pav_odds = st.number_input("Odds", min_value=1.01, value=2.0, step=0.05, format="%.2f")
+            with fo2:
+                pav_stake = st.number_input("Stake (u)", min_value=0.0, value=1.0, step=0.5, format="%.2f")
+            pav_notes = st.text_input("Notes (optional)")
+
+            if st.form_submit_button("Add to Watchlist", type="primary", use_container_width=True):
+                if not pav_player.strip():
+                    st.error("Player name is required.")
+                else:
+                    _sel = sorted(r for r, chk in _rnd_checks.items() if chk)
+                    _save_polls_row({
+                        'Player':    pav_player.strip(),
+                        'Team':      pav_team.strip(),
+                        'My_Rounds': ','.join(str(r) for r in _sel),
+                        'Odds':      round(float(pav_odds), 2),
+                        'Stake':     round(float(pav_stake), 2),
+                        'Notes':     pav_notes.strip(),
+                        'Settled':   False,
+                    })
+                    st.success(f"Added {pav_player.strip()} to watchlist.")
+                    st.rerun()
 
 
 # ── Public dispatch ────────────────────────────────────────────────────────────
