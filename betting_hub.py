@@ -8,7 +8,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-import os, json, uuid, time, requests
+import os, json, uuid, time, requests, re
 from datetime import datetime, timedelta, date
 from io import StringIO, BytesIO
 from theme import inject_global_theme
@@ -480,47 +480,93 @@ def _delete_user_import():
 
 
 def _load_user_import_as_bets() -> pd.DataFrame | None:
-    """Load user_import.csv and normalise it to the bets schema."""
+    """Load user_import.csv and normalise it to the bets schema.
+
+    Only six fields are parsed from the upload — every other column is ignored:
+    Date, Bookmaker, Selection, Stake, Odds, Result. Headers are matched
+    tolerantly (normalise = strip → lowercase → drop punctuation, then look up
+    an alias map). A field falls back to its default ONLY when its column is
+    genuinely absent from the upload (Date → None, Result → Pending,
+    numerics → NaN). P&L is derived from the parsed odds/stake/result; the
+    schema's other fields (match, market_type, notes) are left at defaults.
+    """
     raw = _load_user_import()
     if raw is None or raw.empty:
         return None
-    df = raw.copy()
-    df.columns = [c.strip().lower().replace(' ', '_') for c in df.columns]
-    result_map = {
-        'won': 'Win', 'win': 'Win',
-        'lost': 'Loss', 'loss': 'Loss',
-        'pending': 'Pending',
-        'void': 'Void/Refund', 'void/refund': 'Void/Refund',
+
+    # Normalise a header/alias down to alphanumerics (drops spaces, /, punctuation).
+    def _norm(s):
+        return re.sub(r'[^a-z0-9]+', '', str(s).strip().lower())
+
+    _aliases = {
+        'date':      ['date', 'date placed', 'placed', 'day', 'dt'],
+        'bookmaker': ['bookie', 'bookmaker', 'book', 'sportsbook', 'agency'],
+        'selection': ['bet', 'selection', 'pick', 'player', 'runner'],
+        'stake':     ['stake', 'wager', 'bet amount', 'units', 'risk'],
+        'odds':      ['odds', 'price', 'decimal odds'],
+        'result':    ['result', 'outcome', 'status', 'w/l', 'won', 'won/lost'],
     }
-    col = lambda *names: next((n for n in names if n in df.columns), None)
-    match_col   = col('match', 'event', 'race_event', 'race/event')
-    result_col  = col('result', 'status')
-    pl_col      = col('profit_loss', 'p&l', 'pl', 'profit/loss')
-    market_col  = col('market_type', 'market', 'bet_type', 'event_type')
+    _alias_lookup = {}
+    for _field, _names in _aliases.items():
+        for _n in _names:
+            _alias_lookup[_norm(_n)] = _field
+
+    # Map incoming columns onto the six fields; first match wins, rest ignored.
+    field_col: dict = {}
+    for _c in raw.columns:
+        _f = _alias_lookup.get(_norm(_c))
+        if _f and _f not in field_col:
+            field_col[_f] = _c
+
+    def _txt(v, default=''):
+        if v is None or (isinstance(v, float) and pd.isna(v)):
+            return default
+        s = str(v).strip()
+        return s if s else default
+
+    def _num(v):
+        # Strip currency symbols + thousands separators; non-numeric → NaN.
+        s = str(v).replace('$', '').replace('£', '').replace('€', '').replace(',', '').strip()
+        return pd.to_numeric(s, errors='coerce')
+
+    _result_values = {
+        'w': 'Win', 'win': 'Win', 'won': 'Win',
+        'l': 'Loss', 'lose': 'Loss', 'lost': 'Loss', 'loss': 'Loss',
+    }
+
     rows = []
-    for _, r in df.iterrows():
-        raw_result = str(r.get(result_col, 'Pending') if result_col else 'Pending').strip().lower()
-        result = result_map.get(raw_result, 'Pending')
-        pl_raw = pd.to_numeric(r.get(pl_col, 0) if pl_col else 0, errors='coerce')
-        pl = float(pl_raw) if not pd.isna(pl_raw) else 0.0
-        odds_raw = pd.to_numeric(r.get('odds', 2), errors='coerce')
-        odds = float(odds_raw) if not pd.isna(odds_raw) else 2.0
-        stake_raw = pd.to_numeric(r.get('stake', 0), errors='coerce')
-        stake = abs(float(stake_raw)) if not pd.isna(stake_raw) else 0.0
+    for _, r in raw.iterrows():
+        # Date — None only when the column is genuinely absent.
+        _date = _txt(r.get(field_col['date']), None) if 'date' in field_col else None
+        # Result — value-normalised; Pending when absent / blank / unrecognised.
+        if 'result' in field_col:
+            result = _result_values.get(str(r.get(field_col['result'], '')).strip().lower(), 'Pending')
+        else:
+            result = 'Pending'
+        # Numerics — NaN when the column is absent or the value isn't numeric.
+        odds  = _num(r.get(field_col['odds']))  if 'odds'  in field_col else np.nan
+        stake = _num(r.get(field_col['stake'])) if 'stake' in field_col else np.nan
+        if not pd.isna(stake):
+            stake = abs(stake)
+        # Derive P&L from the parsed fields (no profit_loss column is read).
+        if result in ('Win', 'Loss') and not pd.isna(odds) and not pd.isna(stake):
+            pl = _compute_pl(float(odds), float(stake), result)
+        else:
+            pl = 0.0
         rows.append({
             'bet_id':            str(uuid.uuid4())[:8],
-            'date':              str(r.get('date', '')),
-            'match':             str(r.get(match_col, '') if match_col else ''),
-            'market_type':       str(r.get(market_col, 'Other') if market_col else 'Other'),
-            'selection':         str(r.get('selection', '')),
-            'bookmaker':         str(r.get('bookmaker', 'Other')),
-            'odds':              round(odds, 2),
-            'stake':             round(stake, 2),
+            'date':              _date,
+            'match':             '',
+            'market_type':       'Other',
+            'selection':         _txt(r.get(field_col['selection'])) if 'selection' in field_col else '',
+            'bookmaker':         _txt(r.get(field_col['bookmaker']), 'Other') if 'bookmaker' in field_col else 'Other',
+            'odds':              odds,
+            'stake':             stake,
             'result':            result,
-            'profit_loss':       round(pl, 2),
+            'profit_loss':       pl,
             'is_cha_ching':      False,
             'cha_ching_criteria': '',
-            'notes':             str(r.get('notes', '')),
+            'notes':             '',
         })
     out = pd.DataFrame(rows)
     out['date'] = pd.to_datetime(out['date'], errors='coerce')
