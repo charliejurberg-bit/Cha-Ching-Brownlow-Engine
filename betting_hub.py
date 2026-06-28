@@ -1949,27 +1949,94 @@ def render_bet_tracker():
 def render_cha_ching_tips():
     _inject_css()
 
+    # ── Midnight Turf flush styles — page-scoped via .cc-tips-marker so other
+    #    betting-hub pages (Performance / Bet Tracker / Trends) keep their boxes ──
+    st.markdown("""
+<span class="cc-tips-marker" style="display:none"></span>
+<style>
+/* record strip */
+.stApp:has(.cc-tips-marker) .cc-rec-strip{display:flex;border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:4px 0 24px}
+.stApp:has(.cc-tips-marker) .cc-rec-cell{flex:1;padding:13px 20px;border-left:1px solid var(--line)}
+.stApp:has(.cc-tips-marker) .cc-rec-cell:first-child{border-left:none;padding-left:0}
+.stApp:has(.cc-tips-marker) .cc-rec-num{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;color:var(--text);line-height:1}
+.stApp:has(.cc-tips-marker) .cc-rec-num.pos{color:var(--emerald)}
+.stApp:has(.cc-tips-marker) .cc-rec-num.neg{color:#ef7a6d}
+.stApp:has(.cc-tips-marker) .cc-rec-lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-top:7px}
+/* masthead header (flush, no box) */
+.stApp:has(.cc-tips-marker) .cc-kicker{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.stApp:has(.cc-tips-marker) .cc-title{font-family:'Archivo',sans-serif;font-size:30px;font-weight:800;color:var(--text);margin:2px 0 0;line-height:1.05}
+.stApp:has(.cc-tips-marker) .cc-sub{font-size:13px;color:var(--muted);margin-top:4px}
+/* lock outline button (top-right of masthead) */
+.stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-lock-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-lock-marker)) button{
+  background:transparent !important;border:1px solid var(--line) !important;color:var(--muted) !important;
+  font-family:'IBM Plex Mono',monospace !important;text-transform:uppercase !important;letter-spacing:.12em !important;
+  font-weight:600 !important;box-shadow:none !important}
+.stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-lock-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-lock-marker)) button:hover{
+  border-color:var(--muted) !important;color:var(--text) !important}
+/* filters: borderless controls with a single bottom rule, emerald on focus */
+.stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-filters-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-filters-marker)) div[data-testid="stSelectbox"]>div>div,
+.stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-filters-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-filters-marker)) [data-testid="stDateInput"] input,
+.stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-filters-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-filters-marker)) [data-testid="stDateInput"] div[data-baseweb="input"]{
+  background:transparent !important;border:none !important;border-bottom:1px solid var(--line) !important;border-radius:0 !important;box-shadow:none !important}
+.stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-filters-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-filters-marker)) div[data-testid="stSelectbox"]>div>div:focus-within,
+.stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-filters-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-filters-marker)) [data-testid="stDateInput"] input:focus{
+  border-bottom-color:var(--emerald) !important}
+.stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-filters-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-filters-marker)) label{
+  font-family:'IBM Plex Mono',monospace !important;font-size:10px !important;letter-spacing:.14em !important;
+  text-transform:uppercase !important;color:var(--muted) !important}
+/* bet-history table (flush) */
+.stApp:has(.cc-tips-marker) table.cc-hist{width:100%;border-collapse:collapse;font-size:13px;margin-top:2px}
+.stApp:has(.cc-tips-marker) table.cc-hist th{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}
+.stApp:has(.cc-tips-marker) table.cc-hist th.r{text-align:right}
+.stApp:has(.cc-tips-marker) table.cc-hist td{padding:9px 10px;border-bottom:1px solid rgba(140,165,185,.07);color:var(--text);vertical-align:top}
+.stApp:has(.cc-tips-marker) table.cc-hist tbody tr:hover{background:rgba(140,165,185,.05)}
+.stApp:has(.cc-tips-marker) table.cc-hist td.num{font-family:'IBM Plex Mono',monospace;text-align:right;white-space:nowrap}
+.stApp:has(.cc-tips-marker) table.cc-hist td.dt{font-family:'IBM Plex Mono',monospace;color:var(--muted);white-space:nowrap}
+.stApp:has(.cc-tips-marker) table.cc-hist .meta{font-size:11px;color:var(--muted);margin-top:3px;font-family:'IBM Plex Mono',monospace;letter-spacing:.04em}
+.stApp:has(.cc-tips-marker) table.cc-hist .pos{color:var(--emerald);font-weight:600}
+.stApp:has(.cc-tips-marker) table.cc-hist .neg{color:#ef7a6d;font-weight:600}
+.stApp:has(.cc-tips-marker) table.cc-hist .star{color:var(--gold);text-align:center}
+/* add multi (primary emerald) + manual link */
+.stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-addmulti-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-addmulti-marker)) button{
+  background:var(--emerald) !important;color:#0a1017 !important;border:none !important;
+  font-family:'IBM Plex Mono',monospace !important;text-transform:uppercase !important;letter-spacing:.1em !important;font-weight:700 !important}
+.stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-manuallink-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-manuallink-marker)) button{
+  background:transparent !important;border:none !important;color:var(--muted) !important;box-shadow:none !important;
+  font-family:'IBM Plex Mono',monospace !important;text-transform:uppercase !important;letter-spacing:.1em !important;font-weight:600 !important}
+.stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-manuallink-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-manuallink-marker)) button:hover{
+  color:var(--text) !important;text-decoration:underline !important}
+/* disclosure expanders (Settled / Pending Multis) — flush, hairline top rule.
+   Scoped to expanders that directly contain their marker, so nested add-props
+   expanders elsewhere keep their box. */
+.stApp:has(.cc-tips-marker) [data-testid="stExpander"]:has(.cc-disc-marker){
+  background:transparent !important;border:none !important;border-top:1px solid var(--line) !important;border-radius:0 !important;box-shadow:none !important}
+/* fixtures — flush list, hairline rules, no card */
+.stApp:has(.cc-tips-marker) [data-testid="stExpander"]:has(.cc-fixtures-marker){
+  background:transparent !important;border:none !important;border-top:1px solid var(--line) !important;border-radius:0 !important;box-shadow:none !important}
+.stApp:has(.cc-tips-marker) .cc-empty{font-size:13px;color:var(--muted);padding:10px 0}
+</style>
+""", unsafe_allow_html=True)
+
     # ── Auth gate ─────────────────────────────────────────────────────────────
     editable = st.session_state.get('_cc_authed', False)
     _correct_pw = 'Cha-Ching888!'
 
-    lock_col, title_col = st.columns([1, 6])
+    title_col, lock_col = st.columns([6, 1])
     with title_col:
         st.markdown(
-            '<div class="title-bar">'
-            '<h2 style="color:var(--text);margin:0">Cha Ching Tips</h2>'
-            '<p style="color:var(--muted);margin:4px 0 0 0">'
-            'Upcoming fixtures · Player prop markets · Cha Ching checklist</p></div>',
+            '<div class="cc-title">Cha Ching Tips</div>'
+            '<div class="cc-sub">Upcoming fixtures · Player prop markets · Cha Ching checklist</div>',
             unsafe_allow_html=True,
         )
     with lock_col:
-        st.markdown('<div style="height:10px"></div>', unsafe_allow_html=True)
+        st.markdown('<span class="cc-lock-marker" style="display:none"></span>'
+                    '<div style="height:6px"></div>', unsafe_allow_html=True)
         if editable:
-            if st.button('🔓 Lock', key='_cc_lock', use_container_width=True):
+            if st.button('Lock', key='_cc_lock', use_container_width=True):
                 st.session_state['_cc_authed'] = False
                 st.rerun()
         else:
-            if st.button('🔒 Edit', key='_cc_unlock_btn', use_container_width=True):
+            if st.button('Edit', key='_cc_unlock_btn', use_container_width=True):
                 st.session_state['_cc_pw_open'] = True
 
     if st.session_state.get('_cc_pw_open') and not editable:
@@ -1993,23 +2060,26 @@ def render_cha_ching_tips():
     if not cc_bets.empty:
         st.markdown('<div class="section-header">Cha Ching Bet History</div>', unsafe_allow_html=True)
 
-        # Filters
-        cf1, cf2, cf3, cf4 = st.columns(4)
-        with cf1:
-            cc_markets = ['All'] + sorted(cc_bets['market_type'].dropna().unique().tolist())
-            cc_mkt = st.selectbox("Market", cc_markets, index=0, key='cc_hist_mkt')
-        with cf2:
-            cc_books = ['All'] + sorted(cc_bets['bookmaker'].dropna().unique().tolist())
-            cc_bk = st.selectbox("Bookmaker", cc_books, index=0, key='cc_hist_bk')
-        with cf3:
-            cc_res = st.selectbox("Result", ['All'] + RESULTS, index=0, key='cc_hist_res')
-        with cf4:
-            if pd.notna(cc_bets['date']).any():
-                cc_min_d = cc_bets['date'].dropna().min().date()
-                cc_max_d = cc_bets['date'].dropna().max().date()
-                cc_dr = st.date_input("Date range", (cc_min_d, cc_max_d))
-            else:
-                cc_dr = None
+        # Filters (flush, single inline row) — scoped via .cc-filters-marker
+        with st.container():
+            st.markdown('<span class="cc-filters-marker" style="display:none"></span>',
+                        unsafe_allow_html=True)
+            cf1, cf2, cf3, cf4 = st.columns(4)
+            with cf1:
+                cc_markets = ['All'] + sorted(cc_bets['market_type'].dropna().unique().tolist())
+                cc_mkt = st.selectbox("Market", cc_markets, index=0, key='cc_hist_mkt')
+            with cf2:
+                cc_books = ['All'] + sorted(cc_bets['bookmaker'].dropna().unique().tolist())
+                cc_bk = st.selectbox("Bookmaker", cc_books, index=0, key='cc_hist_bk')
+            with cf3:
+                cc_res = st.selectbox("Result", ['All'] + RESULTS, index=0, key='cc_hist_res')
+            with cf4:
+                if pd.notna(cc_bets['date']).any():
+                    cc_min_d = cc_bets['date'].dropna().min().date()
+                    cc_max_d = cc_bets['date'].dropna().max().date()
+                    cc_dr = st.date_input("Date range", (cc_min_d, cc_max_d))
+                else:
+                    cc_dr = None
 
         cc_filt = cc_bets.copy()
         if cc_mkt != 'All':
@@ -2028,58 +2098,75 @@ def render_cha_ching_tips():
                 pass
         cc_filt = cc_filt.sort_values('date', ascending=False).reset_index(drop=True)
 
-        # Stats strip
+        # ── Record strip (flush, no cards) — Pending dropped; only P&L / ROI tinted ──
         fs = _betting_stats(cc_filt)
-        sc1, sc2, sc3, sc4, sc5, sc6 = st.columns(6)
-        for col, lbl, val in [
-            (sc1, "CC Bets",  str(fs['total_bets'])),
-            (sc2, "P&L",      f"{fs['total_pl']:+.2f}u"),
-            (sc3, "ROI",      f"{fs['roi']:+.1f}%"),
-            (sc4, "Hit Rate", f"{fs['hit_rate']:.1f}%"),
-            (sc5, "W/L",      f"{fs['wins']}W / {fs['losses']}L"),
-            (sc6, "Pending",  str(fs['pending'])),
-        ]:
-            col.markdown(
-                f'<div class="metric-card"><div class="metric-label">{lbl}</div>'
-                f'<div class="metric-value">{val}</div></div>',
+        if fs:
+            _pl = fs.get('total_pl', 0.0)
+            _roi = fs.get('roi', 0.0)
+            _pl_cls = 'pos' if _pl > 0 else ('neg' if _pl < 0 else '')
+            _roi_cls = 'pos' if _roi > 0 else ('neg' if _roi < 0 else '')
+            _rec_cells = [
+                ('', f"{fs.get('total_bets', 0)}", 'CC Bets'),
+                (_pl_cls, f"{_pl:+.2f}u", 'P&L'),
+                (_roi_cls, f"{_roi:+.1f}%", 'ROI'),
+                ('', f"{fs.get('hit_rate', 0.0):.1f}%", 'Hit Rate'),
+                ('', f"{fs.get('wins', 0)}–{fs.get('losses', 0)}", 'Record'),
+            ]
+            st.markdown(
+                '<div class="cc-rec-strip">' + ''.join(
+                    f'<div class="cc-rec-cell"><div class="cc-rec-num {c}">{v}</div>'
+                    f'<div class="cc-rec-lbl">{l}</div></div>'
+                    for c, v, l in _rec_cells
+                ) + '</div>',
                 unsafe_allow_html=True,
             )
 
-        # Table
+        # ── Bet history table (flush HTML; Market folded under Match; P&L only colour) ──
         if not cc_filt.empty:
-            cc_display = cc_filt[[
-                'date', 'match', 'market_type', 'selection', 'bookmaker',
-                'odds', 'stake', 'result', 'profit_loss', 'notes'
-            ]].copy()
-            cc_display['date']        = cc_display['date'].dt.strftime('%d %b %Y')
-            cc_display['odds']        = cc_display['odds'].round(2)
-            cc_display['stake']       = cc_display['stake'].round(2)
-            cc_display['profit_loss'] = cc_display['profit_loss'].round(2)
-            cc_display.columns = ['Date', 'Match', 'Market', 'Selection', 'Bookmaker',
-                                  'Odds', 'Stake', 'Result', 'P&L', 'Notes']
-
-            def _style_cc(df):
-                styles = pd.DataFrame('', index=df.index, columns=df.columns)
-                for i, row in df.iterrows():
-                    if row['Result'] == 'Win':
-                        styles.loc[i, 'P&L'] = 'color: #34d399; font-weight: 700'
-                    elif row['Result'] == 'Loss':
-                        styles.loc[i, 'P&L'] = 'color: #e05252; font-weight: 700'
-                return styles
-
-            st.dataframe(
-                cc_display.style.apply(_style_cc, axis=None),
-                use_container_width=True,
-                hide_index=True,
-                height=min(500, 60 + len(cc_display) * 36),
-                column_config={
-                    'Odds':  st.column_config.NumberColumn('Odds',  format='%.2f'),
-                    'Stake': st.column_config.NumberColumn('Stake', format='%.2f'),
-                    'P&L':   st.column_config.NumberColumn('P&L',   format='%.2f'),
-                },
+            _rows_html = ''
+            for _, r in cc_filt.iterrows():
+                _dt = r['date'].strftime('%d %b %Y') if pd.notna(r.get('date')) else '—'
+                _match = str(r.get('match', '') or '')
+                _market = str(r.get('market_type', '') or '')
+                _sel = str(r.get('selection', '') or '')
+                _book = str(r.get('bookmaker', '') or '')
+                _odds = r.get('odds', None)
+                _odds_s = f"{float(_odds):.2f}" if pd.notna(_odds) else '—'
+                _stake = r.get('stake', None)
+                _stake_s = f"{float(_stake):.2f}" if pd.notna(_stake) else '—'
+                _res = str(r.get('result', '') or '')
+                _res_cls = 'pos' if _res == 'Win' else ('neg' if _res == 'Loss' else '')
+                _res_s = f'<span class="{_res_cls}">{_res.upper()}</span>' if _res else '—'
+                _pl_v = r.get('profit_loss', None)
+                if pd.notna(_pl_v):
+                    _plc = 'pos' if float(_pl_v) > 0 else ('neg' if float(_pl_v) < 0 else '')
+                    _pl_s = f'<span class="{_plc}">{float(_pl_v):+.2f}</span>'
+                else:
+                    _pl_s = '—'
+                _meta = f'<div class="meta">{_market}</div>' if _market else ''
+                _rows_html += (
+                    '<tr>'
+                    f'<td class="dt">{_dt}</td>'
+                    f'<td>{_match}{_meta}</td>'
+                    f'<td>{_sel}</td>'
+                    f'<td>{_book}</td>'
+                    f'<td class="num">{_odds_s}</td>'
+                    f'<td class="num">{_stake_s}</td>'
+                    f'<td class="num">{_res_s}</td>'
+                    f'<td class="num">{_pl_s}</td>'
+                    '</tr>'
+                )
+            st.markdown(
+                '<table class="cc-hist"><thead><tr>'
+                '<th>Date</th><th>Match</th><th>Selection</th><th>Bookmaker</th>'
+                '<th class="r">Odds</th><th class="r">Stake</th>'
+                '<th class="r">Result</th><th class="r">P&amp;L</th>'
+                '</tr></thead><tbody>' + _rows_html + '</tbody></table>',
+                unsafe_allow_html=True,
             )
         else:
-            st.info("No Cha Ching bets match the current filters.")
+            st.markdown('<div class="cc-empty">No Cha Ching bets match the current filters.</div>',
+                        unsafe_allow_html=True)
 
         st.divider()
 
@@ -2118,12 +2205,21 @@ def render_cha_ching_tips():
             unsafe_allow_html=True,
         )
 
-    # ── Add Multi Tip ─────────────────────────────────────────────────────────
+    # ── Add Multi Tip (primary) + Add game manually (text link) ───────────────
     if editable:
-        multi_col, _ = st.columns([2, 5])
-        with multi_col:
-            if st.button("➕ Add Multi Tip", use_container_width=True):
+        _am1, _am2, _ = st.columns([2, 2, 3])
+        with _am1:
+            st.markdown('<span class="cc-addmulti-marker" style="display:none"></span>',
+                        unsafe_allow_html=True)
+            if st.button("+ Add Multi Tip", use_container_width=True):
                 _add_multi_dialog()
+        with _am2:
+            if not fixtures.empty:
+                st.markdown('<span class="cc-manuallink-marker" style="display:none"></span>',
+                            unsafe_allow_html=True)
+                if st.button("+ Add game manually", use_container_width=True, key='_cc_manual_link'):
+                    st.session_state['_cc_manual_add_open'] = \
+                        not st.session_state.get('_cc_manual_add_open', False)
 
     # ── Live & Settled flagged tips ───────────────────────────────────────────
     flagged_all = tips_df[tips_df['is_flagged'] == True].copy() if not tips_df.empty else pd.DataFrame()
@@ -2261,12 +2357,14 @@ def render_cha_ching_tips():
         # ── Unsettled (stale — >48h, no result) ───────────────────────────────
         if not unsettled_tips.empty:
             with st.expander(f"Unsettled Tips ({len(unsettled_tips)}) — awaiting result", expanded=False):
+                st.markdown('<span class="cc-disc-marker" style="display:none"></span>', unsafe_allow_html=True)
                 for _, tip in unsettled_tips.iterrows():
                     _render_tip_card(tip, label_badge='⏳ UNSETTLED', badge_class='live-badge')
 
         # ── Settled ───────────────────────────────────────────────────────────
         if not settled_tips.empty:
             with st.expander(f"Settled Tips ({len(settled_tips)})", expanded=False):
+                st.markdown('<span class="cc-disc-marker" style="display:none"></span>', unsafe_allow_html=True)
                 result_styles = {
                     'Win':         ('✅ Win',  '#34d399', 'rgba(52,211,153,0.12)'),
                     'Loss':        ('❌ Loss', '#e05252', 'rgba(224,82,82,0.12)'),
@@ -2314,14 +2412,16 @@ def render_cha_ching_tips():
         ].drop_duplicates(subset=['tip_id']).copy() if not tips_df.empty else pd.DataFrame()
         if not pending_multis.empty:
             with st.expander(f"Pending Multis ({len(pending_multis)})", expanded=False):
+                st.markdown('<span class="cc-disc-marker" style="display:none"></span>', unsafe_allow_html=True)
                 for _, tip in pending_multis.iterrows():
                     _render_tip_card(tip, label_badge='🎯 MULTI', badge_class='live-badge')
 
     # ── Upcoming games ────────────────────────────────────────────────────────
     if fixtures.empty:
-        st.warning(
-            "Could not load upcoming fixtures from Squiggle API. "
-            "The API may be down or there are no games in the next 7 days."
+        st.markdown(
+            '<div class="section-header">Upcoming · Next 7 days</div>'
+            '<div class="cc-empty">No upcoming fixtures.</div>',
+            unsafe_allow_html=True,
         )
         st.caption("Squiggle API: https://api.squiggle.com.au")
         _render_manual_props()
@@ -2333,31 +2433,31 @@ def render_cha_ching_tips():
     if '_mg_n' not in st.session_state:
         st.session_state['_mg_n'] = 0
 
-    if editable:
-        with st.expander("+ Add game manually", expanded=False):
-            _n = st.session_state['_mg_n']
-            mg1, mg2, mg3, mg4 = st.columns([1.5, 2, 2, 1])
-            with mg1:
-                mg_round = st.text_input("Round", placeholder="Round 11", key=f'mg_round_{_n}')
-            with mg2:
-                mg_home  = st.text_input("Home team", placeholder="Richmond", key=f'mg_home_{_n}')
-            with mg3:
-                mg_away  = st.text_input("Away team", placeholder="Essendon", key=f'mg_away_{_n}')
-            with mg4:
-                st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
-                if st.button("Add", key='mg_add', use_container_width=True):
-                    r = mg_round.strip()
-                    h = mg_home.strip()
-                    a = mg_away.strip()
-                    if r and h and a:
-                        new_gkey = f"{r} {h} v {a}"
-                        existing = [g['gkey'] for g in st.session_state['_manual_games']]
-                        if new_gkey not in existing:
-                            st.session_state['_manual_games'].append({'roundname': r, 'hteam': h, 'ateam': a, 'gkey': new_gkey})
-                        st.session_state['_mg_n'] += 1
-                        st.rerun()
-                    else:
-                        st.warning("Fill in all three fields.")
+    if editable and st.session_state.get('_cc_manual_add_open'):
+        st.markdown('<div class="section-header">Add Game Manually</div>', unsafe_allow_html=True)
+        _n = st.session_state['_mg_n']
+        mg1, mg2, mg3, mg4 = st.columns([1.5, 2, 2, 1])
+        with mg1:
+            mg_round = st.text_input("Round", placeholder="Round 11", key=f'mg_round_{_n}')
+        with mg2:
+            mg_home  = st.text_input("Home team", placeholder="Richmond", key=f'mg_home_{_n}')
+        with mg3:
+            mg_away  = st.text_input("Away team", placeholder="Essendon", key=f'mg_away_{_n}')
+        with mg4:
+            st.markdown("<div style='height:28px'></div>", unsafe_allow_html=True)
+            if st.button("Add", key='mg_add', use_container_width=True):
+                r = mg_round.strip()
+                h = mg_home.strip()
+                a = mg_away.strip()
+                if r and h and a:
+                    new_gkey = f"{r} {h} v {a}"
+                    existing = [g['gkey'] for g in st.session_state['_manual_games']]
+                    if new_gkey not in existing:
+                        st.session_state['_manual_games'].append({'roundname': r, 'hteam': h, 'ateam': a, 'gkey': new_gkey})
+                    st.session_state['_mg_n'] += 1
+                    st.rerun()
+                else:
+                    st.warning("Fill in all three fields.")
 
     # Render manually added games
     if st.session_state['_manual_games']:
@@ -2378,16 +2478,30 @@ def render_cha_ching_tips():
                         st.session_state['_manual_games'] = [g for g in st.session_state['_manual_games'] if g['gkey'] != mgkey]
                         st.rerun()
 
-    st.markdown('<div class="section-header">Upcoming Games — Next 7 Days</div>',
+    st.markdown('<div class="section-header">Upcoming · Next 7 days</div>',
                 unsafe_allow_html=True)
 
     for _, game in fixtures.iterrows():
-        gkey   = _game_key(game)
-        glabel = _game_label(game)
-        venue  = str(game.get('venue', ''))
-        rname  = str(game.get('roundname', ''))
+        gkey  = _game_key(game)
+        rname = str(game.get('roundname', '') or '')
+        home  = str(game.get('hteam', '?'))
+        away  = str(game.get('ateam', '?'))
+        _dt   = game.get('date_parsed')
+        _kick = ''
+        if pd.notna(_dt):
+            try:
+                _kick = pd.Timestamp(_dt).strftime('%a %d %b · %H:%M')
+            except Exception:
+                _kick = ''
+        # NOTE: Streamlit expander summaries render markdown only (no HTML/colour/
+        # flex), so the emerald round chip + right-aligned kickoff can't live in the
+        # label; the round is emphasised in mono-ish bold and the time runs inline.
+        _fx_label = (f"**{rname}**  ·  " if rname else "") + f"{home} v {away}" + \
+                    (f"  ·  {_kick}" if _kick else "")
 
-        with st.expander(f"**{gkey}**  —  {glabel}"):
+        with st.expander(_fx_label):
+            st.markdown('<span class="cc-fixtures-marker" style="display:none"></span>',
+                        unsafe_allow_html=True)
             tab_disp, tab_goals, tab_fpts = st.tabs(["Disposals", "Goals", "Fantasy Points"])
 
             for tab, mtype in [(tab_disp, "Disposals O/U"), (tab_goals, "Goals O/U"), (tab_fpts, "Fantasy Points O/U")]:
