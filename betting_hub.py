@@ -2072,6 +2072,66 @@ def render_cha_ching_tips():
         flagged_all['result'] = flagged_all['result'].fillna('')
         flagged_all = flagged_all.drop_duplicates(subset=['tip_id'])
 
+    # Tip-card renderer (used by Pending Multis up top + Live/Unsettled below)
+    def _render_tip_card(tip, label_badge: str = '● LIVE', badge_class: str = 'live-badge'):
+        tip_id    = str(tip['tip_id'])
+        player    = str(tip.get('player', ''))
+        gkey      = str(tip.get('game_key', ''))
+        mtype     = str(tip.get('market_type', ''))
+        line_raw  = pd.to_numeric(tip.get('line', ''), errors='coerce')
+        odds_raw  = pd.to_numeric(tip.get('odds', ''), errors='coerce')
+        stake_raw = pd.to_numeric(tip.get('stake', ''), errors='coerce')
+        bookie    = str(tip.get('bookmaker', '') or '')
+        bet_parts = []
+        if not pd.isna(line_raw):
+            bet_parts.append(f"O/U {line_raw:.1f}")
+        if not pd.isna(odds_raw) and odds_raw > 1:
+            bet_parts.append(f"@ {odds_raw:.2f}")
+        if bookie:
+            bet_parts.append(f"({bookie})")
+        if not pd.isna(stake_raw) and stake_raw > 0:
+            bet_parts.append(f"— {stake_raw:.2f}u")
+        bet_detail = '&nbsp;&nbsp;'.join(bet_parts)
+        card_col, btn_col = st.columns([3, 2])
+        with card_col:
+            st.markdown(
+                f'<div style="background:var(--surface);border:1px solid var(--line);border-radius:10px;'
+                f'padding:12px 16px;margin-bottom:4px">'
+                f'<div style="display:flex;align-items:center;gap:0;margin-bottom:4px">'
+                f'<span style="font-weight:700;color:var(--text);font-size:14px">{player}</span>'
+                f'<span class="{badge_class}">{label_badge}</span></div>'
+                f'<div style="font-size:12px;color:var(--muted);margin-bottom:2px">{gkey}'
+                f'&nbsp;&nbsp;·&nbsp;&nbsp;{mtype}</div>'
+                + (f'<div style="font-size:12px;font-family:DM Mono,monospace;color:#f0b429">'
+                   f'{bet_detail}</div>' if bet_detail else '')
+                + f'</div>',
+                unsafe_allow_html=True,
+            )
+        if editable:
+            with btn_col:
+                b1, b2, b3, b4 = st.columns(4)
+                with b1:
+                    if st.button('✅ Win', key=f'tip_win_{tip_id}', use_container_width=True):
+                        _save_tip_result(tip_id, 'Win')
+                        st.toast('Tip settled as Win — synced to Bet History', icon='✅')
+                        st.rerun()
+                with b2:
+                    if st.button('❌ Loss', key=f'tip_loss_{tip_id}', use_container_width=True):
+                        _save_tip_result(tip_id, 'Loss')
+                        st.toast('Tip settled as Loss — synced to Bet History', icon='❌')
+                        st.rerun()
+                with b3:
+                    if st.button('↩️ Void', key=f'tip_void_{tip_id}', use_container_width=True):
+                        _save_tip_result(tip_id, 'Void/Refund')
+                        st.toast('Tip voided — synced to Bet History', icon='↩️')
+                        st.rerun()
+                with b4:
+                    if st.button('🗑', key=f'tip_del_{tip_id}', use_container_width=True,
+                                 help='Delete this tip'):
+                        _delete_tip(tip_id)
+                        st.toast('Tip deleted', icon='🗑')
+                        st.rerun()
+
     # ── Pending Tips (upcoming games) — surfaced at the very top ───────────────
     pending_tips = flagged_all[
         flagged_all['game_key'].isin(upcoming_keys) &
@@ -2122,6 +2182,16 @@ def render_cha_ching_tips():
                         _delete_tip(tip_id)
                         st.toast('Tip deleted', icon='🗑')
                         st.rerun()
+
+    # ── Pending Multis — surfaced at the top alongside Pending Tips ────────────
+    pending_multis = tips_df[
+        (tips_df['market_type'] == 'Multi') &
+        (tips_df['result'].fillna('') == '')
+    ].drop_duplicates(subset=['tip_id']).copy() if not tips_df.empty else pd.DataFrame()
+    if not pending_multis.empty:
+        st.markdown('<div class="section-header">Pending Multis</div>', unsafe_allow_html=True)
+        for _, tip in pending_multis.iterrows():
+            _render_tip_card(tip, label_badge='🎯 MULTI', badge_class='live-badge')
 
     # ── Historical CC bets ────────────────────────────────────────────────────
     cc_bets = _load_bets()
@@ -2298,66 +2368,7 @@ def render_cha_ching_tips():
         live_tips      = all_live[_ages.isna() | (_ages >= _cutoff)]
         unsettled_tips = all_live[_ages.notna() & (_ages < _cutoff)]
 
-        def _render_tip_card(tip, label_badge: str = '● LIVE', badge_class: str = 'live-badge'):
-            tip_id    = str(tip['tip_id'])
-            player    = str(tip.get('player', ''))
-            gkey      = str(tip.get('game_key', ''))
-            mtype     = str(tip.get('market_type', ''))
-            line_raw  = pd.to_numeric(tip.get('line', ''), errors='coerce')
-            odds_raw  = pd.to_numeric(tip.get('odds', ''), errors='coerce')
-            stake_raw = pd.to_numeric(tip.get('stake', ''), errors='coerce')
-            bookie    = str(tip.get('bookmaker', '') or '')
-            bet_parts = []
-            if not pd.isna(line_raw):
-                bet_parts.append(f"O/U {line_raw:.1f}")
-            if not pd.isna(odds_raw) and odds_raw > 1:
-                bet_parts.append(f"@ {odds_raw:.2f}")
-            if bookie:
-                bet_parts.append(f"({bookie})")
-            if not pd.isna(stake_raw) and stake_raw > 0:
-                bet_parts.append(f"— {stake_raw:.2f}u")
-            bet_detail = '&nbsp;&nbsp;'.join(bet_parts)
-            card_col, btn_col = st.columns([3, 2])
-            with card_col:
-                st.markdown(
-                    f'<div style="background:var(--surface);border:1px solid var(--line);border-radius:10px;'
-                    f'padding:12px 16px;margin-bottom:4px">'
-                    f'<div style="display:flex;align-items:center;gap:0;margin-bottom:4px">'
-                    f'<span style="font-weight:700;color:var(--text);font-size:14px">{player}</span>'
-                    f'<span class="{badge_class}">{label_badge}</span></div>'
-                    f'<div style="font-size:12px;color:var(--muted);margin-bottom:2px">{gkey}'
-                    f'&nbsp;&nbsp;·&nbsp;&nbsp;{mtype}</div>'
-                    + (f'<div style="font-size:12px;font-family:DM Mono,monospace;color:#f0b429">'
-                       f'{bet_detail}</div>' if bet_detail else '')
-                    + f'</div>',
-                    unsafe_allow_html=True,
-                )
-            if editable:
-                with btn_col:
-                    b1, b2, b3, b4 = st.columns(4)
-                    with b1:
-                        if st.button('✅ Win', key=f'tip_win_{tip_id}', use_container_width=True):
-                            _save_tip_result(tip_id, 'Win')
-                            st.toast('Tip settled as Win — synced to Bet History', icon='✅')
-                            st.rerun()
-                    with b2:
-                        if st.button('❌ Loss', key=f'tip_loss_{tip_id}', use_container_width=True):
-                            _save_tip_result(tip_id, 'Loss')
-                            st.toast('Tip settled as Loss — synced to Bet History', icon='❌')
-                            st.rerun()
-                    with b3:
-                        if st.button('↩️ Void', key=f'tip_void_{tip_id}', use_container_width=True):
-                            _save_tip_result(tip_id, 'Void/Refund')
-                            st.toast('Tip voided — synced to Bet History', icon='↩️')
-                            st.rerun()
-                    with b4:
-                        if st.button('🗑', key=f'tip_del_{tip_id}', use_container_width=True,
-                                     help='Delete this tip'):
-                            _delete_tip(tip_id)
-                            st.toast('Tip deleted', icon='🗑')
-                            st.rerun()
-
-        # ── Pending Tips render at the very top of the page (see above) ─────────
+        # ── Pending Tips + Pending Multis render at the very top (see above) ────
 
         # ── Live ──────────────────────────────────────────────────────────────
         if not live_tips.empty:
@@ -2416,16 +2427,7 @@ def render_cha_ching_tips():
                                 st.toast('Tip deleted', icon='🗑')
                                 st.rerun()
 
-        # ── Pending Multis ─────────────────────────────────────────────────────
-        pending_multis = tips_df[
-            (tips_df['market_type'] == 'Multi') &
-            (tips_df['result'].fillna('') == '')
-        ].drop_duplicates(subset=['tip_id']).copy() if not tips_df.empty else pd.DataFrame()
-        if not pending_multis.empty:
-            with st.expander(f"Pending Multis ({len(pending_multis)})", expanded=False):
-                st.markdown('<span class="cc-disc-marker" style="display:none"></span>', unsafe_allow_html=True)
-                for _, tip in pending_multis.iterrows():
-                    _render_tip_card(tip, label_badge='🎯 MULTI', badge_class='live-badge')
+        # ── Pending Multis render at the very top (see above) ───────────────────
 
     # ── Upcoming games ────────────────────────────────────────────────────────
     if fixtures.empty:
