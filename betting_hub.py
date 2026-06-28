@@ -2053,6 +2053,76 @@ def render_cha_ching_tips():
                     else:
                         st.error('Incorrect password')
 
+    # ── Load fixtures + tips once (Pending Tips renders up top; Live/Settled and
+    #    Upcoming Games render at the bottom from the same data) ────────────────
+    with st.spinner("Loading fixtures..."):
+        fixtures = _fetch_fixtures()
+    props_df = _load_props()
+    _now_utc = pd.Timestamp.now(tz='UTC')
+    upcoming_keys = set()
+    for _, _g in fixtures.iterrows():
+        _dp = _g.get('date_parsed')
+        if pd.notna(_dp) and pd.Timestamp(_dp) > _now_utc:
+            upcoming_keys.add(_game_key(_g))
+    tips_df = _load_tips()
+    if 'result' not in tips_df.columns:
+        tips_df['result'] = ''
+    flagged_all = tips_df[tips_df['is_flagged'] == True].copy() if not tips_df.empty else pd.DataFrame()
+    if not flagged_all.empty:
+        flagged_all['result'] = flagged_all['result'].fillna('')
+        flagged_all = flagged_all.drop_duplicates(subset=['tip_id'])
+
+    # ── Pending Tips (upcoming games) — surfaced at the very top ───────────────
+    pending_tips = flagged_all[
+        flagged_all['game_key'].isin(upcoming_keys) &
+        (flagged_all['market_type'].fillna('') != 'Multi')
+    ] if not flagged_all.empty else pd.DataFrame()
+    if not pending_tips.empty:
+        st.markdown('<div class="section-header">Pending Tips</div>', unsafe_allow_html=True)
+        for _, tip in pending_tips.iterrows():
+            tip_id    = str(tip['tip_id'])
+            player    = str(tip.get('player', ''))
+            gkey      = str(tip.get('game_key', ''))
+            mtype     = str(tip.get('market_type', ''))
+            line_raw  = pd.to_numeric(tip.get('line', ''), errors='coerce')
+            odds_raw  = pd.to_numeric(tip.get('odds', ''), errors='coerce')
+            stake_raw = pd.to_numeric(tip.get('stake', ''), errors='coerce')
+            bookie    = str(tip.get('bookmaker', '') or '')
+            bet_parts = []
+            if not pd.isna(line_raw):
+                bet_parts.append(f"O/U {line_raw:.1f}")
+            if not pd.isna(odds_raw) and odds_raw > 1:
+                bet_parts.append(f"@ {odds_raw:.2f}")
+            if bookie:
+                bet_parts.append(f"({bookie})")
+            if not pd.isna(stake_raw) and stake_raw > 0:
+                bet_parts.append(f"— {stake_raw:.2f}u")
+            bet_detail = '&nbsp;&nbsp;'.join(bet_parts)
+            card_col, btn_col = st.columns([3, 1])
+            with card_col:
+                st.markdown(
+                    f'<div style="background:var(--surface);border:1px solid var(--line);border-radius:10px;'
+                    f'padding:12px 16px;margin-bottom:4px">'
+                    f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
+                    f'<span style="font-weight:700;color:var(--text);font-size:14px">{player}</span>'
+                    f'<span style="font-size:10px;font-weight:700;background:{C["gold"]}22;'
+                    f'color:{C["gold"]};border:1px solid {C["gold"]}55;border-radius:4px;'
+                    f'padding:1px 6px;letter-spacing:0.5px">PENDING</span></div>'
+                    f'<div style="font-size:12px;color:var(--muted);margin-bottom:2px">'
+                    f'{gkey}&nbsp;&nbsp;·&nbsp;&nbsp;{mtype}</div>'
+                    + (f'<div style="font-size:12px;font-family:DM Mono,monospace;color:{C["gold"]}">'
+                       f'{bet_detail}</div>' if bet_detail else '')
+                    + '</div>',
+                    unsafe_allow_html=True,
+                )
+            if editable:
+                with btn_col:
+                    st.markdown('<div style="height:10px"></div>', unsafe_allow_html=True)
+                    if st.button('🗑 Delete', key=f'tip_del_{tip_id}', use_container_width=True):
+                        _delete_tip(tip_id)
+                        st.toast('Tip deleted', icon='🗑')
+                        st.rerun()
+
     # ── Historical CC bets ────────────────────────────────────────────────────
     cc_bets = _load_bets()
     cc_bets = cc_bets[cc_bets['is_cha_ching'] == True].copy()
@@ -2123,8 +2193,11 @@ def render_cha_ching_tips():
 
         # ── Bet history table (flush HTML; Market folded under Match; P&L only colour) ──
         if not cc_filt.empty:
+            _cc_total = len(cc_filt)
+            _cc_show_all = st.session_state.get('_cc_hist_show_all', False)
+            _view = cc_filt if _cc_show_all else cc_filt.head(20)  # latest 20 by default
             _rows_html = ''
-            for _, r in cc_filt.iterrows():
+            for _, r in _view.iterrows():
                 _dt = r['date'].strftime('%d %b %Y') if pd.notna(r.get('date')) else '—'
                 _match = str(r.get('match', '') or '')
                 _market = str(r.get('market_type', '') or '')
@@ -2164,31 +2237,22 @@ def render_cha_ching_tips():
                 '</tr></thead><tbody>' + _rows_html + '</tbody></table>',
                 unsafe_allow_html=True,
             )
+            if _cc_total > 20:
+                _mt1, _ = st.columns([2, 5])
+                with _mt1:
+                    st.markdown('<span class="cc-manuallink-marker" style="display:none"></span>',
+                                unsafe_allow_html=True)
+                    _more_lbl = "Show latest 20" if _cc_show_all else f"Show all ({_cc_total})"
+                    if st.button(_more_lbl, key='_cc_hist_toggle', use_container_width=True):
+                        st.session_state['_cc_hist_show_all'] = not _cc_show_all
+                        st.rerun()
         else:
             st.markdown('<div class="cc-empty">No Cha Ching bets match the current filters.</div>',
                         unsafe_allow_html=True)
 
         st.divider()
 
-    # ── Fixture fetch ─────────────────────────────────────────────────────────
-    with st.spinner("Loading fixtures..."):
-        fixtures = _fetch_fixtures()
-
-    props_df = _load_props()
-
-    # Re-evaluate against current time — fixtures may be cached up to 24h old,
-    # so a game that was upcoming at cache time may have since kicked off.
-    _now_utc = pd.Timestamp.now(tz='UTC')
-    upcoming_keys = set()
-    for _, _g in fixtures.iterrows():
-        _dp = _g.get('date_parsed')
-        if pd.notna(_dp) and pd.Timestamp(_dp) > _now_utc:
-            upcoming_keys.add(_game_key(_g))
-
-    # ── Pending/flagged tips banner (upcoming only) ───────────────────────────
-    tips_df  = _load_tips()
-    if 'result' not in tips_df.columns:
-        tips_df['result'] = ''
+    # ── Flagged-tips banner (upcoming only); fixtures/tips already loaded above ─
     flagged  = tips_df[
         (tips_df['is_flagged'] == True) &
         (tips_df['game_key'].isin(upcoming_keys))
@@ -2221,14 +2285,10 @@ def render_cha_ching_tips():
                     st.session_state['_cc_manual_add_open'] = \
                         not st.session_state.get('_cc_manual_add_open', False)
 
-    # ── Live & Settled flagged tips ───────────────────────────────────────────
-    flagged_all = tips_df[tips_df['is_flagged'] == True].copy() if not tips_df.empty else pd.DataFrame()
-
+    # ── Live & Settled flagged tips (flagged_all already computed up top) ──────
     if flagged_all.empty:
         st.caption("No Cha Ching tips flagged yet — use the checklist in Upcoming Games below to create one.")
     else:
-        flagged_all['result'] = flagged_all['result'].fillna('')
-        flagged_all = flagged_all.drop_duplicates(subset=['tip_id'])
         all_live     = flagged_all[~flagged_all['game_key'].isin(upcoming_keys) & (flagged_all['result'] == '') & (flagged_all['market_type'].fillna('') != 'Multi')]
         settled_tips = flagged_all[~flagged_all['game_key'].isin(upcoming_keys) & (flagged_all['result'] != '')]
 
@@ -2297,56 +2357,7 @@ def render_cha_ching_tips():
                             st.toast('Tip deleted', icon='🗑')
                             st.rerun()
 
-        # ── Pending (upcoming games) ───────────────────────────────────────────
-        pending_tips = flagged_all[
-            flagged_all['game_key'].isin(upcoming_keys) &
-            (flagged_all['market_type'].fillna('') != 'Multi')
-        ]
-        if not pending_tips.empty:
-            st.markdown('<div class="section-header">Pending Tips</div>', unsafe_allow_html=True)
-            for _, tip in pending_tips.iterrows():
-                tip_id    = str(tip['tip_id'])
-                player    = str(tip.get('player', ''))
-                gkey      = str(tip.get('game_key', ''))
-                mtype     = str(tip.get('market_type', ''))
-                line_raw  = pd.to_numeric(tip.get('line', ''), errors='coerce')
-                odds_raw  = pd.to_numeric(tip.get('odds', ''), errors='coerce')
-                stake_raw = pd.to_numeric(tip.get('stake', ''), errors='coerce')
-                bookie    = str(tip.get('bookmaker', '') or '')
-                bet_parts = []
-                if not pd.isna(line_raw):
-                    bet_parts.append(f"O/U {line_raw:.1f}")
-                if not pd.isna(odds_raw) and odds_raw > 1:
-                    bet_parts.append(f"@ {odds_raw:.2f}")
-                if bookie:
-                    bet_parts.append(f"({bookie})")
-                if not pd.isna(stake_raw) and stake_raw > 0:
-                    bet_parts.append(f"— {stake_raw:.2f}u")
-                bet_detail = '&nbsp;&nbsp;'.join(bet_parts)
-                card_col, btn_col = st.columns([3, 1])
-                with card_col:
-                    st.markdown(
-                        f'<div style="background:var(--surface);border:1px solid var(--line);border-radius:10px;'
-                        f'padding:12px 16px;margin-bottom:4px">'
-                        f'<div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">'
-                        f'<span style="font-weight:700;color:var(--text);font-size:14px">{player}</span>'
-                        f'<span style="font-size:10px;font-weight:700;background:{C["gold"]}22;'
-                        f'color:{C["gold"]};border:1px solid {C["gold"]}55;border-radius:4px;'
-                        f'padding:1px 6px;letter-spacing:0.5px">PENDING</span></div>'
-                        f'<div style="font-size:12px;color:var(--muted);margin-bottom:2px">'
-                        f'{gkey}&nbsp;&nbsp;·&nbsp;&nbsp;{mtype}</div>'
-                        + (f'<div style="font-size:12px;font-family:DM Mono,monospace;color:{C["gold"]}">'
-                           f'{bet_detail}</div>' if bet_detail else '')
-                        + '</div>',
-                        unsafe_allow_html=True,
-                    )
-                if editable:
-                    with btn_col:
-                        st.markdown('<div style="height:10px"></div>', unsafe_allow_html=True)
-                        if st.button('🗑 Delete', key=f'tip_del_{tip_id}', use_container_width=True):
-                            _delete_tip(tip_id)
-                            st.toast('Tip deleted', icon='🗑')
-                            st.rerun()
+        # ── Pending Tips render at the very top of the page (see above) ─────────
 
         # ── Live ──────────────────────────────────────────────────────────────
         if not live_tips.empty:
