@@ -1587,15 +1587,15 @@ if st.session_state.page != 'Landing':
     render_banner()
 
 _NAV_BROWNLOW = {
-    "Overview": ["Home", "Leaderboard", "Live Tracker"],
+    "Overview": ["Leaderboard", "Live Tracker"],
     "Players":  ["Player Profile", "Player Comparison"],
     "Analysis": ["Stat Filter", "Game Analysis", "Model Comparison"],
 }
 _NAV_BETTING = {
-    "BH Overview":  ["BH Dashboard", "Brownlow Betting", "Bet Tracker"],
+    "BH Overview":  ["BH Dashboard", "Home", "Bet Tracker"],
     "BH Strategy":  ["Cha Ching Tips", "Trends & Analysis", "Polls a Vote"],
 }
-_BH_PAGES = {'BH Dashboard', 'Brownlow Betting', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis', 'Polls a Vote'}
+_BH_PAGES = {'BH Dashboard', 'Home', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis', 'Polls a Vote'}
 
 def _nav_select(cat_key):
     val = st.session_state.get(cat_key)
@@ -1615,7 +1615,6 @@ _PAGE_ICONS = {
     "Game Analysis":    "ti-chart-dots",
     "Model Comparison": "ti-chart-bar",
     "Live Tracker":     "ti-live-photo",
-    "Brownlow Betting": "ti-currency-dollar",
     "BH Dashboard":     "ti-layout-dashboard",
     "Bet Tracker":      "ti-list-check",
     "Cha Ching Tips":   "ti-bulb",
@@ -1625,12 +1624,12 @@ _PAGE_ICONS = {
 
 if _hub == "brownlow":
     _snav_pages = [
-        "Home", "Leaderboard", "Player Profile", "Player Comparison",
+        "Leaderboard", "Player Profile", "Player Comparison",
         "Stat Filter", "Game Analysis",
         "Model Comparison", "Live Tracker",
     ]
 else:
-    _snav_pages = ["BH Dashboard", "Brownlow Betting", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis", "Polls a Vote"]
+    _snav_pages = ["BH Dashboard", "Home", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis", "Polls a Vote"]
 
 # ── Nav CSS (injected once before containers) ─────────────────
 st.markdown("""
@@ -2115,7 +2114,7 @@ def _render_hub_tabs():
                          type="primary" if _hub == "brownlow" else "secondary"):
                 st.session_state["active_hub"] = "brownlow"
                 if st.session_state.page in _BH_PAGES:
-                    st.session_state.page = "Home"
+                    st.session_state.page = "Leaderboard"
                 st.rerun()
         with _hc2:
             if st.button("Betting Hub", key="pill_betting",
@@ -2506,37 +2505,45 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
 # ════════════════════════════════════════════════════════════
 # BETTING HUB pages
 # ════════════════════════════════════════════════════════════
-elif _page in _BH_PAGES and _page != 'Brownlow Betting':
+elif _page in _BH_PAGES and _page != 'Home':
     betting_hub.render_page(_page)
 
 # ════════════════════════════════════════════════════════════
 # HOME (Brownlow overview)
 # ════════════════════════════════════════════════════════════
 if _page == 'Home':
-    SEASON = 2026
-    CURRENT_ROUND = max_season_rounds - 1
+    st.markdown(
+        '<div class="title-bar"><h2 style="color:#e9eef3;margin:0">Home</h2>'
+        '<p style="color:var(--muted);margin:4px 0 0 0">2026 season overview · value finder</p></div>',
+        unsafe_allow_html=True,
+    )
+    _home_tab, _vf_tab = st.tabs(["Home", "Value Finder"])
 
-    df = load_season(SEASON)
-    odds_df = load_best_odds()
+    with _home_tab:
+        SEASON = 2026
+        CURRENT_ROUND = max_season_rounds - 1
 
-    if df is not None and not df.empty:
-        top5 = (
-            df.groupby("Player_Name")["Exp_Total_Votes"]
-            .sum()
-            .reset_index()
-            .sort_values("Exp_Total_Votes", ascending=False)
-            .head(10)
-        )
-    else:
-        top5 = pd.DataFrame(columns=["Player_Name", "Exp_Total_Votes"])
+        df = load_season(SEASON)
+        odds_df = load_best_odds()
 
-    leader_name  = top5.iloc[0]["Player_Name"] if len(top5) else "—"
-    leader_votes = top5.iloc[0]["Exp_Total_Votes"] if len(top5) else 0
+        if df is not None and not df.empty:
+            top5 = (
+                df.groupby("Player_Name")["Exp_Total_Votes"]
+                .sum()
+                .reset_index()
+                .sort_values("Exp_Total_Votes", ascending=False)
+                .head(10)
+            )
+        else:
+            top5 = pd.DataFrame(columns=["Player_Name", "Exp_Total_Votes"])
 
-    rounds_remaining = 24 - CURRENT_ROUND
-    season_pct = int((CURRENT_ROUND / 24) * 100)
+        leader_name  = top5.iloc[0]["Player_Name"] if len(top5) else "—"
+        leader_votes = top5.iloc[0]["Exp_Total_Votes"] if len(top5) else 0
 
-    st.markdown(f"""
+        rounds_remaining = 24 - CURRENT_ROUND
+        season_pct = int((CURRENT_ROUND / 24) * 100)
+
+        st.markdown(f"""
 <div style="padding:20px 0 12px;animation:fadeSlideUp 500ms cubic-bezier(0.23,1,0.32,1) both;">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
     <div style="width:7px;height:7px;border-radius:50%;background:var(--emerald);
@@ -2559,7 +2566,7 @@ if _page == 'Home':
 </div>
 """, unsafe_allow_html=True)
 
-    st.markdown(f"""
+        st.markdown(f"""
 <div style="margin-bottom:18px;animation:fadeSlideUp 500ms 80ms cubic-bezier(0.23,1,0.32,1) both;">
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
     <span style="font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;
@@ -2574,29 +2581,29 @@ if _page == 'Home':
 </div>
 """, unsafe_allow_html=True)
 
-    # ── Shared lookups (best odds, market rank, team) ──
-    _team_map = {}
-    if df is not None and not df.empty and "Team" in df.columns:
-        _team_map = dict(zip(df["Player_Name"], df["Team"]))
+        # ── Shared lookups (best odds, market rank, team) ──
+        _team_map = {}
+        if df is not None and not df.empty and "Team" in df.columns:
+            _team_map = dict(zip(df["Player_Name"], df["Team"]))
 
-    _odds_best_map, _odds_bookie_map, _market_rank = {}, {}, {}
-    if (odds_df is not None and not odds_df.empty
-            and "player" in odds_df.columns and "best_odds" in odds_df.columns):
-        _od = (odds_df.dropna(subset=["best_odds"])
-                      .sort_values("best_odds", ascending=True)
-                      .reset_index(drop=True))
-        for _mr, _orow in _od.iterrows():
-            _pl = _orow["player"]
-            _odds_best_map[_pl] = float(_orow["best_odds"])
-            _bk = _orow.get("best_bookie")
-            _odds_bookie_map[_pl] = str(_bk) if pd.notna(_bk) else ""
-            _market_rank[_pl] = int(_mr) + 1
+        _odds_best_map, _odds_bookie_map, _market_rank = {}, {}, {}
+        if (odds_df is not None and not odds_df.empty
+                and "player" in odds_df.columns and "best_odds" in odds_df.columns):
+            _od = (odds_df.dropna(subset=["best_odds"])
+                          .sort_values("best_odds", ascending=True)
+                          .reset_index(drop=True))
+            for _mr, _orow in _od.iterrows():
+                _pl = _orow["player"]
+                _odds_best_map[_pl] = float(_orow["best_odds"])
+                _bk = _orow.get("best_bookie")
+                _odds_bookie_map[_pl] = str(_bk) if pd.notna(_bk) else ""
+                _market_rank[_pl] = int(_mr) + 1
 
-    leader_team = str(_team_map.get(leader_name, "")) if leader_name != "—" else ""
-    leader_odds = f"${_odds_best_map[leader_name]:.2f}" if leader_name in _odds_best_map else "—"
+        leader_team = str(_team_map.get(leader_name, "")) if leader_name != "—" else ""
+        leader_odds = f"${_odds_best_map[leader_name]:.2f}" if leader_name in _odds_best_map else "—"
 
-    # ── PART 1: hero winner + supporting metadata strip ──
-    _HOME_HERO_CSS = """
+        # ── PART 1: hero winner + supporting metadata strip ──
+        _HOME_HERO_CSS = """
 .home-hero{font-family:'Archivo',sans-serif;margin:6px 0 0 0;animation:fadeSlideUp 500ms 140ms cubic-bezier(0.23,1,0.32,1) both;}
 .home-hero .hh-row{display:flex;align-items:flex-start;justify-content:space-between;gap:32px;flex-wrap:wrap;}
 .home-hero .hh-main{flex:1 1 320px;min-width:260px;}
@@ -2611,25 +2618,25 @@ if _page == 'Home':
 .home-hero .hh-stat-lab{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);margin-top:9px;}
 .home-hero .hh-rule{height:1px;background:var(--line);margin:26px 0 0 0;}
 """
-    st.markdown(
-        f"<style>{_HOME_HERO_CSS}</style>"
-        '<div class="home-hero"><div class="hh-row">'
-        '<div class="hh-main">'
-        '<div class="hh-overline">★ Predicted Winner</div>'
-        f'<div class="hh-name">{leader_name}</div>'
-        f'<div class="hh-meta">{leader_team} · <b>{leader_votes:.1f}</b> projected votes · <b>{leader_odds}</b> to win</div>'
-        '</div>'
-        '<div class="hh-strip">'
-        '<div class="hh-stat"><div class="hh-stat-val">86%</div><div class="hh-stat-lab">Top-10 acc.</div></div>'
-        '<div class="hh-stat"><div class="hh-stat-val">0.09</div><div class="hh-stat-lab">MAE</div></div>'
-        f'<div class="hh-stat"><div class="hh-stat-val">{rounds_remaining}</div><div class="hh-stat-lab">Rounds left</div></div>'
-        '</div>'
-        '</div><div class="hh-rule"></div></div>',
-        unsafe_allow_html=True,
-    )
+        st.markdown(
+            f"<style>{_HOME_HERO_CSS}</style>"
+            '<div class="home-hero"><div class="hh-row">'
+            '<div class="hh-main">'
+            '<div class="hh-overline">★ Predicted Winner</div>'
+            f'<div class="hh-name">{leader_name}</div>'
+            f'<div class="hh-meta">{leader_team} · <b>{leader_votes:.1f}</b> projected votes · <b>{leader_odds}</b> to win</div>'
+            '</div>'
+            '<div class="hh-strip">'
+            '<div class="hh-stat"><div class="hh-stat-val">86%</div><div class="hh-stat-lab">Top-10 acc.</div></div>'
+            '<div class="hh-stat"><div class="hh-stat-val">0.09</div><div class="hh-stat-lab">MAE</div></div>'
+            f'<div class="hh-stat"><div class="hh-stat-val">{rounds_remaining}</div><div class="hh-stat-lab">Rounds left</div></div>'
+            '</div>'
+            '</div><div class="hh-rule"></div></div>',
+            unsafe_allow_html=True,
+        )
 
-    # ── PART 2: Model vs Market panel ──
-    _HOME_MM_CSS = """
+        # ── PART 2: Model vs Market panel ──
+        _HOME_MM_CSS = """
 .home-mm{font-family:'Archivo',sans-serif;margin:22px 0 0 0;animation:fadeSlideUp 500ms 220ms cubic-bezier(0.23,1,0.32,1) both;}
 .home-mm .mm-title{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);margin-bottom:14px;}
 .home-mm .mm-grid{--mm-cols:34px 1fr 230px 116px 132px;}
@@ -2655,86 +2662,86 @@ if _page == 'Home':
 .home-mm .mm-chip.flat{background:rgba(159,176,191,.12);color:var(--muted);}
 .home-mm .mm-foot{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);margin-top:14px;line-height:1.7;letter-spacing:.02em;}
 """
-    if not top5.empty:
-        _mm_max = top5["Exp_Total_Votes"].max()
-        _mm_rows = []
-        for _rank, (_, _row) in enumerate(top5.iterrows(), start=1):
-            _pname = _row["Player_Name"]
-            _proj = float(_row["Exp_Total_Votes"])
-            _pct = (_proj / _mm_max * 100) if _mm_max > 0 else 0
-            _fill = "var(--emerald)" if _rank <= 3 else "var(--emerald-pack)"
-            _team = str(_team_map.get(_pname, ""))
-            _team_html = f'<span class="mm-team">{_team}</span>' if _team else ""
+        if not top5.empty:
+            _mm_max = top5["Exp_Total_Votes"].max()
+            _mm_rows = []
+            for _rank, (_, _row) in enumerate(top5.iterrows(), start=1):
+                _pname = _row["Player_Name"]
+                _proj = float(_row["Exp_Total_Votes"])
+                _pct = (_proj / _mm_max * 100) if _mm_max > 0 else 0
+                _fill = "var(--emerald)" if _rank <= 3 else "var(--emerald-pack)"
+                _team = str(_team_map.get(_pname, ""))
+                _team_html = f'<span class="mm-team">{_team}</span>' if _team else ""
 
-            # odds cell
-            if _pname in _odds_best_map:
-                _bk = _odds_bookie_map.get(_pname, "")
-                _bk_html = f'<span class="mm-obk">{_bk}</span>' if _bk else ""
-                _odds_html = (f'<div class="mm-odds"><span class="mm-oval">'
-                              f'${_odds_best_map[_pname]:.2f}</span>{_bk_html}</div>')
-            else:
-                _odds_html = '<div class="mm-dash">—</div>'
-
-            # edge chip: market_rank − model_rank
-            if _pname in _market_rank:
-                _edge = _market_rank[_pname] - _rank
-                if _edge >= 2:
-                    _chip = f'<span class="mm-chip up">▲ +{_edge} value</span>'
-                elif _edge <= -2:
-                    _chip = '<span class="mm-chip flat">▼ market</span>'
+                # odds cell
+                if _pname in _odds_best_map:
+                    _bk = _odds_bookie_map.get(_pname, "")
+                    _bk_html = f'<span class="mm-obk">{_bk}</span>' if _bk else ""
+                    _odds_html = (f'<div class="mm-odds"><span class="mm-oval">'
+                                  f'${_odds_best_map[_pname]:.2f}</span>{_bk_html}</div>')
                 else:
-                    _chip = '<span class="mm-chip flat">in line</span>'
-            else:
-                _chip = ""  # no odds → skip edge chip
+                    _odds_html = '<div class="mm-dash">—</div>'
 
-            _mm_rows.append(
-                '<div class="mm-row">'
-                f'<div class="mm-rank">{_rank}</div>'
-                f'<div class="mm-player"><span class="mm-name">{_pname}</span>{_team_html}</div>'
-                '<div class="mm-votes"><div class="mm-track">'
-                f'<div class="mm-fill" style="width:{_pct:.1f}%;background:{_fill};"></div></div>'
-                f'<span class="mm-vval">{_proj:.1f}</span></div>'
-                f'{_odds_html}'
-                f'<div class="mm-edge">{_chip}</div>'
+                # edge chip: market_rank − model_rank
+                if _pname in _market_rank:
+                    _edge = _market_rank[_pname] - _rank
+                    if _edge >= 2:
+                        _chip = f'<span class="mm-chip up">▲ +{_edge} value</span>'
+                    elif _edge <= -2:
+                        _chip = '<span class="mm-chip flat">▼ market</span>'
+                    else:
+                        _chip = '<span class="mm-chip flat">in line</span>'
+                else:
+                    _chip = ""  # no odds → skip edge chip
+
+                _mm_rows.append(
+                    '<div class="mm-row">'
+                    f'<div class="mm-rank">{_rank}</div>'
+                    f'<div class="mm-player"><span class="mm-name">{_pname}</span>{_team_html}</div>'
+                    '<div class="mm-votes"><div class="mm-track">'
+                    f'<div class="mm-fill" style="width:{_pct:.1f}%;background:{_fill};"></div></div>'
+                    f'<span class="mm-vval">{_proj:.1f}</span></div>'
+                    f'{_odds_html}'
+                    f'<div class="mm-edge">{_chip}</div>'
+                    '</div>'
+                )
+            st.markdown(
+                f"<style>{_HOME_MM_CSS}</style>"
+                '<div class="home-mm">'
+                '<div class="mm-title">Model vs Market — Top 10</div>'
+                '<div class="mm-grid">'
+                '<div class="mm-head">'
+                '<span style="text-align:center;">#</span><span>Player</span>'
+                '<span>Projected Votes</span><span class="r">Best Odds</span><span>Model Edge</span>'
                 '</div>'
+                + "".join(_mm_rows)
+                + '</div>'
+                '<div class="mm-foot">'
+                '▲ value — model rates higher than the market (potentially underpriced) &nbsp;·&nbsp; '
+                '▼ market — market rates shorter than the model &nbsp;·&nbsp; '
+                'in line — model and market agree'
+                '</div></div>',
+                unsafe_allow_html=True,
             )
-        st.markdown(
-            f"<style>{_HOME_MM_CSS}</style>"
-            '<div class="home-mm">'
-            '<div class="mm-title">Model vs Market — Top 10</div>'
-            '<div class="mm-grid">'
-            '<div class="mm-head">'
-            '<span style="text-align:center;">#</span><span>Player</span>'
-            '<span>Projected Votes</span><span class="r">Best Odds</span><span>Model Edge</span>'
-            '</div>'
-            + "".join(_mm_rows)
-            + '</div>'
-            '<div class="mm-foot">'
-            '▲ value — model rates higher than the market (potentially underpriced) &nbsp;·&nbsp; '
-            '▼ market — market rates shorter than the model &nbsp;·&nbsp; '
-            'in line — model and market agree'
-            '</div></div>',
-            unsafe_allow_html=True,
-        )
 
-    st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:16px'></div>", unsafe_allow_html=True)
 
-    st.markdown("""
+        st.markdown("""
 <div style="font-size:11px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;
             color:#4a5a6a;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:14px;">
   Quick navigation
 </div>""", unsafe_allow_html=True)
 
-    nav_items = [
-        ("📊", "Leaderboard",    "Full season rankings",  "#34d399"),
-        ("👤", "Player Profile", "Deep dive any player",  "#4a90c4"),
-        ("💰", "Value Finder",   "Model vs market odds",  "#f0b429"),
-        ("🎯", "Cha Ching Tips", "Curated betting tips",  "#e05252"),
-    ]
-    cols = st.columns(4)
-    for col, (icon, title, desc, color) in zip(cols, nav_items):
-        with col:
-            st.markdown(f"""
+        nav_items = [
+            ("📊", "Leaderboard",    "Full season rankings",  "#34d399"),
+            ("👤", "Player Profile", "Deep dive any player",  "#4a90c4"),
+            ("💰", "Value Finder",   "Model vs market odds",  "#f0b429"),
+            ("🎯", "Cha Ching Tips", "Curated betting tips",  "#e05252"),
+        ]
+        cols = st.columns(4)
+        for col, (icon, title, desc, color) in zip(cols, nav_items):
+            with col:
+                st.markdown(f"""
 <div style="background:var(--surface);border:1px solid var(--line);border-radius:10px;
             padding:14px 16px;
             animation:fadeSlideUp 400ms 380ms cubic-bezier(0.23,1,0.32,1) both;
@@ -2746,6 +2753,75 @@ if _page == 'Home':
               font-family:'Sora',sans-serif;">{title}</div>
   <div style="font-size:11px;color:#4a5a6a;">{desc}</div>
 </div>""", unsafe_allow_html=True)
+
+    with _vf_tab:
+        top30_vf = predictions.head(30).copy()
+        top30_vf['Model_Win_Prob'] = (top30_vf['Exp_Total_Votes'] / top30_vf['Exp_Total_Votes'].sum() * 100).round(1)
+        scraped_odds = load_best_odds()
+
+        if scraped_odds is not None and len(scraped_odds) > 0:
+            st.success(f"{len(scraped_odds)} odds loaded from bookmakers")
+            vtab1, vtab2 = st.tabs(["Auto Odds", "Manual Entry"])
+        else:
+            st.info("No scraped odds. Enter manually below.")
+            vtab1, vtab2 = None, st.container()
+
+        odds_data = []
+        if vtab1 is not None:
+            with vtab1:
+                merged = top30_vf.merge(scraped_odds, left_on='Player_Name', right_on='player', how='left')
+                merged['Bookie_Odds'] = merged['best_odds'].fillna(999)
+                merged['Implied %'] = (100 / merged['Bookie_Odds']).round(1)
+                merged['Edge %'] = (merged['Model_Win_Prob'] - merged['Implied %']).round(1)
+                merged['Flag'] = merged['Edge %'].apply(
+                    lambda e: 'Strong Value' if e > 5 else ('Value' if e > 2 else ('Watch' if e > 0 else 'Lay'))
+                )
+                merged = merged.sort_values('Edge %', ascending=False)
+                _vf_disp = merged[['Player_Name', 'Team', 'Model_Win_Prob', 'Bookie_Odds', 'Implied %', 'Edge %', 'Flag']].rename(
+                    columns={'Player_Name': 'Player', 'Model_Win_Prob': 'Model %', 'Bookie_Odds': 'Best Odds'})
+                for col in _vf_disp.select_dtypes(include='float').columns:
+                    _vf_disp[col] = _vf_disp[col].round(1)
+                st.dataframe(_style_table(_vf_disp), width='stretch', hide_index=True)
+                value_plays = merged[merged['Edge %'] > 2]
+                if not value_plays.empty:
+                    st.markdown('<div class="section-header">Value Plays</div>', unsafe_allow_html=True)
+                    for _, row in value_plays.iterrows():
+                        st.success(f"**{row['Player_Name']}** — Model: {row['Model_Win_Prob']:.1f}% | Bookie: {row['Implied %']:.1f}% | Edge: +{row['Edge %']:.1f}% | Odds: ${row['Bookie_Odds']:.1f}")
+
+        manual_container = vtab2 if vtab1 is not None else vtab2
+        with manual_container:
+            st.markdown("Enter decimal odds for each player:")
+            mcols = st.columns(3)
+            for i, (_, row) in enumerate(top30_vf.iterrows()):
+                with mcols[i % 3]:
+                    default = float(max(2.0, round(100 / max(row['Model_Win_Prob'], 0.5), 1)))
+                    odds = st.number_input(
+                        f"{row['Player_Name']} ({row['Team']})",
+                        min_value=1.01, max_value=1001.0, value=default, step=0.5,
+                        key=f"be_odds_{i}",
+                    )
+                    odds_data.append({
+                        'Player': row['Player_Name'], 'Team': row['Team'],
+                        'Exp Votes': round(row['Exp_Total_Votes'], 1),
+                        'Model %': row['Model_Win_Prob'],
+                        'Odds': odds, 'Implied %': round(100 / odds, 1),
+                    })
+            if odds_data:
+                odf = pd.DataFrame(odds_data)
+                odf['Edge %'] = (odf['Model %'] - odf['Implied %']).round(1)
+                odf['Flag'] = odf['Edge %'].apply(
+                    lambda e: 'Strong Value' if e > 5 else ('Value' if e > 2 else ('Watch' if e > 0 else 'Lay'))
+                )
+                odf = odf.sort_values('Edge %', ascending=False)
+                st.markdown('<div class="section-header">EV Analysis</div>', unsafe_allow_html=True)
+                for col in odf.select_dtypes(include='float').columns:
+                    odf[col] = odf[col].round(1)
+                st.dataframe(_style_table(odf), width='stretch', hide_index=True)
+                value = odf[odf['Edge %'] > 2]
+                if not value.empty:
+                    st.markdown('<div class="section-header">Value Plays</div>', unsafe_allow_html=True)
+                    for _, row in value.iterrows():
+                        st.success(f"**{row['Player']}** — Model: {row['Model %']:.1f}% | Bookie: {row['Implied %']:.1f}% | Edge: +{row['Edge %']:.1f}%")
 
 # ════════════════════════════════════════════════════════════
 # LEADERBOARD
@@ -3979,161 +4055,6 @@ if _page == 'Game Analysis':
             margin=dict(t=20, b=120),
         )
         st.plotly_chart(fig5, width='stretch', key="ga_pp_fig5")
-
-# ════════════════════════════════════════════════════════════
-# BETTING EDGE
-# ════════════════════════════════════════════════════════════
-if _page == 'Brownlow Betting':
-    st.markdown(
-        f'<div class="title-bar"><h2 style="color:#e9eef3;margin:0">Brownlow Betting — {selected_season}</h2>'
-        f'<p style="color:var(--muted);margin:4px 0 0 0">Season projection with floor/ceiling · EV analysis against bookmaker odds</p></div>',
-        unsafe_allow_html=True,
-    )
-    _be_sp_tab, _be_vf_tab = st.tabs(["Season Projection", "Value Finder"])
-
-    with _be_sp_tab:
-        proj = load_season_projection()
-        if proj is None:
-            st.error("No season projection found. Run predict_2026.py first.")
-        else:
-            _be_rounds_played = max_season_rounds
-            _be_total_rounds = 24
-            _be_remaining = _be_total_rounds - _be_rounds_played
-            # Leader from season_2026.csv — matches leaderboard
-            if predictions is not None and not predictions.empty:
-                _be_lead_row = predictions.sort_values('Exp_Total_Votes', ascending=False).iloc[0]
-                _be_leader_name = _be_lead_row['Player_Name']
-                _be_leader_votes = _be_lead_row['Exp_Total_Votes']
-                _be_leader_avg = _be_lead_row['Exp_Total_Votes'] / max(_be_lead_row['Games'], 1)
-            else:
-                _be_leader_name, _be_leader_votes, _be_leader_avg = '—', 0.0, 0.0
-
-            c1, c2, c3, c4 = st.columns(4)
-            with c1: st.markdown(f'<div class="metric-card"><div class="metric-label">Rounds Played</div><div class="metric-value">{_be_rounds_played - 1}</div><div class="metric-sub">of {_be_total_rounds - 1} H&A rounds</div></div>', unsafe_allow_html=True)
-            with c2: st.markdown(f'<div class="metric-card"><div class="metric-label">Remaining Rounds</div><div class="metric-value">{_be_remaining + 1}</div><div class="metric-sub">to be projected</div></div>', unsafe_allow_html=True)
-            with c3: st.markdown(f'<div class="metric-card"><div class="metric-label">Projected Leader</div><div class="metric-value">{_be_leader_name}</div><div class="metric-sub">{_be_leader_votes:.1f} projected votes</div></div>', unsafe_allow_html=True)
-            with c4: st.markdown(f'<div class="metric-card"><div class="metric-label">Avg Per Game (Leader)</div><div class="metric-value">{_be_leader_avg:.2f}</div><div class="metric-sub">expected votes per game</div></div>', unsafe_allow_html=True)
-
-            st.markdown('<div class="section-header">Top 30 — Projected Season Total</div>', unsafe_allow_html=True)
-            top30_sp = proj.head(30).copy()
-            top30_sp['Exp_Total_Votes'] = (top30_sp['Avg_Predicted_Per_Game'] * top30_sp['Games_Played']).round(1)
-            err_upper = (top30_sp['Ceiling_Projection'] - top30_sp['Exp_Total_Votes']).clip(lower=0)
-            err_lower = (top30_sp['Exp_Total_Votes'] - top30_sp['Floor_Projection']).clip(lower=0)
-
-            fig_proj = go.Figure()
-            fig_proj.add_trace(go.Bar(
-                name='Expected (played rounds)', x=top30_sp['Player'], y=top30_sp['Exp_Total_Votes'],
-                marker_color='#34d399', opacity=0.9,
-                error_y=dict(type='data', array=err_upper.tolist(), arrayminus=err_lower.tolist(),
-                             visible=True, color='rgba(148,163,184,0.6)', thickness=1.5, width=4),
-                hovertemplate='<b>%{x}</b><br>Expected so far: %{y:.1f}<br>'
-                              'Floor: ' + top30_sp['Floor_Projection'].round(1).astype(str) + '<br>'
-                              'Ceiling: ' + top30_sp['Ceiling_Projection'].round(1).astype(str) + '<extra></extra>',
-            ))
-            fig_proj.add_trace(go.Bar(
-                name='Projected Remaining', x=top30_sp['Player'], y=top30_sp['Projected_Remaining'],
-                marker_color='#64748b', opacity=0.85,
-                hovertemplate='<b>%{x}</b><br>Projected remaining: %{y:.1f}<extra></extra>',
-            ))
-            fig_proj.update_layout(
-                barmode='stack', font_color='#7e8c99',
-                yaxis=dict(title='Votes', gridcolor='rgba(140,165,185,.14)'), xaxis=dict(tickangle=-35),
-                legend=dict(orientation='h', y=1.08, bgcolor='rgba(0,0,0,0)', font=dict(color='#7e8c99')),
-                margin=dict(t=20, b=130), height=480,
-            )
-            fig_proj = apply_chart_theme(fig_proj)
-            st.plotly_chart(fig_proj, width='stretch', key="chart_012")
-            st.caption("Green = Expected votes from played rounds (error bars = 10th–90th percentile)   Brown = Projected votes for remaining rounds")
-
-            st.markdown('<div class="section-header">Full Season Projection Table</div>', unsafe_allow_html=True)
-            _be_col1, _be_col2 = st.columns([3, 1])
-            with _be_col1: _be_search = st.text_input("Search player", "", key="be_proj_search")
-            with _be_col2: _be_show_n = st.selectbox("Show", [30, 50, 100, 200], index=0, key="be_proj_show")
-            display_proj = proj.copy()
-            if _be_search:
-                display_proj = display_proj[display_proj['Player'].str.contains(_be_search, case=False)]
-            display_proj = display_proj.head(_be_show_n).copy()
-            display_proj.insert(0, 'Rank', range(1, len(display_proj) + 1))
-            display_proj['Avg/Game'] = display_proj['Avg_Predicted_Per_Game'].round(2)
-            display_proj['Projected'] = display_proj['Projected_Remaining'].round(1)
-            display_proj['Season Total'] = display_proj['Season_Total_Projected'].round(1)
-            display_proj['Floor'] = display_proj['Floor_Projection'].round(1)
-            display_proj['Ceiling'] = display_proj['Ceiling_Projection'].round(1)
-            _sp_disp = display_proj[['Rank', 'Player', 'Team', 'Games_Played', 'Actual_Votes',
-                          'Avg/Game', 'Remaining_Rounds', 'Projected', 'Floor', 'Ceiling', 'Season Total']].rename(
-                columns={'Games_Played': 'Games', 'Remaining_Rounds': 'Rounds Left', 'Actual_Votes': 'Actual'})
-            for col in _sp_disp.select_dtypes(include='float').columns:
-                _sp_disp[col] = _sp_disp[col].round(1)
-            st.dataframe(_style_table(_sp_disp), width='stretch', hide_index=True)
-
-    with _be_vf_tab:
-        top30_vf = predictions.head(30).copy()
-        top30_vf['Model_Win_Prob'] = (top30_vf['Exp_Total_Votes'] / top30_vf['Exp_Total_Votes'].sum() * 100).round(1)
-        scraped_odds = load_best_odds()
-
-        if scraped_odds is not None and len(scraped_odds) > 0:
-            st.success(f"{len(scraped_odds)} odds loaded from bookmakers")
-            vtab1, vtab2 = st.tabs(["Auto Odds", "Manual Entry"])
-        else:
-            st.info("No scraped odds. Enter manually below.")
-            vtab1, vtab2 = None, st.container()
-
-        odds_data = []
-        if vtab1 is not None:
-            with vtab1:
-                merged = top30_vf.merge(scraped_odds, left_on='Player_Name', right_on='player', how='left')
-                merged['Bookie_Odds'] = merged['best_odds'].fillna(999)
-                merged['Implied %'] = (100 / merged['Bookie_Odds']).round(1)
-                merged['Edge %'] = (merged['Model_Win_Prob'] - merged['Implied %']).round(1)
-                merged['Flag'] = merged['Edge %'].apply(
-                    lambda e: 'Strong Value' if e > 5 else ('Value' if e > 2 else ('Watch' if e > 0 else 'Lay'))
-                )
-                merged = merged.sort_values('Edge %', ascending=False)
-                _vf_disp = merged[['Player_Name', 'Team', 'Model_Win_Prob', 'Bookie_Odds', 'Implied %', 'Edge %', 'Flag']].rename(
-                    columns={'Player_Name': 'Player', 'Model_Win_Prob': 'Model %', 'Bookie_Odds': 'Best Odds'})
-                for col in _vf_disp.select_dtypes(include='float').columns:
-                    _vf_disp[col] = _vf_disp[col].round(1)
-                st.dataframe(_style_table(_vf_disp), width='stretch', hide_index=True)
-                value_plays = merged[merged['Edge %'] > 2]
-                if not value_plays.empty:
-                    st.markdown('<div class="section-header">Value Plays</div>', unsafe_allow_html=True)
-                    for _, row in value_plays.iterrows():
-                        st.success(f"**{row['Player_Name']}** — Model: {row['Model_Win_Prob']:.1f}% | Bookie: {row['Implied %']:.1f}% | Edge: +{row['Edge %']:.1f}% | Odds: ${row['Bookie_Odds']:.1f}")
-
-        manual_container = vtab2 if vtab1 is not None else vtab2
-        with manual_container:
-            st.markdown("Enter decimal odds for each player:")
-            mcols = st.columns(3)
-            for i, (_, row) in enumerate(top30_vf.iterrows()):
-                with mcols[i % 3]:
-                    default = float(max(2.0, round(100 / max(row['Model_Win_Prob'], 0.5), 1)))
-                    odds = st.number_input(
-                        f"{row['Player_Name']} ({row['Team']})",
-                        min_value=1.01, max_value=1001.0, value=default, step=0.5,
-                        key=f"be_odds_{i}",
-                    )
-                    odds_data.append({
-                        'Player': row['Player_Name'], 'Team': row['Team'],
-                        'Exp Votes': round(row['Exp_Total_Votes'], 1),
-                        'Model %': row['Model_Win_Prob'],
-                        'Odds': odds, 'Implied %': round(100 / odds, 1),
-                    })
-            if odds_data:
-                odf = pd.DataFrame(odds_data)
-                odf['Edge %'] = (odf['Model %'] - odf['Implied %']).round(1)
-                odf['Flag'] = odf['Edge %'].apply(
-                    lambda e: 'Strong Value' if e > 5 else ('Value' if e > 2 else ('Watch' if e > 0 else 'Lay'))
-                )
-                odf = odf.sort_values('Edge %', ascending=False)
-                st.markdown('<div class="section-header">EV Analysis</div>', unsafe_allow_html=True)
-                for col in odf.select_dtypes(include='float').columns:
-                    odf[col] = odf[col].round(1)
-                st.dataframe(_style_table(odf), width='stretch', hide_index=True)
-                value = odf[odf['Edge %'] > 2]
-                if not value.empty:
-                    st.markdown('<div class="section-header">Value Plays</div>', unsafe_allow_html=True)
-                    for _, row in value.iterrows():
-                        st.success(f"**{row['Player']}** — Model: {row['Model %']:.1f}% | Bookie: {row['Implied %']:.1f}% | Edge: +{row['Edge %']:.1f}%")
 
 # ════════════════════════════════════════════════════════════
 # STAT FILTER
