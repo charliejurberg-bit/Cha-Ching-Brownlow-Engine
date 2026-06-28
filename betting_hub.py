@@ -530,9 +530,20 @@ def _load_user_import_as_bets() -> pd.DataFrame | None:
         return pd.to_numeric(s, errors='coerce')
 
     _result_values = {
-        'w': 'Win', 'win': 'Win', 'won': 'Win',
-        'l': 'Loss', 'lose': 'Loss', 'lost': 'Loss', 'loss': 'Loss',
+        'y': 'Win', 'yes': 'Win', 'w': 'Win', 'win': 'Win', 'won': 'Win',
+        'n': 'Loss', 'no': 'Loss', 'l': 'Loss', 'lose': 'Loss', 'lost': 'Loss', 'loss': 'Loss',
+        'p': 'Pending', 'push': 'Pending', 'void': 'Pending',
     }
+
+    # Derive a Market from the Bet/Selection text (schema MARKET_TYPES lacks
+    # "Single"/"Same Game Multi", but the import stores the derived label as-is).
+    def _derive_market(selection: str) -> str:
+        s = str(selection).lower()
+        if 'single' in s:
+            return 'Single'
+        if 'sgm' in s or 'same game' in s or 'multi' in s or re.search(r'\d+\s*[- ]?leg', s):
+            return 'Multi'
+        return 'Single'
 
     rows = []
     for _, r in raw.iterrows():
@@ -553,12 +564,13 @@ def _load_user_import_as_bets() -> pd.DataFrame | None:
             pl = _compute_pl(float(odds), float(stake), result)
         else:
             pl = 0.0
+        selection = _txt(r.get(field_col['selection'])) if 'selection' in field_col else ''
         rows.append({
             'bet_id':            str(uuid.uuid4())[:8],
             'date':              _date,
             'match':             '',
-            'market_type':       'Other',
-            'selection':         _txt(r.get(field_col['selection'])) if 'selection' in field_col else '',
+            'market_type':       _derive_market(selection) if selection else 'Single',
+            'selection':         selection,
             'bookmaker':         _txt(r.get(field_col['bookmaker']), 'Other') if 'bookmaker' in field_col else 'Other',
             'odds':              odds,
             'stake':             stake,
