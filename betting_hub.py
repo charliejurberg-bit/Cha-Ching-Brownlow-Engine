@@ -2742,11 +2742,26 @@ def _render_manual_props():
 
 def render_trends_analysis():
     _inject_css()
+    # Midnight Turf flush styles — page-scoped via .tr-page (and the innermost
+    # .tr-flush marker on the masthead) so other BH panels stay boxed. Flush the
+    # masthead onto #0a1017 and turn the upload row into a flush dashed
+    # drop-target with a mono label. No @keyframes here — page needs no motion.
     st.markdown(
-        '<div class="title-bar">'
+        '<style>'
+        '.title-bar:has(.tr-flush){background:transparent !important;border:none !important;'
+        'box-shadow:none !important;padding:0 !important;}'
+        '.stApp:has(.tr-page) [data-testid="stFileUploaderDropzone"]{'
+        'background:transparent !important;border:1px dashed var(--line) !important;'
+        'box-shadow:none !important;border-radius:0 !important;}'
+        '.stApp:has(.tr-page) [data-testid="stFileUploaderDropzoneInstructions"]{'
+        "font-family:'IBM Plex Mono',monospace !important;color:var(--muted) !important;"
+        'letter-spacing:.04em;}'
+        '</style>'
+        '<span class="tr-page" style="display:none"></span>'
+        '<div class="title-bar"><span class="tr-flush" style="display:none"></span>'
         '<h2 style="color:var(--text);margin:0">Trends &amp; Analysis</h2>'
         '<p style="color:var(--muted);margin:4px 0 0 0">'
-        'Hit rate, ROI, and P&L breakdowns across markets, bookmakers, and odds ranges</p></div>',
+        'Hit rate, ROI and P&L across markets, bookmakers and odds ranges</p></div>',
         unsafe_allow_html=True,
     )
 
@@ -2865,51 +2880,80 @@ def render_trends_analysis():
     settled = bets[bets['result'].isin(['Win', 'Loss'])].copy()
     settled['win'] = (settled['result'] == 'Win').astype(int)
 
-    # ── Row 1: Hit rate by market + ROI by market ──────────────────────────
-    st.markdown('<div class="trend-header">Hit Rate &amp; ROI by Market</div>', unsafe_allow_html=True)
-    r1c1, r1c2 = st.columns(2)
+    # Midnight Turf colour-encoding tokens (page-local; match the shared theme).
+    EMERALD, RED, GOLD = '#34d399', '#ef7a6d', '#f0b429'
+    BREAKEVEN_HIT = 50.0  # hit-rate breakeven for colour-by-performance
+    _empty = ('<div style="color:var(--muted);font-size:13px;'
+              'font-family:\'IBM Plex Mono\',monospace;padding:10px 0">No data yet.</div>')
 
-    with r1c1:
-        mkt_grp = settled.groupby('market_type').agg(
-            win=('win', 'sum'), total=('win', 'count')
-        ).reset_index()
-        mkt_grp['hit_rate'] = mkt_grp['win'] / mkt_grp['total'] * 100
-        mkt_grp = mkt_grp.sort_values('hit_rate', ascending=True)
-        fig = _bar_chart(
-            mkt_grp['market_type'].tolist(),
-            mkt_grp['hit_rate'].tolist(),
-            'Hit Rate by Market (%)',
-            color=[C['green']] * len(mkt_grp),
-        )
-        fig.update_layout(height=300)
-        fig = apply_chart_theme(fig)
-        st.plotly_chart(fig, use_container_width=True, key='tr_mkt_hit')
-
-    with r1c2:
+    # ── ROI by market — the page's primary colour-encoded element ───────────
+    # One diverging horizontal bar per market (best at top); colour encodes sign.
+    st.markdown('<div class="trend-header">ROI by Market</div>', unsafe_allow_html=True)
+    if {'market_type', 'stake', 'profit_loss'}.issubset(bets.columns) and not bets.empty:
         mkt_roi = bets.groupby('market_type').apply(
             lambda g: pd.Series({
                 'roi': g['profit_loss'].sum() / g['stake'].sum() * 100 if g['stake'].sum() > 0 else 0
             })
         ).reset_index()
-        mkt_roi = mkt_roi.sort_values('roi', ascending=True)
-        fig = _bar_chart(mkt_roi['market_type'].tolist(), mkt_roi['roi'].tolist(), 'ROI by Market (%)')
-        fig.update_layout(height=300)
-        fig = apply_chart_theme(fig)
-        st.plotly_chart(fig, use_container_width=True, key='tr_mkt_roi')
+        mkt_roi = mkt_roi[mkt_roi['market_type'].astype(str).str.strip() != '']
+    else:
+        mkt_roi = pd.DataFrame(columns=['market_type', 'roi'])
 
-    # ── Row 2: Hit rate by bookmaker + ROI by odds range ───────────────────
-    st.markdown('<div class="trend-header">Bookmaker Performance &amp; Odds Analysis</div>',
+    if not mkt_roi.empty:
+        # Ascending sort → highest ROI lands at the TOP of the horizontal axis.
+        mkt_roi = mkt_roi.sort_values('roi', ascending=True)
+        _mk = mkt_roi['market_type'].astype(str).tolist()
+        _rv = mkt_roi['roi'].tolist()
+        fig = go.Figure(go.Bar(
+            x=_rv, y=_mk, orientation='h',
+            marker_color=[EMERALD if v >= 0 else RED for v in _rv],
+            text=[f'{v:+.1f}%' for v in _rv],
+            textposition='outside',
+            textfont=dict(family='IBM Plex Mono, monospace', size=12, color=C['text']),
+            cliponaxis=False,
+            hovertemplate='%{y}: %{x:+.1f}%<extra></extra>',
+        ))
+        fig.add_vline(x=0, line_width=1, line_color=C['border'])
+        fig.update_layout(height=max(220, 44 * len(_rv) + 60), showlegend=False)
+        fig = apply_chart_theme(fig)
+        fig.update_layout(margin=dict(l=10, r=64, t=8, b=24))
+        fig.update_yaxes(automargin=True)
+        fig.update_xaxes(automargin=True)
+        st.plotly_chart(fig, use_container_width=True, key='tr_mkt_roi')
+    else:
+        st.markdown(_empty, unsafe_allow_html=True)
+
+    # ── Bookmaker hit rate + ROI by odds range (quiet two-up) ──────────────
+    st.markdown('<div class="trend-header">Bookmaker &amp; Odds Performance</div>',
                 unsafe_allow_html=True)
     r2c1, r2c2 = st.columns(2)
 
     with r2c1:
-        bk_grp = settled.groupby('bookmaker').agg(win=('win', 'sum'), total=('win', 'count')).reset_index()
-        bk_grp['hit_rate'] = bk_grp['win'] / bk_grp['total'] * 100
-        fig = _bar_chart(bk_grp['bookmaker'].tolist(), bk_grp['hit_rate'].tolist(),
-                         'Hit Rate by Bookmaker (%)', color=[C['green']] * len(bk_grp))
-        fig.update_layout(height=300)
-        fig = apply_chart_theme(fig)
-        st.plotly_chart(fig, use_container_width=True, key='tr_bk_hit')
+        if 'bookmaker' in settled.columns and not settled.empty:
+            # Normalise casing for grouping only (merges e.g. PointsBet/Pointsbet);
+            # canonicalise against BOOKMAKERS so display names stay branded. The
+            # stored data is untouched — this is render-local.
+            _bk_canon = {b.lower(): b for b in BOOKMAKERS}
+            bk = settled.copy()
+            bk['_bk'] = bk['bookmaker'].astype(str).str.strip().apply(
+                lambda x: _bk_canon.get(x.lower(), x.title()))
+            bk_grp = bk.groupby('_bk').agg(win=('win', 'sum'),
+                                           total=('win', 'count')).reset_index()
+            bk_grp['hit_rate'] = bk_grp['win'] / bk_grp['total'] * 100
+            bk_grp = bk_grp.sort_values('hit_rate', ascending=True)
+        else:
+            bk_grp = pd.DataFrame(columns=['_bk', 'hit_rate'])
+        if not bk_grp.empty:
+            fig = _bar_chart(
+                bk_grp['_bk'].tolist(), bk_grp['hit_rate'].tolist(),
+                'Hit Rate by Bookmaker (%)',
+                color=[EMERALD if h >= BREAKEVEN_HIT else RED for h in bk_grp['hit_rate']],
+            )
+            fig.update_layout(height=260)
+            fig = apply_chart_theme(fig)
+            st.plotly_chart(fig, use_container_width=True, key='tr_bk_hit')
+        else:
+            st.markdown(_empty, unsafe_allow_html=True)
 
     with r2c2:
         def _odds_band(o):
@@ -2918,115 +2962,83 @@ def render_trends_analysis():
             if o < 3.0:   return '2.00-3.00'
             if o < 5.0:   return '3.00-5.00'
             return '5.00+'
-        bets_o = bets.copy()
-        bets_o['odds_band'] = bets_o['odds'].apply(_odds_band)
-        ods_roi = bets_o.groupby('odds_band').apply(
-            lambda g: pd.Series({'roi': g['profit_loss'].sum() / g['stake'].sum() * 100
-                                 if g['stake'].sum() > 0 else 0})
-        ).reset_index()
-        order = ['<1.50', '1.50-2.00', '2.00-3.00', '3.00-5.00', '5.00+']
-        ods_roi['odds_band'] = pd.Categorical(ods_roi['odds_band'], categories=order, ordered=True)
-        ods_roi = ods_roi.sort_values('odds_band')
-        fig = _bar_chart(ods_roi['odds_band'].tolist(), ods_roi['roi'].tolist(), 'ROI by Odds Range (%)')
+        if {'odds', 'stake', 'profit_loss'}.issubset(bets.columns) and not bets.empty:
+            bets_o = bets.copy()
+            bets_o['odds_band'] = bets_o['odds'].apply(_odds_band)
+            ods_roi = bets_o.groupby('odds_band').apply(
+                lambda g: pd.Series({'roi': g['profit_loss'].sum() / g['stake'].sum() * 100
+                                     if g['stake'].sum() > 0 else 0})
+            ).reset_index()
+            order = ['<1.50', '1.50-2.00', '2.00-3.00', '3.00-5.00', '5.00+']
+            ods_roi['odds_band'] = pd.Categorical(ods_roi['odds_band'], categories=order, ordered=True)
+            ods_roi = ods_roi.sort_values('odds_band')
+        else:
+            ods_roi = pd.DataFrame(columns=['odds_band', 'roi'])
+        if not ods_roi.empty:
+            fig = _bar_chart(
+                ods_roi['odds_band'].astype(str).tolist(), ods_roi['roi'].tolist(),
+                'ROI by Odds Range (%)',
+                color=[EMERALD if v >= 0 else RED for v in ods_roi['roi']],
+            )
+            fig.update_layout(height=260)
+            fig = apply_chart_theme(fig)
+            st.plotly_chart(fig, use_container_width=True, key='tr_ods_roi')
+        else:
+            st.markdown(_empty, unsafe_allow_html=True)
+
+    # ── Monthly P&L (time-shape no table carries; recoloured by sign) ──────
+    st.markdown('<div class="trend-header">Monthly P&amp;L</div>', unsafe_allow_html=True)
+    if {'date', 'profit_loss'}.issubset(bets.columns) and not bets['date'].dropna().empty:
+        bets_m = bets.dropna(subset=['date']).copy()
+        bets_m['month'] = bets_m['date'].dt.to_period('M').astype(str)
+        monthly = bets_m.groupby('month')['profit_loss'].sum().reset_index()
+        monthly = monthly.sort_values('month')
+    else:
+        monthly = pd.DataFrame(columns=['month', 'profit_loss'])
+    if not monthly.empty:
+        fig = _bar_chart(
+            monthly['month'].tolist(), monthly['profit_loss'].tolist(),
+            'Monthly P&L (units)',
+            color=[EMERALD if v >= 0 else RED for v in monthly['profit_loss']],
+        )
         fig.update_layout(height=300)
         fig = apply_chart_theme(fig)
-        st.plotly_chart(fig, use_container_width=True, key='tr_ods_roi')
+        st.plotly_chart(fig, use_container_width=True, key='tr_monthly')
+    else:
+        st.markdown(_empty, unsafe_allow_html=True)
 
-    # ── Monthly P&L ────────────────────────────────────────────────────────
-    st.markdown('<div class="trend-header">Monthly P&amp;L</div>', unsafe_allow_html=True)
-    bets_m = bets.copy()
-    bets_m['month'] = bets_m['date'].dt.to_period('M').astype(str)
-    monthly = bets_m.groupby('month')['profit_loss'].sum().reset_index()
-    monthly = monthly.sort_values('month')
-    fig = _bar_chart(monthly['month'].tolist(), monthly['profit_loss'].tolist(), 'Monthly P&L (units)')
-    fig.update_layout(height=300)
-    fig = apply_chart_theme(fig)
-    st.plotly_chart(fig, use_container_width=True, key='tr_monthly')
+    # ── Cha Ching vs non-CC — only when at least one non-CC bet exists ─────
+    if 'is_cha_ching' in bets.columns and bool((bets['is_cha_ching'] != True).any()):
+        st.markdown('<div class="trend-header">Cha Ching Tips vs All Bets</div>',
+                    unsafe_allow_html=True)
+        cc_s   = settled[settled['is_cha_ching'] == True]
+        non_s  = settled[settled['is_cha_ching'] != True]
+        cc_hit  = cc_s['win'].mean() * 100  if len(cc_s) > 0  else 0
+        non_hit = non_s['win'].mean() * 100 if len(non_s) > 0 else 0
+        cc_all  = bets[bets['is_cha_ching'] == True]
+        non_all = bets[bets['is_cha_ching'] != True]
+        cc_roi  = cc_all['profit_loss'].sum() / cc_all['stake'].sum() * 100 if cc_all['stake'].sum() > 0 else 0
+        non_roi = non_all['profit_loss'].sum() / non_all['stake'].sum() * 100 if non_all['stake'].sum() > 0 else 0
 
-    # ── Cha Ching vs non-CC comparison ────────────────────────────────────
-    st.markdown('<div class="trend-header">Cha Ching Tips vs All Bets</div>', unsafe_allow_html=True)
-    cc_s   = settled[settled['is_cha_ching'] == True]
-    non_s  = settled[settled['is_cha_ching'] != True]
-    cc_hit  = cc_s['win'].mean() * 100  if len(cc_s) > 0  else 0
-    non_hit = non_s['win'].mean() * 100 if len(non_s) > 0 else 0
-    cc_all  = bets[bets['is_cha_ching'] == True]
-    non_all = bets[bets['is_cha_ching'] != True]
-    cc_roi  = cc_all['profit_loss'].sum() / cc_all['stake'].sum() * 100 if cc_all['stake'].sum() > 0 else 0
-    non_roi = non_all['profit_loss'].sum() / non_all['stake'].sum() * 100 if non_all['stake'].sum() > 0 else 0
-
-    rc1, rc2 = st.columns(2)
-    with rc1:
-        fig = go.Figure(go.Bar(
-            x=['Cha Ching', 'Non-CC'],
-            y=[cc_hit, non_hit],
-            marker_color=[C['gold'], C['brown']],
-            text=[f'{cc_hit:.1f}%', f'{non_hit:.1f}%'],
-            textposition='outside',
-        ))
-        fig.update_layout(
-            paper_bgcolor=C['bg'], plot_bgcolor=C['bg'], font_color=C['text'],
-            height=280, showlegend=False,
-            title=dict(text='Hit Rate Comparison (%)', font=dict(size=12, color=C['brown'])),
-            yaxis=dict(gridcolor='#ede8df'),
-            margin=dict(l=50, r=20, t=40, b=40),
-        )
-        fig = apply_chart_theme(fig)
-        st.plotly_chart(fig, use_container_width=True, key='tr_cc_hit')
-
-    with rc2:
-        fig = go.Figure(go.Bar(
-            x=['Cha Ching', 'Non-CC'],
-            y=[cc_roi, non_roi],
-            marker_color=[C['gold'] if cc_roi >= 0 else C['red'],
-                          C['green'] if non_roi >= 0 else C['red']],
-            text=[f'{cc_roi:+.1f}%', f'{non_roi:+.1f}%'],
-            textposition='outside',
-        ))
-        fig.update_layout(
-            paper_bgcolor=C['bg'], plot_bgcolor=C['bg'], font_color=C['text'],
-            height=280, showlegend=False,
-            title=dict(text='ROI Comparison (%)', font=dict(size=12, color=C['brown'])),
-            yaxis=dict(gridcolor='#ede8df', zeroline=True, zerolinecolor=C['border']),
-            margin=dict(l=50, r=20, t=40, b=40),
-        )
-        fig = apply_chart_theme(fig)
-        st.plotly_chart(fig, use_container_width=True, key='tr_cc_roi')
-
-    # ── Best / Worst performing markets (table) ────────────────────────────
-    st.markdown('<div class="trend-header">Best &amp; Worst Markets</div>', unsafe_allow_html=True)
-    mkt_full = bets.groupby('market_type').apply(lambda g: pd.Series({
-        'Bets':     len(g),
-        'W':        int(g[g['result'] == 'Win']['result'].count()),
-        'L':        int(g[g['result'] == 'Loss']['result'].count()),
-        'Hit %':    round(g[g['result'] == 'Win']['result'].count() /
-                          max(1, g['result'].isin(['Win','Loss']).sum()) * 100, 1),
-        'Staked':   round(g['stake'].fillna(0).sum(), 2),
-        'P&L':      round(g['profit_loss'].fillna(0).sum(), 2),
-        'ROI %':    round(g['profit_loss'].fillna(0).sum() /
-                          max(0.01, g['stake'].fillna(0).sum()) * 100, 1),
-    })).reset_index()
-    mkt_full = mkt_full.sort_values('P&L', ascending=False)
-
-    def _style_pl(v):
-        try:
-            return f'color: {C["green"]}; font-weight:700' if float(v) >= 0 else f'color: {C["red"]}; font-weight:700'
-        except Exception:
-            return ''
-
-    st.dataframe(
-        mkt_full.style.applymap(_style_pl, subset=['P&L', 'ROI %']),
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-            'Bets':   st.column_config.NumberColumn('Bets',   format='%d'),
-            'W':      st.column_config.NumberColumn('W',      format='%d'),
-            'L':      st.column_config.NumberColumn('L',      format='%d'),
-            'Hit %':  st.column_config.NumberColumn('Hit %',  format='%.2f'),
-            'Staked': st.column_config.NumberColumn('Staked', format='%.2f'),
-            'P&L':    st.column_config.NumberColumn('P&L',    format='%.2f'),
-            'ROI %':  st.column_config.NumberColumn('ROI %',  format='%.2f'),
-        },
-    )
+        rc1, rc2 = st.columns(2)
+        with rc1:
+            fig = _bar_chart(
+                ['Cha Ching', 'Non-CC'], [cc_hit, non_hit],
+                'Hit Rate Comparison (%)',
+                color=[GOLD, EMERALD if non_hit >= BREAKEVEN_HIT else RED],
+            )
+            fig.update_layout(height=280)
+            fig = apply_chart_theme(fig)
+            st.plotly_chart(fig, use_container_width=True, key='tr_cc_hit')
+        with rc2:
+            fig = _bar_chart(
+                ['Cha Ching', 'Non-CC'], [cc_roi, non_roi],
+                'ROI Comparison (%)',
+                color=[GOLD if cc_roi >= 0 else RED, EMERALD if non_roi >= 0 else RED],
+            )
+            fig.update_layout(height=280)
+            fig = apply_chart_theme(fig)
+            st.plotly_chart(fig, use_container_width=True, key='tr_cc_roi')
 
 
 # ── Page 5: Polls a Vote Watchlist ────────────────────────────────────────────
