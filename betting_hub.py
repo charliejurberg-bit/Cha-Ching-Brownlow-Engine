@@ -3217,7 +3217,13 @@ def render_polls_a_vote():
         sub = _gdf[_gdf['Player'].str.lower() == player.lower()]
         if sub.empty:
             return []
-        return (sub.nlargest(3, 'Poll_Prob')['Round_num'].astype(int) - 1).tolist()
+        # Top 3 by projected poll prob, then drop near-zero rounds (>0.2 only) so
+        # bye/DNP rounds never pad the list. May leave 3, 1, or 0 rounds; order
+        # stays highest-first. Single source → matrix dots, card chips, and the
+        # AGREE overlap count all consume this filtered list consistently.
+        top = sub.nlargest(3, 'Poll_Prob')
+        top = top[top['Poll_Prob'] > 0.2]
+        return (top['Round_num'].astype(int) - 1).tolist()
 
     def _parse_rounds(raw: str) -> set[int]:
         rounds = set()
