@@ -5,10 +5,11 @@ Run from brownlow_engine/:
 """
 import os, math
 import pandas as pd
+import streamlit as st
 from supabase import create_client
 
-SUPABASE_URL = input("Supabase URL: ").strip()
-SUPABASE_KEY = input("Supabase service_role key: ").strip()
+SUPABASE_URL = st.secrets["supabase"]["url"]
+SUPABASE_KEY = st.secrets["supabase"]["secret_key"]  # server-side: full write access
 
 sb = create_client(SUPABASE_URL, SUPABASE_KEY)
 

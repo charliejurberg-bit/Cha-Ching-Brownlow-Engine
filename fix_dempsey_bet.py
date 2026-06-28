@@ -2,16 +2,15 @@
 One-off fix: update Dempsey bet from Loss → Win in Supabase.
 
 Usage:
-    Set SUPABASE_URL and SUPABASE_KEY as environment variables, then run:
+    Credentials are read from .streamlit/secrets.toml ([supabase] section).
+    Run:
         python fix_dempsey_bet.py
-
-    Or paste them directly in the placeholders below.
 """
-import os
+import streamlit as st
 from supabase import create_client
 
-SUPABASE_URL = os.getenv("SUPABASE_URL", "YOUR_SUPABASE_URL_HERE")
-SUPABASE_KEY = os.getenv("SUPABASE_KEY", "YOUR_SUPABASE_ANON_KEY_HERE")
+SUPABASE_URL = st.secrets["supabase"]["url"]
+SUPABASE_KEY = st.secrets["supabase"]["secret_key"]  # server-side: write access
 
 sb = create_client(SUPABASE_URL, SUPABASE_KEY)
 

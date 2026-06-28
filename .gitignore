@@ -11,7 +11,7 @@ __pycache__/
 # Streamlit
 .streamlit/secrets.toml
 
-# Data files (optional — remove these lines if you want data on GitHub)
+# Data files (optional ï¿½ remove these lines if you want data on GitHub)
 
 # OS
 .DS_Store
@@ -19,3 +19,16 @@ Thumbs.db
 
 betfair_debug.html
 espn_debug*.html
+
+# Local Claude settings (may contain credentials)
+.claude/settings.local.json
+
+# Nested repo (kept locally, not part of this repo)
+/cha-ching-brownlow-engine/
+
+# Debug artifacts
+*_debug*.html
+*_debug*.py
+debug_*.py
+
+.claude/settings.local.json
