@@ -1592,10 +1592,10 @@ _NAV_BROWNLOW = {
     "Analysis": ["Stat Filter", "Game Analysis", "Model Comparison"],
 }
 _NAV_BETTING = {
-    "BH Overview":  ["BH Dashboard", "Home", "Bet Tracker"],
+    "BH Overview":  ["Performance", "Predictions", "Bet Tracker"],
     "BH Strategy":  ["Cha Ching Tips", "Trends & Analysis", "Polls a Vote"],
 }
-_BH_PAGES = {'BH Dashboard', 'Home', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis', 'Polls a Vote'}
+_BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis', 'Polls a Vote'}
 
 def _nav_select(cat_key):
     val = st.session_state.get(cat_key)
@@ -1607,7 +1607,7 @@ _page = st.session_state.page
 
 # ── Page list + icons for current hub ─────────────────────────
 _PAGE_ICONS = {
-    "Home":             "ti-home",
+    "Predictions":      "ti-home",
     "Leaderboard":      "ti-award",
     "Player Profile":   "ti-user",
     "Player Comparison":"ti-users",
@@ -1615,7 +1615,7 @@ _PAGE_ICONS = {
     "Game Analysis":    "ti-chart-dots",
     "Model Comparison": "ti-chart-bar",
     "Live Tracker":     "ti-live-photo",
-    "BH Dashboard":     "ti-layout-dashboard",
+    "Performance":      "ti-layout-dashboard",
     "Bet Tracker":      "ti-list-check",
     "Cha Ching Tips":   "ti-bulb",
     "Trends & Analysis":"ti-trending-up",
@@ -1629,7 +1629,7 @@ if _hub == "brownlow":
         "Model Comparison", "Live Tracker",
     ]
 else:
-    _snav_pages = ["BH Dashboard", "Home", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis", "Polls a Vote"]
+    _snav_pages = ["Performance", "Predictions", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis", "Polls a Vote"]
 
 # ── Nav CSS (injected once before containers) ─────────────────
 st.markdown("""
@@ -2121,7 +2121,7 @@ def _render_hub_tabs():
                          type="primary" if _hub == "betting" else "secondary"):
                 st.session_state["active_hub"] = "betting"
                 if st.session_state.page not in _BH_PAGES:
-                    st.session_state.page = "BH Dashboard"
+                    st.session_state.page = "Performance"
                 st.rerun()
 
 def _render_page_nav():
@@ -2499,27 +2499,39 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
 </div>""", unsafe_allow_html=True)
             if st.button("Open Betting Hub", key="land_bh"):
                 st.session_state["active_hub"] = "betting"
-                st.session_state.page = 'BH Dashboard'
+                st.session_state.page = 'Performance'
                 st.rerun()
 
 # ════════════════════════════════════════════════════════════
 # BETTING HUB pages
 # ════════════════════════════════════════════════════════════
-elif _page in _BH_PAGES and _page != 'Home':
+elif _page in _BH_PAGES and _page != 'Predictions':
     betting_hub.render_page(_page)
 
 # ════════════════════════════════════════════════════════════
 # HOME (Brownlow overview)
 # ════════════════════════════════════════════════════════════
-if _page == 'Home':
+if _page == 'Predictions':
+    # Flush the page header + tab strip onto the app bg (#0a1017). theme.py gives
+    # .title-bar a --surface fill/border and tints [data-testid="stTabs"] with
+    # --surface; neutralise both for THIS page only via the .pred-flush marker so
+    # the panels below (Model vs Market table, metric strips) stay boxed.
     st.markdown(
-        '<div class="title-bar"><h2 style="color:#e9eef3;margin:0">Home</h2>'
+        '<style>'
+        '.title-bar:has(.pred-flush){background:transparent !important;border:none !important;'
+        'box-shadow:none !important;padding:0 !important;}'
+        '[data-testid="stTabs"]:has(.pred-flush){background:transparent !important;'
+        'border:none !important;box-shadow:none !important;}'
+        '</style>'
+        '<div class="title-bar"><span class="pred-flush" style="display:none"></span>'
+        '<h2 style="color:#e9eef3;margin:0">Predictions</h2>'
         '<p style="color:var(--muted);margin:4px 0 0 0">2026 season overview · value finder</p></div>',
         unsafe_allow_html=True,
     )
     _home_tab, _vf_tab = st.tabs(["Home", "Value Finder"])
 
     with _home_tab:
+        st.markdown('<span class="pred-flush" style="display:none"></span>', unsafe_allow_html=True)
         SEASON = 2026
         CURRENT_ROUND = max_season_rounds - 1
 

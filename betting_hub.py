@@ -1,7 +1,7 @@
 """
 betting_hub.py — Cha Ching Betting Hub
 Four pages rendered by render_page(page_name) and imported into dashboard.py:
-    BH Dashboard, Bet Tracker, Cha Ching Tips, Trends & Analysis
+    Performance, Bet Tracker, Cha Ching Tips, Trends & Analysis
 """
 
 import streamlit as st
@@ -1584,7 +1584,7 @@ def _import_csv_dialog():
             st.rerun()
 
 
-# ── Page 1: BH Dashboard ───────────────────────────────────────────────────────
+# ── Page 1: Performance ────────────────────────────────────────────────────────
 
 def render_bh_dashboard():
     _inject_css()
@@ -3220,7 +3220,7 @@ def render_page(page: str):
     _ensure_dirs()
     if not _supabase_available():
         st.caption("⚠ Supabase not connected — showing empty data")
-    if page == 'BH Dashboard':
+    if page == 'Performance':
         render_bh_dashboard()
     elif page == 'Bet Tracker':
         render_bet_tracker()
