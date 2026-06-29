@@ -184,8 +184,7 @@ def _get_supabase():
         url = st.secrets["supabase"]["url"]
         key = st.secrets["supabase"]["secret_key"]  # server-side: full read/write
         return create_client(url, key)
-    except Exception as e:
-        st.warning(f"Supabase not connected: {e}")  # DEBUG: temporary, revert after diagnosis
+    except Exception:
         return None
 
 
@@ -278,13 +277,7 @@ def _save_watchlist(df: pd.DataFrame):
     df_save = df_save[[c for c in keep if c in df_save.columns]]
     records = _sb_records(df_save)
     if records:
-        try:
-            sb.table(POLLS_SB_TABLE).upsert(records, on_conflict="id").execute()
-        except Exception as e:
-            # DEBUG: temporary error surfacing — revert after diagnosis
-            st.error(f"watchlist save failed: {e}")
-            st.exception(e)
-            return
+        sb.table(POLLS_SB_TABLE).upsert(records, on_conflict="id").execute()
 
 
 def _save_polls_row(row: dict):

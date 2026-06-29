@@ -5252,6 +5252,124 @@ if False:  # merged into Player Comparison
 # ══════════════════════════════════════════════════════════════
 # LIVE TRACKER
 # ════════════════════════════════════════════════════════════
+def _assemble_live_tracker(lt, game_df, watchlist):
+    """Assemble every value the Live Tracker renders from, off (a) live AFL vote
+    data, (b) the model's per-round Exp_Votes / Poll_Prob, and (c) the persisted
+    watchlist. Rounds are AFL display numbering (0 = Opening Round); the model's
+    Round_num is AFLTables numbering, so display = Round_num - 1.
+
+    Dicts are keyed by normalise_name(player) throughout. Returns:
+      totals, prev_totals, round_votes, model_to_date, model_remaining,
+      projection, delta, team, name, model_pollers (display_round -> {norm names}),
+      watch_next (next-round watchlist chips), recon (hit / blanked / bolter).
+    """
+    df = lt.get("df", pd.DataFrame())
+    last_round = int(lt.get("last_round", 0) or 0)
+    asm = {
+        "last_round": last_round, "next_round": last_round + 1,
+        "totals": {}, "prev_totals": {}, "round_votes": {},
+        "model_to_date": {}, "model_remaining": {}, "projection": {}, "delta": {},
+        "team": {}, "name": {}, "model_pollers": {},
+        "watch_next": [], "recon": {"hit": [], "blanked": [], "bolter": []},
+    }
+    if df is None or df.empty:
+        return asm
+
+    # ── actual cumulative totals + per-round history (live data) ──────────────
+    for _, r in df.iterrows():
+        p = r.get("Player", "")
+        nn = normalise_name(p)
+        asm["name"][nn] = p
+        asm["team"][nn] = r.get("Team", "")
+        asm["totals"][nn] = int(r.get("Total_Votes", 0) or 0)
+        rv = r.get("Round_Votes", {})
+        rv = {int(k): int(v) for k, v in rv.items()} if isinstance(rv, dict) else {}
+        asm["round_votes"][nn] = rv
+        asm["prev_totals"][nn] = sum(v for k, v in rv.items() if k < last_round)
+
+    # ── model per-round signal: Exp_Votes (pace/projection) + Poll_Prob (pollers)
+    if (game_df is not None and not getattr(game_df, "empty", True)
+            and {"Exp_Votes", "Poll_Prob", "Round_num"} <= set(game_df.columns)):
+        pcol = next((c for c in ("Player", "Player_Name") if c in game_df.columns), None)
+        if pcol:
+            for _, r in game_df.iterrows():
+                try:
+                    dr = int(r["Round_num"]) - 1          # AFLTables -> display round
+                    ev = float(r["Exp_Votes"])
+                except (TypeError, ValueError):
+                    continue
+                if pd.isna(ev):
+                    continue
+                nn = normalise_name(r[pcol])
+                if dr <= last_round:                       # counted (incl. OR) -> pace
+                    asm["model_to_date"][nn] = asm["model_to_date"].get(nn, 0.0) + ev
+                elif dr <= 24:                             # future rounds -> remaining
+                    asm["model_remaining"][nn] = asm["model_remaining"].get(nn, 0.0) + ev
+            # projected pollers = top-3 Poll_Prob within each game (the project's
+            # established per-game convention; matches the votes-feed marker set)
+            gkeys = [c for c in ("Round_num", "Home.team", "Away.team") if c in game_df.columns]
+            grpkeys = gkeys if len(gkeys) > 1 else ["Round_num"]
+            for gk, grp in game_df.groupby(grpkeys):
+                rn = int(gk[0]) if isinstance(gk, tuple) else int(gk)
+                names = {normalise_name(n) for n in grp.nlargest(3, "Poll_Prob")[pcol]}
+                asm["model_pollers"].setdefault(rn - 1, set()).update(names)
+
+    # ── projection + vs-model delta (apples-to-apples through last_round) ──────
+    for nn, tot in asm["totals"].items():
+        asm["projection"][nn] = tot + asm["model_remaining"].get(nn, 0.0)
+        asm["delta"][nn] = tot - asm["model_to_date"].get(nn, 0.0)
+
+    # ── watchlist: next-round card + last-round reconciliation ────────────────
+    def _rounds_of(s):
+        out = set()
+        for t in str(s).split(","):
+            t = t.strip()
+            if t.lstrip("-").isdigit():
+                out.add(int(t))
+        return out
+
+    next_pollers = asm["model_pollers"].get(last_round + 1, set())
+    watched_next, watched_last = set(), set()
+    if watchlist is not None and not watchlist.empty:
+        for _, w in watchlist.iterrows():
+            if bool(w.get("Settled", False)):
+                continue
+            wn = normalise_name(w.get("Player", ""))
+            rounds = _rounds_of(w.get("My_Rounds", ""))
+            if last_round < 24 and (last_round + 1) in rounds:
+                watched_next.add(wn)
+                asm["watch_next"].append({
+                    "name": w.get("Player", ""), "team": w.get("Team", ""),
+                    "badge": "both" if wn in next_pollers else "you",
+                })
+            if last_round > 0 and last_round in rounds:
+                watched_last.add(wn)
+                polled = asm["round_votes"].get(wn, {}).get(last_round, 0)
+                rec = {"name": w.get("Player", ""), "team": w.get("Team", ""), "votes": polled}
+                asm["recon"]["hit" if polled >= 1 else "blanked"].append(rec)
+
+    # model-only projected pollers for the next round (suggestions you're not on)
+    if last_round < 24:
+        for nn in next_pollers:
+            if nn not in watched_next:
+                asm["watch_next"].append({
+                    "name": asm["name"].get(nn, nn), "team": asm["team"].get(nn, ""),
+                    "badge": "model",
+                })
+
+    # bolters = polled >=2 in last_round but never on the watchlist for it
+    if last_round > 0:
+        for nn, rv in asm["round_votes"].items():
+            pts = rv.get(last_round, 0)
+            if pts >= 2 and nn not in watched_last:
+                asm["recon"]["bolter"].append({
+                    "name": asm["name"].get(nn, nn), "team": asm["team"].get(nn, ""),
+                    "votes": pts,
+                })
+
+    return asm
+
+
 if _page == 'Live Tracker':
     import time as _time
     from datetime import datetime as _dt
@@ -5317,7 +5435,12 @@ if _page == 'Live Tracker':
         _leader_total = int(_leader["Total_Votes"])
         _second_total = int(_lt_df.iloc[1]["Total_Votes"]) if len(_lt_df) > 1 else 0
         _margin = _leader_total - _second_total
-        _scale_max = max(_leader_total + 2, 1)
+
+        # Single assembly off live data + model per-round Exp_Votes/Poll_Prob +
+        # the persisted watchlist. Everything below renders from _asm.
+        _asm = _assemble_live_tracker(_lt, load_game(2026), betting_hub._load_watchlist())
+        _leader_nn = normalise_name(_leader["Player"])
+        _leader_pace = _asm["delta"].get(_leader_nn)
 
         # ── 2. Count-progress bar (replaces the four stat cards) ──
         _rounds_total = 24
@@ -5339,6 +5462,12 @@ if _page == 'Live Tracker':
         _chasers = [(_lt_df.iloc[_i]["Player"], int(_lt_df.iloc[_i]["Total_Votes"]))
                     for _i in (1, 2) if len(_lt_df) > _i]
         _chaser_line = '  ·  '.join(f'{_n} {_v}' for _n, _v in _chasers) or '—'
+        _pace_html = ''
+        if _leader_pace is not None:
+            _pc = '#34d399' if _leader_pace >= 0 else '#f87171'
+            _ps = f'+{_leader_pace:.1f}' if _leader_pace >= 0 else f'−{abs(_leader_pace):.1f}'
+            _pace_html = (f' &nbsp;·&nbsp; <span style="color:{_pc};font-weight:700">'
+                          f'{_ps} vs model pace</span>')
         st.markdown(
             f'<div style="display:flex;align-items:flex-end;justify-content:space-between;'
             f'gap:24px;flex-wrap:wrap;margin:6px 0 2px">'
@@ -5355,7 +5484,7 @@ if _page == 'Live Tracker':
             f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:42px;font-weight:600;'
             f'color:#e9eef3;line-height:1">+{_margin}</div></div>'
             f'</div></div>'
-            f'<div style="font-size:12px;color:#7e8c99;margin:2px 0 12px">Chasing &nbsp;{_chaser_line}</div>',
+            f'<div style="font-size:12px;color:#7e8c99;margin:2px 0 12px">Chasing &nbsp;{_chaser_line}{_pace_html}</div>',
             unsafe_allow_html=True,
         )
 
@@ -5374,57 +5503,54 @@ if _page == 'Live Tracker':
                 unsafe_allow_html=True,
             )
 
-        # ── Read-only data joins: model expected votes + projected pollers ──
-        # CC expected votes (Cha Ching season projection — same loader the page
-        # already used below). Keyed by normalised name.
-        _cc_exp = {}
-        _lt_proj = load_season_projection()
-        if _lt_proj is not None and {'Player', 'Exp_Total_Votes'} <= set(_lt_proj.columns):
-            for _, _pr in _lt_proj.iterrows():
-                try:
-                    _cc_exp[normalise_name(_pr['Player'])] = float(_pr['Exp_Total_Votes'])
-                except (TypeError, ValueError):
-                    pass
-
-        # Four non-CC models' expected vote totals (reuse the model-comparison
-        # loaders). Each value list feeds the consensus band. All guarded.
-        _other_exp = {}
-
-        def _lt_add_model(df, col):
-            if df is None or getattr(df, 'empty', True) or col not in getattr(df, 'columns', []):
-                return
-            if 'Player' not in df.columns:
-                return
-            for _, _r in df.iterrows():
-                try:
-                    _v = float(_r[col])
-                except (TypeError, ValueError):
-                    continue
-                if not pd.isna(_v):
-                    _other_exp.setdefault(normalise_name(_r['Player']), []).append(_v)
-
-        # AFL Predictor = the AFL API's own totals (its projection pre-count).
-        _lt_add_model(_lt_df.rename(columns={'Total_Votes': 'AFL_Votes'}), 'AFL_Votes')
-        try:
-            _bf_df, _ = fetch_betfair_brownlow()
-            _lt_add_model(_bf_df, 'BF_Votes')
-        except Exception:
-            pass
-        try:
-            _espn_df, _ = fetch_espn_brownlow()
-            _lt_add_model(_espn_df, 'ESPN_Votes')
-        except Exception:
-            pass
-        try:
-            if os.path.exists('data_wheelo/wheelo_2026.csv'):
-                _wh_raw = pd.read_csv('data_wheelo/wheelo_2026.csv')
-                # Only ExpVotes is on a Brownlow-vote scale; RatingPoints is not,
-                # so it is excluded from the band to keep the shared scale honest.
-                if 'ExpVotes' in _wh_raw.columns and 'Player' in _wh_raw.columns:
-                    _wh_agg = _wh_raw.groupby('Player')['ExpVotes'].sum().reset_index()
-                    _lt_add_model(_wh_agg.rename(columns={'ExpVotes': 'WH_Votes'}), 'WH_Votes')
-        except Exception:
-            pass
+        # ── Watchlist card — "Watching · Round {next}" ──────────────────────
+        # Persisted watchlist targets for the next round, each badged against the
+        # model's projected pollers for that round (both / you / model). Hidden
+        # once the season is complete (last_round == 24).
+        if _asm["last_round"] < 24:
+            _nextr = _asm["next_round"]
+            _badge_col = {'both': '#f0b429', 'model': '#34d399', 'you': '#4a90c4'}
+            _picks = [_w for _w in _asm["watch_next"] if _w["badge"] in ('both', 'you')]
+            _model_only = sorted(
+                (_w for _w in _asm["watch_next"] if _w["badge"] == 'model'),
+                key=lambda _w: -_asm["projection"].get(normalise_name(_w["name"]), 0.0),
+            )[:6]
+            _chips_src = _picks + _model_only
+            if _chips_src:
+                _chips = ''
+                for _w in _chips_src:
+                    _bc = _badge_col.get(_w["badge"], '#7e8c99')
+                    _chips += (
+                        f'<span style="display:inline-flex;align-items:center;gap:7px;'
+                        f'background:rgba(140,165,185,.08);border:1px solid rgba(140,165,185,.16);'
+                        f'border-radius:999px;padding:6px 12px;margin:0 8px 8px 0">'
+                        f'<span style="width:8px;height:8px;border-radius:50%;background:{_bc}"></span>'
+                        f'<span style="font-size:13px;color:#e9eef3">{_w["name"]}</span>'
+                        f'<span style="font-size:11px;color:#7e8c99">{_w["team"]}</span></span>'
+                    )
+                _chips_body = _chips
+            else:
+                _chips_body = ('<div style="font-size:13px;color:#7e8c99;padding:4px 0">'
+                               f'No targets or projected pollers for Round {_nextr}.</div>')
+            _wl_legend = (
+                '<div style="display:flex;gap:16px;font-size:11px;color:#7e8c99;margin-top:4px;'
+                'font-family:\'IBM Plex Mono\',monospace">'
+                '<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;'
+                'background:#f0b429;vertical-align:middle;margin-right:5px"></span>you + model</span>'
+                '<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;'
+                'background:#4a90c4;vertical-align:middle;margin-right:5px"></span>you</span>'
+                '<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;'
+                'background:#34d399;vertical-align:middle;margin-right:5px"></span>model</span></div>'
+            )
+            st.markdown(
+                f'<div style="background:rgba(140,165,185,.05);border:1px solid rgba(140,165,185,.14);'
+                f'border-radius:12px;padding:16px 18px;margin:14px 0 6px">'
+                f'<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;'
+                f'color:#7e8c99;margin-bottom:12px">Watching '
+                f'<span style="color:#34d399">· Round {_nextr}</span></div>'
+                f'<div>{_chips_body}</div>{_wl_legend}</div>',
+                unsafe_allow_html=True,
+            )
 
         # Previous-round standings for movement arrows — derived from each
         # player's per-round history (Round_Votes). Omitted if no history.
@@ -5471,31 +5597,36 @@ if _page == 'Live Tracker':
         # ── 5. Two-column layout ──────────────────────────────
         _lb_col, _feed_col = st.columns([3, 2])
 
-        def _bx(v):
-            """Clamp a vote value to a 0–100% position on the shared bullet scale."""
-            return max(0.0, min(100.0, v / _scale_max * 100.0))
-
-        # ── 6. Running leaderboard — actual vs expected ───────
+        # ── 6. Running leaderboard — top 10, actual vs model ──
         with _lb_col:
             st.markdown(
                 '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;'
                 'color:#7e8c99;margin:2px 0 8px">Running leaderboard '
-                '<span style="font-weight:400;letter-spacing:0;text-transform:none">— actual vs expected</span></div>'
-                '<div style="display:flex;gap:18px;font-size:11px;color:#7e8c99;margin:0 0 8px;'
+                '<span style="font-weight:400;letter-spacing:0;text-transform:none">— top 10, actual vs model</span></div>'
+                '<div style="display:flex;gap:18px;font-size:11px;color:#7e8c99;margin:0 0 10px;'
                 'font-family:\'IBM Plex Mono\',monospace">'
-                '<span><span style="display:inline-block;width:9px;height:9px;border-radius:50%;'
-                'background:#9fb0bf;vertical-align:middle;margin-right:5px"></span>actual</span>'
-                '<span><span style="display:inline-block;width:2px;height:11px;background:#34d399;'
-                'vertical-align:middle;margin-right:6px"></span>CC expected</span>'
-                '<span><span style="display:inline-block;width:16px;height:7px;border-radius:3px;'
-                'background:rgba(126,140,153,.22);vertical-align:middle;margin-right:5px"></span>model spread</span>'
+                '<span><span style="display:inline-block;width:16px;height:5px;border-radius:3px;'
+                'background:#34d399;vertical-align:middle;margin-right:5px"></span>actual votes</span>'
+                '<span><span style="display:inline-block;width:2px;height:11px;background:#f0b429;'
+                'vertical-align:middle;margin-right:6px"></span>model projection</span>'
                 '</div>',
                 unsafe_allow_html=True,
             )
 
-            _lt_show = _lt_df[_lt_df["Total_Votes"] > 0].head(25)
+            _lt_show = _lt_df[_lt_df["Total_Votes"] > 0].head(10)
             if _lt_show.empty:
-                _lt_show = _lt_df.head(25)
+                _lt_show = _lt_df.head(10)
+
+            # Shared bullet scale spans both actual votes and the model projection.
+            _lb_vals = []
+            for _, _r in _lt_show.iterrows():
+                _a = int(_r["Total_Votes"])
+                _lb_vals.append(_a)
+                _lb_vals.append(_asm["projection"].get(normalise_name(_r["Player"]), _a))
+            _lb_max = max(_lb_vals + [1])
+
+            def _lbx(v):
+                return max(0.0, min(100.0, v / _lb_max * 100.0))
 
             _rows_html = ''
             for _i, (_, _row) in enumerate(_lt_show.iterrows()):
@@ -5503,8 +5634,8 @@ if _page == 'Live Tracker':
                 _actual = int(_row["Total_Votes"])
                 _rank = int(_row["Rank"])
                 _nn = normalise_name(_nm)
-                _cc = _cc_exp.get(_nn)
-                _others = _other_exp.get(_nn, [])
+                _proj = _asm["projection"].get(_nn, _actual)
+                _d = _asm["delta"].get(_nn)
 
                 # movement arrow (omitted when no prior standings)
                 _arrow = ''
@@ -5515,48 +5646,38 @@ if _page == 'Live Tracker':
                         if _mv > 0:
                             _arrow = f'<span style="color:#34d399;font-size:11px;margin-left:6px">▲{_mv}</span>'
                         else:
-                            _arrow = f'<span style="color:#f0b429;font-size:11px;margin-left:6px">▼{abs(_mv)}</span>'
+                            _arrow = f'<span style="color:#f87171;font-size:11px;margin-left:6px">▼{abs(_mv)}</span>'
 
-                # bullet + delta chip (degrade gracefully if no expected data)
-                if _cc is not None or _others:
-                    _band = ''
-                    if _others:
-                        _bl, _bw = _bx(min(_others)), max(_bx(max(_others)) - _bx(min(_others)), 0.8)
-                        _band = (f'<div style="position:absolute;top:5px;height:6px;left:{_bl:.1f}%;'
-                                 f'width:{_bw:.1f}%;background:rgba(126,140,153,.22);border-radius:3px"></div>')
-                    _tick = ''
-                    if _cc is not None:
-                        _tick = (f'<div style="position:absolute;top:1px;height:14px;width:2px;'
-                                 f'left:{_bx(_cc):.1f}%;background:#34d399;transform:translateX(-1px)"></div>')
-                    if _cc is not None and _actual - _cc >= 2:
-                        _dotc = '#34d399'
-                    elif _cc is not None and _actual - _cc <= -2:
-                        _dotc = '#f0b429'
-                    else:
-                        _dotc = '#9fb0bf'
-                    _dot = (f'<div style="position:absolute;top:50%;left:{_bx(_actual):.1f}%;width:9px;height:9px;'
-                            f'border-radius:50%;background:{_dotc};transform:translate(-50%,-50%);'
-                            f'box-shadow:0 0 0 2px #0a1017"></div>')
-                    _bullet = (f'<div style="position:relative;height:16px">'
-                               f'<div style="position:absolute;top:50%;height:1px;width:100%;'
-                               f'background:rgba(140,165,185,.14)"></div>{_band}{_tick}{_dot}</div>')
-                    if _cc is not None:
-                        _d = _actual - _cc
-                        _chipc = '#34d399' if _d >= 2 else ('#f0b429' if _d <= -2 else '#7e8c99')
-                        _ds = f'+{_d:.1f}' if _d >= 0 else f'−{abs(_d):.1f}'
-                        _chip = (f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:12px;'
-                                 f'color:{_chipc}">{_ds}</span>')
-                    else:
-                        _chip = '<span style="color:#7e8c99">—</span>'
-                else:
-                    _bullet = '<div style="height:16px"></div>'
+                # vs-model delta chip (emerald ahead of pace, muted red behind)
+                if _d is None:
                     _chip = '<span style="color:#7e8c99">—</span>'
+                else:
+                    _chipc = '#34d399' if _d >= 0.05 else ('#f87171' if _d <= -0.05 else '#7e8c99')
+                    _ds = f'+{_d:.1f}' if _d >= 0 else f'−{abs(_d):.1f}'
+                    _chip = (f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:13px;'
+                             f'color:{_chipc}">{_ds}</span>')
+
+                # projection number (steel; the gold lives on the bar tick)
+                _projcell = (f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:13px;'
+                             f'color:#9fb0bf">{_proj:.0f}</span>')
+
+                # bullet: emerald actual fill + gold model-projection tick
+                _bullet = (
+                    f'<div style="position:relative;height:16px">'
+                    f'<div style="position:absolute;top:50%;height:1px;width:100%;'
+                    f'background:rgba(140,165,185,.14);transform:translateY(-50%)"></div>'
+                    f'<div style="position:absolute;top:50%;height:5px;left:0;width:{_lbx(_actual):.1f}%;'
+                    f'background:#34d399;border-radius:3px;transform:translateY(-50%)"></div>'
+                    f'<div style="position:absolute;top:1px;height:14px;width:2px;left:{_lbx(_proj):.1f}%;'
+                    f'background:#f0b429;transform:translateX(-1px)"></div>'
+                    f'</div>'
+                )
 
                 _lead = (_i == 0)
                 _nsz, _nw, _nc = ('17px', '800', '#34d399') if _lead else ('14px', '600', '#e9eef3')
                 _vsz = '20px' if _lead else '15px'
                 _rows_html += (
-                    f'<div style="display:grid;grid-template-columns:26px 1.7fr 44px 2.3fr 56px;'
+                    f'<div style="display:grid;grid-template-columns:24px 1.7fr 44px 50px 46px 2fr;'
                     f'align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(140,165,185,.14)">'
                     f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:12px;color:#7e8c99;'
                     f'text-align:right">{_rank}</div>'
@@ -5565,14 +5686,47 @@ if _page == 'Live Tracker':
                     f'<div style="font-size:11px;color:#7e8c99">{_tm}</div></div>'
                     f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:{_vsz};font-weight:600;'
                     f'color:{_nc};text-align:right">{_actual}</div>'
-                    f'<div>{_bullet}</div>'
                     f'<div style="text-align:right">{_chip}</div>'
+                    f'<div style="text-align:right">{_projcell}</div>'
+                    f'<div>{_bullet}</div>'
                     f'</div>'
                 )
             st.markdown(f'<div>{_rows_html}</div>', unsafe_allow_html=True)
 
-        # ── 7. Latest-votes feed — called vs surprise ─────────
+        # ── 7. Reconciliation + latest-votes feed ─────────────
         with _feed_col:
+            # Reconciliation for the last counted round: bolters (polled, unwatched),
+            # hits (watched & polled), blanks (watched & 0). Hidden before any count.
+            _rl = _asm["last_round"]
+            if _rl > 0:
+                _rlab = 'Opening Round' if _rl == 0 else f'Round {_rl}'
+
+                def _recon_group(title, items, color, icon, show_votes):
+                    if not items:
+                        _body = '<div style="font-size:12px;color:#7e8c99;padding:3px 0">—</div>'
+                    else:
+                        _body = ''
+                        for _it in items[:6]:
+                            _v = ''
+                            if show_votes and _it.get("votes"):
+                                _v = (f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
+                                      f'color:{color};margin-left:6px">{_it["votes"]}</span>')
+                            _body += (f'<div style="font-size:12px;color:#e9eef3;padding:2px 0">'
+                                      f'{_it["name"]}<span style="color:#7e8c99"> · {_it["team"]}</span>{_v}</div>')
+                    return (f'<div style="margin-bottom:12px">'
+                            f'<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;'
+                            f'color:{color};margin-bottom:4px">{icon} {title}</div>{_body}</div>')
+
+                st.markdown(
+                    '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;'
+                    'color:#7e8c99;margin:2px 0 10px">Reconciliation '
+                    f'<span style="font-weight:400;letter-spacing:0;text-transform:none">— {_rlab}</span></div>'
+                    + _recon_group('Bolters', _asm["recon"]["bolter"], '#f0b429', '⚡', True)
+                    + _recon_group('Hit', _asm["recon"]["hit"], '#34d399', '✓', True)
+                    + _recon_group('Blanked', _asm["recon"]["blanked"], '#f87171', '✗', False),
+                    unsafe_allow_html=True,
+                )
+
             st.markdown(
                 '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;'
                 'color:#7e8c99;margin:2px 0 8px">Latest votes '
