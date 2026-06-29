@@ -22,7 +22,38 @@ DOWNLOAD_DIR = os.path.abspath("data_wheelo/downloads")
 OUTPUT_CSV = "data_wheelo/wheelo_2026.csv"
 BASE_URL = "https://www.wheeloratings.com/afl_match_stats.html"
 
+# Wheelo's own published per-game Brownlow vote predictions. The dashboard's
+# Model Comparison sums the 'Votes' column per player to reproduce
+# wheeloratings.com's published leaderboard exactly (not our match-stats sum).
+BROWNLOW_CSV_URL = "https://www.wheeloratings.com/src/data/wheelo-brownlow-predictions.csv"
+BROWNLOW_OUTPUT = "data_2026/wheelo_brownlow_predictions.csv"
+
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
+
+
+def fetch_brownlow_predictions():
+    """Download Wheelo's published Brownlow vote predictions (plain CSV, no
+    Selenium needed). Independent of the match-stats fetch below."""
+    import requests
+    try:
+        os.makedirs(os.path.dirname(BROWNLOW_OUTPUT), exist_ok=True)
+        resp = requests.get(
+            BROWNLOW_CSV_URL,
+            headers={"User-Agent": "Mozilla/5.0"}, timeout=30,
+        )
+        resp.raise_for_status()
+        df = pd.read_csv(io.StringIO(resp.text))
+        if "Player" not in df.columns or "Votes" not in df.columns:
+            print(f"  Brownlow predictions: unexpected columns "
+                  f"{list(df.columns)[:6]} — skipped")
+            return
+        df.to_csv(BROWNLOW_OUTPUT, index=False)
+        lead = (df.groupby("Player")["Votes"].sum()
+                .sort_values(ascending=False).head(8))
+        print(f"  Brownlow predictions: saved {len(df)} rows -> {BROWNLOW_OUTPUT}")
+        print("  Top: " + ", ".join(f"{p} {v:.1f}" for p, v in lead.items()))
+    except Exception as e:
+        print(f"  Brownlow predictions fetch failed: {e}")
 
 
 def get_driver():
@@ -151,6 +182,11 @@ def fetch_round(driver, wheelo_round):
 
 
 def main():
+    # Wheelo's published Brownlow leaderboard (drives Model Comparison) — fetch
+    # first so it refreshes even if the Selenium match-stats step below fails.
+    print("Fetching Wheelo published Brownlow predictions...")
+    fetch_brownlow_predictions()
+
     # Load existing data
     if os.path.exists(OUTPUT_CSV):
         existing = pd.read_csv(OUTPUT_CSV)

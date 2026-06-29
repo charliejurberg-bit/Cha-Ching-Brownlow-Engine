@@ -6026,10 +6026,28 @@ if _page == 'Model Comparison':
         if not _mc_bf_df.empty and 'Player' in _mc_bf_df.columns:
             _mc_bf_df['Player'] = _mc_bf_df['Player'].str.title().str.strip()
 
-        # 4. Wheelo
+        # 4. Wheelo — Wheelo's OWN published Brownlow predictions, summed per
+        #    player. wheeloratings.com builds its leaderboard from the per-game
+        #    'Votes' column in wheelo-brownlow-predictions.csv; summing it here
+        #    reproduces that published leaderboard exactly (e.g. Heeney rank 7,
+        #    not 5). Refreshed weekly by update_wheelo_2026.py via Run Update.
+        #    Falls back to the match-stats ExpVotes sum only if the published
+        #    file is absent — that is a different metric and undercounts because
+        #    our match-stats scrape is missing rounds for some players.
         _mc_wh_df = pd.DataFrame()
-        _mc_wh_path = "data_wheelo/wheelo_2026.csv"
-        if os.path.exists(_mc_wh_path):
+        _mc_wh_pub  = "data_2026/wheelo_brownlow_predictions.csv"
+        _mc_wh_path = "data_wheelo/wheelo_2026.csv"   # legacy fallback
+        if os.path.exists(_mc_wh_pub):
+            _mc_wh_raw = pd.read_csv(_mc_wh_pub)
+            if {'Player', 'Votes'} <= set(_mc_wh_raw.columns):
+                _mc_wh_agg = (
+                    _mc_wh_raw.groupby('Player')['Votes'].sum()
+                    .reset_index().sort_values('Votes', ascending=False).reset_index(drop=True)
+                )
+                _mc_wh_agg['WH_Rank'] = _mc_wh_agg.index + 1
+                _mc_wh_df = _mc_wh_agg.rename(columns={'Votes': 'WH_Votes'})
+                _mc_wh_df['Player'] = _mc_wh_df['Player'].str.title().str.strip()
+        elif os.path.exists(_mc_wh_path):
             _mc_wh_raw = pd.read_csv(_mc_wh_path)
             _mc_wh_col = next((c for c in ['ExpVotes', 'RatingPoints'] if c in _mc_wh_raw.columns), None)
             if _mc_wh_col:
