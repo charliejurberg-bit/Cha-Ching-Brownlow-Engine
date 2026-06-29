@@ -6101,7 +6101,7 @@ if _page == 'Model Comparison':
                     f'<div style="font-size:9px;font-weight:700;letter-spacing:1.2px;'
                     f'text-transform:uppercase;color:#7e8c99">{label}</div>'
                     f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:18px;font-weight:600;'
-                    f'color:{_c};text-align:right;font-variant-numeric:tabular-nums">{_v}</div></div>')
+                    f'color:{_c};text-align:left;font-variant-numeric:tabular-nums">{_v}</div></div>')
         st.markdown(
             '<div style="display:grid;grid-template-columns:repeat(5,1fr);margin:0 0 22px;'
             'border-top:1px solid rgba(140,165,185,.14);border-bottom:1px solid rgba(140,165,185,.14)">' +
