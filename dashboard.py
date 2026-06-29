@@ -2168,9 +2168,9 @@ if _show_controls:
                 unsafe_allow_html=True,
             )
     with _cc3:
-        # Player Profile renders its own Season selector inline (next to the
-        # player name); every other season page uses this top-right control.
-        if _page in _SEASON_PAGES and _page != 'Player Profile':
+        # Player Profile and Leaderboard render their own Season selector inline
+        # (next to the title); every other season page uses this top-right control.
+        if _page in _SEASON_PAGES and _page not in ('Player Profile', 'Leaderboard'):
             # Per-page widget key keeps pages independent; on_change mirrors the
             # pick into season_by_page so it survives navigating away and back.
             st.selectbox(
@@ -2843,17 +2843,30 @@ if _page == 'Predictions':
 # ════════════════════════════════════════════════════════════
 if _page == 'Leaderboard':
     _lb_live_html = ' <span class="lb-live-pill">LIVE</span>' if is_2026 else ""
-    st.markdown(
-        f'<div class="lb-header">'
-        f'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
-        f'<h2 class="lb-title">{selected_season} Brownlow Leaderboard</h2>'
-        f'{_lb_live_html}'
-        f'</div>'
-        f'<p class="lb-subtitle">'
-        f'{"Projected votes through current round" if is_2026 else "Model predicted vs actual results"}'
-        f'</p></div>',
-        unsafe_allow_html=True,
-    )
+    _lbh_main, _lbh_season = st.columns([4, 1], vertical_alignment="bottom")
+    with _lbh_main:
+        st.markdown(
+            f'<div class="lb-header">'
+            f'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+            f'<h2 class="lb-title">{selected_season} Brownlow Leaderboard</h2>'
+            f'{_lb_live_html}'
+            f'</div>'
+            f'<p class="lb-subtitle">'
+            f'{"Projected votes through current round" if is_2026 else "Model predicted vs actual results"}'
+            f'</p></div>',
+            unsafe_allow_html=True,
+        )
+    with _lbh_season:
+        # Season picker sits inline with the title (per-page key mirrors the
+        # choice into season_by_page via _season_changed, like the other pages).
+        st.selectbox(
+            "Season", AVAILABLE_SEASONS,
+            index=AVAILABLE_SEASONS.index(selected_season),
+            key=f"_ctrl_season::{_page}",
+            on_change=_season_changed,
+            args=(_page,),
+            label_visibility="collapsed",
+        )
 
     # ── Shared data: projection, odds, form, bar domain, helpers ──
     _proj_floor, _proj_ceiling, has_fc = {}, {}, False
