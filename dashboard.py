@@ -3153,19 +3153,6 @@ SCOPE .lb-bar-lo{text-align:right;}
     if is_2026 and _fg:
         st.caption("Form (last 3 rounds): emerald = predicted to poll (≥30%) · grey = quiet · faint = did not play")
 
-    st.markdown(f'<div class="section-header">{"Projected — Top 20" if is_2026 else "Expected vs Actual — Top 20"}</div>', unsafe_allow_html=True)
-    chart = predictions.head(20).copy()
-    fig = go.Figure()
-    if not is_2026:
-        fig.add_trace(go.Bar(name='Actual', x=chart['Player_Name'], y=chart['Actual_Votes'],
-                             marker_color='#adb5bd', opacity=0.7))
-    fig.add_trace(go.Bar(name='Model Expected', x=chart['Player_Name'],
-                         y=chart['Exp_Total_Votes'].round(1), marker_color='#34d399', opacity=0.9))
-    fig = apply_chart_theme(fig)
-    fig.update_layout(barmode='group', legend=dict(orientation='h', y=1.1),
-                      xaxis_tickangle=-35, margin=dict(t=20, b=120))
-    st.plotly_chart(fig, width='stretch', key="chart_002")
-
 # ════════════════════════════════════════════════════════════
 # PLAYER PROFILE
 # ════════════════════════════════════════════════════════════
