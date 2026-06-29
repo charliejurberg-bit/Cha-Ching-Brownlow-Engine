@@ -5390,7 +5390,7 @@ if _page == 'Live Tracker':
     # ── named constants (single source for the reconciliation thresholds) ──
     BOLTER_MIN_VOTES = 2      # actual round votes ≥ this to count as a poll
     BOLTER_MODEL_MAX = 0.8    # model Exp_Votes below this = "nobody saw it coming"
-    MISSED_MODEL_MIN = 1.2    # model Exp_Votes ≥ this and blanked = a real model miss
+    MISSED_MODEL_MIN = 1.0    # model Exp_Votes ≥ this and blanked = a real model miss
     MODEL_TOPN_ROUND = 5      # model's top-N by Exp_Votes for a given round
     MODEL_VOTE_FLOOR = 0.2    # project convention: ignore projected votes ≤ this (noise)
     UPCOMING_LEAD    = 2      # surface a watchlist target this many rounds ahead
