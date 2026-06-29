@@ -472,6 +472,9 @@ st.markdown("""
     }
     .cc-banner {
         position: relative;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100vw;
         background: var(--bg);
         border-bottom: 1px solid var(--line);
         padding: 26px 0 18px;
