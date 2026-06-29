@@ -5387,9 +5387,19 @@ if _page == 'Live Tracker':
     import streamlit.components.v1 as _stc
     _lt_auto = False  # set in the utility line below; init so refresh guard is safe
 
-    # ── 1. Header (no box) — the LIVE pill pulses (@keyframes), so it is
-    #    rendered through a components.html iframe (Streamlit strips keyframes
-    #    from st.markdown). ─────────────────────────────────────
+    # ── named constants (single source for the reconciliation thresholds) ──
+    BOLTER_MIN_VOTES = 2      # actual round votes ≥ this to count as a poll
+    BOLTER_MODEL_MAX = 0.8    # model Exp_Votes below this = "nobody saw it coming"
+    MISSED_MODEL_MIN = 1.2    # model Exp_Votes ≥ this and blanked = a real model miss
+    MODEL_TOPN_ROUND = 5      # model's top-N by Exp_Votes for a given round
+    MODEL_VOTE_FLOOR = 0.2    # project convention: ignore projected votes ≤ this (noise)
+    UPCOMING_LEAD    = 2      # surface a watchlist target this many rounds ahead
+    _LT_IFRAME_H     = 880    # fixed single-viewport iframe height (no internal scroll)
+
+    _auto_state = bool(st.session_state.get("lt_auto_refresh", False))
+
+    # Small fallback header for the error / no-data states only. The live panel
+    # folds its own topbar (title + LIVE pill) into the single redesign iframe.
     _pill_txt = "LIVE" if _lt_live else "OFF-SEASON"
     _pill_col = "#34d399" if _lt_live else "#7e8c99"
     _hdr_html = f"""<!doctype html><html><head><meta charset="utf-8">
@@ -5412,387 +5422,493 @@ if _page == 'Live Tracker':
     <span class="pill {'live' if _lt_live else ''}"><span class="dot"></span>{_pill_txt}</span></div>
   <div class="comp">{_lt_sn}</div>
 </div></body></html>"""
-    _stc.html(_hdr_html, height=54)
 
     if _lt_err:
+        _stc.html(_hdr_html, height=54)
         st.error(f"Could not fetch AFL tracker data: {_lt_err}")
         if st.button("Retry", key="lt_retry"):
             st.cache_data.clear()
             st.rerun()
-    elif not _lt_live:
-        # Off-season friendly message + still show AFL predictor data if available
+    elif _lt_df.empty:
+        _stc.html(_hdr_html, height=54)
         st.info(
             "Count night hasn't started yet — showing AFL's own Brownlow predictor data "
             "for the current season. This page will update automatically on count night."
         )
-        if _lt_df.empty:
-            st.stop()
     else:
-        pass  # live — fall through to content
+        if not _lt_live:
+            st.info(
+                "Count night hasn't started yet — showing AFL's own Brownlow predictor data "
+                "for the current season. This page will update automatically on count night."
+            )
 
-    if not _lt_df.empty:
-        _leader = _lt_df.iloc[0]
-        _leader_total = int(_leader["Total_Votes"])
-        _second_total = int(_lt_df.iloc[1]["Total_Votes"]) if len(_lt_df) > 1 else 0
-        _margin = _leader_total - _second_total
+        # ── shared assembly: live votes + model per-round signal + watchlist ──
+        _wl      = betting_hub._load_watchlist()
+        _lt_game = load_game(2026)
+        _asm     = _assemble_live_tracker(_lt, _lt_game, _wl)
 
-        # Single assembly off live data + model per-round Exp_Votes/Poll_Prob +
-        # the persisted watchlist. Everything below renders from _asm.
-        _asm = _assemble_live_tracker(_lt, load_game(2026), betting_hub._load_watchlist())
-        _leader_nn = normalise_name(_leader["Player"])
+        _disp_round = int(_asm["last_round"])     # AFL display round (already offset)
+        _next_round = _disp_round + 1
+        _round_lbl  = "Opening Round" if _disp_round == 0 else f"Round {_disp_round}"
+        _race_rstr  = "OR" if _disp_round == 0 else f"R{_disp_round}"
+
+        # team abbreviations (mirror of the leaderboard map; scoped per-branch)
+        _LT_ABBR = {
+            "Adelaide": "ADEL", "Brisbane Lions": "BRIS", "Brisbane": "BRIS",
+            "Carlton": "CARL", "Collingwood": "COLL", "Essendon": "ESSE",
+            "Fremantle": "FREO", "Geelong": "GEEL", "Gold Coast": "GCFC",
+            "Greater Western Sydney": "GWS", "GWS": "GWS", "GWS Giants": "GWS",
+            "Hawthorn": "HAWK", "Melbourne": "MELB", "North Melbourne": "NMFC",
+            "Port Adelaide": "PORT", "Richmond": "RICH", "St Kilda": "STK",
+            "Sydney": "SYD", "West Coast": "WCE", "Western Bulldogs": "WBD",
+        }
+        def _abbr(t):
+            return _LT_ABBR.get(str(t), str(t)[:4].upper())
+
+        # per-round model signal keyed by AFL display round (= Round_num - 1)
+        _round_exp, _round_pp, _game_name, _game_team = {}, {}, {}, {}
+        if (_lt_game is not None and not getattr(_lt_game, "empty", True)
+                and {"Exp_Votes", "Round_num"} <= set(_lt_game.columns)):
+            _gp = next((c for c in ("Player", "Player_Name") if c in _lt_game.columns), None)
+            _has_pp = "Poll_Prob" in _lt_game.columns
+            _has_tm = "Team" in _lt_game.columns
+            if _gp:
+                for _, _g in _lt_game.iterrows():
+                    try:
+                        _dr = int(_g["Round_num"]) - 1
+                        _ev = float(_g["Exp_Votes"])
+                    except (TypeError, ValueError):
+                        continue
+                    _nn = normalise_name(_g[_gp])
+                    _game_name.setdefault(_nn, _g[_gp])
+                    if _has_tm:
+                        _game_team.setdefault(_nn, _g["Team"])
+                    if not pd.isna(_ev):
+                        _round_exp.setdefault(_dr, {})[_nn] = _ev
+                    if _has_pp and pd.notna(_g["Poll_Prob"]):
+                        _round_pp.setdefault(_dr, {})[_nn] = float(_g["Poll_Prob"])
+
+        def _model_topn(dr):
+            _d = _round_exp.get(dr, {})
+            return set(sorted(_d, key=lambda k: -_d[k])[:MODEL_TOPN_ROUND])
+
+        # name / team resolution across live df, watchlist, and model game file
+        _wl_name, _wl_team = {}, {}
+        if _wl is not None and not _wl.empty:
+            for _, _w in _wl.iterrows():
+                _wn = normalise_name(_w.get("Player", ""))
+                _wl_name[_wn] = _w.get("Player", "")
+                _wl_team[_wn] = _w.get("Team", "")
+        def _name_of(nn):
+            return _asm["name"].get(nn) or _wl_name.get(nn) or _game_name.get(nn) or nn
+        def _team_of(nn):
+            return _asm["team"].get(nn) or _wl_team.get(nn) or _game_team.get(nn) or ""
+
+        # watchlist "card" per display round (unsettled rows only)
+        def _rounds_of(s):
+            _out = set()
+            for _t in str(s).split(","):
+                _t = _t.strip()
+                if _t.lstrip("-").isdigit():
+                    _out.add(int(_t))
+            return _out
+        _card_by_round = {}
+        if _wl is not None and not _wl.empty:
+            for _, _w in _wl.iterrows():
+                if bool(_w.get("Settled", False)):
+                    continue
+                _wn = normalise_name(_w.get("Player", ""))
+                for _R in _rounds_of(_w.get("My_Rounds", "")):
+                    _card_by_round.setdefault(_R, set()).add(_wn)
+        _your_card = _card_by_round.get(_disp_round, set())
+
+        # ── leader race band ──────────────────────────────────
+        _leader     = _lt_df.iloc[0]
+        _leader_nm  = _leader["Player"]
+        _leader_tm  = _leader["Team"]
+        _leader_nn  = normalise_name(_leader_nm)
+        _leader_tot = int(_leader["Total_Votes"])
+        _second     = _lt_df.iloc[1] if len(_lt_df) > 1 else None
+        _third      = _lt_df.iloc[2] if len(_lt_df) > 2 else None
+        _second_tot = int(_second["Total_Votes"]) if _second is not None else 0
+        _clear      = _leader_tot - _second_tot
         _leader_pace = _asm["delta"].get(_leader_nn)
 
-        # ── 2. Count-progress bar (replaces the four stat cards) ──
-        _rounds_total = 24
-        _n_counted = max(0, min(int(_lt_last), _rounds_total))
-        _pct = _n_counted / _rounds_total * 100
-        st.markdown(
-            f'<div style="margin:12px 0 8px">'
-            f'<div style="display:flex;justify-content:space-between;font-size:11px;color:#7e8c99;'
-            f'font-family:\'IBM Plex Mono\',monospace;margin-bottom:5px">'
-            f'<span style="text-transform:uppercase;letter-spacing:.12em">Count progress</span>'
-            f'<span>Round {_n_counted} of {_rounds_total} counted</span></div>'
-            f'<div style="height:4px;border-radius:2px;background:rgba(140,165,185,.14)">'
-            f'<div style="height:4px;border-radius:2px;width:{_pct:.1f}%;background:#34d399"></div>'
-            f'</div></div>',
-            unsafe_allow_html=True,
-        )
+        _chase_bits = []
+        for _cr in (_second, _third):
+            if _cr is not None and int(_cr["Total_Votes"]) > 0:
+                _chase_bits.append((_cr["Player"], int(_cr["Total_Votes"])))
+        if _chase_bits:
+            _names_html = " &amp; ".join(f"<b>{_n}</b>" for _n, _ in _chase_bits)
+            _gap = _chase_bits[0][1] - _leader_tot
+            _gap_txt = f"(−{abs(_gap)})" if _gap < 0 else "(level)"
+            _chase_html = (f'Chasing: {_names_html}, on {_chase_bits[0][1]} '
+                           f'<span class="gap">{_gap_txt}</span>')
+        else:
+            _chase_html = '<span style="color:var(--muted2)">No chasers yet</span>'
 
-        # ── 3. Race hero (replaces the rest of the cards) ─────
-        _chasers = [(_lt_df.iloc[_i]["Player"], int(_lt_df.iloc[_i]["Total_Votes"]))
-                    for _i in (1, 2) if len(_lt_df) > _i]
-        _chaser_line = '  ·  '.join(f'{_n} {_v}' for _n, _v in _chasers) or '—'
-        _pace_html = ''
-        if _leader_pace is not None:
-            _pc = '#34d399' if _leader_pace >= 0 else '#f87171'
-            _ps = f'+{_leader_pace:.1f}' if _leader_pace >= 0 else f'−{abs(_leader_pace):.1f}'
-            _pace_html = (f' &nbsp;·&nbsp; <span style="color:{_pc};font-weight:700">'
-                          f'{_ps} vs model pace</span>')
-        st.markdown(
-            f'<div style="display:flex;align-items:flex-end;justify-content:space-between;'
-            f'gap:24px;flex-wrap:wrap;margin:6px 0 2px">'
-            f'<div><div style="font-family:\'Archivo\',sans-serif;font-size:40px;font-weight:800;'
-            f'color:#e9eef3;line-height:1.02">{_leader["Player"]}</div>'
-            f'<div style="font-size:13px;color:#7e8c99;margin-top:5px">{_leader["Team"]}</div></div>'
-            f'<div style="display:flex;gap:38px">'
-            f'<div style="text-align:right"><div style="font-size:10px;font-weight:700;'
-            f'letter-spacing:1.5px;text-transform:uppercase;color:#7e8c99">Votes</div>'
-            f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:42px;font-weight:600;'
-            f'color:#34d399;line-height:1">{_leader_total}</div></div>'
-            f'<div style="text-align:right"><div style="font-size:10px;font-weight:700;'
-            f'letter-spacing:1.5px;text-transform:uppercase;color:#7e8c99">Lead</div>'
-            f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:42px;font-weight:600;'
-            f'color:#e9eef3;line-height:1">+{_margin}</div></div>'
-            f'</div></div>'
-            f'<div style="font-size:12px;color:#7e8c99;margin:2px 0 12px">Chasing &nbsp;{_chaser_line}{_pace_html}</div>',
-            unsafe_allow_html=True,
-        )
+        if _leader_pace is None:
+            _pace_html = ""
+        elif _leader_pace >= 0:
+            _pace_html = f'<span class="pace">+{_leader_pace:.1f} vs model pace</span>'
+        else:
+            _pace_html = (f'<span style="color:var(--muted);font-family:var(--mono);'
+                          f'font-weight:600">−{abs(_leader_pace):.1f} vs model pace</span>')
+        _sub_html = _leader_tm + (f" &nbsp;·&nbsp; {_pace_html}" if _pace_html else "")
 
-        # ── 4. Utility line: auto-refresh, last-fetched, source link ──
-        _ua, _ub = st.columns([1.25, 4])
-        with _ua:
-            _lt_auto = st.checkbox("Auto-refresh 60s", value=False, key="lt_auto_refresh")
-        with _ub:
-            st.markdown(
-                f'<div style="font-size:11px;color:#7e8c99;margin-top:9px;'
-                f'font-family:\'IBM Plex Mono\',monospace">'
-                f'Last fetched {_time.strftime("%H:%M:%S")} &nbsp;·&nbsp; '
-                f'{"Live count" if _count_night else "Prediction mode"} &nbsp;·&nbsp; '
-                f'<a href="https://www.afl.com.au/brownlow-medal/live-tracker" target="_blank" '
-                f'style="color:#34d399;text-decoration:none">AFL.com.au ↗</a></div>',
-                unsafe_allow_html=True,
-            )
+        # ── Zone 1: last counted round reconciliation ─────────
+        def _av(nn):
+            return int(_asm["round_votes"].get(nn, {}).get(_disp_round, 0))
+        def _evr(nn):
+            return float(_round_exp.get(_disp_round, {}).get(nn, 0.0))
+        _topn1 = _model_topn(_disp_round)
+        _cands = set(_your_card) | set(_topn1)
+        for _nn, _rv in _asm["round_votes"].items():
+            if _rv.get(_disp_round, 0):
+                _cands.add(_nn)
+        _bolters, _landed, _missed = [], [], []
+        for _nn in _cands:
+            _a = _av(_nn); _e = _evr(_nn)
+            _oncard = _nn in _your_card
+            _intopn = _nn in _topn1
+            if _a >= BOLTER_MIN_VOTES and _e < BOLTER_MODEL_MAX and not _oncard:
+                _bolters.append((_nn, _a, _e))
+            elif _a > 0 and (_oncard or _intopn):
+                _dot = "both" if (_oncard and _intopn) else ("you" if _oncard else "model")
+                _landed.append((_nn, _a, _dot))
+            elif _a == 0 and (_oncard or (_intopn and _e >= MISSED_MODEL_MIN)):
+                _missed.append((_nn, _e, _oncard))
+        _bolters.sort(key=lambda x: (-x[1], -x[2]))
+        _landed.sort(key=lambda x: -x[1])
+        _missed.sort(key=lambda x: -x[1])
+        _bolters, _landed, _missed = _bolters[:6], _landed[:6], _missed[:6]
 
-        # ── Watchlist card — "Watching · Round {next}" ──────────────────────
-        # Persisted watchlist targets for the next round, each badged against the
-        # model's projected pollers for that round (both / you / model). Hidden
-        # once the season is complete (last_round == 24).
-        if _asm["last_round"] < 24:
-            _nextr = _asm["next_round"]
-            _badge_col = {'both': '#f0b429', 'model': '#34d399', 'you': '#4a90c4'}
-            _picks = [_w for _w in _asm["watch_next"] if _w["badge"] in ('both', 'you')]
-            _model_only = sorted(
-                (_w for _w in _asm["watch_next"] if _w["badge"] == 'model'),
-                key=lambda _w: -_asm["projection"].get(normalise_name(_w["name"]), 0.0),
-            )[:6]
-            _chips_src = _picks + _model_only
-            if _chips_src:
-                _chips = ''
-                for _w in _chips_src:
-                    _bc = _badge_col.get(_w["badge"], '#7e8c99')
-                    _chips += (
-                        f'<span style="display:inline-flex;align-items:center;gap:7px;'
-                        f'background:rgba(140,165,185,.08);border:1px solid rgba(140,165,185,.16);'
-                        f'border-radius:999px;padding:6px 12px;margin:0 8px 8px 0">'
-                        f'<span style="width:8px;height:8px;border-radius:50%;background:{_bc}"></span>'
-                        f'<span style="font-size:13px;color:#e9eef3">{_w["name"]}</span>'
-                        f'<span style="font-size:11px;color:#7e8c99">{_w["team"]}</span></span>'
-                    )
-                _chips_body = _chips
-            else:
-                _chips_body = ('<div style="font-size:13px;color:#7e8c99;padding:4px 0">'
-                               f'No targets or projected pollers for Round {_nextr}.</div>')
-            _wl_legend = (
-                '<div style="display:flex;gap:16px;font-size:11px;color:#7e8c99;margin-top:4px;'
-                'font-family:\'IBM Plex Mono\',monospace">'
-                '<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;'
-                'background:#f0b429;vertical-align:middle;margin-right:5px"></span>you + model</span>'
-                '<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;'
-                'background:#4a90c4;vertical-align:middle;margin-right:5px"></span>you</span>'
-                '<span><span style="display:inline-block;width:8px;height:8px;border-radius:50%;'
-                'background:#34d399;vertical-align:middle;margin-right:5px"></span>model</span></div>'
-            )
-            st.markdown(
-                f'<div style="background:rgba(140,165,185,.05);border:1px solid rgba(140,165,185,.14);'
-                f'border-radius:12px;padding:16px 18px;margin:14px 0 6px">'
-                f'<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;'
-                f'color:#7e8c99;margin-bottom:12px">Watching '
-                f'<span style="color:#34d399">· Round {_nextr}</span></div>'
-                f'<div>{_chips_body}</div>{_wl_legend}</div>',
-                unsafe_allow_html=True,
-            )
+        # right-header tally: how many polled players the model's top-3 called
+        _proj_set = _asm["model_pollers"].get(_disp_round)
+        _polled_nns = [nn for nn, rv in _asm["round_votes"].items() if rv.get(_disp_round, 0)]
+        _total_polled = len(_polled_nns)
+        if _proj_set is not None and _total_polled:
+            _called = sum(1 for nn in _polled_nns if nn in _proj_set)
+            _z1_tally = f"{_called} of {_total_polled} called"
+        else:
+            _z1_tally = f"{_total_polled} polled" if _total_polled else ""
 
-        # Previous-round standings for movement arrows — derived from each
-        # player's per-round history (Round_Votes). Omitted if no history.
+        def _vcls(v):
+            return "v3" if v == 3 else ("v2" if v == 2 else ("v0" if v == 0 else ""))
+        def _vtxt(v):
+            return f"+{v}" if v > 0 else "0"
+        def _rrow(dot, name, mexp, vhtml):
+            _m = f'<span class="mexp">{mexp}</span>' if mexp else ""
+            return (f'<div class="rrow"><span class="dot {dot}"></span>'
+                    f'<span class="pl">{name}</span>{_m}{vhtml}</div>')
+
+        _z1 = (f'<div class="recon-h bolt"><span>⚡ Bolters</span>'
+               f'<span class="ct">polled, nobody called it · {len(_bolters)}</span></div>')
+        if _bolters:
+            for _nn, _a, _e in _bolters:
+                _z1 += _rrow("none", _name_of(_nn), f"model {_e:.1f}",
+                             f'<span class="vn {_vcls(_a)}">{_vtxt(_a)}</span>')
+        else:
+            _z1 += '<div class="empty">No bolters this round.</div>'
+
+        _z1 += (f'<div class="recon-h hit" style="margin-top:16px;"><span>✓ Landed</span>'
+                f'<span class="ct">polled, called by you or model · {len(_landed)}</span></div>')
+        if _landed:
+            for _nn, _a, _dot in _landed:
+                _z1 += _rrow(_dot, _name_of(_nn), "",
+                             f'<span class="vn {_vcls(_a)}">{_vtxt(_a)}</span>')
+        else:
+            _z1 += '<div class="empty">Nothing landed yet.</div>'
+
+        _z1 += (f'<div class="recon-h cold" style="margin-top:16px;"><span>○ Missed</span>'
+                f'<span class="ct">called, blanked · {len(_missed)}</span></div>')
+        if _missed:
+            for _nn, _e, _oncard in _missed:
+                if _oncard:
+                    _z1 += _rrow("you", _name_of(_nn), "your pick",
+                                 '<span class="vn v0">0</span>')
+                else:
+                    _z1 += _rrow("model", _name_of(_nn), f"exp {_e:.1f}",
+                                 '<span class="vn v0">0</span>')
+        else:
+            _z1 += '<div class="empty">No misses — every call polled.</div>'
+
+        # ── Zone 2: cumulative leaderboard top 10 ─────────────
+        _show = _lt_df[_lt_df["Total_Votes"] > 0].head(10)
+        if _show.empty:
+            _show = _lt_df.head(10)
+        _lead_votes = max(1, int(_show.iloc[0]["Total_Votes"]))
+        _lead_proj  = max(1.0, float(_asm["projection"].get(
+            normalise_name(_show.iloc[0]["Player"]), _lead_votes)))
+
         _prev_rank = {}
-        if int(_lt_last) > 0:
+        if _disp_round > 0:
             _prev_tot, _have_hist = {}, False
             for _, _r in _lt_df.iterrows():
-                _rv = _r.get('Round_Votes', {})
-                if isinstance(_rv, dict) and _rv:
+                _rv = _asm["round_votes"].get(normalise_name(_r["Player"]), {})
+                if _rv:
                     _have_hist = True
-                    _prev_tot[_r['Player']] = sum(int(_p) for _rd, _p in _rv.items()
-                                                  if int(_rd) < int(_lt_last))
-                else:
-                    _prev_tot[_r['Player']] = 0
+                _prev_tot[_r["Player"]] = sum(int(p) for rd, p in _rv.items() if int(rd) < _disp_round)
             if _have_hist:
-                _order = sorted(_prev_tot, key=lambda _p: -_prev_tot[_p])
-                _prev_rank = {_p: _i + 1 for _i, _p in enumerate(_order)}
+                _order = sorted(_prev_tot, key=lambda p: -_prev_tot[p])
+                _prev_rank = {p: i + 1 for i, p in enumerate(_order)}
 
-        # Structured vote drops per round (rebuilt from Round_Votes).
-        _drops_by_round = {}
-        for _, _r in _lt_df.iterrows():
-            _rv = _r.get('Round_Votes', {})
-            if isinstance(_rv, dict):
-                for _rd, _pts in _rv.items():
-                    if _pts:
-                        _drops_by_round.setdefault(int(_rd), []).append(
-                            (_r['Player'], _r['Team'], int(_pts)))
-
-        # Per-game projected pollers (Cha Ching, the only per-game source) =
-        # top-3 Poll_Prob within each game. Keyed by AFL round (= game Round_num
-        # − 1, per the project's round-offset convention). None ⇒ unavailable.
-        _proj_pollers = {}
-        _lt_game = load_game(2026)
-        if _lt_game is not None and {'Poll_Prob', 'Round_num'} <= set(_lt_game.columns):
-            _gpcol = next((_c for _c in ('Player', 'Player_Name') if _c in _lt_game.columns), None)
-            if _gpcol:
-                _gkeys = [_c for _c in ('Round_num', 'Home.team', 'Away.team') if _c in _lt_game.columns]
-                _grpkeys = _gkeys if len(_gkeys) > 1 else ['Round_num']
-                for _gk, _grp in _lt_game.groupby(_grpkeys):
-                    _rn = int(_gk[0]) if isinstance(_gk, tuple) else int(_gk)
-                    _names = {normalise_name(_n) for _n in _grp.nlargest(3, 'Poll_Prob')[_gpcol]}
-                    _proj_pollers.setdefault(_rn - 1, set()).update(_names)
-
-        # ── 5. Two-column layout ──────────────────────────────
-        _lb_col, _feed_col = st.columns([3, 2])
-
-        # ── 6. Running leaderboard — top 10, actual vs model ──
-        with _lb_col:
-            st.markdown(
-                '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;'
-                'color:#7e8c99;margin:2px 0 8px">Running leaderboard '
-                '<span style="font-weight:400;letter-spacing:0;text-transform:none">— top 10, actual vs model</span></div>'
-                '<div style="display:flex;gap:18px;font-size:11px;color:#7e8c99;margin:0 0 10px;'
-                'font-family:\'IBM Plex Mono\',monospace">'
-                '<span><span style="display:inline-block;width:16px;height:5px;border-radius:3px;'
-                'background:#34d399;vertical-align:middle;margin-right:5px"></span>actual votes</span>'
-                '<span><span style="display:inline-block;width:2px;height:11px;background:#f0b429;'
-                'vertical-align:middle;margin-right:6px"></span>model projection</span>'
-                '</div>',
-                unsafe_allow_html=True,
-            )
-
-            _lt_show = _lt_df[_lt_df["Total_Votes"] > 0].head(10)
-            if _lt_show.empty:
-                _lt_show = _lt_df.head(10)
-
-            # Shared bullet scale spans both actual votes and the model projection.
-            _lb_vals = []
-            for _, _r in _lt_show.iterrows():
-                _a = int(_r["Total_Votes"])
-                _lb_vals.append(_a)
-                _lb_vals.append(_asm["projection"].get(normalise_name(_r["Player"]), _a))
-            _lb_max = max(_lb_vals + [1])
-
-            def _lbx(v):
-                return max(0.0, min(100.0, v / _lb_max * 100.0))
-
-            _rows_html = ''
-            for _i, (_, _row) in enumerate(_lt_show.iterrows()):
-                _nm, _tm = _row["Player"], _row["Team"]
-                _actual = int(_row["Total_Votes"])
-                _rank = int(_row["Rank"])
-                _nn = normalise_name(_nm)
-                _proj = _asm["projection"].get(_nn, _actual)
-                _d = _asm["delta"].get(_nn)
-
-                # movement arrow (omitted when no prior standings)
-                _arrow = ''
-                if _prev_rank:
-                    _pr = _prev_rank.get(_nm)
-                    if _pr is not None and _pr != _rank:
-                        _mv = _pr - _rank
-                        if _mv > 0:
-                            _arrow = f'<span style="color:#34d399;font-size:11px;margin-left:6px">▲{_mv}</span>'
-                        else:
-                            _arrow = f'<span style="color:#f87171;font-size:11px;margin-left:6px">▼{abs(_mv)}</span>'
-
-                # vs-model delta chip (emerald ahead of pace, muted red behind)
-                if _d is None:
-                    _chip = '<span style="color:#7e8c99">—</span>'
-                else:
-                    _chipc = '#34d399' if _d >= 0.05 else ('#f87171' if _d <= -0.05 else '#7e8c99')
-                    _ds = f'+{_d:.1f}' if _d >= 0 else f'−{abs(_d):.1f}'
-                    _chip = (f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:13px;'
-                             f'color:{_chipc}">{_ds}</span>')
-
-                # projection number (steel; the gold lives on the bar tick)
-                _projcell = (f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:13px;'
-                             f'color:#9fb0bf">{_proj:.0f}</span>')
-
-                # bullet: emerald actual fill + gold model-projection tick
-                _bullet = (
-                    f'<div style="position:relative;height:16px">'
-                    f'<div style="position:absolute;top:50%;height:1px;width:100%;'
-                    f'background:rgba(140,165,185,.14);transform:translateY(-50%)"></div>'
-                    f'<div style="position:absolute;top:50%;height:5px;left:0;width:{_lbx(_actual):.1f}%;'
-                    f'background:#34d399;border-radius:3px;transform:translateY(-50%)"></div>'
-                    f'<div style="position:absolute;top:1px;height:14px;width:2px;left:{_lbx(_proj):.1f}%;'
-                    f'background:#f0b429;transform:translateX(-1px)"></div>'
-                    f'</div>'
-                )
-
-                _lead = (_i == 0)
-                _nsz, _nw, _nc = ('17px', '800', '#34d399') if _lead else ('14px', '600', '#e9eef3')
-                _vsz = '20px' if _lead else '15px'
-                _rows_html += (
-                    f'<div style="display:grid;grid-template-columns:24px 1.7fr 44px 50px 46px 2fr;'
-                    f'align-items:center;gap:10px;padding:7px 0;border-bottom:1px solid rgba(140,165,185,.14)">'
-                    f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:12px;color:#7e8c99;'
-                    f'text-align:right">{_rank}</div>'
-                    f'<div><span style="font-family:\'Archivo\',sans-serif;font-size:{_nsz};font-weight:{_nw};'
-                    f'color:{_nc}">{_nm}</span>{_arrow}'
-                    f'<div style="font-size:11px;color:#7e8c99">{_tm}</div></div>'
-                    f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:{_vsz};font-weight:600;'
-                    f'color:{_nc};text-align:right">{_actual}</div>'
-                    f'<div style="text-align:right">{_chip}</div>'
-                    f'<div style="text-align:right">{_projcell}</div>'
-                    f'<div>{_bullet}</div>'
-                    f'</div>'
-                )
-            st.markdown(f'<div>{_rows_html}</div>', unsafe_allow_html=True)
-
-        # ── 7. Reconciliation + latest-votes feed ─────────────
-        with _feed_col:
-            # Reconciliation for the last counted round: bolters (polled, unwatched),
-            # hits (watched & polled), blanks (watched & 0). Hidden before any count.
-            _rl = _asm["last_round"]
-            if _rl > 0:
-                _rlab = 'Opening Round' if _rl == 0 else f'Round {_rl}'
-
-                def _recon_group(title, items, color, icon, show_votes):
-                    if not items:
-                        _body = '<div style="font-size:12px;color:#7e8c99;padding:3px 0">—</div>'
-                    else:
-                        _body = ''
-                        for _it in items[:6]:
-                            _v = ''
-                            if show_votes and _it.get("votes"):
-                                _v = (f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
-                                      f'color:{color};margin-left:6px">{_it["votes"]}</span>')
-                            _body += (f'<div style="font-size:12px;color:#e9eef3;padding:2px 0">'
-                                      f'{_it["name"]}<span style="color:#7e8c99"> · {_it["team"]}</span>{_v}</div>')
-                    return (f'<div style="margin-bottom:12px">'
-                            f'<div style="font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;'
-                            f'color:{color};margin-bottom:4px">{icon} {title}</div>{_body}</div>')
-
-                st.markdown(
-                    '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;'
-                    'color:#7e8c99;margin:2px 0 10px">Reconciliation '
-                    f'<span style="font-weight:400;letter-spacing:0;text-transform:none">— {_rlab}</span></div>'
-                    + _recon_group('Bolters', _asm["recon"]["bolter"], '#f0b429', '⚡', True)
-                    + _recon_group('Hit', _asm["recon"]["hit"], '#34d399', '✓', True)
-                    + _recon_group('Blanked', _asm["recon"]["blanked"], '#f87171', '✗', False),
-                    unsafe_allow_html=True,
-                )
-
-            st.markdown(
-                '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;'
-                'color:#7e8c99;margin:2px 0 8px">Latest votes '
-                '<span style="font-weight:400;letter-spacing:0;text-transform:none">— called vs surprise</span></div>',
-                unsafe_allow_html=True,
-            )
-            _rounds_sorted = sorted(_drops_by_round.keys(), reverse=True)[:6]
-            if not _rounds_sorted:
-                st.markdown('<div style="color:#7e8c99;font-size:13px;padding:10px 0">'
-                            'No votes announced yet.</div>', unsafe_allow_html=True)
+        _z2 = ""
+        for _i, (_, _r) in enumerate(_show.iterrows()):
+            _nm = _r["Player"]; _tm = _r["Team"]; _nn = normalise_name(_nm)
+            _act = int(_r["Total_Votes"]); _rank = int(_r["Rank"])
+            _proj = _asm["projection"].get(_nn, _act)
+            _d = _asm["delta"].get(_nn)
+            _arr = '<span class="arr same">–</span>'
+            if _prev_rank:
+                _pr = _prev_rank.get(_nm)
+                if _pr is not None and _pr != _rank:
+                    _mv = _pr - _rank
+                    _arr = (f'<span class="arr up">▲{_mv}</span>' if _mv > 0
+                            else f'<span class="arr down">▼{abs(_mv)}</span>')
+            if _d is None:
+                _dl = '<span class="lb-d">–</span>'
+            elif _d >= 0:
+                _dl = f'<span class="lb-d pos">+{_d:.1f}</span>'
             else:
-                _feed_html = ''
-                _newest_done = False
-                for _ri, _rnum in enumerate(_rounds_sorted):
-                    _drops = sorted(_drops_by_round[_rnum], key=lambda _x: -_x[2])
-                    _rlabel = 'Opening Round' if _rnum == 0 else f'Round {_rnum}'
-                    _proj_set = _proj_pollers.get(_rnum)  # None ⇒ unavailable
-                    if _proj_set is not None:
-                        _called = sum(1 for (_pn, _, _) in _drops if normalise_name(_pn) in _proj_set)
-                        _tally = (f'<span style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;'
-                                  f'color:#7e8c99">models called {_called} of {len(_drops)}</span>')
-                    else:
-                        _tally = ''
-                    _feed_html += (
-                        f'<div style="display:flex;justify-content:space-between;align-items:baseline;'
-                        f'margin:{"14px" if _ri else "0"} 0 6px;padding-bottom:5px;'
-                        f'border-bottom:1px solid rgba(140,165,185,.14)">'
-                        f'<span style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;'
-                        f'color:#e9eef3">{_rlabel}</span>{_tally}</div>'
-                    )
-                    for _di, (_pn, _pt, _pv) in enumerate(_drops):
-                        if _proj_set is None:
-                            _mark = '<span style="display:inline-block;width:14px"></span>'
-                        elif normalise_name(_pn) in _proj_set:
-                            _mark = '<span style="color:#34d399;width:14px;display:inline-block">✓</span>'
-                        else:
-                            _mark = '<span style="color:#f0b429;width:14px;display:inline-block">✗</span>'
-                        if _pv == 3:
-                            _pill = ('<span style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
-                                     'font-weight:700;background:#34d399;color:#0a1017;border-radius:4px;'
-                                     'padding:1px 7px">3</span>')
-                        elif _pv == 2:
-                            _pill = ('<span style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
-                                     'font-weight:700;border:1px solid #34d399;color:#34d399;border-radius:4px;'
-                                     'padding:1px 6px">2</span>')
-                        else:
-                            _pill = ('<span style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
-                                     'font-weight:700;border:1px solid #7e8c99;color:#7e8c99;border-radius:4px;'
-                                     'padding:1px 6px">1</span>')
-                        # Most-recent drop: static emerald glow dot (non-keyframe
-                        # fallback — st.markdown strips @keyframes).
-                        _pulse = ''
-                        if not _newest_done and _ri == 0 and _di == 0:
-                            _pulse = ('<span style="display:inline-block;width:7px;height:7px;border-radius:50%;'
-                                      'background:#34d399;box-shadow:0 0 0 3px rgba(52,211,153,.25);'
-                                      'margin-left:7px;vertical-align:middle"></span>')
-                            _newest_done = True
-                        _feed_html += (
-                            f'<div style="display:grid;grid-template-columns:18px 1fr auto;align-items:center;'
-                            f'gap:9px;padding:6px 0;border-bottom:1px solid rgba(140,165,185,.07)">'
-                            f'{_mark}'
-                            f'<div><span style="font-size:13px;color:#e9eef3">{_pn}</span>{_pulse}'
-                            f'<div style="font-size:10px;color:#7e8c99">{_pt}</div></div>'
-                            f'{_pill}</div>'
-                        )
-                st.markdown(_feed_html, unsafe_allow_html=True)
+                _dl = f'<span class="lb-d neg">−{abs(_d):.1f}</span>'
+            _bw = max(0.0, min(100.0, _act / _lead_votes * 100))
+            _pjx = max(0.0, min(100.0, _proj / _lead_proj * 100))
+            _lead_cls = " lead" if _i == 0 else ""
+            _z2 += (
+                f'<div class="lb-row{_lead_cls}">'
+                f'<div class="lb-main"><span class="lb-rank">{_rank}</span>'
+                f'<span class="lb-nm">{_nm} <span class="tm">{_abbr(_tm)}</span> {_arr}</span>'
+                f'<span class="lb-v">{_act}</span>{_dl}'
+                f'<span class="lb-p">proj {_proj:.0f}</span></div>'
+                f'<div class="lb-bul"><div class="bf" style="width:{_bw:.0f}%"></div>'
+                f'<div class="pj" style="left:{_pjx:.0f}%"></div></div></div>'
+            )
+
+        # ── Zone 3: upcoming watchlist targets (forward rail) ──
+        _up = []
+        if _disp_round < 24 and _wl is not None and not _wl.empty:
+            for _, _w in _wl.iterrows():
+                if bool(_w.get("Settled", False)):
+                    continue
+                _wn = normalise_name(_w.get("Player", ""))
+                _rv = _asm["round_votes"].get(_wn, {})
+                if any(int(v) > 0 for v in _rv.values()):    # suppression: already polled
+                    continue
+                for _R in sorted(_rounds_of(_w.get("My_Rounds", ""))):
+                    if (_R - UPCOMING_LEAD) <= _disp_round and _R > _disp_round:
+                        _pp = _round_pp.get(_R, {}).get(_wn)
+                        _pptxt = f"{_pp * 100:.0f}%" if _pp is not None else "pick"
+                        _gold = _wn in _model_topn(_R)
+                        _up.append((_R, _w.get("Player", ""), _pptxt, "both" if _gold else "you"))
+        _up.sort(key=lambda x: (x[0], x[1]))
+        _z3 = ""
+        if _up:
+            for _R, _nm, _pptxt, _dot in _up[:10]:
+                _z3 += (f'<div class="up-row"><span class="dot {_dot}"></span>'
+                        f'<span class="pl">{_nm}</span>'
+                        f'<span class="up-rd">→ R{_R}</span>'
+                        f'<span class="up-pp">{_pptxt}</span></div>')
+        else:
+            _z3 += f'<div class="empty">Nothing backed in the next {UPCOMING_LEAD} rounds.</div>'
+        _z3 += ('<div class="up-note">Each drops the moment they poll. '
+                "Blank when nothing's backed in range.</div>")
+        _z3 += ('<div class="dotkey" style="margin-top:14px;">'
+                '<span><span class="dot both"></span>you + model</span>'
+                '<span><span class="dot you"></span>you</span></div>')
+
+        # ── topbar display values ──
+        _mode_txt = "Live count" if _count_night else "Prediction"
+        _fetched  = _time.strftime("%H:%M:%S")
+        _box = ('<span class="box" style="background:var(--emerald);border-color:var(--emerald)"></span>'
+                if _auto_state else '<span class="box"></span>')
+        _live_pill = ('<span class="live">LIVE</span>' if _lt_live else
+                      '<span class="live" style="color:var(--muted);border-color:var(--hair2)">OFF-SEASON</span>')
+        _pct = max(0.0, min(100.0, _disp_round / 24 * 100))
+
+        # ── CSS: mockup tokens + structure verbatim (standalone votes-feed
+        #    rules dropped per the redesign; .mexp retained — used by .rrow). ──
+        _LT_CSS = """<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+  :root{
+    --bg:#0a1017; --surface:#101a24; --surface2:#0d141d;
+    --hair:rgba(140,165,185,.13); --hair2:rgba(140,165,185,.22);
+    --emerald:#34d399; --gold:#f0b429; --red:#ef7a6d; --blue:#7fb0e0;
+    --ink:#e7eef5; --muted:#8ca5b9; --muted2:#5e7589;
+    --mono:'IBM Plex Mono',monospace; --disp:'Archivo',sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;}
+  html,body{height:100%;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--disp);-webkit-font-smoothing:antialiased;
+    min-height:100vh;display:flex;flex-direction:column;overflow-y:auto;padding:18px 26px 16px;gap:0;}
+  .mono{font-family:var(--mono);}
+
+  /* ---- topbar ---- */
+  .topbar{display:flex;align-items:baseline;justify-content:space-between;gap:18px;padding-bottom:12px;}
+  .tl{display:flex;align-items:center;gap:14px;}
+  .tl h1{font-size:24px;font-weight:900;letter-spacing:-.03em;}
+  .live{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;
+    color:var(--emerald);border:1px solid rgba(52,211,153,.3);border-radius:999px;padding:3px 9px;letter-spacing:.1em;}
+  .live::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--emerald);}
+  .tr{display:flex;align-items:center;gap:20px;font-family:var(--mono);font-size:11.5px;color:var(--muted2);letter-spacing:.03em;}
+  .tr b{color:var(--muted);font-weight:500;}
+  .tr a{color:var(--emerald);text-decoration:none;}
+  .tr .chk{display:inline-flex;align-items:center;gap:6px;}
+  .tr .box{width:11px;height:11px;border:1px solid var(--hair2);border-radius:3px;display:inline-block;}
+
+  /* ---- progress ---- */
+  .prog{display:flex;align-items:center;gap:16px;padding:0 0 16px;}
+  .prog .lbl{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted2);white-space:nowrap;}
+  .prog .track{flex:1;height:4px;background:var(--hair);border-radius:2px;overflow:hidden;}
+  .prog .fill{height:100%;width:66.6%;background:linear-gradient(90deg,var(--emerald),var(--gold));}
+  .prog .rd{font-family:var(--mono);font-size:12px;color:var(--ink);font-weight:600;white-space:nowrap;}
+
+  /* ---- leader race band ---- */
+  .race{display:grid;grid-template-columns:1fr auto auto;gap:36px;align-items:center;
+    padding:20px 0 18px;border-top:1px solid var(--hair);border-bottom:1px solid var(--hair);}
+  .race .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2);margin-bottom:6px;}
+  .race .name{font-size:clamp(38px,4.6vw,62px);font-weight:900;letter-spacing:-.035em;line-height:.92;}
+  .race .sub{margin-top:8px;font-size:13.5px;color:var(--muted);}
+  .race .sub .pace{color:var(--emerald);font-family:var(--mono);font-weight:600;}
+  .race .chase{margin-top:10px;font-family:var(--mono);font-size:12px;color:var(--muted2);}
+  .race .chase b{color:var(--ink);font-weight:600;}
+  .race .chase .gap{color:var(--gold);}
+  .stat{text-align:right;}
+  .stat .v{font-family:var(--mono);font-weight:600;font-size:clamp(34px,4vw,50px);line-height:1;letter-spacing:-.02em;}
+  .stat .v.em{color:var(--emerald);} .stat .v.gd{color:var(--gold);}
+  .stat .k{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted2);margin-top:8px;}
+
+  /* ---- zones ---- */
+  .zones{flex:1;min-height:0;display:grid;grid-template-columns:1.25fr 1.05fr .85fr;gap:0;}
+  .zone{min-height:0;display:flex;flex-direction:column;padding:18px 26px;}
+  .zone + .zone{border-left:1px solid var(--hair);}
+  .zone:first-child{padding-left:0;} .zone:last-child{padding-right:0;}
+  .ztitle{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted2);
+    display:flex;justify-content:space-between;align-items:baseline;margin-bottom:14px;}
+  .ztitle .rd{color:var(--gold);}
+
+  /* watchlist chips */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px;}
+  .chip{display:flex;flex-direction:column;gap:3px;border:1px solid var(--hair2);border-radius:9px;padding:8px 11px;min-width:0;}
+  .chip .top{display:flex;align-items:center;gap:6px;}
+  .dot{width:7px;height:7px;border-radius:50%;flex:none;}
+  .dot.both{background:var(--gold);} .dot.model{background:var(--emerald);} .dot.you{background:var(--blue);}
+  .dot.none{background:transparent;border:1px solid var(--muted2);}
+
+  /* dot key */
+  .dotkey{display:flex;flex-wrap:wrap;gap:12px;font-family:var(--mono);font-size:9.5px;color:var(--muted2);margin-bottom:16px;letter-spacing:.03em;}
+  .dotkey span{display:flex;align-items:center;gap:5px;}
+
+  /* unified reconciliation rows */
+  .rrow{display:flex;align-items:center;gap:9px;padding:7px 0;border-bottom:1px solid var(--hair);font-size:13.5px;}
+  .rrow:last-child{border-bottom:none;}
+  .rrow .pl{flex:1;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rrow .vn{font-family:var(--mono);font-weight:600;font-size:13px;}
+
+  /* upcoming rail */
+  .up-row{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:1px solid var(--hair);font-size:13.5px;}
+  .up-row .pl{flex:1;font-weight:500;}
+  .up-rd{font-family:var(--mono);font-size:11px;color:var(--gold);}
+  .up-pp{font-family:var(--mono);font-size:10.5px;color:var(--muted2);min-width:34px;text-align:right;}
+  .up-note{font-family:var(--mono);font-size:10.5px;color:var(--muted2);opacity:.8;line-height:1.5;margin-top:12px;}
+  .chip .nm{font-weight:600;font-size:13px;white-space:nowrap;}
+  .chip .mt{font-family:var(--mono);font-size:10.5px;color:var(--muted2);}
+  .legend{display:flex;gap:13px;font-family:var(--mono);font-size:9.5px;color:var(--muted2);margin-top:4px;letter-spacing:.03em;}
+  .legend span{display:flex;align-items:center;gap:5px;}
+
+  .divider{height:1px;background:var(--hair);margin:16px 0 14px;}
+
+  /* reconciliation */
+  .recon-row{margin-bottom:13px;}
+  .recon-h{font-family:var(--mono);font-size:11px;letter-spacing:.04em;display:flex;align-items:center;gap:7px;margin-bottom:7px;}
+  .recon-h .ct{color:var(--muted2);}
+  .recon-h.bolt{color:var(--gold);} .recon-h.hit{color:var(--emerald);} .recon-h.blank{color:var(--red);}
+  .recon-h.cold{color:var(--muted);}
+  .names{display:flex;flex-wrap:wrap;gap:5px 10px;font-size:13px;}
+  .names .pn{display:inline-flex;align-items:baseline;gap:5px;color:var(--ink);}
+  .names .pn .vv{font-family:var(--mono);font-weight:600;font-size:11.5px;}
+  .v3{color:var(--gold);} .v2{color:var(--emerald);} .v0{color:var(--muted2);}
+  .empty{font-family:var(--mono);font-size:11.5px;color:var(--muted2);}
+
+  /* leaderboard */
+  .lb{display:flex;flex-direction:column;}
+  .lb-row{padding:9px 0;border-bottom:1px solid var(--hair);}
+  .lb-row:last-child{border-bottom:none;}
+  .lb-main{display:grid;grid-template-columns:18px 1fr auto auto auto;gap:10px;align-items:baseline;}
+  .lb-rank{font-family:var(--mono);font-size:12px;color:var(--muted2);}
+  .lb-nm{font-weight:600;font-size:14px;letter-spacing:-.01em;display:flex;align-items:center;gap:6px;}
+  .lb-nm .tm{font-family:var(--mono);font-size:10px;color:var(--muted2);font-weight:400;}
+  .arr{font-family:var(--mono);font-size:9px;font-weight:600;}
+  .up{color:var(--emerald);} .down{color:var(--red);} .same{color:var(--muted2);opacity:.4;}
+  .lb-v{font-family:var(--mono);font-weight:600;font-size:15px;text-align:right;min-width:26px;}
+  .lb-d{font-family:var(--mono);font-weight:600;font-size:11.5px;text-align:right;min-width:38px;}
+  .lb-d.pos{color:var(--emerald);} .lb-d.neg{color:var(--red);}
+  .lb-p{font-family:var(--mono);font-size:10.5px;color:var(--muted2);text-align:right;min-width:48px;}
+  .lb-bul{height:3px;background:var(--hair);border-radius:2px;position:relative;margin-top:7px;}
+  .lb-bul .bf{height:100%;background:var(--muted);border-radius:2px;}
+  .lb-row.lead .lb-bul .bf{background:var(--emerald);}
+  .lb-bul .pj{position:absolute;top:-3px;width:2px;height:9px;background:var(--gold);}
+
+  .mexp{font-family:var(--mono);font-size:9.5px;color:var(--muted2);opacity:.65;margin-right:12px;white-space:nowrap;}
+
+  @media(max-width:1080px){.zones{grid-template-columns:1fr 1fr;}.zone:nth-child(3){grid-column:1/3;border-left:none;border-top:1px solid var(--hair);padding-top:16px;}body{overflow:auto;}}
+</style>"""
+
+        _body = f'''<body>
+  <div class="topbar">
+    <div class="tl"><h1>Live Tracker</h1>{_live_pill}</div>
+    <div class="tr">
+      <span class="chk">{_box}Auto-refresh 60s</span>
+      <span>Fetched <b>{_fetched}</b></span>
+      <span>Mode <b>{_mode_txt}</b></span>
+      <span>Source <a href="https://www.afl.com.au/brownlow-medal/live-tracker" target="_blank">AFL.com.au ↗</a></span>
+    </div>
+  </div>
+
+  <div class="prog">
+    <span class="lbl">Count progress</span>
+    <div class="track"><div class="fill" style="width:{_pct:.1f}%"></div></div>
+    <span class="rd">Round {_disp_round} of 24 counted</span>
+  </div>
+
+  <div class="race">
+    <div>
+      <div class="eyebrow">Leading the count</div>
+      <div class="name">{_leader_nm}</div>
+      <div class="sub">{_sub_html}</div>
+      <div class="chase">{_chase_html}</div>
+    </div>
+    <div class="stat"><div class="v em">{_leader_tot}</div><div class="k">votes · {_race_rstr}</div></div>
+    <div class="stat"><div class="v gd">+{_clear}</div><div class="k">clear</div></div>
+  </div>
+
+  <div class="zones">
+    <div class="zone">
+      <div class="ztitle"><span>{_round_lbl} · what happened</span><span>{_z1_tally}</span></div>
+      <div class="dotkey"><span><span class="dot both"></span>you + model</span><span><span class="dot you"></span>you</span><span><span class="dot model"></span>model</span><span><span class="dot none"></span>nobody</span></div>
+      {_z1}
+    </div>
+
+    <div class="zone">
+      <div class="ztitle"><span>Leaderboard · top 10</span><span>votes / vs model / proj</span></div>
+      <div class="lb">{_z2}</div>
+    </div>
+
+    <div class="zone">
+      <div class="ztitle"><span>Upcoming targets</span><span>next {UPCOMING_LEAD} rounds</span></div>
+      {_z3}
+    </div>
+  </div>
+</body>'''
+
+        _full_html = ('<!doctype html><html><head><meta charset="utf-8">'
+                      '<meta name="viewport" content="width=device-width, initial-scale=1">'
+                      + _LT_CSS + '</head>' + _body + '</html>')
+        _stc.html(_full_html, height=_LT_IFRAME_H, scrolling=False)
+
+        # Native auto-refresh control (the real refresh driver; the topbar box
+        # above mirrors its state for display only). Kept exactly as before.
+        _lt_auto = st.checkbox("Auto-refresh 60s", value=False, key="lt_auto_refresh")
 
     # ── auto-refresh ─────────────────────────────────────────
     if _lt_auto:
