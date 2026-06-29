@@ -21,8 +21,16 @@ TIPS_CSV        = f"{DATA_DIR}/cha_ching_tips.csv"
 FIXTURES_CSV    = f"{DATA_DIR}/fixtures_cache.csv"
 PROPS_CSV       = f"{DATA_DIR}/player_props_cache.csv"
 USER_IMPORT_CSV = f"{DATA_DIR}/user_import.csv"
-POLLS_CSV       = f"{DATA_DIR}/polls_a_vote.csv"
-POLLS_COLS      = ['Player', 'Team', 'My_Rounds', 'Odds', 'Stake', 'Notes', 'Settled']
+POLLS_CSV       = f"{DATA_DIR}/polls_a_vote.csv"   # legacy local store (pre-Supabase)
+POLLS_SB_TABLE  = "poll_watchlist"
+POLLS_COLS      = ['id', 'Player', 'Team', 'My_Rounds', 'Odds', 'Stake', 'Notes', 'Settled', 'created_at']
+# In-memory uses TitleCase (render reads row['Player'] etc.); Supabase columns are
+# snake_case to match the bets/tips tables. id and created_at share both names.
+POLLS_SB_RENAME = {
+    'Player': 'player', 'Team': 'team', 'My_Rounds': 'my_rounds',
+    'Odds': 'odds', 'Stake': 'stake', 'Notes': 'notes', 'Settled': 'settled',
+}
+POLLS_SB_RENAME_INV = {v: k for k, v in POLLS_SB_RENAME.items()}
 
 BETS_COLS = [
     'bet_id', 'date', 'match', 'market_type', 'selection',
@@ -176,7 +184,8 @@ def _get_supabase():
         url = st.secrets["supabase"]["url"]
         key = st.secrets["supabase"]["secret_key"]  # server-side: full read/write
         return create_client(url, key)
-    except Exception:
+    except Exception as e:
+        st.warning(f"Supabase not connected: {e}")  # DEBUG: temporary, revert after diagnosis
         return None
 
 
@@ -211,9 +220,26 @@ def _load_player_avgs() -> pd.DataFrame:
     return df.groupby('Player')[avail].mean().reset_index()
 
 
-def _load_polls() -> pd.DataFrame:
-    if os.path.exists(POLLS_CSV):
-        df = pd.read_csv(POLLS_CSV)
+def _empty_polls_df() -> pd.DataFrame:
+    df = pd.DataFrame(columns=POLLS_COLS)
+    df['Odds']      = pd.to_numeric(df['Odds'],  errors='coerce')
+    df['Stake']     = pd.to_numeric(df['Stake'], errors='coerce')
+    df['Settled']   = df['Settled'].fillna(False).astype(bool)
+    df['My_Rounds'] = df['My_Rounds'].fillna('').astype(str)
+    df['Notes']     = df['Notes'].fillna('').astype(str)
+    df['id']        = df['id'].fillna('').astype(str)
+    return df
+
+
+def _load_watchlist() -> pd.DataFrame:
+    """Load the Polls-a-Vote watchlist from Supabase (source of truth).
+
+    Mirrors _load_tips(): a successful query is authoritative even when it
+    returns zero rows. Falls back to an empty watchlist (correct columns) when
+    the table is empty or Supabase is unreachable — never crashes the page.
+    """
+    def _coerce(df):
+        df = df.rename(columns=POLLS_SB_RENAME_INV)   # snake_case → TitleCase
         for c in POLLS_COLS:
             if c not in df.columns:
                 df[c] = None
@@ -221,29 +247,74 @@ def _load_polls() -> pd.DataFrame:
         df['Stake']     = pd.to_numeric(df['Stake'], errors='coerce')
         df['Settled']   = df['Settled'].fillna(False).astype(bool)
         df['My_Rounds'] = df['My_Rounds'].fillna('').astype(str)
-        return df
-    return pd.DataFrame(columns=POLLS_COLS)
+        df['Notes']     = df['Notes'].fillna('').astype(str)
+        df['id']        = df['id'].fillna('').astype(str)
+        df = df[POLLS_COLS]
+        if df['created_at'].notna().any():
+            df = df.sort_values('created_at', na_position='last')
+        return df.reset_index(drop=True)
+
+    sb = _get_supabase()
+    if sb is not None:
+        try:
+            resp = sb.table(POLLS_SB_TABLE).select("*").execute()
+            return _coerce(pd.DataFrame(resp.data or []))
+        except Exception:
+            pass
+    return _empty_polls_df()
+
+
+def _save_watchlist(df: pd.DataFrame):
+    """Upsert the full watchlist DataFrame to Supabase (on_conflict id).
+
+    Mirrors _save_bets(): TitleCase in-memory columns are renamed to the
+    table's snake_case columns before the upsert. No-op when Supabase is down.
+    """
+    sb = _get_supabase()
+    if sb is None:
+        return
+    df_save = df.copy().rename(columns=POLLS_SB_RENAME)
+    keep = ['id', 'player', 'team', 'my_rounds', 'odds', 'stake', 'notes', 'settled', 'created_at']
+    df_save = df_save[[c for c in keep if c in df_save.columns]]
+    records = _sb_records(df_save)
+    if records:
+        try:
+            sb.table(POLLS_SB_TABLE).upsert(records, on_conflict="id").execute()
+        except Exception as e:
+            # DEBUG: temporary error surfacing — revert after diagnosis
+            st.error(f"watchlist save failed: {e}")
+            st.exception(e)
+            return
 
 
 def _save_polls_row(row: dict):
-    df = _load_polls()
-    df = pd.concat([df, pd.DataFrame([row])], ignore_index=True)
-    os.makedirs(DATA_DIR, exist_ok=True)
-    df.to_csv(POLLS_CSV, index=False)
+    """Add one new watchlist target — generates id/created_at, then upserts."""
+    row = dict(row)
+    row.setdefault('id', str(uuid.uuid4())[:8])      # same id scheme as bets
+    row.setdefault('created_at', datetime.now().isoformat())
+    _save_watchlist(pd.DataFrame([row]))
 
 
-def _mark_poll_settled(idx: int):
-    df = _load_polls()
-    if idx < len(df):
-        df.at[idx, 'Settled'] = True
-        df.to_csv(POLLS_CSV, index=False)
+def _mark_poll_settled(poll_id: str):
+    """Mark a single watchlist row settled in Supabase (addressed by id)."""
+    sb = _get_supabase()
+    if sb is None:
+        return
+    try:
+        sb.table(POLLS_SB_TABLE).update({'settled': True}).eq('id', str(poll_id)).execute()
+    except Exception:
+        pass
 
 
-def _delete_poll_row(idx: int):
-    df = _load_polls()
-    if idx < len(df):
-        df = df.drop(index=idx).reset_index(drop=True)
-        df.to_csv(POLLS_CSV, index=False)
+def _delete_poll_row(poll_id: str):
+    """Delete a single watchlist row from Supabase (addressed by id)."""
+    sb = _get_supabase()
+    if sb is None:
+        return
+    try:
+        sb.table(POLLS_SB_TABLE).delete().eq('id', str(poll_id)).execute()
+    except Exception:
+        pass
 
 
 def _empty_bets_df() -> pd.DataFrame:
@@ -3099,7 +3170,7 @@ def render_polls_a_vote():
     )
 
     # ── Data + consensus helpers (loaded once, used by matrix, cards, form) ─────
-    polls = _load_polls()
+    polls = _load_watchlist()
 
     _gdf = None  # per-round Poll_Prob source for the grid (the gold numbers)
     if os.path.exists("predictions/game_level_2026.csv"):
@@ -3359,13 +3430,13 @@ def render_polls_a_vote():
                 st.markdown('<span class="pav-settle-marker" style="display:none"></span>',
                             unsafe_allow_html=True)
                 if st.button("Mark settled", key=f"pav_settle_{idx}"):
-                    _mark_poll_settled(idx)
+                    _mark_poll_settled(row['id'])
                     st.rerun()
         with _bcols[1]:
             st.markdown('<span class="pav-delete-marker" style="display:none"></span>',
                         unsafe_allow_html=True)
             if st.button("Delete", key=f"pav_delete_{idx}"):
-                _delete_poll_row(idx)
+                _delete_poll_row(row['id'])
                 st.rerun()
 
     # ── STEP 4 — Add-target form, collapsed disclosure ─────────────────────────
