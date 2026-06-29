@@ -2941,7 +2941,7 @@ SCOPE .lb-bar{width:100%;}
 SCOPE .lb-track{position:relative;height:6px;background:var(--hairline-strong);border-radius:4px;}
 SCOPE .lb-bar.mini .lb-track{height:4px;}
 SCOPE .lb-fill{position:absolute;top:0;height:100%;background:var(--emerald-track);border-radius:4px;}
-SCOPE .lb-marker{position:absolute;top:-2px;width:2px;height:calc(100% + 4px);background:var(--emerald);border-radius:1px;}
+SCOPE .lb-marker{position:absolute;top:50%;width:8px;height:8px;border-radius:50%;background:var(--emerald);transform:translate(-50%,-50%);box-shadow:0 0 0 2px var(--bg);}
 SCOPE .lb-bar-wrap{display:flex;align-items:center;gap:8px;}
 SCOPE .lb-bar-wrap .lb-track{flex:1;}
 SCOPE .lb-bar-lo,SCOPE .lb-bar-hi{font-size:10px;color:var(--muted);min-width:20px;font-family:'IBM Plex Mono',monospace;}
