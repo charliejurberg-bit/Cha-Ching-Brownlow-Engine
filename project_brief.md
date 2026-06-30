@@ -98,8 +98,8 @@ _BH_PAGES = {'BH Dashboard', 'Brownlow Betting', 'Bet Tracker', 'Cha Ching Tips'
 | `_rank_change_html(csv_path, player, ...)` | 1310 | Render rank-change arrow HTML |
 | `_file_ts(path)` | 1332 | File modification timestamp string |
 | `normalise_name(name)` | 1346 | Fuzzy player name normalisation |
-| `fetch_betfair_brownlow()` | 1363 | Scrape Betfair odds via Playwright |
-| `fetch_espn_brownlow()` | 1435 | Scrape ESPN per-game votes via Playwright |
+| `fetch_betfair_brownlow()` | 1363 | Live Betfair votes from their JSON data API (CSV fallback) |
+| `fetch_espn_brownlow()` | 1435 | Live ESPN per-game votes via Playwright render (CSV fallback) |
 | `_round_floats(df, dp=1)` | 1586 | Round all float columns in a DataFrame |
 | `_apply_mt_rows(df)` | 1592 | Apply MT alternating row colours |
 | `_style_table(df)` | 1601 | Standard MT-styled Styler |

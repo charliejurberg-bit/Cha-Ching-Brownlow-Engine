@@ -1442,26 +1442,115 @@ def normalise_name(name):
     s = _NAME_SUFFIX_RE.sub('', s).strip()
     return s
 
-@st.cache_data(ttl=120, show_spinner=False)
+_BF_API_BASE = "https://betfair-data-supplier-prod.herokuapp.com/api"
+
+def _fetch_betfair_api(timeout=20):
+    """Pull Betfair's Brownlow predictions straight from the JSON feed that
+    powers their on-site predictor widget — no browser, no AG-Grid scraping.
+
+    The widget first reads the active season from /widgets/brownlow/parameters
+    then calls /brownlow?year=<season>&widget=brownlow, which returns one row
+    per player with a season-total `total` (the exact number Betfair displays).
+    Returns DataFrame[Player, Team, Total_Votes, Rank] or empty on failure.
+    """
+    import requests
+    _ua = ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+           "(KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36")
+    sess = requests.Session()
+    sess.headers.update({"User-Agent": _ua, "Accept": "application/json"})
+    year = None
+    try:
+        _pj = sess.get(f"{_BF_API_BASE}/widgets/brownlow/parameters",
+                       params={"name": "general"}, timeout=timeout).json()
+        year = _pj.get("year")
+    except Exception:
+        pass
+    if not year:
+        import datetime as _dt
+        year = str(_dt.date.today().year)
+    raw = sess.get(f"{_BF_API_BASE}/brownlow",
+                   params={"year": year, "widget": "brownlow"}, timeout=timeout)
+    raw.raise_for_status()
+    df = pd.DataFrame(raw.json())
+    if df.empty or 'name' not in df.columns or 'total' not in df.columns:
+        return pd.DataFrame()
+    df['Total_Votes'] = pd.to_numeric(df['total'], errors='coerce').fillna(0.0)
+    df['Player'] = df['name'].astype(str).str.title().str.strip()
+    if 'team' in df.columns:
+        df['Team'] = df['team'].apply(
+            lambda t: t.get('name', '') if isinstance(t, dict) else '')
+    else:
+        df['Team'] = ''
+    # Stable sort preserves API order on tied totals, matching Betfair's own
+    # leaderboard tie-break (e.g. Cripps ranked above Newcombe, both 17.5).
+    df = df.sort_values('Total_Votes', ascending=False, kind='stable').reset_index(drop=True)
+    df['Rank'] = df.index + 1
+    return df[['Player', 'Team', 'Total_Votes', 'Rank']]
+
+@st.cache_data(ttl=600, show_spinner=False)
 def fetch_betfair_brownlow():
-    """Load Betfair predictions from CSV (updated by scraper_betfair.py via Run Update)."""
+    """Live Betfair Brownlow predictions from Betfair's own JSON data API
+    (the feed behind their on-site widget). Falls back to the last cached
+    scrape (data_2026/betfair_predictions.csv, maintained by scraper_betfair.py)
+    only if the API is unreachable, so the page is never silently stale."""
     def _csv_to_internal(fb):
         return fb.rename(columns={'Total_Votes': 'BF_Votes', 'Rank': 'BF_Rank'}, errors='ignore')
+    try:
+        live = _fetch_betfair_api()
+        if not live.empty:
+            return _csv_to_internal(live), None
+    except Exception:
+        pass
     fb = _load_csv_fallback(_BF_CSV, 'Rank')
     if fb.empty:
-        return pd.DataFrame(), "No data — click Run Update to refresh"
-    return _csv_to_internal(fb), None
+        return pd.DataFrame(), "No data — Betfair API unreachable and no cache"
+    return _csv_to_internal(fb), "Live fetch failed — showing last cached data"
 
 
-@st.cache_data(ttl=120, show_spinner=False)
+def _fetch_espn_live():
+    """Render ESPN's predictor page and parse it via the same logic as
+    scraper_espn.py. ESPN has no JSON feed (votes live in the article body and
+    the page sits behind a bot challenge), so a headless browser is required.
+    Returns DataFrame[Player, Total_Votes, Rank] or empty on failure."""
+    import scraper_espn
+    html = scraper_espn._pw_get_html(
+        scraper_espn._ESPN_URL,
+        wait_for=['article', 'main', 'body'],
+        scroll=True,
+        extra_sleep_ms=4000,
+    )
+    if not html:
+        return pd.DataFrame()
+    votes, lb_order = scraper_espn._parse_votes(html)
+    if not votes:
+        return pd.DataFrame()
+    df = pd.DataFrame([{'Player': n, 'Total_Votes': v} for n, v in votes.items()])
+    # Ties broken by ESPN's own leaderboard order (others → 9999), matching the scraper.
+    df['_lb'] = df['Player'].map(lambda n: lb_order.get(n, 9999))
+    df = df.sort_values(['Total_Votes', '_lb'], ascending=[False, True])
+    df = df.drop(columns='_lb').reset_index(drop=True)
+    df['Rank'] = df.index + 1
+    return df[['Player', 'Total_Votes', 'Rank']]
+
+@st.cache_data(ttl=900, show_spinner=False)
 def fetch_espn_brownlow():
-    """Load ESPN predictions from CSV (updated by scraper_espn.py via Run Update)."""
+    """Live ESPN Brownlow predictions, rendered the same way as scraper_espn.py.
+    Unlike Betfair, ESPN exposes no JSON feed, so this needs a headless browser;
+    where one isn't available (e.g. some hosts) it falls back to the last cached
+    scrape (espn_predictions.csv) with a visible notice rather than silently
+    serving stale numbers."""
     def _csv_to_internal(fb):
         return fb.rename(columns={'Total_Votes': 'ESPN_Votes', 'Rank': 'ESPN_Rank'}, errors='ignore')
+    try:
+        live = _fetch_espn_live()
+        if not live.empty:
+            return _csv_to_internal(live), None
+    except Exception:
+        pass
     fb = _load_csv_fallback(_ESPN_CSV, 'Rank')
     if fb.empty:
-        return pd.DataFrame(), "No data — click Run Update to refresh"
-    return _csv_to_internal(fb), None
+        return pd.DataFrame(), "No data — ESPN render failed and no cache"
+    return _csv_to_internal(fb), "Live fetch failed — showing last cached data"
 
 
 _TABLE_STYLES = [
