@@ -3207,11 +3207,12 @@ def render_polls_a_vote():
     CC_ROUND_THRESH     = 0.35   # Cha Ching: round Poll_Prob >= this = tips that round
     WHEELO_ROUND_THRESH = 0.5    # Wheelo: round ExpVotes >= this = tips that round
     BF_ROUND_THRESH     = 1.0    # Betfair: round vote >= 1 = tipped to poll that round
+    AFL_ROUND_THRESH    = 1.0    # AFL Predictor: round vote >= 1 = tipped to poll that round
     CC_SEASON_THRESH    = 0.35   # Cha Ching: season max Poll_Prob "on the radar"
     WH_SEASON_THRESH    = 0.65   # Wheelo: season sum "on the radar"
 
     _con_max_prob:  dict[str, float] = {}
-    _con_exp_total: dict[str, float] = {}
+    _con_afl:       dict[str, float] | None = None
     _con_wheelo:    dict[str, float] = {}
     _con_bf:   dict[str, float] | None = None
     _con_espn: dict[str, float] | None = None
@@ -3219,6 +3220,7 @@ def render_polls_a_vote():
     _con_cc_round: dict[str, dict[int, float]] = {}            # CC per-round Poll_Prob
     _con_wheelo_round: dict[str, dict[int, float]] = {}        # Wheelo per-round ExpVotes
     _con_bf_round: dict[str, dict[int, float]] | None = None   # Betfair per-round votes
+    _con_afl_round: dict[str, dict[int, float]] | None = None  # AFL Predictor per-round votes
     try:
         # 1. Cha Ching: max Poll_Prob per player (season) + per-round (verdict).
         #    Round key = Round_num - 1 (display/AFL convention).
@@ -3230,12 +3232,26 @@ def render_polls_a_vote():
                     int(_rr['Round_num']) - 1: float(_rr['Poll_Prob'])
                     for _, _rr in _cg.iterrows()
                 }
-        # 2. AFL Predictor: Exp_Total_Votes from season_2026.csv
-        _s26 = "predictions/season_2026.csv"
-        if os.path.exists(_s26):
-            _sdf = pd.read_csv(_s26, usecols=['Player_Name', 'Exp_Total_Votes'])
-            for _, _sr in _sdf.iterrows():
-                _con_exp_total[_norm(_sr['Player_Name'])] = float(_sr['Exp_Total_Votes'] or 0)
+        # 2. AFL Predictor — season totals (radar) from scraper_afl.py (the
+        #    official AFL award API). Previously this slot read season_2026.csv,
+        #    which is Cha Ching's OWN output — a mislabel that double-counted Cha
+        #    Ching. Now it's real AFL data.
+        _afl_csv = "data_2026/afl_predictor_predictions.csv"
+        if os.path.exists(_afl_csv):
+            _afldf = pd.read_csv(_afl_csv)
+            if 'Total_Votes' in _afldf.columns:
+                _con_afl = {_norm(r['Player']): float(r['Total_Votes'] or 0)
+                            for _, r in _afldf.iterrows()}
+        # 2b. AFL Predictor — per-round votes (verdict) from afl_predictor_round_votes.csv.
+        #     Rounds are AFL/display convention, matching My_Rounds and the others.
+        _afl_round_csv = "data_2026/afl_predictor_round_votes.csv"
+        if os.path.exists(_afl_round_csv):
+            _aflr = pd.read_csv(_afl_round_csv)
+            if {'Player', 'Round', 'Vote'} <= set(_aflr.columns):
+                _con_afl_round = {}
+                for _, _rr in _aflr.iterrows():
+                    _con_afl_round.setdefault(_norm(_rr['Player']), {})[
+                        int(_rr['Round'])] = float(_rr['Vote'] or 0)
         # 3. Wheelo: season sum (radar) + per-round ExpVotes (verdict).
         #    Round key = Round - 1 (wheelo_2026.csv Round is AFLTables convention,
         #    same +1 as CC). NaN ExpVotes rounds are skipped → NA, not disagree.
@@ -3289,9 +3305,9 @@ def render_polls_a_vote():
             total += 1
             if _con_max_prob.get(key, 0) >= CC_SEASON_THRESH:
                 agree += 1
-        if _con_exp_total:
+        if _con_afl is not None:
             total += 1
-            if _con_exp_total.get(key, 0) > 0:
+            if _con_afl.get(key, 0) > 0:
                 agree += 1
         if _con_wheelo:
             total += 1
@@ -3311,8 +3327,8 @@ def render_polls_a_vote():
     # For the picked round(s), classify each model: TIPS (tips him that round),
     # TIPS_OTHER (covers that game but he's not tipped — real disagreement), or
     # NA (no round-level data / season-only → shown as "—", never counted).
-    # Cha Ching, Betfair and Wheelo are round-capable; AFL Predictor and ESPN
-    # are season-only here and always return NA.
+    # Cha Ching, Betfair, Wheelo and AFL Predictor are round-capable; only ESPN
+    # is season-only here and always returns NA.
     _ROUND_MODELS = ['Cha Ching', 'Betfair', 'Wheelo', 'AFL Predictor', 'ESPN']
 
     def _verdict_from(rounds_for: dict[int, float] | None, picked: set[int],
@@ -3334,7 +3350,9 @@ def render_polls_a_vote():
                 None if _con_bf_round is None else _con_bf_round.get(key, {}),
                 rounds, BF_ROUND_THRESH),
             'Wheelo': _verdict_from(_con_wheelo_round.get(key), rounds, WHEELO_ROUND_THRESH),
-            'AFL Predictor': 'NA',   # season-only — cannot speak to one round
+            'AFL Predictor': _verdict_from(
+                None if _con_afl_round is None else _con_afl_round.get(key, {}),
+                rounds, AFL_ROUND_THRESH),
             'ESPN': 'NA',            # round-level deferred (next phase)
         }
 
