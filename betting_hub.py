@@ -1767,22 +1767,16 @@ def render_bh_dashboard():
     bets = _load_bets()
     s    = _betting_stats(bets)
 
-    # ── 1. Header (no box) + Add bet ──────────────────────────────────────────
-    _h_left, _h_right = st.columns([4, 1])
-    with _h_left:
-        st.markdown(
-            '<div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;'
-            'color:#7e8c99">Betting Hub</div>'
-            '<h1 style="font-family:\'Sora\',sans-serif;font-size:34px;font-weight:800;color:#e9eef3;'
-            'margin:2px 0 0;line-height:1.05">Dashboard</h1>'
-            '<div style="font-size:13px;color:#7e8c99;margin-top:4px">'
-            'P&amp;L, hit rate and recent bets at a glance</div>',
-            unsafe_allow_html=True,
-        )
-    with _h_right:
-        st.markdown('<div style="height:18px"></div>', unsafe_allow_html=True)
-        if st.button("+ Add bet", type="primary", key="bh_add_bet_top"):
-            _add_bet_dialog()
+    # ── 1. Header (no box) ────────────────────────────────────────────────────
+    st.markdown(
+        '<div style="font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;'
+        'color:#7e8c99">Betting Hub</div>'
+        '<h1 style="font-family:\'Sora\',sans-serif;font-size:34px;font-weight:800;color:#e9eef3;'
+        'margin:2px 0 0;line-height:1.05">Dashboard</h1>'
+        '<div style="font-size:13px;color:#7e8c99;margin-top:4px">'
+        'P&amp;L, hit rate and recent bets at a glance</div>',
+        unsafe_allow_html=True,
+    )
 
     if bets.empty:
         st.info("No bets logged yet. Use the Bet Tracker to add your first bet.")
