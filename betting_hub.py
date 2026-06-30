@@ -3203,16 +3203,31 @@ def render_polls_a_vote():
         s = _re.sub(r'\s+', ' ', s).strip()
         return _NAME_SUFFIX_RE.sub('', s).strip()
 
+    # ── Cross-model consensus thresholds (named) ───────────────────────────────
+    CC_ROUND_THRESH  = 0.35   # Cha Ching: round Poll_Prob >= this = tips that round
+    BF_ROUND_THRESH  = 1.0    # Betfair: round vote >= 1 = tipped to poll that round
+    CC_SEASON_THRESH = 0.35   # Cha Ching: season max Poll_Prob "on the radar"
+    WH_SEASON_THRESH = 0.65   # Wheelo: season sum "on the radar"
+
     _con_max_prob:  dict[str, float] = {}
     _con_exp_total: dict[str, float] = {}
     _con_wheelo:    dict[str, float] = {}
     _con_bf:   dict[str, float] | None = None
     _con_espn: dict[str, float] | None = None
+    # Round-level lookups (display/AFL round convention: 0 = Opening Round).
+    _con_cc_round: dict[str, dict[int, float]] = {}            # CC per-round Poll_Prob
+    _con_bf_round: dict[str, dict[int, float]] | None = None   # Betfair per-round votes
     try:
-        # 1. Cha Ching: max Poll_Prob per player from game_level
+        # 1. Cha Ching: max Poll_Prob per player (season) + per-round (verdict).
+        #    Round key = Round_num - 1 (display/AFL convention).
         if _gdf is not None:
             for _cp, _cg in _gdf.groupby('Player'):
-                _con_max_prob[_norm(_cp)] = float(_cg['Poll_Prob'].max())
+                _ck = _norm(_cp)
+                _con_max_prob[_ck] = float(_cg['Poll_Prob'].max())
+                _con_cc_round[_ck] = {
+                    int(_rr['Round_num']) - 1: float(_rr['Poll_Prob'])
+                    for _, _rr in _cg.iterrows()
+                }
         # 2. AFL Predictor: Exp_Total_Votes from season_2026.csv
         _s26 = "predictions/season_2026.csv"
         if os.path.exists(_s26):
@@ -3227,13 +3242,24 @@ def render_polls_a_vote():
             if _wh_col:
                 for _wp, _wg in _whdf.groupby('Player'):
                     _con_wheelo[_norm(_wp)] = float(_wg[_wh_col].sum())
-        # 4. Betfair — read cached CSV written by dashboard's scrape function
+        # 4. Betfair — season totals (radar) from the cached CSV.
         _bf_csv = "data_2026/betfair_predictions.csv"
         if os.path.exists(_bf_csv):
             _bfdf = pd.read_csv(_bf_csv)
             if 'Total_Votes' in _bfdf.columns:
                 _con_bf = {_norm(r['Player']): float(r['Total_Votes'] or 0)
                            for _, r in _bfdf.iterrows()}
+        # 4b. Betfair — per-round votes (round verdict) from betfair_round_votes.csv,
+        #     written by scraper_betfair.py from the same JSON feed. Rounds are
+        #     AFL/display convention, matching My_Rounds and CC Round_num-1.
+        _bf_round_csv = "data_2026/betfair_round_votes.csv"
+        if os.path.exists(_bf_round_csv):
+            _bfr = pd.read_csv(_bf_round_csv)
+            if {'Player', 'Round', 'Vote'} <= set(_bfr.columns):
+                _con_bf_round = {}
+                for _, _rr in _bfr.iterrows():
+                    _con_bf_round.setdefault(_norm(_rr['Player']), {})[
+                        int(_rr['Round'])] = float(_rr['Vote'] or 0)
         # 5. ESPN — read cached CSV written by dashboard's scrape function
         _espn_csv = "data_2026/espn_predictions.csv"
         if os.path.exists(_espn_csv):
@@ -3249,7 +3275,7 @@ def render_polls_a_vote():
         agree, total = 0, 0
         if _con_max_prob:
             total += 1
-            if _con_max_prob.get(key, 0) >= 0.35:
+            if _con_max_prob.get(key, 0) >= CC_SEASON_THRESH:
                 agree += 1
         if _con_exp_total:
             total += 1
@@ -3257,7 +3283,7 @@ def render_polls_a_vote():
                 agree += 1
         if _con_wheelo:
             total += 1
-            if _con_wheelo.get(key, 0) >= 0.65:
+            if _con_wheelo.get(key, 0) >= WH_SEASON_THRESH:
                 agree += 1
         if _con_bf is not None:
             total += 1
@@ -3268,6 +3294,37 @@ def render_polls_a_vote():
             if _con_espn.get(key, 0) > 0:
                 agree += 1
         return agree, total
+
+    # ── Round-aware verdict ────────────────────────────────────────────────────
+    # For the picked round(s), classify each model: TIPS (tips him that round),
+    # TIPS_OTHER (covers that game but he's not tipped — real disagreement), or
+    # NA (no round-level data / season-only → shown as "—", never counted).
+    # Cha Ching and Betfair are round-capable; AFL Predictor, Wheelo and ESPN
+    # are season-only here and always return NA.
+    _ROUND_MODELS = ['Cha Ching', 'Betfair', 'AFL Predictor', 'Wheelo', 'ESPN']
+
+    def _verdict_from(rounds_for: dict[int, float] | None, picked: set[int],
+                      thresh: float) -> str:
+        if rounds_for is None:
+            return 'NA'
+        covered = [r for r in picked if r in rounds_for]
+        if not covered:
+            return 'NA'
+        if any(rounds_for[r] >= thresh for r in covered):
+            return 'TIPS'
+        return 'TIPS_OTHER'
+
+    def _round_states(player: str, rounds: set[int]) -> dict[str, str]:
+        key = _norm(player)
+        return {
+            'Cha Ching': _verdict_from(_con_cc_round.get(key), rounds, CC_ROUND_THRESH),
+            'Betfair': _verdict_from(
+                None if _con_bf_round is None else _con_bf_round.get(key, {}),
+                rounds, BF_ROUND_THRESH),
+            'AFL Predictor': 'NA',   # season-only — cannot speak to one round
+            'Wheelo': 'NA',          # season-only
+            'ESPN': 'NA',            # round-level deferred (next phase)
+        }
 
     def _model_top3(player: str) -> list[int]:
         if _gdf is None:
@@ -3364,10 +3421,35 @@ def render_polls_a_vote():
         agreement = len(my_rounds & model_set)
         settled   = bool(row.get('Settled', False))
 
+        # Round-aware verdict (primary headline) — "for this player, in the
+        # round(s) you picked, which round-capable models tip him".
+        _rstates  = _round_states(player, my_rounds)
+        _r_answer = [m for m in _ROUND_MODELS if _rstates[m] != 'NA']
+        _r_tips   = [m for m in _r_answer if _rstates[m] == 'TIPS']
+        _r_na     = sum(1 for m in _ROUND_MODELS if _rstates[m] == 'NA')
+        if not my_rounds:
+            _round_head, _round_color = 'No round picked', '#7e8c99'
+        elif _r_answer:
+            _round_head = f'{len(_r_tips)} of {len(_r_answer)} round-models tip'
+            _round_color = '#34d399' if len(_r_tips) == len(_r_answer) else '#f0b429'
+        else:
+            _round_head, _round_color = 'No round-level model data', '#7e8c99'
+
+        # Per-model strip — TIPS ✓ green, TIPS_OTHER ✗ gold (disagree, never red),
+        # NA — muted (silence, must not look like disagreement).
+        _glyph = {'TIPS': ('✓', '#34d399'),
+                  'TIPS_OTHER': ('✗', '#f0b429'),
+                  'NA': ('—', '#5d6b78')}
+        _short = {'Cha Ching': 'CC', 'Betfair': 'BF', 'AFL Predictor': 'AFL',
+                  'Wheelo': 'WH', 'ESPN': 'ESPN'}
+        _strip = '&nbsp;&nbsp;'.join(
+            f'<span style="color:{_glyph[_rstates[m]][1]}">'
+            f'{_short[m]}&nbsp;{_glyph[_rstates[m]][0]}</span>'
+            for m in _ROUND_MODELS
+        )
+
+        # Season-level "on the radar" — kept as a separate, quieter indicator.
         _cs_agree, _cs_total = _consensus_score(player)
-        _con_full = _cs_total > 0 and _cs_agree == _cs_total
-        _con_color = '#34d399' if _con_full else '#f0b429'
-        _con_line = f'{_cs_agree}/{_cs_total} models agree' if _cs_total else ''
 
         my_chips = ''.join(f'<span class="pav-pill-star">★ {_rl(r)}</span>'
                            for r in sorted(my_rounds))
@@ -3378,15 +3460,24 @@ def render_polls_a_vote():
         stake_str = f"{float(row['Stake']):.2f}u" if pd.notna(row.get('Stake')) else '—'
         _op = 'opacity:.55;' if settled else ''
         sbadge = '<span class="sbadge">SETTLED</span>' if settled else ''
-        con_html = (f'<div class="con" style="color:{_con_color}">{_con_line}</div>'
-                    if _con_line else '')
+        _na_suffix = (f'<span style="color:#7e8c99"> · {_r_na} n/a</span>'
+                      if (my_rounds and _r_answer) else '')
+        _season_line = (
+            f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;'
+            f'color:#7e8c99;margin-top:4px">On the radar (season): '
+            f'{_cs_agree}/{_cs_total}</div>' if _cs_total else '')
+        con_html = (
+            f'<div class="con" style="color:{_round_color}">{_round_head}{_na_suffix}</div>'
+            f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
+            f'margin-top:4px">{_strip}</div>'
+            f'{_season_line}')
 
         st.markdown(
             f'<div class="pav-card" style="{_op}">'
             f'<div style="display:flex;justify-content:space-between;align-items:flex-start;'
             f'flex-wrap:wrap;gap:18px">'
 
-            f'<div style="min-width:160px">'
+            f'<div style="min-width:210px">'
             f'<div class="nm">{player}{sbadge}</div>'
             f'<div class="tm">{team}</div>'
             f'{con_html}'

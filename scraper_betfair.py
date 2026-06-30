@@ -18,6 +18,10 @@ import requests
 
 _API_BASE = 'https://betfair-data-supplier-prod.herokuapp.com/api'
 _BF_CSV = 'data_2026/betfair_predictions.csv'
+# Per-round 3-2-1 the season total is built from. Drives the Polls-a-Vote
+# round verdict. Rounds are Betfair's native round_number (AFL/display
+# convention: 0 = Opening Round), matching the dashboard's My_Rounds picks.
+_BF_ROUND_CSV = 'data_2026/betfair_round_votes.csv'
 
 _UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -55,7 +59,8 @@ def fetch(timeout=30):
         resp = sess.get(f'{_API_BASE}/brownlow',
                         params={'year': year, 'widget': 'brownlow'}, timeout=timeout)
         resp.raise_for_status()
-        df = pd.DataFrame(resp.json())
+        payload = resp.json()
+        df = pd.DataFrame(payload)
         if df.empty or 'name' not in df.columns or 'total' not in df.columns:
             raise ValueError(f'Unexpected API payload (cols={list(df.columns)[:6]})')
 
@@ -75,6 +80,34 @@ def fetch(timeout=30):
         _save_with_backup(df, _BF_CSV)
         print(f'[Betfair] OK ({len(df)} players, season {year})')
         print(df.head(10).to_string(index=False))
+
+        # Round-level votes (per-round 3-2-1). Only scored games are kept:
+        # bye/dnp and unplayed placeholder rounds (no 'vote' key) are omitted so
+        # they read as "no coverage" (NA) in the round verdict, never as a
+        # 0-vote disagreement. vote==0 (played, didn't poll) IS kept so it can
+        # register as real disagreement.
+        round_rows = []
+        for rec in payload:
+            pname = str(rec.get('name', '')).title().strip()
+            if not pname:
+                continue
+            for v in rec.get('votes') or []:
+                if not isinstance(v, dict) or 'vote' not in v:
+                    continue
+                if str(v.get('bye', '0')) == '1' or str(v.get('dnp', '0')) == '1':
+                    continue
+                try:
+                    rn = int(v['round_number'])
+                    vote = float(v['vote'])
+                except (TypeError, ValueError, KeyError):
+                    continue
+                round_rows.append({'Player': pname, 'Round': rn, 'Vote': vote})
+        if round_rows:
+            rdf = pd.DataFrame(round_rows).sort_values(['Player', 'Round']).reset_index(drop=True)
+            _save_with_backup(rdf, _BF_ROUND_CSV)
+            print(f'[Betfair] round-level votes: {len(rdf)} rows '
+                  f'({rdf["Round"].nunique()} rounds) -> {_BF_ROUND_CSV}')
+
         return True
 
     except Exception as e:
