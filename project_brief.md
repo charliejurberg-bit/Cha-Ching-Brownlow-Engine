@@ -1,214 +1,204 @@
 # Cha Ching — Project Brief
 > Paste this once at the start of each Claude session. Do not paste full source files.
+> Regenerated from actual repo state. Locate code by function name, never by line number.
 
 ## Project overview
-AFL Brownlow Medal predictor + personal betting tracker. Streamlit dashboard, live since Round 10 2026.
+AFL Brownlow predictor + betting research tool. Streamlit dashboard deployed on
+Streamlit Cloud from GitHub (`charliejurberg-bit/Cha-Ching-Brownlow-Engine`).
+Persistence via Supabase. Live since Round 10 2026.
 Location: `C:\Users\charl\Python\brownlow_engine\`
-Deployed: `https://cha-ching-brownlow-engine-7ns99ajvlasqotmxxbilyp.streamlit.app/`
+
+**STRATEGY:** Free public launch targeting AFL betting forums, early August 2026.
+Build a timestamped public track record through Brownlow night (late Sept), which
+is the launch milestone. Monetisation later via bookmaker affiliate links — no
+paywall, no paid tips. Betting Hub is PRIVATE/personal; the public product is the
+Brownlow section only.
 
 ## Tech stack
-- Python 3.13, Streamlit (dark theme), XGBoost, pandas, plotly, requests, numpy, scikit-learn
-- Supabase — cloud persistence for bets, tips, polls
-- Playwright — Betfair + ESPN scraping (live odds/predictions inside dashboard.py)
-- undetected_chromedriver — Oddschecker multi-bookmaker scraper (local only, `scraper_odds.py`)
-- Data: FitzRoy (AFL stats via R), Wheelo ratings, Oddschecker, Betfair, ESPN
-- Model v4.0 — trained 2007–2025, 23 H&A rounds modelled (dashboard displays R+1 offset, total 24)
+- **Python 3.13**, Streamlit (dark theme), XGBoost, pandas, numpy, scikit-learn, plotly, requests
+- **Supabase** — cloud persistence for bets, Cha Ching tips, Polls-a-Vote watchlist, player props (source of truth; local CSV fallback)
+- **Playwright** — live Betfair + ESPN prediction fetch inside `dashboard.py`
+- **undetected_chromedriver** — Oddschecker multi-bookmaker scraper (`scraper_odds.py`, local only)
+- Data sources: fitzRoy (AFL stats via R), Wheelo ratings, Oddschecker, Betfair, ESPN, AFL Predictor API
+- **Model v4.0** — MAE 0.0904, top-10 accuracy ~86%, exact medallist in top-3 ~50%. Trained on 2015–2025 H&A rounds, 23 H&A rounds modelled per season.
+- `requirements.txt`: streamlit, pandas, plotly, xgboost, requests, numpy, scikit-learn, supabase, openpyxl
 
 ## File structure
 ```
 brownlow_engine/
-├── dashboard.py              # Main app — 5189 lines — all Brownlow pages + hub router
-├── betting_hub.py            # Betting Hub module — 2613 lines — 5 pages, imported by dashboard.py
-├── brownlow_model.py         # XGBoost model training — 331 lines
-├── predict_2026.py           # 2026 in-season predictions — 265 lines
-├── backtest.py               # 10-season backtest — 284 lines
-├── scraper_odds.py           # Oddschecker scraper (undetected_chromedriver) — 276 lines
-├── scraper_wheelo.py         # Wheelo ratings scraper — 11220 bytes
-├── fetch_wheelo_historical.py # Historical Wheelo fetch — 10473 bytes
-├── update.py                 # One-click update: stats → odds → predictions — 88 lines
-├── merge_wheelo.py           # Merge Wheelo into training data
-├── backtest.py               # Out-of-sample accuracy testing
-├── data_2026/                # Live season data
-│   ├── afltables_2026.csv
-│   ├── coaches_votes_2026.csv
-│   ├── bookmaker_odds.csv
-│   ├── best_odds.csv
-│   ├── betfair_predictions.csv / betfair_predictions_prev.csv
-│   ├── espn_predictions.csv / espn_predictions_prev.csv
-│   ├── historical_model_comparison.csv
-│   ├── fetch_stats_2026.R
-│   └── fetch_coaches.R
-├── data_wheelo/              # Wheelo ratings 2015–2026 + wheelo_all_seasons.csv
-├── data_betting/             # Bet tracking CSVs (bets.csv, cha_ching_tips.csv, player_props_cache.csv)
-├── predictions/              # Model output CSVs — gitignored, generated locally
-│   ├── model.pkl / features.pkl / label_encoder.pkl / rank_stats.pkl
-│   ├── wheelo_features.pkl / form_features.pkl
-│   ├── season_YYYY.csv / game_level_YYYY.csv (2007–2026)
-│   ├── season_projection_2026.csv
-│   └── backtest_results.csv / feature_importance.csv
+├── dashboard.py              # Main app — all Brownlow pages + hub router + global CSS
+├── betting_hub.py            # Betting Hub module — 5 pages, imported by dashboard.py
+├── theme.py                  # Shared design tokens — inject_global_theme() used by both files
+├── brownlow_model.py         # XGBoost model training (v4.0) — once per season
+├── predict_2026.py           # In-season predictions — run weekly after each round
+├── update.py                 # One-click update: R stats → coaches → odds → consensus → predict
+├── backtest.py               # 10-season out-of-sample backtest
+│
+│  # Scrapers / data fetch
+├── scraper_odds.py           # Oddschecker multi-bookie odds (undetected_chromedriver)
+├── scraper_betfair.py        # Betfair Brownlow consensus (JSON API)
+├── scraper_espn.py           # ESPN Brownlow consensus
+├── scraper_afl.py            # AFL Predictor Brownlow votes (award API)
+├── scraper_stats.py          # Squiggle API player stats
+├── scraper_wheelo.py         # Wheelo ratings scraper
+├── update_wheelo_2026.py     # Update 2026 Wheelo ratings
+├── fetch_wheelo_historical.py# Historical Wheelo fetch
+├── data_pull.py              # Historical data fetcher (fitzRoy/R)
+│
+│  # Data directories
+├── data_2026/                # Live season data (18 files): afltables_2026.csv, coaches_votes_2026.csv,
+│                             #   bookmaker_odds.csv, best_odds.csv, betfair/espn/afl_predictor *.csv (+ _prev),
+│                             #   wheelo_brownlow_predictions.csv, fetch_stats_2026.R, fetch_coaches.R
+├── data_wheelo/              # Wheelo ratings 2015–2026 + wheelo_all_seasons.csv (15 files)
+├── data_betting/             # Betting Hub local fallback CSVs (bets, tips, polls, props) (4 files)
+├── predictions/              # Model artifacts + output CSVs — gitignored, generated locally (55 files)
+│                             #   model.pkl, features.pkl, label_encoder.pkl, rank_stats.pkl,
+│                             #   wheelo_features.pkl, form_features.pkl, season_YYYY.csv,
+│                             #   game_level_YYYY.csv, season_projection_2026.csv
+├── pages/                    # Extracted page modules (page_*.py) — refactor in progress; is a package (__init__.py)
 ├── .streamlit/config.toml    # Dark theme (Midnight Turf colours)
-└── requirements.txt          # streamlit, pandas, plotly, xgboost, requests, numpy, scikit-learn, supabase
+└── requirements.txt
 ```
+> Also present: assorted one-off dev/debug scripts (`fix_*.py`, `inspect_betfair*.py`,
+> `debug_espn.py`, `espn_*_debug.py`, `grid_search.py`, `impact_score_*.py`,
+> `time_decay_search.py`, `merge_*.py`, `migrate_to_supabase.py`, `brownlow_medallists.py`,
+> `add_cha_ching_history.py`, `fill_/finalize_/fix_historical_comparison.py`), duplicate
+> snapshots (`dashboard 2.0.py`, `brownlow_model 2.0.py`), and a nested full clone directory
+> `cha-ching-brownlow-engine/` (its own git repo). See "Repo anomalies" in the handover notes.
 
 ## Page structure
 
-### Brownlow section (dashboard.py)
-Navigation defined at line 1655:
+### Brownlow section (dashboard.py) — the public product
 ```python
 _NAV_BROWNLOW = {
-    "Overview": ["Home", "Leaderboard", "Live Tracker"],
+    "Overview": ["Leaderboard", "Live Tracker"],
     "Players":  ["Player Profile", "Player Comparison"],
-    "Analysis": ["Stat Filter", "Coaches Votes", "Game Analysis", "Model Insights", "Model Comparison"],
+    "Analysis": ["Stat Filter", "Game Analysis", "Model Comparison"],
 }
 ```
-Plus a `Landing` page (line 1944) shown on first load. The app also has a hub toggle at line 1865 ("Brownlow Predictor" / "Betting Hub") that switches the nav rail between the two sections.
 
-### Betting Hub section (betting_hub.py, rendered via `betting_hub.render_page()`)
+### Betting Hub section — PRIVATE/personal
 ```python
 _NAV_BETTING = {
-    "BH Overview":  ["BH Dashboard", "Brownlow Betting", "Bet Tracker"],
+    "BH Overview":  ["Performance", "Predictions", "Bet Tracker"],
     "BH Strategy":  ["Cha Ching Tips", "Trends & Analysis", "Polls a Vote"],
 }
-_BH_PAGES = {'BH Dashboard', 'Brownlow Betting', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis', 'Polls a Vote'}
+_BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis', 'Polls a Vote'}
 ```
-`Brownlow Betting` is rendered inline in dashboard.py (line 2995). All other BH pages call `betting_hub.render_page(_page)`.
+> `_NAV_BROWNLOW`, `_NAV_BETTING` and `_BH_PAGES` are all defined in **dashboard.py**.
+> The `Predictions` page is rendered inline in dashboard.py; every other BH page routes
+> through `betting_hub.render_page(page)`. A hub toggle (`_render_hub_tabs()`) switches the
+> nav rail between the Brownlow and Betting sections.
 
 ## Key functions — dashboard.py
-| Function | Line | Purpose |
-|---|---|---|
-| `inject_global_css()` | 40 | Midnight Turf global CSS injection |
-| `apply_chart_theme(fig)` | 372 | Apply MT dark palette to any Plotly figure |
-| `render_banner()` | 408 | Top banner (hub toggle + mode label) |
-| `_read_data_range()` | 989 | Detect training data year range from CSV |
-| `_read_backtest_range()` | 1000 | Detect backtest year range |
-| `_fix_team_names(df)` | 1014 | Normalise Footscray → Western Bulldogs |
-| `load_season(season)` | 1021 | Load season-level predictions CSV |
-| `load_game(season)` | 1026 | Load game-level predictions CSV |
-| `load_importance()` | 1031 | Load feature importance CSV |
-| `load_backtest()` | 1036 | Load backtest results CSV |
-| `load_season_projection()` | 1041 | Load floor/ceiling projection CSV |
-| `load_all_historical()` | 1046 | Load all historical game-level CSVs |
-| `compute_player_efficiency(season)` | 1057 | Poll DNA stats (win/loss/disposal rates) |
-| `load_best_odds()` | 1090 | Load Oddschecker best odds CSV |
-| `form_guide_dots(season, n_rounds=3)` | 1095 | Recent form dots for leaderboard |
-| `fetch_live_brownlow_data()` | 1121 | Live tracker from AFL public API |
-| `_pw_get_html(url, ...)` | 1235 | Playwright helper — fetch JS-rendered page |
-| `_save_with_backup(df, csv_path)` | 1292 | Save CSV keeping previous as _prev |
-| `_load_csv_fallback(csv_path, rank_col)` | 1301 | Load CSV with fallback rank column |
-| `_rank_change_html(csv_path, player, ...)` | 1310 | Render rank-change arrow HTML |
-| `_file_ts(path)` | 1332 | File modification timestamp string |
-| `normalise_name(name)` | 1346 | Fuzzy player name normalisation |
-| `fetch_betfair_brownlow()` | 1363 | Live Betfair votes from their JSON data API (CSV fallback) |
-| `fetch_espn_brownlow()` | 1435 | Live ESPN per-game votes via Playwright render (CSV fallback) |
-| `_round_floats(df, dp=1)` | 1586 | Round all float columns in a DataFrame |
-| `_apply_mt_rows(df)` | 1592 | Apply MT alternating row colours |
-| `_style_table(df)` | 1601 | Standard MT-styled Styler |
-| `_style_leaderboard_table(df)` | 1614 | Leaderboard Styler with team-colour border |
-| `_nav_select(cat_key)` | 1666 | Nav selectbox on_change handler |
-| `_season_changed()` | 1895 | Season selector on_change handler |
-
-### Page rendering (inline blocks in dashboard.py)
-| Page | Line |
+| Function | Purpose |
 |---|---|
-| Landing | 1944 |
-| Home | 2038 |
-| Leaderboard | 2224 |
-| Player Profile | 2340 |
-| Coaches Votes | 2677 |
-| Game Analysis | 2801 |
-| Brownlow Betting | 2995 |
-| Stat Filter | 3150 |
-| Model Insights | 3493 |
-| Player Comparison | 3652 |
-| Live Tracker | 4290 |
-| Model Comparison | 4653 |
+| `inject_global_css()` | Midnight Turf global CSS injection |
+| `apply_chart_theme(fig)` | Apply MT dark palette to a Plotly figure |
+| `render_banner()` | Top banner (hub toggle + mode label) |
+| `_read_data_range()` / `_read_backtest_range()` | Detect training / backtest year range from CSV |
+| `_fix_team_names(df)` | Normalise legacy team names (e.g. Footscray → Western Bulldogs) |
+| `_player_id_map()` | Map players to fitzRoy IDs for disambiguation |
+| `_disambiguate_players(df)` | Append `(Team)` to same-name players |
+| `load_season(season)` / `load_game(season)` | Load season- / game-level predictions CSV |
+| `load_importance()` / `load_backtest()` | Load feature-importance / backtest CSV |
+| `load_season_projection()` | Load Monte Carlo floor/ceiling projection |
+| `load_all_historical()` | Load all historical game-level CSVs |
+| `load_game_career()` / `load_season_career()` | Career-spanning game / season loaders |
+| `_efficiency_from_df(df)` | Compute poll-DNA efficiency stats from a frame |
+| `compute_player_efficiency(season)` / `..._career()` | Win/loss/disposal poll-rate DNA |
+| `load_best_odds()` | Load Oddschecker best-odds CSV |
+| `form_guide_dots(season, n_rounds=3)` | Recent-form dots for leaderboard |
+| `fetch_live_brownlow_data()` | Live tracker from AFL public API |
+| `_pw_get_html(url, ...)` | Playwright helper — fetch JS-rendered page |
+| `_save_with_backup(df, csv_path)` | Save CSV, keep previous as `_prev` |
+| `_load_csv_fallback(csv_path, rank_col)` | Load CSV with fallback rank column |
+| `_rank_change_html(...)` | Rank-change arrow HTML |
+| `_file_ts(path)` | File modification timestamp string |
+| `normalise_name(name)` | Fuzzy player-name normalisation |
+| `_fetch_betfair_api()` / `fetch_betfair_brownlow()` | Live Betfair votes via JSON API (CSV fallback) |
+| `_fetch_espn_live()` / `fetch_espn_brownlow()` | Live ESPN votes via Playwright (CSV fallback) |
+| `_round_floats(df)` | Round float columns |
+| `_apply_mt_rows(df)` | MT alternating row colours |
+| `_style_table(df)` / `_style_leaderboard_table(df)` | MT-styled Stylers |
+| `_nav_select(cat_key)` | Nav selectbox on_change handler |
+| `_render_hub_tabs()` | Brownlow / Betting hub toggle strip |
+| `_render_page_nav()` | Sub-nav page tab strip |
+| `_season_changed(page)` | Season selector on_change handler |
+| `_assemble_live_tracker(...)` | Build the live tracker view |
 
 ## Key functions — betting_hub.py
-| Function | Line | Purpose |
-|---|---|---|
-| `inject_global_css()` | 53 | MT CSS (also called by dashboard.py) |
-| `apply_chart_theme(fig)` | 108 | MT chart theme |
-| `_get_supabase()` | 149 | Supabase client from st.secrets |
-| `_load_polls()` | 171 | Load Polls a Vote watchlist CSV |
-| `_save_polls_row(row)` | 185 | Append a poll row |
-| `_mark_poll_settled(idx)` | 192 | Mark poll as settled |
-| `_delete_poll_row(idx)` | 199 | Delete a poll entry |
-| `_load_bets()` | 206 | Load bets from Supabase (fallback CSV) |
-| `_insert_bet(row)` | 224 | Insert single bet to Supabase |
-| `_save_bets(df)` | 232 | Upsert full bets DataFrame to Supabase |
-| `_load_tips()` | 242 | Load Cha Ching tips CSV |
-| `_save_tip(...)` | 260 | Save a new tip |
-| `_save_tip_result(tip_id, result)` | 289 | Record tip result |
-| `_sync_tip_to_bets(tip_id, tip_row, result, pl)` | 309 | Sync settled tip into bets ledger |
-| `_load_props()` | 333 | Load player props cache |
-| `_save_prop(...)` | 341 | Save a player prop |
-| `_load_user_import()` | 354 | Load user-imported CSV |
-| `_load_user_import_as_bets()` | 370 | Convert import CSV to bets schema |
-| `_compute_pl(odds, stake, result)` | 422 | P&L calculation |
-| `_betting_stats(df)` | 432 | Hit rate, ROI, P&L summary dict |
-| `_fetch_fixtures()` | 465 | Fetch upcoming fixtures |
-| `_pl_chart(df)` | 797 | Cumulative P&L Plotly figure |
-| `_bar_chart(labels, values, title, color)` | 833 | Generic bar chart |
-| `_metric_card(label, value, sub, tone)` | 852 | MT metric card HTML |
-| `_checklist_dialog()` | 871 | Cha Ching checklist UI dialog |
-| `_open_checklist(player, market, game_key, ...)` | 939 | Open checklist for a specific tip |
-| `_add_bet_dialog()` | 953 | Add bet dialog |
-| `_import_csv_dialog()` | 1024 | CSV import dialog |
-| `render_bh_dashboard()` | 1218 | BH Dashboard page |
-| `render_bet_tracker()` | 1311 | Bet Tracker page |
-| `render_cha_ching_tips()` | 1451 | Cha Ching Tips page |
-| `_render_market_tab(game_key, market_type, ...)` | 1800 | Render one market tab in Tips |
-| `_render_manual_props()` | 1914 | Manual props entry UI |
-| `render_trends_analysis()` | 1941 | Trends & Analysis page |
-| `render_polls_a_vote()` | 2232 | Polls a Vote watchlist page |
-| `render_page(page)` | 2600 | Page router (called from dashboard.py) |
+| Function | Purpose |
+|---|---|
+| `inject_global_css()` | MT CSS (also called by dashboard.py) |
+| `apply_chart_theme(fig)` | MT chart theme |
+| `_get_supabase()` / `_supabase_available()` | Supabase client from `st.secrets` + availability check |
+| `_sb_records(df)` | DataFrame → Supabase snake_case records |
+| `_ensure_dirs()` | Create local data dirs |
+| `_load_player_avgs()` | Load player stat averages |
+| `_load_watchlist()` / `_save_watchlist(df)` | Polls-a-Vote watchlist load/save (Supabase source of truth) |
+| `_save_polls_row()` / `_mark_poll_settled()` / `_delete_poll_row()` | Watchlist row ops |
+| `_load_bets()` / `_insert_bet()` / `_save_bets(df)` | Bets ledger (Supabase + CSV fallback) |
+| `_load_tips()` / `_save_tip(...)` / `_delete_tip()` / `_save_tip_result(...)` | Cha Ching tips CRUD |
+| `_sync_tip_to_bets(...)` | Sync a settled tip into the bets ledger |
+| `_load_props()` / `_save_prop(...)` | Player-props cache |
+| `_load_user_import()` / `_load_user_import_as_bets()` | User CSV import → bets schema |
+| `_compute_pl(odds, stake, result)` | P&L calculation |
+| `_betting_stats(df)` | Hit rate / ROI / P&L summary |
+| `_fetch_fixtures()` | Upcoming fixtures |
+| `_game_key(row)` / `_game_label(row)` | Fixture identifiers |
+| `_pl_chart(df)` | Cumulative P&L Plotly figure |
+| `_bar_chart(...)` / `_metric_card(...)` / `_pl_tone(v)` | Chart + card helpers |
+| `_add_multi_dialog()` / `_checklist_dialog()` / `_open_checklist(...)` | Dialogs |
+| `_add_bet_dialog()` / `_import_csv_dialog()` | Add-bet / CSV-import dialogs |
+| `render_bh_dashboard()` | Performance page |
+| `render_bet_tracker()` | Bet Tracker page |
+| `render_cha_ching_tips()` | Cha Ching Tips page (edit-locked via hardcoded password) |
+| `_render_market_tab(...)` / `_render_manual_props()` | Tips market UI |
+| `render_trends_analysis()` | Trends & Analysis page |
+| `render_polls_a_vote()` | Polls a Vote watchlist page |
+| `render_page(page)` | BH page router (called from dashboard.py) |
 
 ## UI theme — Midnight Turf
-Defined in `dashboard.py` at line 20 (`COLORS` dict):
+- **background** `#0a1017`, **surface** `#101a24`, **emerald** `#34d399`,
+  **gold** `#f0b429`, **muted red** `#ef7a6d` (betting/loss contexts ONLY — never model errors)
+- **Archivo** display type, **IBM Plex Mono** for all numerics
+- Streamlit `config.toml`: `base=dark`, `primaryColor=#34d399`, `backgroundColor=#0a1017`,
+  `secondaryBackgroundColor=#101a24`, `textColor=#e9eef3`
 
-```python
-COLORS = {
-    "bg_base":        "#0f1923",   # dark navy — page background
-    "bg_surface":     "#152533",   # cards, panels
-    "bg_elevated":    "#1e3a4a",   # hover states, elevated cards
-    "bg_subtle":      "#1a2d3d",   # subtle backgrounds
-    "accent":         "#34d399",   # emerald — primary CTA, positive values
-    "accent_dim":     "#1a6b4a",
-    "accent_glow":    "rgba(52,211,153,0.12)",
-    "gold":           "#f0b429",   # medals, #1 prediction, top bets
-    "gold_dim":       "#5c420a",
-    "red":            "#e05252",   # losses, negative delta, warnings
-    "red_dim":        "#5c1f1f",
-    "blue":           "#4a90c4",   # secondary info, model stats
-    "text_primary":   "#e8f0f8",   # headings, important numbers
-    "text_secondary": "#94a3b8",   # labels, body text
-    "text_muted":     "#4a5a6a",   # section headers, disabled
-    "border":         "#2a4a5a",   # card borders, dividers
-    "border_subtle":  "#1e3040",
-}
-```
+**Laws:**
+- Colour encodes information, not decoration.
+- Displayed round = `Round_num − 1` at render only; all data/filtering uses the raw AFLTables `Round_num`.
+- Animated / JS content must live in `components.html()` iframes.
+- Use the marker-div `:has()` pattern for CSS targeting.
 
-Fonts: Sora (headings/UI), DM Mono (numbers/odds/code) — loaded via Google Fonts in `inject_global_css()`.
-Icons: Tabler Icons webfont (`@tabler/icons-webfont`), referenced as CSS classes e.g. `ti-award`, `ti-tags`.
-Streamlit theme: `config.toml` sets `base=dark`, `primaryColor=#34d399`, `backgroundColor=#0f1923`.
+## Pre-launch checklist (current priorities, in order)
+1. **Blank page for anonymous visitors** — app hangs before first render on Streamlit
+   Cloud; suspect a startup network call with no timeout. **CRITICAL.**
+2. **Make Betting Hub private** (password-gated via secrets) — removes personal P&L,
+   bet history, and tips from the public build.
+3. **Responsible gambling footer** on every public page: 18+, gamble responsibly,
+   Gambling Help Online 1800 858 858, "informational not betting advice".
+4. **Round 17 vs Round 18 data mismatch** between header / Stat Filter / Game Analysis.
+5. **Rename the Streamlit subdomain** to something clean.
+6. **UI cleanup batch:** unsorted League Efficiency Rankings table; duplicate auto-refresh
+   checkbox on Live Tracker; loading spinners on Poll Probability + Stat Filter;
+   "2015–2026" copy vs 2007 slider; tooltips for jargon (Bolters, CV, ExpV, MAE, 0R).
 
-## Known issues (active)
-1. `TOTAL_HA_ROUNDS = 23` in `predict_2026.py` but dashboard uses 24 — projection calc uses 23, display uses 24 (R+1 offset). Keep consistent when editing either file.
-2. Plotly chart keys — mostly resolved with explicit `key="chart_NNN"` throughout; new charts must get a unique key.
-3. Model Comparison page — pulls from `data_2026/historical_model_comparison.csv`; regenerated by `fill_historical_comparison.py`.
-
-## Current priorities
-1. Keep Polls a Vote data persistence solid (Supabase + CSV fallback)
-2. Brownlow night live tracker polish (September 2026)
-3. Model Comparison — ensure `historical_model_comparison.csv` stays current
-4. Player props / Cha Ching Tips market coverage
+## Conventions
+- Locate code by function name, never line number.
+- PowerShell only (`Select-String`, never `grep`).
+- One task per session; atomic commits (one concern per commit).
+- Stop and report if structure is ambiguous — don't guess.
+- Keep `dashboard.py` closed in VS Code during edits; format-on-save off.
 
 ## How to ask for help efficiently
-- **Never paste full files.** Reference by filename + line number.
+- **Never paste full files.** Reference by filename + function name.
 - **Paste only the relevant function** (20–50 lines max).
 - **For errors:** paste the traceback + the function it points to, nothing else.
 - **For UI changes:** describe the page name + paste the render function only.
 - **For new features:** state the page, the goal, and any relevant data shape.
 
 ## Example efficient prompt
-> "In betting_hub.py around line 1218, `render_bh_dashboard()` is crashing when `_load_bets()` returns an empty DataFrame. Here's the function: [paste 20 lines]. Fix it to handle the empty case gracefully."
+> "In betting_hub.py, `render_bh_dashboard()` is crashing when `_load_bets()` returns an
+> empty DataFrame. Here's the function: [paste 20 lines]. Fix it to handle the empty case gracefully."
