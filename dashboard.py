@@ -2272,6 +2272,57 @@ if _show_controls:
             )
 
 # ════════════════════════════════════════════════════════════
+# BETTING HUB ACCESS GATE
+# Single chokepoint before any page body renders — covers every _BH_PAGES
+# page, including the inline Predictions block below. Brownlow pages
+# (_page not in _BH_PAGES) never hit this and are visually unchanged.
+# ════════════════════════════════════════════════════════════
+if _page in _BH_PAGES and not st.session_state.get("bh_authed"):
+    # FAIL CLOSED: any problem reading the secret (missing key, no secrets
+    # file at all) → deny access rather than crash or fall open.
+    try:
+        _bh_pw_secret = st.secrets["BH_PASSWORD"]
+    except Exception:
+        _bh_pw_secret = None
+
+    _gl, _gc, _gr = st.columns([1, 1.1, 1])
+    with _gc:
+        st.markdown(
+            '<div style="text-align:center;margin:64px 0 18px 0">'
+            '<div style="font-size:26px;font-weight:800;color:#e9eef3;'
+            'letter-spacing:.5px">Betting Hub</div>'
+            '<div style="color:var(--muted);font-size:13px;margin-top:6px">'
+            'Private &mdash; enter password to continue</div>'
+            '</div>',
+            unsafe_allow_html=True,
+        )
+        if _bh_pw_secret is None:
+            st.markdown(
+                '<div style="text-align:center;color:var(--muted);font-size:13px">'
+                'Access is not configured. Set <code>BH_PASSWORD</code> in secrets '
+                'to enable the Betting Hub.</div>',
+                unsafe_allow_html=True,
+            )
+        else:
+            with st.form("bh_gate_form"):
+                _bh_pw_try = st.text_input(
+                    "Betting Hub password", type="password",
+                    label_visibility="collapsed", placeholder="Password",
+                )
+                _bh_submit = st.form_submit_button("Enter", type="primary")
+            if _bh_submit:
+                if _bh_pw_try == _bh_pw_secret:
+                    st.session_state["bh_authed"] = True
+                    st.rerun()
+                else:
+                    st.markdown(
+                        '<div style="text-align:center;color:var(--muted);'
+                        'font-size:13px;margin-top:8px">Incorrect password.</div>',
+                        unsafe_allow_html=True,
+                    )
+    st.stop()
+
+# ════════════════════════════════════════════════════════════
 # LANDING PAGE
 # ════════════════════════════════════════════════════════════
 if _page == 'Landing':
