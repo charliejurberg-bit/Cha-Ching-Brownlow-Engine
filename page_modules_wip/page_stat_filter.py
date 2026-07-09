@@ -1,2 +1,2 @@
-# page_stat_filter.py — extracted from dashboard.py
+# page_stat_filter.py â€” extracted from dashboard.py
 

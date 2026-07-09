@@ -1,2 +1,2 @@
-# page_home.py — extracted from dashboard.py
+# page_home.py â€” extracted from dashboard.py
 

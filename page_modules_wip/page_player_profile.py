@@ -1,2 +1,2 @@
-# page_player_profile.py — extracted from dashboard.py
+# page_player_profile.py â€” extracted from dashboard.py
 
