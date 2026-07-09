@@ -161,7 +161,7 @@ _BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Tre
 | `_add_bet_dialog()` / `_import_csv_dialog()` | Add-bet / CSV-import dialogs |
 | `render_bh_dashboard()` | Performance page |
 | `render_bet_tracker()` | Bet Tracker page |
-| `render_cha_ching_tips()` | Cha Ching Tips page (edit-locked via hardcoded password) |
+| `render_cha_ching_tips()` | Cha Ching Tips page (edit lock reads `st.secrets["TIPS_EDIT_PASSWORD"]`, fail-closed) |
 | `_render_market_tab(...)` / `_render_manual_props()` | Tips market UI |
 | `render_trends_analysis()` | Trends & Analysis page |
 | `render_polls_a_vote()` | Polls a Vote watchlist page |
@@ -183,8 +183,12 @@ _BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Tre
 ## Pre-launch checklist (current priorities, in order)
 1. **Blank page for anonymous visitors** — app hangs before first render on Streamlit
    Cloud; suspect a startup network call with no timeout. **CRITICAL.**
-2. **Make Betting Hub private** (password-gated via secrets) — removes personal P&L,
-   bet history, and tips from the public build.
+2. **Make Betting Hub private** — **DONE.** Session-state gate (`bh_authed`) at the router
+   chokepoint in `dashboard.py` (before line 2277), so it covers every `_BH_PAGES` page
+   including the inline Predictions block; password checked against `st.secrets["BH_PASSWORD"]`,
+   then `st.rerun()`. Cha Ching Tips edit-lock now reads `st.secrets["TIPS_EDIT_PASSWORD"]`.
+   Both **fail closed**: a missing secret denies access rather than crashing or falling open.
+   Brownlow section untouched. Removes personal P&L, bet history, and tips from the public build.
 3. **Responsible gambling footer** on every public page: 18+, gamble responsibly,
    Gambling Help Online 1800 858 858, "informational not betting advice".
 4. **Round 17 vs Round 18 data mismatch** between header / Stat Filter / Game Analysis.
