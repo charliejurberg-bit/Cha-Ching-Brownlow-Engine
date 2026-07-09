@@ -2177,7 +2177,13 @@ def render_cha_ching_tips():
 
     # ── Auth gate ─────────────────────────────────────────────────────────────
     editable = st.session_state.get('_cc_authed', False)
-    _correct_pw = 'Cha-Ching888!'
+    # Edit-lock password comes from secrets. FAIL CLOSED: if the secret is
+    # missing (or there is no secrets file), _correct_pw stays None so no
+    # entered password can ever match — the panel stays read-only, no crash.
+    try:
+        _correct_pw = st.secrets["TIPS_EDIT_PASSWORD"]
+    except Exception:
+        _correct_pw = None
 
     title_col, lock_col = st.columns([6, 1])
     with title_col:
