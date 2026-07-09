@@ -55,7 +55,7 @@ brownlow_engine/
 │                             #   model.pkl, features.pkl, label_encoder.pkl, rank_stats.pkl,
 │                             #   wheelo_features.pkl, form_features.pkl, season_YYYY.csv,
 │                             #   game_level_YYYY.csv, season_projection_2026.csv
-├── pages/                    # Extracted page modules (page_*.py) — refactor in progress; is a package (__init__.py)
+├── page_modules_wip/         # Extracted page modules (page_*.py) — dead half-refactor; renamed from pages/ (see anomaly note below)
 ├── .streamlit/config.toml    # Dark theme (Midnight Turf colours)
 └── requirements.txt
 ```
@@ -65,6 +65,14 @@ brownlow_engine/
 > `add_cha_ching_history.py`, `fill_/finalize_/fix_historical_comparison.py`), duplicate
 > snapshots (`dashboard 2.0.py`, `brownlow_model 2.0.py`), and a nested full clone directory
 > `cha-ching-brownlow-engine/` (its own git repo). See "Repo anomalies" in the handover notes.
+
+**Repo anomalies**
+- `pages/` renamed to `page_modules_wip/`. Streamlit auto-discovers a `pages/` directory
+  as multipage-app pages; `pages/page_player_profile.py` (and 11 sibling stubs) contained
+  non-UTF-8 bytes (cp1252 `0x97` em-dash), so Streamlit hit `SyntaxError: invalid or missing
+  encoding declaration` before first render → blank page for anonymous visitors on Streamlit
+  Cloud. The directory is a dead half-refactor (nothing imports it); renaming removes it from
+  auto-discovery while preserving the code and git history. The 12 files were also converted to UTF-8.
 
 ## Page structure
 
@@ -162,7 +170,7 @@ _BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Tre
 ## UI theme — Midnight Turf
 - **background** `#0a1017`, **surface** `#101a24`, **emerald** `#34d399`,
   **gold** `#f0b429`, **muted red** `#ef7a6d` (betting/loss contexts ONLY — never model errors)
-- **Archivo** display type, **IBM Plex Mono** for all numerics
+- **Archivo** for display headings, **Sora** for UI text, **DM Mono** for all numerics
 - Streamlit `config.toml`: `base=dark`, `primaryColor=#34d399`, `backgroundColor=#0a1017`,
   `secondaryBackgroundColor=#101a24`, `textColor=#e9eef3`
 
@@ -180,8 +188,10 @@ _BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Tre
 3. **Responsible gambling footer** on every public page: 18+, gamble responsibly,
    Gambling Help Online 1800 858 858, "informational not betting advice".
 4. **Round 17 vs Round 18 data mismatch** between header / Stat Filter / Game Analysis.
-5. **Rename the Streamlit subdomain** to something clean.
-6. **UI cleanup batch:** unsorted League Efficiency Rankings table; duplicate auto-refresh
+5. **Migrate `st.components.v1.html` to `st.iframe`** — removed after 2026-06-01, will break
+   on next Streamlit version bump.
+7. **Rename the Streamlit subdomain** to something clean.
+8. **UI cleanup batch:** unsorted League Efficiency Rankings table; duplicate auto-refresh
    checkbox on Live Tracker; loading spinners on Poll Probability + Stat Filter;
    "2015–2026" copy vs 2007 slider; tooltips for jargon (Bolters, CV, ExpV, MAE, 0R).
 
