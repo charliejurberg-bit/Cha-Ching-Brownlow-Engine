@@ -20,7 +20,7 @@ Brownlow section only.
 - **Playwright** — live Betfair + ESPN prediction fetch inside `dashboard.py`
 - **undetected_chromedriver** — Oddschecker multi-bookmaker scraper (`scraper_odds.py`, local only)
 - Data sources: fitzRoy (AFL stats via R), Wheelo ratings, Oddschecker, Betfair, ESPN, AFL Predictor API
-- **Model v4.0** — MAE 0.0904, top-10 accuracy ~86%, exact medallist in top-3 ~50%. Trained on 2015–2025 H&A rounds, 23 H&A rounds modelled per season.
+- **Model v4.0** — MAE 0.0904, top-10 accuracy ~86%, exact medallist in top-3 ~50%. Trained on 2015–2025 H&A rounds. Round count varies by season: 2024+ seasons add an Opening Round (Opening Round + 24 rounds), so their AFLTables `Round_num` runs one ahead — see `_display_round` / `_OPENING_ROUND_FROM = 2024` in dashboard.py.
 - `requirements.txt`: streamlit, pandas, plotly, xgboost, requests, numpy, scikit-learn, supabase, openpyxl
 
 ## File structure
@@ -51,7 +51,8 @@ brownlow_engine/
 │                             #   wheelo_brownlow_predictions.csv, fetch_stats_2026.R, fetch_coaches.R
 ├── data_wheelo/              # Wheelo ratings 2015–2026 + wheelo_all_seasons.csv (15 files)
 ├── data_betting/             # Betting Hub local fallback CSVs (bets, tips, polls, props) (4 files)
-├── predictions/              # Model artifacts + output CSVs — gitignored, generated locally (55 files)
+├── predictions/              # Model artifacts + output CSVs — tracked in git (55 files); Streamlit
+│                             #   Cloud loads these at runtime and can't regenerate them on deploy
 │                             #   model.pkl, features.pkl, label_encoder.pkl, rank_stats.pkl,
 │                             #   wheelo_features.pkl, form_features.pkl, season_YYYY.csv,
 │                             #   game_level_YYYY.csv, season_projection_2026.csv
@@ -59,12 +60,6 @@ brownlow_engine/
 ├── .streamlit/config.toml    # Dark theme (Midnight Turf colours)
 └── requirements.txt
 ```
-> Also present: assorted one-off dev/debug scripts (`fix_*.py`, `inspect_betfair*.py`,
-> `debug_espn.py`, `espn_*_debug.py`, `grid_search.py`, `impact_score_*.py`,
-> `time_decay_search.py`, `merge_*.py`, `migrate_to_supabase.py`, `brownlow_medallists.py`,
-> `add_cha_ching_history.py`, `fill_/finalize_/fix_historical_comparison.py`), duplicate
-> snapshots (`dashboard 2.0.py`, `brownlow_model 2.0.py`), and a nested full clone directory
-> `cha-ching-brownlow-engine/` (its own git repo). See "Repo anomalies" in the handover notes.
 
 **Repo anomalies**
 - `pages/` renamed to `page_modules_wip/`. Streamlit auto-discovers a `pages/` directory
