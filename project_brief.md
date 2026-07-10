@@ -189,8 +189,14 @@ _BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Tre
    then `st.rerun()`. Cha Ching Tips edit-lock now reads `st.secrets["TIPS_EDIT_PASSWORD"]`.
    Both **fail closed**: a missing secret denies access rather than crashing or falling open.
    Brownlow section untouched. Removes personal P&L, bet history, and tips from the public build.
-3. **Responsible gambling footer** on every public page: 18+, gamble responsibly,
-   Gambling Help Online 1800 858 858, "informational not betting advice".
+3. **Responsible gambling footer** on every public page — **DONE.** Helper
+   `_render_rg_footer()` in `dashboard.py`, called at the dispatch chokepoint (the
+   "Responsible-gambling footer" block at the very end of the file) guarded by
+   `if _page not in _BH_PAGES`. Full-bleed Midnight Turf footer (surface `#101a24`,
+   muted text, thin top border): 18+ / gamble responsibly, Gambling Help Online
+   1800 858 858, "informational not betting advice". Renders on all Brownlow pages
+   (Landing included); excluded on `_BH_PAGES` and the password-gate screen (gate
+   `st.stop()`s earlier, so it never reaches the footer).
 4. **Round 17 vs Round 18 data mismatch** between header / Stat Filter / Game Analysis.
 5. **Migrate `st.components.v1.html` to `st.iframe`** — removed after 2026-06-01, will break
    on next Streamlit version bump.
