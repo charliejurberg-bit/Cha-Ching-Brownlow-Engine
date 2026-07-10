@@ -4219,22 +4219,23 @@ if _page == 'Game Analysis':
         with c1: min_games_pp = st.slider("Min games played", 1, max_season_rounds, min(10, max_season_rounds), key="pp_ming")
         with c2: top_n_pp = st.selectbox("Show top N", [20, 30, 50], index=0, key="pp_topn")
 
-        filtered_pp = predictions[predictions['Games'] >= min_games_pp].head(top_n_pp).copy()
-        filtered_pp['P3%'] = (filtered_pp['Exp_3vote_games'] / filtered_pp['Games'] * 100).round(1)
-        filtered_pp['P2%'] = (filtered_pp['Exp_2vote_games'] / filtered_pp['Games'] * 100).round(1)
-        filtered_pp['P1%'] = (filtered_pp['Exp_1vote_games'] / filtered_pp['Games'] * 100).round(1)
+        with st.spinner("Computing poll probabilities…"):
+            filtered_pp = predictions[predictions['Games'] >= min_games_pp].head(top_n_pp).copy()
+            filtered_pp['P3%'] = (filtered_pp['Exp_3vote_games'] / filtered_pp['Games'] * 100).round(1)
+            filtered_pp['P2%'] = (filtered_pp['Exp_2vote_games'] / filtered_pp['Games'] * 100).round(1)
+            filtered_pp['P1%'] = (filtered_pp['Exp_1vote_games'] / filtered_pp['Games'] * 100).round(1)
 
-        fig5 = go.Figure()
-        fig5.add_trace(go.Bar(name='P(3 votes)', x=filtered_pp['Player_Name'], y=filtered_pp['P3%'], marker_color='#f0b429'))
-        fig5.add_trace(go.Bar(name='P(2 votes)', x=filtered_pp['Player_Name'], y=filtered_pp['P2%'], marker_color='#34d399'))
-        fig5.add_trace(go.Bar(name='P(1 vote)', x=filtered_pp['Player_Name'], y=filtered_pp['P1%'], marker_color='#4a90c4'))
-        fig5 = apply_chart_theme(fig5)
-        fig5.update_layout(
-            barmode='stack', yaxis_title='Probability (%)',
-            xaxis_tickangle=-35, legend=dict(orientation='h', y=1.05),
-            margin=dict(t=20, b=120),
-        )
-        st.plotly_chart(fig5, width='stretch', key="ga_pp_fig5")
+            fig5 = go.Figure()
+            fig5.add_trace(go.Bar(name='P(3 votes)', x=filtered_pp['Player_Name'], y=filtered_pp['P3%'], marker_color='#f0b429'))
+            fig5.add_trace(go.Bar(name='P(2 votes)', x=filtered_pp['Player_Name'], y=filtered_pp['P2%'], marker_color='#34d399'))
+            fig5.add_trace(go.Bar(name='P(1 vote)', x=filtered_pp['Player_Name'], y=filtered_pp['P1%'], marker_color='#4a90c4'))
+            fig5 = apply_chart_theme(fig5)
+            fig5.update_layout(
+                barmode='stack', yaxis_title='Probability (%)',
+                xaxis_tickangle=-35, legend=dict(orientation='h', y=1.05),
+                margin=dict(t=20, b=120),
+            )
+            st.plotly_chart(fig5, width='stretch', key="ga_pp_fig5")
 
 # ════════════════════════════════════════════════════════════
 # STAT FILTER
@@ -4252,7 +4253,8 @@ if _page == 'Stat Filter':
         '</div>',
         unsafe_allow_html=True,
     )
-    hist = load_all_historical()
+    with st.spinner("Loading historical games…"):
+        hist = load_all_historical()
     if hist is None:
         st.error("No historical game-level data found. Run brownlow_model.py first.")
     else:
