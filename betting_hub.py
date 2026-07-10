@@ -68,7 +68,7 @@ STAT_COL_MAP = {
 
 C = dict(
     green='#34d399', lgreen='#1a5c40', gold='#f0b429', lgold='#f5c842',
-    brown='#7e8c99', red='#e05252', bg='#101a24', card='#0d141d',
+    brown='#7e8c99', red='#ef7a6d', bg='#101a24', card='#0d141d',
     border='rgba(140,165,185,.14)', text='#e9eef3',
 )
 
@@ -828,20 +828,20 @@ BH_CSS = """
 }
 .bh-metric:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.2); transform: translateY(-2px); }
 .bh-metric.positive { border-top: 3px solid #34d399; }
-.bh-metric.negative { border-top: 3px solid #e05252; }
+.bh-metric.negative { border-top: 3px solid #ef7a6d; }
 .bh-metric.neutral  { border-top: 3px solid #4a5a6a; }
 .bh-metric.gold     { border-top: 3px solid #f0b429; }
 .bh-label { color: var(--muted); font-size: 10px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 4px; }
 .bh-value { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; line-height: 1.15; }
 .bh-value.pos  { color: #34d399; }
-.bh-value.neg  { color: #e05252; }
+.bh-value.neg  { color: #ef7a6d; }
 .bh-value.neu  { color: var(--text); }
 .bh-value.gold { color: #f0b429; }
 .bh-sub   { color: var(--muted); font-size: 11px; margin-top: 4px; line-height: 1.4; }
 
 /* ── Bet result badges ── */
 .bet-win     { background: rgba(52,211,153,0.18);  color: #34d399; border: 1px solid rgba(52,211,153,0.4);  padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; }
-.bet-loss    { background: rgba(224,82,82,0.18);   color: #e05252; border: 1px solid rgba(224,82,82,0.4);   padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; }
+.bet-loss    { background: rgba(239,122,109,0.18);   color: #ef7a6d; border: 1px solid rgba(239,122,109,0.4);   padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; }
 .bet-pending { background: rgba(240,180,41,0.15);  color: #f0b429; border: 1px solid rgba(240,180,41,0.4);  padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; }
 .bet-void    { background: rgba(74,90,106,0.25);   color: var(--muted); border: 1px solid var(--line);               padding: 2px 10px; border-radius: 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.3px; display: inline-block; }
 
@@ -2086,7 +2086,7 @@ def render_bet_tracker():
             if row['Result'] == 'Win':
                 styles.loc[i, 'P&L'] = 'color: #34d399; font-weight: 700'
             elif row['Result'] == 'Loss':
-                styles.loc[i, 'P&L'] = 'color: #e05252; font-weight: 700'
+                styles.loc[i, 'P&L'] = 'color: #ef7a6d; font-weight: 700'
         return styles
 
     st.dataframe(
@@ -2553,7 +2553,7 @@ def render_cha_ching_tips():
                 st.markdown('<span class="cc-disc-marker" style="display:none"></span>', unsafe_allow_html=True)
                 result_styles = {
                     'Win':         ('✅ Win',  '#34d399', 'rgba(52,211,153,0.12)'),
-                    'Loss':        ('❌ Loss', '#e05252', 'rgba(224,82,82,0.12)'),
+                    'Loss':        ('❌ Loss', '#ef7a6d', 'rgba(239,122,109,0.12)'),
                     'Void/Refund': ('↩️ Void', '#7e8c99', 'rgba(74,90,106,0.15)'),
                 }
                 for _, tip in settled_tips.sort_values('game_key').iterrows():
@@ -2722,7 +2722,7 @@ def _render_market_tab(game_key: str, market_type: str, props_df: pd.DataFrame,
                 if not pmatch.empty:
                     avg  = pmatch[stat_col].iloc[0]
                     diff = avg - float(line)
-                    clr  = '#34d399' if diff >= 0 else '#e05252'
+                    clr  = '#34d399' if diff >= 0 else '#ef7a6d'
                     edge_html = (
                         f'<span style="color:var(--muted)">avg {avg:.1f}</span>'
                         f'&nbsp;<span style="color:{clr};font-weight:700">'

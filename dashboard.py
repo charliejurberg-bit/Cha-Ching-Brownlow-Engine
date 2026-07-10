@@ -118,10 +118,6 @@ code, [data-testid="stCode"] {
     color: #34d399 !important;
     font-size: 12px !important;
 }
-[data-testid="stMetricDelta"] [data-testid="stMetricDeltaNegative"] {
-    color: #e05252 !important;
-    font-size: 12px !important;
-}
 [data-testid="stDataFrame"] {
     border: 1px solid var(--line) !important;
     border-radius: 10px !important;
