@@ -6750,6 +6750,30 @@ if _page == 'Model Comparison':
                         "weight during training."
                     )
 
+def _render_rg_footer():
+    """Full-bleed responsible-gambling footer, Midnight Turf styling.
+
+    Rendered only on public (Brownlow) pages — every page NOT in _BH_PAGES.
+    Static HTML, no JS/iframe. Called once at the dispatch chokepoint below.
+    """
+    st.markdown(
+        '<div style="background:#101a24;border-top:1px solid rgba(140,165,185,.14);'
+        'margin-left:calc(-50vw + 50%);margin-right:calc(-50vw + 50%);width:100vw;'
+        'margin-top:32px;padding:16px 20px;color:#7e8c99;'
+        'font-family:\'IBM Plex Mono\',monospace;font-size:11px;line-height:1.7;'
+        'text-align:center;">'
+        '<div style="letter-spacing:.18em;text-transform:uppercase;font-weight:600;'
+        'color:#8ca5b9;">18+ &nbsp;&middot;&nbsp; Gamble responsibly</div>'
+        '<div style="margin-top:4px;">Gambling Help Online &nbsp;&middot;&nbsp; '
+        '1800 858 858 &nbsp;&middot;&nbsp; gamblinghelponline.org.au</div>'
+        '<div style="margin-top:6px;max-width:640px;margin-left:auto;margin-right:auto;'
+        'font-size:10px;color:#5f6f7d;">'
+        'Cha Ching provides statistical analysis for informational and entertainment '
+        'purposes only. It is not betting advice.</div>'
+        '</div>',
+        unsafe_allow_html=True,
+    )
+
 # ── Global footer ────────────────────────────────────────────
 if _page == 'Landing':
     st.markdown(
@@ -6769,3 +6793,9 @@ else:
         '</div>',
         unsafe_allow_html=True,
     )
+
+# ── Responsible-gambling footer (public/Brownlow pages only) ──
+# Reached by every page that renders a body. Betting Hub pages are excluded
+# by _BH_PAGES; the password-gate screen st.stop()s earlier and never gets here.
+if _page not in _BH_PAGES:
+    _render_rg_footer()
