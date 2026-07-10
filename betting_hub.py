@@ -905,8 +905,8 @@ BH_CSS = """
 }
 .live-badge {
     display: inline-block;
-    background: #e05252;
-    color: #fff;
+    background: #34d399;
+    color: #0a1017;
     font-size: 10px;
     font-weight: 800;
     letter-spacing: 1.2px;

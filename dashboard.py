@@ -2909,7 +2909,7 @@ if _page == 'Predictions':
             ("📊", "Leaderboard",    "Full season rankings",  "#34d399"),
             ("👤", "Player Profile", "Deep dive any player",  "#4a90c4"),
             ("💰", "Value Finder",   "Model vs market odds",  "#f0b429"),
-            ("🎯", "Cha Ching Tips", "Curated betting tips",  "#e05252"),
+            ("🎯", "Cha Ching Tips", "Curated betting tips",  "#34d399"),
         ]
         cols = st.columns(4)
         for col, (icon, title, desc, color) in zip(cols, nav_items):
