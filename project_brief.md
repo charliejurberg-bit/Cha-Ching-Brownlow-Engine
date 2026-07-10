@@ -177,7 +177,11 @@ _BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Tre
 **Laws:**
 - Colour encodes information, not decoration.
 - Displayed round = `Round_num − 1` at render only; all data/filtering uses the raw AFLTables `Round_num`.
-- Animated / JS content must live in `components.html()` iframes.
+- Animated / JS content must live in `st.iframe(html, height=N)` iframes (raw-HTML
+  form; renders a real `<iframe srcdoc=…>`, so JS runs and cross-frame
+  `window.parent.document` still resolves). Replaced `components.html()`, which was
+  removed after 2026-06-01. Note: `st.iframe` rejects `height=0` — use `height=1`
+  for invisible utility iframes and hide the container via CSS.
 - Use the marker-div `:has()` pattern for CSS targeting.
 
 ## Pre-launch checklist (current priorities, in order)
@@ -198,8 +202,15 @@ _BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Tre
    (Landing included); excluded on `_BH_PAGES` and the password-gate screen (gate
    `st.stop()`s earlier, so it never reaches the footer).
 4. **Round 17 vs Round 18 data mismatch** between header / Stat Filter / Game Analysis.
-5. **Migrate `st.components.v1.html` to `st.iframe`** — removed after 2026-06-01, will break
-   on next Streamlit version bump.
+5. **Migrate `st.components.v1.html` to `st.iframe`** — **DONE.** All 7 call sites in
+   `dashboard.py` migrated to `st.iframe(html, height=N)` (Landing ticker/hero/stat
+   strip; Live Tracker error header, no-data header, live panel; global animated
+   counter). Dropped the `scrolling=` arg (no such param; each iframe controls its own
+   overflow). Removed both `import streamlit.components.v1` lines. Counter kept `height=1`
+   (st.iframe rejects `height=0`); its container is still hidden by the
+   `iframe[srcdoc*="_ccAnimated"]` CSS rule, which still matches (st.iframe emits
+   `<iframe srcdoc=…>`). Cross-frame `window.parent.document` verified working in-browser.
+   `requirements.txt` now pins `streamlit>=1.57` (st.iframe hard dependency).
 7. **Rename the Streamlit subdomain** to something clean.
 8. **UI cleanup batch:** unsorted League Efficiency Rankings table; duplicate auto-refresh
    checkbox on Live Tracker; loading spinners on Poll Probability + Stat Filter;
