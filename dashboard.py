@@ -404,9 +404,32 @@ def apply_chart_theme(fig):
             trace.update(marker_line_width=0)
     return fig
 
+# ── Round display law (single home) ───────────────────────────
+# AFLTables numbers every season's rounds from 1. Seasons from 2024 onward open
+# with an "Opening Round" (AFL Round 0), so their AFLTables Round_num runs one
+# ahead of the real-world AFL round; earlier seasons map 1:1. Convert to the
+# displayed round HERE, at render time only — never mutate stored, filtered,
+# joined, or sorted Round_num values.
+_OPENING_ROUND_FROM = 2024  # first season with an AFL Opening Round
+
+def _display_round(round_num, season):
+    """AFLTables Round_num → the AFL round number shown to users (season-aware)."""
+    try:
+        rn = int(round_num)
+        sn = int(season)
+    except (TypeError, ValueError):
+        return round_num
+    return rn - 1 if sn >= _OPENING_ROUND_FROM else rn
+
+def _display_rounds(df):
+    """Season-aware display rounds for a game-level df (has Round_num + Season)."""
+    if 'Season' in df.columns:
+        return [_display_round(rn, sn) for rn, sn in zip(df['Round_num'], df['Season'])]
+    return list(df['Round_num'])
+
 def render_banner():
     _hub = st.session_state.get("active_hub", "brownlow")
-    _sub = ("Through Round {}".format(max_season_rounds - 1) if is_2026
+    _sub = ("Through Round {}".format(_display_round(max_season_rounds, selected_season)) if is_2026
             else "All Seasons" if is_career else f"{selected_season} Season")
     _mode_label = "Brownlow Predictor" if _hub == "brownlow" else "Betting Hub"
     st.markdown(f"""
@@ -2355,7 +2378,7 @@ if _page == 'Landing':
     _land_pl_val = _land_pl or 0.0
     _pl_str = f"+{_land_pl_val:.2f}u" if _land_pl_val >= 0 else f"-{abs(_land_pl_val):.2f}u"
     _pl_color = "#34d399" if _land_pl_val >= 0 else "#e0625a"
-    _land_round = max_season_rounds - 1
+    _land_round = _display_round(max_season_rounds, 2026)
 
     # Latest round's predicted 3-2-1 vote read
     _TEAM_ABBR = {
@@ -2675,7 +2698,7 @@ if _page == 'Predictions':
     with _home_tab:
         st.markdown('<span class="pred-flush" style="display:none"></span>', unsafe_allow_html=True)
         SEASON = 2026
-        CURRENT_ROUND = max_season_rounds - 1
+        CURRENT_ROUND = _display_round(max_season_rounds, SEASON)
 
         df = load_season(SEASON)
         odds_df = load_best_odds()
@@ -3353,9 +3376,9 @@ if _page == 'Player Profile':
                     _avg_poll = player_games['Poll_Prob'].mean() * 100
                     _best = player_games.loc[player_games['Poll_Prob'].idxmax()]
                     if is_career:
-                        _best_round_lbl = f"{int(_best['Season'])} R{int(_best['Round_num']) - 1}"
+                        _best_round_lbl = f"{int(_best['Season'])} R{_display_round(_best['Round_num'], _best['Season'])}"
                     else:
-                        _best_round_lbl = f"R{int(_best['Round_num']) - 1}"
+                        _best_round_lbl = f"R{_display_round(_best['Round_num'], selected_season)}"
                 else:
                     _avg_votes = 0.0
                     _avg_poll = 0.0
@@ -3441,7 +3464,7 @@ if _page == 'Player Profile':
                 if is_career:
                     _x = list(range(len(player_games)))
                     _seasons_order = player_games['Season'].astype(int).tolist()
-                    _rounds_order = (player_games['Round_num'].astype(int) - 1).tolist()
+                    _rounds_order = _display_rounds(player_games)
                     _seen = {}
                     for _i, _s in enumerate(_seasons_order):
                         _seen.setdefault(_s, _i)
@@ -3454,7 +3477,7 @@ if _page == 'Player Profile':
                     _traj_caption = 'poll probability across career'
                     _avg_word = 'career'
                 else:
-                    _x = (player_games['Round_num'] - 1)
+                    _x = _display_rounds(player_games)
                     _xaxis_cfg = dict(title='Round', dtick=1)
                     _customdata = None
                     _hover_pp = 'Round %{x}<br>Poll %{y:.1f}%<extra></extra>'
@@ -3567,8 +3590,11 @@ if _page == 'Player Profile':
                 })
                 _sort_cols = ['Season', 'Rnd'] if is_career else ['Rnd']
                 _log_disp = log_display.sort_values(_sort_cols).copy()
-                # Display AFL round (AFLTables Round_num runs 1 ahead) — display only, order unchanged
-                _log_disp['Rnd'] = _log_disp['Rnd'] - 1
+                # Display AFL round (season-aware) — display only, sort order unchanged
+                if is_career:
+                    _log_disp['Rnd'] = [_display_round(r, s) for r, s in zip(_log_disp['Rnd'], _log_disp['Season'])]
+                else:
+                    _log_disp['Rnd'] = _log_disp['Rnd'].apply(lambda r: _display_round(r, selected_season))
                 if is_career:
                     _log_disp['Season'] = _log_disp['Season'].astype(int)
                 for col in _log_disp.select_dtypes(include='float').columns:
@@ -3961,7 +3987,7 @@ if _page == 'Game Analysis':
             with sel_col:
                 selected_round = st.selectbox(
                     "Select Round", available_rounds,
-                    format_func=lambda r: f"Round {r - 1}",
+                    format_func=lambda r: f"Round {_display_round(r, 2026)}",
                     index=max(0, len(available_rounds) - 1),
                     key="rbr_round",
                 )
@@ -3969,7 +3995,7 @@ if _page == 'Game Analysis':
             with info_col:
                 st.markdown(
                     f'<div style="line-height:38px;color:var(--muted);font-size:14px;">'
-                    f'Round {selected_round - 1} &nbsp;·&nbsp; {rnd["Match"].nunique()} matches &nbsp;·&nbsp; {len(rnd)} players'
+                    f'Round {_display_round(selected_round, 2026)} &nbsp;·&nbsp; {rnd["Match"].nunique()} matches &nbsp;·&nbsp; {len(rnd)} players'
                     f'</div>',
                     unsafe_allow_html=True,
                 )
@@ -4165,7 +4191,7 @@ if _page == 'Game Analysis':
 
                 st.markdown(
                     f'<div class="ga-game"><style>{_GA_CSS}</style>'
-                    f'<div class="ga-overline">GAME {game_idx + 1} · ROUND {selected_round - 1}</div>'
+                    f'<div class="ga-overline">GAME {game_idx + 1} · ROUND {_display_round(selected_round, 2026)}</div>'
                     f'<div class="ga-result">{result_html}</div>'
                     f'<div class="ga-rule"></div>'
                     f'<div class="ga-section-label">PREDICTED VOTES'
@@ -4474,6 +4500,8 @@ if _page == 'Stat Filter':
                                                    'Playing.for': 'Team', 'Contested.Possessions': 'ContPoss',
                                                    'Coaches_Votes': 'CV', 'Is_Win': 'Result', 'Brownlow.Votes': 'Votes'})
             _sf_disp = sample_sf.sort_values(['Season', 'Rnd'], ascending=[False, False]).head(200).copy()
+            # Display AFL round (season-aware) — display only, sort order unchanged
+            _sf_disp['Rnd'] = [_display_round(r, s) for r, s in zip(_sf_disp['Rnd'], _sf_disp['Season'])]
             for col in _sf_disp.select_dtypes(include='float').columns:
                 _sf_disp[col] = _sf_disp[col].round(1)
             st.markdown(
@@ -4935,7 +4963,7 @@ if _page == 'Player Comparison':
                     _fig_rbr = go.Figure()
                     if not _g1.empty:
                         _fig_rbr.add_trace(go.Scatter(
-                            x=_g1['Round_num'], y=_g1['Exp_Votes'].round(1),
+                            x=_display_rounds(_g1), y=_g1['Exp_Votes'].round(1),
                             name=_p1, mode='lines+markers',
                             line=dict(color='#34d399', width=2.5),
                             marker=dict(size=7, color='#34d399'),
@@ -4943,7 +4971,7 @@ if _page == 'Player Comparison':
                         ))
                     if not _g2.empty:
                         _fig_rbr.add_trace(go.Scatter(
-                            x=_g2['Round_num'], y=_g2['Exp_Votes'].round(1),
+                            x=_display_rounds(_g2), y=_g2['Exp_Votes'].round(1),
                             name=_p2, mode='lines+markers',
                             line=dict(color='rgba(126,140,153,0.55)', width=2.5),
                             marker=dict(size=7, color='rgba(126,140,153,0.55)'),
@@ -5065,14 +5093,14 @@ if _page == 'Player Comparison':
                     _fig_h2h_rbr = go.Figure()
                     if not _hg1.empty:
                         _fig_h2h_rbr.add_trace(go.Scatter(
-                            x=_hg1['Round_num'], y=_hg1['Exp_Votes'].round(1),
+                            x=_display_rounds(_hg1), y=_hg1['Exp_Votes'].round(1),
                             name=_p1, mode='lines+markers',
                             line=dict(color='#34d399', width=2.5), marker=dict(size=7, color='#34d399'),
                             hovertemplate='<b>' + _p1 + '</b><br>Round %{x}<br>%{y:.1f} exp votes<extra></extra>',
                         ))
                     if not _hg2.empty:
                         _fig_h2h_rbr.add_trace(go.Scatter(
-                            x=_hg2['Round_num'], y=_hg2['Exp_Votes'].round(1),
+                            x=_display_rounds(_hg2), y=_hg2['Exp_Votes'].round(1),
                             name=_p2, mode='lines+markers',
                             line=dict(color='#7e8c99', width=2.5), marker=dict(size=7, color='#7e8c99'),
                             hovertemplate='<b>' + _p2 + '</b><br>Round %{x}<br>%{y:.1f} exp votes<extra></extra>',
@@ -5322,7 +5350,7 @@ if False:  # merged into Player Comparison
                         _fig_h2h = go.Figure()
                         if not _hg1.empty:
                             _fig_h2h.add_trace(go.Scatter(
-                                x=_hg1['Round_num'], y=_hg1['Exp_Votes'].round(1),
+                                x=_display_rounds(_hg1), y=_hg1['Exp_Votes'].round(1),
                                 name=_ha, mode='lines+markers',
                                 line=dict(color='#34d399', width=2.5),
                                 marker=dict(size=7, color='#34d399'),
@@ -5330,7 +5358,7 @@ if False:  # merged into Player Comparison
                             ))
                         if not _hg2.empty:
                             _fig_h2h.add_trace(go.Scatter(
-                                x=_hg2['Round_num'], y=_hg2['Exp_Votes'].round(1),
+                                x=_display_rounds(_hg2), y=_hg2['Exp_Votes'].round(1),
                                 name=_hb, mode='lines+markers',
                                 line=dict(color='#7e8c99', width=2.5),
                                 marker=dict(size=7, color='#7e8c99'),
