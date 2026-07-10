@@ -5360,8 +5360,6 @@ if _page == 'Live Tracker':
     UPCOMING_LEAD    = 2      # surface a watchlist target this many rounds ahead
     _LT_IFRAME_H     = 880    # fixed single-viewport iframe height (no internal scroll)
 
-    _auto_state = bool(st.session_state.get("lt_auto_refresh", False))
-
     # Small fallback header for the error / no-data states only. The live panel
     # folds its own topbar (title + LIVE pill) into the single redesign iframe.
     _pill_txt = "LIVE" if _lt_live else "OFF-SEASON"
@@ -5684,8 +5682,6 @@ if _page == 'Live Tracker':
         # ── topbar display values ──
         _mode_txt = "Live count" if _count_night else "Prediction"
         _fetched  = _time.strftime("%H:%M:%S")
-        _box = ('<span class="box" style="background:var(--emerald);border-color:var(--emerald)"></span>'
-                if _auto_state else '<span class="box"></span>')
         _live_pill = ('<span class="live">LIVE</span>' if _lt_live else
                       '<span class="live" style="color:var(--muted);border-color:var(--hair2)">OFF-SEASON</span>')
         _pct = max(0.0, min(100.0, _disp_round / 24 * 100))
@@ -5717,8 +5713,6 @@ if _page == 'Live Tracker':
   .tr{display:flex;align-items:center;gap:20px;font-family:var(--mono);font-size:11.5px;color:var(--muted2);letter-spacing:.03em;}
   .tr b{color:var(--muted);font-weight:500;}
   .tr a{color:var(--emerald);text-decoration:none;}
-  .tr .chk{display:inline-flex;align-items:center;gap:6px;}
-  .tr .box{width:11px;height:11px;border:1px solid var(--hair2);border-radius:3px;display:inline-block;}
 
   /* ---- progress ---- */
   .prog{display:flex;align-items:center;gap:16px;padding:0 0 16px;}
@@ -5822,7 +5816,6 @@ if _page == 'Live Tracker':
   <div class="topbar">
     <div class="tl"><h1>Live Tracker</h1>{_live_pill}</div>
     <div class="tr">
-      <span class="chk">{_box}Auto-refresh 60s</span>
       <span>Fetched <b>{_fetched}</b></span>
       <span>Mode <b>{_mode_txt}</b></span>
       <span>Source <a href="https://www.afl.com.au/brownlow-medal/live-tracker" target="_blank">AFL.com.au ↗</a></span>
