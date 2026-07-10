@@ -73,7 +73,7 @@ if __name__ == "__main__":
     py_scripts = [
         ("scraper_odds.py",        "Scraping bookmaker odds"),
         ("scraper_betfair.py",     "Scraping Betfair Brownlow predictions"),
-        ("scraper_espn.py",        "Scraping ESPN Brownlow predictions"),
+        ("scraper_espn.py",        "Scraping ESPN Brownlow predictions (season + per-round votes)"),
         ("scraper_afl.py",         "Scraping AFL Predictor Brownlow votes"),
         ("update_wheelo_2026.py",  "Updating Wheelo 2026 ratings"),
         ("predict_2026.py",        "Generating 2026 predictions"),

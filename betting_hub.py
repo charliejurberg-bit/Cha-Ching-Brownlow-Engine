@@ -3214,6 +3214,7 @@ def render_polls_a_vote():
     WHEELO_ROUND_THRESH = 0.5    # Wheelo: round ExpVotes >= this = tips that round
     BF_ROUND_THRESH     = 1.0    # Betfair: round vote >= 1 = tipped to poll that round
     AFL_ROUND_THRESH    = 1.0    # AFL Predictor: round vote >= 1 = tipped to poll that round
+    ESPN_ROUND_THRESH   = 0.5    # ESPN: round vote >= 0.5 = tips (ESPN's min published spread value)
     CC_SEASON_THRESH    = 0.35   # Cha Ching: season max Poll_Prob "on the radar"
     WH_SEASON_THRESH    = 0.65   # Wheelo: season sum "on the radar"
 
@@ -3227,6 +3228,8 @@ def render_polls_a_vote():
     _con_wheelo_round: dict[str, dict[int, float]] = {}        # Wheelo per-round ExpVotes
     _con_bf_round: dict[str, dict[int, float]] | None = None   # Betfair per-round votes
     _con_afl_round: dict[str, dict[int, float]] | None = None  # AFL Predictor per-round votes
+    _con_espn_round: dict[str, dict[int, float]] | None = None  # ESPN per-round votes
+    _espn_rounds_covered: set[int] = set()                     # rounds ESPN published (any game)
     try:
         # 1. Cha Ching: max Poll_Prob per player (season) + per-round (verdict).
         #    Round key = Round_num - 1 (display/AFL convention).
@@ -3294,13 +3297,28 @@ def render_polls_a_vote():
                 for _, _rr in _bfr.iterrows():
                     _con_bf_round.setdefault(_norm(_rr['Player']), {})[
                         int(_rr['Round'])] = float(_rr['Vote'] or 0)
-        # 5. ESPN — read cached CSV written by dashboard's scrape function
+        # 5. ESPN — season totals (radar) from the cached CSV.
         _espn_csv = "data_2026/espn_predictions.csv"
         if os.path.exists(_espn_csv):
             _espndf = pd.read_csv(_espn_csv)
             if 'Total_Votes' in _espndf.columns:
                 _con_espn = {_norm(r['Player']): float(r['Total_Votes'] or 0)
                              for _, r in _espndf.iterrows()}
+        # 5b. ESPN — per-round votes (verdict) from espn_round_votes.csv, written by
+        #     scraper_espn.py. Rounds are AFL/display convention (0 = Opening Round),
+        #     matching the others. ESPN names only vote-getters, so absence in a
+        #     covered round is disagreement, not silence — _espn_rounds_covered records
+        #     which rounds ESPN published so a missing player reads TIPS_OTHER, not NA.
+        _espn_round_csv = "data_2026/espn_round_votes.csv"
+        if os.path.exists(_espn_round_csv):
+            _espnr = pd.read_csv(_espn_round_csv)
+            if {'Player', 'Round', 'Vote'} <= set(_espnr.columns):
+                _con_espn_round = {}
+                for _, _rr in _espnr.iterrows():
+                    _rnd = int(_rr['Round'])
+                    _con_espn_round.setdefault(_norm(_rr['Player']), {})[
+                        _rnd] = float(_rr['Vote'] or 0)
+                    _espn_rounds_covered.add(_rnd)
     except Exception:
         pass
 
@@ -3333,8 +3351,7 @@ def render_polls_a_vote():
     # For the picked round(s), classify each model: TIPS (tips him that round),
     # TIPS_OTHER (covers that game but he's not tipped — real disagreement), or
     # NA (no round-level data / season-only → shown as "—", never counted).
-    # Cha Ching, Betfair, Wheelo and AFL Predictor are round-capable; only ESPN
-    # is season-only here and always returns NA.
+    # All five sources are now round-capable.
     _ROUND_MODELS = ['Cha Ching', 'Betfair', 'Wheelo', 'AFL Predictor', 'ESPN']
 
     def _verdict_from(rounds_for: dict[int, float] | None, picked: set[int],
@@ -3345,6 +3362,22 @@ def render_polls_a_vote():
         if not covered:
             return 'NA'
         if any(rounds_for[r] >= thresh for r in covered):
+            return 'TIPS'
+        return 'TIPS_OTHER'
+
+    def _verdict_espn(key: str, picked: set[int]) -> str:
+        # ESPN prose names only vote-getters, so it can't emit "played, 0 votes"
+        # rows the way AFL Predictor does. Coverage is therefore judged at the
+        # round level: if ESPN published a picked round, a player named >= thresh
+        # there TIPS, and a player absent from it is disagreement (TIPS_OTHER),
+        # not silence. A round ESPN never published stays NA.
+        if _con_espn_round is None:
+            return 'NA'
+        covered = picked & _espn_rounds_covered
+        if not covered:
+            return 'NA'
+        player_rounds = _con_espn_round.get(key, {})
+        if any(player_rounds.get(r, 0) >= ESPN_ROUND_THRESH for r in covered):
             return 'TIPS'
         return 'TIPS_OTHER'
 
@@ -3359,7 +3392,7 @@ def render_polls_a_vote():
             'AFL Predictor': _verdict_from(
                 None if _con_afl_round is None else _con_afl_round.get(key, {}),
                 rounds, AFL_ROUND_THRESH),
-            'ESPN': 'NA',            # round-level deferred (next phase)
+            'ESPN': _verdict_espn(key, rounds),
         }
 
     def _model_top3(player: str) -> list[int]:
