@@ -4,7 +4,6 @@ Run: python -m streamlit run dashboard.py
 """
 
 import streamlit as st
-import streamlit.components.v1 as _components
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
@@ -891,7 +890,7 @@ inject_global_css()
 inject_global_theme()
 
 # ── Animated number counter (JS via iframe → parent DOM) ──────
-_components.html("""
+st.iframe("""
 <script>
 (function() {
     function run() {
@@ -923,7 +922,7 @@ _components.html("""
     setTimeout(run, 1100);
 })();
 </script>
-""", height=0)
+""", height=1)  # global animated-counter utility (JS reaches parent DOM); st.iframe rejects height=0, container is hidden via the iframe[srcdoc*="_ccAnimated"] CSS rule
 
 # ── Helpers ──────────────────────────────────────────────────
 PRED_DIR = "predictions"
@@ -2452,7 +2451,7 @@ track.innerHTML += track.innerHTML;
     _ticker_html = _ticker_html.replace("__SEG__", _ticker_segment)
     with st.container():
         st.markdown('<div class="cc-ticker-marker">&#8203;</div>', unsafe_allow_html=True)
-        _components.html(_ticker_html, height=40, scrolling=False)
+        st.iframe(_ticker_html, height=40)
 
     # ── Hero ──
     _hero_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
@@ -2550,7 +2549,7 @@ font-family:'Archivo',sans-serif;font-weight:800;font-size:14px;flex-shrink:0;}
         .replace("__NAME2__", _initial_surname(_chip2["name"])).replace("__STATS2__", _chip_stats(_chip2))
         .replace("__NAME3__", _initial_surname(_chip3["name"])).replace("__STATS3__", _chip_stats(_chip3))
     )
-    _components.html(_hero_html, height=440, scrolling=False)
+    st.iframe(_hero_html, height=440)
 
     # ── Stat strip ──
     _stat_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
@@ -2604,7 +2603,7 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
         .replace("__PL_PREFIX__", "+" if _land_pl_val >= 0 else "-")
         .replace("__PL_FALLBACK__", _pl_str)
     )
-    _components.html(_stat_html, height=110, scrolling=False)
+    st.iframe(_stat_html, height=110)
 
     # ── Destination panels ──
     _lc1, _lc2 = st.columns(2, gap="medium")
@@ -5524,7 +5523,6 @@ if _page == 'Live Tracker':
     _lt_sn   = _lt.get("season_name", "")
     _lt_live = _lt.get("is_live", False)
 
-    import streamlit.components.v1 as _stc
     _lt_auto = False  # set in the utility line below; init so refresh guard is safe
 
     # ── named constants (single source for the reconciliation thresholds) ──
@@ -5564,13 +5562,13 @@ if _page == 'Live Tracker':
 </div></body></html>"""
 
     if _lt_err:
-        _stc.html(_hdr_html, height=54)
+        st.iframe(_hdr_html, height=54)
         st.error(f"Could not fetch AFL tracker data: {_lt_err}")
         if st.button("Retry", key="lt_retry"):
             st.cache_data.clear()
             st.rerun()
     elif _lt_df.empty:
-        _stc.html(_hdr_html, height=54)
+        st.iframe(_hdr_html, height=54)
         st.info(
             "Count night hasn't started yet — showing AFL's own Brownlow predictor data "
             "for the current season. This page will update automatically on count night."
@@ -6044,7 +6042,7 @@ if _page == 'Live Tracker':
         _full_html = ('<!doctype html><html><head><meta charset="utf-8">'
                       '<meta name="viewport" content="width=device-width, initial-scale=1">'
                       + _LT_CSS + '</head>' + _body + '</html>')
-        _stc.html(_full_html, height=_LT_IFRAME_H, scrolling=False)
+        st.iframe(_full_html, height=_LT_IFRAME_H)
 
         # Native auto-refresh control (the real refresh driver; the topbar box
         # above mirrors its state for display only). Kept exactly as before.
