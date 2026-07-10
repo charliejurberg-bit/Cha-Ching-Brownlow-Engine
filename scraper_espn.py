@@ -14,6 +14,7 @@ _ESPN_URL = (
     "afl-2026-brownlow-medal-predictor-tracker-leaderboard-odds-every-vote"
 )
 _ESPN_CSV = 'data_2026/espn_predictions.csv'
+_ESPN_ROUND_CSV = 'data_2026/espn_round_votes.csv'
 
 _UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -154,6 +155,71 @@ def _parse_votes(html_text):
     return votes, lb_order
 
 
+# Round headings and per-game vote lines in the ESPN predictor prose.
+_ROUND_HDR_RE = re.compile(r'^(OPENING ROUND|ROUND (\d{1,2}))$', re.M)
+_ROUND_VOTE_RE = re.compile(
+    r"(\d+\.?\d*)\s*[-–—]\s*"
+    r"((?:[A-Z][A-Za-z.'\-]+(?:\s+[A-Z][A-Za-z.'\-]+)+\s*\([A-Z]{1,4}\)(?:\s*,\s*)?)+)"
+)
+_ROUND_PLAYER_RE = re.compile(
+    r"([A-Z][A-Za-z.'\-]+(?:\s+[A-Z][A-Za-z.'\-]+)+)\s*\([A-Z]{1,4}\)"
+)
+
+
+def _parse_round_votes(html_text):
+    """Extract ESPN's per-round predictor votes → list of {Player, Round, Vote}.
+
+    Round numbers use the AFL DISPLAY convention (Opening Round = 0, Round N = N),
+    matching afl_predictor_round_votes.csv / betfair_round_votes.csv and the
+    Polls-a-Vote consumer's My_Rounds picks — NOT raw AFLTables Round_num.
+
+    ESPN's predictor publishes a fractional 3-2-1 spread per game (values like
+    2.5 / 1.5 / 1 / 0.5, sometimes a value split across two players). Votes are
+    stored AS-IS (float, unrounded) to preserve the weighting. Only named
+    vote-getters appear; players who scored 0 are absent, which the round-verdict
+    consumer reads as disagreement within a covered round (not silence).
+
+    Article structure: rounds are <h2> headings 'OPENING ROUND' / 'ROUND N'; games
+    within a round carry a 'TEAM (score) def.[ by] TEAM (score)' header and then
+    the vote lines 'VALUE - Player (TEAM)[, Player (TEAM)]'.
+
+    Raises ValueError if the expected round/vote structure is not found, so the
+    caller can fail loudly and leave the existing CSV untouched.
+    """
+    from bs4 import BeautifulSoup
+    soup = BeautifulSoup(html_text, 'html.parser')
+    text = soup.get_text("\n", strip=True)
+
+    marks = [(m.start(), m.end(),
+              0 if m.group(1) == 'OPENING ROUND' else int(m.group(2)))
+             for m in _ROUND_HDR_RE.finditer(text)]
+    if not marks:
+        raise ValueError(
+            "ESPN round parse: no round headings (OPENING ROUND / ROUND N) found — "
+            "article structure may have changed")
+
+    rows = []
+    for i, (_s, e, disp) in enumerate(marks):
+        nxt = marks[i + 1][0] if i + 1 < len(marks) else len(text)
+        block = text[e:nxt]
+        for vm in _ROUND_VOTE_RE.finditer(block):
+            try:
+                val = float(vm.group(1))
+            except ValueError:
+                continue
+            if not (0 < val <= 3):
+                continue
+            for pm in _ROUND_PLAYER_RE.finditer(vm.group(2)):
+                rows.append({'Player': pm.group(1).title().strip(),
+                             'Round': disp, 'Vote': val})
+
+    if not rows:
+        raise ValueError(
+            "ESPN round parse: round headings found but no per-game vote lines "
+            "matched — article structure may have changed")
+    return rows
+
+
 def fetch():
     try:
         html = _pw_get_html(
@@ -179,6 +245,23 @@ def fetch():
 
         print(f"[ESPN] OK ({len(df)} players)")
         print(df.head(10).to_string(index=False))
+
+        # ── Per-round votes (same fetch; independent of the season output) ──
+        # Fail loud on a structure mismatch and keep the existing CSV rather than
+        # writing a partial/garbage file over good data.
+        try:
+            round_rows = _parse_round_votes(html)
+            rdf = (pd.DataFrame(round_rows)
+                   .sort_values(['Player', 'Round']).reset_index(drop=True))
+            _save_with_backup(rdf, _ESPN_ROUND_CSV)
+            polled = int((rdf['Vote'] >= 0.5).sum())
+            print(f"[ESPN] round-level votes: {len(rdf)} rows "
+                  f"({rdf['Round'].nunique()} rounds, {polled} with a vote) -> {_ESPN_ROUND_CSV}")
+        except Exception as round_err:
+            print(f"[ESPN] round parse FAILED: {round_err}")
+            if os.path.exists(_ESPN_ROUND_CSV):
+                print(f"[ESPN] Keeping existing {_ESPN_ROUND_CSV} (unchanged)")
+
         return True
 
     except Exception as e:
