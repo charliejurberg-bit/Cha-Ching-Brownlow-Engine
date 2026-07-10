@@ -176,7 +176,13 @@ _BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Tre
 
 **Laws:**
 - Colour encodes information, not decoration.
-- Displayed round = `Round_num − 1` at render only; all data/filtering uses the raw AFLTables `Round_num`.
+- Displayed round is **season-aware**: use `_display_round(round_num, season)` (single home
+  in `dashboard.py`) at render only — never mutate stored/filtered/joined `Round_num`.
+  Seasons ≥ 2024 opened with an Opening Round, so their AFLTables `Round_num` runs 1 ahead
+  (subtract 1); 2007–2023 map 1:1. `_display_rounds(df)` is the vectorised form for
+  game-level dataframes (uses the df's `Season` column). Live Tracker and betting_hub
+  Polls-a-Vote key their models in display-round space via their own `- 1` join logic on
+  2026-only data — left as-is (not render sites).
 - Animated / JS content must live in `st.iframe(html, height=N)` iframes (raw-HTML
   form; renders a real `<iframe srcdoc=…>`, so JS runs and cross-frame
   `window.parent.document` still resolves). Replaced `components.html()`, which was
@@ -201,7 +207,17 @@ _BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Tre
    1800 858 858, "informational not betting advice". Renders on all Brownlow pages
    (Landing included); excluded on `_BH_PAGES` and the password-gate screen (gate
    `st.stop()`s earlier, so it never reaches the footer).
-4. **Round 17 vs Round 18 data mismatch** between header / Stat Filter / Game Analysis.
+4. **Round 17 vs Round 18 display mismatch** — **DONE.** Root cause: 2024+ seasons open
+   with an Opening Round, so AFLTables `Round_num` runs 1 ahead — some render sites applied
+   the `−1`, others didn't. Centralised on a single season-aware helper `_display_round(round_num,
+   season)` (+ vectorised `_display_rounds(df)`) in `dashboard.py`, used at every live render
+   site: banner, Landing hero/stat strip, Predictions, Player Profile (best-round label, career/
+   season trajectory chart, game-log table), Game Analysis (selector/header/overline), the
+   **Stat Filter "Sample games" table** (the reported bug — was raw), and the 3 Player Comparison
+   round-by-round charts. Pre-2024 seasons now map 1:1 (fixes a latent bug where Player Profile
+   subtracted 1 unconditionally). Join/keying logic left untouched (Live Tracker `_assemble`,
+   betting_hub Polls-a-Vote) — those operate in display space on 2026-only data. Dead `if False:`
+   blocks left as-is. Verified in-app: all surfaces read Round 17; historical rows un-offset.
 5. **Migrate `st.components.v1.html` to `st.iframe`** — **DONE.** All 7 call sites in
    `dashboard.py` migrated to `st.iframe(html, height=N)` (Landing ticker/hero/stat
    strip; Live Tracker error header, no-data header, live panel; global animated
