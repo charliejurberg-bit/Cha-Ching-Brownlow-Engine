@@ -223,9 +223,14 @@ _BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Tre
    `<iframe srcdoc=…>`). Cross-frame `window.parent.document` verified working in-browser.
    `requirements.txt` now pins `streamlit>=1.57` (st.iframe hard dependency).
 7. **Rename the Streamlit subdomain** to something clean.
-8. **UI cleanup batch:** unsorted League Efficiency Rankings table; duplicate auto-refresh
-   checkbox on Live Tracker; loading spinners on Poll Probability + Stat Filter;
-   "2015–2026" copy vs 2007 slider; tooltips for jargon (Bolters, CV, ExpV, MAE, 0R).
+8. **UI cleanup batch** — **MOSTLY DONE.** Removed duplicate auto-refresh checkbox on Live
+   Tracker; added loading spinners to Poll Probability + Stat Filter; fixed "2015–2026" copy
+   to 2007–2026; added jargon tooltips (Bolters, CV, ExpV, MAE, and "OR" = Opening Round —
+   the term is "OR", not "0R"). League Efficiency Rankings was already sorted (user "Sort by"
+   selectbox, defaults to Poll Rate desc) — no change. **Still open:** two `#e05252` recolours
+   deferred — the `.live-badge` (betting_hub) and the Cha Ching Tips nav accent (dashboard)
+   can't go gold without clashing (adjacent gold bet-detail / white-on-gold contrast; and the
+   Value Finder nav card is already gold). Awaiting a colour decision.
 
 ## Conventions
 - Locate code by function name, never line number.
