@@ -4249,7 +4249,7 @@ if _page == 'Stat Filter':
         '<h1 style="font-family:\'Archivo\',sans-serif;font-size:34px;font-weight:800;'
         'color:#e9eef3;margin:4px 0 2px;line-height:1.05">Threshold to votes</h1>'
         '<div style="color:#7e8c99;font-size:13px">How historical Brownlow polling '
-        'responds as you raise a stat threshold · 2015–2026</div>'
+        'responds as you raise a stat threshold · 2007–2026</div>'
         '</div>',
         unsafe_allow_html=True,
     )
