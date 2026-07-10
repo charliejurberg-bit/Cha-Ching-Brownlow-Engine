@@ -2805,7 +2805,7 @@ if _page == 'Predictions':
             '</div>'
             '<div class="hh-strip">'
             '<div class="hh-stat"><div class="hh-stat-val">86%</div><div class="hh-stat-lab">Top-10 acc.</div></div>'
-            '<div class="hh-stat"><div class="hh-stat-val">0.09</div><div class="hh-stat-lab">MAE</div></div>'
+            '<div class="hh-stat"><div class="hh-stat-val">0.09</div><div class="hh-stat-lab" title="Mean absolute error — average votes the model misses by per player-game">MAE</div></div>'
             f'<div class="hh-stat"><div class="hh-stat-val">{rounds_remaining}</div><div class="hh-stat-lab">Rounds left</div></div>'
             '</div>'
             '</div><div class="hh-rule"></div></div>',
@@ -3599,7 +3599,11 @@ if _page == 'Player Profile':
                     _log_disp['Season'] = _log_disp['Season'].astype(int)
                 for col in _log_disp.select_dtypes(include='float').columns:
                     _log_disp[col] = _log_disp[col].round(1)
-                st.dataframe(_style_table(_log_disp), width='stretch', hide_index=True)
+                st.dataframe(_style_table(_log_disp), width='stretch', hide_index=True,
+                             column_config={
+                                 'CV': st.column_config.Column(help="Coaches' Votes (AFLCA award)"),
+                                 'ExpV': st.column_config.Column(help="Expected Votes (Wheelo)"),
+                             })
 
         # ── DNA tab ───────────────────────────────────────────
         with _tab_dna:
@@ -4513,7 +4517,8 @@ if _page == 'Stat Filter':
                 f'{len(_sf_disp):,} of {total:,} matching</span></div>',
                 unsafe_allow_html=True,
             )
-            st.dataframe(_quiet_sf_table(_sf_disp), width='stretch', hide_index=True)
+            st.dataframe(_quiet_sf_table(_sf_disp), width='stretch', hide_index=True,
+                         column_config={'CV': st.column_config.Column(help="Coaches' Votes (AFLCA award)")})
 
 # ════════════════════════════════════════════════════════════
 # PLAYER COMPARISON
@@ -5566,7 +5571,7 @@ if _page == 'Live Tracker':
             return (f'<div class="rrow"><span class="dot {dot}"></span>'
                     f'<span class="pl">{name}</span>{_m}{vhtml}</div>')
 
-        _z1 = (f'<div class="recon-h bolt"><span>⚡ Bolters</span>'
+        _z1 = (f'<div class="recon-h bolt"><span title="Players polling well above model expectation">⚡ Bolters</span>'
                f'<span class="ct">polled, nobody called it · {len(_bolters)}</span></div>')
         if _bolters:
             for _nn, _a, _e in _bolters:

@@ -3590,6 +3590,7 @@ def render_polls_a_vote():
         with st.form("pav_add_form", clear_on_submit=True):
             st.markdown(
                 '<div class="lbl" style="margin:8px 0 6px">Rounds to watch'
+                ' &nbsp;·&nbsp; OR = Opening Round'
                 ' &nbsp;·&nbsp; <span style="color:#f0b429">gold</span> = high poll prob'
                 ' &nbsp;·&nbsp; ◆ = model top 3</div>',
                 unsafe_allow_html=True,
