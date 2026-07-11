@@ -1874,6 +1874,17 @@ st.markdown("""
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) button span {
     color: inherit !important;
 }
+/* Mobile: scroll the page strip horizontally instead of shrinking columns to
+   equal narrow slices (which makes nowrap labels overflow and overlap). Desktop
+   keeps the full-width even-tab layout above. */
+@media (max-width: 640px) {
+    [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stHorizontalBlock"] {
+        overflow-x: auto !important;
+    }
+    [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"] {
+        flex: 0 0 auto !important;
+    }
+}
 /* Page strip icons via ::before — keyed by hidden .ti marker div */
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti) button::before {
     font-family: tabler-icons, sans-serif !important;
