@@ -2346,7 +2346,8 @@ if _page in _BH_PAGES and not st.session_state.get("bh_authed"):
 if _page == 'Landing':
     st.markdown('<div class="landing-top-anchor"></div>', unsafe_allow_html=True)
 
-    # ── Live context: leader, projections, betting P&L ──
+    # ── Live context: leader + projections (public model output only; betting
+    #    P&L is private and never surfaced to anonymous landing visitors) ──
     _land_df = load_season(selected_season)
     _land_leader = "—"
     _land_votes = 0.0
@@ -2360,20 +2361,6 @@ if _page == 'Landing':
             _land_leader = _land_top.index[0]
             _land_votes = float(_land_top.iloc[0])
 
-    try:
-        _land_bets = betting_hub._load_bets()
-        _land_pl = float(_land_bets["profit_loss"].sum()) if not _land_bets.empty else None
-        _land_n = len(_land_bets)
-        _land_pending = int((_land_bets["result"] == "Pending").sum()) if not _land_bets.empty else 0
-    except Exception:
-        _land_bets = pd.DataFrame()
-        _land_pl = None
-        _land_n = 0
-        _land_pending = 0
-
-    _land_pl_val = _land_pl or 0.0
-    _pl_str = f"+{_land_pl_val:.2f}u" if _land_pl_val >= 0 else f"-{abs(_land_pl_val):.2f}u"
-    _pl_color = "#34d399" if _land_pl_val >= 0 else "#e0625a"
     _land_round = _display_round(max_season_rounds, 2026)
 
     # Latest round's predicted 3-2-1 vote read
@@ -2417,28 +2404,43 @@ if _page == 'Landing':
         _abbr = _TEAM_ABBR.get(_c['team'], _c['team'][:3].upper())
         return f"&middot; {_abbr} &middot; {_c['exp_votes']:.1f}"
 
-    # ── Ticker bar ──
-    _ticker_bet_items = []
-    if not _land_bets.empty and "match" in _land_bets.columns:
-        _round_bets = _land_bets[
-            _land_bets["match"].astype(str).str.contains(f"Round {_land_round}", na=False)
-            & _land_bets["result"].isin(["Win", "Loss"])
-        ]
-        for _, _b in _round_bets.head(4).iterrows():
-            _sel = str(_b["selection"]).upper()
-            if _b["result"] == "Win":
-                _ticker_bet_items.append(f'<span style="color:#34d399">{_sel} &#10003; WIN</span>')
-            else:
-                _ticker_bet_items.append(f'{_sel} &#10007; LOSS')
-    if not _ticker_bet_items:
-        # TODO: wire to live bet results once the current round has settled bets
-        _ticker_bet_items = ['<span style="color:#34d399">DUURSMA 16+ DISP &#10003; WIN</span>']
+    # ── Ticker bar: model's projected 3-2-1 per game of the most recent round.
+    #    Public-safe — no betting data. Highest Exp_Votes in each game → 3, then
+    #    2, then 1. Leading label flags these as projections, not results. ──
+    def _ticker_surname(_name):
+        _n = re.sub(r'\s*\(.*\)$', '', str(_name)).strip()
+        _parts = _n.split()
+        if not _parts:
+            return _n
+        # Keep a lowercase nobiliary particle with the surname (e.g. "van Rooyen")
+        if len(_parts) >= 2 and _parts[-2].islower():
+            return f'{_parts[-2]} {_parts[-1]}'
+        return _parts[-1]
 
-    _ticker_items_html = _ticker_bet_items + [
-        f'SEASON P&amp;L <span style="color:{_pl_color}">{_pl_str}</span>',
-        f'BROWNLOW LEADER <span style="color:#f0b429">{_initial_surname(_land_leader).upper()} {_land_votes:.1f}</span>',
-        'MODEL V4.0 &middot; MAE 0.0904',
-    ]
+    _ticker_items_html = []
+    _ticker_game_df = load_game(2026)
+    if _ticker_game_df is not None and len(_ticker_game_df):
+        _tk_round = int(_ticker_game_df['Round_num'].max())
+        _tk_disp = _display_round(_tk_round, 2026)
+        _tk_latest = _ticker_game_df[_ticker_game_df['Round_num'] == _tk_round]
+        _ticker_items_html.append(
+            f'<span style="color:#f0b429;font-weight:500">MODEL 3-2-1 &middot; R{_tk_disp}</span>'
+        )
+        for _gid, _gg in _tk_latest.groupby('Game_ID', sort=True):
+            _top3 = _gg.sort_values('Exp_Votes', ascending=False).head(3)
+            if len(_top3) < 3:
+                continue
+            _home = _gg['Home.team'].iloc[0]
+            _away = _gg['Away.team'].iloc[0]
+            _ha = _TEAM_ABBR.get(_home, str(_home)[:3].upper())
+            _aa = _TEAM_ABBR.get(_away, str(_away)[:3].upper())
+            _picks = ' '.join(
+                f'<span style="color:#f0b429">{_v}</span> {_ticker_surname(_r["Player_Name"])}'
+                for _v, (_, _r) in zip((3, 2, 1), _top3.iterrows())
+            )
+            _ticker_items_html.append(f'{_ha} v {_aa} &nbsp;{_picks}')
+    if not _ticker_items_html:
+        _ticker_items_html = ['MODEL 3-2-1 PROJECTIONS']
     _ticker_sep = ' &nbsp;&nbsp;&middot;&nbsp;&nbsp; '
     _ticker_segment = (_ticker_sep.join(_ticker_items_html)) + _ticker_sep
     _ticker_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
@@ -2581,19 +2583,19 @@ html,body{background:transparent;height:110px;overflow:hidden;font-family:'IBM P
 .label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#7e8c99;}
 .value{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:28px;color:#e9eef3;letter-spacing:.02em;}
 .value.leader{color:#34d399;}
-.value.pl{color:#f0b429;}
+.value.locked{display:flex;align-items:center;gap:10px;}
+.lockblur{color:#f0b429;filter:blur(5px);user-select:none;}
+.lockbadge{font-size:11px;letter-spacing:.12em;color:#7e8c99;text-transform:uppercase;}
 </style></head><body>
 <div class="grid">
   <div class="cell"><div class="label">Round</div><div class="value">__ROUND__</div></div>
   <div class="cell"><div class="label">Current Leader</div><div class="value leader">__LEADER__</div></div>
   <div class="cell"><div class="label">Predicted Votes</div><div class="value" id="votes">0.0</div></div>
-  <div class="cell"><div class="label">Betting P&amp;L</div><div class="value pl" id="pl">__PL_FALLBACK__</div></div>
+  <div class="cell"><div class="label">Betting P&amp;L</div><div class="value locked"><span class="lockblur">+&ndash;&ndash;.&ndash;&ndash;u</span><span class="lockbadge">&#128274; Private</span></div></div>
 </div>
 <script>
 var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 var votesTarget = __VOTES__;
-var plTarget = __PL_ABS__;
-var plPrefix = "__PL_PREFIX__";
 function easeOut(p){ return 1 - Math.pow(1 - p, 4); }
 function animate(el, target, formatter, duration, delay){
   if(reduced){ el.textContent = formatter(target); return; }
@@ -2610,7 +2612,6 @@ function animate(el, target, formatter, duration, delay){
   }, delay);
 }
 animate(document.getElementById('votes'), votesTarget, function(v){ return v.toFixed(1); }, 1400, 700);
-animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + v.toFixed(2) + 'u'; }, 1400, 700);
 </script>
 </body></html>"""
     _stat_html = (
@@ -2618,9 +2619,6 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
         .replace("__ROUND__", str(_land_round))
         .replace("__LEADER__", str(_land_leader))
         .replace("__VOTES__", f"{_land_votes:.4f}")
-        .replace("__PL_ABS__", f"{abs(_land_pl_val):.4f}")
-        .replace("__PL_PREFIX__", "+" if _land_pl_val >= 0 else "-")
-        .replace("__PL_FALLBACK__", _pl_str)
     )
     st.iframe(_stat_html, height=110)
 
@@ -2652,10 +2650,11 @@ animate(document.getElementById('pl'), plTarget, function(v){ return plPrefix + 
   <span class="dest-tag bh">Live Tracking</span>
   <h2>Betting Hub</h2>
   <div class="dest-desc">Track bets, log P&amp;L, flag Cha Ching tips and analyse hit rates and ROI across markets.</div>
-  <div class="dest-data-row">
-    <div><span class="dr-label">Season</span><span class="dr-value">{_land_n} bets</span></div>
-    <div><span class="dr-label">P&amp;L</span><span class="dr-value" style="color:var(--gold)">{_pl_str}</span></div>
-    <div><span class="dr-label">Fade Hit Rate</span><span class="dr-value">8/8</span></div>
+  <div class="dest-data-row" style="position:relative">
+    <div><span class="dr-label">Season</span><span class="dr-value" style="filter:blur(5px);user-select:none">&ndash;&ndash; bets</span></div>
+    <div><span class="dr-label">P&amp;L</span><span class="dr-value" style="color:var(--gold);filter:blur(5px);user-select:none">+&ndash;&ndash;.&ndash;&ndash;u</span></div>
+    <div><span class="dr-label">Fade Hit Rate</span><span class="dr-value" style="filter:blur(5px);user-select:none">&ndash;/&ndash;</span></div>
+    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)">&#128274; Private</div>
   </div>
 </div>""", unsafe_allow_html=True)
             if st.button("Open Betting Hub", key="land_bh"):
