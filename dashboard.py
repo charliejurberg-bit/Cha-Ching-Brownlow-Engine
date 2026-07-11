@@ -2211,7 +2211,7 @@ div[data-testid="stHorizontalBlock"]:has(.lb-controls-marker) label {
 .st-key-land_bh button:hover { filter: brightness(1.08); }
 /* Private padlock sits inline to the right of the Open Betting Hub button */
 .st-key-land_bh { display: flex !important; align-items: center !important; gap: 10px !important; }
-.st-key-land_bh::after { content: "\1F512"; font-size: 16px; margin-top: 16px; line-height: 1; }
+.st-key-land_bh::after { content: "🔒"; font-size: 16px; margin-top: 16px; line-height: 1; }
 
 </style>
 """, unsafe_allow_html=True)
@@ -2586,14 +2586,13 @@ html,body{background:transparent;height:110px;overflow:hidden;font-family:'IBM P
 .label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#7e8c99;}
 .value{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:28px;color:#e9eef3;letter-spacing:.02em;}
 .value.leader{color:#34d399;}
-.value.locked{display:flex;align-items:center;gap:10px;}
 .lockblur{color:#f0b429;filter:blur(5px);user-select:none;}
 </style></head><body>
 <div class="grid">
   <div class="cell"><div class="label">Round</div><div class="value">__ROUND__</div></div>
   <div class="cell"><div class="label">Current Leader</div><div class="value leader">__LEADER__</div></div>
   <div class="cell"><div class="label">Predicted Votes</div><div class="value" id="votes">0.0</div></div>
-  <div class="cell"><div class="label">Betting P&amp;L</div><div class="value locked"><span class="lockblur">+&ndash;&ndash;.&ndash;&ndash;u</span><span style="font-size:20px;line-height:1">&#128274;</span></div></div>
+  <div class="cell"><div class="label">Betting P&amp;L</div><div class="value"><span class="lockblur">+&ndash;&ndash;.&ndash;&ndash;u</span></div></div>
 </div>
 <script>
 var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
