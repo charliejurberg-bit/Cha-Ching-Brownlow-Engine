@@ -1875,14 +1875,18 @@ st.markdown("""
     color: inherit !important;
 }
 /* Mobile: scroll the page strip horizontally instead of shrinking columns to
-   equal narrow slices (which makes nowrap labels overflow and overlap). Desktop
+   equal narrow slices (which makes nowrap labels overflow and overlap). The base
+   column rule sets min-width:0, which lets each column collapse below its label
+   width (the button's width:100% gives the column no intrinsic width to hold on
+   to) — so min-width:max-content is the essential piece here, not just the flex
+   change. Verified against the real Streamlit DOM at a 393px viewport. Desktop
    keeps the full-width even-tab layout above. */
 @media (max-width: 640px) {
     [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stHorizontalBlock"] {
         overflow-x: auto !important;
     }
     [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"] {
-        flex: 0 0 auto !important;
+        flex: 0 0 auto !important; min-width: max-content !important;
     }
 }
 /* Page strip icons via ::before — keyed by hidden .ti marker div */
