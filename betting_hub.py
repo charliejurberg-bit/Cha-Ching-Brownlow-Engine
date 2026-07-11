@@ -898,24 +898,36 @@ BH_CSS = """
 .cc-badge { transition: opacity 0.15s ease, transform 0.15s ease; display: inline-block; }
 .cc-badge:hover { opacity: 0.88; transform: scale(1.03); }
 
-/* ── Live tip badge ── */
-@keyframes live-pulse {
+/* ── Live tip badge (emerald ghost pill) ── */
+@keyframes live-dot-pulse {
     0%, 100% { opacity: 1; }
-    50%       { opacity: 0.2; }
+    50%      { opacity: 0.35; }
 }
 .live-badge {
-    display: inline-block;
-    background: #ef7a6d;
-    border: none;
-    color: #0a1017;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 1.2px;
-    padding: 2px 8px;
-    border-radius: 4px;
-    animation: live-pulse 1.4s ease-in-out infinite;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(52, 211, 153, 0.08);
+    border: 1px solid rgba(52, 211, 153, 0.45);
+    color: #34d399;
+    font-size: 10.5px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 3px 9px;
+    border-radius: 999px;
     vertical-align: middle;
     margin-left: 6px;
+}
+.live-badge.is-live::before {
+    content: "";
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #34d399;
+    flex-shrink: 0;
+    animation: live-dot-pulse 1.6s ease-in-out infinite;
 }
 
 /* ── Checklist progress line ── */
@@ -2238,7 +2250,7 @@ def render_cha_ching_tips():
         flagged_all = flagged_all.drop_duplicates(subset=['tip_id'])
 
     # Tip-card renderer (used by Pending Multis up top + Live/Unsettled below)
-    def _render_tip_card(tip, label_badge: str = '● LIVE', badge_class: str = 'live-badge'):
+    def _render_tip_card(tip, label_badge: str = 'LIVE', badge_class: str = 'live-badge is-live'):
         tip_id    = str(tip['tip_id'])
         player    = str(tip.get('player', ''))
         gkey      = str(tip.get('game_key', ''))
