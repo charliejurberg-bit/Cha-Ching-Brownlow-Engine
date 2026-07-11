@@ -2585,13 +2585,12 @@ html,body{background:transparent;height:110px;overflow:hidden;font-family:'IBM P
 .value.leader{color:#34d399;}
 .value.locked{display:flex;align-items:center;gap:10px;}
 .lockblur{color:#f0b429;filter:blur(5px);user-select:none;}
-.lockbadge{font-size:11px;letter-spacing:.12em;color:#7e8c99;text-transform:uppercase;}
 </style></head><body>
 <div class="grid">
   <div class="cell"><div class="label">Round</div><div class="value">__ROUND__</div></div>
   <div class="cell"><div class="label">Current Leader</div><div class="value leader">__LEADER__</div></div>
   <div class="cell"><div class="label">Predicted Votes</div><div class="value" id="votes">0.0</div></div>
-  <div class="cell"><div class="label">Betting P&amp;L</div><div class="value locked"><span class="lockblur">+&ndash;&ndash;.&ndash;&ndash;u</span><span class="lockbadge">&#128274; Private</span></div></div>
+  <div class="cell"><div class="label">Betting P&amp;L</div><div class="value locked"><span class="lockblur">+&ndash;&ndash;.&ndash;&ndash;u</span><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#e9eef3" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div></div>
 </div>
 <script>
 var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -2655,7 +2654,7 @@ animate(document.getElementById('votes'), votesTarget, function(v){ return v.toF
     <div><span class="dr-label">P&amp;L</span><span class="dr-value" style="color:var(--gold);filter:blur(5px);user-select:none">+&ndash;&ndash;.&ndash;&ndash;u</span></div>
     <div><span class="dr-label">Fade Hit Rate</span><span class="dr-value" style="filter:blur(5px);user-select:none">&ndash;/&ndash;</span></div>
   </div>
-  <div style="display:flex;align-items:center;gap:7px;margin-top:10px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)">&#128274; Private</div>
+  <div style="display:flex;align-items:center;margin-top:10px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#7e8c99" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg></div>
 </div>""", unsafe_allow_html=True)
             if st.button("Open Betting Hub", key="land_bh"):
                 st.session_state["active_hub"] = "betting"
