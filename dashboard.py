@@ -2650,12 +2650,12 @@ animate(document.getElementById('votes'), votesTarget, function(v){ return v.toF
   <span class="dest-tag bh">Live Tracking</span>
   <h2>Betting Hub</h2>
   <div class="dest-desc">Track bets, log P&amp;L, flag Cha Ching tips and analyse hit rates and ROI across markets.</div>
-  <div class="dest-data-row" style="position:relative">
+  <div class="dest-data-row">
     <div><span class="dr-label">Season</span><span class="dr-value" style="filter:blur(5px);user-select:none">&ndash;&ndash; bets</span></div>
     <div><span class="dr-label">P&amp;L</span><span class="dr-value" style="color:var(--gold);filter:blur(5px);user-select:none">+&ndash;&ndash;.&ndash;&ndash;u</span></div>
     <div><span class="dr-label">Fade Hit Rate</span><span class="dr-value" style="filter:blur(5px);user-select:none">&ndash;/&ndash;</span></div>
-    <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:7px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)">&#128274; Private</div>
   </div>
+  <div style="display:flex;align-items:center;gap:7px;margin-top:10px;font-size:11px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--gold)">&#128274; Private</div>
 </div>""", unsafe_allow_html=True)
             if st.button("Open Betting Hub", key="land_bh"):
                 st.session_state["active_hub"] = "betting"
