@@ -3594,11 +3594,8 @@ if _page == 'Player Profile':
                     _log_disp['Season'] = _log_disp['Season'].astype(int)
                 for col in _log_disp.select_dtypes(include='float').columns:
                     _log_disp[col] = _log_disp[col].round(1)
-                st.dataframe(_style_table(_log_disp), width='stretch', hide_index=True,
-                             column_config={
-                                 'CV': st.column_config.Column(help="Coaches' Votes (AFLCA award)"),
-                                 'ExpV': st.column_config.Column(help="Expected Votes (Wheelo)"),
-                             })
+                st.dataframe(_style_table(_log_disp), width='stretch', hide_index=True)
+                st.caption("CV = coaches votes · ExpV = expected votes")
 
         # ── DNA tab ───────────────────────────────────────────
         with _tab_dna:
@@ -4512,8 +4509,8 @@ if _page == 'Stat Filter':
                 f'{len(_sf_disp):,} of {total:,} matching</span></div>',
                 unsafe_allow_html=True,
             )
-            st.dataframe(_quiet_sf_table(_sf_disp), width='stretch', hide_index=True,
-                         column_config={'CV': st.column_config.Column(help="Coaches' Votes (AFLCA award)")})
+            st.dataframe(_quiet_sf_table(_sf_disp), width='stretch', hide_index=True)
+            st.caption("CV = coaches votes")
 
 # ════════════════════════════════════════════════════════════
 # PLAYER COMPARISON
