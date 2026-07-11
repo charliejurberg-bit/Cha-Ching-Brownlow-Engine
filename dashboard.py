@@ -2556,7 +2556,7 @@ font-family:'Archivo',sans-serif;font-weight:800;font-size:14px;flex-shrink:0;}
   <div class="content">
     <div class="eyebrow rise r1">BROWNLOW PREDICTOR &middot; THROUGH ROUND __ROUND__</div>
     <h1 class="wordmark rise r2"><span class="cha">CHA</span> <span class="ching">CHING</span></h1>
-    <p class="subtitle rise r3">One model. Two games: the medal count, and the money.</p>
+    <p class="subtitle rise r3">Who's polling votes — before the votes are read.</p>
     <div class="chips-label">ROUND __ROUND__ &middot; MOST LIKELY TO POLL</div>
     <div class="chips">
       <div class="chip chip-1"><span class="badge badge-1">1</span><span class="chip-name">__NAME1__</span><span class="chip-stats">__STATS1__</span></div>
