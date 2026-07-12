@@ -3819,8 +3819,8 @@ if _page == 'Player Profile':
                         # (display label) -> (column, slider min, max, default). All three
                         # columns are in game_df / _CAREER_COLS, so career is covered too.
                         _THRESH_STATS = {
-                            'Disposals':     ('Disposals',     10, 40, 20),
-                            'Goals':         ('Goals',          0,  5,  2),
+                            'Disposals':     ('Disposals',     10, 50, 20),
+                            'Goals':         ('Goals',          0, 10,  2),
                             'Coaches Votes': ('Coaches_Votes',  0, 10,  5),
                         }
                         _tstat = st.selectbox("Threshold stat", list(_THRESH_STATS.keys()),
