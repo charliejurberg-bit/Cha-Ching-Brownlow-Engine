@@ -1097,16 +1097,42 @@ def load_season_projection():
     path = f"{PRED_DIR}/season_projection_2026.csv"
     return _fix_team_names(pd.read_csv(path)) if os.path.exists(path) else None
 
+# Columns the Stat Filter page actually reads. Passed to load_all_historical()
+# so that path loads ~17 columns instead of all 166 — the source-level fix for
+# the Community Cloud OOM on this page. (The team/identity columns needed by the
+# team-name fusion + disambiguation are force-added inside the loader.)
+_STAT_FILTER_COLS = (
+    'Player_Name', 'Season', 'Round_num', 'Playing.for', 'Team', 'Brownlow.Votes',
+    'Is_Win', 'Is_Loss', 'Disposals', 'Goals', 'Kicks', 'Clearances',
+    'Contested.Possessions', 'Coaches_Votes', 'Tackles', 'Score_Involvements',
+    'RatingPoints', 'Exp_Votes',
+)
+
 @st.cache_data(ttl=300)
-def load_all_historical():
+def load_all_historical(columns=None):
     """Per-game data across every season, with a clean Team column and same-name
     players split into distinct people. (Older season files only carry
-    'Playing.for'; 2026 carries 'Team'.)"""
+    'Playing.for'; 2026 carries 'Team'.)
+
+    When `columns` is given (a tuple of names), only those are read from each CSV
+    via usecols — a large memory saving for narrow consumers like Stat Filter.
+    The identity/team columns the disambiguation + team-name fusion depend on are
+    always kept, and only columns actually present in each file are requested
+    (older files lack 'Team', 2026 lacks nothing). `Season` is always set by the
+    loader. `columns=None` (the default) preserves the full-width behaviour every
+    career-view consumer relies on."""
+    want = None
+    if columns is not None:
+        want = set(columns) | {'Player_Name', 'Round_num', 'Team', 'Playing.for'}
     frames = []
     for season in sorted(AVAILABLE_SEASONS):
         path = f"{PRED_DIR}/game_level_{season}.csv"
         if os.path.exists(path):
-            df = _fix_team_names(pd.read_csv(path))
+            if want is None:
+                df = _fix_team_names(pd.read_csv(path))
+            else:
+                avail = set(pd.read_csv(path, nrows=0).columns)
+                df = _fix_team_names(pd.read_csv(path, usecols=list(want & avail)))
             df['Season'] = season
             frames.append(df)
     if not frames:
@@ -4265,7 +4291,7 @@ if _page == 'Stat Filter':
         unsafe_allow_html=True,
     )
     with st.spinner("Loading historical games…"):
-        hist = load_all_historical()
+        hist = load_all_historical(_STAT_FILTER_COLS)
     if hist is None:
         st.error("No historical game-level data found. Run brownlow_model.py first.")
     else:
