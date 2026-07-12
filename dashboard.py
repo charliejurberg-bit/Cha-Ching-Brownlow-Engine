@@ -1108,8 +1108,19 @@ _STAT_FILTER_COLS = (
     'RatingPoints', 'Exp_Votes',
 )
 
+# Columns the career Player Profile path reads — the union of what the profile
+# tab, DNA tab, load_season_career() and compute_player_efficiency_career() touch.
+# Passed to load_all_historical() so the career view never materialises the full
+# 166-col frame either. Player_Name is deliberately NOT categorised here (see
+# below) because the career consumers group by it.
+_CAREER_COLS = (
+    'Player_Name', 'Season', 'Round_num', 'Team', 'Playing.for', 'Brownlow.Votes',
+    'Exp_Votes', 'Poll_Prob', 'P_1', 'P_2', 'P_3', 'Is_Win', 'Is_Loss',
+    'Disposals', 'Goals', 'Kicks', 'Clearances', 'Contested.Possessions', 'Coaches_Votes',
+)
+
 @st.cache_data(ttl=300)
-def load_all_historical(columns=None):
+def load_all_historical(columns=None, categorize=('Player_Name', 'Playing.for', 'Team', '_base_name')):
     """Per-game data across every season, with a clean Team column and same-name
     players split into distinct people. (Older season files only carry
     'Playing.for'; 2026 carries 'Team'.)
@@ -1119,8 +1130,13 @@ def load_all_historical(columns=None):
     The identity/team columns the disambiguation + team-name fusion depend on are
     always kept, and only columns actually present in each file are requested
     (older files lack 'Team', 2026 lacks nothing). `Season` is always set by the
-    loader. `columns=None` (the default) preserves the full-width behaviour every
-    career-view consumer relies on."""
+    loader. `columns=None` (the default) preserves the full-width behaviour.
+
+    `categorize` names the (present) text columns cast to category dtype — this
+    kills most of the pandas-2.x object-string overhead on Cloud and shrinks the
+    per-rerun cache_data copy. Only applied when `columns` is given. Callers that
+    group by a text column must exclude it: category group keys re-admit unobserved
+    categories (spurious rows), so the career loader keeps 'Player_Name' as object."""
     want = None
     if columns is not None:
         want = set(columns) | {'Player_Name', 'Round_num', 'Team', 'Playing.for'}
@@ -1145,9 +1161,7 @@ def load_all_historical(columns=None):
             g['Team'] = g['Playing.for']
     g = _disambiguate_players(g)
     if want is not None:
-        # Low-cardinality text → category: kills most of the pandas-2.x object
-        # string overhead on Cloud and shrinks the per-rerun cache_data copy.
-        for _c in ('Player_Name', 'Playing.for', 'Team', '_base_name'):
+        for _c in categorize:
             if _c in g.columns:
                 g[_c] = g[_c].astype('category')
     return g
@@ -1157,8 +1171,11 @@ CAREER = "Career"
 
 @st.cache_data(ttl=300)
 def load_game_career():
-    """Per-game data across every season (career view)."""
-    return load_all_historical()
+    """Per-game data across every season (career view). Loads only the ~19
+    columns the career Player Profile actually reads, and keeps 'Player_Name' as
+    object dtype because load_season_career() / compute_player_efficiency_career()
+    group by it."""
+    return load_all_historical(_CAREER_COLS, categorize=('Playing.for', 'Team', '_base_name'))
 
 @st.cache_data(ttl=300)
 def load_season_career():
