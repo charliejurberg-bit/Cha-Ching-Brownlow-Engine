@@ -3415,7 +3415,7 @@ if _page == 'Player Profile':
                 args=(_page,),
             )
 
-        _tab_prof, _tab_dna = st.tabs(["Profile", "DNA"])
+        _tab_prof, _tab_dna, _tab_compare = st.tabs(["Profile", "DNA", "Compare"])
 
         # ── Profile tab ───────────────────────────────────────
         with _tab_prof:
@@ -3899,6 +3899,257 @@ if _page == 'Player Profile':
 </div>
 {_vins_html}
 """, unsafe_allow_html=True)
+
+        # ── Compare tab ───────────────────────────────────────
+        with _tab_compare:
+            # Compare is season-based: career predictions lack Avg_Poll_Prob and the
+            # career game frame lacks Tackles/Inside.50s, so NO comparison logic may
+            # run in career mode — this guard renders a notice and nothing else.
+            if is_career:
+                st.markdown(
+                    '<div style="background:var(--surface);border-radius:10px;padding:40px 24px;'
+                    'text-align:center;margin-top:6px">'
+                    '<div style="font-family:\'Archivo\',sans-serif;font-size:18px;font-weight:800;'
+                    'color:var(--text)">Comparison is season-based</div>'
+                    '<div style="font-family:\'Sora\',sans-serif;font-size:13px;color:var(--muted);'
+                    'margin:8px auto 0;max-width:56ch;line-height:1.6">'
+                    'Pick a season from the selector above to compare '
+                    f'<span style="color:#34d399">{selected_player}</span> against another player — '
+                    'projections and market odds are per-season only</div>'
+                    '</div>',
+                    unsafe_allow_html=True,
+                )
+            else:
+                _cmp_pool = [p for p in sorted(predictions['Player_Name'].tolist())
+                             if p != selected_player]
+                if not _cmp_pool:
+                    st.info("No other players available to compare.")
+                else:
+                    # Reused cmp_p2 widget state can hold a value outside the current
+                    # pool (Player 1 itself, or a pick from another season) — reset it
+                    # before the widget instantiates so Streamlit never errors on it.
+                    if st.session_state.get("cmp_p2") not in _cmp_pool:
+                        st.session_state["cmp_p2"] = _cmp_pool[0]
+
+                    _cc_l, _cc_m, _cc_r = st.columns([2, 1, 2])
+                    with _cc_l:
+                        st.markdown(
+                            '<div style="padding-top:4px">'
+                            '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;'
+                            'text-transform:uppercase;color:var(--muted)">Player 1 · From Profile</div>'
+                            '<div style="font-family:\'Archivo\',sans-serif;font-size:22px;font-weight:800;'
+                            f'color:var(--text);line-height:1.15;margin-top:3px">{selected_player}</div>'
+                            '</div>',
+                            unsafe_allow_html=True,
+                        )
+                    with _cc_m:
+                        st.markdown(
+                            '<div style="text-align:center;font-family:\'Archivo\',sans-serif;'
+                            'font-size:18px;font-weight:800;color:var(--muted);padding-top:22px">VS</div>',
+                            unsafe_allow_html=True,
+                        )
+                    with _cc_r:
+                        _cp2 = st.selectbox("Player 2", _cmp_pool, key="cmp_p2")
+                    _cp1 = selected_player
+
+                    _cg1 = game_df[game_df['Player_Name'] == _cp1]
+                    _cg2 = game_df[game_df['Player_Name'] == _cp2]
+
+                    def _cmp_pred(name, col):
+                        _r = predictions[predictions['Player_Name'] == name]
+                        if _r.empty or col not in predictions.columns:
+                            return None
+                        _v = _r.iloc[0][col]
+                        return float(_v) if pd.notna(_v) else None
+
+                    def _cmp_mean(g, col):
+                        if col not in g.columns or g.empty:
+                            return None
+                        _m = g[col].mean()
+                        return float(_m) if pd.notna(_m) else None
+
+                    def _cmp_header(title):
+                        return ('<div style="display:flex;align-items:center;gap:12px;margin:26px 0 10px">'
+                                '<div style="font-family:\'Archivo\',sans-serif;font-size:15px;font-weight:700;'
+                                f'color:var(--text);white-space:nowrap">{title}</div>'
+                                '<div style="flex:1;height:1px;background:var(--line)"></div></div>')
+
+                    _fmt_mean = lambda v: f"{v:.1f}"
+                    _fmt_prob = lambda v: f"{v:.3f}"
+                    _fmt_int  = lambda v: f"{int(round(v))}"
+
+                    def _mirror_row(label, v1, v2, fmt):
+                        # Leader (higher wins for every stat here) shows emerald; compare
+                        # on raw values so display rounding never invents a false lead.
+                        s1 = fmt(v1) if v1 is not None else "—"
+                        s2 = fmt(v2) if v2 is not None else "—"
+                        _both = v1 is not None and v2 is not None
+                        _c1 = '#34d399' if (_both and v1 > v2) else 'var(--text)'
+                        _c2 = '#34d399' if (_both and v2 > v1) else 'var(--text)'
+                        return (
+                            '<div style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;'
+                            'gap:16px;padding:10px 0;border-bottom:1px solid rgba(233,238,243,0.08)">'
+                            f'<div style="font-family:\'DM Mono\',monospace;font-size:16px;text-align:right;'
+                            f'color:{_c1}">{s1}</div>'
+                            '<div style="font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;'
+                            f'color:var(--muted);text-align:center;min-width:132px">{label}</div>'
+                            f'<div style="font-family:\'DM Mono\',monospace;font-size:16px;text-align:left;'
+                            f'color:{_c2}">{s2}</div></div>'
+                        )
+
+                    # ── Season overview (mirror rows) ──
+                    st.markdown(_cmp_header('Season overview'), unsafe_allow_html=True)
+                    _so = ''
+                    if 'Exp_Total_Votes' in predictions.columns:
+                        _so += _mirror_row('Exp. Total Votes', _cmp_pred(_cp1, 'Exp_Total_Votes'),
+                                           _cmp_pred(_cp2, 'Exp_Total_Votes'), _fmt_int)
+                    if 'Avg_Poll_Prob' in predictions.columns:
+                        _so += _mirror_row('Avg Poll Prob', _cmp_pred(_cp1, 'Avg_Poll_Prob'),
+                                           _cmp_pred(_cp2, 'Avg_Poll_Prob'), _fmt_prob)
+                    for _lbl, _col in [
+                        ('Disposals / game', 'Disposals'),
+                        ('Contested / game', 'Contested.Possessions'),
+                        ('Clearances / game', 'Clearances'),
+                        ('Tackles / game', 'Tackles'),
+                        ('Goals / game', 'Goals'),
+                        ('Score involvements / game', 'Score_Involvements'),
+                    ]:
+                        if _col in game_df.columns:
+                            _so += _mirror_row(_lbl, _cmp_mean(_cg1, _col), _cmp_mean(_cg2, _col), _fmt_mean)
+                    if 'Coaches_Votes' in game_df.columns:
+                        _so += _mirror_row('Games with coaches votes',
+                                           float(int((_cg1['Coaches_Votes'] > 0).sum())),
+                                           float(int((_cg2['Coaches_Votes'] > 0).sum())), _fmt_int)
+                        _so += _mirror_row('Total coaches votes',
+                                           float(_cg1['Coaches_Votes'].sum()),
+                                           float(_cg2['Coaches_Votes'].sum()), _fmt_int)
+                    st.markdown(f'<div>{_so}</div>', unsafe_allow_html=True)
+
+                    # ── Round by round (predicted-votes overlay) ──
+                    st.markdown(_cmp_header('Round by round'), unsafe_allow_html=True)
+                    _rg1 = _cg1.sort_values('Round_num')
+                    _rg2 = _cg2.sort_values('Round_num')
+                    if _rg1.empty and _rg2.empty:
+                        st.caption("No round-by-round data for this season.")
+                    else:
+                        _fig_cmp = go.Figure()
+                        if not _rg1.empty:
+                            _fig_cmp.add_trace(go.Scatter(
+                                x=_display_rounds(_rg1), y=_rg1['Exp_Votes'].round(1),
+                                name=_cp1, mode='lines+markers',
+                                line=dict(color='#34d399', width=2.5), marker=dict(size=7, color='#34d399'),
+                                hovertemplate='<b>' + _cp1 + '</b><br>Round %{x}<br>%{y:.1f} exp votes<extra></extra>',
+                            ))
+                        if not _rg2.empty:
+                            _fig_cmp.add_trace(go.Scatter(
+                                x=_display_rounds(_rg2), y=_rg2['Exp_Votes'].round(1),
+                                name=_cp2, mode='lines+markers',
+                                line=dict(color='#f0b429', width=2.5), marker=dict(size=7, color='#f0b429'),
+                                hovertemplate='<b>' + _cp2 + '</b><br>Round %{x}<br>%{y:.1f} exp votes<extra></extra>',
+                            ))
+                        _fig_cmp = apply_chart_theme(_fig_cmp)
+                        _fig_cmp.update_layout(
+                            paper_bgcolor='rgba(0,0,0,0)', plot_bgcolor='rgba(0,0,0,0)',
+                            xaxis=dict(title='Round', dtick=1, showgrid=False, zeroline=False),
+                            yaxis=dict(title='Predicted Votes', rangemode='tozero',
+                                       gridcolor='rgba(140,165,185,.14)', zeroline=False),
+                            legend=dict(orientation='h', y=1.1),
+                            margin=dict(t=20, b=40), height=300, hovermode='x unified',
+                        )
+                        st.plotly_chart(_fig_cmp, width='stretch', key="chart_020")
+
+                    # ── Market edge ──
+                    # Model probability = each player's share of the pair's expected
+                    # votes; market implied = normalised share of implied prob — exactly
+                    # as the old Head to Head tab computed them. Odds via load_best_odds();
+                    # projections aren't surfaced here, so load_season_projection() is unused.
+                    st.markdown(_cmp_header('Market edge'), unsafe_allow_html=True)
+                    _cmp_odds = load_best_odds()
+                    _e1 = _cmp_pred(_cp1, 'Exp_Total_Votes') or 0.0
+                    _e2 = _cmp_pred(_cp2, 'Exp_Total_Votes') or 0.0
+                    _etot = _e1 + _e2
+                    _mod1 = round(_e1 / _etot * 100, 1) if _etot > 0 else 50.0
+                    _mod2 = round(100.0 - _mod1, 1)
+
+                    def _odds_for(name):
+                        _bo = _mi = None
+                        if _cmp_odds is not None and len(_cmp_odds):
+                            _ow = _cmp_odds[_cmp_odds['player'] == name]
+                            if not _ow.empty:
+                                _v = _ow.iloc[0]['best_odds']
+                                _bo = float(_v) if pd.notna(_v) else None
+                                _v2 = _ow.iloc[0]['implied_prob']
+                                _mi = float(_v2) if pd.notna(_v2) else None
+                        return _bo, _mi
+                    _bo1, _mi1 = _odds_for(_cp1)
+                    _bo2, _mi2 = _odds_for(_cp2)
+                    _has_mkt = _mi1 is not None and _mi2 is not None
+                    if _has_mkt:
+                        _msum = _mi1 + _mi2
+                        _mkt1 = round(_mi1 / _msum * 100, 1) if _msum > 0 else 50.0
+                        _mkt2 = round(100.0 - _mkt1, 1)
+                        _edge1 = round(_mod1 - _mkt1, 1)
+                        _edge2 = round(_mod2 - _mkt2, 1)
+                    else:
+                        _mkt1 = _mkt2 = _edge1 = _edge2 = None
+
+                    def _edge_card(name, model_pct, best_odds, mkt_pct, edge):
+                        def _cell(lbl, val, col='var(--text)'):
+                            return ('<div style="display:flex;justify-content:space-between;align-items:baseline;'
+                                    'padding:7px 0;border-bottom:1px solid rgba(233,238,243,0.06)">'
+                                    f'<span style="font-size:11px;color:var(--muted)">{lbl}</span>'
+                                    '<span style="font-family:\'DM Mono\',monospace;font-size:14px;'
+                                    f'color:{col}">{val}</span></div>')
+                        _mp = f"{model_pct:.1f}%" if model_pct is not None else "—"
+                        _bo = f"${best_odds:.1f}" if best_odds is not None else "—"
+                        _mv = f"{mkt_pct:.1f}%" if mkt_pct is not None else "—"
+                        if edge is None:
+                            _ev, _ec = "—", 'var(--muted)'
+                        else:
+                            _ev = f"{'+' if edge >= 0 else ''}{edge:.1f}%"
+                            _ec = '#34d399' if edge > 0 else 'var(--muted)'  # never red (losses only)
+                        return (
+                            '<div style="background:var(--surface);border:1px solid var(--line);'
+                            'border-radius:8px;padding:16px 18px">'
+                            '<div style="font-family:\'Archivo\',sans-serif;font-size:16px;font-weight:800;'
+                            f'color:var(--text);margin-bottom:8px">{name}</div>'
+                            + _cell('Model probability', _mp)
+                            + _cell('Best odds', _bo)
+                            + _cell('Market implied', _mv)
+                            + _cell('Edge', _ev, _ec)
+                            + '</div>'
+                        )
+                    _me1, _me2 = st.columns(2)
+                    with _me1:
+                        st.markdown(_edge_card(_cp1, _mod1, _bo1, _mkt1, _edge1), unsafe_allow_html=True)
+                    with _me2:
+                        st.markdown(_edge_card(_cp2, _mod2, _bo2, _mkt2, _edge2), unsafe_allow_html=True)
+
+                    _lean = None
+                    if _edge1 is not None:
+                        if _edge1 > 0:
+                            _lean = (_cp1, _edge1)
+                        elif _edge2 > 0:
+                            _lean = (_cp2, _edge2)
+                    if _lean:
+                        _vtag = "MODEL LEANS"
+                        _vtxt = (f"{_lean[0]} — model probability exceeds market implied by "
+                                 f"+{_lean[1]:.1f}%. Informational only, not betting advice.")
+                    else:
+                        _vtag = "NO EDGE"
+                        _vtxt = ("Market implied probability exceeds the model for both players. "
+                                 "Informational only, not betting advice.")
+                    st.markdown(
+                        '<div style="background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.3);'
+                        'border-radius:8px;padding:14px 18px;margin-top:14px">'
+                        '<span style="font-family:\'Archivo\',sans-serif;font-size:11px;font-weight:800;'
+                        'letter-spacing:2px;text-transform:uppercase;color:#34d399;margin-right:10px">'
+                        f'{_vtag}</span>'
+                        '<span style="font-family:\'Sora\',sans-serif;font-size:13px;'
+                        f'color:var(--text)">{_vtxt}</span>'
+                        '</div>',
+                        unsafe_allow_html=True,
+                    )
 
 # ════════════════════════════════════════════════════════════
 # PLAYER DNA — merged into Player Profile
