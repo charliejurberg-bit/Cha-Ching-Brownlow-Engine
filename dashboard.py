@@ -3749,6 +3749,44 @@ if _page == 'Player Profile':
 """, unsafe_allow_html=True)
 
                     st.markdown('<div class="section-header">Polling DNA</div>', unsafe_allow_html=True)
+
+                    # Minimum-games filter now feeds only the personal rank chip below.
+                    # Career spans many seasons, so allow a higher minimum (separate key
+                    # avoids a stored value falling outside the season range).
+                    if is_career:
+                        _mg_max = max(int(efficiency['Games'].max()), 1)
+                        min_g = st.slider("Minimum games", 1, _mg_max, min(50, _mg_max), key="dna_min_g_career")
+                    else:
+                        min_g = st.slider("Minimum games", 1, max_season_rounds, min(10, max_season_rounds), key="dna_min_g")
+
+                    # Personal poll-efficiency rank among all players clearing min_g,
+                    # ranked by overall poll rate (the old table's default sort column).
+                    _qual = (efficiency[efficiency['Games'] >= min_g]
+                             .sort_values('Poll_Rate', ascending=False).reset_index(drop=True))
+                    _n_qual = len(_qual)
+                    _pos = _qual.index[_qual['Player_Name'] == selected_player]
+                    if len(_pos):
+                        _rank = int(_pos[0]) + 1
+                        st.markdown(
+                            '<div style="margin:4px 0 18px"><span style="display:inline-block;'
+                            'background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.35);'
+                            "color:#34d399;font-family:'Sora',sans-serif;font-size:11px;font-weight:600;"
+                            'letter-spacing:.02em;padding:4px 13px;border-radius:999px;">Poll efficiency: '
+                            f'<b style="font-family:\'DM Mono\',monospace;font-weight:500">#{_rank}</b> of '
+                            f'<b style="font-family:\'DM Mono\',monospace;font-weight:500">{_n_qual}</b> qualified'
+                            '</span></div>',
+                            unsafe_allow_html=True,
+                        )
+                    else:
+                        st.markdown(
+                            '<div style="margin:4px 0 18px"><span style="display:inline-block;'
+                            'background:rgba(159,176,191,.08);border:1px solid var(--hairline-strong);'
+                            "color:var(--muted);font-family:'Sora',sans-serif;font-size:11px;font-weight:600;"
+                            'letter-spacing:.02em;padding:4px 13px;border-radius:999px;">'
+                            f'Poll efficiency: — (below {min_g} game minimum)</span></div>',
+                            unsafe_allow_html=True,
+                        )
+
                     dna_l, dna_r = st.columns(2)
 
                     # ── Left: poll rate headline + win/loss split + 30+ readout ──
@@ -3776,18 +3814,30 @@ if _page == 'Player Profile':
 </div>
 """, unsafe_allow_html=True)
 
-                    # ── Right: disposal-threshold finding (slider-driven) ──
+                    # ── Right: stat-selectable threshold finder ──
                     with dna_r:
-                        st.markdown('<div class="dna-mini-head">Disposal Threshold</div>', unsafe_allow_html=True)
-                        thr = st.slider("Min disposals", 10, 40, 30, key="dna_disp_thresh")
-                        if has_votes:
-                            subset = player_games_dna[player_games_dna['Disposals'] >= thr]
+                        # (display label) -> (column, slider min, max, default). All three
+                        # columns are in game_df / _CAREER_COLS, so career is covered too.
+                        _THRESH_STATS = {
+                            'Disposals':     ('Disposals',     10, 40, 20),
+                            'Goals':         ('Goals',          0,  5,  2),
+                            'Coaches Votes': ('Coaches_Votes',  0, 10,  5),
+                        }
+                        _tstat = st.selectbox("Threshold stat", list(_THRESH_STATS.keys()),
+                                              index=0, key="dna_thresh_stat")
+                        _tcol, _tmin, _tmax, _tdef = _THRESH_STATS[_tstat]
+                        _tnoun = _tstat.lower()
+                        st.markdown(f'<div class="dna-mini-head">{_tstat} Threshold</div>', unsafe_allow_html=True)
+                        # Per-stat key so switching stats never carries a stale out-of-range value.
+                        thr = st.slider(f"Min {_tnoun}", _tmin, _tmax, _tdef, 1, key=f"dna_thresh::{_tstat}")
+                        if has_votes and _tcol in player_games_dna.columns:
+                            subset = player_games_dna[player_games_dna[_tcol] >= thr]
                             n_sub = len(subset)
                             n_tot = len(player_games_dna)
                             if n_sub == 0:
                                 st.markdown(
                                     f'<div class="dna-find-val">—</div>'
-                                    f'<div class="dna-find-sub">no games at {thr}+ disposals</div>',
+                                    f'<div class="dna-find-sub">no games at {thr}+ {_tnoun}</div>',
                                     unsafe_allow_html=True,
                                 )
                             else:
@@ -3796,14 +3846,14 @@ if _page == 'Player Profile':
                                 tvr = (subset['Brownlow.Votes'] == 3).mean()
                                 _ln = selected_player.split()[-1]
                                 if pr == 1.0:
-                                    _s = f"When {_ln} reaches {thr} touches he polls every time"
+                                    _s = f"When {_ln} reaches {thr}+ {_tnoun} he polls every time"
                                     _s += " — and every one was a 3-vote game." if tvr == 1.0 else f" — averaging {av:.2f} votes."
                                 else:
-                                    _s = f"At {thr}+ disposals {_ln} polls {pr * 100:.0f}% of the time, averaging {av:.2f} votes."
+                                    _s = f"At {thr}+ {_tnoun} {_ln} polls {pr * 100:.0f}% of the time, averaging {av:.2f} votes."
                                 st.markdown(f"""
 <div>
   <div class="dna-find-val">{_rate(pr, n_sub)}</div>
-  <div class="dna-find-cap">poll rate at {thr}+ disposals</div>
+  <div class="dna-find-cap">poll rate at {thr}+ {_tnoun}</div>
   <div class="dna-find-sentence">{_s}</div>
   <div class="dna-find-strip">
     <div class="dfs"><div class="dfs-v">{n_sub} of {n_tot}</div><div class="dfs-l">Games</div></div>
@@ -3812,8 +3862,11 @@ if _page == 'Player Profile':
   </div>
 </div>
 """, unsafe_allow_html=True)
-                        else:
+                        elif not has_votes:
                             st.markdown('<div class="dna-find-sub">No actual-vote data for this season.</div>',
+                                        unsafe_allow_html=True)
+                        else:
+                            st.markdown(f'<div class="dna-find-sub">{_tstat} not available for this player.</div>',
                                         unsafe_allow_html=True)
 
                     # ── Vote distribution: one horizontal stacked bar ──
@@ -3845,63 +3898,6 @@ if _page == 'Player Profile':
   <span><span class="sw" style="background:var(--muted-fill)"></span>0 votes · {n0}</span>
 </div>
 {_vins_html}
-""", unsafe_allow_html=True)
-
-                st.markdown('<div class="section-header" style="margin-top:8px">League Efficiency Rankings</div>', unsafe_allow_html=True)
-                # Career spans many seasons, so allow a higher minimum-games filter
-                # (separate key avoids a stored value falling outside the season range).
-                if is_career:
-                    _mg_max = max(int(efficiency['Games'].max()), 1)
-                    min_g = st.slider("Minimum games", 1, _mg_max, min(50, _mg_max), key="dna_min_g_career")
-                else:
-                    min_g = st.slider("Minimum games", 1, max_season_rounds, min(10, max_season_rounds), key="dna_min_g")
-                sort_by = st.selectbox("Sort by", ['Poll_Rate', 'Win_Poll_Rate', 'HD_Poll_Rate', 'Three_Vote_Rate'],
-                                       format_func=lambda x: {
-                                           'Poll_Rate': 'Overall Poll Rate', 'Win_Poll_Rate': 'Win Poll Rate',
-                                           'HD_Poll_Rate': '30+ Disposal Poll Rate', 'Three_Vote_Rate': '3-Vote Rate',
-                                       }[x], key="dna_sort")
-                eff_display = efficiency[efficiency['Games'] >= min_g].copy()
-                eff_display = eff_display.sort_values(sort_by, ascending=False).head(30)
-                eff_display.insert(0, 'Rank', range(1, len(eff_display) + 1))
-
-                # Custom HTML table (Leaderboard convention). Null rule via _rate:
-                # 30+ % shows "—" when the player has no 30+ games (HD_Games NaN/0),
-                # "0.0%" only when defined-but-zero. Sort logic above is untouched.
-                _rows = ""
-                for _, rr in eff_display.iterrows():
-                    _rows += (
-                        '<tr>'
-                        f'<td class="lft lb-rank">{int(rr["Rank"])}</td>'
-                        f'<td class="lft lb-pname">{rr["Player_Name"]}</td>'
-                        f'<td>{int(rr["Games"])}</td>'
-                        f'<td class="key">{_rate(rr["Poll_Rate"])}</td>'
-                        f'<td>{_rate(rr["Win_Poll_Rate"])}</td>'
-                        f'<td>{_rate(rr["Loss_Poll_Rate"])}</td>'
-                        f'<td>{_rate(rr["HD_Poll_Rate"], rr.get("HD_Games"))}</td>'
-                        f'<td>{_rate(rr["Three_Vote_Rate"])}</td>'
-                        f'<td>{rr["Avg_Disposals"]:.1f}</td>'
-                        '</tr>'
-                    )
-                st.markdown(f"""
-<style>
-.dna-rank .lb-tbl-wrap{{overflow-x:auto;}}
-.dna-rank table{{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;}}
-.dna-rank th{{font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:9px 12px;border-bottom:1px solid var(--hairline-strong);text-align:right;white-space:nowrap;}}
-.dna-rank th.lft{{text-align:left;}}
-.dna-rank td{{font-size:13px;padding:8px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;color:var(--steel);}}
-.dna-rank td.lft{{text-align:left;}}
-.dna-rank td.key{{color:var(--text);font-weight:600;}}
-.dna-rank td.lb-rank{{color:var(--text);font-weight:600;width:40px;}}
-.dna-rank td.lb-pname{{font-family:'Archivo',sans-serif;font-size:14px;font-weight:600;color:var(--text);}}
-.dna-rank tr:hover td{{background:rgba(255,255,255,.02);}}
-</style>
-<div class="dna-rank"><div class="lb-tbl-wrap"><table>
-<thead><tr>
-<th class="lft">Rank</th><th class="lft">Player</th><th>Games</th>
-<th>Poll %</th><th>Win %</th><th>Loss %</th><th>30+ %</th><th>3V %</th><th>Avg Disp</th>
-</tr></thead>
-<tbody>{_rows}</tbody>
-</table></div></div>
 """, unsafe_allow_html=True)
 
 # ════════════════════════════════════════════════════════════
