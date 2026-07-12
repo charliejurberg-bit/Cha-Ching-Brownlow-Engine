@@ -1143,7 +1143,14 @@ def load_all_historical(columns=None):
             g['Team'] = g['Team'].fillna(g['Playing.for'])
         else:
             g['Team'] = g['Playing.for']
-    return _disambiguate_players(g)
+    g = _disambiguate_players(g)
+    if want is not None:
+        # Low-cardinality text → category: kills most of the pandas-2.x object
+        # string overhead on Cloud and shrinks the per-rerun cache_data copy.
+        for _c in ('Player_Name', 'Playing.for', 'Team', '_base_name'):
+            if _c in g.columns:
+                g[_c] = g[_c].astype('category')
+    return g
 
 # Sentinel season value meaning "all seasons combined" (career view).
 CAREER = "Career"
@@ -4295,7 +4302,10 @@ if _page == 'Stat Filter':
     if hist is None:
         st.error("No historical game-level data found. Run brownlow_model.py first.")
     else:
-        hist = hist[hist['Brownlow.Votes'].notna()].copy()
+        # (No Brownlow.Votes NaN exist in any game_level file — 2026 votes are
+        # 0-filled — so the old notna()+copy() dropped zero rows and only cost a
+        # full-frame copy per rerun. Downstream 'Season < 2026' guards already
+        # keep unassigned 2026 votes out of every rate.)
 
         # ── 2. Filters — flush, no panel. Widgets + logic unchanged ──
         all_players_sf = sorted(hist['Player_Name'].dropna().unique().tolist())
@@ -4372,7 +4382,10 @@ if _page == 'Stat Filter':
             for _lab, _col, _val, _mn, _mx in _stat_sliders:
                 if _col != active_col:
                     _sweep_mask &= (hist[_col] >= _val)
-            _sweep_base = hist[_sweep_mask]
+            # Only the stat columns (any may be the active one) + votes are read
+            # from _sweep_base below — carry just those, not the full frame.
+            _sweep_cols = [_c for _l, _c, _v, _m, _x in _stat_sliders] + ['Brownlow.Votes']
+            _sweep_base = hist.loc[_sweep_mask, _sweep_cols]
 
             def _threshold_sweep(df, col, thresholds):
                 """Poll rate, 3-vote rate and avg votes at each threshold of `col`.
@@ -4403,8 +4416,9 @@ if _page == 'Stat Filter':
             base_poll = sweep[0]['poll_rate'] if sweep else cur_poll
             base_three = sweep[0]['three_rate'] if sweep else cur_three
 
-            # Vote pool (pre-2026 only), reused for the breakdown strip.
-            vote_data = filtered_sf[filtered_sf['Season'] < 2026]
+            # Vote pool (pre-2026 only), reused for the breakdown strip. Only the
+            # votes column is counted below, so carry just that.
+            vote_data = filtered_sf.loc[filtered_sf['Season'] < 2026, ['Brownlow.Votes']]
             n3 = int((vote_data['Brownlow.Votes'] == 3).sum())
             n2 = int((vote_data['Brownlow.Votes'] == 2).sum())
             n1 = int((vote_data['Brownlow.Votes'] == 1).sum())
