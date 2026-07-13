@@ -4156,25 +4156,13 @@ if _page == 'Player Profile':
 if _page == 'Game Analysis':
     st.markdown(
         f'<div class="title-bar"><h2 style="color:var(--text);margin:0">Game Analysis — {selected_season}</h2>'
-        f'<p style="color:var(--muted);margin:4px 0 0 0">Round-by-round match predictions · poll probability breakdown</p></div>',
+        f'<p style="color:var(--muted);margin:4px 0 0 0">Round-by-round match predictions</p></div>',
         unsafe_allow_html=True,
     )
-    _ga_rbr_tab, _ga_pp_tab = st.tabs(["Round by Round", "Poll Probability"])
+    _ga_rbr_tab = st.container()
 
-    # ── Round by Round tab ────────────────────────────────────
+    # ── Round by Round ────────────────────────────────────────
     with _ga_rbr_tab:
-        # theme.py gives [data-testid="stTabs"] a --surface (#101a24) fill +
-        # border, which reads as a raised card. Neutralise it for this page only
-        # via :has(.ga-flush) — the marker below sits INSIDE the tabs so the
-        # selector matches. The tab-strip hairline and active-tab emerald
-        # underline live on [role="tablist"]/[role="tab"] and are untouched.
-        st.markdown(
-            '<style>[data-testid="stTabs"]:has(.ga-flush){'
-            'background:transparent !important;border:none !important;'
-            'box-shadow:none !important;}</style>'
-            '<span class="ga-flush" style="display:none"></span>',
-            unsafe_allow_html=True,
-        )
         rr = load_game(2026)
         if rr is None:
             st.error("No 2026 game-level predictions found. Run predict_2026.py first.")
@@ -4412,30 +4400,6 @@ if _page == 'Game Analysis':
                     if st.button(_exp_lbl, key=f"rr_btn_{selected_round}_{game_idx}"):
                         st.session_state[expand_key] = not show_all
                         st.rerun()
-
-    # ── Poll Probability tab ──────────────────────────────────
-    with _ga_pp_tab:
-        c1, c2 = st.columns([2, 1])
-        with c1: min_games_pp = st.slider("Min games played", 1, max_season_rounds, min(10, max_season_rounds), key="pp_ming")
-        with c2: top_n_pp = st.selectbox("Show top N", [20, 30, 50], index=0, key="pp_topn")
-
-        with st.spinner("Computing poll probabilities…"):
-            filtered_pp = predictions[predictions['Games'] >= min_games_pp].head(top_n_pp).copy()
-            filtered_pp['P3%'] = (filtered_pp['Exp_3vote_games'] / filtered_pp['Games'] * 100).round(1)
-            filtered_pp['P2%'] = (filtered_pp['Exp_2vote_games'] / filtered_pp['Games'] * 100).round(1)
-            filtered_pp['P1%'] = (filtered_pp['Exp_1vote_games'] / filtered_pp['Games'] * 100).round(1)
-
-            fig5 = go.Figure()
-            fig5.add_trace(go.Bar(name='P(3 votes)', x=filtered_pp['Player_Name'], y=filtered_pp['P3%'], marker_color='#f0b429'))
-            fig5.add_trace(go.Bar(name='P(2 votes)', x=filtered_pp['Player_Name'], y=filtered_pp['P2%'], marker_color='#34d399'))
-            fig5.add_trace(go.Bar(name='P(1 vote)', x=filtered_pp['Player_Name'], y=filtered_pp['P1%'], marker_color='#4a90c4'))
-            fig5 = apply_chart_theme(fig5)
-            fig5.update_layout(
-                barmode='stack', yaxis_title='Probability (%)',
-                xaxis_tickangle=-35, legend=dict(orientation='h', y=1.05),
-                margin=dict(t=20, b=120),
-            )
-            st.plotly_chart(fig5, width='stretch', key="ga_pp_fig5")
 
 # ════════════════════════════════════════════════════════════
 # STAT FILTER
@@ -5398,54 +5362,7 @@ if _page == 'Model Comparison':
 
     # ── Load all five data sources ────────────────────────────
 
-    _mc_tab1, _mc_tab2, _mc_tab3 = st.tabs(['2026 (Live)', 'Historical (2021–2025)', 'Insights'])
-
-    with _mc_tab2:
-        _mc_hist_path = 'data_2026/historical_model_comparison.csv'
-        st.markdown(
-            '<div class="section-header">Actual Brownlow Winners — Model Predictions (2021–2025)</div>',
-            unsafe_allow_html=True,
-        )
-        if os.path.exists(_mc_hist_path):
-            _mc_hist = pd.read_csv(_mc_hist_path)
-            for _rc in ['CC_Rank', 'Wheelo_Rank', 'Betfair_Rank', 'ESPN_Rank']:
-                if _rc in _mc_hist.columns:
-                    _mc_hist[_rc] = pd.to_numeric(_mc_hist[_rc], errors='coerce').astype('Int64')
-            _mc_hist_disp = _mc_hist.rename(columns={
-                'Actual_Winner': 'Actual Winner',
-                'CC_Rank': 'Cha Ching',
-                'Wheelo_Rank': 'Wheelo',
-                'Betfair_Rank': 'Betfair',
-                'ESPN_Rank': 'ESPN',
-            })
-            _mc_hist_disp = _mc_hist_disp[['Season', 'Actual Winner', 'Cha Ching', 'Wheelo', 'Betfair', 'ESPN']]
-            def _hist_rank_fmt(v):
-                return '—' if pd.isna(v) else str(int(v))
-            def _hist_style(df):
-                styles = pd.DataFrame('', index=df.index, columns=df.columns)
-                for col in ['Cha Ching', 'Wheelo', 'Betfair', 'ESPN']:
-                    if col not in df.columns:
-                        continue
-                    styles[col] = df[col].apply(
-                        lambda v: 'background-color:rgba(52,211,153,0.18);color:#34d399;font-weight:700'
-                        if pd.notna(v) and int(v) <= 3
-                        else ('background-color:rgba(240,180,41,0.13);color:#f0b429'
-                              if pd.notna(v) and int(v) <= 8 else '')
-                    )
-                return styles
-            _hist_rank_cols = [c for c in ['Cha Ching', 'Wheelo', 'Betfair', 'ESPN'] if c in _mc_hist_disp.columns]
-            _hist_fmt = {c: _hist_rank_fmt for c in _hist_rank_cols}
-            st.dataframe(
-                _mc_hist_disp.style.apply(_hist_style, axis=None).format(_hist_fmt),
-                hide_index=True, use_container_width=True,
-            )
-            st.caption(
-                'Green = top-3 prediction  |  Yellow = top-8. '
-                'Cha Ching ranks from backtest model. Wheelo ranks from wheeloratings.com PDFs. '
-                'Betfair and ESPN ranks sourced manually from archived articles.'
-            )
-        else:
-            st.info('Historical comparison data not available.')
+    _mc_tab1, _mc_tab3 = st.tabs(['2026 (Live)', 'Insights'])
 
     with _mc_tab1:
         # theme.py tints [data-testid="stTabs"] with --surface; neutralise it for
