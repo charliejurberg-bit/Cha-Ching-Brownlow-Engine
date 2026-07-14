@@ -16,6 +16,13 @@ import betting_hub
 from theme import inject_global_theme
 from brownlow_medallists import get_medallists
 
+# ── TEMP perf instrumentation (revert after measurement) ──
+_PERF = []
+def _t(label):
+    import time
+    _PERF.append((label, time.perf_counter()))
+_t("boot")
+
 st.set_page_config(page_title="Cha Ching | AFL Brownlow Medal Predictor", page_icon="assets/favicon.png", layout="wide", initial_sidebar_state="collapsed")
 
 def inject_global_css():
@@ -907,6 +914,7 @@ st.markdown("""
 
 inject_global_css()
 inject_global_theme()
+_t("css")
 
 # ── Animated number counter (JS via iframe → parent DOM) ──────
 st.iframe("""
@@ -979,6 +987,7 @@ def _read_backtest_range():
 
 _TRAIN_MIN, _TRAIN_MAX = _read_data_range()
 _BT_MIN, _BT_MAX = _read_backtest_range()
+_t("range")
 
 # Canonical team names. Source files mix old/abbreviated labels (fitzRoy uses
 # 'GWS'/'Footscray'; older game files use 'Kangaroos'). Collapse them so the
@@ -1735,6 +1744,7 @@ if predictions is None:
 # max_season_rounds: highest round number in data (used for slider upper bounds)
 # rounds_played: count of distinct rounds (correct display even if rounds start at 0 or skip)
 max_season_rounds = int(game_df['Round_num'].max()) if game_df is not None and len(game_df) > 0 else 25
+_t("data")
 rounds_played = int(game_df['Round_num'].nunique()) if game_df is not None and len(game_df) > 0 else 0
 
 # ── State init + banner ───────────────────────────────────────
@@ -2362,6 +2372,7 @@ if _show_controls:
 # page, including the inline Predictions block below. Brownlow pages
 # (_page not in _BH_PAGES) never hit this and are visually unchanged.
 # ════════════════════════════════════════════════════════════
+_t("nav")
 if _page in _BH_PAGES and not st.session_state.get("bh_authed"):
     # FAIL CLOSED: any problem reading the secret (missing key, no secrets
     # file at all) → deny access rather than crash or fall open.
@@ -3063,6 +3074,7 @@ if _page == 'Predictions':
 # LEADERBOARD
 # ════════════════════════════════════════════════════════════
 if _page == 'Leaderboard':
+    _t("lb:enter")
     _lb_live_html = ' <span class="lb-live-pill">LIVE</span>' if is_2026 else ""
     _lbh_main, _lbh_season = st.columns([4, 1], vertical_alignment="bottom")
     with _lbh_main:
@@ -3115,6 +3127,7 @@ if _page == 'Leaderboard':
         _max_ceil = float(predictions['Exp_Total_Votes'].max() or 1.0)
     if _max_ceil <= 0:
         _max_ceil = 1.0
+    _t("lb:shared")
 
     _LB_ABBR = {
         "Adelaide": "ADEL", "Brisbane Lions": "BRIS", "Carlton": "CARL",
@@ -3250,6 +3263,7 @@ SCOPE .lb-bar-lo{text-align:right;}
         unsafe_allow_html=True,
     )
 
+    _t("lb:spotlight")
     st.markdown('<div class="lb-section-label">Full Leaderboard</div>', unsafe_allow_html=True)
     _cc1, _cc2 = st.columns([5, 1])
     with _cc1:
@@ -3293,6 +3307,7 @@ SCOPE .lb-bar-lo{text-align:right;}
     else:
         _tbl_maxceil = 1.0
 
+    _t("lb:movement")
     # ── PART 3: full leaderboard table ──
     _LB_TBL_CSS = ("""
 .lb-table .lb-tbl-wrap{overflow-x:auto;}
@@ -3380,6 +3395,7 @@ SCOPE .lb-bar-lo{text-align:right;}
         _tr_cls = ' class="lb-leader"' if _rank == 1 else ''
         _rows.append(f'<tr{_tr_cls}>{"".join(_cells)}</tr>')
 
+    _t("lb:rows")
     st.markdown(
         f'<div class="lb-table"><style>{_LB_TBL_CSS}</style>'
         f'<div class="lb-tbl-wrap"><table class="lb-tbl">'
@@ -3387,6 +3403,7 @@ SCOPE .lb-bar-lo{text-align:right;}
         f'</table></div></div>',
         unsafe_allow_html=True,
     )
+    _t("lb:render")
     if is_2026 and _fg:
         st.caption("Form (last 3 rounds): emerald = predicted to poll (≥30%) · grey = quiet · faint = did not play")
 
@@ -4158,6 +4175,7 @@ if _page == 'Player Profile':
 # GAME ANALYSIS
 # ════════════════════════════════════════════════════════════
 if _page == 'Game Analysis':
+    _t("ga:enter")
     st.markdown(
         f'<div class="title-bar"><h2 style="color:var(--text);margin:0">Game Analysis — {selected_season}</h2>'
         f'<p style="color:var(--muted);margin:4px 0 0 0">Round-by-round match predictions</p></div>',
@@ -4174,6 +4192,7 @@ if _page == 'Game Analysis':
             rr = rr.copy()
             rr['Match'] = rr['Home.team'] + ' vs ' + rr['Away.team']
             available_rounds = sorted(rr['Round_num'].dropna().unique().astype(int).tolist())
+            _t("ga:load")
 
             sel_col, info_col = st.columns([2, 5])
             with sel_col:
@@ -4192,6 +4211,7 @@ if _page == 'Game Analysis':
                     unsafe_allow_html=True,
                 )
 
+            _t("ga:select")
             # Team tag abbreviations for the breakdown table / podium meta line
             _GA_ABBR = {
                 "Adelaide": "ADEL", "Brisbane Lions": "BRIS", "Carlton": "CARL",
@@ -4289,6 +4309,7 @@ if _page == 'Game Analysis':
                 return f'<span class="ga-tbadge ga-tbadge-{alloc}">{alloc}</span>'
 
             game_order = rnd.drop_duplicates('Match')[['Match', 'Home.team', 'Away.team', 'Home.score', 'Away.score']].reset_index(drop=True)
+            _t("ga:prep")
 
             for game_idx, game_row in game_order.iterrows():
                 match = game_row['Match']
@@ -4404,6 +4425,8 @@ if _page == 'Game Analysis':
                     if st.button(_exp_lbl, key=f"rr_btn_{selected_round}_{game_idx}"):
                         st.session_state[expand_key] = not show_all
                         st.rerun()
+
+            _t("ga:games")
 
 # ════════════════════════════════════════════════════════════
 # STAT FILTER
@@ -6051,3 +6074,8 @@ else:
 # by _BH_PAGES; the password-gate screen st.stop()s earlier and never gets here.
 if _page not in _BH_PAGES:
     _render_rg_footer()
+
+# ── TEMP perf render (revert after measurement) ──
+if st.query_params.get("perf") == "1":
+    rows = [f"{_PERF[i][0]}: {(_PERF[i][1]-_PERF[i-1][1])*1000:.0f}ms" for i in range(1, len(_PERF))]
+    st.caption(" | ".join(rows) + f" | TOTAL: {(_PERF[-1][1]-_PERF[0][1])*1000:.0f}ms")
