@@ -230,6 +230,7 @@ def _empty_polls_df() -> pd.DataFrame:
     return df
 
 
+@st.cache_data(ttl=60)
 def _load_watchlist() -> pd.DataFrame:
     """Load the Polls-a-Vote watchlist from Supabase (source of truth).
 
@@ -278,6 +279,7 @@ def _save_watchlist(df: pd.DataFrame):
     records = _sb_records(df_save)
     if records:
         sb.table(POLLS_SB_TABLE).upsert(records, on_conflict="id").execute()
+        _load_watchlist.clear()
 
 
 def _save_polls_row(row: dict):
@@ -286,6 +288,7 @@ def _save_polls_row(row: dict):
     row.setdefault('id', str(uuid.uuid4())[:8])      # same id scheme as bets
     row.setdefault('created_at', datetime.now().isoformat())
     _save_watchlist(pd.DataFrame([row]))
+    _load_watchlist.clear()
 
 
 def _mark_poll_settled(poll_id: str):
@@ -295,6 +298,7 @@ def _mark_poll_settled(poll_id: str):
         return
     try:
         sb.table(POLLS_SB_TABLE).update({'settled': True}).eq('id', str(poll_id)).execute()
+        _load_watchlist.clear()
     except Exception:
         pass
 
@@ -306,6 +310,7 @@ def _delete_poll_row(poll_id: str):
         return
     try:
         sb.table(POLLS_SB_TABLE).delete().eq('id', str(poll_id)).execute()
+        _load_watchlist.clear()
     except Exception:
         pass
 
@@ -320,6 +325,7 @@ def _empty_bets_df() -> pd.DataFrame:
     return df
 
 
+@st.cache_data(ttl=60)
 def _load_bets() -> pd.DataFrame:
     def _coerce(df):
         for c in BETS_COLS:
@@ -366,6 +372,7 @@ def _insert_bet(row: dict):
         row['date'] = row['date'].strftime('%Y-%m-%d')
     row = {k: (None if isinstance(v, float) and pd.isna(v) else v) for k, v in row.items()}
     _get_supabase().table("bets").insert(row).execute()
+    _load_bets.clear()
 
 
 def _save_bets(df: pd.DataFrame):
@@ -376,6 +383,7 @@ def _save_bets(df: pd.DataFrame):
     records = _sb_records(df_save)
     if records:
         _get_supabase().table("bets").upsert(records, on_conflict="bet_id").execute()
+        _load_bets.clear()
 
 
 def _empty_tips_df() -> pd.DataFrame:
@@ -388,6 +396,7 @@ def _empty_tips_df() -> pd.DataFrame:
     return df
 
 
+@st.cache_data(ttl=60)
 def _load_tips() -> pd.DataFrame:
     def _coerce(df):
         for col in TIPS_COLS:
@@ -445,6 +454,7 @@ def _save_tip(game_key: str, player: str, market_type: str,
             'profit_loss':   None,
         }
         _get_supabase().table("cha_ching_tips").insert(new_row).execute()
+        _load_tips.clear()
         return None
     except Exception as e:
         import traceback
@@ -454,6 +464,7 @@ def _save_tip(game_key: str, player: str, market_type: str,
 def _delete_tip(tip_id: str):
     try:
         _get_supabase().table("cha_ching_tips").delete().eq('tip_id', tip_id).execute()
+        _load_tips.clear()
         return None
     except Exception as e:
         return str(e)
@@ -473,6 +484,7 @@ def _save_tip_result(tip_id: str, result: str):
             'result':      result,
             'profit_loss': pl if result else None,
         }).eq('tip_id', tip_id).execute()
+        _load_tips.clear()
         try:
             _sync_tip_to_bets(tip_id, row, result, pl)
         except Exception as e:
@@ -501,8 +513,10 @@ def _sync_tip_to_bets(tip_id: str, tip_row, result: str, pl: float):
             'cha_ching_criteria': str(tip_row.get('criteria_json', '') or ''),
             'notes':              str(tip_row.get('notes', '') or ''),
         }).execute()
+    _load_bets.clear()
 
 
+@st.cache_data(ttl=60)
 def _load_props() -> pd.DataFrame:
     sb = _get_supabase()
     if sb is None:
@@ -525,6 +539,7 @@ def _save_prop(game_key: str, player: str, market_type: str,
         'odds':        odds,
         'updated_at':  datetime.now().isoformat(),
     }, on_conflict="game_key,player,market_type").execute()
+    _load_props.clear()
 
 
 def _load_user_import() -> pd.DataFrame | None:
