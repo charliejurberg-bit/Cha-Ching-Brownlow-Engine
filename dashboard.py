@@ -3662,7 +3662,8 @@ if _page == 'Player Profile':
                 st.caption("CV = coaches votes · ExpV = expected votes")
 
         # ── DNA tab ───────────────────────────────────────────
-        with _tab_dna:
+        @st.fragment
+        def _render_dna_tab(selected_player, game_df, efficiency, is_career, max_season_rounds):
             if efficiency is None:
                 st.error("No game-level data found.")
             else:
@@ -3898,6 +3899,9 @@ if _page == 'Player Profile':
 </div>
 {_vins_html}
 """, unsafe_allow_html=True)
+
+        with _tab_dna:
+            _render_dna_tab(selected_player, game_df, efficiency, is_career, max_season_rounds)
 
         # ── Compare tab ───────────────────────────────────────
         with _tab_compare:
