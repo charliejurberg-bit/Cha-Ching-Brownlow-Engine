@@ -4404,7 +4404,8 @@ if _page == 'Game Analysis':
 # ════════════════════════════════════════════════════════════
 # STAT FILTER
 # ════════════════════════════════════════════════════════════
-if _page == 'Stat Filter':
+@st.fragment
+def _render_stat_filter():
     # ── 1. Header — no box ────────────────────────────────────
     st.markdown(
         '<div style="margin:2px 0 16px">'
@@ -4686,6 +4687,10 @@ if _page == 'Stat Filter':
             )
             st.dataframe(_quiet_sf_table(_sf_disp), width='stretch', hide_index=True)
             st.caption("CV = coaches votes")
+
+
+if _page == 'Stat Filter':
+    _render_stat_filter()
 
 # ══════════════════════════════════════════════════════════════
 # LIVE TRACKER
