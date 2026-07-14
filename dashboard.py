@@ -2564,7 +2564,7 @@ text-align:center;padding:0 24px;max-width:900px;}
 .eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.34em;
 text-transform:uppercase;color:#34d399;margin-bottom:8px;}
 .wordmark{font-family:'Archivo',sans-serif;font-weight:900;font-variation-settings:'wdth' 122;
-font-size:clamp(56px,9vw,110px);line-height:.94;white-space:nowrap;margin:0;}
+font-size:clamp(44px,9vw,110px);line-height:.94;white-space:nowrap;margin:0;}
 .cha{background:linear-gradient(180deg,#ffffff,#9fb3c4);-webkit-background-clip:text;background-clip:text;color:transparent;}
 .ching{background:linear-gradient(120deg,#34d399,#f0b429);-webkit-background-clip:text;background-clip:text;color:transparent;}
 .subtitle{font-size:15px;color:#7e8c99;margin:14px 0 26px;}
