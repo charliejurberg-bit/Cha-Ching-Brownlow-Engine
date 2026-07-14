@@ -2042,6 +2042,11 @@ def render_bet_tracker():
             st.rerun()
 
     # ── Filters ───────────────────────────────────────────────────────────────
+    _bt_filter_section(bets)
+
+
+@st.fragment
+def _bt_filter_section(bets):
     st.markdown('<div class="section-header">Filters</div>', unsafe_allow_html=True)
     fc1, fc2, fc3, fc4 = st.columns(4)
     with fc1:
@@ -2389,7 +2394,8 @@ def render_cha_ching_tips():
     cc_bets = _load_bets()
     cc_bets = cc_bets[cc_bets['is_cha_ching'] == True].copy()
 
-    if not cc_bets.empty:
+    @st.fragment
+    def _cc_history_section(cc_bets):
         st.markdown('<div class="section-header">Cha Ching Bet History</div>', unsafe_allow_html=True)
 
         # Filters (flush, single inline row) — scoped via .cc-filters-marker
@@ -2513,6 +2519,9 @@ def render_cha_ching_tips():
                         unsafe_allow_html=True)
 
         st.divider()
+
+    if not cc_bets.empty:
+        _cc_history_section(cc_bets)
 
     # ── Flagged-tips banner (upcoming only); fixtures/tips already loaded above ─
     flagged  = tips_df[
