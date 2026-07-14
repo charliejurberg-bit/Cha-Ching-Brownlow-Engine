@@ -16,7 +16,7 @@ import betting_hub
 from theme import inject_global_theme
 from brownlow_medallists import get_medallists
 
-st.set_page_config(page_title="Cha Ching | AFL Brownlow Medal Predictor", layout="wide", initial_sidebar_state="collapsed")
+st.set_page_config(page_title="Cha Ching | AFL Brownlow Medal Predictor", page_icon="🏉", layout="wide", initial_sidebar_state="collapsed")
 
 def inject_global_css():
     st.markdown("""
