@@ -5,6 +5,6 @@ xgboost
 requests
 numpy
 scikit-learn
-supabase
+supabase==2.30.0
 
 openpyxl

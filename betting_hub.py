@@ -192,6 +192,35 @@ def _supabase_available() -> bool:
     return _get_supabase() is not None
 
 
+def _form_instance_id(state_key: str) -> str:
+    """Stable row id for one form/dialog instance, held in session state.
+
+    Minted on first render, so a double-click or a rerun mid-write reuses the
+    same id and the keyed upsert collapses onto one row instead of adding a
+    duplicate. Cleared only by _clear_form_instance() after a write is
+    confirmed — a failed write deliberately keeps the key so the retry carries
+    the same id. That is the whole point.
+    """
+    if not st.session_state.get(state_key):
+        st.session_state[state_key] = str(uuid.uuid4())
+    return st.session_state[state_key]
+
+
+def _clear_form_instance(state_key: str):
+    """Drop a form-instance id so the next entry starts a fresh row."""
+    st.session_state.pop(state_key, None)
+
+
+def _is_duplicate_error(e: Exception) -> bool:
+    """True for a Postgres unique violation (SQLSTATE 23505) via PostgREST.
+
+    The error shape differs across supabase-py versions, so match on the
+    SQLSTATE and the message text rather than on any one attribute.
+    """
+    s = f"{getattr(e, 'code', '')} {getattr(e, 'message', '')} {e}".lower()
+    return '23505' in s or 'duplicate key' in s
+
+
 def _sb_records(df: pd.DataFrame) -> list[dict]:
     """Convert DataFrame rows to JSON-safe dicts (NaN/NaT → None)."""
     rows = []
@@ -283,9 +312,15 @@ def _save_watchlist(df: pd.DataFrame):
 
 
 def _save_polls_row(row: dict):
-    """Add one new watchlist target — generates id/created_at, then upserts."""
+    """Add one new watchlist target — fills id/created_at, then upserts on id.
+
+    The add form supplies a form-instance id; the fallback below only covers
+    callers that don't. New ids are full uuid4s (the old [:8] truncation left
+    32 bits of entropy for no benefit — the column is text either way, so
+    widening needs no migration).
+    """
     row = dict(row)
-    row.setdefault('id', str(uuid.uuid4())[:8])      # same id scheme as bets
+    row.setdefault('id', str(uuid.uuid4()))
     row.setdefault('created_at', datetime.now().isoformat())
     _save_watchlist(pd.DataFrame([row]))
     _load_watchlist.clear()
@@ -367,11 +402,15 @@ def _load_bets() -> pd.DataFrame:
 
 
 def _insert_bet(row: dict):
-    """Insert a single new bet row into Supabase."""
+    """Upsert a single bet row into Supabase, keyed on bet_id.
+
+    The caller mints bet_id once per dialog instance, so a resubmit rewrites
+    that one row rather than inserting a duplicate.
+    """
     if 'date' in row and hasattr(row['date'], 'strftime'):
         row['date'] = row['date'].strftime('%Y-%m-%d')
     row = {k: (None if isinstance(v, float) and pd.isna(v) else v) for k, v in row.items()}
-    _get_supabase().table("bets").insert(row).execute()
+    _get_supabase().table("bets").upsert(row, on_conflict="bet_id").execute()
     _load_bets.clear()
 
 
@@ -434,11 +473,16 @@ def _load_tips() -> pd.DataFrame:
 def _save_tip(game_key: str, player: str, market_type: str,
               criteria: list[str], is_flagged: bool, notes: str = '',
               stake: float = 0.0, odds: float = 0.0, bookmaker: str = '',
-              line: float = 0.0):
-    """Returns None on success, or an error string on failure."""
+              line: float = 0.0, tip_id: str | None = None):
+    """Returns None on success, or an error string on failure.
+
+    tip_id is the caller's form-instance id, so a resubmit upserts the same row
+    instead of adding a duplicate. It falls back to a fresh uuid4 for callers
+    that don't supply one.
+    """
     try:
         new_row = {
-            'tip_id':        str(uuid.uuid4()),
+            'tip_id':        tip_id or str(uuid.uuid4()),
             'game_key':      game_key,
             'player':        player,
             'market_type':   market_type,
@@ -453,7 +497,8 @@ def _save_tip(game_key: str, player: str, market_type: str,
             'result':        '',
             'profit_loss':   None,
         }
-        _get_supabase().table("cha_ching_tips").insert(new_row).execute()
+        _get_supabase().table("cha_ching_tips").upsert(
+            new_row, on_conflict="tip_id").execute()
         _load_tips.clear()
         return None
     except Exception as e:
@@ -492,27 +537,36 @@ def _save_tip_result(tip_id: str, result: str):
 
 
 def _sync_tip_to_bets(tip_id: str, tip_row, result: str, pl: float):
-    """Write or remove a settled tip as a CC bet record."""
+    """Write or remove a settled tip as a CC bet record.
+
+    bet_id is the tip_id, so this was already idempotent by key — but it did it
+    as delete-then-insert, which is two statements: a failure between them lost
+    the ledger row outright. Upserting rewrites the row in one statement.
+    Clearing the result still removes the row, exactly as before.
+    """
     sb = _get_supabase()
-    sb.table("bets").delete().eq("bet_id", tip_id).execute()
-    if result:
-        odds  = pd.to_numeric(tip_row.get('odds',  0), errors='coerce') or 0.0
-        stake = pd.to_numeric(tip_row.get('stake', 0), errors='coerce') or 0.0
-        sb.table("bets").insert({
-            'bet_id':             tip_id,
-            'date':               date.today().strftime('%Y-%m-%d'),
-            'match':              str(tip_row.get('game_key', '')),
-            'market_type':        str(tip_row.get('market_type', '')),
-            'selection':          str(tip_row.get('player', '')),
-            'bookmaker':          str(tip_row.get('bookmaker', '') or ''),
-            'odds':               round(float(odds), 2),
-            'stake':              round(float(stake), 2),
-            'result':             result,
-            'profit_loss':        round(float(pl), 2),
-            'is_cha_ching':       True,
-            'cha_ching_criteria': str(tip_row.get('criteria_json', '') or ''),
-            'notes':              str(tip_row.get('notes', '') or ''),
-        }).execute()
+    if not result:
+        sb.table("bets").delete().eq("bet_id", tip_id).execute()
+        _load_bets.clear()
+        return
+
+    odds  = pd.to_numeric(tip_row.get('odds',  0), errors='coerce') or 0.0
+    stake = pd.to_numeric(tip_row.get('stake', 0), errors='coerce') or 0.0
+    sb.table("bets").upsert({
+        'bet_id':             tip_id,
+        'date':               date.today().strftime('%Y-%m-%d'),
+        'match':              str(tip_row.get('game_key', '')),
+        'market_type':        str(tip_row.get('market_type', '')),
+        'selection':          str(tip_row.get('player', '')),
+        'bookmaker':          str(tip_row.get('bookmaker', '') or ''),
+        'odds':               round(float(odds), 2),
+        'stake':              round(float(stake), 2),
+        'result':             result,
+        'profit_loss':        round(float(pl), 2),
+        'is_cha_ching':       True,
+        'cha_ching_criteria': str(tip_row.get('criteria_json', '') or ''),
+        'notes':              str(tip_row.get('notes', '') or ''),
+    }, on_conflict="bet_id").execute()
     _load_bets.clear()
 
 
@@ -1242,8 +1296,10 @@ def _add_multi_dialog():
                     game_key, player_label, "Multi",
                     criteria, is_flagged, notes,
                     stake=float(stake), odds=float(odds), bookmaker=bookmaker,
+                    tip_id=_form_instance_id('_multi_tip_id'),
                 )
                 if err is None:
+                    _clear_form_instance('_multi_tip_id')
                     for item_key, _ in CHECKLIST_ITEMS:
                         st.session_state.pop(f"{pfx}{item_key}", None)
                     st.toast(f"Multi tip saved — {'Cha Ching flagged!' if is_flagged else 'not yet flagged'}")
@@ -1486,8 +1542,10 @@ def _checklist_dialog():
                 game_key, h_player, market_orig, criteria,
                 is_flagged, combined,
                 stake=float(stake), odds=h_odds, bookmaker=bookmaker, line=line_orig,
+                tip_id=_form_instance_id('_cl_tip_id'),
             )
             if err is None:
+                _clear_form_instance('_cl_tip_id')
                 st.session_state['_cl_open'] = False
                 st.toast(f"Tip saved — {'Cha Ching flagged!' if is_flagged else 'not flagged'}")
                 st.rerun()
@@ -1514,6 +1572,7 @@ def _open_checklist(player: str, market: str, game_key: str,
 
 @st.dialog("Add New Bet", width="large")
 def _add_bet_dialog():
+    _bet_id = _form_instance_id('_bet_form_id')
     pre = st.session_state.get('_bet_prefill', {})
     tips_df = _load_tips()
     flagged_tips = tips_df[tips_df['is_flagged'] == True] if not tips_df.empty else pd.DataFrame()
@@ -1557,7 +1616,7 @@ def _add_bet_dialog():
         if st.button("Save Bet", type="primary", use_container_width=True):
             pl = _compute_pl(float(odds), float(stake), result) if result != 'Pending' else 0.0
             new_row = {
-                'bet_id':           str(uuid.uuid4())[:8],
+                'bet_id':           _bet_id,
                 'date':             bet_date.strftime('%Y-%m-%d'),
                 'match':            match,
                 'market_type':      market,
@@ -1572,6 +1631,9 @@ def _add_bet_dialog():
                 'notes':            notes,
             }
             _insert_bet(new_row)
+            # Only reached when the write didn't raise — a failure keeps the id
+            # so a retry reuses it and upserts the same row.
+            _clear_form_instance('_bet_form_id')
             st.session_state.pop('_bet_prefill', None)
             st.toast("Bet saved!")
             st.rerun()
@@ -3657,6 +3719,7 @@ def render_polls_a_vote():
 
         _form_top3 = set(_model_top3(pav_player)) if pav_player.strip() else set()
 
+        _wl_id = _form_instance_id('_pav_row_id')
         with st.form("pav_add_form", clear_on_submit=True):
             st.markdown(
                 '<div class="lbl" style="margin:8px 0 6px">Rounds to watch'
@@ -3699,17 +3762,32 @@ def render_polls_a_vote():
                     st.error("Player name is required.")
                 else:
                     _sel = sorted(r for r, chk in _rnd_checks.items() if chk)
-                    _save_polls_row({
-                        'Player':    pav_player.strip(),
-                        'Team':      pav_team.strip(),
-                        'My_Rounds': ','.join(str(r) for r in _sel),
-                        'Odds':      round(float(pav_odds), 2),
-                        'Stake':     round(float(pav_stake), 2),
-                        'Notes':     pav_notes.strip(),
-                        'Settled':   False,
-                    })
-                    st.success(f"Added {pav_player.strip()} to watchlist.")
-                    st.rerun()
+                    try:
+                        _save_polls_row({
+                            'id':        _wl_id,
+                            'Player':    pav_player.strip(),
+                            'Team':      pav_team.strip(),
+                            'My_Rounds': ','.join(str(r) for r in _sel),
+                            'Odds':      round(float(pav_odds), 2),
+                            'Stake':     round(float(pav_stake), 2),
+                            'Notes':     pav_notes.strip(),
+                            'Settled':   False,
+                        })
+                    except Exception as _pav_err:
+                        # poll_watchlist_active_player: one unsettled row per
+                        # (player, team). Anything else is a genuine failure.
+                        if _is_duplicate_error(_pav_err):
+                            st.warning(
+                                f"Already watching {pav_player.strip()} — "
+                                "edit the existing entry."
+                            )
+                        else:
+                            st.error(f"Save failed — {_pav_err}")
+                    else:
+                        # st.rerun() raises, so it must stay clear of the try.
+                        _clear_form_instance('_pav_row_id')
+                        st.success(f"Added {pav_player.strip()} to watchlist.")
+                        st.rerun()
 
 
 # ── Public dispatch ────────────────────────────────────────────────────────────
