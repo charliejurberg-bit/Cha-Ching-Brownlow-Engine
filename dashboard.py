@@ -10,6 +10,7 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import os
 import re
+import hmac
 import subprocess
 import sys
 import betting_hub
@@ -2411,7 +2412,9 @@ if _page in _BH_PAGES and not st.session_state.get("bh_authed"):
                 )
                 _bh_submit = st.form_submit_button("Enter", type="primary")
             if _bh_submit:
-                if _bh_pw_try == _bh_pw_secret:
+                # Constant-time compare. _bh_pw_secret is never None here — the
+                # branch above renders the not-configured notice and no form.
+                if hmac.compare_digest(str(_bh_pw_try), str(_bh_pw_secret)):
                     st.session_state["bh_authed"] = True
                     st.rerun()
                 else:
@@ -4903,7 +4906,12 @@ if _page == 'Live Tracker':
             )
 
         # ── shared assembly: live votes + model per-round signal + watchlist ──
-        _wl      = betting_hub._load_watchlist()
+        # The watchlist is private Betting Hub data on an otherwise public page.
+        # Anonymous visitors get no fetch at all — not a fetch-then-hide — and
+        # the panels it feeds are dropped below, so the tracker renders as if
+        # the feature doesn't exist. Same session key as the BH gate.
+        _wl_visible = bool(st.session_state.get("bh_authed"))
+        _wl      = betting_hub._load_watchlist() if _wl_visible else None
         _lt_game = load_game(2026)
         _asm     = _assemble_live_tracker(_lt, _lt_game, _wl)
 
@@ -5310,6 +5318,34 @@ if _page == 'Live Tracker':
   @media(max-width:1080px){.zones{grid-template-columns:1fr 1fr;}.zone:nth-child(3){grid-column:1/3;border-left:none;border-top:1px solid var(--hair);padding-top:16px;}body{overflow:auto;}}
 </style>"""
 
+        # Watchlist-fed chrome. With no watchlist the "you"/"both" dots can never
+        # appear, so the legend drops them; Zone 3 is entirely watchlist, so it
+        # is omitted and the zone grid collapses to two columns rather than
+        # leaving an empty rail. _zones_css is emitted after _LT_CSS, so equal
+        # specificity lets it win without !important — which matters, because
+        # !important here would also override the narrow-width media query.
+        _z1_dotkey = (
+            '<div class="dotkey">'
+            + ('<span><span class="dot both"></span>you + model</span>'
+               '<span><span class="dot you"></span>you</span>' if _wl_visible else '')
+            + '<span><span class="dot model"></span>model</span>'
+              '<span><span class="dot none"></span>nobody</span></div>'
+        )
+        if _wl_visible:
+            _z3_zone = (
+                '<div class="zone">'
+                '<div class="ztitle"><span>Upcoming targets</span>'
+                f'<span>next {UPCOMING_LEAD} rounds</span></div>'
+                f'{_z3}'
+                '</div>'
+            )
+            _zones_css = ''
+        else:
+            _z3_zone   = ''
+            _zones_css = ('<style>.zones{grid-template-columns:1.25fr 1.05fr;}'
+                          '@media(max-width:1080px){.zones{grid-template-columns:1fr 1fr;}}'
+                          '</style>')
+
         _body = f'''<body>
   <div class="topbar">
     <div class="tl"><h1>Live Tracker</h1>{_live_pill}</div>
@@ -5340,7 +5376,7 @@ if _page == 'Live Tracker':
   <div class="zones">
     <div class="zone">
       <div class="ztitle"><span>{_round_lbl} · what happened</span><span>{_z1_tally}</span></div>
-      <div class="dotkey"><span><span class="dot both"></span>you + model</span><span><span class="dot you"></span>you</span><span><span class="dot model"></span>model</span><span><span class="dot none"></span>nobody</span></div>
+      {_z1_dotkey}
       {_z1}
     </div>
 
@@ -5349,16 +5385,13 @@ if _page == 'Live Tracker':
       <div class="lb">{_z2}</div>
     </div>
 
-    <div class="zone">
-      <div class="ztitle"><span>Upcoming targets</span><span>next {UPCOMING_LEAD} rounds</span></div>
-      {_z3}
-    </div>
+    {_z3_zone}
   </div>
 </body>'''
 
         _full_html = ('<!doctype html><html><head><meta charset="utf-8">'
                       '<meta name="viewport" content="width=device-width, initial-scale=1">'
-                      + _LT_CSS + '</head>' + _body + '</html>')
+                      + _LT_CSS + _zones_css + '</head>' + _body + '</html>')
         st.iframe(_full_html, height=_LT_IFRAME_H)
 
         # Native auto-refresh control (the real refresh driver; the topbar box

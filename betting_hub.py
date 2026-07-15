@@ -8,7 +8,7 @@ import streamlit as st
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
-import os, json, uuid, time, requests, re
+import os, json, uuid, time, requests, re, hmac
 from datetime import datetime, timedelta, date
 from io import StringIO, BytesIO
 from theme import inject_global_theme
@@ -2305,7 +2305,11 @@ def render_cha_ching_tips():
                 pw = st.text_input('Password', type='password', label_visibility='collapsed',
                                    placeholder='Enter password...')
                 if st.form_submit_button('Unlock', use_container_width=True):
-                    if pw == _correct_pw:
+                    # The None check is load-bearing, not belt-and-braces:
+                    # str(None) == 'None', so without it, typing "None" would
+                    # unlock the panel whenever the secret is missing.
+                    if _correct_pw is not None and hmac.compare_digest(
+                            str(pw), str(_correct_pw)):
                         st.session_state['_cc_authed'] = True
                         st.session_state['_cc_pw_open'] = False
                         st.rerun()
@@ -3793,7 +3797,15 @@ def render_polls_a_vote():
 # ── Public dispatch ────────────────────────────────────────────────────────────
 
 def render_page(page: str):
-    """Called from dashboard.py for each Betting Hub page."""
+    """Called from dashboard.py for each Betting Hub page.
+
+    The gate in dashboard.py already st.stop()s an unauthenticated request long
+    before this runs. This is a backstop so no future caller can route around
+    it: every BH page is gated here too, regardless of how it was reached. It
+    reads the same session key the gate sets — there is deliberately only one.
+    """
+    if not st.session_state.get("bh_authed"):
+        st.stop()
     inject_global_css()
     _ensure_dirs()
     if not _supabase_available():
