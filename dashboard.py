@@ -4936,6 +4936,16 @@ if _page == 'Live Tracker':
         _cc_opts  = (sorted(_lt_game["Player_Name"].dropna().unique().tolist())
                      if _lt_game is not None and "Player_Name" in _lt_game.columns
                      else [])
+        # The leaderboard's names come from the AFL feed; picks are stored as
+        # model-frame names. normalise_name bridges the two — the same bridge
+        # _assemble_live_tracker uses for the private watchlist.
+        _cc_watch_nn = {normalise_name(p) for p in _cc_picks}
+        # The toggle widget renders below the iframe, but the HTML above needs
+        # its state, so read the stored value now. Streamlit keeps a widget's
+        # value between runs and reruns on change, so this is never stale by
+        # more than the rerun that is already happening.
+        _cc_only = bool(_cc_user) and bool(
+            st.session_state.get("cc_user_only", False))
 
         _disp_round = int(_asm["last_round"])     # AFL display round (already offset)
         _next_round = _disp_round + 1
@@ -5124,56 +5134,76 @@ if _page == 'Live Tracker':
             _z1 += '<div class="empty">No misses — every call polled.</div>'
 
         # ── Zone 2: cumulative leaderboard top 10 ─────────────
-        _show = _lt_df[_lt_df["Total_Votes"] > 0].head(10)
+        # "My watchlist only" narrows the pool BEFORE the top-10 cut, so it
+        # shows the user's best ten — not the field's best ten intersected with
+        # their picks, which would usually be empty.
+        _cc_pool = _lt_df
+        if _cc_only and _cc_watch_nn:
+            _cc_pool = _lt_df[_lt_df["Player"].map(
+                lambda _p: normalise_name(_p) in _cc_watch_nn)]
+        _show = _cc_pool[_cc_pool["Total_Votes"] > 0].head(10)
         if _show.empty:
-            _show = _lt_df.head(10)
-        _lead_votes = max(1, int(_show.iloc[0]["Total_Votes"]))
-        _lead_proj  = max(1.0, float(_asm["projection"].get(
-            normalise_name(_show.iloc[0]["Player"]), _lead_votes)))
+            _show = _cc_pool.head(10)
 
-        _prev_rank = {}
-        if _disp_round > 0:
-            _prev_tot, _have_hist = {}, False
-            for _, _r in _lt_df.iterrows():
-                _rv = _asm["round_votes"].get(normalise_name(_r["Player"]), {})
-                if _rv:
-                    _have_hist = True
-                _prev_tot[_r["Player"]] = sum(int(p) for rd, p in _rv.items() if int(rd) < _disp_round)
-            if _have_hist:
-                _order = sorted(_prev_tot, key=lambda p: -_prev_tot[p])
-                _prev_rank = {p: i + 1 for i, p in enumerate(_order)}
+        if _show.empty:
+            # Only reachable with the filter on. The unfiltered field is never
+            # empty here — the _lt_df.empty branch above already returned — so
+            # this needs no equivalent for anonymous visitors.
+            _z2 = ('<div class="empty">No one on your watchlist is in the '
+                   'count yet.</div>')
+        else:
+            _lead_votes = max(1, int(_show.iloc[0]["Total_Votes"]))
+            _lead_proj  = max(1.0, float(_asm["projection"].get(
+                normalise_name(_show.iloc[0]["Player"]), _lead_votes)))
 
-        _z2 = ""
-        for _i, (_, _r) in enumerate(_show.iterrows()):
-            _nm = _r["Player"]; _tm = _r["Team"]; _nn = normalise_name(_nm)
-            _act = int(_r["Total_Votes"]); _rank = int(_r["Rank"])
-            _proj = _asm["projection"].get(_nn, _act)
-            _d = _asm["delta"].get(_nn)
-            _arr = '<span class="arr same">–</span>'
-            if _prev_rank:
-                _pr = _prev_rank.get(_nm)
-                if _pr is not None and _pr != _rank:
-                    _mv = _pr - _rank
-                    _arr = (f'<span class="arr up">▲{_mv}</span>' if _mv > 0
-                            else f'<span class="arr down">▼{abs(_mv)}</span>')
-            if _d is None:
-                _dl = '<span class="lb-d">–</span>'
-            elif _d >= 0:
-                _dl = f'<span class="lb-d pos">+{_d:.1f}</span>'
-            else:
-                _dl = f'<span class="lb-d neg">−{abs(_d):.1f}</span>'
-            _bw = max(0.0, min(100.0, _act / _lead_votes * 100))
-            _pjx = max(0.0, min(100.0, _proj / _lead_proj * 100))
-            _lead_cls = " lead" if _i == 0 else ""
-            _z2 += (
-                f'<div class="lb-row{_lead_cls}">'
-                f'<div class="lb-main"><span class="lb-rank">{_rank}</span>'
-                f'<span class="lb-nm">{_nm} <span class="tm">{_abbr(_tm)}</span> {_arr}</span>'
-                f'<span class="lb-v">{_act}</span>{_dl}'
-                f'<span class="lb-p">proj {_proj:.0f}</span></div>'
-                f'<div class="lb-bul"><div class="bf" style="width:{_bw:.0f}%"></div>'
-                f'<div class="pj" style="left:{_pjx:.0f}%"></div></div></div>'
-            )
+            # Rank movement stays measured against the FULL field: a watched
+            # player's ▲/▼ means their move up the Brownlow, not up a filtered
+            # subset of it.
+            _prev_rank = {}
+            if _disp_round > 0:
+                _prev_tot, _have_hist = {}, False
+                for _, _r in _lt_df.iterrows():
+                    _rv = _asm["round_votes"].get(normalise_name(_r["Player"]), {})
+                    if _rv:
+                        _have_hist = True
+                    _prev_tot[_r["Player"]] = sum(int(p) for rd, p in _rv.items() if int(rd) < _disp_round)
+                if _have_hist:
+                    _order = sorted(_prev_tot, key=lambda p: -_prev_tot[p])
+                    _prev_rank = {p: i + 1 for i, p in enumerate(_order)}
+
+            _z2 = ""
+            for _i, (_, _r) in enumerate(_show.iterrows()):
+                _nm = _r["Player"]; _tm = _r["Team"]; _nn = normalise_name(_nm)
+                _act = int(_r["Total_Votes"]); _rank = int(_r["Rank"])
+                _proj = _asm["projection"].get(_nn, _act)
+                _d = _asm["delta"].get(_nn)
+                _arr = '<span class="arr same">–</span>'
+                if _prev_rank:
+                    _pr = _prev_rank.get(_nm)
+                    if _pr is not None and _pr != _rank:
+                        _mv = _pr - _rank
+                        _arr = (f'<span class="arr up">▲{_mv}</span>' if _mv > 0
+                                else f'<span class="arr down">▼{abs(_mv)}</span>')
+                if _d is None:
+                    _dl = '<span class="lb-d">–</span>'
+                elif _d >= 0:
+                    _dl = f'<span class="lb-d pos">+{_d:.1f}</span>'
+                else:
+                    _dl = f'<span class="lb-d neg">−{abs(_d):.1f}</span>'
+                _bw = max(0.0, min(100.0, _act / _lead_votes * 100))
+                _pjx = max(0.0, min(100.0, _proj / _lead_proj * 100))
+                _lead_cls = " lead" if _i == 0 else ""
+                _star = '★' if _nn in _cc_watch_nn else ''
+                _z2 += (
+                    f'<div class="lb-row{_lead_cls}">'
+                    f'<div class="lb-main"><span class="lb-star">{_star}</span>'
+                    f'<span class="lb-rank">{_rank}</span>'
+                    f'<span class="lb-nm">{_nm} <span class="tm">{_abbr(_tm)}</span> {_arr}</span>'
+                    f'<span class="lb-v">{_act}</span>{_dl}'
+                    f'<span class="lb-p">proj {_proj:.0f}</span></div>'
+                    f'<div class="lb-bul"><div class="bf" style="width:{_bw:.0f}%"></div>'
+                    f'<div class="pj" style="left:{_pjx:.0f}%"></div></div></div>'
+                )
 
         # ── Zone 3: upcoming watchlist targets (forward rail) ──
         _up = []
@@ -5320,7 +5350,10 @@ if _page == 'Live Tracker':
   .lb{display:flex;flex-direction:column;}
   .lb-row{padding:9px 0;border-bottom:1px solid var(--hair);}
   .lb-row:last-child{border-bottom:none;}
-  .lb-main{display:grid;grid-template-columns:18px 1fr auto auto auto;gap:10px;align-items:baseline;}
+  .lb-main{display:grid;grid-template-columns:11px 18px 1fr auto auto auto;gap:10px;align-items:baseline;}
+  /* Leading star cell. Always rendered, empty for unwatched players, so the
+     rank column stays on one axis whether or not anyone is signed in. */
+  .lb-star{font-size:10px;line-height:1;color:var(--gold);}
   .lb-rank{font-family:var(--mono);font-size:12px;color:var(--muted2);}
   .lb-nm{font-weight:600;font-size:14px;letter-spacing:-.01em;display:flex;align-items:center;gap:6px;}
   .lb-nm .tm{font-family:var(--mono);font-size:10px;color:var(--muted2);font-weight:400;}
@@ -5502,9 +5535,19 @@ if _page == 'Live Tracker':
                                 else:
                                     st.error(_cc_msg)
 
-        # Native auto-refresh control (the real refresh driver; the topbar box
-        # above mirrors its state for display only). Kept exactly as before.
-        _lt_auto = st.checkbox("Auto-refresh 60s", value=False, key="lt_auto_refresh")
+        # Tracker controls. The watchlist filter only exists for a signed-in
+        # public user; when it isn't rendered Streamlit drops cc_user_only from
+        # session state, which is exactly right — a signed-out visitor has no
+        # filter state to remember.
+        _lt_c1, _lt_c2 = st.columns([1, 3])
+        with _lt_c1:
+            _lt_auto = st.checkbox("Auto-refresh 60s", value=False,
+                                   key="lt_auto_refresh")
+        with _lt_c2:
+            if _cc_user and _cc_watch_nn:
+                # No value= — session state is the source of truth, and toggling
+                # reruns the page, which is what feeds _cc_only at the top.
+                st.toggle("My watchlist only", key="cc_user_only")
 
     # ── auto-refresh ─────────────────────────────────────────
     if _lt_auto:
