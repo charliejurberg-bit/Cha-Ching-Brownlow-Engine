@@ -14,6 +14,7 @@ import hmac
 import subprocess
 import sys
 import betting_hub
+import user_auth
 from theme import inject_global_theme
 from brownlow_medallists import get_medallists
 
@@ -4860,6 +4861,11 @@ if _page == 'Live Tracker':
     MODEL_VOTE_FLOOR = 0.2    # project convention: ignore projected votes ≤ this (noise)
     UPCOMING_LEAD    = 2      # surface a watchlist target this many rounds ahead
     _LT_IFRAME_H     = 880    # fixed single-viewport iframe height (no internal scroll)
+    # This page is single-season by design — it has no Season control and is not
+    # in _SEASON_PAGES, so `selected_season` is not its source of truth. One
+    # constant feeds both the model frame and the public watchlist's season
+    # column, so the two can never drift apart.
+    _LT_SEASON       = 2026
 
     # Small fallback header for the error / no-data states only. The live panel
     # folds its own topbar (title + LIVE pill) into the single redesign iframe.
@@ -4912,8 +4918,24 @@ if _page == 'Live Tracker':
         # the feature doesn't exist. Same session key as the BH gate.
         _wl_visible = bool(st.session_state.get("bh_authed"))
         _wl      = betting_hub._load_watchlist() if _wl_visible else None
-        _lt_game = load_game(2026)
+        _lt_game = load_game(_LT_SEASON)
         _asm     = _assemble_live_tracker(_lt, _lt_game, _wl)
+
+        # ── Public account watchlist — independent of bh_authed ─────────────
+        # Two unrelated identities share this page. bh_authed is my private
+        # Betting Hub gate; cc_user is a public visitor's account. They must not
+        # interact in either direction: signing in publicly must never reach the
+        # private _load_watchlist() above, and bh_authed must never require an
+        # account. Both set at once is legal (me, testing) — the private zones
+        # win and the public picks still mark up the leaderboard.
+        _cc_user  = user_auth.current_user()
+        if _cc_user and "cc_user_watchlist" not in st.session_state:
+            user_auth.load_watchlist(_LT_SEASON)
+        _cc_picks = set(st.session_state.get("cc_user_watchlist", set()))
+        # Options come from the frame the tracker already loaded — no extra read.
+        _cc_opts  = (sorted(_lt_game["Player_Name"].dropna().unique().tolist())
+                     if _lt_game is not None and "Player_Name" in _lt_game.columns
+                     else [])
 
         _disp_round = int(_asm["last_round"])     # AFL display round (already offset)
         _next_round = _disp_round + 1
@@ -5393,6 +5415,92 @@ if _page == 'Live Tracker':
                       '<meta name="viewport" content="width=device-width, initial-scale=1">'
                       + _LT_CSS + _zones_css + '</head>' + _body + '</html>')
         st.iframe(_full_html, height=_LT_IFRAME_H)
+
+        # ── Public account panel ────────────────────────────────────────────
+        # Every control lives out here because the tracker is one self-contained
+        # iframe and cannot call back into Streamlit. Hidden entirely when the
+        # anon key isn't configured — a sign-in box that cannot work is worse
+        # than no sign-in box.
+        if user_auth.auth_available():
+            if _cc_user:
+                with st.expander(f"Your watchlist · {_cc_user.get('email', '')}",
+                                 expanded=False):
+                    # Intersect with the current options: a player who has left
+                    # the season would otherwise be a default that isn't in
+                    # options, which Streamlit rejects outright.
+                    _cc_default = sorted(_cc_picks & set(_cc_opts))
+                    _cc_sel = st.multiselect(
+                        "Players you expect to poll",
+                        options=_cc_opts,
+                        default=_cc_default,
+                        max_selections=user_auth.WATCHLIST_MAX,
+                        key="cc_user_picks",
+                        placeholder="Add players you expect to poll…",
+                        label_visibility="collapsed",
+                    )
+                    st.caption(
+                        f"{len(_cc_sel)}/{user_auth.WATCHLIST_MAX} players · "
+                        "shown as ★ on the leaderboard."
+                    )
+                    _cc_b1, _cc_b2, _ = st.columns([1, 1, 4])
+                    with _cc_b1:
+                        # Disabled when there is nothing to save. A save cannot
+                        # be "in flight" across renders — the script is
+                        # synchronous — so the real double-submit guard is the
+                        # cooldown inside save_watchlist().
+                        if st.button("Save", key="cc_user_save", type="primary",
+                                     use_container_width=True,
+                                     disabled=(set(_cc_sel) == _cc_picks)):
+                            _cc_ok, _cc_msg = user_auth.save_watchlist(
+                                _cc_sel, _LT_SEASON)
+                            if _cc_ok:
+                                st.toast("Watchlist saved.")
+                                st.rerun()
+                            elif _cc_msg:
+                                st.error(_cc_msg)
+                    with _cc_b2:
+                        if st.button("Sign out", key="cc_user_signout",
+                                     use_container_width=True):
+                            user_auth.sign_out()
+                            st.rerun()
+            else:
+                with st.expander("Track your own Poll-a-Vote watchlist",
+                                 expanded=False):
+                    _cc_t1, _cc_t2 = st.tabs(["Sign in", "Create account"])
+                    with _cc_t1:
+                        # A form so typing doesn't rerun the page per keystroke.
+                        # Both tabs need an "Email" input: Streamlit derives a
+                        # widget's identity from its label and params, so two
+                        # unkeyed identical inputs risk a DuplicateWidgetID.
+                        # Explicit cc_user_* keys avoid that and get cleared by
+                        # sign_out(); clear_on_submit wipes them after each try.
+                        with st.form("cc_user_signin", clear_on_submit=True):
+                            _cc_e = st.text_input("Email", key="cc_user_in_email")
+                            _cc_p = st.text_input("Password", type="password",
+                                                  key="cc_user_in_pw")
+                            if st.form_submit_button("Sign in", type="primary"):
+                                _cc_ok, _cc_msg = user_auth.sign_in(_cc_e, _cc_p)
+                                if _cc_ok:
+                                    st.rerun()
+                                else:
+                                    st.error(_cc_msg)
+                    with _cc_t2:
+                        with st.form("cc_user_signup", clear_on_submit=True):
+                            _cc_e2 = st.text_input("Email", key="cc_user_up_email")
+                            _cc_p2 = st.text_input(
+                                "Password", type="password",
+                                key="cc_user_up_pw",
+                                help="At least 8 characters.")
+                            st.caption("Email is used for sign-in only.")
+                            if st.form_submit_button("Create account",
+                                                     type="primary"):
+                                _cc_ok, _cc_msg = user_auth.sign_up(_cc_e2, _cc_p2)
+                                if _cc_ok and not _cc_msg:
+                                    st.rerun()          # confirmation off
+                                elif _cc_ok:
+                                    st.success(_cc_msg)  # confirmation on
+                                else:
+                                    st.error(_cc_msg)
 
         # Native auto-refresh control (the real refresh driver; the topbar box
         # above mirrors its state for display only). Kept exactly as before.
