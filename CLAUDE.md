@@ -98,18 +98,46 @@ brownlow_engine/
 
 ## Dashboard pages
 
-| Nav group | Pages |
+Navigation is a **two-row tab bar**, and both rows are `st.button`s laid out in
+`st.columns` — *not* `st.selectbox`, `st.sidebar`, or `st.tabs`. They only look
+like tabs because of the CSS hung off the `.nav-hub-anchor` / `.nav-page-anchor`
+marker divs. Grep for those anchors when changing nav styling.
+
+| Row | Rendered by | Contents |
+|---|---|---|
+| Hub toggle | `_render_hub_tabs()` | `Brownlow` · `Betting Hub` |
+| Page strip | `_render_page_nav()` | one button per page of the active hub (`_snav_pages`) |
+
+Two pieces of state, both plain session keys:
+
+- `st.session_state["active_hub"]` — `"brownlow"` (default) or `"betting"`
+- `st.session_state["page"]` — the current page
+
+| Hub | Pages (in strip order) |
 |---|---|
-| Overview | Landing (home), Home (season summary) |
-| Players | Leaderboard, Player Profile, Player Comparison |
-| Analysis | Live Tracker, Coaches Votes, Game Analysis, Model Insights, Model Comparison |
-| Betting | Betting Edge, Stat Filter |
-| BH Overview | Betting Hub Dashboard |
-| BH Strategy | Bet Tracker, Cha Ching Tips, Trends & Analysis |
+| Brownlow | Leaderboard, Player Profile, Stat Filter, Game Analysis, Model Comparison, Live Tracker |
+| Betting Hub (`_BH_PAGES`) | Performance, Predictions, Bet Tracker, Cha Ching Tips, Trends & Analysis, Polls a Vote |
 
-Navigation is implemented as **six horizontal `st.selectbox` dropdowns** (not `st.sidebar` or `st.tabs`). Page state is held in `st.session_state["page"]`.
+Behaviour worth knowing before touching nav:
 
-Betting Hub pages are rendered via `betting_hub.render_page(page_name)` — the module is imported at top of `dashboard.py`.
+- **Landing renders no nav at all** — it's gated on `if _page != 'Landing'`.
+- **Switching hub reassigns `page`** if the current page belongs to the other hub
+  (→ `Leaderboard` / `Performance`), so the strip is never showing a page the hub
+  doesn't own.
+- **Page icons** come from `_PAGE_ICONS` (Tabler webfont) — a `.ti-*` marker div per
+  button, drawn via CSS `::before`. A new page with no entry there renders iconless.
+- **`_NAV_BROWNLOW`, `_NAV_BETTING` and `_nav_select()` are dead code** left from the
+  old selectbox nav. Nothing reads them; their groupings no longer match the strip.
+  Don't trust them as a page list.
+
+Betting Hub pages render via `betting_hub.render_page(page_name)` (module imported at
+top of `dashboard.py`) — **except `Predictions`, which `dashboard.py` renders itself**.
+All `_BH_PAGES` sit behind a password gate that `st.stop()`s unless
+`st.session_state["bh_authed"]`; the gate runs after nav, so the bar stays visible.
+
+Several pages that this table once listed separately are now `st.tabs` *inside* a page:
+Player Profile → Profile / DNA / Compare · Model Comparison → 2026 (Live) / Insights ·
+Predictions → Home / Value Finder.
 
 ## CSS design system
 
