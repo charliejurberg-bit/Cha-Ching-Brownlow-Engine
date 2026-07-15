@@ -126,9 +126,6 @@ Behaviour worth knowing before touching nav:
   doesn't own.
 - **Page icons** come from `_PAGE_ICONS` (Tabler webfont) — a `.ti-*` marker div per
   button, drawn via CSS `::before`. A new page with no entry there renders iconless.
-- **`_NAV_BROWNLOW`, `_NAV_BETTING` and `_nav_select()` are dead code** left from the
-  old selectbox nav. Nothing reads them; their groupings no longer match the strip.
-  Don't trust them as a page list.
 
 Betting Hub pages render via `betting_hub.render_page(page_name)` (module imported at
 top of `dashboard.py`) — **except `Predictions`, which `dashboard.py` renders itself**.

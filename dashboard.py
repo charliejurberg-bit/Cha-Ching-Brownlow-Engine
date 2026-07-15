@@ -1775,21 +1775,7 @@ if 'page' not in st.session_state:
 if st.session_state.page != 'Landing':
     render_banner()
 
-_NAV_BROWNLOW = {
-    "Overview": ["Leaderboard", "Live Tracker"],
-    "Players":  ["Player Profile"],
-    "Analysis": ["Stat Filter", "Game Analysis", "Model Comparison"],
-}
-_NAV_BETTING = {
-    "BH Overview":  ["Performance", "Predictions", "Bet Tracker"],
-    "BH Strategy":  ["Cha Ching Tips", "Trends & Analysis", "Polls a Vote"],
-}
 _BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis', 'Polls a Vote'}
-
-def _nav_select(cat_key):
-    val = st.session_state.get(cat_key)
-    if val is not None:
-        st.session_state.page = val
 
 _hub  = st.session_state.get("active_hub", "brownlow")
 _page = st.session_state.page
