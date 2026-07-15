@@ -963,6 +963,7 @@ if os.path.exists(PRED_DIR):
 AVAILABLE_SEASONS = sorted(AVAILABLE_SEASONS, reverse=True)
 
 # ── Dynamic year bounds (read once from source files) ─────────
+@st.cache_data(ttl=3600)
 def _read_data_range():
     for path in ("fitzroy_stats_all.csv", "fitzroy_stats_2015_2025.csv"):
         if os.path.exists(path):
@@ -974,6 +975,7 @@ def _read_data_range():
                 pass
     return 2015, 2025
 
+@st.cache_data(ttl=3600)
 def _read_backtest_range():
     path = f"{PRED_DIR}/backtest_results.csv"
     if os.path.exists(path):
@@ -1247,9 +1249,36 @@ def compute_player_efficiency_career():
     df = g[voted]
     return _efficiency_from_df(df) if not df.empty else None
 
+@st.cache_data(ttl=300)
 def load_best_odds():
     path = "data_2026/best_odds.csv"
     return _fix_team_names(pd.read_csv(path)) if os.path.exists(path) else None
+
+# Model Comparison source files. Paths are module-level because the page also
+# renders them as the per-model source label.
+_MC_CC_PATH = "predictions/season_2026.csv"
+_MC_WH_PUB  = "data_2026/wheelo_brownlow_predictions.csv"
+_MC_WH_PATH = "data_wheelo/wheelo_2026.csv"   # legacy fallback
+
+@st.cache_data(ttl=300)
+def _load_model_comparison():
+    """Raw frames behind the Model Comparison page. usecols is a callable so a
+    file missing an optional column ('Team', or whichever of ExpVotes/
+    RatingPoints the legacy file carries) is skipped rather than raising —
+    the caller's column probes still decide what's usable."""
+    cc = None
+    if os.path.exists(_MC_CC_PATH):
+        cc = pd.read_csv(_MC_CC_PATH,
+                         usecols=lambda c: c in {'Player_Name', 'Team', 'Exp_Total_Votes'})
+    wh, wh_src = None, None
+    if os.path.exists(_MC_WH_PUB):
+        wh = pd.read_csv(_MC_WH_PUB, usecols=lambda c: c in {'Player', 'Votes'})
+        wh_src = 'pub'
+    elif os.path.exists(_MC_WH_PATH):
+        wh = pd.read_csv(_MC_WH_PATH,
+                         usecols=lambda c: c in {'Player', 'ExpVotes', 'RatingPoints'})
+        wh_src = 'legacy'
+    return cc, wh, wh_src
 
 @st.cache_data
 def form_guide_dots(season, n_rounds=3):
@@ -5408,11 +5437,11 @@ if _page == 'Model Comparison':
             unsafe_allow_html=True,
         )
 
+        _mc_cc_raw, _mc_wh_raw, _mc_wh_src = _load_model_comparison()
+
         # 1. Cha Ching
         _mc_cc_df = pd.DataFrame()
-        _mc_cc_path = "predictions/season_2026.csv"
-        if os.path.exists(_mc_cc_path):
-            _mc_cc_raw = pd.read_csv(_mc_cc_path)
+        if _mc_cc_raw is not None:
             _mc_cc_raw = _mc_cc_raw.sort_values('Exp_Total_Votes', ascending=False).reset_index(drop=True)
             _mc_cc_raw['CC_Rank'] = _mc_cc_raw.index + 1
             _cols_cc = ['Player_Name', 'Exp_Total_Votes', 'CC_Rank']
@@ -5450,10 +5479,7 @@ if _page == 'Model Comparison':
         #    file is absent — that is a different metric and undercounts because
         #    our match-stats scrape is missing rounds for some players.
         _mc_wh_df = pd.DataFrame()
-        _mc_wh_pub  = "data_2026/wheelo_brownlow_predictions.csv"
-        _mc_wh_path = "data_wheelo/wheelo_2026.csv"   # legacy fallback
-        if os.path.exists(_mc_wh_pub):
-            _mc_wh_raw = pd.read_csv(_mc_wh_pub)
+        if _mc_wh_src == 'pub':
             if {'Player', 'Votes'} <= set(_mc_wh_raw.columns):
                 _mc_wh_agg = (
                     _mc_wh_raw.groupby('Player')['Votes'].sum()
@@ -5462,8 +5488,7 @@ if _page == 'Model Comparison':
                 _mc_wh_agg['WH_Rank'] = _mc_wh_agg.index + 1
                 _mc_wh_df = _mc_wh_agg.rename(columns={'Votes': 'WH_Votes'})
                 _mc_wh_df['Player'] = _mc_wh_df['Player'].str.title().str.strip()
-        elif os.path.exists(_mc_wh_path):
-            _mc_wh_raw = pd.read_csv(_mc_wh_path)
+        elif _mc_wh_src == 'legacy':
             _mc_wh_col = next((c for c in ['ExpVotes', 'RatingPoints'] if c in _mc_wh_raw.columns), None)
             if _mc_wh_col:
                 _mc_wh_agg = (
@@ -5543,10 +5568,10 @@ if _page == 'Model Comparison':
 
         # ── Model registry ─────────────────────────────────────────
         _MC_MODELS = [
-            ('Cha Ching',     _mc_cc_df,   'CC_Rank',   _mc_cc_path,  'metric-card-primary'),
+            ('Cha Ching',     _mc_cc_df,   'CC_Rank',   _MC_CC_PATH,  'metric-card-primary'),
             ('AFL Predictor', _mc_afl_df,  'AFL_Rank',  '',           'metric-card'),
             ('Betfair',       _mc_bf_df,   'BF_Rank',   _BF_CSV,      'metric-card'),
-            ('Wheelo',        _mc_wh_df,   'WH_Rank',   _mc_wh_path,  'metric-card'),
+            ('Wheelo',        _mc_wh_df,   'WH_Rank',   _MC_WH_PATH,  'metric-card'),
             ('ESPN',          _mc_espn_df, 'ESPN_Rank',  _ESPN_CSV,    'metric-card'),
         ]
         # (Five model cards, summary cards, heatmap and scatter removed — the
