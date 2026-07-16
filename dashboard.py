@@ -1869,6 +1869,13 @@ _nav_icon_css = (
               for _p, _g in _nav_icon_pairs)
 )
 
+# Active hub-pill accent. Old CSS carried a base emerald rule plus a
+# `.nav-hub-anchor.bh` override to gold; the override only ever touched color +
+# border-bottom-color, so it collapses to one rule with the colour chosen here.
+# _hub is the single source of truth the .bh marker used to encode, so with the
+# marker gone this conditional is that same signal, read in Python.
+_hub_accent = "var(--gold)" if _hub == "betting" else "var(--emerald)"
+
 if _hub == "brownlow":
     _snav_pages = [
         "Leaderboard", "Player Profile",
@@ -1890,15 +1897,17 @@ st.markdown("""
    The .cc-banner CSS hides the zero-height injection containers that
    used to add 32px of stacked flex gap above this row, so the hub row
    now sits flush against the banner with no negative pull. */
-[data-testid="stLayoutWrapper"]:has(.nav-hub-anchor) {
+.st-key-ccnav_hub {
     margin-top: 0 !important;
 }
 [data-testid="stLayoutWrapper"]:has(.nav-page-anchor) {
     margin-top: -16px !important;
 }
 
-/* ── Hub row container ───────────────────────────────────────── */
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) {
+/* ── Hub row container — keyed via st.container(key="ccnav_hub"). The key
+   lands on the container's stLayoutWrapper; its stVerticalBlock is the
+   immediate child. No marker div, no :has(). ──────────────────── */
+.st-key-ccnav_hub > [data-testid="stVerticalBlock"] {
     background: var(--bg) !important;
     position: relative !important;
     left: 50% !important;
@@ -1913,23 +1922,20 @@ st.markdown("""
     margin-bottom: 0 !important;
     gap: 0 !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) > :first-child {
-    display: none !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stHorizontalBlock"] {
+.st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="stHorizontalBlock"] {
     display: grid !important; grid-template-columns: 1fr 1fr !important;
     gap: 0 !important; padding: 0 !important; align-items: stretch !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stColumn"] {
+.st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="stColumn"] {
     width: 100% !important; min-width: 0 !important; padding: 0 !important;
     display: flex !important; flex-direction: column !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stColumn"] > div,
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stElementContainer"],
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stButton"] {
+.st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="stColumn"] > div,
+.st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="stElementContainer"],
+.st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="stButton"] {
     width: 100% !important; flex: 1 !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button {
+.st-key-ccnav_hub > [data-testid="stVerticalBlock"] button {
     background: transparent !important; border: none !important;
     border-bottom: 2px solid transparent !important;
     color: var(--muted) !important; font-size: 13px !important;
@@ -1940,22 +1946,18 @@ st.markdown("""
     align-items: center !important; justify-content: center !important;
     transition: color 160ms ease-out, border-color 160ms ease-out !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button p,
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button span {
+.st-key-ccnav_hub > [data-testid="stVerticalBlock"] button p,
+.st-key-ccnav_hub > [data-testid="stVerticalBlock"] button span {
     color: inherit !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stBaseButton-primary"],
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-primary"] {
-    color: var(--emerald) !important; border-bottom-color: var(--emerald) !important;
+.st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="stBaseButton-primary"],
+.st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="baseButton-primary"] {
+    color: __HUB_ACCENT__ !important; border-bottom-color: __HUB_ACCENT__ !important;
     font-weight: 600 !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor.bh) [data-testid="stBaseButton-primary"],
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor.bh) [data-testid="baseButton-primary"] {
-    color: var(--gold) !important; border-bottom-color: var(--gold) !important;
-}
 @media (hover: hover) {
-    [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stBaseButton-secondary"]:hover,
-    [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="baseButton-secondary"]:hover {
+    .st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="stBaseButton-secondary"]:hover,
+    .st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="baseButton-secondary"]:hover {
         color: var(--text) !important;
     }
 }
@@ -2348,13 +2350,14 @@ div[data-testid="stHorizontalBlock"]:has(.lb-controls-marker) label {
 .st-key-land_bh::after { content: "🔒"; font-size: 16px; margin-top: 16px; line-height: 1; }
 
 </style>
-""".replace("__ICON_CSS__", _nav_icon_css), unsafe_allow_html=True)
+""".replace("__ICON_CSS__", _nav_icon_css)
+   .replace("__HUB_ACCENT__", _hub_accent), unsafe_allow_html=True)
 
 # ── Hub toggle row + page strip row ─────────────────────────────
 def _render_hub_tabs():
-    with st.container():
-        _anchor_cls = "nav-hub-anchor bh" if _hub == "betting" else "nav-hub-anchor"
-        st.markdown(f'<div class="{_anchor_cls}"></div>', unsafe_allow_html=True)
+    # key=ccnav_hub puts .st-key-ccnav_hub on the container's layout wrapper; the
+    # nav CSS keys off that instead of a hidden .nav-hub-anchor marker + :has().
+    with st.container(key="ccnav_hub"):
         _hc1, _hc2 = st.columns(2)
         with _hc1:
             if st.button("Brownlow", key="pill_brownlow",
