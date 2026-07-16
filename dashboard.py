@@ -1661,7 +1661,11 @@ def _fetch_espn_live():
     """Render ESPN's predictor page and parse it via the same logic as
     scraper_espn.py. ESPN has no JSON feed (votes live in the article body and
     the page sits behind a bot challenge), so a headless browser is required.
-    Returns DataFrame[Player, Total_Votes, Rank] or empty on failure."""
+    Returns DataFrame[Player, Total_Votes, Rank] or empty on failure.
+
+    NOT for the render path — _pw_get_html alone sits on ~16s of hardcoded waits
+    before the browser has even answered. Reached only via
+    _refresh_espn_live_to_csv(), behind an explicit button."""
     import scraper_espn
     html = scraper_espn._pw_get_html(
         scraper_espn._ESPN_URL,
@@ -1682,25 +1686,49 @@ def _fetch_espn_live():
     df['Rank'] = df.index + 1
     return df[['Player', 'Total_Votes', 'Rank']]
 
-@st.cache_data(ttl=900, show_spinner=False)
-def fetch_espn_brownlow():
-    """Live ESPN Brownlow predictions, rendered the same way as scraper_espn.py.
-    Unlike Betfair, ESPN exposes no JSON feed, so this needs a headless browser;
-    where one isn't available (e.g. some hosts) it falls back to the last cached
-    scrape (espn_predictions.csv) with a visible notice rather than silently
-    serving stale numbers."""
-    def _csv_to_internal(fb):
-        return fb.rename(columns={'Total_Votes': 'ESPN_Votes', 'Rank': 'ESPN_Rank'}, errors='ignore')
+def _refresh_espn_live_to_csv():
+    """Render ESPN with a headless browser and write the result to _ESPN_CSV.
+
+    The slow path, made opt-in. It used to run inside fetch_espn_brownlow on
+    the render path, so whichever visitor happened to arrive after the 15-minute
+    cache expiry paid a full Chromium launch — ~20-30s, most of it hardcoded
+    waits — before Model Comparison drew anything. Now nothing renders this; a
+    signed-in user presses a button.
+
+    _save_with_backup keeps the *_prev.csv that _rank_change_html reads, so the
+    ▲/▼ deltas still measure against the previous refresh.
+    Returns (ok, message)."""
     try:
         live = _fetch_espn_live()
-        if not live.empty:
-            return _csv_to_internal(live), None
-    except Exception:
-        pass
+    except Exception as exc:
+        return False, f"ESPN refresh failed: {exc}"
+    if live.empty:
+        return False, "ESPN refresh got nothing back — the render or the parse failed."
+    _save_with_backup(live, _ESPN_CSV)
+    return True, f"ESPN refreshed — {len(live)} players."
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def fetch_espn_brownlow():
+    """ESPN Brownlow predictions, read from espn_predictions.csv.
+
+    ESPN is the only model here with no feed to poll — the votes sit in an
+    article body behind a bot challenge — so its numbers are always a stored
+    render, refreshed by scraper_espn.py or the Model Comparison button
+    (_refresh_espn_live_to_csv). Reading the file is all this does; nothing on
+    a render path launches a browser.
+
+    Because the column can therefore be arbitrarily old, the page shows the
+    file's mtime as an 'as of' stamp — the honest version of the "visible
+    notice" the old docstring promised but never wired up (its error return was
+    assigned and dropped).
+
+    ttl matches the other file-derived loaders; the button clears it explicitly."""
     fb = _load_csv_fallback(_ESPN_CSV, 'Rank')
     if fb.empty:
-        return pd.DataFrame(), "No data — ESPN render failed and no cache"
-    return _csv_to_internal(fb), "Live fetch failed — showing last cached data"
+        return pd.DataFrame(), "No ESPN data yet — refresh it, or run scraper_espn.py"
+    return fb.rename(columns={'Total_Votes': 'ESPN_Votes', 'Rank': 'ESPN_Rank'},
+                     errors='ignore'), None
 
 
 _TABLE_STYLES = [
@@ -5943,6 +5971,38 @@ if _page == 'Model Comparison':
             '</div>',
             unsafe_allow_html=True,
         )
+
+        # ── 4b. ESPN source freshness + opt-in refresh ──
+        # Four of these five models are read live or from the weekly run. ESPN
+        # is a stored browser render, so it is the one column that can be
+        # silently old — hence the stamp, which every visitor sees. The refresh
+        # itself is ~20-30s of headless Chromium and is signed-in only: an
+        # anonymous visitor must never be able to spawn a browser on the server.
+        if _mc_espn_msg := st.session_state.pop("mc_espn_msg", None):
+            st.success(_mc_espn_msg)
+        _espn_ts = _file_ts(_ESPN_CSV)
+        _espn_cap = (
+            '<div style="font-size:11px;color:#7e8c99;margin:2px 0 10px">'
+            f'ESPN column · {"as of " + _espn_ts if _espn_ts else "never fetched"}'
+            ' — a stored render, not a live pull (ESPN publishes no feed).</div>'
+        )
+        if st.session_state.get("bh_authed"):
+            _es1, _es2 = st.columns([4, 1])
+            _es1.markdown(_espn_cap, unsafe_allow_html=True)
+            if _es2.button("Refresh ESPN", key="mc_espn_refresh",
+                           help="Renders espn.com in a headless browser. Takes ~30s."):
+                with st.spinner("Rendering ESPN — this takes ~30s…"):
+                    _espn_ok, _espn_msg = _refresh_espn_live_to_csv()
+                if _espn_ok:
+                    # The frame above was already built from the old csv, so the
+                    # rerun is what actually redraws the table.
+                    fetch_espn_brownlow.clear()
+                    st.session_state["mc_espn_msg"] = _espn_msg
+                    st.rerun()
+                else:
+                    st.error(_espn_msg)
+        else:
+            st.markdown(_espn_cap, unsafe_allow_html=True)
 
         # ── 5. Consensus ranking table (replaces table + heatmap + scatter) ──
         st.markdown(
