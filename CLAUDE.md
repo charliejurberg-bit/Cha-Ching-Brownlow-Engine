@@ -100,8 +100,31 @@ brownlow_engine/
 
 Navigation is a **two-row tab bar**, and both rows are `st.button`s laid out in
 `st.columns` — *not* `st.selectbox`, `st.sidebar`, or `st.tabs`. They only look
-like tabs because of the CSS hung off the `.nav-hub-anchor` / `.nav-page-anchor`
-marker divs. Grep for those anchors when changing nav styling.
+like tabs because of CSS. Each row's columns live in a **keyed container** —
+`_render_hub_tabs()` → `st.container(key="ccnav_hub")`, `_render_page_nav()` →
+`st.container(key="ccnav_page")`. Streamlit stamps `.st-key-ccnav_hub` /
+`.st-key-ccnav_page` **on that container's own `stVerticalBlock`** (same element
+as `data-testid="stVerticalBlock"`, not a parent wrapper), and the nav CSS (one
+big `st.markdown` in `dashboard.py`) selects off those classes. Grep
+`st-key-ccnav_` when changing nav styling. (The old `.nav-hub-anchor` /
+`.nav-page-anchor` marker divs and their `:has()` selectors are gone.)
+
+**Two traps here each cost a deploy — read before touching nav CSS:**
+1. A plain `st.container(key=…)` puts the key class on the `stVerticalBlock`
+   itself, so rules read `.st-key-ccnav_page <descendant>`, **never**
+   `.st-key-ccnav_page > [data-testid="stVerticalBlock"]`. (A keyed *widget* like
+   `st.button(key=…)` instead puts `.st-key-<key>` on its `stElementContainer` —
+   that's how the page icons attach.)
+2. Every nav selector is prefixed `.stApp` **for specificity, not scoping**. The
+   old marker `:has()` selectors scored ~(0,3,1); a flat `.st-key-` rewrite is
+   (0,1,1) and *loses* to `betting_hub.py` / `theme.py` button resets that
+   re-inject **after** the nav CSS on `betting_hub.render_page()` pages — so the
+   nav breaks on BH pages but not on inline ones (Predictions). `.stApp` lifts
+   each rule a class. The active-pill rule goes further still —
+   `.stApp .st-key-ccnav_* [data-testid="stButton"] button[kind="primary"]`
+   (0,4,1) — to beat `render_bh_dashboard()`'s global (0,2,2)/(0,3,2) emerald
+   fill. **Any new nav rule must out-specify those resets; verify on a Betting
+   Hub page, not just an inline one.**
 
 | Row | Rendered by | Contents |
 |---|---|---|
@@ -124,8 +147,12 @@ Behaviour worth knowing before touching nav:
 - **Switching hub reassigns `page`** if the current page belongs to the other hub
   (→ `Leaderboard` / `Performance`), so the strip is never showing a page the hub
   doesn't own.
-- **Page icons** come from `_PAGE_ICONS` (Tabler webfont) — a `.ti-*` marker div per
-  button, drawn via CSS `::before`. A new page with no entry there renders iconless.
+- **Page icons** come from `_PAGE_ICONS` × `_TI_GLYPHS` (Tabler webfont). Each nav
+  button is keyed `nav_<Page>`, so its container carries `.st-key-nav_<Page>`, and
+  the icon is a CSS `::before` on that (generated into `_nav_icon_css`) — no marker
+  div. A page missing from `_TI_GLYPHS` renders iconless. Codepoints are verified
+  against the pinned Tabler version (`_TABLER_HREF`, 2.47.0 — note `@latest`
+  silently serves 2.47.0 because 3.x moved the file to `/dist/`).
 
 Betting Hub pages render via `betting_hub.render_page(page_name)` (module imported at
 top of `dashboard.py`) — **except `Predictions`, which `dashboard.py` renders itself**.
