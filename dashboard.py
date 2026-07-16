@@ -1893,21 +1893,17 @@ else:
 # rules find these injections via `stMarkdownContainer > style:only-child`.
 st.markdown("""
 <style>
-/* ── Collapse flex gaps above/between nav rows ─────────────────
-   The .cc-banner CSS hides the zero-height injection containers that
-   used to add 32px of stacked flex gap above this row, so the hub row
-   now sits flush against the banner with no negative pull. */
-.st-key-ccnav_hub {
-    margin-top: 0 !important;
-}
+/* ── Collapse flex gaps above/between nav rows ───────────────── */
 [data-testid="stLayoutWrapper"]:has(.nav-page-anchor) {
     margin-top: -16px !important;
 }
 
-/* ── Hub row container — keyed via st.container(key="ccnav_hub"). The key
-   lands on the container's stLayoutWrapper; its stVerticalBlock is the
-   immediate child. No marker div, no :has(). ──────────────────── */
-.st-key-ccnav_hub > [data-testid="stVerticalBlock"] {
+/* ── Hub row container — keyed via st.container(key="ccnav_hub"). For a plain
+   keyed container Streamlit stamps the key class straight onto the stVerticalBlock
+   element (data-testid AND st-key- on the same node), NOT a parent wrapper — so
+   .st-key-ccnav_hub IS the block; its children are selected as descendants.
+   margin-top:0 keeps the row flush under the banner. No marker div, no :has(). */
+.st-key-ccnav_hub {
     background: var(--bg) !important;
     position: relative !important;
     left: 50% !important;
@@ -1922,20 +1918,20 @@ st.markdown("""
     margin-bottom: 0 !important;
     gap: 0 !important;
 }
-.st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="stHorizontalBlock"] {
+.st-key-ccnav_hub [data-testid="stHorizontalBlock"] {
     display: grid !important; grid-template-columns: 1fr 1fr !important;
     gap: 0 !important; padding: 0 !important; align-items: stretch !important;
 }
-.st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="stColumn"] {
+.st-key-ccnav_hub [data-testid="stColumn"] {
     width: 100% !important; min-width: 0 !important; padding: 0 !important;
     display: flex !important; flex-direction: column !important;
 }
-.st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="stColumn"] > div,
-.st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="stElementContainer"],
-.st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="stButton"] {
+.st-key-ccnav_hub [data-testid="stColumn"] > div,
+.st-key-ccnav_hub [data-testid="stElementContainer"],
+.st-key-ccnav_hub [data-testid="stButton"] {
     width: 100% !important; flex: 1 !important;
 }
-.st-key-ccnav_hub > [data-testid="stVerticalBlock"] button {
+.st-key-ccnav_hub button {
     background: transparent !important; border: none !important;
     border-bottom: 2px solid transparent !important;
     color: var(--muted) !important; font-size: 13px !important;
@@ -1946,18 +1942,18 @@ st.markdown("""
     align-items: center !important; justify-content: center !important;
     transition: color 160ms ease-out, border-color 160ms ease-out !important;
 }
-.st-key-ccnav_hub > [data-testid="stVerticalBlock"] button p,
-.st-key-ccnav_hub > [data-testid="stVerticalBlock"] button span {
+.st-key-ccnav_hub button p,
+.st-key-ccnav_hub button span {
     color: inherit !important;
 }
-.st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="stBaseButton-primary"],
-.st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="baseButton-primary"] {
+.st-key-ccnav_hub [data-testid="stBaseButton-primary"],
+.st-key-ccnav_hub [data-testid="baseButton-primary"] {
     color: __HUB_ACCENT__ !important; border-bottom-color: __HUB_ACCENT__ !important;
     font-weight: 600 !important;
 }
 @media (hover: hover) {
-    .st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="stBaseButton-secondary"]:hover,
-    .st-key-ccnav_hub > [data-testid="stVerticalBlock"] [data-testid="baseButton-secondary"]:hover {
+    .st-key-ccnav_hub [data-testid="stBaseButton-secondary"]:hover,
+    .st-key-ccnav_hub [data-testid="baseButton-secondary"]:hover {
         color: var(--text) !important;
     }
 }
