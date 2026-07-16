@@ -1953,9 +1953,18 @@ st.markdown("""
 .stApp .st-key-ccnav_hub button span {
     color: inherit !important;
 }
-.stApp .st-key-ccnav_hub [data-testid="stBaseButton-primary"],
-.stApp .st-key-ccnav_hub [data-testid="baseButton-primary"] {
-    color: __HUB_ACCENT__ !important; border-bottom-color: __HUB_ACCENT__ !important;
+/* Active hub pill. This rule OWNS the whole box (bg / border / radius), not just
+   the accent — betting_hub's render_bh_dashboard() injects a global
+   `div[data-testid="stButton"] button[kind="primary"]` emerald-fill rule at
+   (0,2,2), plus a :hover at (0,3,2), during the Performance render. Targeting
+   `[data-testid="stButton"] button[kind="primary"]` (the exact element it hits)
+   scores (0,4,1) so we beat both, resting and hover, and the pill stays a tab. */
+.stApp .st-key-ccnav_hub [data-testid="stButton"] button[kind="primary"] {
+    background: transparent !important;
+    color: __HUB_ACCENT__ !important;
+    border: none !important;
+    border-bottom: 2px solid __HUB_ACCENT__ !important;
+    border-radius: 0 !important;
     font-weight: 600 !important;
 }
 @media (hover: hover) {
@@ -2040,11 +2049,17 @@ st.markdown("""
    nav button's own st-key- class. No marker divs, no :has(). */
 __ICON_CSS__
 
-/* Active tab: underline is the active-hub accent (emerald / gold), folded from
-   the old .nav-page-anchor.bh override into __PAGE_ACCENT__. */
-.stApp .st-key-ccnav_page [data-testid="stBaseButton-primary"],
-.stApp .st-key-ccnav_page [data-testid="baseButton-primary"] {
-    color: var(--text) !important; border-bottom-color: __PAGE_ACCENT__ !important;
+/* Active tab: accent underline (emerald / gold), folded from the old
+   .nav-page-anchor.bh override into __PAGE_ACCENT__. Owns the whole box at
+   (0,4,1) for the same reason as the hub pill above — betting_hub's Performance
+   render injects a (0,2,2)/(0,3,2) emerald-fill on every primary button, which
+   otherwise leaks onto the active tab here. */
+.stApp .st-key-ccnav_page [data-testid="stButton"] button[kind="primary"] {
+    background: transparent !important;
+    color: var(--text) !important;
+    border: none !important;
+    border-bottom: 2px solid __PAGE_ACCENT__ !important;
+    border-radius: 0 !important;
     font-weight: 600 !important;
 }
 @media (hover: hover) {
