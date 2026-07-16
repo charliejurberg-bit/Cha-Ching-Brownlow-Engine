@@ -999,7 +999,7 @@ def _fix_team_names(df: pd.DataFrame) -> pd.DataFrame:
             df[col] = df[col].replace(_TEAM_ALIASES)
     return df
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=86400)
 def _player_id_map():
     """(Player, Team, Season) -> fitzRoy player ID. fitzRoy's ID is the only
     authoritative identity: it separates two different people who share a name
@@ -1053,7 +1053,7 @@ def _disambiguate_players(df: pd.DataFrame) -> pd.DataFrame:
         df.loc[mask, 'Player_Name'] = df.loc[mask, '_base_name'] + ' (' + suffix.astype(str) + ')'
     return df.drop(columns=['_pid'])
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=3600)
 def load_season(season):
     path = f"{PRED_DIR}/season_{season}.csv"
     if not os.path.exists(path):
@@ -1079,7 +1079,7 @@ def load_season(season):
     out = pd.concat([keep, rebuilt], ignore_index=True)
     return out.sort_values('Exp_Total_Votes', ascending=False).reset_index(drop=True)
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=3600)
 def load_game(season):
     path = f"{PRED_DIR}/game_level_{season}.csv"
     if not os.path.exists(path):
@@ -1299,11 +1299,15 @@ def form_guide_dots(season, n_rounds=3):
         result[player] = ''.join(dots)
     return result
 
-@st.cache_data(ttl=55, show_spinner=False)
+# count night: temporarily drop to ~60 and match the sleep.
+@st.cache_data(ttl=300, show_spinner="Fetching live votes…")
 def fetch_live_brownlow_data():
     """Fetch Brownlow vote data from AFL public API. Returns a result dict."""
     import requests as _req
     BASE = "https://aflapi.afl.com.au/afl/v2"
+    # (connect, read) split — a dead host fails in 5s instead of hanging 10s
+    # on each of the up-to-7 sequential calls below.
+    TMO = (5, 10)
     HDRS = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
         "Accept": "application/json",
@@ -1313,7 +1317,7 @@ def fetch_live_brownlow_data():
               "season_name": "", "is_live": False, "error": None}
     try:
         # Resolve current AFLM season id
-        cr = _req.get(f"{BASE}/competitions/1/compseasons?pageSize=5", headers=HDRS, timeout=10)
+        cr = _req.get(f"{BASE}/competitions/1/compseasons?pageSize=5", headers=HDRS, timeout=TMO)
         cr.raise_for_status()
         seasons = [s for s in cr.json().get("compSeasons", []) if "Premiership" in s.get("name", "")]
         if not seasons:
@@ -1322,7 +1326,7 @@ def fetch_live_brownlow_data():
         season_id, season_name = season["id"], season["name"]
 
         # Team id → name lookup
-        tr = _req.get(f"{BASE}/teams?compSeasonId={season_id}&pageSize=100", headers=HDRS, timeout=10)
+        tr = _req.get(f"{BASE}/teams?compSeasonId={season_id}&pageSize=100", headers=HDRS, timeout=TMO)
         team_map = {}
         if tr.status_code == 200:
             for t in tr.json().get("teams", []):
@@ -1333,7 +1337,7 @@ def fetch_live_brownlow_data():
         for page in range(5):
             pr = _req.get(
                 f"{BASE}/compseasons/{season_id}/award/brownlow?page={page}&pageSize=100",
-                headers=HDRS, timeout=10,
+                headers=HDRS, timeout=TMO,
             )
             if pr.status_code != 200:
                 break
@@ -5541,7 +5545,7 @@ if _page == 'Live Tracker':
         # filter state to remember.
         _lt_c1, _lt_c2 = st.columns([1, 3])
         with _lt_c1:
-            _lt_auto = st.checkbox("Auto-refresh 60s", value=False,
+            _lt_auto = st.checkbox("Auto-refresh 5 min", value=False,
                                    key="lt_auto_refresh")
         with _lt_c2:
             if _cc_user and _cc_watch_nn:
@@ -5550,8 +5554,10 @@ if _page == 'Live Tracker':
                 st.toggle("My watchlist only", key="cc_user_only")
 
     # ── auto-refresh ─────────────────────────────────────────
+    # Matches the fetch_live_brownlow_data ttl, so each refresh lands on an
+    # expired cache and actually pulls new votes. Move both together.
     if _lt_auto:
-        _time.sleep(60)
+        _time.sleep(300)
         st.rerun()
 
 # ════════════════════════════════════════════════════════════
