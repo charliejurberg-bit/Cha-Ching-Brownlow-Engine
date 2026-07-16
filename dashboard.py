@@ -1820,6 +1820,55 @@ _PAGE_ICONS = {
     "Polls a Vote":     "ti-tags",
 }
 
+# The other half of _PAGE_ICONS: that says which icon a page wears, this says
+# which glyph the icon is. Codepoints verified against the pinned stylesheet —
+# see _TABLER_HREF, and re-verify here if that pin ever moves. Written with a
+# doubled backslash so the string carries a real one; \e is not a Python escape
+# but \f is, and going through this dict makes the two consistent.
+_TI_GLYPHS = {
+    "ti-home":                   "\\eac1",
+    "ti-award":                  "\\ea2c",
+    "ti-user":                   "\\eb4d",
+    "ti-adjustments-horizontal": "\\ec38",
+    "ti-chart-dots":             "\\ee2f",
+    "ti-chart-bar":              "\\ea59",
+    "ti-live-photo":             "\\eadf",
+    "ti-layout-dashboard":       "\\f02c",
+    "ti-list-check":             "\\eb6a",
+    "ti-bulb":                   "\\ea51",
+    "ti-trending-up":            "\\eb43",
+    "ti-tags":                   "\\ef86",
+}
+
+
+def _st_key_class(key):
+    """The css class Streamlit puts on a keyed element, for `key`.
+
+    Mirrors the frontend's own sanitiser exactly — `st-key-` + the key trimmed
+    with every character outside [a-zA-Z0-9_-] replaced by '-'. So the nav
+    button keyed "nav_Player Profile" carries .st-key-nav_Player-Profile, and
+    "nav_Trends & Analysis" carries .st-key-nav_Trends---Analysis.
+    """
+    return "st-key-" + re.sub(r"[^a-zA-Z0-9_-]", "-", str(key).strip())
+
+
+# Page-strip icons. Each nav button is already keyed nav_<Page>, so Streamlit
+# has ALREADY put a unique class on its container — the icon does not need a
+# marker div, and the rules do not need :has() to find the column. This replaces
+# 19 marker-keyed :has() rules (two :has() apiece) with plain class matches.
+# Pages absent from _TI_GLYPHS simply get no rule and render iconless, which is
+# the documented behaviour for a page with no _PAGE_ICONS entry.
+_nav_icon_pairs = [(_p, _TI_GLYPHS[_i]) for _p, _i in _PAGE_ICONS.items()
+                   if _i in _TI_GLYPHS]
+_nav_icon_css = (
+    ",".join(f'.{_st_key_class("nav_" + _p)} button::before'
+             for _p, _ in _nav_icon_pairs)
+    + "{font-family:tabler-icons,sans-serif !important;margin-right:4px;"
+      "display:inline-block !important;}"
+    + "".join(f'.{_st_key_class("nav_" + _p)} button::before{{content:"{_g}";}}'
+              for _p, _g in _nav_icon_pairs)
+)
+
 if _hub == "brownlow":
     _snav_pages = [
         "Leaderboard", "Player Profile",
@@ -1830,8 +1879,11 @@ else:
     _snav_pages = ["Performance", "Predictions", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis", "Polls a Vote"]
 
 # ── Nav CSS (injected once before containers) ─────────────────
-# The tabler-icons webfont this block's .ti-* rules depend on is loaded as a
-# pinned <link> in inject_global_css — see _TABLER_HREF.
+# The tabler-icons webfont the icon rules depend on is loaded as a pinned <link>
+# in inject_global_css — see _TABLER_HREF. __ICON_CSS__ is substituted rather
+# than injected as a second st.markdown on purpose: this block must stay a
+# single <style> in a single element container, because the landing/banner gap
+# rules find these injections via `stMarkdownContainer > style:only-child`.
 st.markdown("""
 <style>
 /* ── Collapse flex gaps above/between nav rows ─────────────────
@@ -1877,8 +1929,6 @@ st.markdown("""
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) [data-testid="stButton"] {
     width: 100% !important; flex: 1 !important;
 }
-/* Hide icon marker divs (used for ::before icon injection) */
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"] div.ti { display: none !important; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-hub-anchor) button {
     background: transparent !important; border: none !important;
     border-bottom: 2px solid transparent !important;
@@ -1978,29 +2028,9 @@ st.markdown("""
         flex: 0 0 auto !important; min-width: max-content !important;
     }
 }
-/* Page strip icons via ::before — keyed by hidden .ti marker div */
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti) button::before {
-    font-family: tabler-icons, sans-serif !important;
-    margin-right: 4px; display: inline-block !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-home) button::before                   { content: "\eac1"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-medal) button::before               { content: "\ed79"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-user) button::before                   { content: "\eb4d"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-users) button::before                  { content: "\ebf2"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-adjustments-horizontal) button::before { content: "\ec38"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-award) button::before                  { content: "\ea2c"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-trophy) button::before              { content: "\edd9"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-user-pentagon) button::before       { content: "\\fc4f"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-chart-bar) button::before               { content: "\ea59"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-chart-dots) button::before              { content: "\ee2f"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-brain) button::before                  { content: "\\f59f"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-live-photo) button::before              { content: "\eadf"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-currency-dollar) button::before        { content: "\eb84"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-layout-dashboard) button::before       { content: "\\f02c"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-list-check) button::before             { content: "\eb6a"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-bulb) button::before                   { content: "\ea51"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-trending-up) button::before            { content: "\eb43"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-tags) button::before                  { font-family: tabler-icons, sans-serif !important; content: "\ef86"; }
+/* Page strip icons — generated from _PAGE_ICONS x _TI_GLYPHS, keyed off each
+   nav button's own st-key- class. No marker divs, no :has(). */
+__ICON_CSS__
 
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stBaseButton-primary"],
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-primary"] {
@@ -2318,7 +2348,7 @@ div[data-testid="stHorizontalBlock"]:has(.lb-controls-marker) label {
 .st-key-land_bh::after { content: "🔒"; font-size: 16px; margin-top: 16px; line-height: 1; }
 
 </style>
-""", unsafe_allow_html=True)
+""".replace("__ICON_CSS__", _nav_icon_css), unsafe_allow_html=True)
 
 # ── Hub toggle row + page strip row ─────────────────────────────
 def _render_hub_tabs():
@@ -2348,9 +2378,8 @@ def _render_page_nav():
         _pcols = st.columns(len(_snav_pages), gap="small")
         for _pc, _sp in zip(_pcols, _snav_pages):
             with _pc:
-                _icon_cls = _PAGE_ICONS.get(_sp, '')
-                if _icon_cls:
-                    st.markdown(f'<div class="ti {_icon_cls}"></div>', unsafe_allow_html=True)
+                # No icon marker div: the button's own key already puts a unique
+                # st-key- class on its container, which _nav_icon_css keys off.
                 if st.button(_sp, key=f"nav_{_sp}",
                              type="primary" if _page == _sp else "secondary"):
                     st.session_state.page = _sp
