@@ -1580,24 +1580,48 @@ def _fetch_betfair_api(timeout=20):
     df['Rank'] = df.index + 1
     return df[['Player', 'Team', 'Total_Votes', 'Rank']]
 
-@st.cache_data(ttl=600, show_spinner=False)
-def fetch_betfair_brownlow():
-    """Live Betfair Brownlow predictions from Betfair's own JSON data API
-    (the feed behind their on-site widget). Falls back to the last cached
-    scrape (data_2026/betfair_predictions.csv, maintained by scraper_betfair.py)
-    only if the API is unreachable, so the page is never silently stale."""
-    def _csv_to_internal(fb):
-        return fb.rename(columns={'Total_Votes': 'BF_Votes', 'Rank': 'BF_Rank'}, errors='ignore')
+def _refresh_betfair_live_to_csv():
+    """Pull Betfair's live JSON feed and write it to _BF_CSV.
+
+    The slow path, made opt-in — mirrors _refresh_espn_live_to_csv. It used to
+    run inside fetch_betfair_brownlow on the render path; Betfair's API is a
+    Heroku-hosted widget backend whose dyno sleeps off-season and cold-wakes in
+    ~10s, so whichever visitor hit Model Comparison after the 10-minute cache
+    expiry ate that wake before the page drew. Now nothing renders this; a
+    signed-in user presses a button.
+
+    Validates the payload is non-empty and well-formed before writing, so a bad
+    fetch never overwrites a good CSV. _save_with_backup keeps the *_prev.csv
+    that _rank_change_html reads, so the ▲/▼ deltas survive.
+    Returns (ok, message)."""
     try:
         live = _fetch_betfair_api()
-        if not live.empty:
-            return _csv_to_internal(live), None
-    except Exception:
-        pass
+    except Exception as exc:
+        return False, f"Betfair refresh failed: {exc}"
+    if live.empty or not {'Player', 'Total_Votes'} <= set(live.columns):
+        return False, "Betfair refresh got nothing usable back — leaving the CSV as-is."
+    _save_with_backup(live, _BF_CSV)
+    return True, f"Betfair refreshed — {len(live)} players."
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def fetch_betfair_brownlow():
+    """Betfair Brownlow predictions, read from betfair_predictions.csv.
+
+    Betfair's numbers come from a Heroku-hosted widget API whose dyno sleeps
+    off-season and cold-wakes in ~10s. That live pull is now off the render path
+    (see _refresh_betfair_live_to_csv); this only reads the stored CSV, refreshed
+    by scraper_betfair.py (Run Update) or the Model Comparison button. Nothing on
+    a render path opens a socket.
+
+    Like ESPN, the column can be arbitrarily old, so the page shows the file's
+    mtime as an 'as of' stamp. ttl matches the other file-derived loaders; the
+    button clears it explicitly."""
     fb = _load_csv_fallback(_BF_CSV, 'Rank')
     if fb.empty:
-        return pd.DataFrame(), "No data — Betfair API unreachable and no cache"
-    return _csv_to_internal(fb), "Live fetch failed — showing last cached data"
+        return pd.DataFrame(), "No Betfair data yet — refresh it, or run scraper_betfair.py"
+    return fb.rename(columns={'Total_Votes': 'BF_Votes', 'Rank': 'BF_Rank'},
+                     errors='ignore'), None
 
 
 def _fetch_espn_live():
@@ -5736,8 +5760,9 @@ if _page == 'Model Comparison':
             _mc_afl_df['Player'] = _mc_afl_df['Player'].str.title().str.strip()
         _mc_afl_has_votes = not _mc_afl_df.empty and _mc_afl_df['AFL_Votes'].max() > 0
 
-        # 3. Betfair
-        _mc_bf_df, _mc_bf_err = fetch_betfair_brownlow()
+        # 3. Betfair — CSV-primary now (live pull is behind the refresh button
+        #    below); the second return is unused, so it's discarded.
+        _mc_bf_df, _ = fetch_betfair_brownlow()
         if not _mc_bf_df.empty and 'Player' in _mc_bf_df.columns:
             _mc_bf_df['Player'] = _mc_bf_df['Player'].str.title().str.strip()
 
@@ -6009,6 +6034,36 @@ if _page == 'Model Comparison':
                     st.error(_espn_msg)
         else:
             st.markdown(_espn_cap, unsafe_allow_html=True)
+
+        # ── 4c. Betfair source freshness + opt-in refresh ──
+        # Same treatment as ESPN: Betfair's widget API is a Heroku backend whose
+        # dyno sleeps off-season (~10s cold-wake), so it's a stored CSV read on
+        # render now, with the live pull behind this signed-in button.
+        if _mc_bf_msg := st.session_state.pop("mc_bf_msg", None):
+            st.success(_mc_bf_msg)
+        _bf_ts = _file_ts(_BF_CSV)
+        _bf_cap = (
+            '<div style="font-size:11px;color:#7e8c99;margin:2px 0 10px">'
+            f'Betfair column · {"as of " + _bf_ts if _bf_ts else "never fetched"}'
+            ' — a stored pull, not live (their API sleeps off-season).</div>'
+        )
+        if st.session_state.get("bh_authed"):
+            _bf1, _bf2 = st.columns([4, 1])
+            _bf1.markdown(_bf_cap, unsafe_allow_html=True)
+            if _bf2.button("Refresh Betfair", key="mc_bf_refresh",
+                           help="Pulls Betfair's live JSON feed. Takes ~10s if their API is cold."):
+                with st.spinner("Pulling Betfair — this can take ~10s…"):
+                    _bf_ok, _bf_msg = _refresh_betfair_live_to_csv()
+                if _bf_ok:
+                    # The frame above was built from the old csv, so the rerun is
+                    # what redraws the table.
+                    fetch_betfair_brownlow.clear()
+                    st.session_state["mc_bf_msg"] = _bf_msg
+                    st.rerun()
+                else:
+                    st.error(_bf_msg)
+        else:
+            st.markdown(_bf_cap, unsafe_allow_html=True)
 
         # ── 5. Consensus ranking table (replaces table + heatmap + scatter) ──
         st.markdown(
