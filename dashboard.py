@@ -2057,7 +2057,7 @@ st.markdown("""
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-list-check) button::before             { content: "\eb6a"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-bulb) button::before                   { content: "\ea51"; }
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-trending-up) button::before            { content: "\eb43"; }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-tags) button::before                  { font-family: tabler-icons, sans-serif !important; content: "\eff7"; }
+[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"]:has(.ti-tags) button::before                  { font-family: tabler-icons, sans-serif !important; content: "\ef86"; }
 
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stBaseButton-primary"],
 [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-primary"] {
