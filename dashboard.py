@@ -33,6 +33,22 @@ _FONTS_HREF = ("https://fonts.googleapis.com/css2?"
                "family=Archivo:wdth,wght@62.5..125,400..900&"
                "family=IBM+Plex+Mono:wght@400;500;600&display=swap")
 
+# Tabler icons webfont — backs the nav page-strip glyphs (.ti-* marker divs
+# drawn via CSS ::before). Shell-only: no iframe uses it.
+#
+# Pinned to 2.47.0 ON PURPOSE, and not because 2.x is current — it isn't (3.44.0
+# is). This replaces `@tabler/icons-webfont@latest/tabler-icons.min.css`, and
+# jsDelivr resolves a versionless path to the newest release that still ships
+# that file AT THE PACKAGE ROOT. 3.x moved it to /dist/, so @latest has silently
+# been serving 2.47.0 the whole time — the root path 404s on 3.44.0. 2.47.0 is
+# byte-identical to what shipped before this pin, and the nav's hardcoded
+# codepoints are calibrated against it.
+#
+# Bumping to 3.x is a separate, visual change: re-verify every codepoint in
+# _PAGE_ICONS against the new release before doing it.
+_TABLER_HREF = ("https://cdn.jsdelivr.net/npm/"
+                "@tabler/icons-webfont@2.47.0/tabler-icons.min.css")
+
 # For iframe heads. A stylesheet <link> still blocks the iframe's first paint —
 # it is not async — but the preload scanner finds it immediately, where an
 # @import is only discovered once the surrounding <style> has been parsed. The
@@ -48,7 +64,12 @@ def inject_global_css():
 iframe[title="streamlit_app"] { margin-top: -60px !important; }
 </style>
 """, unsafe_allow_html=True)
-    st.markdown(f'<link href="{_FONTS_HREF}" rel="stylesheet">', unsafe_allow_html=True)
+    # Both as <link>, up here in the shell head rather than an @import buried in
+    # a later <style>: the preload scanner finds a link immediately, where an
+    # @import is only discovered once the enclosing stylesheet has been parsed.
+    st.markdown(f'<link href="{_FONTS_HREF}" rel="stylesheet">'
+                f'<link href="{_TABLER_HREF}" rel="stylesheet">',
+                unsafe_allow_html=True)
     st.markdown("""
 <style>
 html, body, [data-testid="stAppViewContainer"] {
@@ -1838,9 +1859,10 @@ else:
     _snav_pages = ["Performance", "Predictions", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis", "Polls a Vote"]
 
 # ── Nav CSS (injected once before containers) ─────────────────
+# The tabler-icons webfont this block's .ti-* rules depend on is loaded as a
+# pinned <link> in inject_global_css — see _TABLER_HREF.
 st.markdown("""
 <style>
-@import url('https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css');
 /* ── Collapse flex gaps above/between nav rows ─────────────────
    The .cc-banner CSS hides the zero-height injection containers that
    used to add 32px of stacked flex gap above this row, so the hub row
