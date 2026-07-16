@@ -2090,7 +2090,6 @@ __ICON_CSS__
 .stApp:has(.landing-top-anchor) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > style:only-child),
 .stApp:has(.landing-top-anchor) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > link:only-child),
 .stApp:has(.landing-top-anchor) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > div.landing-top-anchor:only-child),
-.stApp:has(.landing-top-anchor) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > div.cc-ticker-marker:only-child),
 .stApp:has(.landing-top-anchor) div[data-testid="stElementContainer"]:has(> iframe[srcdoc*="_ccAnimated"]) {
     display: none !important;
 }
@@ -2102,8 +2101,12 @@ __ICON_CSS__
 .stApp:has(.landing-top-anchor) div[data-testid="stMainBlockContainer"] {
     padding-top: 0 !important;
 }
-.cc-ticker-marker { display: none; }
-div[data-testid="stVerticalBlock"]:has(.cc-ticker-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-ticker-marker)) {
+/* Ticker bar — keyed via st.container(key="cc_ticker"); .st-key-cc_ticker is the
+   block. .stApp prefix is a specificity bump (see the nav block): the old
+   marker :has():not(:has()) idiom scored ~(0,4,2) and outranked the global
+   `[data-testid="stVerticalBlock"]{overflow-x:visible}` and similar; a bare
+   .st-key- would drop below them. */
+.stApp .st-key-cc_ticker {
     width: 100vw !important;
     min-width: 100vw !important;
     max-width: 100vw !important;
@@ -2116,10 +2119,10 @@ div[data-testid="stVerticalBlock"]:has(.cc-ticker-marker):not(:has(div[data-test
     margin-top: 0 !important;
     margin-bottom: 0 !important;
 }
-div[data-testid="stVerticalBlock"]:has(.cc-ticker-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-ticker-marker)) [data-testid="stElementContainer"] {
+.stApp .st-key-cc_ticker [data-testid="stElementContainer"] {
     margin: 0 !important;
 }
-div[data-testid="stVerticalBlock"]:has(.cc-ticker-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-ticker-marker)) iframe {
+.stApp .st-key-cc_ticker iframe {
     display: block !important;
     width: 100% !important;
 }
@@ -2129,8 +2132,14 @@ div[data-testid="stVerticalBlock"]:has(.cc-ticker-marker):not(:has(div[data-test
     0%, 100% { opacity: 1; }
     50%      { opacity: .35; }
 }
-.cc-card-marker { display: none; }
-div[data-testid="stVerticalBlock"]:has(.cc-card-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-card-marker)) {
+/* Destination cards — keyed via st.container(key="card_brownlow"/"card_betting")
+   (the keys already existed; the CSS just moved off the markers onto them).
+   .st-key-card_* IS each card's block. .stApp prefix is a specificity bump: the
+   old marker idiom scored ~(0,4,2) and had to outrank the global
+   `[data-testid="stVerticalBlock"]{overflow-x:visible}` (line ~447) for the
+   card's overflow:hidden to hold — a bare .st-key- (0,1,0) would lose that. */
+.stApp .st-key-card_brownlow,
+.stApp .st-key-card_betting {
     position: relative;
     background: linear-gradient(180deg, #101a24 0%, #0d141d 100%) !important;
     border: 1px solid rgba(140,165,185,.14) !important;
@@ -2146,27 +2155,29 @@ div[data-testid="stVerticalBlock"]:has(.cc-card-marker):not(:has(div[data-testid
                 box-shadow 220ms cubic-bezier(0.23,1,0.32,1);
 }
 @media (hover: hover) {
-    div[data-testid="stVerticalBlock"]:has(.cc-brownlow):not(:has(div[data-testid="stVerticalBlock"] .cc-brownlow)):hover {
+    .stApp .st-key-card_brownlow:hover {
         transform: translateY(-4px);
         border-color: rgba(52,211,153,.35) !important;
         box-shadow: 0 12px 32px rgba(52,211,153,.10);
     }
-    div[data-testid="stVerticalBlock"]:has(.cc-betting):not(:has(div[data-testid="stVerticalBlock"] .cc-betting)):hover {
+    .stApp .st-key-card_betting:hover {
         transform: translateY(-4px);
         border-color: rgba(240,180,41,.35) !important;
         box-shadow: 0 12px 32px rgba(240,180,41,.10);
     }
 }
-div[data-testid="stVerticalBlock"]:has(.cc-card-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-card-marker))::before {
+.stApp .st-key-card_brownlow::before,
+.stApp .st-key-card_betting::before {
     content: "";
     position: absolute;
     top: 0; left: 0; right: 0;
     height: 2px;
     z-index: 1;
 }
-div[data-testid="stVerticalBlock"]:has(.cc-brownlow):not(:has(div[data-testid="stVerticalBlock"] .cc-brownlow))::before { background: linear-gradient(90deg, transparent, #34d399, transparent); }
-div[data-testid="stVerticalBlock"]:has(.cc-betting):not(:has(div[data-testid="stVerticalBlock"] .cc-betting))::before { background: linear-gradient(90deg, transparent, #f0b429, transparent); }
-div[data-testid="stVerticalBlock"]:has(.cc-card-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-card-marker)) [data-testid="stElementContainer"]:first-child {
+.stApp .st-key-card_brownlow::before { background: linear-gradient(90deg, transparent, #34d399, transparent); }
+.stApp .st-key-card_betting::before { background: linear-gradient(90deg, transparent, #f0b429, transparent); }
+.stApp .st-key-card_brownlow [data-testid="stElementContainer"]:first-child,
+.stApp .st-key-card_betting [data-testid="stElementContainer"]:first-child {
     flex: 1 1 auto;
 }
 .dest-tag {
@@ -2636,8 +2647,9 @@ track.innerHTML += track.innerHTML;
 </script>
 </body></html>"""
     _ticker_html = _ticker_html.replace("__SEG__", _ticker_segment)
-    with st.container():
-        st.markdown('<div class="cc-ticker-marker">&#8203;</div>', unsafe_allow_html=True)
+    # key=cc_ticker → .st-key-cc_ticker on this container's stVerticalBlock; the
+    # ticker CSS keys off it instead of a hidden .cc-ticker-marker + :has().
+    with st.container(key="cc_ticker"):
         st.iframe(_ticker_html, height=40)
 
     # ── Hero ──
@@ -2791,7 +2803,6 @@ animate(document.getElementById('votes'), votesTarget, function(v){ return v.toF
     with _lc1:
         with st.container(key="card_brownlow"):
             st.markdown(f"""
-<div class="cc-card-marker cc-brownlow">&#8203;</div>
 <div class="dest-content">
   <span class="dest-tag bw">Prediction Engine</span>
   <h2>Brownlow Medal</h2>
@@ -2809,7 +2820,6 @@ animate(document.getElementById('votes'), votesTarget, function(v){ return v.toF
     with _lc2:
         with st.container(key="card_betting"):
             st.markdown(f"""
-<div class="cc-card-marker cc-betting">&#8203;</div>
 <div class="dest-content">
   <span class="dest-tag bh">Live Tracking</span>
   <h2>Betting Hub</h2>
