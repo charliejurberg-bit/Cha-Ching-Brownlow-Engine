@@ -20,13 +20,35 @@ from brownlow_medallists import get_medallists
 
 st.set_page_config(page_title="Cha Ching | AFL Brownlow Medal Predictor", page_icon="assets/favicon.png", layout="wide", initial_sidebar_state="collapsed")
 
+# Every document on the page — the app shell and each srcdoc iframe — must ask
+# for this EXACT url. An iframe is a separate document and cannot inherit the
+# shell's fonts, but it does share the HTTP cache, so an identical url is served
+# from cache while a divergent one silently costs a fresh CSS round-trip and its
+# own woff2 set. Keep the shell and the iframes on one constant so they can't
+# drift apart. Archivo is the variable font: it covers 400..900, so every static
+# weight the iframes ask for renders off the one file the shell already fetched.
+_FONTS_HREF = ("https://fonts.googleapis.com/css2?"
+               "family=DM+Mono:wght@400;500&"
+               "family=Sora:wght@400;500;600;700&"
+               "family=Archivo:wdth,wght@62.5..125,400..900&"
+               "family=IBM+Plex+Mono:wght@400;500;600&display=swap")
+
+# For iframe heads. A stylesheet <link> still blocks the iframe's first paint —
+# it is not async — but the preload scanner finds it immediately, where an
+# @import is only discovered once the surrounding <style> has been parsed. The
+# preconnects warm gstatic for an iframe whose head parses before the shell's
+# own font fetch has opened the connection.
+_FONTS_LINKS = ('<link rel="preconnect" href="https://fonts.googleapis.com">'
+                '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
+                f'<link rel="stylesheet" href="{_FONTS_HREF}">')
+
 def inject_global_css():
     st.markdown("""
 <style>
 iframe[title="streamlit_app"] { margin-top: -60px !important; }
 </style>
 """, unsafe_allow_html=True)
-    st.markdown('<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Sora:wght@400;500;600;700&family=Archivo:wdth,wght@62.5..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">', unsafe_allow_html=True)
+    st.markdown(f'<link href="{_FONTS_HREF}" rel="stylesheet">', unsafe_allow_html=True)
     st.markdown("""
 <style>
 html, body, [data-testid="stAppViewContainer"] {
@@ -4919,7 +4941,7 @@ if _page == 'Live Tracker':
     _pill_txt = "LIVE" if _lt_live else "OFF-SEASON"
     _pill_col = "#34d399" if _lt_live else "#7e8c99"
     _hdr_html = f"""<!doctype html><html><head><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@800&family=IBM+Plex+Mono:wght@600;800&display=swap" rel="stylesheet">
+{_FONTS_LINKS}
 <style>
   *{{margin:0;box-sizing:border-box}}
   body{{background:#0a1017;font-family:'Archivo',sans-serif;-webkit-font-smoothing:antialiased}}
@@ -5279,8 +5301,10 @@ if _page == 'Live Tracker':
 
         # ── CSS: mockup tokens + structure verbatim (standalone votes-feed
         #    rules dropped per the redesign; .mexp retained — used by .rrow). ──
+        # Fonts come from _FONTS_LINKS in the head, not an @import here — see
+        # the constant at the top of this file for why the url must match the
+        # shell's byte for byte.
         _LT_CSS = """<style>
-  @import url('https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
   :root{
     --bg:#0a1017; --surface:#101a24; --surface2:#0d141d;
     --hair:rgba(140,165,185,.13); --hair2:rgba(140,165,185,.22);
@@ -5479,7 +5503,7 @@ if _page == 'Live Tracker':
 
         _full_html = ('<!doctype html><html><head><meta charset="utf-8">'
                       '<meta name="viewport" content="width=device-width, initial-scale=1">'
-                      + _LT_CSS + _zones_css + '</head>' + _body + '</html>')
+                      + _FONTS_LINKS + _LT_CSS + _zones_css + '</head>' + _body + '</html>')
         st.iframe(_full_html, height=_LT_IFRAME_H)
 
         # ── Public account panel ────────────────────────────────────────────
