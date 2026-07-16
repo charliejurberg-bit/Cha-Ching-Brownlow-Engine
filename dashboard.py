@@ -4732,7 +4732,13 @@ def _assemble_live_tracker(lt, game_df, watchlist):
     Dicts are keyed by normalise_name(player) throughout. Returns:
       totals, prev_totals, round_votes, model_to_date, model_remaining,
       projection, delta, team, name, model_pollers (display_round -> {norm names}),
-      watch_next (next-round watchlist chips), recon (hit / blanked / bolter).
+      watch_next (next-round watchlist chips), recon (hit / blanked / bolter),
+      round_exp / round_pp (display_round -> {norm name -> value}),
+      game_name / game_team (norm name -> model-frame name / team).
+
+    round_exp, round_pp, game_name and game_team exist for the page rather than
+    for this function: the render used to rebuild them in a second walk of the
+    same game frame. They are produced here so the frame is touched once.
     """
     df = lt.get("df", pd.DataFrame())
     last_round = int(lt.get("last_round", 0) or 0)
@@ -4741,6 +4747,7 @@ def _assemble_live_tracker(lt, game_df, watchlist):
         "totals": {}, "prev_totals": {}, "round_votes": {},
         "model_to_date": {}, "model_remaining": {}, "projection": {}, "delta": {},
         "team": {}, "name": {}, "model_pollers": {},
+        "round_exp": {}, "round_pp": {}, "game_name": {}, "game_team": {},
         "watch_next": [], "recon": {"hit": [], "blanked": [], "bolter": []},
     }
     if df is None or df.empty:
@@ -4763,26 +4770,62 @@ def _assemble_live_tracker(lt, game_df, watchlist):
             and {"Exp_Votes", "Poll_Prob", "Round_num"} <= set(game_df.columns)):
         pcol = next((c for c in ("Player", "Player_Name") if c in game_df.columns), None)
         if pcol:
-            for _, r in game_df.iterrows():
-                try:
-                    dr = int(r["Round_num"]) - 1          # AFLTables -> display round
-                    ev = float(r["Exp_Votes"])
-                except (TypeError, ValueError):
-                    continue
-                if pd.isna(ev):
-                    continue
-                nn = normalise_name(r[pcol])
-                if dr <= last_round:                       # counted (incl. OR) -> pace
-                    asm["model_to_date"][nn] = asm["model_to_date"].get(nn, 0.0) + ev
-                elif dr <= 24:                             # future rounds -> remaining
-                    asm["model_remaining"][nn] = asm["model_remaining"].get(nn, 0.0) + ev
+            # One pass over the ~7k-row game frame feeds every dict below.
+            # normalise_name runs once per DISTINCT name (~600) through a lookup
+            # instead of once per row per consumer.
+            _raw = game_df[pcol]
+            _lut = {v: normalise_name(v) for v in _raw.dropna().unique()}
+            # A null name isn't in the lookup and maps to '' — which is what
+            # normalise_name(NaN) returns, so null-named rows keep colliding on
+            # the '' key exactly as they did row-by-row.
+            _nn = _raw.map(_lut).fillna('')
+            _rn = pd.to_numeric(game_df["Round_num"], errors="coerce")
+            _ev = pd.to_numeric(game_df["Exp_Votes"], errors="coerce")
+            _pp = pd.to_numeric(game_df["Poll_Prob"], errors="coerce")
+            # Drop the rows the old int()/float() raised on: a Round_num that
+            # won't convert (finals labels) or a non-numeric Exp_Votes. A genuine
+            # NaN Exp_Votes is NOT a raise, so those rows stay — they still
+            # register a name/team and a Poll_Prob, just no Exp_Votes.
+            _keep = _rn.notna() & ~(_ev.isna() & game_df["Exp_Votes"].notna())
+            _w = pd.DataFrame({"nn": _nn, "raw": _raw, "rn": _rn, "ev": _ev, "pp": _pp})
+            if "Team" in game_df.columns:
+                _w["team"] = game_df["Team"]
+            _w = _w[_keep].copy()
+            # trunc, not round: the old code went through int(), which truncates
+            _w["dr"] = np.trunc(_w["rn"]).astype("int64") - 1   # AFLTables -> display
+
+            _m = _w[_w["ev"].notna()]
+            _tod = _m[_m["dr"] <= last_round]                   # counted (incl. OR) -> pace
+            _rem = _m[(_m["dr"] > last_round) & (_m["dr"] <= 24)]   # future -> remaining
+            asm["model_to_date"] = _tod.groupby("nn")["ev"].sum().to_dict()
+            asm["model_remaining"] = _rem.groupby("nn")["ev"].sum().to_dict()
+
+            # display round -> {norm name -> value}. dict(zip(...)) keeps
+            # last-wins on a duplicate (round, player), matching the old
+            # row-by-row assignment; the key is only created for a non-empty
+            # group, matching the old setdefault.
+            for _d, _s in _m.groupby("dr"):
+                asm["round_exp"][int(_d)] = dict(zip(_s["nn"], _s["ev"]))
+            for _d, _s in _w[_w["pp"].notna()].groupby("dr"):
+                asm["round_pp"][int(_d)] = dict(zip(_s["nn"], _s["pp"]))
+
+            # first-wins on name/team, matching the old setdefault
+            _first = _w.drop_duplicates("nn")
+            asm["game_name"] = dict(zip(_first["nn"], _first["raw"]))
+            if "team" in _w.columns:
+                asm["game_team"] = dict(zip(_first["nn"], _first["team"]))
+
             # projected pollers = top-3 Poll_Prob within each game (the project's
-            # established per-game convention; matches the votes-feed marker set)
+            # established per-game convention; matches the votes-feed marker set).
+            # nlargest stays: its tie-break is first-occurrence, and a
+            # sort_values/head rewrite would not reproduce that on ties.
             gkeys = [c for c in ("Round_num", "Home.team", "Away.team") if c in game_df.columns]
             grpkeys = gkeys if len(gkeys) > 1 else ["Round_num"]
-            for gk, grp in game_df.groupby(grpkeys):
+            _psrc = game_df[grpkeys + ["Poll_Prob"]].copy()
+            _psrc["_nn"] = _nn
+            for gk, grp in _psrc.groupby(grpkeys):
                 rn = int(gk[0]) if isinstance(gk, tuple) else int(gk)
-                names = {normalise_name(n) for n in grp.nlargest(3, "Poll_Prob")[pcol]}
+                names = set(grp.nlargest(3, "Poll_Prob")["_nn"])
                 asm["model_pollers"].setdefault(rn - 1, set()).update(names)
 
     # ── projection + vs-model delta (apples-to-apples through last_round) ──────
@@ -4969,28 +5012,14 @@ if _page == 'Live Tracker':
         def _abbr(t):
             return _LT_ABBR.get(str(t), str(t)[:4].upper())
 
-        # per-round model signal keyed by AFL display round (= Round_num - 1)
-        _round_exp, _round_pp, _game_name, _game_team = {}, {}, {}, {}
-        if (_lt_game is not None and not getattr(_lt_game, "empty", True)
-                and {"Exp_Votes", "Round_num"} <= set(_lt_game.columns)):
-            _gp = next((c for c in ("Player", "Player_Name") if c in _lt_game.columns), None)
-            _has_pp = "Poll_Prob" in _lt_game.columns
-            _has_tm = "Team" in _lt_game.columns
-            if _gp:
-                for _, _g in _lt_game.iterrows():
-                    try:
-                        _dr = int(_g["Round_num"]) - 1
-                        _ev = float(_g["Exp_Votes"])
-                    except (TypeError, ValueError):
-                        continue
-                    _nn = normalise_name(_g[_gp])
-                    _game_name.setdefault(_nn, _g[_gp])
-                    if _has_tm:
-                        _game_team.setdefault(_nn, _g["Team"])
-                    if not pd.isna(_ev):
-                        _round_exp.setdefault(_dr, {})[_nn] = _ev
-                    if _has_pp and pd.notna(_g["Poll_Prob"]):
-                        _round_pp.setdefault(_dr, {})[_nn] = float(_g["Poll_Prob"])
+        # Per-round model signal keyed by AFL display round (= Round_num - 1).
+        # Built in _assemble_live_tracker off the same single pass that produces
+        # the pace/projection dicts — this page walked the 7k-row game frame a
+        # second time to rebuild exactly these four.
+        _round_exp = _asm["round_exp"]
+        _round_pp  = _asm["round_pp"]
+        _game_name = _asm["game_name"]
+        _game_team = _asm["game_team"]
 
         def _model_topn(dr):
             _d = _round_exp.get(dr, {})
