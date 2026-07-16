@@ -1814,10 +1814,10 @@ if predictions is None:
     st.error(f"No predictions for {selected_season}. Run brownlow_model.py first.")
     st.stop()
 
-# max_season_rounds: highest round number in data (used for slider upper bounds)
-# rounds_played: count of distinct rounds (correct display even if rounds start at 0 or skip)
+# max_season_rounds: highest round number in data (used for slider upper bounds).
+# Every page reads this (the banner, Landing, Predictions, the DNA tab), so it
+# and the loads above cannot be page-gated.
 max_season_rounds = int(game_df['Round_num'].max()) if game_df is not None and len(game_df) > 0 else 25
-rounds_played = int(game_df['Round_num'].nunique()) if game_df is not None and len(game_df) > 0 else 0
 
 # ── State init + banner ───────────────────────────────────────
 if 'active_hub' not in st.session_state:
@@ -2486,7 +2486,11 @@ if _page == 'Landing':
 
     # ── Live context: leader + projections (public model output only; betting
     #    P&L is private and never surfaced to anonymous landing visitors) ──
-    _land_df = load_season(selected_season)
+    # Same call the module-level `predictions` already made, so reuse it rather
+    # than take a second cache_data copy of the identical frame. (The ticker's
+    # load_game(2026) below is NOT the same as game_df — it pins 2026 where
+    # game_df follows selected_season — so that one genuinely is its own load.)
+    _land_df = predictions
     _land_leader = "—"
     _land_votes = 0.0
     if _land_df is not None and not _land_df.empty and 'Exp_Total_Votes' in _land_df.columns:
