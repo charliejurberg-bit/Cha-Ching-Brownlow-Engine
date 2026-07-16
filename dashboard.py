@@ -1108,7 +1108,7 @@ def load_game(season):
         return None
     return _disambiguate_players(_fix_team_names(pd.read_csv(path)))
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=3600)
 def load_importance():
     path = f"{PRED_DIR}/feature_importance.csv"
     return pd.read_csv(path) if os.path.exists(path) else None
@@ -1118,7 +1118,7 @@ def load_backtest():
     path = f"{PRED_DIR}/backtest_results.csv"
     return pd.read_csv(path) if os.path.exists(path) else None
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=3600)
 def load_season_projection():
     path = f"{PRED_DIR}/season_projection_2026.csv"
     return _fix_team_names(pd.read_csv(path)) if os.path.exists(path) else None
@@ -1145,7 +1145,7 @@ _CAREER_COLS = (
     'Disposals', 'Goals', 'Kicks', 'Clearances', 'Contested.Possessions', 'Coaches_Votes',
 )
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=3600)
 def load_all_historical(columns=None, categorize=('Player_Name', 'Playing.for', 'Team', '_base_name')):
     """Per-game data across every season, with a clean Team column and same-name
     players split into distinct people. (Older season files only carry
@@ -1195,7 +1195,7 @@ def load_all_historical(columns=None, categorize=('Player_Name', 'Playing.for', 
 # Sentinel season value meaning "all seasons combined" (career view).
 CAREER = "Career"
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=3600)
 def load_game_career():
     """Per-game data across every season (career view). Loads only the ~19
     columns the career Player Profile actually reads, and keeps 'Player_Name' as
@@ -1203,7 +1203,7 @@ def load_game_career():
     group by it."""
     return load_all_historical(_CAREER_COLS, categorize=('Playing.for', 'Team', '_base_name'))
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=3600)
 def load_season_career():
     """Career stand-in for a season_*.csv: one row per player (player list +
     most-recent team), used by Player Profile for the picker and identity."""
@@ -1264,6 +1264,10 @@ def compute_player_efficiency_career():
     df = g[voted]
     return _efficiency_from_df(df) if not df.empty else None
 
+# Deliberately 300, unlike its sibling loaders. best_odds.csv is the one file
+# here that does NOT derive from the weekly predict run — scraper_odds.py can
+# rewrite it any time, and an ad-hoc scrape before placing a bet must not sit
+# behind an hour-long cache. It's a 6KB read, so there is nothing to win anyway.
 @st.cache_data(ttl=300)
 def load_best_odds():
     path = "data_2026/best_odds.csv"
@@ -1275,7 +1279,7 @@ _MC_CC_PATH = "predictions/season_2026.csv"
 _MC_WH_PUB  = "data_2026/wheelo_brownlow_predictions.csv"
 _MC_WH_PATH = "data_wheelo/wheelo_2026.csv"   # legacy fallback
 
-@st.cache_data(ttl=300)
+@st.cache_data(ttl=3600)
 def _load_model_comparison():
     """Raw frames behind the Model Comparison page. usecols is a callable so a
     file missing an optional column ('Team', or whichever of ExpVotes/
