@@ -1899,9 +1899,18 @@ st.markdown("""
 /* ── Hub row container — keyed via st.container(key="ccnav_hub"). For a plain
    keyed container Streamlit stamps the key class straight onto the stVerticalBlock
    element (data-testid AND st-key- on the same node), NOT a parent wrapper — so
-   .st-key-ccnav_hub IS the block; its children are selected as descendants.
-   margin-top:0 keeps the row flush under the banner. No marker div, no :has(). */
-.st-key-ccnav_hub {
+   the st-key-ccnav_hub node IS the block; its children are selected as descendants.
+   margin-top:0 keeps the row flush under the banner. No marker div, no :has().
+
+   Every selector is prefixed with .stApp as a specificity bump, NOT for scoping.
+   The old marker :has() selectors scored ~(0,3,1); the flat st-key- rewrite is
+   (0,1,1), which merely TIES betting_hub's `button[kind="primary"]` reset and
+   theme.py's `.stButton button` — both re-injected during a BH page render,
+   AFTER this block, so they won ties on source order and the pills fell back to
+   default fills. .stApp lifts every rule one class (structural -> (0,2,1),
+   accent -> (0,3,0)) so they clear those resets on every page while keeping
+   accent above structural. See the session notes / CLAUDE.md. ─────────────── */
+.stApp .st-key-ccnav_hub {
     background: var(--bg) !important;
     position: relative !important;
     left: 50% !important;
@@ -1916,20 +1925,20 @@ st.markdown("""
     margin-bottom: 0 !important;
     gap: 0 !important;
 }
-.st-key-ccnav_hub [data-testid="stHorizontalBlock"] {
+.stApp .st-key-ccnav_hub [data-testid="stHorizontalBlock"] {
     display: grid !important; grid-template-columns: 1fr 1fr !important;
     gap: 0 !important; padding: 0 !important; align-items: stretch !important;
 }
-.st-key-ccnav_hub [data-testid="stColumn"] {
+.stApp .st-key-ccnav_hub [data-testid="stColumn"] {
     width: 100% !important; min-width: 0 !important; padding: 0 !important;
     display: flex !important; flex-direction: column !important;
 }
-.st-key-ccnav_hub [data-testid="stColumn"] > div,
-.st-key-ccnav_hub [data-testid="stElementContainer"],
-.st-key-ccnav_hub [data-testid="stButton"] {
+.stApp .st-key-ccnav_hub [data-testid="stColumn"] > div,
+.stApp .st-key-ccnav_hub [data-testid="stElementContainer"],
+.stApp .st-key-ccnav_hub [data-testid="stButton"] {
     width: 100% !important; flex: 1 !important;
 }
-.st-key-ccnav_hub button {
+.stApp .st-key-ccnav_hub button {
     background: transparent !important; border: none !important;
     border-bottom: 2px solid transparent !important;
     color: var(--muted) !important; font-size: 13px !important;
@@ -1940,29 +1949,30 @@ st.markdown("""
     align-items: center !important; justify-content: center !important;
     transition: color 160ms ease-out, border-color 160ms ease-out !important;
 }
-.st-key-ccnav_hub button p,
-.st-key-ccnav_hub button span {
+.stApp .st-key-ccnav_hub button p,
+.stApp .st-key-ccnav_hub button span {
     color: inherit !important;
 }
-.st-key-ccnav_hub [data-testid="stBaseButton-primary"],
-.st-key-ccnav_hub [data-testid="baseButton-primary"] {
+.stApp .st-key-ccnav_hub [data-testid="stBaseButton-primary"],
+.stApp .st-key-ccnav_hub [data-testid="baseButton-primary"] {
     color: __HUB_ACCENT__ !important; border-bottom-color: __HUB_ACCENT__ !important;
     font-weight: 600 !important;
 }
 @media (hover: hover) {
-    .st-key-ccnav_hub [data-testid="stBaseButton-secondary"]:hover,
-    .st-key-ccnav_hub [data-testid="baseButton-secondary"]:hover {
+    .stApp .st-key-ccnav_hub [data-testid="stBaseButton-secondary"]:hover,
+    .stApp .st-key-ccnav_hub [data-testid="baseButton-secondary"]:hover {
         color: var(--text) !important;
     }
 }
 
 /* ── Page strip container — keyed via st.container(key="ccnav_page"). As with
    the hub row, the key class is stamped on the container's stVerticalBlock
-   itself, so .st-key-ccnav_page IS the block and its children are descendants.
-   margin-top:-16px folds in the negative pull the old
+   itself, so the st-key-ccnav_page node IS the block and its children are
+   descendants. margin-top:-16px folds in the negative pull the old
    stLayoutWrapper:has(.nav-page-anchor) rule applied, tucking the strip up under
-   the hub row's border. No marker div, no :has(). ──────────────── */
-.st-key-ccnav_page {
+   the hub row's border. .stApp prefix is the same specificity bump as the hub
+   row (see above). No marker div, no :has(). ──────────────── */
+.stApp .st-key-ccnav_page {
     background: var(--bg) !important;
     position: relative !important;
     left: 50% !important;
@@ -1977,25 +1987,25 @@ st.markdown("""
     margin-bottom: 0 !important;
     gap: 0 !important;
 }
-.st-key-ccnav_page [data-testid="stHorizontalBlock"] {
+.stApp .st-key-ccnav_page [data-testid="stHorizontalBlock"] {
     display: flex !important; flex-wrap: nowrap !important;
     width: 100% !important; gap: 0 !important;
     padding: 0 !important; align-items: stretch !important;
     scrollbar-width: none !important;
 }
-.st-key-ccnav_page [data-testid="stHorizontalBlock"]::-webkit-scrollbar {
+.stApp .st-key-ccnav_page [data-testid="stHorizontalBlock"]::-webkit-scrollbar {
     display: none !important;
 }
-.st-key-ccnav_page [data-testid="stColumn"] {
+.stApp .st-key-ccnav_page [data-testid="stColumn"] {
     flex: 1 1 0 !important; min-width: 0 !important; padding: 0 !important;
     display: flex !important; align-items: center !important; justify-content: center !important;
 }
-.st-key-ccnav_page [data-testid="stColumn"] > div,
-.st-key-ccnav_page [data-testid="stElementContainer"],
-.st-key-ccnav_page [data-testid="stButton"] {
+.stApp .st-key-ccnav_page [data-testid="stColumn"] > div,
+.stApp .st-key-ccnav_page [data-testid="stElementContainer"],
+.stApp .st-key-ccnav_page [data-testid="stButton"] {
     width: 100% !important; padding: 0 !important; margin: 0 !important;
 }
-.st-key-ccnav_page button {
+.stApp .st-key-ccnav_page button {
     background: transparent !important; border: none !important;
     border-bottom: 2px solid transparent !important;
     color: var(--muted) !important; font-size: 12px !important;
@@ -2007,8 +2017,8 @@ st.markdown("""
     align-items: center !important;
     transition: color 160ms ease-out, border-color 160ms ease-out !important;
 }
-.st-key-ccnav_page button p,
-.st-key-ccnav_page button span {
+.stApp .st-key-ccnav_page button p,
+.stApp .st-key-ccnav_page button span {
     color: inherit !important;
 }
 /* Mobile: scroll the page strip horizontally instead of shrinking columns to
@@ -2019,10 +2029,10 @@ st.markdown("""
    change. Verified against the real Streamlit DOM at a 393px viewport. Desktop
    keeps the full-width even-tab layout above. */
 @media (max-width: 640px) {
-    .st-key-ccnav_page [data-testid="stHorizontalBlock"] {
+    .stApp .st-key-ccnav_page [data-testid="stHorizontalBlock"] {
         overflow-x: auto !important;
     }
-    .st-key-ccnav_page [data-testid="stColumn"] {
+    .stApp .st-key-ccnav_page [data-testid="stColumn"] {
         flex: 0 0 auto !important; min-width: max-content !important;
     }
 }
@@ -2032,14 +2042,14 @@ __ICON_CSS__
 
 /* Active tab: underline is the active-hub accent (emerald / gold), folded from
    the old .nav-page-anchor.bh override into __PAGE_ACCENT__. */
-.st-key-ccnav_page [data-testid="stBaseButton-primary"],
-.st-key-ccnav_page [data-testid="baseButton-primary"] {
+.stApp .st-key-ccnav_page [data-testid="stBaseButton-primary"],
+.stApp .st-key-ccnav_page [data-testid="baseButton-primary"] {
     color: var(--text) !important; border-bottom-color: __PAGE_ACCENT__ !important;
     font-weight: 600 !important;
 }
 @media (hover: hover) {
-    .st-key-ccnav_page [data-testid="stBaseButton-secondary"]:hover,
-    .st-key-ccnav_page [data-testid="baseButton-secondary"]:hover {
+    .stApp .st-key-ccnav_page [data-testid="stBaseButton-secondary"]:hover,
+    .stApp .st-key-ccnav_page [data-testid="baseButton-secondary"]:hover {
         color: var(--text) !important;
     }
 }
@@ -2350,7 +2360,7 @@ div[data-testid="stHorizontalBlock"]:has(.lb-controls-marker) label {
 
 # ── Hub toggle row + page strip row ─────────────────────────────
 def _render_hub_tabs():
-    # key=ccnav_hub puts .st-key-ccnav_hub on the container's layout wrapper; the
+    # key=ccnav_hub puts st-key-ccnav_hub on the container's stVerticalBlock; the
     # nav CSS keys off that instead of a hidden .nav-hub-anchor marker + :has().
     with st.container(key="ccnav_hub"):
         _hc1, _hc2 = st.columns(2)
@@ -2370,7 +2380,7 @@ def _render_hub_tabs():
                 st.rerun()
 
 def _render_page_nav():
-    # key=ccnav_page puts .st-key-ccnav_page on the container's stVerticalBlock
+    # key=ccnav_page puts st-key-ccnav_page on the container's stVerticalBlock
     # (same element as data-testid, per slice 3); the nav CSS keys off it as
     # descendants instead of a hidden .nav-page-anchor marker + :has().
     with st.container(key="ccnav_page"):
