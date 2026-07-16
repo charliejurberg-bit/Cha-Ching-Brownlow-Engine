@@ -1875,6 +1875,9 @@ _nav_icon_css = (
 # _hub is the single source of truth the .bh marker used to encode, so with the
 # marker gone this conditional is that same signal, read in Python.
 _hub_accent = "var(--gold)" if _hub == "betting" else "var(--emerald)"
+# Same active-accent signal for the page strip's active-tab underline. Kept as a
+# separate token so slice 4's rules never touch slice 3's verified hub rule.
+_page_accent = _hub_accent
 
 if _hub == "brownlow":
     _snav_pages = [
@@ -1893,11 +1896,6 @@ else:
 # rules find these injections via `stMarkdownContainer > style:only-child`.
 st.markdown("""
 <style>
-/* ── Collapse flex gaps above/between nav rows ───────────────── */
-[data-testid="stLayoutWrapper"]:has(.nav-page-anchor) {
-    margin-top: -16px !important;
-}
-
 /* ── Hub row container — keyed via st.container(key="ccnav_hub"). For a plain
    keyed container Streamlit stamps the key class straight onto the stVerticalBlock
    element (data-testid AND st-key- on the same node), NOT a parent wrapper — so
@@ -1958,8 +1956,13 @@ st.markdown("""
     }
 }
 
-/* ── Page strip container ────────────────────────────────────── */
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) {
+/* ── Page strip container — keyed via st.container(key="ccnav_page"). As with
+   the hub row, the key class is stamped on the container's stVerticalBlock
+   itself, so .st-key-ccnav_page IS the block and its children are descendants.
+   margin-top:-16px folds in the negative pull the old
+   stLayoutWrapper:has(.nav-page-anchor) rule applied, tucking the strip up under
+   the hub row's border. No marker div, no :has(). ──────────────── */
+.st-key-ccnav_page {
     background: var(--bg) !important;
     position: relative !important;
     left: 50% !important;
@@ -1970,32 +1973,29 @@ st.markdown("""
     margin-left: 0 !important;
     padding: 4px 16px !important;
     border-bottom: 1px solid var(--line) !important;
-    margin-top: 0 !important;
+    margin-top: -16px !important;
     margin-bottom: 0 !important;
     gap: 0 !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) > :first-child {
-    display: none !important;
-}
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stHorizontalBlock"] {
+.st-key-ccnav_page [data-testid="stHorizontalBlock"] {
     display: flex !important; flex-wrap: nowrap !important;
     width: 100% !important; gap: 0 !important;
     padding: 0 !important; align-items: stretch !important;
     scrollbar-width: none !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stHorizontalBlock"]::-webkit-scrollbar {
+.st-key-ccnav_page [data-testid="stHorizontalBlock"]::-webkit-scrollbar {
     display: none !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"] {
+.st-key-ccnav_page [data-testid="stColumn"] {
     flex: 1 1 0 !important; min-width: 0 !important; padding: 0 !important;
     display: flex !important; align-items: center !important; justify-content: center !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"] > div,
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stElementContainer"],
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stButton"] {
+.st-key-ccnav_page [data-testid="stColumn"] > div,
+.st-key-ccnav_page [data-testid="stElementContainer"],
+.st-key-ccnav_page [data-testid="stButton"] {
     width: 100% !important; padding: 0 !important; margin: 0 !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) button {
+.st-key-ccnav_page button {
     background: transparent !important; border: none !important;
     border-bottom: 2px solid transparent !important;
     color: var(--muted) !important; font-size: 12px !important;
@@ -2007,8 +2007,8 @@ st.markdown("""
     align-items: center !important;
     transition: color 160ms ease-out, border-color 160ms ease-out !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) button p,
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) button span {
+.st-key-ccnav_page button p,
+.st-key-ccnav_page button span {
     color: inherit !important;
 }
 /* Mobile: scroll the page strip horizontally instead of shrinking columns to
@@ -2019,10 +2019,10 @@ st.markdown("""
    change. Verified against the real Streamlit DOM at a 393px viewport. Desktop
    keeps the full-width even-tab layout above. */
 @media (max-width: 640px) {
-    [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stHorizontalBlock"] {
+    .st-key-ccnav_page [data-testid="stHorizontalBlock"] {
         overflow-x: auto !important;
     }
-    [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stColumn"] {
+    .st-key-ccnav_page [data-testid="stColumn"] {
         flex: 0 0 auto !important; min-width: max-content !important;
     }
 }
@@ -2030,18 +2030,16 @@ st.markdown("""
    nav button's own st-key- class. No marker divs, no :has(). */
 __ICON_CSS__
 
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stBaseButton-primary"],
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-primary"] {
-    color: var(--text) !important; border-bottom-color: var(--emerald) !important;
+/* Active tab: underline is the active-hub accent (emerald / gold), folded from
+   the old .nav-page-anchor.bh override into __PAGE_ACCENT__. */
+.st-key-ccnav_page [data-testid="stBaseButton-primary"],
+.st-key-ccnav_page [data-testid="baseButton-primary"] {
+    color: var(--text) !important; border-bottom-color: __PAGE_ACCENT__ !important;
     font-weight: 600 !important;
 }
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor.bh) [data-testid="stBaseButton-primary"],
-[data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor.bh) [data-testid="baseButton-primary"] {
-    border-bottom-color: var(--gold) !important;
-}
 @media (hover: hover) {
-    [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="stBaseButton-secondary"]:hover,
-    [data-testid="stVerticalBlock"]:has(> :first-child .nav-page-anchor) [data-testid="baseButton-secondary"]:hover {
+    .st-key-ccnav_page [data-testid="stBaseButton-secondary"]:hover,
+    .st-key-ccnav_page [data-testid="baseButton-secondary"]:hover {
         color: var(--text) !important;
     }
 }
@@ -2347,7 +2345,8 @@ div[data-testid="stHorizontalBlock"]:has(.lb-controls-marker) label {
 
 </style>
 """.replace("__ICON_CSS__", _nav_icon_css)
-   .replace("__HUB_ACCENT__", _hub_accent), unsafe_allow_html=True)
+   .replace("__HUB_ACCENT__", _hub_accent)
+   .replace("__PAGE_ACCENT__", _page_accent), unsafe_allow_html=True)
 
 # ── Hub toggle row + page strip row ─────────────────────────────
 def _render_hub_tabs():
@@ -2371,9 +2370,10 @@ def _render_hub_tabs():
                 st.rerun()
 
 def _render_page_nav():
-    with st.container():
-        _anchor_cls = "nav-page-anchor bh" if _hub == "betting" else "nav-page-anchor"
-        st.markdown(f'<div class="{_anchor_cls}"></div>', unsafe_allow_html=True)
+    # key=ccnav_page puts .st-key-ccnav_page on the container's stVerticalBlock
+    # (same element as data-testid, per slice 3); the nav CSS keys off it as
+    # descendants instead of a hidden .nav-page-anchor marker + :has().
+    with st.container(key="ccnav_page"):
         _pcols = st.columns(len(_snav_pages), gap="small")
         for _pc, _sp in zip(_pcols, _snav_pages):
             with _pc:
