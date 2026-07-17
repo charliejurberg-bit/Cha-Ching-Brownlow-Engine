@@ -6618,8 +6618,23 @@ def render_polls_a_vote(season: int):
     polls = (user_auth.load_poll_picks(_pav_uid, season) if _pav_uid
              else user_auth._empty_poll_picks())
 
+    # ── Consensus reads are for signed-in users only ───────────────────────────
+    # Every read below answers one question: "in the rounds you called, which
+    # models tip this player?" With no picks there is nothing to ask it about,
+    # and no zone a visitor sees touches the answers — the matrix, the cards and
+    # the add form are all behind `_pav_user is None` branches. So the whole
+    # consensus layer is nine uncached pd.read_csv calls that a visitor pays for
+    # and never sees. This page went public in session 3; before that only one
+    # signed-in person ever paid it.
+    #
+    # ANY LOADER ADDED BELOW MUST CARRY THIS GUARD. The reads degrade to the
+    # empty defaults already initialised for them (that is the missing-file
+    # path), so gating is just a missing file the page already knows how to
+    # survive — no new failure mode, and the visitor's render is unchanged.
+    _pav_load = bool(_pav_uid)
+
     _gdf = None  # per-round Poll_Prob source for the grid (the gold numbers)
-    if os.path.exists("predictions/game_level_2026.csv"):
+    if _pav_load and os.path.exists("predictions/game_level_2026.csv"):
         try:
             _gdf = pd.read_csv(
                 "predictions/game_level_2026.csv",
@@ -6641,7 +6656,7 @@ def render_polls_a_vote(season: int):
     # Player list for the Add form dropdown
     _pav_all_players: list[str] = []
     _pav_player_team: dict[str, str] = {}
-    if os.path.exists("predictions/game_level_2026.csv"):
+    if _pav_load and os.path.exists("predictions/game_level_2026.csv"):
         try:
             _pav_plist = pd.read_csv("predictions/game_level_2026.csv", usecols=['Player', 'Team'])
             _pav_plist = _pav_plist.dropna(subset=['Player'])
@@ -6699,7 +6714,7 @@ def render_polls_a_vote(season: int):
         #    which is Cha Ching's OWN output — a mislabel that double-counted Cha
         #    Ching. Now it's real AFL data.
         _afl_csv = "data_2026/afl_predictor_predictions.csv"
-        if os.path.exists(_afl_csv):
+        if _pav_load and os.path.exists(_afl_csv):
             _afldf = pd.read_csv(_afl_csv)
             if 'Total_Votes' in _afldf.columns:
                 _con_afl = {_norm(r['Player']): float(r['Total_Votes'] or 0)
@@ -6707,7 +6722,7 @@ def render_polls_a_vote(season: int):
         # 2b. AFL Predictor — per-round votes (verdict) from afl_predictor_round_votes.csv.
         #     Rounds are AFL/display convention, matching My_Rounds and the others.
         _afl_round_csv = "data_2026/afl_predictor_round_votes.csv"
-        if os.path.exists(_afl_round_csv):
+        if _pav_load and os.path.exists(_afl_round_csv):
             _aflr = pd.read_csv(_afl_round_csv)
             if {'Player', 'Round', 'Vote'} <= set(_aflr.columns):
                 _con_afl_round = {}
@@ -6718,7 +6733,7 @@ def render_polls_a_vote(season: int):
         #    Round key = Round - 1 (wheelo_2026.csv Round is AFLTables convention,
         #    same +1 as CC). NaN ExpVotes rounds are skipped → NA, not disagree.
         _wh26 = "data_wheelo/wheelo_2026.csv"
-        if os.path.exists(_wh26):
+        if _pav_load and os.path.exists(_wh26):
             _whdf = pd.read_csv(_wh26)
             _wh_col = next((c for c in ['ExpVotes', 'RatingPoints'] if c in _whdf.columns), None)
             if _wh_col:
@@ -6734,7 +6749,7 @@ def render_polls_a_vote(season: int):
                             int(_wr['Round']) - 1] = float(_wr['ExpVotes'])
         # 4. Betfair — season totals (radar) from the cached CSV.
         _bf_csv = "data_2026/betfair_predictions.csv"
-        if os.path.exists(_bf_csv):
+        if _pav_load and os.path.exists(_bf_csv):
             _bfdf = pd.read_csv(_bf_csv)
             if 'Total_Votes' in _bfdf.columns:
                 _con_bf = {_norm(r['Player']): float(r['Total_Votes'] or 0)
@@ -6743,7 +6758,7 @@ def render_polls_a_vote(season: int):
         #     written by scraper_betfair.py from the same JSON feed. Rounds are
         #     AFL/display convention, matching My_Rounds and CC Round_num-1.
         _bf_round_csv = "data_2026/betfair_round_votes.csv"
-        if os.path.exists(_bf_round_csv):
+        if _pav_load and os.path.exists(_bf_round_csv):
             _bfr = pd.read_csv(_bf_round_csv)
             if {'Player', 'Round', 'Vote'} <= set(_bfr.columns):
                 _con_bf_round = {}
@@ -6752,7 +6767,7 @@ def render_polls_a_vote(season: int):
                         int(_rr['Round'])] = float(_rr['Vote'] or 0)
         # 5. ESPN — season totals (radar) from the cached CSV.
         _espn_csv = "data_2026/espn_predictions.csv"
-        if os.path.exists(_espn_csv):
+        if _pav_load and os.path.exists(_espn_csv):
             _espndf = pd.read_csv(_espn_csv)
             if 'Total_Votes' in _espndf.columns:
                 _con_espn = {_norm(r['Player']): float(r['Total_Votes'] or 0)
@@ -6763,7 +6778,7 @@ def render_polls_a_vote(season: int):
         #     covered round is disagreement, not silence — _espn_rounds_covered records
         #     which rounds ESPN published so a missing player reads TIPS_OTHER, not NA.
         _espn_round_csv = "data_2026/espn_round_votes.csv"
-        if os.path.exists(_espn_round_csv):
+        if _pav_load and os.path.exists(_espn_round_csv):
             _espnr = pd.read_csv(_espn_round_csv)
             if {'Player', 'Round', 'Vote'} <= set(_espnr.columns):
                 _con_espn_round = {}
