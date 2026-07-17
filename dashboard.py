@@ -5790,86 +5790,45 @@ if _page == 'Live Tracker':
         # iframe and cannot call back into Streamlit. Hidden entirely when the
         # anon key isn't configured — a sign-in box that cannot work is worse
         # than no sign-in box.
-        if user_auth.auth_available():
-            if _cc_user:
-                with st.expander(f"Your watchlist · {_cc_user.get('email', '')}",
-                                 expanded=False):
-                    # Intersect with the current options: a player who has left
-                    # the season would otherwise be a default that isn't in
-                    # options, which Streamlit rejects outright.
-                    _cc_default = sorted(_cc_picks & set(_cc_opts))
-                    _cc_sel = st.multiselect(
-                        "Players you expect to poll",
-                        options=_cc_opts,
-                        default=_cc_default,
-                        max_selections=user_auth.WATCHLIST_MAX,
-                        key="cc_user_picks",
-                        placeholder="Add players you expect to poll…",
-                        label_visibility="collapsed",
-                    )
-                    st.caption(
-                        f"{len(_cc_sel)}/{user_auth.WATCHLIST_MAX} players · "
-                        "shown as ★ on the leaderboard."
-                    )
-                    _cc_b1, _cc_b2, _ = st.columns([1, 1, 4])
-                    with _cc_b1:
-                        # Disabled when there is nothing to save. A save cannot
-                        # be "in flight" across renders — the script is
-                        # synchronous — so the real double-submit guard is the
-                        # cooldown inside save_watchlist().
-                        if st.button("Save", key="cc_user_save", type="primary",
-                                     use_container_width=True,
-                                     disabled=(set(_cc_sel) == _cc_picks)):
-                            _cc_ok, _cc_msg = user_auth.save_watchlist(
-                                _cc_sel, _LT_SEASON)
-                            if _cc_ok:
-                                st.toast("Watchlist saved.")
-                                st.rerun()
-                            elif _cc_msg:
-                                st.error(_cc_msg)
-                    with _cc_b2:
-                        if st.button("Sign out", key="cc_user_signout",
-                                     use_container_width=True):
-                            user_auth.sign_out()
+        # The ★ watchlist only — signing in and out is the banner's job now, and
+        # this expander no longer offers either. A visitor sees nothing here
+        # because there is no watchlist to edit until they have an account; the
+        # banner is where they get one.
+        if _cc_user:
+            with st.expander("Your watchlist", expanded=False):
+                # Intersect with the current options: a player who has left
+                # the season would otherwise be a default that isn't in
+                # options, which Streamlit rejects outright.
+                _cc_default = sorted(_cc_picks & set(_cc_opts))
+                _cc_sel = st.multiselect(
+                    "Players you expect to poll",
+                    options=_cc_opts,
+                    default=_cc_default,
+                    max_selections=user_auth.WATCHLIST_MAX,
+                    key="cc_user_picks",
+                    placeholder="Add players you expect to poll…",
+                    label_visibility="collapsed",
+                )
+                st.caption(
+                    f"{len(_cc_sel)}/{user_auth.WATCHLIST_MAX} players · "
+                    "shown as ★ on the leaderboard."
+                )
+                _cc_b1, _ = st.columns([1, 5])
+                with _cc_b1:
+                    # Disabled when there is nothing to save. A save cannot
+                    # be "in flight" across renders — the script is
+                    # synchronous — so the real double-submit guard is the
+                    # cooldown inside save_watchlist().
+                    if st.button("Save", key="cc_user_save", type="primary",
+                                 use_container_width=True,
+                                 disabled=(set(_cc_sel) == _cc_picks)):
+                        _cc_ok, _cc_msg = user_auth.save_watchlist(
+                            _cc_sel, _LT_SEASON)
+                        if _cc_ok:
+                            st.toast("Watchlist saved.")
                             st.rerun()
-            else:
-                with st.expander("Track your own Poll-a-Vote watchlist",
-                                 expanded=False):
-                    _cc_t1, _cc_t2 = st.tabs(["Sign in", "Create account"])
-                    with _cc_t1:
-                        # A form so typing doesn't rerun the page per keystroke.
-                        # Both tabs need an "Email" input: Streamlit derives a
-                        # widget's identity from its label and params, so two
-                        # unkeyed identical inputs risk a DuplicateWidgetID.
-                        # Explicit cc_user_* keys avoid that and get cleared by
-                        # sign_out(); clear_on_submit wipes them after each try.
-                        with st.form("cc_user_signin", clear_on_submit=True):
-                            _cc_e = st.text_input("Email", key="cc_user_in_email")
-                            _cc_p = st.text_input("Password", type="password",
-                                                  key="cc_user_in_pw")
-                            if st.form_submit_button("Sign in", type="primary"):
-                                _cc_ok, _cc_msg = user_auth.sign_in(_cc_e, _cc_p)
-                                if _cc_ok:
-                                    st.rerun()
-                                else:
-                                    st.error(_cc_msg)
-                    with _cc_t2:
-                        with st.form("cc_user_signup", clear_on_submit=True):
-                            _cc_e2 = st.text_input("Email", key="cc_user_up_email")
-                            _cc_p2 = st.text_input(
-                                "Password", type="password",
-                                key="cc_user_up_pw",
-                                help="At least 8 characters.")
-                            st.caption("Email is used for sign-in only.")
-                            if st.form_submit_button("Create account",
-                                                     type="primary"):
-                                _cc_ok, _cc_msg = user_auth.sign_up(_cc_e2, _cc_p2)
-                                if _cc_ok and not _cc_msg:
-                                    st.rerun()          # confirmation off
-                                elif _cc_ok:
-                                    st.success(_cc_msg)  # confirmation on
-                                else:
-                                    st.error(_cc_msg)
+                        elif _cc_msg:
+                            st.error(_cc_msg)
 
         # Tracker controls. The watchlist filter only exists for a signed-in
         # public user; when it isn't rendered Streamlit drops cc_user_only from
@@ -6651,68 +6610,6 @@ def _render_rg_footer():
 _PAV_SEASON = 2026
 
 
-def _pav_render_account(user):
-    """The account control: the way in for a visitor, the way out once signed in.
-
-    Mirrors the Live Tracker's panel — same expander shape, same user_auth entry
-    points, same cc_user_* prefix so sign_out() clears these too — with its own
-    keys. The two never render together today, but identical widget labels in one
-    app are a DuplicateWidgetID waiting for the day someone renders both.
-
-    The signed-in half is not decoration. Cookie persistence means a session now
-    survives the browser closing, so a page that can sign you in and never sign
-    you out leaves you stuck in it — on a shared machine, indefinitely. The Live
-    Tracker has had a sign-out all along, but it is on another page and buried in
-    a collapsed expander; this page could sign you in and offer no way back.
-    """
-    if user:
-        with st.expander(f"Signed in · {user.get('email', '')}", expanded=False):
-            _pa1, _pa2 = st.columns([1, 4])
-            with _pa1:
-                if st.button("Sign out", key="cc_user_pav_signout",
-                             use_container_width=True):
-                    user_auth.sign_out()
-                    st.rerun()
-        return
-
-    if not user_auth.auth_available():
-        # A sign-in box that cannot work is worse than no sign-in box — the same
-        # call the Live Tracker makes.
-        st.markdown(
-            '<div class="pav-empty">Accounts aren\'t available right now.</div>',
-            unsafe_allow_html=True)
-        return
-
-    with st.expander("Sign in to track your own targets", expanded=True):
-        _pt1, _pt2 = st.tabs(["Sign in", "Create account"])
-        with _pt1:
-            with st.form("cc_user_pav_signin", clear_on_submit=True):
-                _pe = st.text_input("Email", key="cc_user_pav_in_email")
-                _pp = st.text_input("Password", type="password",
-                                    key="cc_user_pav_in_pw")
-                if st.form_submit_button("Sign in", type="primary"):
-                    _pok, _pmsg = user_auth.sign_in(_pe, _pp)
-                    if _pok:
-                        st.rerun()
-                    else:
-                        st.error(_pmsg)
-        with _pt2:
-            with st.form("cc_user_pav_signup", clear_on_submit=True):
-                _pe2 = st.text_input("Email", key="cc_user_pav_up_email")
-                _pp2 = st.text_input("Password", type="password",
-                                     key="cc_user_pav_up_pw",
-                                     help="At least 8 characters.")
-                st.caption("Email is used for sign-in only.")
-                if st.form_submit_button("Create account", type="primary"):
-                    _pok, _pmsg = user_auth.sign_up(_pe2, _pp2)
-                    if _pok and not _pmsg:
-                        st.rerun()          # confirmation off
-                    elif _pok:
-                        st.success(_pmsg)   # confirmation on
-                    else:
-                        st.error(_pmsg)
-
-
 def render_polls_a_vote(season: int):
     """Per-user Polls-a-Vote picks, for `season`.
 
@@ -7046,7 +6943,8 @@ def render_polls_a_vote(season: int):
     )
 
     if _pav_user is None:
-        st.markdown('<div class="pav-empty">Sign in below to track your own targets.</div>',
+        st.markdown('<div class="pav-empty">Sign in to track your own targets — '
+                    'the button is top right.</div>',
                     unsafe_allow_html=True)
     elif polls.empty:
         st.markdown('<div class="pav-empty">No targets yet — add one below.</div>',
@@ -7223,11 +7121,10 @@ def render_polls_a_vote(season: int):
                 elif _msg:
                     st.error(_msg)
 
-    # ── STEP 4 — Add-target form, or the way in ───────────────────────────────
-    # Last zone on the page, so a visitor is served here and returns: there is no
-    # add form without an account to attach a pick to.
+    # ── STEP 4 — Add-target form ──────────────────────────────────────────────
+    # Nothing to add a pick to without an account, and the way to get one is the
+    # banner's Sign in — this page no longer carries a form of its own.
     if _pav_user is None:
-        _pav_render_account(None)
         return
 
     with st.expander("+ Add a watchlist target", expanded=False):
@@ -7321,11 +7218,6 @@ def render_polls_a_vote(season: int):
                         # the player is already on the list and the user just edits
                         # it — which is a nudge, not an error.
                         st.warning(_msg)
-
-    # Last thing on the page, below the add form: the same slot the sign-in
-    # prompt occupies for a visitor, so the account control is always in one
-    # place whichever state you are in.
-    _pav_render_account(_pav_user)
 
 
 if _page == 'Polls a Vote':
