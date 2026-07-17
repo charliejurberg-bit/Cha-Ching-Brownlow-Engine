@@ -12,6 +12,13 @@ Writes:
 
 Round numbers are the AFL's native round (display/AFL convention: 0 = Opening
 Round), matching betfair_round_votes.csv and the dashboard's My_Rounds picks.
+
+A round-votes row means "this match was counted and he got this many votes" —
+so a 0 there is a real disagreement, not silence. Matches the AFL hasn't counted
+yet are omitted rather than written as zeros (see fetch), because a consumer
+can't tell the two apart from the CSV alone: Polls-a-Vote reads any present row
+as a verdict, so an uncounted match written as 0 would read as "the AFL says he
+didn't poll".
 """
 
 import os
@@ -91,22 +98,28 @@ def fetch(timeout=20):
                 'Player': name, 'Team': team,
                 'Total_Votes': float(p.get("totalVotes", 0) or 0),
             })
-            # Per-round breakdown. A round is "covered" only if he played it
-            # (entry carries a providerId / match id). Byes and unplayed rounds
-            # have no providerId, so they're omitted → read as NA, not a 0-vote
-            # disagreement. Played-but-didn't-poll keeps vote 0 (real disagree).
+            # Per-round breakdown. Three buckets:
+            #   didn't play (bye/dnp)      → no providerId → omitted → reads NA
+            #   played, match counted, 0   → vote 0 kept   → real disagreement
+            #   played, match NOT counted  → dropped below → omitted → reads NA
+            # The API can't tell the last two apart per player: an uncounted match
+            # still carries a providerId with points 0. They're separated after the
+            # loop, per match — hence _match is carried here and dropped before write.
             for rkey, entries in (p.get("rounds") or {}).items():
                 try:
                     rnum = int(rkey)
                 except (TypeError, ValueError):
                     continue
-                played, pts = False, 0
+                played, pts, mid = False, 0, None
                 for e in entries:
                     if isinstance(e, dict) and 'providerId' in e:
                         played = True
+                        if mid is None:
+                            mid = e['providerId']
                         pts = max(pts, int(e.get("points", 0) or 0))
                 if played:
-                    round_rows.append({'Player': name, 'Round': rnum, 'Vote': float(pts)})
+                    round_rows.append({'Player': name, 'Round': rnum,
+                                       'Vote': float(pts), '_match': mid})
 
         sdf = (pd.DataFrame(season_rows)
                .sort_values('Total_Votes', ascending=False, kind='stable')
@@ -118,8 +131,31 @@ def fetch(timeout=20):
         print(sdf.head(10).to_string(index=False))
 
         if round_rows:
-            rdf = (pd.DataFrame(round_rows)
-                   .sort_values(['Player', 'Round']).reset_index(drop=True))
+            rdf = pd.DataFrame(round_rows)
+            # Drop uncounted matches. Votes are awarded per match (3+2+1=6), so a
+            # match where nobody we captured polled has not been counted yet — its
+            # zeros mean "not published", not "played, polled nothing". Filtering
+            # per match rather than per round is what makes a round that's counted
+            # game-by-game come out right: the counted games stay, the rest wait.
+            # Zeros inside a match that has any vote are real disagreements (a
+            # played-but-didn't-poll player) and are kept.
+            #
+            # Accepted edge case: a match IS counted but all three vote-getters sit
+            # outside our capture (top ~180 by season total). The match then looks
+            # uncounted and is dropped, so its players read NA instead of
+            # TIPS_OTHER. Conservative — silence, never a false disagreement — and
+            # rare, since a 3-vote game almost always lifts a player into the top
+            # 180. Self-corrects on the next run once he's captured.
+            _scored = rdf.groupby('_match')['Vote'].transform('sum') > 0
+            _dropped_matches = rdf.loc[~_scored, '_match'].nunique()
+            _dropped_rows = int((~_scored).sum())
+            rdf = rdf[_scored].drop(columns='_match')
+            rdf = rdf.sort_values(['Player', 'Round']).reset_index(drop=True)
+            if _dropped_rows:
+                print(f'[AFL] skipped {_dropped_rows} row(s) across {_dropped_matches} '
+                      f'uncounted match(es) - votes not published yet.')
+
+        if round_rows and not rdf.empty:
             _save_with_backup(rdf, _ROUND_CSV)
             polled = (rdf['Vote'] >= 1).sum()
             print(f'[AFL] round-level votes: {len(rdf)} rows '
