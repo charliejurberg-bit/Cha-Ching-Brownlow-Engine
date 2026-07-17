@@ -694,6 +694,28 @@ st.markdown("""
         color: #b8c4ce !important;
     }
 
+    /* Row 1 at narrow widths. The old banner had NO media queries — it was
+       centred, fixed at 44px, and simply overflowed. Row 1 has to hold a
+       wordmark and an account control on one line, so it sheds in order of what
+       is least load-bearing: the name first (the avatar still identifies the
+       account), then the round stamp (context, recoverable from the page), and
+       the wordmark shrinks rather than wraps. Sign in / Sign out stay real text
+       buttons at every width — an icon-only auth control is a guess, and
+       guessing is worse on a phone than a slightly narrower label. */
+    @media (max-width: 640px) {
+        .cc-banner { gap: 8px; }
+        .ccb-mark { font-size: 16px; }
+        .ccb-chip { padding: 3px; gap: 0; }
+        .ccb-name { display: none; }
+        .stApp .st-key-ccbanner [data-testid="stButton"] button,
+        .stApp .st-key-ccland [data-testid="stButton"] button {
+            padding: 5px 10px !important;
+        }
+    }
+    @media (max-width: 480px) {
+        .ccb-stamp { display: none; }
+    }
+
     /* ── Column stagger ── */
     [data-testid="stColumn"] { animation: columnEnter 0.3s ease both; }
     [data-testid="stColumn"]:nth-child(1) { animation-delay: 0ms; }
@@ -2232,6 +2254,10 @@ st.markdown("""
     border-bottom: 2px solid transparent !important;
     color: var(--muted) !important; font-size: 12px !important;
     font-weight: 500 !important; padding: 4px 6px !important;
+    /* 44px is the touch-target floor. The tabs are the primary navigation and
+       the only way between pages on a phone, so they get a thumb-sized row
+       even though the label is 12px. */
+    min-height: 44px !important;
     border-radius: 0 !important; white-space: nowrap !important;
     box-shadow: none !important; width: 100% !important; min-width: 0 !important;
     line-height: 1.4 !important; text-align: center !important;
@@ -2243,14 +2269,20 @@ st.markdown("""
 .stApp .st-key-ccnav_page button span {
     color: inherit !important;
 }
-/* Mobile: scroll the page strip horizontally instead of shrinking columns to
+/* Narrow: scroll the page strip horizontally instead of shrinking columns to
    equal narrow slices (which makes nowrap labels overflow and overlap). The base
    column rule sets min-width:0, which lets each column collapse below its label
    width (the button's width:100% gives the column no intrinsic width to hold on
    to) — so min-width:max-content is the essential piece here, not just the flex
-   change. Verified against the real Streamlit DOM at a 393px viewport. Desktop
-   keeps the full-width even-tab layout above. */
-@media (max-width: 640px) {
+   change. Verified against the real Streamlit DOM at a 393px viewport.
+   Scrollbar is hidden above (scrollbar-width + ::-webkit-scrollbar).
+
+   900px, raised from 640px: the Brownlow strip is seven tabs now (Polls a Vote
+   joined it in session 3), and seven nowrap labels do not fit a 900px viewport —
+   between 640 and 900 they were being squeezed under their own text rather than
+   scrolling. The breakpoint tracks the widest strip, so re-check it if an
+   eighth page ever lands. */
+@media (max-width: 900px) {
     .stApp .st-key-ccnav_page [data-testid="stHorizontalBlock"] {
         overflow-x: auto !important;
     }
