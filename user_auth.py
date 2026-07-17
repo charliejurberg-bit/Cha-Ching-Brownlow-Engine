@@ -24,10 +24,13 @@ Session keys all start with "cc_user", which is what sign_out() clears.
 
 import uuid
 import time
+import logging
 from datetime import datetime, timedelta, timezone
 
 import pandas as pd
 import streamlit as st
+
+_log = logging.getLogger(__name__)
 
 WATCHLIST_MAX = 30
 
@@ -126,27 +129,45 @@ def _is_cap_error(e: Exception) -> bool:
 #   write -> extra_streamlit_components.CookieManager, because Streamlit has no
 #            cookie-write API at all (verified: nothing in dir(st) writes one).
 #
-# Two consequences of that split are load-bearing:
+# Three consequences of that split are load-bearing:
 #
 #   1. st.context.cookies does NOT update as cookies change — it is a snapshot
 #      of the initial request. Recovery therefore runs ONCE per browser session
 #      (_BOOTSTRAPPED), not once per run: a later attempt would re-read the same
 #      stale snapshot, and after a sign-out would try to recover a session the
 #      user just ended.
-#   2. Writes are STAGED in session_state and flushed at one fixed point per run
-#      rather than issued inline. A component only reaches the browser if the
-#      script keeps running; sign-in and sign-out both st.rerun() immediately,
-#      which would race the write. Staging moves the write to the next run's
-#      bootstrap, where nothing reruns behind it.
+#   2. Writes are STAGED in session_state and issued from bootstrap rather than
+#      inline. A component only reaches the browser if the script keeps running,
+#      and sign-in/sign-out both st.rerun() immediately, which would race it.
+#   3. The manager MOUNTS EVERY RUN, and a staged write waits for a run where it
+#      was already mounted on the run before. This is the whole fix for the race
+#      that shipped in 1e32d87, so it is worth being precise about:
+#
+#      CookieManager.__init__ renders a getAll component, which is a value
+#      round-trip: on first mount the browser reports back and Streamlit reruns
+#      the script. The old code mounted the manager only on the run that had a
+#      write staged, and popped the token on that same run — so getAll's callback
+#      rerun landed on a run with nothing staged, the manager was not
+#      re-rendered, and both iframes were torn down. The set iframe (a 465 KB
+#      bundle, one-way, nothing waiting on it) lost that race and the cookie was
+#      never written, with the token already gone.
+#
+#      Mounting unconditionally turns that callback from the bug into the engine:
+#      it guarantees a second run right after the first mount, and by then the
+#      iframe is real and a write issued into it survives. A component only stays
+#      alive while it is re-rendered every run — that is the conventional pattern
+#      and there is no cheaper version of it.
 #
 # The staging keys deliberately do NOT start with "cc_user": sign_out() clears
 # every cc_user* key, and would otherwise wipe its own staged cookie delete.
 
-_COOKIE_NAME    = "cc_session"
-_COOKIE_DAYS    = 30
-_COOKIE_PENDING = "cc_cookie_pending"       # staged write: token, or "" to delete
-_BOOTSTRAPPED   = "cc_cookie_bootstrapped"  # recovery is once per browser session
-_UNSET          = object()
+_COOKIE_NAME        = "cc_session"
+_COOKIE_DAYS        = 30
+_COOKIE_PENDING     = "cc_cookie_pending"       # staged write: token, or "" to delete
+_COOKIE_MOUNTED     = "cc_cookie_mounted"       # manager was mounted on the PREVIOUS run
+_COOKIE_UNAVAILABLE = "cc_cookie_unavailable"   # component missing; persistence is off
+_BOOTSTRAPPED       = "cc_cookie_bootstrapped"  # recovery is once per browser session
+_UNSET              = object()
 
 
 def _stage_cookie(token) -> None:
@@ -163,32 +184,64 @@ def _read_cookie():
 
 
 def _cookie_manager():
-    """A CookieManager, or None when the component isn't installed.
+    """Mount the CookieManager for this run. None when the component isn't usable.
 
-    Fails soft on purpose: without it the app loses persistence across refreshes
-    and nothing else. An auth module that crashes the whole page because an
-    optional convenience is missing would be a worse trade.
+    Constructing it IS the mount — __init__ renders the getAll component — so
+    this must be called on every run, not only when there is something to write.
+
+    Fails soft: without it the app loses persistence across refreshes and nothing
+    else. An auth module that crashes the page because an optional convenience is
+    missing would be a worse trade. It no longer fails SILENTLY, though — the old
+    bare except made a missing component indistinguishable from a lost write,
+    which is precisely the thing that needed telling apart when this broke.
     """
     try:
         from extra_streamlit_components import CookieManager
         return CookieManager(key="cc_cookie_mgr")
-    except Exception:
+    except Exception as exc:
+        # Once per session, not once per run: this is called on every run and the
+        # answer cannot change mid-session.
+        if not st.session_state.get(_COOKIE_UNAVAILABLE):
+            _log.warning("cc_session: cookie manager unavailable — %r", exc)
+        st.session_state[_COOKIE_UNAVAILABLE] = True
         return None
 
 
-def _flush_cookie() -> None:
-    """Perform the staged cookie write, if any.
+def _hide_cookie_iframes() -> None:
+    """Collapse the manager's zero-height iframes.
 
-    Instantiating CookieManager renders an (invisible) component iframe, so this
-    builds one only when there is something to write — on a normal run nothing
-    is staged and no component renders at all.
+    The library hides its own with this rule, but only from get/set/get_all —
+    __init__ never calls it. Mounting every run therefore needs it here, or the
+    getAll iframe leaves an empty element container at the top of every page.
     """
-    pending = st.session_state.pop(_COOKIE_PENDING, _UNSET)
-    if pending is _UNSET:
+    st.markdown(
+        '<style>.element-container:has(iframe[height="0"]){display:none;}</style>',
+        unsafe_allow_html=True,
+    )
+
+
+def _flush_cookie(cm) -> None:
+    """Issue the staged cookie write onto an ALREADY-MOUNTED manager.
+
+    Takes the manager rather than building one: bootstrap mounts it every run,
+    and a second construction here would be a second component with the same key.
+
+    The token stays staged until the write has actually been issued. Popping it
+    first is what made the old race unrecoverable — the write was lost and the
+    only copy of the token went with it.
+    """
+    pending = st.session_state.get(_COOKIE_PENDING, _UNSET)
+    if pending is _UNSET or cm is None:
         return
-    cm = _cookie_manager()
-    if cm is None:
+
+    if not st.session_state.get(_COOKIE_MOUNTED):
+        # The manager mounted for the FIRST time on this run: its iframe does not
+        # exist in the browser yet, and a write issued into it would be racing its
+        # own mount. Leave the token staged — the getAll round-trip that this
+        # mount triggers reruns the script within moments, and on that run the
+        # iframe is real. Waiting a run is the entire fix.
         return
+
     try:
         if pending:
             # expires_at is not optional in practice: omit it and the component
@@ -203,9 +256,21 @@ def _flush_cookie() -> None:
                 same_site="strict",
             )
         else:
-            cm.delete(_COOKIE_NAME, key="cc_cookie_del")
-    except Exception:
-        pass
+            try:
+                cm.delete(_COOKIE_NAME, key="cc_cookie_del")
+            except KeyError:
+                # delete() issues the component call and THEN does
+                # `del self.cookies[name]`, which raises when getAll has not
+                # reported that cookie back. The delete was already sent; this is
+                # the library's bookkeeping, not a failed write.
+                pass
+    except Exception as exc:
+        # Left staged deliberately: a write that never went out should be retried
+        # next run, not dropped. Logged rather than swallowed.
+        _log.warning("cc_session: cookie write failed — %r", exc)
+        return
+
+    st.session_state.pop(_COOKIE_PENDING, None)
 
 
 def _recover() -> None:
@@ -242,15 +307,26 @@ def bootstrap_session() -> None:
     """Restore a signed-in cc_user after a page refresh. Call once per script
     run, from the top of the app, before anything reads current_user().
 
+    Mounting the manager first, unconditionally, is deliberate — see the note at
+    the top of this section. It is what keeps the iframe alive between the run
+    that stages a write and the run that issues it.
+
     Cheap on every run but the first of a browser session: recovery is gated on
-    _BOOTSTRAPPED, and the flush is a session_state pop that usually finds
+    _BOOTSTRAPPED, and the flush is a session_state lookup that usually finds
     nothing.
     """
+    cm = _cookie_manager()
+    if cm is not None:
+        _hide_cookie_iframes()
+
     if not st.session_state.get(_BOOTSTRAPPED):
         st.session_state[_BOOTSTRAPPED] = True
         if not st.session_state.get("cc_user"):
             _recover()
-    _flush_cookie()
+
+    # Reads the PREVIOUS run's mount state, so it must run before the write below.
+    _flush_cookie(cm)
+    st.session_state[_COOKIE_MOUNTED] = cm is not None
 
 
 # ── Session state ──────────────────────────────────────────────────────────
