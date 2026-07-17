@@ -170,19 +170,42 @@ CREATE POLICY user_poll_picks_delete_own
 -- RLS decides which rows; grants decide whether the role may reach the table at
 -- all. Both are needed. UPDATE is granted where 03 withholds it — see the header
 -- for why that is a reasoned divergence and not drift.
+--
+-- Revoke before grant, in 02's style — and here that is not a formality. Supabase
+-- ships ALTER DEFAULT PRIVILEGES granting ALL on new public-schema tables to
+-- anon/authenticated/service_role, so section 1's CREATE TABLE has already handed
+-- authenticated the full privilege set — TRUNCATE, REFERENCES and TRIGGER
+-- included — long before this section is reached. Granting the four we want does
+-- not take away the three we don't; only the REVOKE does. Observed on the live
+-- table, not theorised.
+--
+-- TRUNCATE is the one that matters. It is not a DELETE, and RLS does not apply
+-- to it, so section 3's careful auth.uid() scoping does nothing here: an
+-- authenticated caller holding TRUNCATE can empty every user's picks in one
+-- statement. A grant list is therefore an assertion of the whole privilege set,
+-- never an addition to whatever the platform left behind.
 
+REVOKE ALL ON TABLE public.user_poll_picks FROM authenticated;
 GRANT SELECT, INSERT, UPDATE, DELETE ON public.user_poll_picks TO authenticated;
 
 
 -- ── 5. Revoke everything else ──────────────────────────────────────────────
 --
--- Belt and braces, in 02's style. RLS already denies anon (it is named in no
--- policy) and no grant was made to it, so both of these are no-ops today. They
--- are here so that a policy added by mistake later still grants anon nothing.
+-- REVOKE ALL already covers the defaults section 4 describes, so these two lines
+-- need no widening — ALL is ALL, TRUNCATE included.
 --
--- PUBLIC is revoked as well: it is the role every role inherits, so a grant to
--- PUBLIC would quietly reach anon. Revoking PUBLIC does not touch the grant to
--- authenticated above — that is a grant to a named role, and survives this.
+-- What they are NOT is belt and braces. An earlier draft of this file called
+-- them no-ops on the grounds that anon is named in no policy and was never
+-- granted anything. Both halves of that are wrong: a policy is not a grant, and
+-- the same ALTER DEFAULT PRIVILEGES that gave authenticated the full set gave it
+-- to anon as well. These REVOKEs are what actually take it back. Delete them and
+-- anon holds TRUNCATE on a table it cannot otherwise even see — RLS will not
+-- save you, because RLS does not apply to TRUNCATE.
+--
+-- PUBLIC is revoked for the related reason: it is the role every role inherits,
+-- so a grant to PUBLIC would quietly reach anon. Revoking PUBLIC does not touch
+-- section 4's grant to authenticated — that is a grant to a named role, and
+-- survives this.
 
 REVOKE ALL ON TABLE public.user_poll_picks FROM anon;
 REVOKE ALL ON TABLE public.user_poll_picks FROM PUBLIC;
@@ -198,8 +221,10 @@ REVOKE ALL ON TABLE public.user_poll_picks FROM PUBLIC;
 --   WHERE tablename = 'user_poll_picks'
 --   ORDER BY policyname;
 --
--- authenticated holds exactly SELECT/INSERT/UPDATE/DELETE, and anon holds
--- nothing (anon must return zero rows):
+-- The query that catches the default-privilege trap in sections 4 and 5. Expect
+-- exactly four rows, all authenticated: SELECT, INSERT, UPDATE, DELETE. A fifth
+-- (TRUNCATE, REFERENCES, TRIGGER) means a REVOKE did not run. anon must return
+-- zero rows:
 --
 --   SELECT grantee, privilege_type
 --   FROM information_schema.role_table_grants
