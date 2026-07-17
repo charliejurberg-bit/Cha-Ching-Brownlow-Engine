@@ -12,14 +12,21 @@ Two invariants hold every line below:
    on the server, so a cached client carrying a user's JWT would hand that
    user's identity to the next visitor who happened to load the page. Clients
    are rebuilt per call; they are cheap.
-2. User-scoped data lives only in st.session_state, never st.cache_data — same
-   reason: cache_data is keyed by arguments, not by viewer.
+2. User-scoped data reaches st.cache_data only when the viewer is part of the
+   cache key. cache_data is keyed by arguments and shared across every session
+   on the server, so caching per-user rows under a key that does not name the
+   user serves the first viewer's data to the next. load_poll_picks() takes
+   user_id for exactly that reason and no other — it is a cache key, not a
+   filter. Everything else user-scoped lives in st.session_state.
 
 Session keys all start with "cc_user", which is what sign_out() clears.
 """
 
+import uuid
 import time
+from datetime import datetime, timezone
 
+import pandas as pd
 import streamlit as st
 
 WATCHLIST_MAX = 30
@@ -383,3 +390,236 @@ def _save_cooldown_remaining() -> float:
         return 0.0
     left = _SAVE_COOLDOWN - (time.time() - last)
     return left if left > 0 else 0.0
+
+
+# ── Poll picks ─────────────────────────────────────────────────────────────
+#
+# Per-user Polls-a-Vote picks, backed by user_poll_picks (supabase/04). Every
+# call below goes through _user_client(), so RLS is what scopes it to the
+# caller's rows — none of these functions filter on user_id, and section 3 of 04
+# is the reason they don't have to.
+#
+# Not yet called by anything: the page still reads betting_hub's service_role
+# poll_watchlist path. This is the backend it moves onto.
+#
+# Each write ends in load_poll_picks.clear(), which drops every viewer's cached
+# entry, not just the writer's — cache_data.clear() is per-function, not per-key.
+# That is correct (nobody serves stale rows) and costs the other viewers one
+# re-read within the 60s ttl, which is cheaper than a bespoke invalidation.
+
+POLL_PICKS_TABLE = "user_poll_picks"
+
+# The page reads row['Player'], so in-memory stays TitleCase while the table is
+# snake_case. Ported from betting_hub.POLLS_SB_RENAME rather than imported:
+# user_auth must not depend on the service_role module (see the docstring), and
+# a seven-key dict is a cheaper duplicate than that dependency. id and
+# created_at share both spellings; user_id and season are storage-side only and
+# never appear in the frame the page sees.
+POLL_PICK_COLS = ['id', 'Player', 'Team', 'My_Rounds', 'Odds', 'Stake',
+                  'Notes', 'Settled', 'created_at']
+POLL_PICK_RENAME = {
+    'Player': 'player', 'Team': 'team', 'My_Rounds': 'my_rounds',
+    'Odds': 'odds', 'Stake': 'stake', 'Notes': 'notes', 'Settled': 'settled',
+}
+POLL_PICK_RENAME_INV = {v: k for k, v in POLL_PICK_RENAME.items()}
+
+_DUPLICATE_PICK = "You're already tracking that player — edit the open pick."
+_PICK_SAVE_FAILED = "Couldn't save that pick — try again."
+_PICK_WRITE_FAILED = "Couldn't update that pick — try again."
+
+
+def _is_duplicate_error(e: Exception) -> bool:
+    """True for a Postgres unique violation (SQLSTATE 23505) via PostgREST.
+
+    Ported from betting_hub, and matching on SQLSTATE + message text for the
+    same reason _is_auth_expired does: the error type has moved between
+    supabase-py versions. Here it means user_poll_picks_active_player fired —
+    the same player picked twice while the first pick is still open.
+    """
+    s = _err_text(e)
+    return '23505' in s or 'duplicate key' in s
+
+
+def _json_safe(record: dict) -> dict:
+    """NaN/NaT → None, so a float column with no value serialises to JSON null.
+
+    The single-record equivalent of betting_hub._sb_records.
+    """
+    return {
+        k: (None if (isinstance(v, float) and pd.isna(v)) else v)
+        for k, v in record.items()
+    }
+
+
+def _empty_poll_picks() -> pd.DataFrame:
+    """An empty frame carrying the columns and dtypes the page expects."""
+    df = pd.DataFrame(columns=POLL_PICK_COLS)
+    df['Odds']      = pd.to_numeric(df['Odds'],  errors='coerce')
+    df['Stake']     = pd.to_numeric(df['Stake'], errors='coerce')
+    df['Settled']   = df['Settled'].fillna(False).astype(bool)
+    df['My_Rounds'] = df['My_Rounds'].fillna('').astype(str)
+    df['Notes']     = df['Notes'].fillna('').astype(str)
+    df['id']        = df['id'].fillna('').astype(str)
+    return df
+
+
+def _coerce_poll_picks(df: pd.DataFrame) -> pd.DataFrame:
+    """Table rows → the page's in-memory shape. Mirrors betting_hub's _coerce.
+
+    Selecting POLL_PICK_COLS at the end is load-bearing as well as tidy: the
+    select is a `*`, so user_id and season arrive too and are dropped here.
+    """
+    if df.empty:
+        return _empty_poll_picks()
+    df = df.rename(columns=POLL_PICK_RENAME_INV)      # snake_case → TitleCase
+    for c in POLL_PICK_COLS:
+        if c not in df.columns:
+            df[c] = None
+    df['Odds']      = pd.to_numeric(df['Odds'],  errors='coerce')
+    df['Stake']     = pd.to_numeric(df['Stake'], errors='coerce')
+    df['Settled']   = df['Settled'].fillna(False).astype(bool)
+    df['My_Rounds'] = df['My_Rounds'].fillna('').astype(str)
+    df['Notes']     = df['Notes'].fillna('').astype(str)
+    df['id']        = df['id'].fillna('').astype(str)
+    df = df[POLL_PICK_COLS]
+    if df['created_at'].notna().any():
+        df = df.sort_values('created_at', na_position='last')
+    return df.reset_index(drop=True)
+
+
+@st.cache_data(ttl=60)
+def load_poll_picks(user_id: str, season: int) -> pd.DataFrame:
+    """The signed-in user's picks for `season`, oldest first. Never raises.
+
+    user_id is in the signature to key the cache, NOT to filter the query.
+    st.cache_data is keyed by arguments and shared across every session on the
+    server, so a cache whose key doesn't name the viewer hands the first
+    viewer's picks to the next — which is exactly what would happen if
+    betting_hub._load_watchlist's keyless ttl=60 cache were pointed at per-user
+    data. Naming user_id gives each viewer their own entry. Callers pass
+    current_user()["id"].
+
+    No .eq("user_id", ...) filter: the select policy already scopes this to the
+    caller's rows, and restating it in the query would imply the filter is what
+    protects the data. It isn't — RLS is.
+
+    An empty frame on failure rather than a raise: this feeds a render, and the
+    page's own "no targets yet" empty state is a better answer than a traceback.
+    """
+    if not current_user():
+        return _empty_poll_picks()
+
+    def _op(sb):
+        return (sb.table(POLL_PICKS_TABLE)
+                  .select("*")
+                  .eq("season", int(season))
+                  .execute())
+
+    try:
+        res, err = _run(_op)
+    except Exception:
+        return _empty_poll_picks()
+    if err:
+        return _empty_poll_picks()
+    return _coerce_poll_picks(pd.DataFrame(getattr(res, "data", None) or []))
+
+
+def save_poll_pick(pick: dict, season: int):
+    """Insert or update one pick. Returns (ok, message).
+
+    id semantics mirror betting_hub._save_polls_row: the caller supplies it — a
+    form-instance uuid, so a double-click or a rerun mid-write reuses the id and
+    this upsert collapses onto one row instead of adding a duplicate. A missing
+    id gets a fresh uuid4 for callers that don't, and created_at likewise (the
+    setdefault matters: an edit passes the original through, so created_at
+    survives the round trip rather than being reset on every save).
+
+    `pick` is TitleCase, as the page holds it. my_rounds is stored exactly as
+    given — its convention ("0" = Opening Round, comma-joined display rounds) is
+    the page's, and this layer does not parse or rewrite it.
+
+    A duplicate is reported, not raised, mirroring how save_watchlist() turns
+    the cap trigger into a message. It means the guard index fired: this player
+    already has an open pick.
+    """
+    user = current_user()
+    if not user:
+        return False, _SESSION_EXPIRED
+
+    row = dict(pick)
+    row.setdefault('id', str(uuid.uuid4()))
+    row.setdefault('created_at', datetime.now(timezone.utc).isoformat())
+
+    record = {POLL_PICK_RENAME.get(k, k): v
+              for k, v in row.items() if k in POLL_PICK_COLS}
+    # Storage-side columns the page's shape doesn't carry. user_id is set from
+    # the session rather than trusted from the caller, and the insert policy's
+    # WITH CHECK rejects it anyway if it isn't auth.uid().
+    record['user_id'] = user["id"]
+    record['season']  = int(season)
+
+    def _op(sb):
+        return (sb.table(POLL_PICKS_TABLE)
+                  .upsert(_json_safe(record), on_conflict="id")
+                  .execute())
+
+    try:
+        _, err = _run(_op)
+        if err:
+            return False, err
+    except Exception as e:
+        if _is_duplicate_error(e):
+            return False, _DUPLICATE_PICK
+        return False, _PICK_SAVE_FAILED
+
+    load_poll_picks.clear()
+    return True, None
+
+
+def mark_poll_pick_settled(pick_id: str):
+    """Mark one pick settled. Returns (ok, message).
+
+    No .eq("user_id", ...) here either: the update policy scopes it to the
+    caller's rows, so an id belonging to someone else matches nothing and
+    changes nothing. RLS, not a filter, is what makes that true.
+    """
+    if not current_user():
+        return False, _SESSION_EXPIRED
+
+    def _op(sb):
+        return (sb.table(POLL_PICKS_TABLE)
+                  .update({'settled': True})
+                  .eq('id', str(pick_id))
+                  .execute())
+
+    try:
+        _, err = _run(_op)
+        if err:
+            return False, err
+    except Exception:
+        return False, _PICK_WRITE_FAILED
+
+    load_poll_picks.clear()
+    return True, None
+
+
+def delete_poll_pick(pick_id: str):
+    """Delete one pick. Returns (ok, message). Scoped by the delete policy."""
+    if not current_user():
+        return False, _SESSION_EXPIRED
+
+    def _op(sb):
+        return (sb.table(POLL_PICKS_TABLE)
+                  .delete()
+                  .eq('id', str(pick_id))
+                  .execute())
+
+    try:
+        _, err = _run(_op)
+        if err:
+            return False, err
+    except Exception:
+        return False, _PICK_WRITE_FAILED
+
+    load_poll_picks.clear()
+    return True, None
