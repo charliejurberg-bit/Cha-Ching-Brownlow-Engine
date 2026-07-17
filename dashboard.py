@@ -410,29 +410,125 @@ def _display_rounds(df):
         return [_display_round(rn, sn) for rn, sn in zip(df['Round_num'], df['Season'])]
     return list(df['Round_num'])
 
+@st.dialog("Cha Ching account")
+def _auth_dialog():
+    """The one sign-in / create-account form in the app.
+
+    A dialog so the banner can offer it from every page without carving a slice
+    out of every layout — which is what the two inline expanders this replaces
+    were doing, in duplicate.
+
+    Safe with the cookie flow, and the reason is worth stating because it is not
+    obvious: st.dialog is implemented as a fragment, and the cookie write is
+    flushed by bootstrap_session() at the TOP of the script, outside any
+    fragment. A fragment-scoped rerun would skip that and silently lose the
+    cookie — the 1e32d87 bug, back again. It does not, because st.rerun()
+    defaults to scope='app' and reruns the whole script. Never pass
+    scope='fragment' here.
+
+    All this does is call user_auth and stage; the four-branch signup handling
+    (confirmation on vs off) is carried over verbatim from the retired forms.
+    """
+    _t1, _t2 = st.tabs(["Sign in", "Create account"])
+    with _t1:
+        with st.form("cc_auth_signin", clear_on_submit=True):
+            _e = st.text_input("Email", key="cc_user_dlg_in_email")
+            _p = st.text_input("Password", type="password", key="cc_user_dlg_in_pw")
+            if st.form_submit_button("Sign in", type="primary",
+                                     use_container_width=True):
+                _ok, _msg = user_auth.sign_in(_e, _p)
+                if _ok:
+                    st.rerun()
+                else:
+                    st.error(_msg)
+    with _t2:
+        with st.form("cc_auth_signup", clear_on_submit=True):
+            _e2 = st.text_input("Email", key="cc_user_dlg_up_email")
+            _p2 = st.text_input("Password", type="password",
+                                key="cc_user_dlg_up_pw",
+                                help="At least 8 characters.")
+            st.caption("Email is used for sign-in only.")
+            if st.form_submit_button("Create account", type="primary",
+                                     use_container_width=True):
+                _ok, _msg = user_auth.sign_up(_e2, _p2)
+                if _ok and not _msg:
+                    st.rerun()          # confirmation off — straight in
+                elif _ok:
+                    st.success(_msg)    # confirmation on — check your email
+                else:
+                    st.error(_msg)
+
+
+def _render_account_control(prefix: str):
+    """Account chip + Sign out when signed in; Sign in otherwise.
+
+    One implementation, two homes (the interior banner and the landing hero).
+    `prefix` only exists because Streamlit needs distinct widget keys — the two
+    never render together, but identical keys would be a DuplicateWidgetID
+    waiting for the day they do.
+
+    Hidden entirely when the anon key isn't configured: a sign-in button that
+    cannot work is worse than no button, the same call auth_available() has
+    always been used for.
+    """
+    _user = user_auth.current_user()
+    if not _user and not user_auth.auth_available():
+        return
+
+    _chip_col, _btn_col = st.columns([2.4, 1.6], vertical_alignment="center")
+    if _user:
+        # Admin wears gold, everyone else emerald — the same signal the hub pill
+        # gives, on the one element that is always on screen.
+        _admin = bool(st.session_state.get("cc_is_admin"))
+        _name = (_user.get("email") or "").split("@")[0] or "account"
+        _initial = _name[:1].upper()
+        with _chip_col:
+            st.markdown(
+                f'<div class="ccb-chip{" admin" if _admin else ""}">'
+                f'<span class="ccb-av">{_initial}</span>'
+                f'<span class="ccb-name">{_name}</span>'
+                f'</div>',
+                unsafe_allow_html=True,
+            )
+        with _btn_col:
+            if st.button("Sign out", key=f"{prefix}_signout",
+                         use_container_width=True):
+                user_auth.sign_out()
+                st.rerun()
+    else:
+        with _btn_col:
+            if st.button("Sign in", key=f"{prefix}_signin",
+                         use_container_width=True):
+                _auth_dialog()
+
+
 def render_banner():
-    _hub = st.session_state.get("active_hub", "brownlow")
+    """Row 1 of every interior page: wordmark left, account control right.
+
+    Columns rather than one st.markdown because the right-hand side has to be
+    real st.buttons — they drive reruns, and the dialog opens from one. The hub
+    pill is NOT here: it is its own row (see _render_hub_tabs), because
+    st.columns wrap is not ours to control and a pill squeezed into this row
+    would clip before it wrapped.
+    """
     _sub = ("Through Round {}".format(_display_round(max_season_rounds, selected_season)) if is_2026
             else "All Seasons" if is_career else f"{selected_season} Season")
-    _mode_label = "Brownlow Predictor" if _hub == "brownlow" else "Betting Hub"
-    st.markdown(f"""
-<div class="cc-banner">
-    <svg class="cc-banner-oval" viewBox="0 0 1000 600" preserveAspectRatio="none" aria-hidden="true">
-        <ellipse class="cc-oval-boundary" cx="500" cy="300" rx="460" ry="270"/>
-        <g class="cc-oval-inner">
-            <path d="M500 255 L545 300 L500 345 L455 300 Z"/>
-            <circle cx="500" cy="300" r="45"/>
-            <circle cx="500" cy="300" r="8"/>
-            <path d="M115 95 A235 235 0 0 0 115 505"/>
-            <path d="M885 95 A235 235 0 0 1 885 505"/>
-            <rect x="40" y="270" width="35" height="60"/>
-            <rect x="925" y="270" width="35" height="60"/>
-        </g>
-    </svg>
-    <div class="cc-banner-title"><span class="cha">CHA </span><span class="ching">CHING</span></div>
-    <div class="cc-banner-eyebrow{' bh' if _hub != 'brownlow' else ''}">{_mode_label.upper()} &middot; {_sub.upper()}</div>
-</div>
-""", unsafe_allow_html=True)
+    with st.container(key="ccbanner"):
+        _bl, _br = st.columns([6, 4], vertical_alignment="center")
+        with _bl:
+            # .cc-banner is kept as the marker the leading-gap rules key off —
+            # see the :has(.cc-banner) block in the CSS.
+            st.markdown(
+                '<div class="cc-banner">'
+                '<span class="ccb-mark">'
+                '<span class="cha">CHA</span><span class="ching">CHING</span>'
+                '</span>'
+                f'<span class="ccb-stamp">{_sub.upper()}</span>'
+                '</div>',
+                unsafe_allow_html=True,
+            )
+        with _br:
+            _render_account_control("ccb")
 
 # ── CSS ──────────────────────────────────────────────────────
 st.markdown("""
@@ -475,75 +571,127 @@ st.markdown("""
     .stApp:has(.cc-banner) div[data-testid="stElementContainer"]:has(> iframe[srcdoc*="_ccAnimated"]) {
         display: none !important;
     }
+    /* Row 1: wordmark + round stamp. The oval/44px hero treatment lives on the
+       landing page only now — interior pages get this compact row so the page
+       itself starts near the top. */
     .cc-banner {
-        position: relative;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100vw;
-        background: var(--bg);
-        border-bottom: 1px solid var(--line);
-        padding: 26px 0 18px;
-        text-align: center;
-        overflow: hidden;
+        display: flex;
+        align-items: baseline;
+        gap: 11px;
+        white-space: nowrap;
+        min-width: 0;
     }
-    /* preserveAspectRatio="none": the 1000x600 viewBox stretches to fill
-       620px x banner height, so the full boundary ellipse fits the banner
-       and cradles the wordmark instead of being clipped to a middle slice. */
-    .cc-banner-oval {
-        position: absolute;
-        top: 6px;
-        left: 50%;
-        width: 620px;
-        max-width: 90%;
-        height: calc(100% - 12px);
-        transform: translateX(-50%);
-        pointer-events: none;
-    }
-    .cc-banner-oval ellipse,
-    .cc-banner-oval path,
-    .cc-banner-oval circle,
-    .cc-banner-oval rect {
-        fill: none;
-        stroke-width: 1;
-        vector-effect: non-scaling-stroke;
-    }
-    .cc-banner-oval .cc-oval-boundary { stroke: rgba(126,156,178,.25); }
-    .cc-banner-oval .cc-oval-inner *  { stroke: rgba(126,156,178,.14); }
-    .cc-banner-title {
-        position: relative;
+    .ccb-mark {
         font-family: 'Archivo', sans-serif;
         font-weight: 900;
         font-variation-settings: 'wdth' 122;
-        font-size: 44px;
+        font-size: 19px;
         line-height: 1;
-        white-space: nowrap;
-        margin: 0 0 8px 0;
+        letter-spacing: .01em;
+        flex: 0 0 auto;
     }
-    .cc-banner-title .cha {
-        background: linear-gradient(180deg, #ffffff 0%, #9fb3c4 100%);
+    /* The gradients are painted on the text itself, so the span must not be
+       display:inline-block-with-zero-width — a trailing space between CHA and
+       CHING would fall outside both gradients, hence the explicit margin. */
+    .ccb-mark .cha {
+        background: linear-gradient(180deg, #e9eef3 0%, #8a9aa9 100%);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        margin-right: .28em;
+    }
+    .ccb-mark .ching {
+        background: linear-gradient(120deg, #34d399 0%, #8ec94a 52%, #f0b429 100%);
         -webkit-background-clip: text;
         background-clip: text;
         -webkit-text-fill-color: transparent;
         color: transparent;
     }
-    .cc-banner-title .ching {
-        background: linear-gradient(120deg, var(--emerald), var(--gold));
-        -webkit-background-clip: text;
-        background-clip: text;
-        -webkit-text-fill-color: transparent;
-        color: transparent;
-    }
-    .cc-banner-eyebrow {
-        position: relative;
-        font-family: 'IBM Plex Mono', monospace;
+    .ccb-stamp {
+        font-family: 'DM Mono', monospace;
         font-size: 10px;
-        letter-spacing: .3em;
+        letter-spacing: .18em;
         text-transform: uppercase;
-        color: var(--emerald);
-        margin: 0;
+        color: #5a6a79;
+        flex: 0 1 auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
-    .cc-banner-eyebrow.bh {
-        color: var(--gold);
+
+    /* Account chip */
+    .ccb-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        max-width: 100%;
+        padding: 3px 12px 3px 3px;
+        background: #101a24;
+        border: 1px solid #1a2632;
+        border-radius: 999px;
+    }
+    .ccb-av {
+        flex: 0 0 auto;
+        width: 24px; height: 24px;
+        border-radius: 50%;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Archivo', sans-serif;
+        font-weight: 800;
+        font-size: 11px;
+        line-height: 1;
+        background: #0f3d31;
+        color: #34d399;
+    }
+    .ccb-chip.admin .ccb-av { background: #3d3110; color: #f0b429; }
+    .ccb-name {
+        font-family: 'Archivo', sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        color: #b8c4ce;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    /* Banner row chrome + buttons.
+       .stApp .st-key-* scores (0,2,1) and theme.py's `.stButton button` reset is
+       (0,1,1) !important — and theme injects AFTER this block, so specificity is
+       the only thing winning here, not order. Same lesson as the nav CSS. */
+    .stApp .st-key-ccbanner {
+        border-bottom: 1px solid var(--line);
+        padding: 10px 0 9px;
+        margin-bottom: 2px;
+    }
+    .stApp .st-key-ccbanner [data-testid="stHorizontalBlock"] { gap: 0 !important; }
+    .stApp .st-key-ccbanner [data-testid="stButton"] button,
+    .stApp .st-key-ccland [data-testid="stButton"] button {
+        font-family: 'Archivo', sans-serif !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        padding: 5px 14px !important;
+        min-height: 30px !important;
+        border-radius: 999px !important;
+        box-shadow: none !important;
+        transition: border-color 160ms ease-out, color 160ms ease-out !important;
+    }
+    .stApp .st-key-ccb_signin button,
+    .stApp .st-key-ccl_signin button {
+        background: transparent !important;
+        border: 1px solid var(--emerald) !important;
+        color: var(--emerald) !important;
+    }
+    .stApp .st-key-ccb_signout button,
+    .stApp .st-key-ccl_signout button {
+        background: transparent !important;
+        border: 1px solid #2a3948 !important;
+        color: #7a8a99 !important;
+    }
+    .stApp .st-key-ccb_signout button:hover,
+    .stApp .st-key-ccl_signout button:hover {
+        border-color: #3d5062 !important;
+        color: #b8c4ce !important;
     }
 
     /* ── Column stagger ── */
@@ -2486,7 +2634,13 @@ def _render_page_nav():
                     st.rerun()
 
 if _page != 'Landing':
-    _render_hub_tabs()
+    # The hub pill is admin-only: every _BH_PAGES page is gated on the admin
+    # check anyway, so for anyone else it is a switch onto a locked door. It
+    # stays its OWN row rather than folding into the banner — st.columns wrap is
+    # not ours to drive, and a pill squeezed into row 1 would clip before it
+    # wrapped. Admin sees three rows, everyone else two.
+    if _is_admin:
+        _render_hub_tabs()
     _render_page_nav()
 
 # ── Controls row (season + odds timestamp) ──────────────────
@@ -2701,6 +2855,13 @@ track.innerHTML += track.innerHTML;
     # ticker CSS keys off it instead of a hidden .cc-ticker-marker + :has().
     with st.container(key="cc_ticker"):
         st.iframe(_ticker_html, height=40)
+
+    # Account control — additive, and placed AFTER the ticker so it cannot
+    # overlap it or push it off the flush top edge. The hero below is untouched.
+    with st.container(key="ccland"):
+        _lsp, _lac = st.columns([6, 4], vertical_alignment="center")
+        with _lac:
+            _render_account_control("ccl")
 
     # ── Hero ──
     _hero_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
