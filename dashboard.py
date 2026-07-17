@@ -1395,6 +1395,7 @@ def fetch_live_brownlow_data():
 
 _BF_CSV   = "data_2026/betfair_predictions.csv"
 _ESPN_CSV = "data_2026/espn_predictions.csv"
+_AFL_CSV  = "data_2026/afl_predictor_predictions.csv"
 
 _PW_UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -1622,6 +1623,22 @@ def fetch_betfair_brownlow():
         return pd.DataFrame(), "No Betfair data yet — refresh it, or run scraper_betfair.py"
     return fb.rename(columns={'Total_Votes': 'BF_Votes', 'Rank': 'BF_Rank'},
                      errors='ignore'), None
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def fetch_afl_predictor_brownlow():
+    """AFL Predictor season totals, read from afl_predictor_predictions.csv.
+
+    Model Comparison is a five-way snapshot, not a live board, so it reads the
+    stored CSV that scraper_afl.py writes on Run Update — nothing on this render
+    path opens a socket. The live award-API pull (fetch_live_brownlow_data,
+    ttl=300) stays on the Live Tracker, where count-night freshness is the whole
+    point. Don't merge the two: the ttls encode different jobs.
+
+    Returns DataFrame[Player, Team, Total_Votes, Rank] — the page re-ranks and
+    renames it itself, so no rename here. Like ESPN and Betfair the column can be
+    arbitrarily old, hence the 'as of' stamp on the page."""
+    return _load_csv_fallback(_AFL_CSV, 'Rank')
 
 
 def _fetch_espn_live():
@@ -5748,9 +5765,9 @@ if _page == 'Model Comparison':
         _mc_cc_team = dict(zip(_mc_cc_df['Player'], _mc_cc_df['Team'])) \
             if 'Team' in _mc_cc_df.columns else {}
 
-        # 2. AFL Predictor
-        _mc_afl_result = fetch_live_brownlow_data()
-        _mc_afl_raw = _mc_afl_result.get('df', pd.DataFrame())
+        # 2. AFL Predictor — CSV-primary, refreshed by scraper_afl.py on Run
+        #    Update. The live API read lives on the Live Tracker, not here.
+        _mc_afl_raw = fetch_afl_predictor_brownlow()
         _mc_afl_df = pd.DataFrame()
         if not _mc_afl_raw.empty and 'Total_Votes' in _mc_afl_raw.columns:
             _mc_afl_s = _mc_afl_raw.sort_values('Total_Votes', ascending=False).reset_index(drop=True)
@@ -6003,10 +6020,22 @@ if _page == 'Model Comparison':
             unsafe_allow_html=True,
         )
 
+        # ── 4a. AFL Predictor source freshness ──
+        # No refresh button by design: the cadence is Run Update (scraper_afl.py),
+        # and the live award-API read stays on the Live Tracker. This is a stamp
+        # only, so the column can't go silently old without saying so.
+        _afl_ts = _file_ts(_AFL_CSV)
+        st.markdown(
+            '<div style="font-size:11px;color:#7e8c99;margin:2px 0 10px">'
+            f'AFL Predictor column · {"as of " + _afl_ts if _afl_ts else "never fetched"}'
+            ' — a stored pull, not live (the Live Tracker reads the API direct).</div>',
+            unsafe_allow_html=True,
+        )
+
         # ── 4b. ESPN source freshness + opt-in refresh ──
-        # Four of these five models are read live or from the weekly run. ESPN
-        # is a stored browser render, so it is the one column that can be
-        # silently old — hence the stamp, which every visitor sees. The refresh
+        # Every column here is stored rather than live-read, so any of them can
+        # be silently old — hence the stamps. ESPN's is a browser render, which
+        # is why it also gets a refresh button (Betfair's is at 4c). The refresh
         # itself is ~20-30s of headless Chromium and is signed-in only: an
         # anonymous visitor must never be able to spawn a browser on the server.
         if _mc_espn_msg := st.session_state.pop("mc_espn_msg", None):
