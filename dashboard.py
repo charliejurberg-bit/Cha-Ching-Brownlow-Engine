@@ -896,6 +896,13 @@ st.markdown("""
 inject_global_css()
 inject_global_theme()
 
+# Trade the session cookie for a live cc_user before anything reads it. This has
+# to sit ahead of every page body — the Live Tracker and Polls a Vote both branch
+# on current_user(), and a page that rendered first would render signed-out and
+# then be contradicted. Recovery itself runs once per browser session; on every
+# other run this is a session_state lookup.
+user_auth.bootstrap_session()
+
 # ── Animated number counter (JS via iframe → parent DOM) ──────
 st.iframe("""
 <script>

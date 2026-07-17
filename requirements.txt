@@ -1,4 +1,11 @@
-streamlit>=1.57
+# Pinned exact, not >=1.57. Cloud resolves >= to whatever is newest at build
+# time, so the deployed Streamlit drifted on its own schedule — and this app now
+# depends on version-sensitive behaviour: st.context.cookies (read-only, initial
+# request only) and a third-party component's iframe. 1.59.2 is what >=1.57 was
+# already resolving to, so the pin changes nothing today; it just stops the next
+# release from changing it for us. Bump deliberately, verify sign-in survives a
+# refresh, then commit the new pin.
+streamlit==1.59.2
 pandas
 plotly
 xgboost
@@ -6,5 +13,11 @@ requests
 numpy
 scikit-learn
 supabase==2.30.0
+# Cookie WRITES only — Streamlit has no cookie-write API, and reads go through
+# st.context.cookies instead (see user_auth). Chosen over
+# streamlit-cookies-controller (last release 2024-04, still 0.0.x) and
+# streamlit-cookies-manager (2021, dead); this one tracks modern Streamlit and
+# declares streamlit>=1.40.1.
+extra-streamlit-components==0.1.81
 
 openpyxl

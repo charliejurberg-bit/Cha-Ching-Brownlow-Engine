@@ -24,7 +24,7 @@ Session keys all start with "cc_user", which is what sign_out() clears.
 
 import uuid
 import time
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pandas as pd
 import streamlit as st
@@ -110,15 +110,167 @@ def _is_cap_error(e: Exception) -> bool:
     return "watchlist limit reached" in s or "p0001" in s
 
 
+# ── Session persistence across a browser refresh ───────────────────────────
+#
+# st.session_state dies with the browser session, so a refresh used to sign
+# everyone out. The refresh token now rides in a cookie and bootstrap_session()
+# trades it for a fresh session on the first script run.
+#
+# READ and WRITE come from different places, deliberately:
+#
+#   read  -> st.context.cookies, native, no component. It is populated from the
+#            INITIAL HTTP REQUEST, so it is already there on the first script
+#            run — which is exactly when recovery needs it. This sidesteps the
+#            first-render round-trip that makes CookieManager.get_all() return
+#            {} on run one, the classic flakiness of this whole approach.
+#   write -> extra_streamlit_components.CookieManager, because Streamlit has no
+#            cookie-write API at all (verified: nothing in dir(st) writes one).
+#
+# Two consequences of that split are load-bearing:
+#
+#   1. st.context.cookies does NOT update as cookies change — it is a snapshot
+#      of the initial request. Recovery therefore runs ONCE per browser session
+#      (_BOOTSTRAPPED), not once per run: a later attempt would re-read the same
+#      stale snapshot, and after a sign-out would try to recover a session the
+#      user just ended.
+#   2. Writes are STAGED in session_state and flushed at one fixed point per run
+#      rather than issued inline. A component only reaches the browser if the
+#      script keeps running; sign-in and sign-out both st.rerun() immediately,
+#      which would race the write. Staging moves the write to the next run's
+#      bootstrap, where nothing reruns behind it.
+#
+# The staging keys deliberately do NOT start with "cc_user": sign_out() clears
+# every cc_user* key, and would otherwise wipe its own staged cookie delete.
+
+_COOKIE_NAME    = "cc_session"
+_COOKIE_DAYS    = 30
+_COOKIE_PENDING = "cc_cookie_pending"       # staged write: token, or "" to delete
+_BOOTSTRAPPED   = "cc_cookie_bootstrapped"  # recovery is once per browser session
+_UNSET          = object()
+
+
+def _stage_cookie(token) -> None:
+    """Queue a cookie write for the next flush. Falsy token queues a delete."""
+    st.session_state[_COOKIE_PENDING] = token or ""
+
+
+def _read_cookie():
+    """The stored refresh token, or None. Native read — see the note above."""
+    try:
+        return st.context.cookies.get(_COOKIE_NAME)
+    except Exception:
+        return None
+
+
+def _cookie_manager():
+    """A CookieManager, or None when the component isn't installed.
+
+    Fails soft on purpose: without it the app loses persistence across refreshes
+    and nothing else. An auth module that crashes the whole page because an
+    optional convenience is missing would be a worse trade.
+    """
+    try:
+        from extra_streamlit_components import CookieManager
+        return CookieManager(key="cc_cookie_mgr")
+    except Exception:
+        return None
+
+
+def _flush_cookie() -> None:
+    """Perform the staged cookie write, if any.
+
+    Instantiating CookieManager renders an (invisible) component iframe, so this
+    builds one only when there is something to write — on a normal run nothing
+    is staged and no component renders at all.
+    """
+    pending = st.session_state.pop(_COOKIE_PENDING, _UNSET)
+    if pending is _UNSET:
+        return
+    cm = _cookie_manager()
+    if cm is None:
+        return
+    try:
+        if pending:
+            # expires_at is not optional in practice: omit it and the component
+            # silently defaults the cookie to ONE DAY, whatever max_age says.
+            cm.set(
+                _COOKIE_NAME, pending,
+                key="cc_cookie_set",
+                path="/",
+                expires_at=datetime.now(timezone.utc) + timedelta(days=_COOKIE_DAYS),
+                max_age=_COOKIE_DAYS * 24 * 60 * 60,
+                secure=True,
+                same_site="strict",
+            )
+        else:
+            cm.delete(_COOKIE_NAME, key="cc_cookie_del")
+    except Exception:
+        pass
+
+
+def _recover() -> None:
+    """Trade the cookie's refresh token for a live session. Silent on failure.
+
+    A refresh token is single-use — Supabase rotates it and hands back a new one
+    — so _set_user stages the ROTATED token straight back to the cookie. Storing
+    the one we just spent would break the next recovery.
+
+    Any failure (expired, revoked, reused, replayed from another machine) drops
+    the cookie and leaves the visitor signed out with no message. There is
+    nothing here a visitor did wrong, and nothing they can act on.
+    """
+    token = _read_cookie()
+    if not token:
+        return
+    sb = _anon_client()
+    if sb is None:
+        return
+    try:
+        res = sb.auth.refresh_session(token)
+    except Exception:
+        _stage_cookie(None)
+        return
+    user    = getattr(res, "user", None)
+    session = getattr(res, "session", None)
+    if not user or not session:
+        _stage_cookie(None)
+        return
+    _set_user(user, session)
+
+
+def bootstrap_session() -> None:
+    """Restore a signed-in cc_user after a page refresh. Call once per script
+    run, from the top of the app, before anything reads current_user().
+
+    Cheap on every run but the first of a browser session: recovery is gated on
+    _BOOTSTRAPPED, and the flush is a session_state pop that usually finds
+    nothing.
+    """
+    if not st.session_state.get(_BOOTSTRAPPED):
+        st.session_state[_BOOTSTRAPPED] = True
+        if not st.session_state.get("cc_user"):
+            _recover()
+    _flush_cookie()
+
+
 # ── Session state ──────────────────────────────────────────────────────────
 
 def _set_user(user, session) -> None:
+    """The single place a session is established — and therefore the single
+    place the cookie is staged. sign_in, sign_up, _refresh_once and _recover all
+    land here, so every path that mints a refresh token persists it, including
+    the rotated one _refresh_once gets back.
+    """
     st.session_state["cc_user"] = {
         "id":            getattr(user, "id", None),
         "email":         getattr(user, "email", None),
         "access_token":  getattr(session, "access_token", None),
         "refresh_token": getattr(session, "refresh_token", None),
+        # Carried so a proactive refresh becomes possible later. Nothing reads it
+        # yet — _run still refreshes reactively, when PostgREST says PGRST301.
+        "expires_at":    getattr(session, "expires_at", None),
     }
+    _stage_cookie(getattr(session, "refresh_token", None))
 
 
 def current_user():
@@ -127,12 +279,28 @@ def current_user():
 
 
 def sign_out() -> None:
-    """Clear every cc_user* key and nothing else.
+    """Revoke the session server-side, drop the cookie, clear every cc_user* key.
 
-    This includes the multiselect's widget key, which matters: without it, one
-    user's picks would still be sitting in the widget when the next person signs
-    in on the same browser session.
+    Order matters. The revoke goes first because it needs the JWT that the clear
+    below is about to throw away, and it is what stops the cookie's refresh token
+    from outliving the sign-out: deleting the cookie alone would leave a live
+    credential on any machine that had already copied it.
+
+    Clearing cc_user* includes the multiselect's widget key, which matters:
+    without it, one user's picks would still be sitting in the widget when the
+    next person signs in on the same browser session. The staged cookie delete
+    survives that sweep by not carrying the prefix — see the persistence note.
     """
+    sb = _user_client()
+    if sb is not None:
+        try:
+            sb.auth.sign_out()
+        except Exception:
+            # Already expired or unreachable. The cookie still goes, and the
+            # token dies on its own; nothing here is worth a message.
+            pass
+
+    _stage_cookie(None)
     for key in [k for k in list(st.session_state.keys())
                 if str(k).startswith(_SESSION_PREFIX)]:
         st.session_state.pop(key, None)
