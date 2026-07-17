@@ -4862,6 +4862,24 @@ if _page == 'Stat Filter':
 # ══════════════════════════════════════════════════════════════
 # LIVE TRACKER
 # ════════════════════════════════════════════════════════════
+def _rounds_of(s):
+    """Parse a My_Rounds string ("0,3,7") to a set of display rounds.
+
+    Display convention on both sides — "0" is Opening Round, and the values are
+    compared straight against last_round / _disp_round, which are already
+    offset. Do NOT apply the Round_num − 1 law here; it is already applied.
+
+    One definition for the assembler and the render, which each carried an
+    identical private copy before.
+    """
+    out = set()
+    for t in str(s).split(","):
+        t = t.strip()
+        if t.lstrip("-").isdigit():
+            out.add(int(t))
+    return out
+
+
 def _assemble_live_tracker(lt, game_df, watchlist):
     """Assemble every value the Live Tracker renders from, off (a) live AFL vote
     data, (b) the model's per-round Exp_Votes / Poll_Prob, and (c) the persisted
@@ -4871,7 +4889,7 @@ def _assemble_live_tracker(lt, game_df, watchlist):
     Dicts are keyed by normalise_name(player) throughout. Returns:
       totals, prev_totals, round_votes, model_to_date, model_remaining,
       projection, delta, team, name, model_pollers (display_round -> {norm names}),
-      watch_next (next-round watchlist chips), recon (hit / blanked / bolter),
+      recon (hit / blanked / bolter),
       round_exp / round_pp (display_round -> {norm name -> value}),
       game_name / game_team (norm name -> model-frame name / team).
 
@@ -4887,7 +4905,7 @@ def _assemble_live_tracker(lt, game_df, watchlist):
         "model_to_date": {}, "model_remaining": {}, "projection": {}, "delta": {},
         "team": {}, "name": {}, "model_pollers": {},
         "round_exp": {}, "round_pp": {}, "game_name": {}, "game_team": {},
-        "watch_next": [], "recon": {"hit": [], "blanked": [], "bolter": []},
+        "recon": {"hit": [], "blanked": [], "bolter": []},
     }
     if df is None or df.empty:
         return asm
@@ -4972,43 +4990,26 @@ def _assemble_live_tracker(lt, game_df, watchlist):
         asm["projection"][nn] = tot + asm["model_remaining"].get(nn, 0.0)
         asm["delta"][nn] = tot - asm["model_to_date"].get(nn, 0.0)
 
-    # ── watchlist: next-round card + last-round reconciliation ────────────────
-    def _rounds_of(s):
-        out = set()
-        for t in str(s).split(","):
-            t = t.strip()
-            if t.lstrip("-").isdigit():
-                out.add(int(t))
-        return out
-
-    next_pollers = asm["model_pollers"].get(last_round + 1, set())
-    watched_next, watched_last = set(), set()
+    # ── watchlist: last-round reconciliation ──────────────────────────────────
+    # `watchlist` is whichever source the page selected — the private
+    # poll_watchlist for bh_authed, or a cc_user's own poll picks. Identical
+    # columns (Player / Team / My_Rounds / Settled) and identical round
+    # convention, so nothing here knows or cares which it got.
+    #
+    # Settled rows are skipped: a settled pick is a closed position, not a
+    # standing call on a round.
+    watched_last = set()
     if watchlist is not None and not watchlist.empty:
         for _, w in watchlist.iterrows():
             if bool(w.get("Settled", False)):
                 continue
             wn = normalise_name(w.get("Player", ""))
             rounds = _rounds_of(w.get("My_Rounds", ""))
-            if last_round < 24 and (last_round + 1) in rounds:
-                watched_next.add(wn)
-                asm["watch_next"].append({
-                    "name": w.get("Player", ""), "team": w.get("Team", ""),
-                    "badge": "both" if wn in next_pollers else "you",
-                })
             if last_round > 0 and last_round in rounds:
                 watched_last.add(wn)
                 polled = asm["round_votes"].get(wn, {}).get(last_round, 0)
                 rec = {"name": w.get("Player", ""), "team": w.get("Team", ""), "votes": polled}
                 asm["recon"]["hit" if polled >= 1 else "blanked"].append(rec)
-
-    # model-only projected pollers for the next round (suggestions you're not on)
-    if last_round < 24:
-        for nn in next_pollers:
-            if nn not in watched_next:
-                asm["watch_next"].append({
-                    "name": asm["name"].get(nn, nn), "team": asm["team"].get(nn, ""),
-                    "badge": "model",
-                })
 
     # bolters = polled >=2 in last_round but never on the watchlist for it
     if last_round > 0:
@@ -5098,12 +5099,35 @@ if _page == 'Live Tracker':
             )
 
         # ── shared assembly: live votes + model per-round signal + watchlist ──
-        # The watchlist is private Betting Hub data on an otherwise public page.
-        # Anonymous visitors get no fetch at all — not a fetch-then-hide — and
-        # the panels it feeds are dropped below, so the tracker renders as if
-        # the feature doesn't exist. Same session key as the BH gate.
-        _wl_visible = bool(st.session_state.get("bh_authed"))
-        _wl      = betting_hub._load_watchlist() if _wl_visible else None
+        # Two identities can supply a watchlist, so the source is chosen once,
+        # here, and everything downstream (Zone 1 recon, Zone 3 upcoming, the dot
+        # legend, the 3-column grid) consumes the result without knowing which it
+        # got. The frames are interchangeable: same TitleCase columns, same
+        # display-round convention in My_Rounds.
+        #
+        # Precedence — bh_authed wins. It is the private Betting Hub watchlist and
+        # it is still the only place Charlie's rows live; a cc_user session that
+        # happens to be signed in at the same time (me, testing) must not silently
+        # replace them. This whole branch dies with poll_watchlist's retirement,
+        # after which picks are the only source and the elif becomes the rule.
+        #
+        # An anonymous visitor gets no fetch at all — not a fetch-then-hide — and
+        # the panels it feeds are dropped below, so the tracker renders as if the
+        # feature doesn't exist.
+        _cc_user = user_auth.current_user()
+        _cc_uid  = _cc_user.get("id") if _cc_user else None
+        if st.session_state.get("bh_authed"):
+            _wl = betting_hub._load_watchlist()
+        elif _cc_uid:
+            _wl = user_auth.load_poll_picks(_cc_uid, _LT_SEASON)
+        else:
+            _wl = None
+        # "A watchlist source exists" — no longer "bh_authed". An empty frame is
+        # still a source: an account with no picks owns the panel and sees it
+        # empty, which is the same thing bh_authed with an empty watchlist has
+        # always done.
+        _wl_visible = _wl is not None
+
         _lt_game = load_game(_LT_SEASON)
         _asm     = _assemble_live_tracker(_lt, _lt_game, _wl)
 
@@ -5114,7 +5138,15 @@ if _page == 'Live Tracker':
         # private _load_watchlist() above, and bh_authed must never require an
         # account. Both set at once is legal (me, testing) — the private zones
         # win and the public picks still mark up the leaderboard.
-        _cc_user  = user_auth.current_user()
+        #
+        # The ★ set below and the poll picks feeding Zone 1/3 above are separate
+        # on purpose and neither feeds the other: a ★ says "watching this player
+        # all season", a pick says "backing him in round N". They are different
+        # claims, the ★ set is capped at 30 by a DB trigger that picks have no
+        # equivalent of, and merging them would quietly widen the "My watchlist
+        # only" filter to players nobody starred.
+        #
+        # (_cc_user is read at the source selection above — it picks the frame.)
         if _cc_user and "cc_user_watchlist" not in st.session_state:
             user_auth.load_watchlist(_LT_SEASON)
         _cc_picks = set(st.session_state.get("cc_user_watchlist", set()))
@@ -5176,14 +5208,9 @@ if _page == 'Live Tracker':
         def _team_of(nn):
             return _asm["team"].get(nn) or _wl_team.get(nn) or _game_team.get(nn) or ""
 
-        # watchlist "card" per display round (unsettled rows only)
-        def _rounds_of(s):
-            _out = set()
-            for _t in str(s).split(","):
-                _t = _t.strip()
-                if _t.lstrip("-").isdigit():
-                    _out.add(int(_t))
-            return _out
+        # watchlist "card" per display round (unsettled rows only).
+        # _rounds_of is the module-level one now — this block carried a private
+        # copy identical to the assembler's.
         _card_by_round = {}
         if _wl is not None and not _wl.empty:
             for _, _w in _wl.iterrows():
