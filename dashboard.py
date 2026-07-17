@@ -10,7 +10,6 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 import os
 import re
-import hmac
 import subprocess
 import sys
 import betting_hub
@@ -902,6 +901,19 @@ inject_global_theme()
 # then be contradicted. Recovery itself runs once per browser session; on every
 # other run this is a session_state lookup.
 user_auth.bootstrap_session()
+
+# Admin access, resolved once per run and never re-derived. Every gate below
+# reads this or the session key beside it, so there is exactly one place that
+# decides who is admin — the property the old password gate had, kept.
+#
+# The session key exists for betting_hub's render_page backstop. betting_hub
+# deliberately does not import user_auth (that module talks to Supabase with the
+# anon key + a user JWT; betting_hub uses service_role, and keeping them apart is
+# what stops anyone reaching for the wrong client), so a session key is the
+# bridge — the same shape the backstop already relied on with bh_authed, and
+# still the only key it reads.
+_is_admin = user_auth.is_admin()
+st.session_state["cc_is_admin"] = _is_admin
 
 # ── Animated number counter (JS via iframe → parent DOM) ──────
 st.iframe("""
@@ -2518,15 +2530,16 @@ if _show_controls:
 # Single chokepoint before any page body renders — covers every _BH_PAGES
 # page, including the inline Predictions block below. Brownlow pages
 # (_page not in _BH_PAGES) never hit this and are visually unchanged.
+#
+# Access is an admin account now, not a shared password. There is nothing to
+# type here any more: a password could be passed on, forwarded, or shoulder-read,
+# and it authenticated a STRING rather than a person. The admin check resolves an
+# identity Supabase already verified, so the way in is to sign in — which the
+# Live Tracker and Polls a Vote already offer — and the way to lose access is to
+# sign out. This screen therefore states the fact and stops; it never collects a
+# credential of its own.
 # ════════════════════════════════════════════════════════════
-if _page in _BH_PAGES and not st.session_state.get("bh_authed"):
-    # FAIL CLOSED: any problem reading the secret (missing key, no secrets
-    # file at all) → deny access rather than crash or fall open.
-    try:
-        _bh_pw_secret = st.secrets["BH_PASSWORD"]
-    except Exception:
-        _bh_pw_secret = None
-
+if _page in _BH_PAGES and not _is_admin:
     _gl, _gc, _gr = st.columns([1, 1.1, 1])
     with _gc:
         st.markdown(
@@ -2534,36 +2547,20 @@ if _page in _BH_PAGES and not st.session_state.get("bh_authed"):
             '<div style="font-size:26px;font-weight:800;color:#e9eef3;'
             'letter-spacing:.5px">Betting Hub</div>'
             '<div style="color:var(--muted);font-size:13px;margin-top:6px">'
-            'Private &mdash; enter password to continue</div>'
+            'Private &mdash; this section is not public.</div>'
             '</div>',
             unsafe_allow_html=True,
         )
-        if _bh_pw_secret is None:
+        # A signed-in non-admin is told the same thing as a visitor, deliberately:
+        # "wrong account" would confirm that some account does have access, and
+        # there is nothing they can do with that but go looking for it.
+        if not user_auth.current_user():
             st.markdown(
                 '<div style="text-align:center;color:var(--muted);font-size:13px">'
-                'Access is not configured. Set <code>BH_PASSWORD</code> in secrets '
-                'to enable the Betting Hub.</div>',
+                'Signed-in accounts can track their own Brownlow picks from the '
+                '<b>Live Tracker</b> and <b>Polls a Vote</b>.</div>',
                 unsafe_allow_html=True,
             )
-        else:
-            with st.form("bh_gate_form"):
-                _bh_pw_try = st.text_input(
-                    "Betting Hub password", type="password",
-                    label_visibility="collapsed", placeholder="Password",
-                )
-                _bh_submit = st.form_submit_button("Enter", type="primary")
-            if _bh_submit:
-                # Constant-time compare. _bh_pw_secret is never None here — the
-                # branch above renders the not-configured notice and no form.
-                if hmac.compare_digest(str(_bh_pw_try), str(_bh_pw_secret)):
-                    st.session_state["bh_authed"] = True
-                    st.rerun()
-                else:
-                    st.markdown(
-                        '<div style="text-align:center;color:var(--muted);'
-                        'font-size:13px;margin-top:8px">Incorrect password.</div>',
-                        unsafe_allow_html=True,
-                    )
     st.stop()
 
 # ════════════════════════════════════════════════════════════
@@ -6085,7 +6082,7 @@ if _page == 'Model Comparison':
             f'ESPN column · {"as of " + _espn_ts if _espn_ts else "never fetched"}'
             ' — a stored render, not a live pull (ESPN publishes no feed).</div>'
         )
-        if st.session_state.get("bh_authed"):
+        if _is_admin:
             _es1, _es2 = st.columns([4, 1])
             _es1.markdown(_espn_cap, unsafe_allow_html=True)
             if _es2.button("Refresh ESPN", key="mc_espn_refresh",
@@ -6115,7 +6112,7 @@ if _page == 'Model Comparison':
             f'Betfair column · {"as of " + _bf_ts if _bf_ts else "never fetched"}'
             ' — a stored pull, not live (their API sleeps off-season).</div>'
         )
-        if st.session_state.get("bh_authed"):
+        if _is_admin:
             _bf1, _bf2 = st.columns([4, 1])
             _bf1.markdown(_bf_cap, unsafe_allow_html=True)
             if _bf2.button("Refresh Betfair", key="mc_bf_refresh",

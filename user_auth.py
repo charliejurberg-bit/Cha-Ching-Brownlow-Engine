@@ -415,8 +415,41 @@ def _set_user(user, session) -> None:
 
 
 def current_user():
-    """The signed-in public user, or None. Independent of bh_authed."""
+    """The signed-in public user, or None."""
     return st.session_state.get("cc_user")
+
+
+def is_admin() -> bool:
+    """True when the signed-in user is the admin account.
+
+    Replaces the shared Betting Hub password: access is now a property of who
+    you are signed in as, not of a string anyone can pass on. The UUID lives in
+    secrets rather than in code because this repo is public — the value is not a
+    credential, but committing it would publish exactly which account to attack.
+
+    Plain == on purpose, not hmac.compare_digest. compare_digest defends against
+    an attacker who can guess a secret by timing their guesses; here the caller
+    must ALREADY hold a valid JWT for the account they are claiming, minted by
+    Supabase against a password we never see. Timing this comparison buys
+    nothing, and reaching for it would imply the UUID is the thing keeping the
+    door shut. It is not — the session is.
+
+    Fails closed on every path: no secret configured, no one signed in, a user
+    dict without an id, or any error reading secrets → False. A missing
+    ADMIN_UID therefore locks the admin out rather than letting anyone in, which
+    is the right way round for this to break.
+    """
+    user = current_user()
+    if not user:
+        return False
+    uid = user.get("id")
+    if not uid:
+        return False
+    try:
+        admin_uid = st.secrets["ADMIN_UID"]
+    except Exception:
+        return False
+    return bool(admin_uid) and str(uid) == str(admin_uid)
 
 
 def sign_out() -> None:

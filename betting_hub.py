@@ -3255,12 +3255,18 @@ def render_trends_analysis():
 def render_page(page: str):
     """Called from dashboard.py for each Betting Hub page.
 
-    The gate in dashboard.py already st.stop()s an unauthenticated request long
-    before this runs. This is a backstop so no future caller can route around
-    it: every BH page is gated here too, regardless of how it was reached. It
-    reads the same session key the gate sets — there is deliberately only one.
+    The gate in dashboard.py already st.stop()s a non-admin request long before
+    this runs. This is a backstop so no future caller can route around it: every
+    BH page is gated here too, regardless of how it was reached. It reads the
+    same session key the gate sets — there is deliberately only one.
+
+    cc_is_admin, not user_auth.is_admin(): this module talks to Supabase with the
+    service_role key, user_auth talks with the anon key and a per-user JWT, and
+    they are kept apart so nobody reaches for the wrong client. The session key
+    dashboard writes once per run is the bridge — same shape this backstop always
+    had, when the key was bh_authed.
     """
-    if not st.session_state.get("bh_authed"):
+    if not st.session_state.get("cc_is_admin"):
         st.stop()
     inject_global_css()
     _ensure_dirs()
