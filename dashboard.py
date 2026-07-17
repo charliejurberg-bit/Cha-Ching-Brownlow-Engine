@@ -6633,14 +6633,30 @@ def render_polls_a_vote(season: int):
     # survive — no new failure mode, and the visitor's render is unchanged.
     _pav_load = bool(_pav_uid)
 
+    # One cached read for all three of this page's game-frame needs. It replaces
+    # three raw usecols reads of the same 8.7 MB / 166-column file — one for the
+    # grid, one for the add-form player list, one for the add-form round lookup —
+    # which re-parsed it from disk on EVERY rerun, including every checkbox tick
+    # in the add form. Measured: 3 narrow parses ~290ms per rerun against ~15ms
+    # for cache_data's frame copy.
+    #
+    # load_game is the same file behind @st.cache_data(ttl=3600) and is keyed by
+    # season, so this shares the entry the Live Tracker and Leaderboard already
+    # warm — usually no disk read at all. It returns None on a missing file,
+    # which is exactly the degradation the os.path.exists guards gave us: every
+    # consumer below already treats "no frame" as its empty default.
+    #
+    # Called ONCE and sliced. cache_data hands back a copy per call, so three
+    # calls would be three copies of an 11 MB frame.
+    _pav_game = load_game(season) if _pav_load else None
+
     _gdf = None  # per-round Poll_Prob source for the grid (the gold numbers)
-    if _pav_load and os.path.exists("predictions/game_level_2026.csv"):
+    if _pav_game is not None:
         try:
-            _gdf = pd.read_csv(
-                "predictions/game_level_2026.csv",
-                usecols=['Player', 'Team', 'Round_num', 'Poll_Prob'],
-            )
+            _gdf = _pav_game[['Player', 'Team', 'Round_num', 'Poll_Prob']]
         except Exception:
+            # A missing column raises here where usecols used to — same outcome,
+            # _gdf stays None and the grid degrades as it always has.
             pass
 
     # Current round anchor — latest round present in the predictions source (NOT
@@ -6656,10 +6672,9 @@ def render_polls_a_vote(season: int):
     # Player list for the Add form dropdown
     _pav_all_players: list[str] = []
     _pav_player_team: dict[str, str] = {}
-    if _pav_load and os.path.exists("predictions/game_level_2026.csv"):
+    if _pav_game is not None:
         try:
-            _pav_plist = pd.read_csv("predictions/game_level_2026.csv", usecols=['Player', 'Team'])
-            _pav_plist = _pav_plist.dropna(subset=['Player'])
+            _pav_plist = _pav_game[['Player', 'Team']].dropna(subset=['Player'])
             _pav_player_team = (
                 _pav_plist.drop_duplicates('Player').set_index('Player')['Team'].to_dict()
             )
@@ -7089,18 +7104,16 @@ def render_polls_a_vote(season: int):
 
         # Per-round Exp_Votes (the gold poll-prob numbers driving which rounds tick)
         _pav_round_votes: dict[int, float] = {}
-        if pav_player.strip():
+        # Reuses the frame loaded once at the top rather than re-parsing the CSV.
+        # This ran on every rerun of the add form — every checkbox tick — so it
+        # was the most expensive of the three reads despite looking the smallest.
+        if pav_player.strip() and _pav_game is not None:
             try:
-                if os.path.exists("predictions/game_level_2026.csv"):
-                    _gdf_lookup = pd.read_csv(
-                        "predictions/game_level_2026.csv",
-                        usecols=['Player', 'Round_num', 'Exp_Votes'],
-                    )
-                    _lk_match = _gdf_lookup[
-                        _gdf_lookup['Player'].str.lower() == pav_player.strip().lower()
-                    ]
-                    for _, _lk_r in _lk_match.iterrows():
-                        _pav_round_votes[int(_lk_r['Round_num']) - 1] = float(_lk_r['Exp_Votes'])
+                _lk_match = _pav_game[
+                    _pav_game['Player'].str.lower() == pav_player.strip().lower()
+                ]
+                for _, _lk_r in _lk_match.iterrows():
+                    _pav_round_votes[int(_lk_r['Round_num']) - 1] = float(_lk_r['Exp_Votes'])
             except Exception:
                 pass
 
