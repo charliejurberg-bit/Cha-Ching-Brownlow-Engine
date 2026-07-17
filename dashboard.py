@@ -1840,7 +1840,11 @@ if 'page' not in st.session_state:
 if st.session_state.page != 'Landing':
     render_banner()
 
-_BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis', 'Polls a Vote'}
+# Membership here is what the password gate keys off (see the chokepoint below),
+# so a page leaves the gate by leaving this set. Polls a Vote did exactly that in
+# session 3: it is per-user now, scoped by RLS rather than by this gate, and
+# lives in the Brownlow strip.
+_BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis'}
 
 _hub  = st.session_state.get("active_hub", "brownlow")
 _page = st.session_state.page
@@ -1925,9 +1929,10 @@ if _hub == "brownlow":
         "Leaderboard", "Player Profile",
         "Stat Filter", "Game Analysis",
         "Model Comparison", "Live Tracker",
+        "Polls a Vote",
     ]
 else:
-    _snav_pages = ["Performance", "Predictions", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis", "Polls a Vote"]
+    _snav_pages = ["Performance", "Predictions", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis"]
 
 # ── Nav CSS (injected once before containers) ─────────────────
 # The tabler-icons webfont the icon rules depend on is loaded as a pinned <link>
@@ -6460,6 +6465,655 @@ def _render_rg_footer():
         '</div>',
         unsafe_allow_html=True,
     )
+
+# ════════════════════════════════════════════════════════════
+# POLLS A VOTE
+# ════════════════════════════════════════════════════════════
+# Moved out of the Betting Hub in session 3. It was private-by-gate: the page
+# read poll_watchlist through betting_hub's service_role client with no filter,
+# and only _BH_PAGES membership kept Charlie's rows off a public screen. It is
+# per-user now — user_poll_picks, read with the caller's JWT so RLS does the
+# scoping — which is what makes it safe to render outside that gate.
+#
+# The season is pinned rather than taken from `selected_season`, exactly as the
+# Live Tracker pins _LT_SEASON: this page has no Season control and is not in
+# _SEASON_PAGES. One constant feeds the picks' season column, and it matches the
+# 2026 model frame the consensus loaders below read.
+_PAV_SEASON = 2026
+
+
+def _pav_render_signin():
+    """The way in, shown where the add form sits for a visitor.
+
+    Mirrors the Live Tracker's account panel — same user_auth entry points, same
+    cc_user_* prefix so sign_out() clears these too — with its own keys. The two
+    never render together today, but identical widget labels in one app are a
+    DuplicateWidgetID waiting for the day someone renders both.
+    """
+    if not user_auth.auth_available():
+        # A sign-in box that cannot work is worse than no sign-in box — the same
+        # call the Live Tracker makes.
+        st.markdown(
+            '<div class="pav-empty">Accounts aren\'t available right now.</div>',
+            unsafe_allow_html=True)
+        return
+
+    with st.expander("Sign in to track your own targets", expanded=True):
+        _pt1, _pt2 = st.tabs(["Sign in", "Create account"])
+        with _pt1:
+            with st.form("cc_user_pav_signin", clear_on_submit=True):
+                _pe = st.text_input("Email", key="cc_user_pav_in_email")
+                _pp = st.text_input("Password", type="password",
+                                    key="cc_user_pav_in_pw")
+                if st.form_submit_button("Sign in", type="primary"):
+                    _pok, _pmsg = user_auth.sign_in(_pe, _pp)
+                    if _pok:
+                        st.rerun()
+                    else:
+                        st.error(_pmsg)
+        with _pt2:
+            with st.form("cc_user_pav_signup", clear_on_submit=True):
+                _pe2 = st.text_input("Email", key="cc_user_pav_up_email")
+                _pp2 = st.text_input("Password", type="password",
+                                     key="cc_user_pav_up_pw",
+                                     help="At least 8 characters.")
+                st.caption("Email is used for sign-in only.")
+                if st.form_submit_button("Create account", type="primary"):
+                    _pok, _pmsg = user_auth.sign_up(_pe2, _pp2)
+                    if _pok and not _pmsg:
+                        st.rerun()          # confirmation off
+                    elif _pok:
+                        st.success(_pmsg)   # confirmation on
+                    else:
+                        st.error(_pmsg)
+
+
+def render_polls_a_vote(season: int):
+    """Per-user Polls-a-Vote picks, for `season`.
+
+    Lived in betting_hub behind the _BH_PAGES password until session 3. It is
+    a public Brownlow page now, so bh_authed plays no part: the consensus
+    machinery below is shared and file-derived, and the only per-user data —
+    the picks themselves — comes from user_poll_picks via user_auth, where RLS
+    scopes it to the caller. Nothing here may touch betting_hub's service_role
+    watchlist path; that client bypasses RLS and would serve one viewer's rows
+    to every other.
+
+    The BH stylesheet still owns .pav-* — the page carries its own look across
+    rather than forking it, so _inject_css stays betting_hub's.
+    """
+    betting_hub._inject_css()
+    # STEP 1 — masthead flushed onto #0a1017 via the innermost .pav-flush marker;
+    # .pav-page marker scopes the field/button restyles below (no global override).
+    st.markdown(
+        '<span class="pav-page" style="display:none"></span>'
+        '<div class="title-bar"><span class="pav-flush" style="display:none"></span>'
+        '<h2 style="color:var(--text);margin:0">Polls a Vote Watchlist</h2>'
+        '<p style="color:var(--muted);margin:4px 0 0 0">'
+        'Track your "polls a vote" targets — five models, round by round</p></div>',
+        unsafe_allow_html=True,
+    )
+
+    # ── Who is asking ─────────────────────────────────────────────────────────
+    # The only identity this page knows. bh_authed is deliberately not consulted:
+    # it gates the Betting Hub, and this page left it.
+    _pav_user = user_auth.current_user()
+    _pav_uid  = _pav_user.get("id") if _pav_user else None
+
+    # ── Data + consensus helpers (loaded once, used by matrix, cards, form) ─────
+    # Picks are the only per-user data here. A visitor triggers no fetch at all —
+    # not a fetch-then-hide — and gets the empty frame the zones below already
+    # have empty states for. Everything after this line is shared, file-derived
+    # and identical for every viewer.
+    polls = (user_auth.load_poll_picks(_pav_uid, season) if _pav_uid
+             else user_auth._empty_poll_picks())
+
+    _gdf = None  # per-round Poll_Prob source for the grid (the gold numbers)
+    if os.path.exists("predictions/game_level_2026.csv"):
+        try:
+            _gdf = pd.read_csv(
+                "predictions/game_level_2026.csv",
+                usecols=['Player', 'Team', 'Round_num', 'Poll_Prob'],
+            )
+        except Exception:
+            pass
+
+    # Current round anchor — latest round present in the predictions source (NOT
+    # hardcoded). Matrix column index = Round_num - 1 (same convention as
+    # _model_top3 and the round labels OR..R24). Degrades to None if unavailable.
+    _cur_idx = None
+    if _gdf is not None and not _gdf.empty and 'Round_num' in _gdf.columns:
+        try:
+            _cur_idx = int(_gdf['Round_num'].max()) - 1
+        except Exception:
+            _cur_idx = None
+
+    # Player list for the Add form dropdown
+    _pav_all_players: list[str] = []
+    _pav_player_team: dict[str, str] = {}
+    if os.path.exists("predictions/game_level_2026.csv"):
+        try:
+            _pav_plist = pd.read_csv("predictions/game_level_2026.csv", usecols=['Player', 'Team'])
+            _pav_plist = _pav_plist.dropna(subset=['Player'])
+            _pav_player_team = (
+                _pav_plist.drop_duplicates('Player').set_index('Player')['Team'].to_dict()
+            )
+            _pav_all_players = sorted(_pav_player_team.keys())
+        except Exception:
+            pass
+
+    import re as _re
+    _NAME_SUFFIX_RE = _re.compile(r'\s+(Jr\.?|Sr\.?|II|III|IV)$', _re.IGNORECASE)
+
+    def _norm(name) -> str:
+        if pd.isna(name):
+            return ''
+        s = str(name).title().strip().replace("'", '').replace('-', ' ')
+        s = _re.sub(r'\s+', ' ', s).strip()
+        return _NAME_SUFFIX_RE.sub('', s).strip()
+
+    # ── Cross-model consensus thresholds (named) ───────────────────────────────
+    CC_ROUND_THRESH     = 0.35   # Cha Ching: round Poll_Prob >= this = tips that round
+    WHEELO_ROUND_THRESH = 0.5    # Wheelo: round ExpVotes >= this = tips that round
+    BF_ROUND_THRESH     = 1.0    # Betfair: round vote >= 1 = tipped to poll that round
+    AFL_ROUND_THRESH    = 1.0    # AFL Predictor: round vote >= 1 = tipped to poll that round
+    ESPN_ROUND_THRESH   = 0.5    # ESPN: round vote >= 0.5 = tips (ESPN's min published spread value)
+    CC_SEASON_THRESH    = 0.35   # Cha Ching: season max Poll_Prob "on the radar"
+    WH_SEASON_THRESH    = 0.65   # Wheelo: season sum "on the radar"
+
+    _con_max_prob:  dict[str, float] = {}
+    _con_afl:       dict[str, float] | None = None
+    _con_wheelo:    dict[str, float] = {}
+    _con_bf:   dict[str, float] | None = None
+    _con_espn: dict[str, float] | None = None
+    # Round-level lookups (display/AFL round convention: 0 = Opening Round).
+    _con_cc_round: dict[str, dict[int, float]] = {}            # CC per-round Poll_Prob
+    _con_wheelo_round: dict[str, dict[int, float]] = {}        # Wheelo per-round ExpVotes
+    _con_bf_round: dict[str, dict[int, float]] | None = None   # Betfair per-round votes
+    _con_afl_round: dict[str, dict[int, float]] | None = None  # AFL Predictor per-round votes
+    _con_espn_round: dict[str, dict[int, float]] | None = None  # ESPN per-round votes
+    _espn_rounds_covered: set[int] = set()                     # rounds ESPN published (any game)
+    try:
+        # 1. Cha Ching: max Poll_Prob per player (season) + per-round (verdict).
+        #    Round key = Round_num - 1 (display/AFL convention).
+        if _gdf is not None:
+            for _cp, _cg in _gdf.groupby('Player'):
+                _ck = _norm(_cp)
+                _con_max_prob[_ck] = float(_cg['Poll_Prob'].max())
+                _con_cc_round[_ck] = {
+                    int(_rr['Round_num']) - 1: float(_rr['Poll_Prob'])
+                    for _, _rr in _cg.iterrows()
+                }
+        # 2. AFL Predictor — season totals (radar) from scraper_afl.py (the
+        #    official AFL award API). Previously this slot read season_2026.csv,
+        #    which is Cha Ching's OWN output — a mislabel that double-counted Cha
+        #    Ching. Now it's real AFL data.
+        _afl_csv = "data_2026/afl_predictor_predictions.csv"
+        if os.path.exists(_afl_csv):
+            _afldf = pd.read_csv(_afl_csv)
+            if 'Total_Votes' in _afldf.columns:
+                _con_afl = {_norm(r['Player']): float(r['Total_Votes'] or 0)
+                            for _, r in _afldf.iterrows()}
+        # 2b. AFL Predictor — per-round votes (verdict) from afl_predictor_round_votes.csv.
+        #     Rounds are AFL/display convention, matching My_Rounds and the others.
+        _afl_round_csv = "data_2026/afl_predictor_round_votes.csv"
+        if os.path.exists(_afl_round_csv):
+            _aflr = pd.read_csv(_afl_round_csv)
+            if {'Player', 'Round', 'Vote'} <= set(_aflr.columns):
+                _con_afl_round = {}
+                for _, _rr in _aflr.iterrows():
+                    _con_afl_round.setdefault(_norm(_rr['Player']), {})[
+                        int(_rr['Round'])] = float(_rr['Vote'] or 0)
+        # 3. Wheelo: season sum (radar) + per-round ExpVotes (verdict).
+        #    Round key = Round - 1 (wheelo_2026.csv Round is AFLTables convention,
+        #    same +1 as CC). NaN ExpVotes rounds are skipped → NA, not disagree.
+        _wh26 = "data_wheelo/wheelo_2026.csv"
+        if os.path.exists(_wh26):
+            _whdf = pd.read_csv(_wh26)
+            _wh_col = next((c for c in ['ExpVotes', 'RatingPoints'] if c in _whdf.columns), None)
+            if _wh_col:
+                for _wp, _wg in _whdf.groupby('Player'):
+                    _con_wheelo[_norm(_wp)] = float(_wg[_wh_col].sum())
+            if 'ExpVotes' in _whdf.columns and 'Round' in _whdf.columns:
+                for _wp, _wg in _whdf.groupby('Player'):
+                    _wk = _norm(_wp)
+                    for _, _wr in _wg.iterrows():
+                        if pd.isna(_wr['ExpVotes']) or pd.isna(_wr['Round']):
+                            continue
+                        _con_wheelo_round.setdefault(_wk, {})[
+                            int(_wr['Round']) - 1] = float(_wr['ExpVotes'])
+        # 4. Betfair — season totals (radar) from the cached CSV.
+        _bf_csv = "data_2026/betfair_predictions.csv"
+        if os.path.exists(_bf_csv):
+            _bfdf = pd.read_csv(_bf_csv)
+            if 'Total_Votes' in _bfdf.columns:
+                _con_bf = {_norm(r['Player']): float(r['Total_Votes'] or 0)
+                           for _, r in _bfdf.iterrows()}
+        # 4b. Betfair — per-round votes (round verdict) from betfair_round_votes.csv,
+        #     written by scraper_betfair.py from the same JSON feed. Rounds are
+        #     AFL/display convention, matching My_Rounds and CC Round_num-1.
+        _bf_round_csv = "data_2026/betfair_round_votes.csv"
+        if os.path.exists(_bf_round_csv):
+            _bfr = pd.read_csv(_bf_round_csv)
+            if {'Player', 'Round', 'Vote'} <= set(_bfr.columns):
+                _con_bf_round = {}
+                for _, _rr in _bfr.iterrows():
+                    _con_bf_round.setdefault(_norm(_rr['Player']), {})[
+                        int(_rr['Round'])] = float(_rr['Vote'] or 0)
+        # 5. ESPN — season totals (radar) from the cached CSV.
+        _espn_csv = "data_2026/espn_predictions.csv"
+        if os.path.exists(_espn_csv):
+            _espndf = pd.read_csv(_espn_csv)
+            if 'Total_Votes' in _espndf.columns:
+                _con_espn = {_norm(r['Player']): float(r['Total_Votes'] or 0)
+                             for _, r in _espndf.iterrows()}
+        # 5b. ESPN — per-round votes (verdict) from espn_round_votes.csv, written by
+        #     scraper_espn.py. Rounds are AFL/display convention (0 = Opening Round),
+        #     matching the others. ESPN names only vote-getters, so absence in a
+        #     covered round is disagreement, not silence — _espn_rounds_covered records
+        #     which rounds ESPN published so a missing player reads TIPS_OTHER, not NA.
+        _espn_round_csv = "data_2026/espn_round_votes.csv"
+        if os.path.exists(_espn_round_csv):
+            _espnr = pd.read_csv(_espn_round_csv)
+            if {'Player', 'Round', 'Vote'} <= set(_espnr.columns):
+                _con_espn_round = {}
+                for _, _rr in _espnr.iterrows():
+                    _rnd = int(_rr['Round'])
+                    _con_espn_round.setdefault(_norm(_rr['Player']), {})[
+                        _rnd] = float(_rr['Vote'] or 0)
+                    _espn_rounds_covered.add(_rnd)
+    except Exception:
+        pass
+
+    def _consensus_score(player: str) -> tuple[int, int]:
+        key = _norm(player)
+        agree, total = 0, 0
+        if _con_max_prob:
+            total += 1
+            if _con_max_prob.get(key, 0) >= CC_SEASON_THRESH:
+                agree += 1
+        if _con_afl is not None:
+            total += 1
+            if _con_afl.get(key, 0) > 0:
+                agree += 1
+        if _con_wheelo:
+            total += 1
+            if _con_wheelo.get(key, 0) >= WH_SEASON_THRESH:
+                agree += 1
+        if _con_bf is not None:
+            total += 1
+            if _con_bf.get(key, 0) > 0:
+                agree += 1
+        if _con_espn is not None:
+            total += 1
+            if _con_espn.get(key, 0) > 0:
+                agree += 1
+        return agree, total
+
+    # ── Round-aware verdict ────────────────────────────────────────────────────
+    # For the picked round(s), classify each model: TIPS (tips him that round),
+    # TIPS_OTHER (covers that game but he's not tipped — real disagreement), or
+    # NA (no round-level data / season-only → shown as "—", never counted).
+    # All five sources are now round-capable.
+    _ROUND_MODELS = ['Cha Ching', 'Betfair', 'Wheelo', 'AFL Predictor', 'ESPN']
+
+    def _verdict_from(rounds_for: dict[int, float] | None, picked: set[int],
+                      thresh: float) -> str:
+        if rounds_for is None:
+            return 'NA'
+        covered = [r for r in picked if r in rounds_for]
+        if not covered:
+            return 'NA'
+        if any(rounds_for[r] >= thresh for r in covered):
+            return 'TIPS'
+        return 'TIPS_OTHER'
+
+    def _verdict_espn(key: str, picked: set[int]) -> str:
+        # ESPN prose names only vote-getters, so it can't emit "played, 0 votes"
+        # rows the way AFL Predictor does. Coverage is therefore judged at the
+        # round level: if ESPN published a picked round, a player named >= thresh
+        # there TIPS, and a player absent from it is disagreement (TIPS_OTHER),
+        # not silence. A round ESPN never published stays NA.
+        if _con_espn_round is None:
+            return 'NA'
+        covered = picked & _espn_rounds_covered
+        if not covered:
+            return 'NA'
+        player_rounds = _con_espn_round.get(key, {})
+        if any(player_rounds.get(r, 0) >= ESPN_ROUND_THRESH for r in covered):
+            return 'TIPS'
+        return 'TIPS_OTHER'
+
+    def _round_states(player: str, rounds: set[int]) -> dict[str, str]:
+        key = _norm(player)
+        return {
+            'Cha Ching': _verdict_from(_con_cc_round.get(key), rounds, CC_ROUND_THRESH),
+            'Betfair': _verdict_from(
+                None if _con_bf_round is None else _con_bf_round.get(key, {}),
+                rounds, BF_ROUND_THRESH),
+            'Wheelo': _verdict_from(_con_wheelo_round.get(key), rounds, WHEELO_ROUND_THRESH),
+            'AFL Predictor': _verdict_from(
+                None if _con_afl_round is None else _con_afl_round.get(key, {}),
+                rounds, AFL_ROUND_THRESH),
+            'ESPN': _verdict_espn(key, rounds),
+        }
+
+    def _model_top3(player: str) -> list[int]:
+        if _gdf is None:
+            return []
+        sub = _gdf[_gdf['Player'].str.lower() == player.lower()]
+        if sub.empty:
+            return []
+        # Top 3 by projected poll prob, then drop near-zero rounds (>0.2 only) so
+        # bye/DNP rounds never pad the list. May leave 3, 1, or 0 rounds; order
+        # stays highest-first. Single source → matrix dots, card chips, and the
+        # AGREE overlap count all consume this filtered list consistently.
+        top = sub.nlargest(3, 'Poll_Prob')
+        top = top[top['Poll_Prob'] > 0.2]
+        return (top['Round_num'].astype(int) - 1).tolist()
+
+    def _parse_rounds(raw: str) -> set[int]:
+        rounds = set()
+        for t in str(raw).split(','):
+            t = t.strip()
+            if t.lstrip('-').isdigit():
+                rounds.add(int(t))
+        return rounds
+
+    _rl = lambda r: 'OR' if r == 0 else f'R{r}'
+
+    # ── STEP 2 — Round Matrix (hero, flush) ────────────────────────────────────
+    st.markdown(
+        '<div class="pav-secthead"><span class="t">Round Matrix</span>'
+        '<span class="pav-key"><b style="color:#f0b429">★</b> you + model'
+        ' &nbsp; <b style="color:#34d399">★</b> your pick'
+        ' &nbsp; <b style="color:var(--muted)">·</b> model only</span></div>',
+        unsafe_allow_html=True,
+    )
+
+    if _pav_user is None:
+        st.markdown('<div class="pav-empty">Sign in below to track your own targets.</div>',
+                    unsafe_allow_html=True)
+    elif polls.empty:
+        st.markdown('<div class="pav-empty">No targets yet — add one below.</div>',
+                    unsafe_allow_html=True)
+    else:
+        _rnd_labels_m = ['OR'] + [str(i) for i in range(1, 25)]
+        _header = '<th class="pl">Player</th>'
+        for _ci, _lbl in enumerate(_rnd_labels_m):
+            _w = 'background:rgba(52,211,153,.10);' if _ci == _cur_idx else ''
+            _header += f'<th style="{_w}">{_lbl}</th>'
+
+        _rows_html = ''
+        for _, row in polls.iterrows():
+            player    = str(row['Player'])
+            team      = str(row['Team'])
+            my_rounds = _parse_rounds(row['My_Rounds'])
+            model_set = set(_model_top3(player))
+            settled   = bool(row.get('Settled', False))
+            _op       = 'opacity:.45;' if settled else ''
+            cells = (f'<td class="pl"><span class="nm">{player}</span><br>'
+                     f'<span class="tm">{team}</span></td>')
+            for rn in range(25):
+                # Current-round wash anchors "now"; encoding bg layers on top.
+                _w = 'background:rgba(52,211,153,.08);' if rn == _cur_idx else ''
+                # TODO(suppression): no round-suppression logic exists in this
+                # codebase yet (no "Brownlow.Votes>0 in a prior round" rule). When
+                # it lands, grey/blank suppressed (player, round) cells here.
+                in_m, in_mod = rn in my_rounds, rn in model_set
+                if in_m and in_mod:
+                    cells += f'<td style="{_w}background:rgba(240,180,41,.16);color:#f0b429">★</td>'
+                elif in_m:
+                    cells += f'<td style="{_w}color:#34d399">★</td>'
+                elif in_mod:
+                    cells += f'<td style="{_w}color:var(--muted)">·</td>'
+                else:
+                    cells += f'<td style="{_w}"></td>'
+            _rows_html += f'<tr style="{_op}">{cells}</tr>'
+
+        st.markdown(
+            f'<div style="overflow-x:auto">'
+            f'<table class="pav-matrix">'
+            f'<thead><tr>{_header}</tr></thead>'
+            f'<tbody>{_rows_html}</tbody>'
+            f'</table></div>',
+            unsafe_allow_html=True,
+        )
+
+    # ── STEP 3 — Active Watchlist monitoring cards ─────────────────────────────
+    st.markdown('<div class="pav-secthead"><span class="t">Active Watchlist</span></div>',
+                unsafe_allow_html=True)
+
+    if _pav_user is None:
+        st.markdown('<div class="pav-empty">Your picks appear here once you sign in.</div>',
+                    unsafe_allow_html=True)
+    elif polls.empty:
+        st.markdown('<div class="pav-empty">No targets yet.</div>', unsafe_allow_html=True)
+
+    for idx, row in polls.iterrows():
+        player    = str(row['Player'])
+        team      = str(row['Team'])
+        my_rounds = _parse_rounds(row['My_Rounds'])
+        top3      = _model_top3(player)
+        settled   = bool(row.get('Settled', False))
+
+        # Gold headline number — Cha Ching's season probability the player polls
+        # AT LEAST ONCE: 1 − Π(1 − Poll_Prob_r) over every round he has a row.
+        # COMPOUND, not a sum (two 0.2 rounds → 1 − 0.8·0.8 = 36%, not 40%).
+        _cc_probs = [_p for _p in _con_cc_round.get(_norm(player), {}).values()
+                     if _p == _p]   # drop NaN
+        _no_poll = 1.0
+        for _p in _cc_probs:
+            _no_poll *= (1.0 - min(max(_p, 0.0), 1.0))
+        _poll_pct_str = f'{(1.0 - _no_poll) * 100:.0f}%' if _cc_probs else '—'
+
+        # Round-aware verdict (primary headline) — "for this player, in the
+        # round(s) you picked, which round-capable models tip him".
+        _rstates  = _round_states(player, my_rounds)
+        _r_answer = [m for m in _ROUND_MODELS if _rstates[m] != 'NA']
+        _r_tips   = [m for m in _r_answer if _rstates[m] == 'TIPS']
+        _r_na     = sum(1 for m in _ROUND_MODELS if _rstates[m] == 'NA')
+        if not my_rounds:
+            _round_head, _round_color = 'No round picked', '#7e8c99'
+        elif _r_answer:
+            _round_head = f'{len(_r_tips)} of {len(_r_answer)} round-models tip'
+            _round_color = '#34d399' if len(_r_tips) == len(_r_answer) else '#f0b429'
+        else:
+            _round_head, _round_color = 'No round-level model data', '#7e8c99'
+
+        # Per-model strip — TIPS ✓ green, TIPS_OTHER ✗ gold (disagree, never red),
+        # NA — muted (silence, must not look like disagreement).
+        _glyph = {'TIPS': ('✓', '#34d399'),
+                  'TIPS_OTHER': ('✗', '#f0b429'),
+                  'NA': ('—', '#5d6b78')}
+        _short = {'Cha Ching': 'CC', 'Betfair': 'BF', 'AFL Predictor': 'AFL',
+                  'Wheelo': 'WH', 'ESPN': 'ESPN'}
+        _strip = '&nbsp;&nbsp;'.join(
+            f'<span style="color:{_glyph[_rstates[m]][1]}">'
+            f'{_short[m]}&nbsp;{_glyph[_rstates[m]][0]}</span>'
+            for m in _ROUND_MODELS
+        )
+
+        # Season-level "on the radar" — kept as a separate, quieter indicator.
+        _cs_agree, _cs_total = _consensus_score(player)
+
+        my_chips = ''.join(f'<span class="pav-pill-star">★ {_rl(r)}</span>'
+                           for r in sorted(my_rounds))
+        model_chips = ''.join(f'<span class="pav-pill-dash">{_rl(r)}</span>' for r in top3)
+        chips = (my_chips + model_chips) or '<span style="color:var(--muted);font-size:12px">—</span>'
+
+        odds_str  = f"{float(row['Odds']):.2f}"  if pd.notna(row.get('Odds'))  else '—'
+        stake_str = f"{float(row['Stake']):.2f}u" if pd.notna(row.get('Stake')) else '—'
+        _op = 'opacity:.55;' if settled else ''
+        sbadge = '<span class="sbadge">SETTLED</span>' if settled else ''
+        _na_suffix = (f'<span style="color:#7e8c99"> · {_r_na} n/a</span>'
+                      if (my_rounds and _r_answer) else '')
+        _season_line = (
+            f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:10px;'
+            f'color:#7e8c99;margin-top:4px">On the radar (season): '
+            f'{_cs_agree}/{_cs_total}</div>' if _cs_total else '')
+        con_html = (
+            f'<div class="con" style="color:{_round_color}">{_round_head}{_na_suffix}</div>'
+            f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
+            f'margin-top:4px">{_strip}</div>'
+            f'{_season_line}')
+
+        st.markdown(
+            f'<div class="pav-card" style="{_op}">'
+            f'<div style="display:flex;justify-content:space-between;align-items:flex-start;'
+            f'flex-wrap:wrap;gap:18px">'
+
+            f'<div style="min-width:210px">'
+            f'<div class="nm">{player}{sbadge}</div>'
+            f'<div class="tm">{team}</div>'
+            f'{con_html}'
+            f'</div>'
+
+            f'<div style="flex:1;min-width:220px">'
+            f'<div class="lbl">My rounds / model top 3</div>'
+            f'<div>{chips}</div>'
+            f'</div>'
+
+            f'<div style="text-align:center;min-width:70px">'
+            f'<div class="agree">{_poll_pct_str}</div>'
+            f'<div class="lbl" style="margin-top:5px">Season poll %</div>'
+            f'</div>'
+
+            f'<div style="min-width:96px">'
+            f'<div class="lbl">Odds / Stake</div>'
+            f'<div class="os">{odds_str} / {stake_str}</div>'
+            f'</div>'
+
+            f'</div></div>',
+            unsafe_allow_html=True,
+        )
+
+        _bcols = st.columns([1, 1, 6])
+        if not settled:
+            with _bcols[0]:
+                st.markdown('<span class="pav-settle-marker" style="display:none"></span>',
+                            unsafe_allow_html=True)
+                if st.button("Mark settled", key=f"pav_settle_{idx}"):
+                    _ok, _msg = user_auth.mark_poll_pick_settled(row['id'])
+                    if _ok:
+                        st.rerun()
+                    elif _msg:
+                        st.error(_msg)
+        with _bcols[1]:
+            st.markdown('<span class="pav-delete-marker" style="display:none"></span>',
+                        unsafe_allow_html=True)
+            if st.button("Delete", key=f"pav_delete_{idx}"):
+                _ok, _msg = user_auth.delete_poll_pick(row['id'])
+                if _ok:
+                    st.rerun()
+                elif _msg:
+                    st.error(_msg)
+
+    # ── STEP 4 — Add-target form, or the way in ───────────────────────────────
+    # Last zone on the page, so a visitor is served here and returns: there is no
+    # add form without an account to attach a pick to.
+    if _pav_user is None:
+        _pav_render_signin()
+        return
+
+    with st.expander("+ Add a watchlist target", expanded=False):
+        # Selectbox outside the form so selection reruns and refreshes the round
+        # lookup; the form below keeps the existing checkbox state + submit callback.
+        pav_player = st.selectbox("Player name", options=[""] + _pav_all_players, index=0) or ""
+        pav_team = _pav_player_team.get(pav_player, "")
+
+        # Per-round Exp_Votes (the gold poll-prob numbers driving which rounds tick)
+        _pav_round_votes: dict[int, float] = {}
+        if pav_player.strip():
+            try:
+                if os.path.exists("predictions/game_level_2026.csv"):
+                    _gdf_lookup = pd.read_csv(
+                        "predictions/game_level_2026.csv",
+                        usecols=['Player', 'Round_num', 'Exp_Votes'],
+                    )
+                    _lk_match = _gdf_lookup[
+                        _gdf_lookup['Player'].str.lower() == pav_player.strip().lower()
+                    ]
+                    for _, _lk_r in _lk_match.iterrows():
+                        _pav_round_votes[int(_lk_r['Round_num']) - 1] = float(_lk_r['Exp_Votes'])
+            except Exception:
+                pass
+
+        _form_top3 = set(_model_top3(pav_player)) if pav_player.strip() else set()
+
+        _wl_id = betting_hub._form_instance_id('_pav_row_id')
+        with st.form("pav_add_form", clear_on_submit=True):
+            st.markdown(
+                '<div class="lbl" style="margin:8px 0 6px">Rounds to watch'
+                ' &nbsp;·&nbsp; OR = Opening Round'
+                ' &nbsp;·&nbsp; <span style="color:#f0b429">gold</span> = high poll prob'
+                ' &nbsp;·&nbsp; ◆ = model top 3</div>',
+                unsafe_allow_html=True,
+            )
+            _rnd_labels = ['OR'] + [f'R{i}' for i in range(1, 25)]
+            _rnd_checks: dict[int, bool] = {}
+            for _ri in range(0, 25, 5):
+                _rcols = st.columns(5)
+                for _ci in range(5):
+                    _rn = _ri + _ci
+                    with _rcols[_ci]:
+                        ev = _pav_round_votes.get(_rn)
+                        base_lbl = _rnd_labels[_rn]
+                        if _rn in _form_top3:
+                            base_lbl = f'◆ {base_lbl}'
+                        lbl = f"**{base_lbl}**" if (ev is not None and ev > 0.35) else base_lbl
+                        _rnd_checks[_rn] = st.checkbox(lbl, key=f"pav_rnd_{_rn}")
+                        if ev is not None:
+                            ev_cls = 'pav-ev-gold' if ev > 0.35 else 'pav-ev-muted'
+                            st.markdown(
+                                f'<div class="{ev_cls}" style="font-size:12px;margin-top:-10px;'
+                                f'padding-left:26px;line-height:1;'
+                                f'font-family:\'IBM Plex Mono\',monospace">{ev:.2f}</div>',
+                                unsafe_allow_html=True,
+                            )
+
+            fo1, fo2 = st.columns(2)
+            with fo1:
+                pav_odds = st.number_input("Odds", min_value=1.01, value=2.0, step=0.05, format="%.2f")
+            with fo2:
+                pav_stake = st.number_input("Stake (u)", min_value=0.0, value=1.0, step=0.5, format="%.2f")
+            pav_notes = st.text_input("Notes (optional)")
+
+            if st.form_submit_button("Add to Watchlist", type="primary", use_container_width=True):
+                if not pav_player.strip():
+                    # Amber for the same reason as the duplicate below: nothing
+                    # failed, the form just isn't filled in yet.
+                    st.warning("Player name is required.")
+                else:
+                    _sel = sorted(r for r, chk in _rnd_checks.items() if chk)
+                    # save_poll_pick reports the duplicate rather than raising it —
+                    # user_poll_picks_active_player is now (user_id, player), so it
+                    # can only ever mean this user's own open pick, never another's.
+                    _ok, _msg = user_auth.save_poll_pick({
+                        'id':        _wl_id,
+                        'Player':    pav_player.strip(),
+                        'Team':      pav_team.strip(),
+                        'My_Rounds': ','.join(str(r) for r in _sel),
+                        'Odds':      round(float(pav_odds), 2),
+                        'Stake':     round(float(pav_stake), 2),
+                        'Notes':     pav_notes.strip(),
+                        'Settled':   False,
+                    }, season)
+                    if _ok:
+                        betting_hub._clear_form_instance('_pav_row_id')
+                        st.success(f"Added {pav_player.strip()} to watchlist.")
+                        st.rerun()
+                    elif _msg:
+                        # Amber, not red: red is reserved for losses and negative
+                        # P&L. The expected failure here is the duplicate guard —
+                        # the player is already on the list and the user just edits
+                        # it — which is a nudge, not an error.
+                        st.warning(_msg)
+
+
+if _page == 'Polls a Vote':
+    render_polls_a_vote(_PAV_SEASON)
+
 
 # ── Global footer ────────────────────────────────────────────
 if _page == 'Landing':

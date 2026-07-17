@@ -423,7 +423,10 @@ POLL_PICK_RENAME = {
 }
 POLL_PICK_RENAME_INV = {v: k for k, v in POLL_PICK_RENAME.items()}
 
-_DUPLICATE_PICK = "You're already tracking that player — edit the open pick."
+# The wording the page has shown for this case since it lived in the Betting Hub.
+# save_poll_pick fills the name in — it has the pick in hand, and "already
+# watching Nick Daicos" is the whole point of the message.
+_DUPLICATE_PICK = "Already watching {player} — edit the existing entry."
 _PICK_SAVE_FAILED = "Couldn't save that pick — try again."
 _PICK_WRITE_FAILED = "Couldn't update that pick — try again."
 
@@ -569,7 +572,8 @@ def save_poll_pick(pick: dict, season: int):
             return False, err
     except Exception as e:
         if _is_duplicate_error(e):
-            return False, _DUPLICATE_PICK
+            return False, _DUPLICATE_PICK.format(
+                player=row.get('Player') or 'that player')
         return False, _PICK_SAVE_FAILED
 
     load_poll_picks.clear()
