@@ -685,6 +685,39 @@ st.markdown("""
     }
     .stApp .st-key-ccbanner [data-testid="stHorizontalBlock"] { gap: 0 !important; }
 
+    /* Row 1 centreline — the wordmark and the account group sit on one axis.
+       st.columns(vertical_alignment="center") is the primary mechanism and is
+       already passed in render_banner (available since 1.36; present on both
+       1.57 local and 1.59 Cloud). It sets the column proto's vertical_alignment,
+       which the frontend turns into justify-content on the column's own flex
+       container — so it centres each column's CHILDREN inside the column.
+       It was not enough on its own, and this is why: Streamlit's markdown block
+       carries default paragraph margins, so the wordmark's BOX was taller than
+       the text inside it. The column dutifully centred the box; the text sat
+       low inside that box, and the account group — whose container we already
+       zero the margins on — did not. Making the box honest is the fix; the
+       justify-content below is a backstop in case a future Streamlit renders
+       vertical_alignment differently.
+       Scoped to the two banner containers, so no other page's markdown loses
+       its paragraph spacing. */
+    .stApp .st-key-ccbanner [data-testid="stMarkdownContainer"],
+    .stApp .st-key-ccland [data-testid="stMarkdownContainer"],
+    .stApp .st-key-ccbanner [data-testid="stMarkdownContainer"] p,
+    .stApp .st-key-ccland [data-testid="stMarkdownContainer"] p {
+        margin: 0 !important;
+        padding: 0 !important;
+        line-height: inherit !important;
+    }
+    .stApp .st-key-ccbanner [data-testid="stColumn"],
+    .stApp .st-key-ccland [data-testid="stColumn"] {
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: center !important;
+    }
+    .stApp .st-key-ccbanner [data-testid="stElementContainer"] {
+        margin: 0 !important;
+    }
+
     /* The account group: chip immediately left of the button, hard right.
        st.container(key=...) stamps the class on the stVerticalBlock ITSELF, so
        this node is the flex container — no descendant hop needed. A column
