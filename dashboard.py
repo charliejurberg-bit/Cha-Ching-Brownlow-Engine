@@ -659,10 +659,27 @@ st.markdown("""
        .stApp .st-key-* scores (0,2,1) and theme.py's `.stButton button` reset is
        (0,1,1) !important — and theme injects AFTER this block, so specificity is
        the only thing winning here, not order. Same lesson as the nav CSS. */
+    /* Full-bleed, the same way the hub row and page strip do it: escape the
+       centred block container with left:50% + translateX(-50%) + width:100vw.
+       The OLD .cc-banner carried this trio and the rebuild dropped it, which is
+       why row 1 sat indented while the strip below ran edge to edge.
+       padding's 16px matches .st-key-ccnav_page's `padding: 4px 16px`, so both
+       rows share one content box and the wordmark lines up with the strip's
+       left inset. Change the two together or they drift apart again. */
     .stApp .st-key-ccbanner {
-        border-bottom: 1px solid var(--line);
-        padding: 10px 0 9px;
-        margin-bottom: 2px;
+        background: var(--bg) !important;
+        position: relative !important;
+        left: 50% !important;
+        transform: translateX(-50%) !important;
+        width: 100vw !important;
+        min-width: 100vw !important;
+        flex-shrink: 0 !important;
+        margin-left: 0 !important;
+        padding: 10px 16px 9px !important;
+        border-bottom: 1px solid var(--line) !important;
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+        gap: 0 !important;
     }
     .stApp .st-key-ccbanner [data-testid="stHorizontalBlock"] { gap: 0 !important; }
     .stApp .st-key-ccbanner [data-testid="stButton"] button,
