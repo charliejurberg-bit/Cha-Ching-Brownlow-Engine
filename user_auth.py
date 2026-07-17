@@ -119,23 +119,37 @@ def _is_cap_error(e: Exception) -> bool:
 # everyone out. The refresh token now rides in a cookie and bootstrap_session()
 # trades it for a fresh session on the first script run.
 #
-# READ and WRITE come from different places, deliberately:
+# BOTH reads and writes go through the component, i.e. through document.cookie in
+# the browser. Streamlit has no cookie-write API at all (verified: nothing in
+# dir(st) writes one), and — the expensive lesson — it has no usable cookie READ
+# for this either:
 #
-#   read  -> st.context.cookies, native, no component. It is populated from the
-#            INITIAL HTTP REQUEST, so it is already there on the first script
-#            run — which is exactly when recovery needs it. This sidesteps the
-#            first-render round-trip that makes CookieManager.get_all() return
-#            {} on run one, the classic flakiness of this whole approach.
-#   write -> extra_streamlit_components.CookieManager, because Streamlit has no
-#            cookie-write API at all (verified: nothing in dir(st) writes one).
+#   st.context.cookies is NOT the page's cookies. Streamlit builds it from the
+#   WEBSOCKET HANDSHAKE (streamlit/web/server/starlette/starlette_websocket.py:
+#   StarletteClientContext.__init__ -> dict(websocket.cookies)). A handshake is a
+#   subresource request, so SameSite is judged against the TOP-LEVEL document —
+#   and Streamlit Cloud serves the app inside an iframe. The browser therefore
+#   withholds cc_session from the handshake and st.context.cookies comes back
+#   empty, while document.cookie in the component iframe reads it perfectly.
+#   That asymmetry cost a deploy in 66b5ddf: writes landed, reads were blind.
 #
-# Three consequences of that split are load-bearing:
+#   Do not "fix" SameSite=Strict to Lax to get it back. Lax is sent on TOP-LEVEL
+#   NAVIGATIONS only; a websocket handshake is not one, so Lax fails identically
+#   under an iframe. Only SameSite=None would reach the handshake, and the
+#   component cannot emit it (its signature is Literal["lax", "strict"]). Strict
+#   now governs nothing we depend on — both paths are document.cookie — so it
+#   stays, because stricter costs nothing.
 #
-#   1. st.context.cookies does NOT update as cookies change — it is a snapshot
-#      of the initial request. Recovery therefore runs ONCE per browser session
-#      (_BOOTSTRAPPED), not once per run: a later attempt would re-read the same
-#      stale snapshot, and after a sign-out would try to recover a session the
-#      user just ended.
+# Three consequences of going through the component are load-bearing:
+#
+#   1. getAll is a ROUND-TRIP: the first render returns its default and the real
+#      cookies only arrive on the rerun its callback triggers. So recovery must
+#      distinguish "not reported yet" from "reported, no cc_session" — the
+#      library's own default of {} conflates them, which is why _read_cookies
+#      calls the component directly with default=None as a sentinel. Until the
+#      report lands, bootstrap does NOT conclude: the gate stays open and
+#      recovery retries on the callback rerun. Closing it early would strand a
+#      signed-in visitor as signed out, reading nothing and calling it an answer.
 #   2. Writes are STAGED in session_state and issued from bootstrap rather than
 #      inline. A component only reaches the browser if the script keeps running,
 #      and sign-in/sign-out both st.rerun() immediately, which would race it.
@@ -159,14 +173,15 @@ def _is_cap_error(e: Exception) -> bool:
 #      and there is no cheaper version of it.
 #
 # The staging keys deliberately do NOT start with "cc_user": sign_out() clears
-# every cc_user* key, and would otherwise wipe its own staged cookie delete.
+# every cc_user* key, and would otherwise wipe its own staged cookie delete —
+# and, just as importantly, its own _BOOTSTRAPPED gate. See sign_out().
 
 _COOKIE_NAME        = "cc_session"
 _COOKIE_DAYS        = 30
 _COOKIE_PENDING     = "cc_cookie_pending"       # staged write: token, or "" to delete
 _COOKIE_MOUNTED     = "cc_cookie_mounted"       # manager was mounted on the PREVIOUS run
 _COOKIE_UNAVAILABLE = "cc_cookie_unavailable"   # component missing; persistence is off
-_BOOTSTRAPPED       = "cc_cookie_bootstrapped"  # recovery is once per browser session
+_BOOTSTRAPPED       = "cc_cookie_bootstrapped"  # recovery has CONCLUDED for this session
 _UNSET              = object()
 
 
@@ -175,12 +190,26 @@ def _stage_cookie(token) -> None:
     st.session_state[_COOKIE_PENDING] = token or ""
 
 
-def _read_cookie():
-    """The stored refresh token, or None. Native read — see the note above."""
+def _read_cookies(cm):
+    """The browser's cookies as the component sees them, or None until it reports.
+
+    Client-side: the component's JS reads document.cookie, which SameSite does
+    not govern — that is the whole reason this is not st.context.cookies.
+
+    The component is called directly rather than via cm.cookies / cm.get_all(),
+    because the library hardcodes default={} and an empty dict cannot be told
+    apart from "hasn't answered yet". default=None gives us that sentinel:
+
+        None  -> not reported yet (transient; the callback rerun brings the real
+                 answer within moments)
+        dict  -> reported, authoritative, possibly without cc_session in it
+    """
     try:
-        return st.context.cookies.get(_COOKIE_NAME)
-    except Exception:
-        return None
+        return cm.cookie_manager(method="getAll", key="cc_cookie_read",
+                                 default=None)
+    except Exception as exc:
+        _log.warning("cc_session: cookie read failed — %r", exc)
+        return {}   # reported-and-empty: conclude signed out rather than spin
 
 
 def _cookie_manager():
@@ -273,34 +302,64 @@ def _flush_cookie(cm) -> None:
     st.session_state.pop(_COOKIE_PENDING, None)
 
 
-def _recover() -> None:
-    """Trade the cookie's refresh token for a live session. Silent on failure.
+def _recover(cm) -> bool:
+    """Trade the cookie's refresh token for a live session.
+
+    Returns whether bootstrap has CONCLUDED — True for any settled outcome
+    (recovered, or definitively signed out), False only while still waiting on
+    the component's cookie report. The caller closes the gate on True; on False
+    it must leave it open so the callback rerun tries again.
 
     A refresh token is single-use — Supabase rotates it and hands back a new one
     — so _set_user stages the ROTATED token straight back to the cookie. Storing
     the one we just spent would break the next recovery.
 
-    Any failure (expired, revoked, reused, replayed from another machine) drops
-    the cookie and leaves the visitor signed out with no message. There is
-    nothing here a visitor did wrong, and nothing they can act on.
+    Every exit logs. Silent on failure was the previous design, and it meant a
+    failed live test produced no evidence at all: read-returned-nothing and
+    token-rejected were indistinguishable from never having run. Nothing here is
+    surfaced to the visitor — none of it is anything they did or can act on.
     """
-    token = _read_cookie()
+    if cm is None:
+        # _cookie_manager already logged why, once. No component, no read.
+        return True
+
+    reported = _read_cookies(cm)
+    if reported is None:
+        # Mounted, but its JS has not sent the cookies back yet. Not a failure
+        # and NOT a conclusion — debug, because it is the normal transient on
+        # every first run and would otherwise cry wolf on every page load.
+        _log.debug("cc_session: awaiting cookie report")
+        return False
+
+    token = reported.get(_COOKIE_NAME) if isinstance(reported, dict) else None
     if not token:
-        return
+        _log.info("cc_session: no cookie present — visitor stays signed out")
+        return True
+
     sb = _anon_client()
     if sb is None:
-        return
+        _log.warning("cc_session: client build failed — cannot recover")
+        return True
+
     try:
         res = sb.auth.refresh_session(token)
-    except Exception:
+    except Exception as exc:
+        # Expired, revoked, reused, or replayed from another machine. Expected
+        # enough to be info, not a warning.
+        _log.info("cc_session: refresh rejected — %r", exc)
         _stage_cookie(None)
-        return
+        return True
+
     user    = getattr(res, "user", None)
     session = getattr(res, "session", None)
     if not user or not session:
+        _log.warning("cc_session: no session returned")
         _stage_cookie(None)
-        return
+        return True
+
     _set_user(user, session)
+    _log.info("cc_session: session recovered")
+    return True
 
 
 def bootstrap_session() -> None:
@@ -320,9 +379,15 @@ def bootstrap_session() -> None:
         _hide_cookie_iframes()
 
     if not st.session_state.get(_BOOTSTRAPPED):
-        st.session_state[_BOOTSTRAPPED] = True
-        if not st.session_state.get("cc_user"):
-            _recover()
+        if st.session_state.get("cc_user"):
+            # Signed in during this session already — nothing to recover, and
+            # closing the gate here is what stops a later sign_out from leaving
+            # it open for a stale cookie report to act on.
+            st.session_state[_BOOTSTRAPPED] = True
+        elif _recover(cm):
+            # Only on a settled outcome. While _recover is waiting on the cookie
+            # report it returns False and the gate stays open deliberately.
+            st.session_state[_BOOTSTRAPPED] = True
 
     # Reads the PREVIOUS run's mount state, so it must run before the write below.
     _flush_cookie(cm)
@@ -375,6 +440,16 @@ def sign_out() -> None:
             # Already expired or unreachable. The cookie still goes, and the
             # token dies on its own; nothing here is worth a message.
             pass
+
+    # Close the recovery gate, and do it here rather than trusting that some
+    # earlier run already did. This is the anti-zombie latch, and the window it
+    # shuts is real: the cookie delete below is only STAGED and lands a run
+    # later, while the component's getAll report is cached from before that — so
+    # for one run the browser still reports a live cc_session. With the gate
+    # closed, _recover never runs again this session and never sees it. Without
+    # it, a sign-out whose server-side revoke quietly failed would be undone by
+    # the next run silently signing the user back in.
+    st.session_state[_BOOTSTRAPPED] = True
 
     _stage_cookie(None)
     for key in [k for k in list(st.session_state.keys())
