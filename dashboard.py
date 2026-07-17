@@ -6489,14 +6489,30 @@ def _render_rg_footer():
 _PAV_SEASON = 2026
 
 
-def _pav_render_signin():
-    """The way in, shown where the add form sits for a visitor.
+def _pav_render_account(user):
+    """The account control: the way in for a visitor, the way out once signed in.
 
-    Mirrors the Live Tracker's account panel — same user_auth entry points, same
-    cc_user_* prefix so sign_out() clears these too — with its own keys. The two
-    never render together today, but identical widget labels in one app are a
-    DuplicateWidgetID waiting for the day someone renders both.
+    Mirrors the Live Tracker's panel — same expander shape, same user_auth entry
+    points, same cc_user_* prefix so sign_out() clears these too — with its own
+    keys. The two never render together today, but identical widget labels in one
+    app are a DuplicateWidgetID waiting for the day someone renders both.
+
+    The signed-in half is not decoration. Cookie persistence means a session now
+    survives the browser closing, so a page that can sign you in and never sign
+    you out leaves you stuck in it — on a shared machine, indefinitely. The Live
+    Tracker has had a sign-out all along, but it is on another page and buried in
+    a collapsed expander; this page could sign you in and offer no way back.
     """
+    if user:
+        with st.expander(f"Signed in · {user.get('email', '')}", expanded=False):
+            _pa1, _pa2 = st.columns([1, 4])
+            with _pa1:
+                if st.button("Sign out", key="cc_user_pav_signout",
+                             use_container_width=True):
+                    user_auth.sign_out()
+                    st.rerun()
+        return
+
     if not user_auth.auth_available():
         # A sign-in box that cannot work is worse than no sign-in box — the same
         # call the Live Tracker makes.
@@ -7020,7 +7036,7 @@ def render_polls_a_vote(season: int):
     # Last zone on the page, so a visitor is served here and returns: there is no
     # add form without an account to attach a pick to.
     if _pav_user is None:
-        _pav_render_signin()
+        _pav_render_account(None)
         return
 
     with st.expander("+ Add a watchlist target", expanded=False):
@@ -7116,6 +7132,11 @@ def render_polls_a_vote(season: int):
                         # the player is already on the list and the user just edits
                         # it — which is a nudge, not an error.
                         st.warning(_msg)
+
+    # Last thing on the page, below the add form: the same slot the sign-in
+    # prompt occupies for a visitor, so the account control is always in one
+    # place whichever state you are in.
+    _pav_render_account(_pav_user)
 
 
 if _page == 'Polls a Vote':
