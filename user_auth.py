@@ -751,8 +751,9 @@ def _save_cooldown_remaining() -> float:
 # caller's rows — none of these functions filter on user_id, and section 3 of 04
 # is the reason they don't have to.
 #
-# Not yet called by anything: the page still reads betting_hub's service_role
-# poll_watchlist path. This is the backend it moves onto.
+# The only source of poll picks: the Polls a Vote page and the Live Tracker's
+# upcoming panel both read them from here. The private service_role table this
+# replaced is retired.
 #
 # Each write ends in load_poll_picks.clear(), which drops every viewer's cached
 # entry, not just the writer's — cache_data.clear() is per-function, not per-key.
@@ -762,11 +763,10 @@ def _save_cooldown_remaining() -> float:
 POLL_PICKS_TABLE = "user_poll_picks"
 
 # The page reads row['Player'], so in-memory stays TitleCase while the table is
-# snake_case. Ported from betting_hub.POLLS_SB_RENAME rather than imported:
-# user_auth must not depend on the service_role module (see the docstring), and
-# a seven-key dict is a cheaper duplicate than that dependency. id and
-# created_at share both spellings; user_id and season are storage-side only and
-# never appear in the frame the page sees.
+# snake_case — the same split the retired betting_hub watchlist used, kept
+# because the page's render was written against it. id and created_at share both
+# spellings; user_id and season are storage-side only and never appear in the
+# frame the page sees.
 POLL_PICK_COLS = ['id', 'Player', 'Team', 'My_Rounds', 'Odds', 'Stake',
                   'Notes', 'Settled', 'created_at']
 POLL_PICK_RENAME = {
@@ -849,9 +849,9 @@ def load_poll_picks(user_id: str, season: int) -> pd.DataFrame:
     user_id is in the signature to key the cache, NOT to filter the query.
     st.cache_data is keyed by arguments and shared across every session on the
     server, so a cache whose key doesn't name the viewer hands the first
-    viewer's picks to the next — which is exactly what would happen if
-    betting_hub._load_watchlist's keyless ttl=60 cache were pointed at per-user
-    data. Naming user_id gives each viewer their own entry. Callers pass
+    viewer's picks to the next — which is exactly what the retired watchlist's
+    keyless ttl=60 cache would have done the moment its data became per-user.
+    Naming user_id gives each viewer their own entry. Callers pass
     current_user()["id"].
 
     No .eq("user_id", ...) filter: the select policy already scopes this to the
@@ -882,8 +882,8 @@ def load_poll_picks(user_id: str, season: int) -> pd.DataFrame:
 def save_poll_pick(pick: dict, season: int):
     """Insert or update one pick. Returns (ok, message).
 
-    id semantics mirror betting_hub._save_polls_row: the caller supplies it — a
-    form-instance uuid, so a double-click or a rerun mid-write reuses the id and
+    The caller supplies the id — a form-instance uuid, so a double-click or a
+    rerun mid-write reuses it and
     this upsert collapses onto one row instead of adding a duplicate. A missing
     id gets a fresh uuid4 for callers that don't, and created_at likewise (the
     setdefault matters: an edit passes the original through, so created_at

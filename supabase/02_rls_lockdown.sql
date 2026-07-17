@@ -39,9 +39,11 @@
 -- add a policy to "make it work" — service_role needs none, and any policy
 -- here would be a hole for anon.
 
+-- poll_watchlist was locked down here too until it was dropped in 05; both its
+-- lines are removed rather than left to fail on a missing relation, because this
+-- file has to stay re-runnable.
 ALTER TABLE public.bets            ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.cha_ching_tips  ENABLE ROW LEVEL SECURITY;
-ALTER TABLE public.poll_watchlist  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.player_props    ENABLE ROW LEVEL SECURITY;
 
 
@@ -53,7 +55,6 @@ ALTER TABLE public.player_props    ENABLE ROW LEVEL SECURITY;
 
 REVOKE ALL ON TABLE public.bets            FROM anon, authenticated;
 REVOKE ALL ON TABLE public.cha_ching_tips  FROM anon, authenticated;
-REVOKE ALL ON TABLE public.poll_watchlist  FROM anon, authenticated;
 REVOKE ALL ON TABLE public.player_props    FROM anon, authenticated;
 
 

@@ -4988,10 +4988,8 @@ def _assemble_live_tracker(lt, game_df, watchlist):
         asm["delta"][nn] = tot - asm["model_to_date"].get(nn, 0.0)
 
     # ── watchlist: last-round reconciliation ──────────────────────────────────
-    # `watchlist` is whichever source the page selected — the private
-    # poll_watchlist for bh_authed, or a cc_user's own poll picks. Identical
-    # columns (Player / Team / My_Rounds / Settled) and identical round
-    # convention, so nothing here knows or cares which it got.
+    # `watchlist` is the caller's poll picks (Player / Team / My_Rounds /
+    # Settled), or None when nobody is signed in.
     #
     # Settled rows are skipped: a settled pick is a closed position, not a
     # standing call on a round.
@@ -5096,46 +5094,25 @@ if _page == 'Live Tracker':
             )
 
         # ── shared assembly: live votes + model per-round signal + watchlist ──
-        # Two identities can supply a watchlist, so the source is chosen once,
-        # here, and everything downstream (Zone 1 recon, Zone 3 upcoming, the dot
-        # legend, the 3-column grid) consumes the result without knowing which it
-        # got. The frames are interchangeable: same TitleCase columns, same
-        # display-round convention in My_Rounds.
-        #
-        # Precedence — bh_authed wins. It is the private Betting Hub watchlist and
-        # it is still the only place Charlie's rows live; a cc_user session that
-        # happens to be signed in at the same time (me, testing) must not silently
-        # replace them. This whole branch dies with poll_watchlist's retirement,
-        # after which picks are the only source and the elif becomes the rule.
+        # A signed-in user's own poll picks are the watchlist, and the only
+        # source there is. The private poll_watchlist that used to win here is
+        # retired; everything downstream (Zone 1 recon, Zone 3 upcoming, the dot
+        # legend, the 3-column grid) consumes this frame unchanged.
         #
         # An anonymous visitor gets no fetch at all — not a fetch-then-hide — and
         # the panels it feeds are dropped below, so the tracker renders as if the
         # feature doesn't exist.
         _cc_user = user_auth.current_user()
         _cc_uid  = _cc_user.get("id") if _cc_user else None
-        if st.session_state.get("bh_authed"):
-            _wl = betting_hub._load_watchlist()
-        elif _cc_uid:
-            _wl = user_auth.load_poll_picks(_cc_uid, _LT_SEASON)
-        else:
-            _wl = None
-        # "A watchlist source exists" — no longer "bh_authed". An empty frame is
-        # still a source: an account with no picks owns the panel and sees it
-        # empty, which is the same thing bh_authed with an empty watchlist has
-        # always done.
+        _wl = user_auth.load_poll_picks(_cc_uid, _LT_SEASON) if _cc_uid else None
+        # "A watchlist source exists". An empty frame is still a source: an
+        # account with no picks owns the panel and sees it empty.
         _wl_visible = _wl is not None
 
         _lt_game = load_game(_LT_SEASON)
         _asm     = _assemble_live_tracker(_lt, _lt_game, _wl)
 
-        # ── Public account watchlist — independent of bh_authed ─────────────
-        # Two unrelated identities share this page. bh_authed is my private
-        # Betting Hub gate; cc_user is a public visitor's account. They must not
-        # interact in either direction: signing in publicly must never reach the
-        # private _load_watchlist() above, and bh_authed must never require an
-        # account. Both set at once is legal (me, testing) — the private zones
-        # win and the public picks still mark up the leaderboard.
-        #
+        # ── Public account watchlist ────────────────────────────────────────
         # The ★ set below and the poll picks feeding Zone 1/3 above are separate
         # on purpose and neither feeds the other: a ★ says "watching this player
         # all season", a pick says "backing him in round N". They are different
@@ -6578,13 +6555,12 @@ def _pav_render_account(user):
 def render_polls_a_vote(season: int):
     """Per-user Polls-a-Vote picks, for `season`.
 
-    Lived in betting_hub behind the _BH_PAGES password until session 3. It is
-    a public Brownlow page now, so bh_authed plays no part: the consensus
-    machinery below is shared and file-derived, and the only per-user data —
-    the picks themselves — comes from user_poll_picks via user_auth, where RLS
-    scopes it to the caller. Nothing here may touch betting_hub's service_role
-    watchlist path; that client bypasses RLS and would serve one viewer's rows
-    to every other.
+    Lived in betting_hub behind the _BH_PAGES password until session 3. It is a
+    public Brownlow page now: the consensus machinery below is shared and
+    file-derived, and the only per-user data — the picks themselves — comes from
+    user_poll_picks via user_auth, where RLS scopes it to the caller. Nothing
+    here may reach for betting_hub's service_role client; it bypasses RLS and
+    would serve one viewer's rows to every other.
 
     The BH stylesheet still owns .pav-* — the page carries its own look across
     rather than forking it, so _inject_css stays betting_hub's.
@@ -6602,8 +6578,8 @@ def render_polls_a_vote(season: int):
     )
 
     # ── Who is asking ─────────────────────────────────────────────────────────
-    # The only identity this page knows. bh_authed is deliberately not consulted:
-    # it gates the Betting Hub, and this page left it.
+    # The only identity this page knows. Admin is not consulted either — this is
+    # a public page, and being the admin grants no claim on someone's picks.
     _pav_user = user_auth.current_user()
     _pav_uid  = _pav_user.get("id") if _pav_user else None
 

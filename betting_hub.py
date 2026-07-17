@@ -21,16 +21,6 @@ TIPS_CSV        = f"{DATA_DIR}/cha_ching_tips.csv"
 FIXTURES_CSV    = f"{DATA_DIR}/fixtures_cache.csv"
 PROPS_CSV       = f"{DATA_DIR}/player_props_cache.csv"
 USER_IMPORT_CSV = f"{DATA_DIR}/user_import.csv"
-POLLS_CSV       = f"{DATA_DIR}/polls_a_vote.csv"   # legacy local store (pre-Supabase)
-POLLS_SB_TABLE  = "poll_watchlist"
-POLLS_COLS      = ['id', 'Player', 'Team', 'My_Rounds', 'Odds', 'Stake', 'Notes', 'Settled', 'created_at']
-# In-memory uses TitleCase (render reads row['Player'] etc.); Supabase columns are
-# snake_case to match the bets/tips tables. id and created_at share both names.
-POLLS_SB_RENAME = {
-    'Player': 'player', 'Team': 'team', 'My_Rounds': 'my_rounds',
-    'Odds': 'odds', 'Stake': 'stake', 'Notes': 'notes', 'Settled': 'settled',
-}
-POLLS_SB_RENAME_INV = {v: k for k, v in POLLS_SB_RENAME.items()}
 
 BETS_COLS = [
     'bet_id', 'date', 'match', 'market_type', 'selection',
@@ -246,108 +236,6 @@ def _load_player_avgs() -> pd.DataFrame:
     if 'Player' not in df.columns or not avail:
         return pd.DataFrame()
     return df.groupby('Player')[avail].mean().reset_index()
-
-
-def _empty_polls_df() -> pd.DataFrame:
-    df = pd.DataFrame(columns=POLLS_COLS)
-    df['Odds']      = pd.to_numeric(df['Odds'],  errors='coerce')
-    df['Stake']     = pd.to_numeric(df['Stake'], errors='coerce')
-    df['Settled']   = df['Settled'].fillna(False).astype(bool)
-    df['My_Rounds'] = df['My_Rounds'].fillna('').astype(str)
-    df['Notes']     = df['Notes'].fillna('').astype(str)
-    df['id']        = df['id'].fillna('').astype(str)
-    return df
-
-
-@st.cache_data(ttl=60)
-def _load_watchlist() -> pd.DataFrame:
-    """Load the Polls-a-Vote watchlist from Supabase (source of truth).
-
-    Mirrors _load_tips(): a successful query is authoritative even when it
-    returns zero rows. Falls back to an empty watchlist (correct columns) when
-    the table is empty or Supabase is unreachable — never crashes the page.
-    """
-    def _coerce(df):
-        df = df.rename(columns=POLLS_SB_RENAME_INV)   # snake_case → TitleCase
-        for c in POLLS_COLS:
-            if c not in df.columns:
-                df[c] = None
-        df['Odds']      = pd.to_numeric(df['Odds'],  errors='coerce')
-        df['Stake']     = pd.to_numeric(df['Stake'], errors='coerce')
-        df['Settled']   = df['Settled'].fillna(False).astype(bool)
-        df['My_Rounds'] = df['My_Rounds'].fillna('').astype(str)
-        df['Notes']     = df['Notes'].fillna('').astype(str)
-        df['id']        = df['id'].fillna('').astype(str)
-        df = df[POLLS_COLS]
-        if df['created_at'].notna().any():
-            df = df.sort_values('created_at', na_position='last')
-        return df.reset_index(drop=True)
-
-    sb = _get_supabase()
-    if sb is not None:
-        try:
-            resp = sb.table(POLLS_SB_TABLE).select("*").execute()
-            return _coerce(pd.DataFrame(resp.data or []))
-        except Exception:
-            pass
-    return _empty_polls_df()
-
-
-def _save_watchlist(df: pd.DataFrame):
-    """Upsert the full watchlist DataFrame to Supabase (on_conflict id).
-
-    Mirrors _save_bets(): TitleCase in-memory columns are renamed to the
-    table's snake_case columns before the upsert. No-op when Supabase is down.
-    """
-    sb = _get_supabase()
-    if sb is None:
-        return
-    df_save = df.copy().rename(columns=POLLS_SB_RENAME)
-    keep = ['id', 'player', 'team', 'my_rounds', 'odds', 'stake', 'notes', 'settled', 'created_at']
-    df_save = df_save[[c for c in keep if c in df_save.columns]]
-    records = _sb_records(df_save)
-    if records:
-        sb.table(POLLS_SB_TABLE).upsert(records, on_conflict="id").execute()
-        _load_watchlist.clear()
-
-
-def _save_polls_row(row: dict):
-    """Add one new watchlist target — fills id/created_at, then upserts on id.
-
-    The add form supplies a form-instance id; the fallback below only covers
-    callers that don't. New ids are full uuid4s (the old [:8] truncation left
-    32 bits of entropy for no benefit — the column is text either way, so
-    widening needs no migration).
-    """
-    row = dict(row)
-    row.setdefault('id', str(uuid.uuid4()))
-    row.setdefault('created_at', datetime.now().isoformat())
-    _save_watchlist(pd.DataFrame([row]))
-    _load_watchlist.clear()
-
-
-def _mark_poll_settled(poll_id: str):
-    """Mark a single watchlist row settled in Supabase (addressed by id)."""
-    sb = _get_supabase()
-    if sb is None:
-        return
-    try:
-        sb.table(POLLS_SB_TABLE).update({'settled': True}).eq('id', str(poll_id)).execute()
-        _load_watchlist.clear()
-    except Exception:
-        pass
-
-
-def _delete_poll_row(poll_id: str):
-    """Delete a single watchlist row from Supabase (addressed by id)."""
-    sb = _get_supabase()
-    if sb is None:
-        return
-    try:
-        sb.table(POLLS_SB_TABLE).delete().eq('id', str(poll_id)).execute()
-        _load_watchlist.clear()
-    except Exception:
-        pass
 
 
 def _empty_bets_df() -> pd.DataFrame:

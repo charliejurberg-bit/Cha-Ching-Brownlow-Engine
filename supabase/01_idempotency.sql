@@ -49,37 +49,15 @@ CREATE UNIQUE INDEX IF NOT EXISTS cha_ching_tips_tip_id_key
     ON public.cha_ching_tips (tip_id);
 
 
--- ── 2. poll_watchlist: one active row per (player, team) ───────────────────
+-- ── 2. poll_watchlist — dropped ────────────────────────────────────────────
 --
--- This is a GUARD ONLY. It is never an on_conflict target — PostgREST cannot
--- target a partial index, and does not need to here: _save_polls_row upserts
--- on id, and Commit 1 makes that id stable per form instance so a double
--- submit collapses onto one row.
+-- This file used to create poll_watchlist_active_player, a partial unique guard
+-- on (player, team). The table is gone (see 05_drop_poll_watchlist.sql) and the
+-- index went with it, so the CREATE is removed rather than left to fail: it was
+-- guarded IF NOT EXISTS on the INDEX, which does nothing about a missing TABLE,
+-- and this file promises to be re-runnable.
 --
--- What this index catches is the other case: the same player added to the
--- watchlist twice in separate sittings while the first entry is still open.
--- The app catches the resulting unique violation and shows a quiet "already
--- watching this player" message instead of a traceback.
---
--- Settled rows are exempt (WHERE settled = false), so re-watching a player
--- after an earlier entry is settled stays legal.
---
--- SURFACE DUPLICATES FIRST. This must return zero rows or the CREATE below
--- will fail:
---
---   SELECT player, team, count(*) AS n, array_agg(id) AS ids
---   FROM public.poll_watchlist
---   WHERE settled = false
---   GROUP BY player, team
---   HAVING count(*) > 1
---   ORDER BY n DESC;
---
--- If it returns rows, settle or remove the extras by hand, then re-run this
--- file. No DELETEs are issued here on purpose.
-
-CREATE UNIQUE INDEX IF NOT EXISTS poll_watchlist_active_player
-    ON public.poll_watchlist (player, team)
-    WHERE settled = false;
+-- Its tenant-scoped successor is user_poll_picks_active_player in 04.
 
 
 -- ── 3. player_props — nothing to do ────────────────────────────────────────

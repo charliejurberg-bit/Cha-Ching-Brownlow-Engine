@@ -1,0 +1,67 @@
+-- ═══════════════════════════════════════════════════════════════════════════
+-- 05_drop_poll_watchlist.sql — Cha Ching / retire the private poll watchlist
+--
+-- ►► RUN AFTER 04_user_poll_picks.sql, and after the app is on 04. ◄◄
+--
+-- poll_watchlist was the Polls-a-Vote store from before the page was per-user:
+-- one table, no user_id, read through the service_role client, and private only
+-- because a password gate stood in front of the page. That page is public and
+-- per-user now — picks live in user_poll_picks, scoped by RLS to whoever asks —
+-- so nothing reads this table any more. The code that did was deleted in the
+-- same commit as this file.
+--
+-- THIS DESTROYS DATA, unlike every other file in this directory. It is safe here
+-- for one specific reason: the table is EMPTY. The only person who ever had rows
+-- in it deleted them before this was written, so there is no migration step —
+-- nothing was carried across to user_poll_picks because there was nothing to
+-- carry. If you are reading this in a context where that is not true, STOP: copy
+-- the rows out first, because DROP does not ask.
+--
+--   SELECT count(*) FROM public.poll_watchlist;   -- expect 0
+--
+-- The drop takes its own dependents with it — poll_watchlist_active_player (the
+-- partial unique guard from 01) and the RLS/grant state from 02 all die with the
+-- relation, so there is nothing else to clean up. 01 and 02 had their
+-- poll_watchlist lines removed in this same commit: they promise to be
+-- re-runnable, and a CREATE INDEX or ALTER TABLE against a dropped relation
+-- errors regardless of any IF NOT EXISTS, which guards the index and not the
+-- table.
+--
+-- Deliberately NOT dropped: bets, cha_ching_tips, player_props. They are still
+-- live and still deny-all under 02.
+--
+-- Run in: Supabase dashboard → SQL Editor.
+-- Safe to run repeatedly (IF EXISTS), but only ever necessary once.
+-- ═══════════════════════════════════════════════════════════════════════════
+
+
+-- ── 1. Drop ────────────────────────────────────────────────────────────────
+--
+-- No CASCADE, on purpose. Nothing should depend on this table, and if something
+-- does, this errors and tells you — which is the outcome you want from a DROP
+-- you cannot undo. CASCADE would silently take that dependent with it.
+
+DROP TABLE IF EXISTS public.poll_watchlist;
+
+
+-- ── Verify ─────────────────────────────────────────────────────────────────
+--
+-- The table is gone (expect zero rows):
+--
+--   SELECT tablename
+--   FROM pg_tables
+--   WHERE schemaname = 'public' AND tablename = 'poll_watchlist';
+--
+-- Its index went with it (expect zero rows):
+--
+--   SELECT indexname
+--   FROM pg_indexes
+--   WHERE indexname = 'poll_watchlist_active_player';
+--
+-- The tables that remain are untouched and still deny-all — expect bets,
+-- cha_ching_tips and player_props, each with relrowsecurity = true:
+--
+--   SELECT relname, relrowsecurity
+--   FROM pg_class
+--   WHERE relname IN ('bets', 'cha_ching_tips', 'player_props')
+--   ORDER BY relname;
