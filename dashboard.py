@@ -475,14 +475,18 @@ def _render_account_control(prefix: str):
     if not _user and not user_auth.auth_available():
         return
 
-    _chip_col, _btn_col = st.columns([2.4, 1.6], vertical_alignment="center")
-    if _user:
-        # Admin wears gold, everyone else emerald — the same signal the hub pill
-        # gives, on the one element that is always on screen.
-        _admin = bool(st.session_state.get("cc_is_admin"))
-        _name = (_user.get("email") or "").split("@")[0] or "account"
-        _initial = _name[:1].upper()
-        with _chip_col:
+    # One keyed container, not two columns. The chip and the button are a single
+    # compact group pinned to the right inset — columns would give each of them a
+    # FRACTION of the row and park the chip somewhere near the middle, which is
+    # what they did. The CSS turns this container into a right-aligned flex row;
+    # keying it means the rule addresses this group and nothing else.
+    with st.container(key=f"{prefix}_acct"):
+        if _user:
+            # Admin wears gold, everyone else emerald — the same signal the hub
+            # pill gives, on the one element that is always on screen.
+            _admin = bool(st.session_state.get("cc_is_admin"))
+            _name = (_user.get("email") or "").split("@")[0] or "account"
+            _initial = _name[:1].upper()
             st.markdown(
                 f'<div class="ccb-chip{" admin" if _admin else ""}">'
                 f'<span class="ccb-av">{_initial}</span>'
@@ -490,15 +494,13 @@ def _render_account_control(prefix: str):
                 f'</div>',
                 unsafe_allow_html=True,
             )
-        with _btn_col:
-            if st.button("Sign out", key=f"{prefix}_signout",
-                         use_container_width=True):
+            # No use_container_width: it is what stretched this to ~300px of
+            # mostly empty pill with the label adrift in the middle.
+            if st.button("Sign out", key=f"{prefix}_signout"):
                 user_auth.sign_out()
                 st.rerun()
-    else:
-        with _btn_col:
-            if st.button("Sign in", key=f"{prefix}_signin",
-                         use_container_width=True):
+        else:
+            if st.button("Sign in", key=f"{prefix}_signin"):
                 _auth_dialog()
 
 
@@ -682,6 +684,40 @@ st.markdown("""
         gap: 0 !important;
     }
     .stApp .st-key-ccbanner [data-testid="stHorizontalBlock"] { gap: 0 !important; }
+
+    /* The account group: chip immediately left of the button, hard right.
+       st.container(key=...) stamps the class on the stVerticalBlock ITSELF, so
+       this node is the flex container — no descendant hop needed. A column
+       stacks its children vertically by default, hence the explicit row.
+       justify-content:flex-end lands the group on the container's right padding
+       edge, which is the shared 16px the strip uses. */
+    .stApp .st-key-ccb_acct,
+    .stApp .st-key-ccl_acct {
+        display: flex !important;
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        gap: 8px !important;
+        width: 100% !important;
+    }
+    /* Kill the stretch at every level of the chain. The button element alone is
+       not enough — Streamlit wraps it in element/wrapper divs that carry their
+       own width, and a 100%-wide wrapper stretches the button inside it no
+       matter what the button says. flex:0 0 auto stops them growing to fill the
+       row as flex items too. Scoped to these two groups, so no other button on
+       any page is deflated by it. */
+    .stApp .st-key-ccb_acct [data-testid="stElementContainer"],
+    .stApp .st-key-ccl_acct [data-testid="stElementContainer"],
+    .stApp .st-key-ccb_acct [data-testid="stButton"],
+    .stApp .st-key-ccl_acct [data-testid="stButton"],
+    .stApp .st-key-ccb_acct [data-testid="stButton"] button,
+    .stApp .st-key-ccl_acct [data-testid="stButton"] button {
+        width: auto !important;
+        min-width: 0 !important;
+        flex: 0 0 auto !important;
+        margin: 0 !important;
+    }
+
     .stApp .st-key-ccbanner [data-testid="stButton"] button,
     .stApp .st-key-ccland [data-testid="stButton"] button {
         font-family: 'Archivo', sans-serif !important;
