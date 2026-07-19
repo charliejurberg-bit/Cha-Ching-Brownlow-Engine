@@ -4936,6 +4936,24 @@ if _page == 'Player Profile':
                                 else:
                                     _h2h_btn = ("Track this H2H instead" if _h2h_saved
                                                 else "Track this H2H")
+                                    if _h2h_saved:
+                                        # A different pair is tracked. Say which, so
+                                        # "instead" has a referent. Rendered OUTSIDE the
+                                        # keyed container below: that container zeroes
+                                        # markdown margins to hold the helper text on the
+                                        # button's centreline, which would leave this line
+                                        # jammed against the button row.
+                                        _sv_l1, _sv_l2 = _h2h_short_pair(
+                                            str(_h2h_saved.get('player1') or ''),
+                                            str(_h2h_saved.get('player2') or ''),
+                                        )
+                                        st.markdown(
+                                            '<div style="font-family:\'DM Mono\',monospace;'
+                                            'font-size:11px;color:#8a9aa9;margin-bottom:7px">'
+                                            '<span style="color:#f0b429">&#9733;</span> '
+                                            f'TRACKED: {_sv_l1} v {_sv_l2}</div>',
+                                            unsafe_allow_html=True,
+                                        )
                                     # Keyed container so the emerald button CSS has
                                     # something to scope to. Only this branch is wrapped
                                     # — the Untrack button above stays default on purpose.
