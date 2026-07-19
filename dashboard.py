@@ -3873,6 +3873,12 @@ SCOPE .lb-bar-lo{text-align:right;}
 H2H_POLL_LIKELY = 0.35
 # Rounds shown in the ledger before the rest move into the "All rounds" expander.
 H2H_LEDGER_ROWS = 8
+# Swing chips in the Live Tracker panel before the rest collapse into "+N".
+# Three, not five, because the chips now carry the beneficiary's name: a long
+# one ("R19 BONTEMPELLI", ~93px at 9px DM Mono) fits three to a row in Zone 3's
+# .85fr rail at 1280-1500px, and five would wrap to a second row. Shrinking the
+# font below 9px instead was rejected — it is already the smallest type here.
+H2H_LIVE_CHIPS = 3
 
 
 # The four helpers below are module level because BOTH the Compare tab and the
@@ -6458,22 +6464,30 @@ if _page == 'Live Tracker':
                     if _k in ('SAME GAME', 'SWING', 'FREE'):
                         _h2h_chips.append((_r, _k, _o))
                 if _h2h_chips:
+                    # gap applies on both axes, so a wrapped second row keeps the
+                    # same 4px rhythm as the first; align-items keeps chips of
+                    # differing label length on one baseline within a row.
                     _h2h_body += ('<div style="display:flex;flex-wrap:wrap;gap:4px;'
-                                  'margin-top:9px">')
-                    for _r, _k, _o in _h2h_chips[:5]:
+                                  'align-items:center;margin-top:9px">')
+                    for _r, _k, _o in _h2h_chips[:H2H_LIVE_CHIPS]:
                         if _k == 'SAME GAME':
                             _cs = 'background:#3d3110;color:#f0b429'
+                            # No beneficiary: the round is contested between them.
+                            _ctxt = 'SAME GAME'
                         elif _o == 1:
                             _cs = 'background:#0f3d31;color:#34d399'
+                            _ctxt = _hA_lbl.upper()
                         else:
                             _cs = ('background:#101a24;color:#e9eef3;'
                                    'box-shadow:inset 0 0 0 1px rgba(140,165,185,.14)')
+                            _ctxt = _hB_lbl.upper()
                         _h2h_body += ('<span style="font-family:var(--mono);font-size:9px;'
-                                      f'padding:2px 6px;border-radius:8px;{_cs}">R{_r}</span>')
-                    if len(_h2h_chips) > 5:
+                                      'padding:2px 6px;border-radius:8px;white-space:nowrap;'
+                                      f'{_cs}">R{_r} {_ctxt}</span>')
+                    if len(_h2h_chips) > H2H_LIVE_CHIPS:
                         _h2h_body += ('<span style="font-family:var(--mono);font-size:9px;'
                                       'padding:2px 6px;color:#8a9aa9">'
-                                      f'+{len(_h2h_chips) - 5}</span>')
+                                      f'+{len(_h2h_chips) - H2H_LIVE_CHIPS}</span>')
                     _h2h_body += '</div>'
 
             # Most recent counted round where either polled.
