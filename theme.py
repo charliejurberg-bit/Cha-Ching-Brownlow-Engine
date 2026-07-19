@@ -70,6 +70,30 @@ div[data-testid="stMultiSelect"] > div > div,
 }
 [data-testid="stTabs"] [data-baseweb="tab"] { color: var(--muted) !important; }
 [data-testid="stTabs"] [aria-selected="true"] { color: var(--text) !important; }
+/* ── Selectbox dropdown panel ──
+   Streamlit mounts this as a direct child of <body>, OUTSIDE .stApp, so it
+   cannot be reached by any .stApp-scoped rule. Every selector below is keyed
+   on the panel's own unique testid (stSelectboxVirtualDropdown) rather than on
+   body-level position or the generic [data-testid="portal"] container — that
+   generic portal is a SEPARATE body-level div and is where st.dialog (the auth
+   dialog) mounts, so these rules provably cannot leak into it. */
+[data-testid="stSelectboxVirtualDropdown"] {
+    background: var(--surface) !important;
+    border: 1px solid #1a2632 !important;
+}
+[data-testid="stSelectboxVirtualDropdown"] [role="option"] > div {
+    background: transparent !important;
+    color: var(--text) !important;
+    transition: background-color 0.12s ease !important;
+}
+[data-testid="stSelectboxVirtualDropdown"] [role="option"]:hover > div,
+[data-testid="stSelectboxVirtualDropdown"] [role="option"][data-hovered="true"] > div,
+[data-testid="stSelectboxVirtualDropdown"] [role="option"][data-focused="true"] > div {
+    background: rgba(52,211,153,0.08) !important;
+}
+[data-testid="stSelectboxVirtualDropdown"] [role="option"][aria-selected="true"] > div {
+    background: rgba(52,211,153,0.14) !important;
+}
 .stButton button, button[kind="primary"], button[kind="secondary"] {
     border-radius: 9px !important;
     font-family: 'Archivo', sans-serif !important;
