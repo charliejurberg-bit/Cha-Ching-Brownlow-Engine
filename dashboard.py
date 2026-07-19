@@ -2934,6 +2934,7 @@ if _page == 'Landing':
     _land_df = predictions
     _land_leader = "—"
     _land_votes = 0.0
+    _land_lead = "—"
     if _land_df is not None and not _land_df.empty and 'Exp_Total_Votes' in _land_df.columns:
         _land_top = (
             _land_df.groupby("Player_Name")["Exp_Total_Votes"]
@@ -2943,6 +2944,25 @@ if _page == 'Landing':
         if len(_land_top):
             _land_leader = _land_top.index[0]
             _land_votes = float(_land_top.iloc[0])
+        # Margin over the runner-up, off the same sorted series. An em dash when
+        # there is no second player to be ahead of.
+        if len(_land_top) > 1:
+            _land_lead = f"+{float(_land_top.iloc[0]) - float(_land_top.iloc[1]):.1f}"
+
+    # Leader's best market price. Plain-name equality against best_odds.csv's
+    # `player` column is the join this project already uses everywhere odds meet
+    # players — the Leaderboard's dict(zip(...)) and the Compare tab's _odds_for
+    # both do exactly this. normalise_name belongs to the LIVE FEED's names, not
+    # to this file, so it is deliberately not used here.
+    # An em dash covers both misses: a leader absent from the odds file, and a
+    # disambiguated 'Name (Team)' that the plain-name file cannot match.
+    _land_odds = "—"
+    _land_odds_df = load_best_odds()
+    if (_land_odds_df is not None and len(_land_odds_df)
+            and 'player' in _land_odds_df.columns and 'best_odds' in _land_odds_df.columns):
+        _lo_row = _land_odds_df[_land_odds_df['player'] == _land_leader]
+        if not _lo_row.empty and pd.notna(_lo_row.iloc[0]['best_odds']):
+            _land_odds = f"${float(_lo_row.iloc[0]['best_odds']):.1f}"
 
     _land_round = _display_round(max_season_rounds, 2026)
 
@@ -3237,12 +3257,12 @@ animate(document.getElementById('votes'), votesTarget, function(v){ return v.toF
             st.markdown(f"""
 <div class="dest-content">
   <span class="dest-tag bw">Prediction Engine</span>
-  <h2>Brownlow Medal</h2>
-  <div class="dest-desc">Live leaderboard, player profiles, game-by-game vote modelling and where the market has it wrong.</div>
+  <h2>Brownlow Engine</h2>
+  <div class="dest-desc">Machine-modelled votes for every game &mdash; live leaderboard, player profiles, comparison tools and more.</div>
   <div class="dest-data-row">
     <div><span class="dr-label">Leader</span><span class="dr-value">{_land_leader}</span></div>
     <div><span class="dr-label">Proj. Votes</span><span class="dr-value">{_land_votes:.1f}</span></div>
-    <div><span class="dr-label">Top-10 Acc.</span><span class="dr-value">86%</span></div>
+    <div><span class="dr-label">Best Odds</span><span class="dr-value">{_land_odds}</span></div>
   </div>
 </div>""", unsafe_allow_html=True)
             if st.button("Open Leaderboard", type="primary", key="land_bw"):
