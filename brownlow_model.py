@@ -22,6 +22,30 @@ warnings.filterwarnings('ignore')
 
 os.makedirs("predictions", exist_ok=True)
 
+# ── Variant switch ───────────────────────────────────────────
+# One script, two feature sets — NOT two scripts. A fork would let the variants
+# drift apart the first time a feature is added to only one of them, and the
+# whole point of the variant is that it is the same model minus coaches votes.
+#
+# NO_COACHES=1 drops the six same-game coaches features and takes Coaches_Votes
+# out of RANK_STATS, for predicting rounds whose coaches votes are not published
+# yet (the last two rounds before the count).
+#
+# DROP_MOMENTUM_CV is separate because momentum_cv is a SEVENTH coaches-derived
+# feature and the answer is not obvious. Since the point-in-time fix it reads
+# only PRIOR rounds, so in the target scenario — late rounds, where earlier
+# coaches votes have long been published — it is genuinely computable. Dropping
+# it buys independence from coaches data entirely; keeping it keeps real signal
+# that is actually available. Both are trained and compared rather than assumed.
+NO_COACHES       = os.environ.get('NO_COACHES', '0') == '1'
+DROP_MOMENTUM_CV = os.environ.get('DROP_MOMENTUM_CV', '0') == '1'
+_SUFFIX = ''
+if NO_COACHES:
+    _SUFFIX = '_nocv_nomom' if DROP_MOMENTUM_CV else '_nocv'
+print(f"Variant: {'NO_COACHES' if NO_COACHES else 'FULL'}"
+      f"{' (momentum_cv dropped)' if NO_COACHES and DROP_MOMENTUM_CV else ''}"
+      f" | artifact suffix: {_SUFFIX or '(none)'}")
+
 print("Loading data...")
 stats_file   = "fitzroy_stats_all.csv"   if os.path.exists("fitzroy_stats_all.csv")   else "fitzroy_stats_2015_2025.csv"
 coaches_file = "coaches_votes_all.csv"   if os.path.exists("coaches_votes_all.csv")   else "coaches_votes_2015_2025.csv"
@@ -163,6 +187,8 @@ df['Game_ID'] = df['Season'].astype(str)+'_'+df['Round_num'].astype(str)+'_'+df[
 
 RANK_STATS = ['Disposals','Goals','Contested.Possessions','Clearances',
               'Kicks','Impact_Score','Score_Involvements','Coaches_Votes','Tackles']
+if NO_COACHES:
+    RANK_STATS = [s for s in RANK_STATS if s != 'Coaches_Votes']
 
 # Add Wheelo stats to ranking if available
 if 'RatingPoints' in df.columns:
@@ -175,11 +201,14 @@ for stat in RANK_STATS:
         df[f'{stat}_game_z'] = df.groupby('Game_ID')[stat].transform(lambda x: (x-x.mean())/(x.std()+0.001))
 
 df['Top3_Disposals'] = (df['Disposals_game_rank']<=3).astype(int)
-df['Top3_Coaches'] = (df['Coaches_Votes_game_rank']<=3).astype(int)
 df['Top3_Impact'] = (df['Impact_Score_game_rank']<=3).astype(int)
 df['BOG_Disposals'] = (df['Disposals_game_rank']==1).astype(int)
-df['BOG_Coaches'] = (df['Coaches_Votes_game_rank']==1).astype(int)
 df['BOG_Impact'] = (df['Impact_Score_game_rank']==1).astype(int)
+# Guarded: NO_COACHES takes Coaches_Votes out of RANK_STATS above, so the rank
+# column these read does not exist in that variant.
+if not NO_COACHES:
+    df['Top3_Coaches'] = (df['Coaches_Votes_game_rank']<=3).astype(int)
+    df['BOG_Coaches'] = (df['Coaches_Votes_game_rank']==1).astype(int)
 if 'RatingPoints_game_rank' in df.columns:
     df['BOG_Rating'] = (df['RatingPoints_game_rank']==1).astype(int)
     df['Top3_Rating'] = (df['RatingPoints_game_rank']<=3).astype(int)
@@ -238,12 +267,22 @@ def _pit_momentum(s):
     return recent_mean - earlier_mean
 
 
-for _src, _out in (('Coaches_Votes', 'momentum_cv'), ('Disposals', 'momentum_disp')):
+_MOM_SPECS = [('Coaches_Votes', 'momentum_cv'), ('Disposals', 'momentum_disp')]
+if NO_COACHES and DROP_MOMENTUM_CV:
+    _MOM_SPECS = [(s, o) for s, o in _MOM_SPECS if o != 'momentum_cv']
+for _src, _out in _MOM_SPECS:
     df[_out] = (df.groupby(['Season', 'Player_Name'])[_src]
                   .transform(_pit_momentum)
                   .fillna(0))
 
-FORM_FEATURES = ['late_form_ewm', 'momentum_cv', 'momentum_disp']
+FORM_FEATURES = [f for f in ('late_form_ewm', 'momentum_cv', 'momentum_disp')
+                 if f in df.columns]
+# late_form_ewm stays in every variant: _form_src resolves to ExpVotes (Wheelo),
+# not Coaches_Votes. The Coaches_Votes fallback on that line never fires with the
+# current data — wheelo_all_seasons.csv carries ExpVotes for every season — so
+# this feature is Wheelo-derived, not coaches-derived. If a future dataset ever
+# lacks ExpVotes the fallback WOULD fire and silently make late_form_ewm a
+# coaches feature, which the NO_COACHES assertion below is there to catch.
 print(f"  Form/momentum features: {FORM_FEATURES}")
 
 # ── Define all features ──────────────────────────────────────
@@ -271,6 +310,24 @@ TARGET = 'Brownlow.Votes'
 FEATURES = list(dict.fromkeys(FEATURES))
 # Keep only features that exist in df
 FEATURES = [f for f in FEATURES if f in df.columns]
+
+if NO_COACHES:
+    FEATURES = [f for f in FEATURES if 'Coaches' not in f]
+    if DROP_MOMENTUM_CV:
+        FEATURES = [f for f in FEATURES if f != 'momentum_cv']
+    # Assert rather than trust the filters above. A coaches feature surviving
+    # into this variant is the one failure that matters — it would be trained on
+    # data that does not exist at predict time, and nothing downstream would say
+    # so. The momentum_cv check is by NAME because its dependency is in how it is
+    # built, not in what it is called.
+    _leaked = [f for f in FEATURES if 'Coaches' in f]
+    if DROP_MOMENTUM_CV:
+        _leaked += [f for f in FEATURES if f == 'momentum_cv']
+    assert not _leaked, f"NO_COACHES variant still carries: {_leaked}"
+    print(f"  NO_COACHES: {len(_leaked)} coaches features remain (asserted 0)")
+    if not DROP_MOMENTUM_CV and 'momentum_cv' in FEATURES:
+        print("  NOTE: momentum_cv retained — built from Coaches_Votes over PRIOR "
+              "rounds only, so it needs published history but not the current game.")
 
 print(f"\nTotal features: {len(FEATURES)}")
 print(f"  Base: {len(BASE_FEATURES)}")
@@ -316,17 +373,17 @@ model.fit(X, y, sample_weight=w)
 # Feature importance
 imp = pd.DataFrame({'Feature':FEATURES,'Importance':model.feature_importances_})\
     .sort_values('Importance',ascending=False)
-imp.to_csv("predictions/feature_importance.csv", index=False)
+imp.to_csv(f"predictions/feature_importance{_SUFFIX}.csv", index=False)
 print("\n=== TOP 20 FEATURES ===")
 print(imp.head(20).to_string(index=False))
 
 # Save model artifacts
-with open("predictions/model.pkl","wb") as f: pickle.dump(model, f)
-with open("predictions/features.pkl","wb") as f: pickle.dump(FEATURES, f)
-with open("predictions/label_encoder.pkl","wb") as f: pickle.dump(le, f)
-with open("predictions/rank_stats.pkl","wb") as f: pickle.dump(RANK_STATS, f)
-with open("predictions/wheelo_features.pkl","wb") as f: pickle.dump(WHEELO_FEATURES, f)
-with open("predictions/form_features.pkl","wb") as f: pickle.dump(FORM_FEATURES, f)
+with open(f"predictions/model{_SUFFIX}.pkl","wb") as f: pickle.dump(model, f)
+with open(f"predictions/features{_SUFFIX}.pkl","wb") as f: pickle.dump(FEATURES, f)
+with open(f"predictions/label_encoder{_SUFFIX}.pkl","wb") as f: pickle.dump(le, f)
+with open(f"predictions/rank_stats{_SUFFIX}.pkl","wb") as f: pickle.dump(RANK_STATS, f)
+with open(f"predictions/wheelo_features{_SUFFIX}.pkl","wb") as f: pickle.dump(WHEELO_FEATURES, f)
+with open(f"predictions/form_features{_SUFFIX}.pkl","wb") as f: pickle.dump(FORM_FEATURES, f)
 print("OK Model artifacts saved")
 
 # ── Disambiguate same-name players for output ────────────────
@@ -352,6 +409,15 @@ else:
     print("  No ID column found — skipping same-name disambiguation")
 
 # ── Generate predictions for all seasons ─────────────────────
+# Variant runs stop here. These CSVs are unsuffixed and are what the dashboard
+# reads, so letting a variant reach them would silently replace the full model's
+# published predictions with a deliberately weaker model's. The variant exists to
+# be measured, not to serve.
+if NO_COACHES:
+    print(f"\nNO_COACHES variant: artifacts saved with suffix '{_SUFFIX}'.")
+    print("Skipping per-season prediction CSVs — those belong to the full model.")
+    raise SystemExit(0)
+
 print("\nGenerating predictions for all seasons...")
 classes = list(model.classes_)
 ALL_SEASONS = sorted(model_df['Season'].unique().astype(int).tolist())
