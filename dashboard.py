@@ -3839,6 +3839,106 @@ H2H_POLL_LIKELY = 0.35
 # Rounds shown in the ledger before the rest move into the "All rounds" expander.
 H2H_LEDGER_ROWS = 8
 
+
+# The four helpers below are module level because BOTH the Compare tab and the
+# Live Tracker's H2H panel need them, and the tracker runs on a page where the
+# Player Profile block never executes. They are pure: no session state, no
+# frames captured, nothing Streamlit-aware.
+
+def _h2h_num(row, col):
+    """A numeric cell as float, with an absent row or NaN reading as 0.0."""
+    if row is None:
+        return 0.0
+    _x = row.get(col)
+    return float(_x) if pd.notna(_x) else 0.0
+
+
+def _h2h_pmf(row):
+    """Vote pmf over {0,1,2,3} from P_1/P_2/P_3. An absent row is a certain 0,
+    which is what a DNP or bye round means — those rows never exist upstream."""
+    if row is None:
+        return np.array([1.0, 0.0, 0.0, 0.0])
+    _p1 = _h2h_num(row, 'P_1')
+    _p2 = _h2h_num(row, 'P_2')
+    _p3 = _h2h_num(row, 'P_3')
+    return np.array([max(0.0, 1.0 - _p1 - _p2 - _p3), _p1, _p2, _p3])
+
+
+def _h2h_total_dist(rmap, axis, certain=None):
+    """Exact season-total distribution: convolve the per-round pmfs.
+
+    No simulation — 3 votes x ~23 rounds is a tiny support. `axis` is the round
+    axis to fold over (the union of both players' rounds), passed in rather than
+    closed over so the Live Tracker can supply its own.
+
+    `certain` optionally maps a round to a known vote count, replacing that
+    round's model pmf with a point mass. The tracker uses it for rounds the
+    count has already reached; the Compare tab leaves it None.
+    """
+    _d = np.array([1.0])
+    for _rn in axis:
+        if certain is not None and _rn in certain:
+            _pt = np.zeros(4)
+            _pt[max(0, min(3, int(certain[_rn])))] = 1.0
+            _d = np.convolve(_d, _pt)
+        else:
+            _d = np.convolve(_d, _h2h_pmf(rmap.get(_rn)))
+    return _d
+
+
+def _h2h_short_pair(n1, n2):
+    """Shortest labels that still tell these two players apart.
+
+    A bare surname reads best, but two different players can share one —
+    upstream only appends '(Team)' for genuine fitzRoy-ID collisions, so
+    'Ryan' v 'Ryan' is reachable with plain names. Widen both labels together,
+    only as far as needed: surname, then initial + surname, then the full given
+    name. Shared initials are why the third rung exists (Luke / Liam Ryan)."""
+    def _base(_n):
+        return str(_n).split(' (')[0].strip()
+
+    def _sur(_n):
+        _b = _base(_n)
+        return _b.split()[-1] if _b else str(_n)
+
+    def _init(_n):
+        _p = _base(_n).split()
+        return f"{_p[0][0]}. {_p[-1]}" if len(_p) > 1 else _sur(_n)
+
+    for _form in (_sur, _init, _base):
+        _a, _b = _form(n1), _form(n2)
+        if _a != _b:
+            return _a, _b
+    # Identical full names — only reachable in the disambiguated 'Name (Team)'
+    # form, where the suffix is the differentiator.
+    return str(n1), str(n2)
+
+
+def _h2h_classify(same_game, pp1, pp2, s1, s2):
+    """One round's (kind, owner, label). pp is None exactly when that player
+    did not play. Owner is 1, 2 or None, and is what the chip colours read —
+    never the label, which two players sharing a surname would make ambiguous.
+    """
+    if same_game:
+        return 'SAME GAME', None, 'SAME GAME'
+
+    _hot1 = pp1 is not None and pp1 >= H2H_POLL_LIKELY
+    _hot2 = pp2 is not None and pp2 >= H2H_POLL_LIKELY
+
+    if pp1 is None or pp2 is None:
+        _live = _hot2 if pp1 is None else _hot1
+        _who  = s2 if pp1 is None else s1
+        if _live:
+            return 'FREE', (2 if pp1 is None else 1), f'FREE &rarr; {_who}'
+        return 'DEAD', None, 'DEAD'
+    if _hot1 and _hot2:
+        return 'CONTESTED', None, 'CONTESTED'
+    if _hot1:
+        return 'SWING', 1, f'SWING &rarr; {s1}'
+    if _hot2:
+        return 'SWING', 2, f'SWING &rarr; {s2}'
+    return 'DEAD', None, 'DEAD'
+
 # ════════════════════════════════════════════════════════════
 # PLAYER PROFILE
 # ════════════════════════════════════════════════════════════
@@ -4624,31 +4724,11 @@ if _page == 'Player Profile':
                         _h2h_axis = sorted(set(_h2h_r1) | set(_h2h_r2))
 
                         if _h2h_axis:
-                            def _h2h_num(row, col):
-                                if row is None:
-                                    return 0.0
-                                _x = row.get(col)
-                                return float(_x) if pd.notna(_x) else 0.0
-
-                            def _h2h_pmf(row):
-                                """Vote pmf over {0,1,2,3}. An absent round is a certain 0."""
-                                if row is None:
-                                    return np.array([1.0, 0.0, 0.0, 0.0])
-                                _p1 = _h2h_num(row, 'P_1')
-                                _p2 = _h2h_num(row, 'P_2')
-                                _p3 = _h2h_num(row, 'P_3')
-                                return np.array([max(0.0, 1.0 - _p1 - _p2 - _p3), _p1, _p2, _p3])
-
-                            def _h2h_total_dist(rmap):
-                                """Exact season-total distribution: convolve the per-round pmfs.
-                                No simulation — 3 votes x ~23 rounds is a tiny support."""
-                                _d = np.array([1.0])
-                                for _rn in _h2h_axis:
-                                    _d = np.convolve(_d, _h2h_pmf(rmap.get(_rn)))
-                                return _d
-
-                            _h2h_d1 = _h2h_total_dist(_h2h_r1)
-                            _h2h_d2 = _h2h_total_dist(_h2h_r2)
+                            # _h2h_num / _h2h_pmf / _h2h_total_dist / _h2h_short_pair /
+                            # _h2h_classify are module level — the Live Tracker's H2H
+                            # panel shares them and cannot see this block.
+                            _h2h_d1 = _h2h_total_dist(_h2h_r1, _h2h_axis)
+                            _h2h_d2 = _h2h_total_dist(_h2h_r2, _h2h_axis)
 
                             # Joint over (P1 total, P2 total) assuming independence. This is a
                             # v1 approximation: in rounds where both play the SAME game the two
@@ -4670,34 +4750,6 @@ if _page == 'Player Profile':
                                 for _f, _a in zip(game_df['Playing.for'], game_df['Team']):
                                     if pd.notna(_f) and pd.notna(_a):
                                         _h2h_abbr.setdefault(str(_f), str(_a))
-
-                            def _h2h_short_pair(n1, n2):
-                                """Shortest labels that still tell these two players apart.
-
-                                A bare surname reads best, but two different players can share
-                                one — upstream only appends '(Team)' for genuine fitzRoy-ID
-                                collisions, so 'Ryan' v 'Ryan' is reachable with plain names.
-                                Widen both labels together, only as far as needed: surname,
-                                then initial + surname, then the full given name. Shared
-                                initials are why the third rung exists (Luke / Liam Ryan)."""
-                                def _base(_n):
-                                    return str(_n).split(' (')[0].strip()
-
-                                def _sur(_n):
-                                    _b = _base(_n)
-                                    return _b.split()[-1] if _b else str(_n)
-
-                                def _init(_n):
-                                    _p = _base(_n).split()
-                                    return f"{_p[0][0]}. {_p[-1]}" if len(_p) > 1 else _sur(_n)
-
-                                for _form in (_sur, _init, _base):
-                                    _a, _b = _form(n1), _form(n2)
-                                    if _a != _b:
-                                        return _a, _b
-                                # Identical full names — only reachable in the disambiguated
-                                # 'Name (Team)' form, where the suffix is the differentiator.
-                                return str(n1), str(n2)
 
                             def _h2h_opp(row):
                                 """Opponent abbreviation, from Home.team/Away.team + Home.Away."""
@@ -4731,34 +4783,15 @@ if _page == 'Player Profile':
                                 _same = (not _dnp1 and not _dnp2 and pd.notna(_g1)
                                          and pd.notna(_g2) and _g1 == _g2)
 
-                                _hot1 = (_pp1 is not None and _pp1 >= H2H_POLL_LIKELY)
-                                _hot2 = (_pp2 is not None and _pp2 >= H2H_POLL_LIKELY)
-                                # Each branch settles three things at once: the stable `kind`,
-                                # the beneficiary `owner` (1, 2 or None) and the display label.
-                                # Rendering reads kind/owner only — never the label — so two
-                                # players sharing a surname cannot misroute the colours.
+                                # Classification is module level (_h2h_classify) so the Live
+                                # Tracker panel classifies remaining rounds the same way.
+                                # Rendering reads kind/owner, never the label — two players
+                                # sharing a surname would make the label ambiguous.
+                                _kind, _owner, _cls = _h2h_classify(
+                                    _same, _pp1, _pp2, _h2h_s1, _h2h_s2)
                                 if _same:
-                                    _kind, _owner = 'SAME GAME', None
-                                    _cls, _matchup = 'SAME GAME', _h2h_fixture(_row1)
+                                    _matchup = _h2h_fixture(_row1)
                                 else:
-                                    if _dnp1 or _dnp2:
-                                        _live = _hot2 if _dnp1 else _hot1
-                                        _who = _h2h_s2 if _dnp1 else _h2h_s1
-                                        if _live:
-                                            _kind, _owner = 'FREE', (2 if _dnp1 else 1)
-                                            _cls = f'FREE &rarr; {_who}'
-                                        else:
-                                            _kind, _owner, _cls = 'DEAD', None, 'DEAD'
-                                    elif _hot1 and _hot2:
-                                        _kind, _owner, _cls = 'CONTESTED', None, 'CONTESTED'
-                                    elif _hot1:
-                                        _kind, _owner = 'SWING', 1
-                                        _cls = f'SWING &rarr; {_h2h_s1}'
-                                    elif _hot2:
-                                        _kind, _owner = 'SWING', 2
-                                        _cls = f'SWING &rarr; {_h2h_s2}'
-                                    else:
-                                        _kind, _owner, _cls = 'DEAD', None, 'DEAD'
                                     _o1, _o2 = _h2h_opp(_row1), _h2h_opp(_row2)
                                     _parts = [f"v {_o}" for _o in (_o1, _o2) if _o]
                                     _matchup = ' / '.join(_parts) if _parts else '—'
