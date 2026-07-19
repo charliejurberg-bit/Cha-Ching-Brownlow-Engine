@@ -3184,7 +3184,7 @@ font-family:'Archivo',sans-serif;font-weight:800;font-size:14px;flex-shrink:0;}
   <div class="content">
     <div class="eyebrow rise r1">BROWNLOW PREDICTOR &middot; THROUGH ROUND __ROUND__</div>
     <h1 class="wordmark rise r2"><span class="cha">CHA</span> <span class="ching">CHING</span></h1>
-    <p class="subtitle rise r3">Insights and tools for Brownlow night.</p>
+    <p class="subtitle rise r3">Everything you need for an edge on Brownlow night.</p>
     <div class="chips-label">ROUND __ROUND__ &middot; MOST LIKELY TO POLL</div>
     <div class="chips">
       <div class="chip chip-1"><span class="badge badge-1">1</span><span class="chip-name">__NAME1__</span><span class="chip-stats">__STATS1__</span></div>
@@ -3284,7 +3284,7 @@ animate(document.getElementById('votes'), votesTarget, function(v){ return v.toF
 <div class="dest-content">
   <span class="dest-tag bw">Prediction Engine</span>
   <h2>Brownlow Engine</h2>
-  <div class="dest-desc">Machine-modelled votes for every game &mdash; live leaderboard, player profiles, comparison tools and more.</div>
+  <div class="dest-desc">Vote projections for every player in every game. Live leaderboard, player profiles, comparison tools and more.</div>
   <div class="dest-data-row">
     <div><span class="dr-label">Leader</span><span class="dr-value">{_land_leader}</span></div>
     <div><span class="dr-label">Proj. Votes</span><span class="dr-value">{_land_votes:.1f}</span></div>
@@ -3301,7 +3301,7 @@ animate(document.getElementById('votes'), votesTarget, function(v){ return v.toF
 <div class="dest-content">
   <span class="dest-tag bh">Live Tracking</span>
   <h2>Personalised Tracker</h2>
-  <div class="dest-desc">Follow the count your way &mdash; track head-to-heads, build a watchlist, and watch your calls settle live as the votes are read.</div>
+  <div class="dest-desc">Your picks, your players, live on the night. Track head-to-heads and watch your watchlist settle as the votes are read.</div>
   <div class="dest-data-row">
     <div><span class="dr-label">Brownlow Night</span><span class="dr-value">Sept 21</span></div>
     <div><span class="dr-label">Countdown</span><span class="dr-value" style="color:var(--gold)">{_land_countdown}</span></div>
