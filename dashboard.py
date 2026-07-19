@@ -547,7 +547,15 @@ def render_banner():
 st.markdown("""
 <style>
     /* ── Structural ── */
-    body { overflow-x: hidden !important; }
+    /* PROJECT LAW: no overflow-x:hidden at page level. Clipping the root hides
+       a sideways overflow instead of fixing it, and takes the content with it.
+       Anything too wide gets contained where it lives — a wrapper carrying
+       overflow-x:auto (see the Polls a Vote matrix, .lb-tbl-wrap, the Game
+       Analysis and Model Comparison tables) or a layout that wraps.
+       A `body { overflow-x: hidden !important; }` line sat here and was dead:
+       the rule below names `body` too, at the same (0,0,1) specificity and also
+       !important, so `visible` won on source order. It read as protection while
+       doing nothing. Do not reinstate it. */
     html, body, .stApp, .main,
     [data-testid="stAppViewContainer"],
     [data-testid="stMainBlockContainer"],
