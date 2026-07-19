@@ -6337,7 +6337,39 @@ if _page == 'Live Tracker':
 
   .mexp{font-family:var(--mono);font-size:9.5px;color:var(--muted2);opacity:.65;margin-right:12px;white-space:nowrap;}
 
-  @media(max-width:1080px){.zones{grid-template-columns:1fr 1fr;}.zone:nth-child(3){grid-column:1/3;border-left:none;border-top:1px solid var(--hair);padding-top:16px;}body{overflow:auto;}}
+  /* Tablet: three rails become two, Zone 3 spans the pair underneath.
+     Lower-bounded at 701px so it cannot reach the phone block below. Without
+     that bound BOTH rules match at 390px and only source order separates them —
+     the same ordering hazard the nav CSS carries (see CLAUDE.md), and here it
+     bites harder because _zones_css is concatenated AFTER _LT_CSS and would
+     silently win on the anonymous path. Bounding the range means the phone
+     block is the single source of truth below 700px on both paths. */
+  @media(min-width:701px) and (max-width:1080px){.zones{grid-template-columns:1fr 1fr;}.zone:nth-child(3){grid-column:1/3;border-left:none;border-top:1px solid var(--hair);padding-top:16px;}body{overflow:auto;}}
+
+  /* Phone: stack everything in one column.
+     Two properties do the real work. .zones drops flex:1 so its height stops
+     being "whatever the topbar/race band left over" and becomes content-driven,
+     and .zone regains its min-content floor (min-height:0 is what let a zone box
+     be shorter than its own content, so the surplus painted over the next row
+     instead of growing it). display:block on .zones makes the grid-template
+     columns inert, so neither 1080 rule nor _zones_css's base rule can reassert
+     a multi-column layout here.
+     The leaderboard gets a contained horizontal scroll rather than bleeding: its
+     .lb-main floors (11+18+26+38+48 plus five 10px gaps, before the name) come
+     to ~280px, which is far wider than a phone cell. */
+  @media(max-width:700px){
+    html,body{height:auto;}
+    body{display:block;min-height:0;overflow:visible;padding:14px 16px;}
+    .zones{display:block;flex:none;min-height:0;}
+    .zone{min-height:auto;padding:16px 0;}
+    .zone:first-child{padding-left:0;} .zone:last-child{padding-right:0;}
+    .zone + .zone{border-left:none;border-top:1px solid var(--hair);}
+    .zone:nth-child(3){grid-column:auto;padding-top:16px;}
+    .lb{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+    .lb-main{min-width:280px;}
+    .race{grid-template-columns:1fr;gap:14px;}
+    .stat{text-align:left;}
+  }
 </style>"""
 
         # Watchlist-fed chrome. With no watchlist the "you"/"both" dots can never
@@ -6552,8 +6584,16 @@ if _page == 'Live Tracker':
             _zones_css = ''
         else:
             _z3_zone   = ''
+            # Lower-bounded at 701px for the same reason as _LT_CSS's tablet
+            # rule: this string is concatenated AFTER _LT_CSS, so an unbounded
+            # max-width:1080px would match at phone widths too and — at equal
+            # (0,1,0) specificity — win on source order, quietly reinstating two
+            # columns on a 390px screen for anonymous visitors only. Bounding it
+            # leaves _LT_CSS's max-width:700px block as the one authority below
+            # 700 on both paths. Same ordering hazard as the nav CSS (CLAUDE.md).
             _zones_css = ('<style>.zones{grid-template-columns:1.25fr 1.05fr;}'
-                          '@media(max-width:1080px){.zones{grid-template-columns:1fr 1fr;}}'
+                          '@media(min-width:701px) and (max-width:1080px)'
+                          '{.zones{grid-template-columns:1fr 1fr;}}'
                           '</style>')
 
         _body = f'''<body>
