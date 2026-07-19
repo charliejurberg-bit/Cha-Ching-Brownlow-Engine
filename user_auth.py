@@ -979,3 +979,132 @@ def delete_poll_pick(pick_id: str):
 
     load_poll_picks.clear()
     return True, None
+
+
+# ── Tracked H2H pair ───────────────────────────────────────────────────────
+#
+# One pair per user per season, enforced by UNIQUE (user_id, season) in
+# 06_h2h_pairs.sql. Saving a different pair overwrites rather than accumulates,
+# so the write is an upsert on that constraint and there is no "which one is
+# current" question for the reader to answer.
+#
+# The fitzRoy IDs are stored alongside the names because the names are not
+# stable across seasons: _disambiguate_players() only rewrites to 'Name (Team)'
+# when two IDs collide in that season's data. Callers should prefer the IDs when
+# deciding whether a saved pair is the one on screen.
+
+H2H_PAIRS_TABLE = "user_h2h_pairs"
+
+_H2H_SAVE_FAILED = "Couldn't save that pair — try again."
+_H2H_CLEAR_FAILED = "Couldn't untrack that pair — try again."
+
+
+@st.cache_data(ttl=60)
+def load_h2h_pair(user_id: str, season: int):
+    """The signed-in user's tracked pair for `season`, or None. Never raises.
+
+    user_id is in the signature to key the cache, NOT to filter the query.
+    st.cache_data is keyed by arguments and shared across every session on the
+    server, so a cache whose key doesn't name the viewer hands the first
+    viewer's pair to the next. Naming user_id gives each viewer their own
+    entry. Callers pass current_user()["id"].
+
+    No .eq("user_id", ...) filter: the select policy already scopes this to the
+    caller's rows, and restating it in the query would imply the filter is what
+    protects the data. It isn't — RLS is.
+
+    None on failure rather than a raise: this feeds a render, and showing the
+    untracked state is a better answer than a traceback. The unique constraint
+    means at most one row can come back, so the first is the only.
+    """
+    if not current_user():
+        return None
+
+    def _op(sb):
+        return (sb.table(H2H_PAIRS_TABLE)
+                  .select("*")
+                  .eq("season", int(season))
+                  .execute())
+
+    try:
+        res, err = _run(_op)
+    except Exception:
+        return None
+    if err:
+        return None
+
+    rows = getattr(res, "data", None) or []
+    return dict(rows[0]) if rows else None
+
+
+def save_h2h_pair(player1, player2, season: int,
+                  player1_id=None, player2_id=None):
+    """Save (or replace) the user's tracked pair for `season`. Returns (ok, message).
+
+    Upserts on the (user_id, season) unique constraint, so a user who already
+    tracks a pair this season has it overwritten in one statement — no delete
+    first, and no window where they track nothing.
+
+    Player order is stored as given. Callers compare pairs order-insensitively,
+    so {A, B} saved as (B, A) still matches; nothing downstream may assume
+    player1 is the profile player.
+    """
+    user = current_user()
+    if not user:
+        return False, _SESSION_EXPIRED
+
+    def _txt(v):
+        return None if v is None or v == "" else str(v)
+
+    # user_id is set from the session rather than trusted from the caller, and
+    # the insert policy's WITH CHECK rejects it anyway if it isn't auth.uid().
+    record = {
+        "user_id":    user["id"],
+        "season":     int(season),
+        "player1":    str(player1),
+        "player2":    str(player2),
+        "player1_id": _txt(player1_id),
+        "player2_id": _txt(player2_id),
+    }
+
+    def _op(sb):
+        return (sb.table(H2H_PAIRS_TABLE)
+                  .upsert(record, on_conflict="user_id,season")
+                  .execute())
+
+    try:
+        _, err = _run(_op)
+        if err:
+            return False, err
+    except Exception:
+        return False, _H2H_SAVE_FAILED
+
+    load_h2h_pair.clear()
+    return True, None
+
+
+def clear_h2h_pair(season: int):
+    """Drop the user's tracked pair for `season`. Returns (ok, message).
+
+    No .eq("user_id", ...): the delete policy scopes it to the caller's rows,
+    so this can only ever reach their own pair. RLS, not a filter, is what
+    makes that true.
+    """
+    if not current_user():
+        return False, _SESSION_EXPIRED
+
+    def _op(sb):
+        return (sb.table(H2H_PAIRS_TABLE)
+                  .delete()
+                  .eq("season", int(season))
+                  .execute())
+
+    try:
+        _, err = _run(_op)
+        if err:
+            return False, err
+    except Exception:
+        return False, _H2H_CLEAR_FAILED
+
+    load_h2h_pair.clear()
+    return True, None
