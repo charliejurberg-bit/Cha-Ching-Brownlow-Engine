@@ -2305,7 +2305,12 @@ _nav_icon_css = (
 # border-bottom-color, so it collapses to one rule with the colour chosen here.
 # _hub is the single source of truth the .bh marker used to encode, so with the
 # marker gone this conditional is that same signal, read in Python.
-_hub_accent = "var(--gold)" if _hub == "betting" else "var(--emerald)"
+# Gold for The Count as well as Betting: the count is the medal night, and gold
+# is already this project's medal/vote accent (the tracker's progress fill, the
+# 3-vote markers). Emerald stays the model's colour, so the public toggle reads
+# as prediction vs result rather than as two arbitrary tabs. Colour law: gold is
+# right here, red never.
+_hub_accent = "var(--gold)" if _hub in ("betting", "count") else "var(--emerald)"
 # Same active-accent signal for the page strip's active-tab underline. Kept as a
 # separate token so slice 4's rules never touch slice 3's verified hub rule.
 _page_accent = _hub_accent
