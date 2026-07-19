@@ -4788,8 +4788,6 @@ if _page == 'Player Profile':
                                 'SWING1':    'background:#0f3d31;color:#34d399',
                                 'SWING2':    'background:var(--surface);color:#e9eef3;'
                                              'box-shadow:inset 0 0 0 1px var(--line)',
-                                'FREE1':     'background:#0f3d31;color:#34d399',
-                                'FREE2':     'background:#0f3d31;color:#34d399',
                                 # Not in the brief's chip set — both players live in separate
                                 # games needs its own read, and gold/emerald are taken. Steel
                                 # keeps it inside the MT palette and out of the colour law.
@@ -4798,10 +4796,12 @@ if _page == 'Player Profile':
                             }
 
                             def _h2h_chip_key(cls):
-                                if cls.startswith('SWING'):
+                                # FREE inherits the beneficiary's SWING scheme: the chip says
+                                # "this round belongs to <player>", and which player that is
+                                # matters more than whether he got it by outpolling the other
+                                # or by the other not playing.
+                                if cls.startswith('SWING') or cls.startswith('FREE'):
                                     return 'SWING1' if cls.endswith(_h2h_s1) else 'SWING2'
-                                if cls.startswith('FREE'):
-                                    return 'FREE1' if cls.endswith(_h2h_s1) else 'FREE2'
                                 return cls
 
                             _H2H_GRID = ('display:grid;grid-template-columns:46px 1fr 88px 88px 150px;'
