@@ -32,6 +32,29 @@ if os.path.exists("predictions/form_features.pkl"):
     with open("predictions/form_features.pkl","rb") as f: FORM_FEATURES = pickle.load(f)
 
 print(f"Model loaded. {len(FEATURES)} features.")
+
+# ── No-coaches variant (optional) ────────────────────────────
+# Trained by brownlow_model.py with NO_COACHES=1. Used for games whose coaches
+# votes are not published yet — the last rounds before the count, which is
+# exactly when the full model is blindest, since coaches features carry ~43% of
+# its importance. Absent artifacts simply disable routing; the full model then
+# handles every game as before.
+MODEL_NOCV = FEATURES_NOCV = None
+if os.path.exists("predictions/model_nocv.pkl") and os.path.exists("predictions/features_nocv.pkl"):
+    with open("predictions/model_nocv.pkl","rb") as f: MODEL_NOCV = pickle.load(f)
+    with open("predictions/features_nocv.pkl","rb") as f: FEATURES_NOCV = pickle.load(f)
+    print(f"No-coaches variant loaded. {len(FEATURES_NOCV)} features.")
+else:
+    print("No-coaches variant not found — every game will use the full model.")
+
+# The six same-game coaches features. Never fed to the variant, and blanked in
+# the output for variant-routed games so the degenerate all-zero ranking is not
+# published as if it were real: with no votes in a game, rank(method='min')
+# gives EVERY player rank 1, so BOG_Coaches and Top3_Coaches would read 1 for
+# all 22 — the exact inverse of what they mean.
+COACHES_FEATURES = ['Coaches_Votes', 'Coaches_Votes_game_rank', 'Coaches_Votes_game_pct',
+                    'Coaches_Votes_game_z', 'Top3_Coaches', 'BOG_Coaches']
+
 TARGET = 'Brownlow.Votes'
 
 # ── Load 2026 stats ──────────────────────────────────────────
@@ -238,11 +261,52 @@ print("\nGenerating predictions...")
 df26_valid = df26[df26['Round_num'].notna()].copy().reset_index(drop=True)
 df26_valid['Brownlow.Votes'] = 0
 
-proba = model.predict_proba(df26_valid[FEATURES])
-classes = list(model.classes_)
-df26_valid['P_1'] = proba[:,classes.index(1)] if 1 in classes else 0
-df26_valid['P_2'] = proba[:,classes.index(2)] if 2 in classes else 0
-df26_valid['P_3'] = proba[:,classes.index(3)] if 3 in classes else 0
+# ── Per-game model routing ───────────────────────────────────
+# A game routes on whether ITS OWN rows carry any coaches votes, not on a round
+# number: rounds are published in blocks but the rule should follow the data, so
+# a late or partial release routes correctly with no constant to maintain.
+#
+# Zero votes across a whole game means "not published yet" rather than "nobody
+# polled" — coaches award 5-4-3-2-1 in every game, so a played game always has
+# nonzero votes somewhere once released.
+_has_cv = df26_valid.groupby('Game_ID')['Coaches_Votes'].transform(lambda s: (s != 0).any())
+df26_valid['model_source'] = np.where(_has_cv, 'full', 'no_cv')
+if MODEL_NOCV is None:
+    df26_valid['model_source'] = 'full'          # variant unavailable
+
+_n_nocv_games = df26_valid.loc[df26_valid['model_source'] == 'no_cv', 'Game_ID'].nunique()
+_n_full_games = df26_valid.loc[df26_valid['model_source'] == 'full', 'Game_ID'].nunique()
+print(f"  Routing: {_n_full_games} game(s) -> full model, {_n_nocv_games} -> no-coaches variant")
+
+for _c in ('P_1', 'P_2', 'P_3'):
+    df26_valid[_c] = 0.0
+
+
+def _fill_probs(_mask, _mdl, _feats):
+    """Predict one routing group in place. Each model gets only its own feature
+    list, so the variant never sees a coaches column."""
+    if not _mask.any():
+        return
+    _pr = _mdl.predict_proba(df26_valid.loc[_mask, _feats])
+    _cl = list(_mdl.classes_)
+    for _v in (1, 2, 3):
+        if _v in _cl:
+            df26_valid.loc[_mask, f'P_{_v}'] = _pr[:, _cl.index(_v)]
+
+
+_m_full = df26_valid['model_source'] == 'full'
+_m_nocv = df26_valid['model_source'] == 'no_cv'
+_fill_probs(_m_full, model, FEATURES)
+if MODEL_NOCV is not None:
+    _fill_probs(_m_nocv, MODEL_NOCV, FEATURES_NOCV)
+    # Blank the coaches columns on variant rows AFTER predicting. They were
+    # computed over a game with no votes, so every one of them is an artefact —
+    # BOG_Coaches and Top3_Coaches would both read 1 for all 22 players. NaN
+    # says "not available"; 1 would say "led the game for coaches votes".
+    for _c in COACHES_FEATURES:
+        if _c in df26_valid.columns:
+            df26_valid.loc[_m_nocv, _c] = np.nan
+
 df26_valid['Poll_Prob'] = df26_valid['P_1']+df26_valid['P_2']+df26_valid['P_3']
 df26_valid['Exp_Votes'] = df26_valid['P_1']*1+df26_valid['P_2']*2+df26_valid['P_3']*3
 

@@ -366,7 +366,10 @@ for fold, (train_idx, val_idx) in enumerate(gkf.split(X, y, groups)):
     print(f"  Fold {fold+1} | Seasons {np.unique(groups[val_idx])} | MAE: {mae:.4f}")
 
 print(f"\nMean CV MAE: {np.mean(fold_scores):.4f}")
-print(f"  v1 was 0.0954, v2 was 0.0910, v3 was 0.0902, v4 is 0.0904")
+print("  Baselines: 0.0953 full model | 0.1013 no-coaches variant.")
+print("  (Pre-2026-audit figures — v1 0.0954 / v2 0.0910 / v3 0.0902 / v4 0.0904 —")
+print("   were all measured with the momentum leak in place, so none of them is")
+print("   comparable to these and the apparent v1->v4 gain may be partly artefact.)")
 print("Fitting final model on all data...")
 model.fit(X, y, sample_weight=w)
 
