@@ -2196,14 +2196,44 @@ if 'page' not in st.session_state:
 if st.session_state.page != 'Landing':
     render_banner()
 
-# Membership here is what the password gate keys off (see the chokepoint below),
-# so a page leaves the gate by leaving this set. Polls a Vote did exactly that in
+# ── Hubs ──────────────────────────────────────────────────────
+# Three hubs, each owning an ordered page list. The public split is Engine (the
+# model and its pages) vs The Count (the live count on medal night) — one page
+# apiece being a legitimate hub, since a hub is a grouping, not a strip.
+# Betting stays exactly as it was and is admin-only.
+_ENGINE_PAGES  = ["Leaderboard", "Player Profile", "Stat Filter",
+                  "Game Analysis", "Model Comparison", "Polls a Vote"]
+_COUNT_PAGES   = ["Live Tracker"]
+_BETTING_PAGES = ["Performance", "Predictions", "Bet Tracker",
+                  "Cha Ching Tips", "Trends & Analysis"]
+
+_HUB_PAGES   = {"brownlow": _ENGINE_PAGES,
+                "count":    _COUNT_PAGES,
+                "betting":  _BETTING_PAGES}
+_HUB_DEFAULT = {"brownlow": "Leaderboard",
+                "count":    "Live Tracker",
+                "betting":  "Performance"}
+
+# Membership here is what the admin gate keys off (see the chokepoint below), so
+# a page leaves the gate by leaving this set. Polls a Vote did exactly that in
 # session 3: it is per-user now, scoped by RLS rather than by this gate, and
-# lives in the Brownlow strip.
-_BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis'}
+# lives in the Engine strip. Derived from the nav list rather than written out
+# twice, so the strip and the gate can never disagree about what is private.
+_BH_PAGES = set(_BETTING_PAGES)
 
 _hub  = st.session_state.get("active_hub", "brownlow")
 _page = st.session_state.page
+
+# A page belongs to exactly one hub, so make active_hub agree with it before
+# anything reads either. Without this, a session stored before the Engine/Count
+# split (active_hub='brownlow', page='Live Tracker') would render the Engine
+# strip with no button matching the page showing — and the landing buttons,
+# which set both, would be the only way back to a consistent state.
+_HUB_OF_PAGE = {_p: _h for _h, _ps in _HUB_PAGES.items() for _p in _ps}
+if _page != 'Landing':
+    _owner_hub = _HUB_OF_PAGE.get(_page)
+    if _owner_hub is not None and _owner_hub != _hub:
+        _hub = st.session_state["active_hub"] = _owner_hub
 
 # ── Page list + icons for current hub ─────────────────────────
 _PAGE_ICONS = {
@@ -2280,15 +2310,7 @@ _hub_accent = "var(--gold)" if _hub == "betting" else "var(--emerald)"
 # separate token so slice 4's rules never touch slice 3's verified hub rule.
 _page_accent = _hub_accent
 
-if _hub == "brownlow":
-    _snav_pages = [
-        "Leaderboard", "Player Profile",
-        "Stat Filter", "Game Analysis",
-        "Model Comparison", "Live Tracker",
-        "Polls a Vote",
-    ]
-else:
-    _snav_pages = ["Performance", "Predictions", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis"]
+_snav_pages = _HUB_PAGES.get(_hub, _ENGINE_PAGES)
 
 # ── Nav CSS (injected once before containers) ─────────────────
 # The tabler-icons webfont the icon rules depend on is loaded as a pinned <link>
