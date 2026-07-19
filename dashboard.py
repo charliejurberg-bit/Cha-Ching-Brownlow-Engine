@@ -353,18 +353,29 @@ def apply_chart_theme(fig):
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family="Archivo, sans-serif", color="#7e8c99", size=12),
         title_font=dict(family="Archivo, sans-serif", color="#e9eef3", size=14),
+        # fixedrange locks each axis against zoom/pan, which on a touch screen is
+        # what stops a scrolling finger being captured by the chart instead of
+        # scrolling the page. dragmode=False removes the drag interaction that
+        # would otherwise pan. Both are figure-level, so every themed chart gets
+        # them without touching a single call site — and they survive the
+        # update_layout / update_xaxes calls several sites make AFTERWARDS,
+        # because Plotly's update is recursive and merges rather than replaces.
+        # Hover is untouched: this is deliberately not staticPlot.
         xaxis=dict(
             gridcolor="rgba(140,165,185,.14)",
             linecolor="rgba(140,165,185,.14)",
             tickcolor="rgba(140,165,185,.14)",
             tickfont=dict(color="#7e8c99", size=11),
+            fixedrange=True,
         ),
         yaxis=dict(
             gridcolor="rgba(140,165,185,.14)",
             linecolor="rgba(140,165,185,.14)",
             tickcolor="rgba(140,165,185,.14)",
             tickfont=dict(color="#7e8c99", size=11),
+            fixedrange=True,
         ),
+        dragmode=False,
         legend=dict(
             bgcolor="rgba(0,0,0,0)",
             bordercolor="rgba(140,165,185,.14)",

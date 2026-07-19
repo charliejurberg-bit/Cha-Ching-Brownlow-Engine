@@ -124,18 +124,25 @@ def apply_chart_theme(fig):
         plot_bgcolor="rgba(0,0,0,0)",
         font=dict(family="Archivo, sans-serif", color="#7e8c99", size=12),
         title_font=dict(family="Archivo, sans-serif", color="#e9eef3", size=14),
+        # See dashboard.py's apply_chart_theme for the full reasoning: fixedrange
+        # stops a touch-screen scroll being captured as a chart zoom/pan, and
+        # dragmode=False removes the pan interaction. Kept in step with that copy
+        # — the two functions are duplicates and must be edited together.
         xaxis=dict(
             gridcolor="rgba(140,165,185,.14)",
             linecolor="rgba(140,165,185,.14)",
             tickcolor="rgba(140,165,185,.14)",
             tickfont=dict(color="#7e8c99", size=11),
+            fixedrange=True,
         ),
         yaxis=dict(
             gridcolor="rgba(140,165,185,.14)",
             linecolor="rgba(140,165,185,.14)",
             tickcolor="rgba(140,165,185,.14)",
             tickfont=dict(color="#7e8c99", size=11),
+            fixedrange=True,
         ),
+        dragmode=False,
         legend=dict(
             bgcolor="rgba(0,0,0,0)",
             bordercolor="rgba(140,165,185,.14)",
