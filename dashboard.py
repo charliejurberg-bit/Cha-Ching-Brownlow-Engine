@@ -3175,6 +3175,21 @@ html,body{background:transparent;height:110px;overflow:hidden;font-family:'IBM P
 .value{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:28px;color:#e9eef3;letter-spacing:.02em;}
 .value.leader{color:#34d399;}
 .lockblur{color:#f0b429;filter:blur(5px);user-select:none;}
+/* Phone: repeat(4,1fr) is minmax(auto,1fr), so the tracks could not shrink
+   below min-content and never wrapped — the leader cell alone wants ~245px
+   (28px mono name + 60px padding) against ~97px available at 390px. The
+   fourth column fell off the edge and the fixed 110px height plus
+   overflow:hidden clipped the leader name at the container's bottom.
+   Two columns, content height, and a name that ellipsises instead of being
+   cut. Pairs with height='content' on the st.iframe call: without that the
+   taller stacked strip would simply be re-clipped at 110px. */
+@media(max-width:500px){
+  html,body{height:auto;overflow:visible;}
+  .grid{grid-template-columns:repeat(2,1fr);height:auto;}
+  .cell{padding:16px 14px;gap:6px;}
+  .value{font-size:clamp(18px,5vw,28px);}
+  .value.leader{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+}
 </style></head><body>
 <div class="grid">
   <div class="cell"><div class="label">Round</div><div class="value">__ROUND__</div></div>
@@ -3209,7 +3224,11 @@ animate(document.getElementById('votes'), votesTarget, function(v){ return v.toF
         .replace("__LEADER__", str(_land_leader))
         .replace("__VOTES__", f"{_land_votes:.4f}")
     )
-    st.iframe(_stat_html, height=110)
+    # height='content', not 110: the phone breakpoint above lets the strip grow
+    # to two rows, and a fixed height would clip it exactly as before. Verified
+    # on the deployed Live Tracker that 'content' measures a srcdoc frame
+    # correctly (frame height == body scrollHeight, no gap, no inner scrollbar).
+    st.iframe(_stat_html, height='content')
 
     # ── Destination panels ──
     _lc1, _lc2 = st.columns(2, gap="medium")
