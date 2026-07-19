@@ -2554,7 +2554,10 @@ __ICON_CSS__
 .dest-data-row .dr-label { font-size: 10px; letter-spacing: .18em; text-transform: uppercase; color: #7e8c99; }
 .dest-data-row .dr-value { font-size: 14px; font-weight: 600; color: #e9eef3; }
 
-/* ── Leaderboard page ── */
+/* ── Leaderboard page ──
+   .lb-header / .lb-title / .lb-subtitle are the shared bare-heading trio;
+   Game Analysis uses them too so both pages' titles stay identical. The
+   rest of the .lb-* rules below are Leaderboard-only. */
 .lb-header { margin-bottom: 18px; }
 .lb-title {
     font-family: 'Archivo', sans-serif;
@@ -4597,8 +4600,8 @@ if _page == 'Player Profile':
 # ════════════════════════════════════════════════════════════
 if _page == 'Game Analysis':
     st.markdown(
-        f'<div class="title-bar"><h2 style="color:var(--text);margin:0">Game Analysis — {selected_season}</h2>'
-        f'<p style="color:var(--muted);margin:4px 0 0 0">Round-by-round match predictions</p></div>',
+        f'<div class="lb-header"><h2 class="lb-title">Game Analysis — {selected_season}</h2>'
+        f'<p class="lb-subtitle">Round-by-round match predictions</p></div>',
         unsafe_allow_html=True,
     )
     _ga_rbr_tab = st.container()
