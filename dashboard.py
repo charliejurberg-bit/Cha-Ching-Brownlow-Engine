@@ -3382,8 +3382,7 @@ if _page == 'Predictions':
   <p style="font-family:'IBM Plex Mono',monospace;color:var(--muted);font-size:12px;
             margin:0;max-width:560px;line-height:1.7;letter-spacing:0.02em;">
     Brownlow Medal predictor · 2026 season · XGBoost v4.0 &nbsp;·&nbsp;
-    <span style="color:var(--text);font-weight:600;">MAE 0.09</span> &nbsp;·&nbsp;
-    <span style="color:var(--text);font-weight:600;">86% top-10 accuracy</span>
+    <span style="color:var(--text);font-weight:600;">MAE 0.095</span>
   </p>
 </div>
 """, unsafe_allow_html=True)
@@ -3449,8 +3448,7 @@ if _page == 'Predictions':
             f'<div class="hh-meta">{leader_team} · <b>{leader_votes:.1f}</b> projected votes · <b>{leader_odds}</b> to win</div>'
             '</div>'
             '<div class="hh-strip">'
-            '<div class="hh-stat"><div class="hh-stat-val">86%</div><div class="hh-stat-lab">Top-10 acc.</div></div>'
-            '<div class="hh-stat"><div class="hh-stat-val">0.09</div><div class="hh-stat-lab" title="Mean absolute error — average votes the model misses by per player-game">MAE</div></div>'
+            '<div class="hh-stat"><div class="hh-stat-val">0.095</div><div class="hh-stat-lab" title="Mean absolute error — average votes the model misses by per player-game">MAE</div></div>'
             f'<div class="hh-stat"><div class="hh-stat-val">{rounds_remaining}</div><div class="hh-stat-lab">Rounds left</div></div>'
             '</div>'
             '</div><div class="hh-rule"></div></div>',
