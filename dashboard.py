@@ -5834,7 +5834,8 @@ if _page == 'Live Tracker':
     MODEL_TOPN_ROUND = 5      # model's top-N by Exp_Votes for a given round
     MODEL_VOTE_FLOOR = 0.2    # project convention: ignore projected votes ≤ this (noise)
     UPCOMING_LEAD    = 2      # surface a watchlist target this many rounds ahead
-    _LT_IFRAME_H     = 880    # fixed single-viewport iframe height (no internal scroll)
+    # (_LT_IFRAME_H = 880 was here. Removed, not left defined-but-unused: the
+    # render passes height='content' so the frame sizes to its own document.)
     # This page is single-season by design — it has no Season control and is not
     # in _SEASON_PAGES, so `selected_season` is not its source of truth. One
     # constant feeds both the model frame and the public watchlist's season
@@ -6642,7 +6643,19 @@ if _page == 'Live Tracker':
         _full_html = ('<!doctype html><html><head><meta charset="utf-8">'
                       '<meta name="viewport" content="width=device-width, initial-scale=1">'
                       + _FONTS_LINKS + _LT_CSS + _zones_css + '</head>' + _body + '</html>')
-        st.iframe(_full_html, height=_LT_IFRAME_H)
+        # height='content' rather than a fixed pixel count. The frame is srcdoc,
+        # so it is same-origin and Streamlit can measure the document; a fixed
+        # height cannot work here because the stacked phone layout is far taller
+        # than the desktop one and the iframe cannot call back to renegotiate.
+        # Letting it size to content is what hands scrolling back to the page
+        # instead of leaving a scrollbar nested inside the frame.
+        #
+        # This pairs with the max-width:700px block, which sets html,body to
+        # height:auto and min-height:0. Above that breakpoint body keeps
+        # height:100% / min-height:100vh, so the desktop frame still measures a
+        # viewport-height panel and .zones{flex:1} still has something to stretch
+        # against — the single-viewport look _LT_IFRAME_H used to pin.
+        st.iframe(_full_html, height='content')
 
         # ── Public account panel ────────────────────────────────────────────
         # Every control lives out here because the tracker is one self-contained
