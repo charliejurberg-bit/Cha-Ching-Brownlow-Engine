@@ -5336,10 +5336,15 @@ if _page == 'Game Analysis':
                     f'<div class="ga-section-label">PREDICTED VOTES'
                     f'<span class="ga-hint">model expectation · 3-2-1</span></div>'
                     f'{podium_html}'
+                    # Eight mono columns come to ~440px of min-content, so on a
+                    # phone the table used to widen the page instead of itself.
+                    # Contained scroll, the Polls a Vote matrix pattern — never
+                    # overflow-x:hidden at page level (project law).
+                    f'<div style="overflow-x:auto">'
                     f'<table class="ga-table"><thead><tr>'
                     f'<th class="ga-l">Player</th><th>Exp Votes</th><th>P(3)</th><th>Disp</th>'
                     f'<th>Cont.</th><th>Clr</th><th>Goals</th><th>Coaches</th>'
-                    f'</tr></thead><tbody>{"".join(rows_html)}</tbody></table>'
+                    f'</tr></thead><tbody>{"".join(rows_html)}</tbody></table></div>'
                     f'<div class="ga-legend">heat = expected votes &nbsp;·&nbsp; gold = coaches votes '
                     f'&nbsp;·&nbsp; shaded rows = predicted 3-2-1</div>'
                     f'</div>',
@@ -7163,9 +7168,14 @@ if _page == 'Model Comparison':
             )
 
         st.markdown(
+            # Eight columns (# / Player / Cha Ching / AFL / Betfair / Wheelo /
+            # ESPN / Edge). width:100% is only a PREFERRED width — min-content
+            # wins, so on a phone this widened the page rather than itself.
+            # Contained scroll, the Polls a Vote matrix pattern.
+            '<div style="overflow-x:auto">'
             "<table style=\"width:100%;border-collapse:collapse;font-size:13px;margin-top:4px;"
             "font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums\">"
-            + _mc_head + _mc_body + '</table>',
+            + _mc_head + _mc_body + '</table></div>',
             unsafe_allow_html=True,
         )
         st.caption('Edge = mean of the other four models’ ranks minus Cha Ching’s rank. '
@@ -7317,8 +7327,10 @@ if _page == 'Model Comparison':
                     '</tr>'
                 )
             st.markdown(
+                # Same containment as the model-vs-market table above.
+                '<div style="overflow-x:auto">'
                 '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:2px">'
-                + _tbl_head + _tbl_body + '</table>',
+                + _tbl_head + _tbl_body + '</table></div>',
                 unsafe_allow_html=True,
             )
             st.caption('Predicted rank of the actual medallist. Emerald = top 3 · gold = outside top 10 '
