@@ -68,7 +68,9 @@ div[data-testid="stMultiSelect"] > div > div,
     border: 1px solid var(--line) !important;
     color: var(--text) !important;
 }
-[data-testid="stTabs"] [data-baseweb="tab"] { color: var(--muted) !important; }
+/* Qualified to aria-selected="false": the selected tab's emerald comes from
+   Streamlit's own primaryColor and we deliberately leave it alone. */
+[data-testid="stTabs"] [data-testid="stTab"][aria-selected="false"] { color: var(--muted) !important; }
 [data-testid="stTabs"] [aria-selected="true"] { color: var(--text) !important; }
 /* ── Selectbox dropdown panel ──
    Streamlit mounts this as a direct child of <body>, OUTSIDE .stApp, so it

@@ -1038,7 +1038,7 @@ BH_CSS = """
 .pav-pill-dash{background:transparent;color:var(--muted);border:1px dashed var(--line);}
 .pav-pill-star,.pav-pill-dash{padding:2px 9px;border-radius:12px;font-family:'IBM Plex Mono',monospace;font-size:11px;font-weight:600;white-space:nowrap;display:inline-block;margin:2px 2px 2px 0;}
 /* borderless bottom-border fields inside the Add expander only */
-.stApp:has(.pav-page) [data-testid="stExpander"] [data-baseweb="select"]>div,
+.stApp:has(.pav-page) [data-testid="stExpander"] .react-aria-ComboBox>div,
 .stApp:has(.pav-page) [data-testid="stExpander"] [data-testid="stTextInput"] input,
 .stApp:has(.pav-page) [data-testid="stExpander"] [data-testid="stNumberInput"] input{
     background:transparent !important;border:none !important;border-bottom:1px solid var(--line) !important;border-radius:0 !important;}
@@ -2116,8 +2116,7 @@ def render_cha_ching_tips():
   border-color:var(--muted) !important;color:var(--text) !important}
 /* filters: borderless controls with a single bottom rule, emerald on focus */
 .stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-filters-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-filters-marker)) div[data-testid="stSelectbox"]>div>div,
-.stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-filters-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-filters-marker)) [data-testid="stDateInput"] input,
-.stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-filters-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-filters-marker)) [data-testid="stDateInput"] div[data-baseweb="input"]{
+.stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-filters-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-filters-marker)) [data-testid="stDateInput"] input{
   background:transparent !important;border:none !important;border-bottom:1px solid var(--line) !important;border-radius:0 !important;box-shadow:none !important}
 .stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-filters-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-filters-marker)) div[data-testid="stSelectbox"]>div>div:focus-within,
 .stApp:has(.cc-tips-marker) div[data-testid="stVerticalBlock"]:has(.cc-filters-marker):not(:has(div[data-testid="stVerticalBlock"] .cc-filters-marker)) [data-testid="stDateInput"] input:focus{

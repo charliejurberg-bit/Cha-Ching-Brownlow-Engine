@@ -961,7 +961,7 @@ st.markdown("""
     [data-testid="stToast"] { animation: toastIn 0.22s cubic-bezier(0.23,1,0.32,1) forwards; }
 
     /* ── Selectbox smooth focus ── */
-    [data-testid="stSelectbox"] [data-baseweb="select"] > div {
+    [data-testid="stSelectbox"] .react-aria-ComboBox > div {
         transition: border-color 0.15s ease, box-shadow 0.2s ease !important;
     }
 
