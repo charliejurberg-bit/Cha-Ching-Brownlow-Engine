@@ -2196,44 +2196,14 @@ if 'page' not in st.session_state:
 if st.session_state.page != 'Landing':
     render_banner()
 
-# ── Hubs ──────────────────────────────────────────────────────
-# Three hubs, each owning an ordered page list. The public split is Engine (the
-# model and its pages) vs The Count (the live count on medal night) — one page
-# apiece being a legitimate hub, since a hub is a grouping, not a strip.
-# Betting stays exactly as it was and is admin-only.
-_ENGINE_PAGES  = ["Leaderboard", "Player Profile", "Stat Filter",
-                  "Game Analysis", "Model Comparison", "Polls a Vote"]
-_COUNT_PAGES   = ["Live Tracker"]
-_BETTING_PAGES = ["Performance", "Predictions", "Bet Tracker",
-                  "Cha Ching Tips", "Trends & Analysis"]
-
-_HUB_PAGES   = {"brownlow": _ENGINE_PAGES,
-                "count":    _COUNT_PAGES,
-                "betting":  _BETTING_PAGES}
-_HUB_DEFAULT = {"brownlow": "Leaderboard",
-                "count":    "Live Tracker",
-                "betting":  "Performance"}
-
-# Membership here is what the admin gate keys off (see the chokepoint below), so
-# a page leaves the gate by leaving this set. Polls a Vote did exactly that in
+# Membership here is what the password gate keys off (see the chokepoint below),
+# so a page leaves the gate by leaving this set. Polls a Vote did exactly that in
 # session 3: it is per-user now, scoped by RLS rather than by this gate, and
-# lives in the Engine strip. Derived from the nav list rather than written out
-# twice, so the strip and the gate can never disagree about what is private.
-_BH_PAGES = set(_BETTING_PAGES)
+# lives in the Brownlow strip.
+_BH_PAGES = {'Performance', 'Predictions', 'Bet Tracker', 'Cha Ching Tips', 'Trends & Analysis'}
 
 _hub  = st.session_state.get("active_hub", "brownlow")
 _page = st.session_state.page
-
-# A page belongs to exactly one hub, so make active_hub agree with it before
-# anything reads either. Without this, a session stored before the Engine/Count
-# split (active_hub='brownlow', page='Live Tracker') would render the Engine
-# strip with no button matching the page showing — and the landing buttons,
-# which set both, would be the only way back to a consistent state.
-_HUB_OF_PAGE = {_p: _h for _h, _ps in _HUB_PAGES.items() for _p in _ps}
-if _page != 'Landing':
-    _owner_hub = _HUB_OF_PAGE.get(_page)
-    if _owner_hub is not None and _owner_hub != _hub:
-        _hub = st.session_state["active_hub"] = _owner_hub
 
 # ── Page list + icons for current hub ─────────────────────────
 _PAGE_ICONS = {
@@ -2305,17 +2275,20 @@ _nav_icon_css = (
 # border-bottom-color, so it collapses to one rule with the colour chosen here.
 # _hub is the single source of truth the .bh marker used to encode, so with the
 # marker gone this conditional is that same signal, read in Python.
-# Gold for The Count as well as Betting: the count is the medal night, and gold
-# is already this project's medal/vote accent (the tracker's progress fill, the
-# 3-vote markers). Emerald stays the model's colour, so the public toggle reads
-# as prediction vs result rather than as two arbitrary tabs. Colour law: gold is
-# right here, red never.
-_hub_accent = "var(--gold)" if _hub in ("betting", "count") else "var(--emerald)"
+_hub_accent = "var(--gold)" if _hub == "betting" else "var(--emerald)"
 # Same active-accent signal for the page strip's active-tab underline. Kept as a
 # separate token so slice 4's rules never touch slice 3's verified hub rule.
 _page_accent = _hub_accent
 
-_snav_pages = _HUB_PAGES.get(_hub, _ENGINE_PAGES)
+if _hub == "brownlow":
+    _snav_pages = [
+        "Leaderboard", "Player Profile",
+        "Stat Filter", "Game Analysis",
+        "Model Comparison", "Live Tracker",
+        "Polls a Vote",
+    ]
+else:
+    _snav_pages = ["Performance", "Predictions", "Bet Tracker", "Cha Ching Tips", "Trends & Analysis"]
 
 # ── Nav CSS (injected once before containers) ─────────────────
 # The tabler-icons webfont the icon rules depend on is loaded as a pinned <link>
@@ -2830,27 +2803,22 @@ div[data-testid="stHorizontalBlock"]:has(.lb-controls-marker) label {
 def _render_hub_tabs():
     # key=ccnav_hub puts st-key-ccnav_hub on the container's stVerticalBlock; the
     # nav CSS keys off that instead of a hidden .nav-hub-anchor marker + :has().
-    # ENGINE | THE COUNT is public; the Betting pill is appended only for the
-    # admin, so a visitor is never shown a switch onto a locked door. The row's
-    # CSS selects columns as plain descendants with no nth-child anywhere, so it
-    # takes a third pill without changes.
-    _hubs = [("brownlow", "ENGINE"), ("count", "THE COUNT")]
-    if _is_admin:
-        _hubs.append(("betting", "Betting Hub"))
-
     with st.container(key="ccnav_hub"):
-        _hcols = st.columns(len(_hubs))
-        for _hcol, (_hid, _hlabel) in zip(_hcols, _hubs):
-            with _hcol:
-                if st.button(_hlabel, key=f"pill_{_hid}",
-                             type="primary" if _hub == _hid else "secondary"):
-                    st.session_state["active_hub"] = _hid
-                    # One reconciliation rule for every hub: if the page on
-                    # screen isn't in the hub being entered, fall to that hub's
-                    # default. Replaces the two hand-written per-pill variants.
-                    if st.session_state.page not in _HUB_PAGES[_hid]:
-                        st.session_state.page = _HUB_DEFAULT[_hid]
-                    st.rerun()
+        _hc1, _hc2 = st.columns(2)
+        with _hc1:
+            if st.button("Brownlow", key="pill_brownlow",
+                         type="primary" if _hub == "brownlow" else "secondary"):
+                st.session_state["active_hub"] = "brownlow"
+                if st.session_state.page in _BH_PAGES:
+                    st.session_state.page = "Leaderboard"
+                st.rerun()
+        with _hc2:
+            if st.button("Betting Hub", key="pill_betting",
+                         type="primary" if _hub == "betting" else "secondary"):
+                st.session_state["active_hub"] = "betting"
+                if st.session_state.page not in _BH_PAGES:
+                    st.session_state.page = "Performance"
+                st.rerun()
 
 def _render_page_nav():
     # key=ccnav_page puts st-key-ccnav_page on the container's stVerticalBlock
@@ -2868,18 +2836,14 @@ def _render_page_nav():
                     st.rerun()
 
 if _page != 'Landing':
-    # The hub row is public now — it carries ENGINE | THE COUNT for everyone,
-    # and _render_hub_tabs appends the Betting pill only for the admin, so a
-    # visitor still never sees a switch onto a locked door. It stays its OWN row
-    # rather than folding into the banner — st.columns wrap is not ours to
-    # drive, and a pill squeezed into row 1 would clip before it wrapped.
-    _render_hub_tabs()
-    # A one-page hub needs no strip: st.columns(1) would draw a single
-    # full-width button repeating the hub label directly above it. The Count is
-    # that case today; the guard is written on the length rather than the hub id
-    # so it holds if the lists change.
-    if len(_snav_pages) > 1:
-        _render_page_nav()
+    # The hub pill is admin-only: every _BH_PAGES page is gated on the admin
+    # check anyway, so for anyone else it is a switch onto a locked door. It
+    # stays its OWN row rather than folding into the banner — st.columns wrap is
+    # not ours to drive, and a pill squeezed into row 1 would clip before it
+    # wrapped. Admin sees three rows, everyone else two.
+    if _is_admin:
+        _render_hub_tabs()
+    _render_page_nav()
 
 # ── Controls row (season + odds timestamp) ──────────────────
 # Only show controls for Brownlow pages, not Betting Hub or Landing
@@ -3267,19 +3231,7 @@ animate(document.getElementById('votes'), votesTarget, function(v){ return v.toF
     st.iframe(_stat_html, height='content')
 
     # ── Destination panels ──
-    # The Betting card was the last public sight of the hub: it rendered for
-    # everyone with blurred figures and a button that routed straight into the
-    # admin chokepoint. Admin-only now, so the private section is invisible
-    # rather than merely locked.
-    #
-    # Dropping the second card out of st.columns(2) would leave the Brownlow
-    # card at half width with an empty right half, which reads as broken rather
-    # than deliberate. A visitor therefore gets a plain container — one
-    # full-width card — until the Engine/Count re-card lands next session.
-    if _is_admin:
-        _lc1, _lc2 = st.columns(2, gap="medium")
-    else:
-        _lc1 = st.container()
+    _lc1, _lc2 = st.columns(2, gap="medium")
     with _lc1:
         with st.container(key="card_brownlow"):
             st.markdown(f"""
@@ -3297,8 +3249,8 @@ animate(document.getElementById('votes'), votesTarget, function(v){ return v.toF
                 st.session_state["active_hub"] = "brownlow"
                 st.session_state.page = 'Leaderboard'
                 st.rerun()
-    if _is_admin:
-        with _lc2, st.container(key="card_betting"):
+    with _lc2:
+        with st.container(key="card_betting"):
             st.markdown(f"""
 <div class="dest-content">
   <span class="dest-tag bh">Live Tracking</span>
