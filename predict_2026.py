@@ -159,28 +159,39 @@ if _form_src in df26.columns:
 else:
     df26['late_form_ewm'] = 0
 
-df26['_gseq'] = df26.groupby('Player_Name').cumcount()
-df26['_ng']   = df26.groupby('Player_Name')['Round_num'].transform('count')
+# Momentum: recent form minus earlier form, POINT-IN-TIME.
+#
+# Character-for-character the same construction as brownlow_model.py's
+# _pit_momentum, and it has to stay that way — the two scripts share no module,
+# so any change here must be mirrored there or the model reads a feature that
+# means something different at predict time than it did at train time.
+#
+# The previous version took the last 6 games minus the first 6 of the season and
+# broadcast one value onto every row, which leaked future rounds backwards. Now
+# it is a trailing window over strictly prior rounds, shift(1) first, exactly as
+# late_form_ewm above does it.
+_MOM_RECENT = 6
+_MOM_MIN_EARLIER = 2
 
-_f6 = (df26[df26['_gseq'] < 6]
-       .groupby('Player_Name')[['Coaches_Votes', 'Disposals']]
-       .mean()
-       .rename(columns={'Coaches_Votes': '_f6cv', 'Disposals': '_f6d'})
-       .reset_index())
-_l6 = (df26[df26['_gseq'] >= df26['_ng'] - 6]
-       .groupby('Player_Name')[['Coaches_Votes', 'Disposals']]
-       .mean()
-       .rename(columns={'Coaches_Votes': '_l6cv', 'Disposals': '_l6d'})
-       .reset_index())
 
-_mom = _f6.merge(_l6, on='Player_Name', how='outer').fillna(0)
-_mom['momentum_cv']   = _mom['_l6cv'] - _mom['_f6cv']
-_mom['momentum_disp'] = _mom['_l6d']  - _mom['_f6d']
+def _pit_momentum(s):
+    """Trailing recent-minus-earlier for one player, in round order."""
+    prior = s.shift(1)                                        # current game excluded
+    recent_sum = prior.rolling(_MOM_RECENT, min_periods=_MOM_RECENT).sum()
+    recent_mean = recent_sum / _MOM_RECENT
+    all_sum = prior.expanding(min_periods=1).sum()
+    all_cnt = prior.expanding(min_periods=1).count()
+    earlier_sum = all_sum - recent_sum
+    earlier_cnt = all_cnt - _MOM_RECENT
+    _ok = earlier_cnt >= _MOM_MIN_EARLIER
+    earlier_mean = earlier_sum.where(_ok) / earlier_cnt.where(_ok)
+    return recent_mean - earlier_mean
 
-df26 = df26.merge(_mom[['Player_Name', 'momentum_cv', 'momentum_disp']],
-                  on='Player_Name', how='left')
-df26[['momentum_cv', 'momentum_disp']] = df26[['momentum_cv', 'momentum_disp']].fillna(0)
-df26.drop(columns=['_gseq', '_ng'], inplace=True)
+
+for _src, _out in (('Coaches_Votes', 'momentum_cv'), ('Disposals', 'momentum_disp')):
+    df26[_out] = (df26.groupby('Player_Name')[_src]
+                      .transform(_pit_momentum)
+                      .fillna(0))
 
 # Fill any missing features
 for f in FEATURES:

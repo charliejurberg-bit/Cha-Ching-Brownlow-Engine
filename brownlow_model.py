@@ -196,29 +196,52 @@ df['late_form_ewm'] = (
     .fillna(0)
 )
 
-# Season momentum: avg of last 6 games minus avg of first 6 games
-df['_gseq'] = df.groupby(['Season', 'Player_Name']).cumcount()
-df['_ng']   = df.groupby(['Season', 'Player_Name'])['Round_num'].transform('count')
+# Momentum: recent form minus earlier form, POINT-IN-TIME.
+#
+# The previous version computed the last 6 games minus the first 6 games of the
+# COMPLETED season and merged that single value onto every row of the player's
+# season — so a round 2 row carried information from round 23. That is future
+# leakage, and it flattered the CV score it was measured by.
+#
+# This version is built the same way late_form_ewm above is: shift(1) first, so
+# the current game is never part of its own feature, then everything is a
+# trailing window over strictly prior rounds.
+#
+#   recent  = mean of the previous _MOM_RECENT games
+#   earlier = mean of every game before those
+#   value   = recent - earlier
+#
+# A row needs _MOM_RECENT prior games to have a `recent` window at all, plus
+# _MOM_MIN_EARLIER more to have anything to compare it against — 8 prior games
+# in total. Below that the result is NaN and fills to 0, matching how the old
+# block's missing values were handled.
+_MOM_RECENT = 6
+_MOM_MIN_EARLIER = 2
 
-_f6 = (df[df['_gseq'] < 6]
-       .groupby(['Season', 'Player_Name'])[['Coaches_Votes', 'Disposals']]
-       .mean()
-       .rename(columns={'Coaches_Votes': '_f6cv', 'Disposals': '_f6d'})
-       .reset_index())
-_l6 = (df[df['_gseq'] >= df['_ng'] - 6]
-       .groupby(['Season', 'Player_Name'])[['Coaches_Votes', 'Disposals']]
-       .mean()
-       .rename(columns={'Coaches_Votes': '_l6cv', 'Disposals': '_l6d'})
-       .reset_index())
 
-_mom = _f6.merge(_l6, on=['Season', 'Player_Name'], how='outer').fillna(0)
-_mom['momentum_cv']   = _mom['_l6cv'] - _mom['_f6cv']
-_mom['momentum_disp'] = _mom['_l6d']  - _mom['_f6d']
+def _pit_momentum(s):
+    """Trailing recent-minus-earlier for one player-season, in round order.
 
-df = df.merge(_mom[['Season', 'Player_Name', 'momentum_cv', 'momentum_disp']],
-              on=['Season', 'Player_Name'], how='left')
-df[['momentum_cv', 'momentum_disp']] = df[['momentum_cv', 'momentum_disp']].fillna(0)
-df.drop(columns=['_gseq', '_ng'], inplace=True)
+    Kept in step with the identical helper in predict_2026.py — the two scripts
+    share no module, so a change here must be made there or train and predict
+    drift apart on a feature the model reads.
+    """
+    prior = s.shift(1)                                        # current game excluded
+    recent_sum = prior.rolling(_MOM_RECENT, min_periods=_MOM_RECENT).sum()
+    recent_mean = recent_sum / _MOM_RECENT
+    all_sum = prior.expanding(min_periods=1).sum()
+    all_cnt = prior.expanding(min_periods=1).count()
+    earlier_sum = all_sum - recent_sum
+    earlier_cnt = all_cnt - _MOM_RECENT
+    _ok = earlier_cnt >= _MOM_MIN_EARLIER
+    earlier_mean = earlier_sum.where(_ok) / earlier_cnt.where(_ok)
+    return recent_mean - earlier_mean
+
+
+for _src, _out in (('Coaches_Votes', 'momentum_cv'), ('Disposals', 'momentum_disp')):
+    df[_out] = (df.groupby(['Season', 'Player_Name'])[_src]
+                  .transform(_pit_momentum)
+                  .fillna(0))
 
 FORM_FEATURES = ['late_form_ewm', 'momentum_cv', 'momentum_disp']
 print(f"  Form/momentum features: {FORM_FEATURES}")
