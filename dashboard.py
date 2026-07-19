@@ -5600,6 +5600,10 @@ def _assemble_live_tracker(lt, game_df, watchlist):
     last_round = int(lt.get("last_round", 0) or 0)
     asm = {
         "last_round": last_round, "next_round": last_round + 1,
+        # Carried through so consumers don't recompute it off the feed. It is
+        # what disambiguates last_round == 0: that value means "nothing counted"
+        # when is_live is False and "Opening Round counted" when it is True.
+        "is_live": bool(lt.get("is_live", False)),
         "totals": {}, "prev_totals": {}, "round_votes": {},
         "model_to_date": {}, "model_remaining": {}, "projection": {}, "delta": {},
         "team": {}, "name": {}, "model_pollers": {},
@@ -6263,12 +6267,192 @@ if _page == 'Live Tracker':
             + '<span><span class="dot model"></span>model</span>'
               '<span><span class="dot none"></span>nobody</span></div>'
         )
+        # ── tracked H2H panel (rendered inside Zone 3) ────────
+        # Display-only: this iframe is self-contained and cannot call back into
+        # Streamlit, so the pair is managed from the Compare tab.
+        #
+        # Keyed on _LT_SEASON rather than the app-wide selected_season: the
+        # tracker is always the live 2026 count, so a pair saved against another
+        # season correctly does not surface here.
+        #
+        # It lives inside _z3_zone so neither grid-template-columns declaration
+        # nor the 1080px media rule has to change. That ties it to Zone 3, which
+        # is sound: Zone 3 renders whenever a watchlist SOURCE exists, an empty
+        # frame counts as a source, and both it and a saved pair require sign-in
+        # — so a signed-in user with a pair always has Zone 3.
+        _h2h_panel = ''
+        _h2h_pair = user_auth.load_h2h_pair(_cc_uid, _LT_SEASON) if _cc_uid else None
+        if _h2h_pair:
+            # fitzRoy ID -> current model-frame name. Preferred over the stored
+            # name because a name only carries its '(Team)' suffix in seasons
+            # where it collides, so the stored string can be stale.
+            _h2h_id2name = {}
+            if _lt_game is not None and 'ID' in _lt_game.columns:
+                for _i, _n in zip(_lt_game['ID'], _lt_game['Player_Name']):
+                    if pd.notna(_i) and pd.notna(_n):
+                        try:
+                            _h2h_id2name.setdefault(str(int(float(_i))), _n)
+                        except (TypeError, ValueError):
+                            continue
+
+            def _h2h_resolve(nm, pid):
+                _d = _h2h_id2name.get(str(pid)) if pid else None
+                _d = _d or str(nm or '')
+                return _d, normalise_name(_d)
+
+            _hA_nm, _hA_nn = _h2h_resolve(_h2h_pair.get('player1'),
+                                          _h2h_pair.get('player1_id'))
+            _hB_nm, _hB_nn = _h2h_resolve(_h2h_pair.get('player2'),
+                                          _h2h_pair.get('player2_id'))
+            _hA_lbl, _hB_lbl = _h2h_short_pair(_hA_nm, _hB_nm)
+            _hA_in = _hA_nn in _asm["totals"]
+            _hB_in = _hB_nn in _asm["totals"]
+            _hA_tot = int(_asm["totals"].get(_hA_nn, 0))
+            _hB_tot = int(_asm["totals"].get(_hB_nn, 0))
+
+            # Counted rounds. last_round == 0 is ambiguous on its own — nothing
+            # counted, or Opening Round counted — so is_live decides, carried
+            # through from the feed by the assembler.
+            _h2h_counted = (set(range(0, int(_asm["last_round"]) + 1))
+                            if _asm.get("is_live") else set())
+
+            # ROUND NUMBERING: live rounds are AFL display numbering (0 = Opening
+            # Round); the model frame's Round_num is AFLTables numbering, and
+            # display = Round_num - 1 (see _assemble_live_tracker's docstring).
+            # That is a JOIN KEY here, not a label, so the conversion happens
+            # once, on the way in — every round value below is already display.
+            def _h2h_model_rows(disp_name):
+                _out = {}
+                if _lt_game is None or not disp_name:
+                    return _out
+                for _, _r in _lt_game[_lt_game['Player_Name'] == disp_name].iterrows():
+                    try:
+                        _out[int(_r['Round_num']) - 1] = _r
+                    except (TypeError, ValueError):
+                        continue
+                return _out
+
+            _hA_rows, _hB_rows = _h2h_model_rows(_hA_nm), _h2h_model_rows(_hB_nm)
+            _hA_rv = _asm["round_votes"].get(_hA_nn, {})
+            _hB_rv = _asm["round_votes"].get(_hB_nn, {})
+
+            _h2h_score = (
+                '<div style="display:flex;align-items:baseline;justify-content:space-between;'
+                'margin-top:9px">'
+                + f'<span style="font-family:var(--mono);font-size:12px;'
+                  f'color:{"#34d399" if _hA_tot >= _hB_tot else "#e9eef3"}">'
+                  f'{_hA_lbl} {_hA_tot if _hA_in else "—"}</span>'
+                + f'<span style="font-family:var(--mono);font-size:12px;'
+                  f'color:{"#34d399" if _hB_tot >= _hA_tot else "#e9eef3"}">'
+                  f'{_hB_tot if _hB_in else "—"} {_hB_lbl}</span>'
+                + '</div>'
+            )
+            _h2h_margin = abs(_hA_tot - _hB_tot)
+            _h2h_score += (
+                '<div style="font-family:var(--mono);font-size:10px;text-align:center;'
+                f'color:{"#34d399" if _h2h_margin else "#8a9aa9"};margin-top:2px">'
+                f'{("+" + str(_h2h_margin)) if _h2h_margin else "LEVEL"}</div>'
+            )
+            if not (_hA_in and _hB_in):
+                _h2h_score += ('<div class="empty" style="margin-top:4px">'
+                               'not in count feed</div>')
+
+            _h2h_body = ''
+            # No model frame -> live totals only: no pmf, so no bar and no chips.
+            if _lt_game is not None:
+                _h2h_axis = sorted(set(_hA_rows) | set(_hB_rows) | _h2h_counted)
+                # round_votes records only NON-ZERO votes, so an absent round is
+                # normally "no votes OR not yet counted". Inside a COUNTED round
+                # it does mean zero, because counted-ness asserts it — this is
+                # the one place absence is read as a certain 0.
+                _hA_cert = {_r: int(_hA_rv.get(_r, 0))
+                            for _r in _h2h_axis if _r in _h2h_counted}
+                _hB_cert = {_r: int(_hB_rv.get(_r, 0))
+                            for _r in _h2h_axis if _r in _h2h_counted}
+                _hA_d = _h2h_total_dist(_hA_rows, _h2h_axis, certain=_hA_cert)
+                _hB_d = _h2h_total_dist(_hB_rows, _h2h_axis, certain=_hB_cert)
+                _h2h_j = np.outer(_hA_d, _hB_d)
+                _hA_w = float(np.tril(_h2h_j, -1).sum())
+                _h2h_tie = float(np.trace(_h2h_j))
+                _hB_w = float(np.triu(_h2h_j, 1).sum())
+
+                _h2h_body += (
+                    '<div style="display:flex;height:7px;border-radius:4px;overflow:hidden;'
+                    'border:1px solid rgba(140,165,185,.14);margin-top:10px">'
+                    f'<div style="width:{_hA_w * 100:.2f}%;background:#34d399"></div>'
+                    f'<div style="width:{_h2h_tie * 100:.2f}%;background:#5a6b7a"></div>'
+                    f'<div style="width:{_hB_w * 100:.2f}%;background:#1a2632"></div>'
+                    '</div>'
+                    '<div style="display:flex;justify-content:space-between;'
+                    'font-family:var(--mono);font-size:9.5px;margin-top:4px">'
+                    f'<span style="color:#34d399">LIVE WIN {_hA_w * 100:.0f}%</span>'
+                    f'<span style="color:#8a9aa9">TIE {_h2h_tie * 100:.0f}%</span>'
+                    f'<span style="color:#e9eef3">{_hB_w * 100:.0f}%</span>'
+                    '</div>'
+                )
+
+                # Remaining swing rounds: uncounted only, same thresholds as the
+                # Compare tab. Rounds here are already display numbers.
+                _h2h_chips = []
+                for _r in _h2h_axis:
+                    if _r in _h2h_counted:
+                        continue
+                    _ra, _rb = _hA_rows.get(_r), _hB_rows.get(_r)
+                    _pa = None if _ra is None else _h2h_num(_ra, 'Poll_Prob')
+                    _pb = None if _rb is None else _h2h_num(_rb, 'Poll_Prob')
+                    _sg = (_ra is not None and _rb is not None
+                           and pd.notna(_ra.get('Game_ID'))
+                           and _ra.get('Game_ID') == _rb.get('Game_ID'))
+                    _k, _o, _ = _h2h_classify(_sg, _pa, _pb, _hA_lbl, _hB_lbl)
+                    if _k in ('SAME GAME', 'SWING', 'FREE'):
+                        _h2h_chips.append((_r, _k, _o))
+                if _h2h_chips:
+                    _h2h_body += ('<div style="display:flex;flex-wrap:wrap;gap:4px;'
+                                  'margin-top:9px">')
+                    for _r, _k, _o in _h2h_chips[:5]:
+                        if _k == 'SAME GAME':
+                            _cs = 'background:#3d3110;color:#f0b429'
+                        elif _o == 1:
+                            _cs = 'background:#0f3d31;color:#34d399'
+                        else:
+                            _cs = ('background:#101a24;color:#e9eef3;'
+                                   'box-shadow:inset 0 0 0 1px rgba(140,165,185,.14)')
+                        _h2h_body += ('<span style="font-family:var(--mono);font-size:9px;'
+                                      f'padding:2px 6px;border-radius:8px;{_cs}">R{_r}</span>')
+                    if len(_h2h_chips) > 5:
+                        _h2h_body += ('<span style="font-family:var(--mono);font-size:9px;'
+                                      'padding:2px 6px;color:#8a9aa9">'
+                                      f'+{len(_h2h_chips) - 5}</span>')
+                    _h2h_body += '</div>'
+
+            # Most recent counted round where either polled.
+            _h2h_hits = [(_r, _hA_lbl, _v) for _r, _v in _hA_rv.items()
+                         if _v and _r in _h2h_counted]
+            _h2h_hits += [(_r, _hB_lbl, _v) for _r, _v in _hB_rv.items()
+                          if _v and _r in _h2h_counted]
+            if _h2h_hits:
+                _lr = max(_r for _r, _, _ in _h2h_hits)
+                _lw = [(_n, _v) for _r, _n, _v in _h2h_hits if _r == _lr]
+                _lt_txt = ' · '.join(f'{_n} +{int(_v)}' for _n, _v in _lw)
+                _h2h_body += ('<div style="font-family:var(--mono);font-size:9.5px;'
+                              'color:#8a9aa9;margin-top:8px">'
+                              f'LAST: R{_lr} — {_lt_txt}</div>')
+
+            _h2h_panel = (
+                '<div style="border-top:1px solid rgba(140,165,185,.14);'
+                'margin-top:16px;padding-top:12px">'
+                '<div class="ztitle"><span>My H2H · live</span></div>'
+                + _h2h_score + _h2h_body
+                + '</div>'
+            )
+
         if _wl_visible:
             _z3_zone = (
                 '<div class="zone">'
                 '<div class="ztitle"><span>Upcoming targets</span>'
                 f'<span>next {UPCOMING_LEAD} rounds</span></div>'
                 f'{_z3}'
+                f'{_h2h_panel}'
                 '</div>'
             )
             _zones_css = ''
