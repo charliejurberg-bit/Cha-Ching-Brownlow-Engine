@@ -8221,7 +8221,7 @@ if _page == 'Landing':
         '<div style="border-top:1px solid rgba(140,165,185,.14);margin-top:40px;padding:14px 0;'
         'color:#7e8c99;font-family:\'IBM Plex Mono\',monospace;font-size:11px;letter-spacing:.18em;'
         'text-align:center;text-transform:uppercase;font-weight:500;">'
-        f'MODEL V4.0 &nbsp;&nbsp;&middot;&nbsp;&nbsp; DATA {_TRAIN_MIN}–{_TRAIN_MAX} &nbsp;&nbsp;&middot;&nbsp;&nbsp; 93 FEATURES &nbsp;&nbsp;&middot;&nbsp;&nbsp; MAE 0.0904'
+        f'MODEL V4.0 &nbsp;&nbsp;&middot;&nbsp;&nbsp; DATA {_TRAIN_MIN}–{_TRAIN_MAX} &nbsp;&nbsp;&middot;&nbsp;&nbsp; 93 FEATURES &nbsp;&nbsp;&middot;&nbsp;&nbsp; MAE 0.0953'
         '</div>',
         unsafe_allow_html=True,
     )
@@ -8230,7 +8230,7 @@ else:
         '<div style="border-top:1px solid var(--line);margin-top:40px;padding:14px 0;'
         'color:var(--muted);font-size:10px;letter-spacing:1.2px;text-align:center;'
         'text-transform:uppercase;font-weight:600;">'
-        f'Model v4.0 &nbsp;&nbsp;·&nbsp;&nbsp; Data: {_TRAIN_MIN}–{_TRAIN_MAX} &nbsp;&nbsp;·&nbsp;&nbsp; 93 features &nbsp;&nbsp;·&nbsp;&nbsp; MAE 0.0904'
+        f'Model v4.0 &nbsp;&nbsp;·&nbsp;&nbsp; Data: {_TRAIN_MIN}–{_TRAIN_MAX} &nbsp;&nbsp;·&nbsp;&nbsp; 93 features &nbsp;&nbsp;·&nbsp;&nbsp; MAE 0.0953'
         '</div>',
         unsafe_allow_html=True,
     )

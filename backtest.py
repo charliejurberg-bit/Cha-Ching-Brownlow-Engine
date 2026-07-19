@@ -157,7 +157,13 @@ if 'RatingPoints_game_rank' in df.columns:
     df['BOG_Rating']  = (df['RatingPoints_game_rank'] == 1).astype(int)
     df['Top3_Rating'] = (df['RatingPoints_game_rank'] <= 3).astype(int)
 
-# ── Build form and momentum features (identical to brownlow_model.py) ──
+# ── Build form and momentum features ──────────────────────────
+# THIRD COPY of this logic — brownlow_model.py and predict_2026.py carry the
+# other two, and the three share no module. That duplication is exactly how this
+# block went stale: it kept the pre-audit whole-season momentum for a while after
+# brownlow_model.py was fixed, under a comment claiming the two were identical.
+# A backtest measuring a leak the trained model no longer has is worse than no
+# backtest. Change one copy, change all three.
 print("Building form and momentum features...")
 df = df.sort_values(['Season', 'Player_Name', 'Round_num']).reset_index(drop=True)
 
@@ -168,28 +174,32 @@ df['late_form_ewm'] = (
     .fillna(0)
 )
 
-df['_gseq'] = df.groupby(['Season', 'Player_Name']).cumcount()
-df['_ng']   = df.groupby(['Season', 'Player_Name'])['Round_num'].transform('count')
+# Point-in-time momentum: recent form minus earlier form over strictly PRIOR
+# rounds. shift(1) first, so the current game is never part of its own feature.
+# A row needs _MOM_RECENT prior games for the recent window plus _MOM_MIN_EARLIER
+# more to compare against — 8 in total — below which it is NaN and fills to 0.
+_MOM_RECENT = 6
+_MOM_MIN_EARLIER = 2
 
-_f6 = (df[df['_gseq'] < 6]
-       .groupby(['Season', 'Player_Name'])[['Coaches_Votes', 'Disposals']]
-       .mean()
-       .rename(columns={'Coaches_Votes': '_f6cv', 'Disposals': '_f6d'})
-       .reset_index())
-_l6 = (df[df['_gseq'] >= df['_ng'] - 6]
-       .groupby(['Season', 'Player_Name'])[['Coaches_Votes', 'Disposals']]
-       .mean()
-       .rename(columns={'Coaches_Votes': '_l6cv', 'Disposals': '_l6d'})
-       .reset_index())
 
-_mom = _f6.merge(_l6, on=['Season', 'Player_Name'], how='outer').fillna(0)
-_mom['momentum_cv']   = _mom['_l6cv'] - _mom['_f6cv']
-_mom['momentum_disp'] = _mom['_l6d']  - _mom['_f6d']
+def _pit_momentum(s):
+    """Trailing recent-minus-earlier for one player-season, in round order."""
+    prior = s.shift(1)                                        # current game excluded
+    recent_sum = prior.rolling(_MOM_RECENT, min_periods=_MOM_RECENT).sum()
+    recent_mean = recent_sum / _MOM_RECENT
+    all_sum = prior.expanding(min_periods=1).sum()
+    all_cnt = prior.expanding(min_periods=1).count()
+    earlier_sum = all_sum - recent_sum
+    earlier_cnt = all_cnt - _MOM_RECENT
+    _ok = earlier_cnt >= _MOM_MIN_EARLIER
+    earlier_mean = earlier_sum.where(_ok) / earlier_cnt.where(_ok)
+    return recent_mean - earlier_mean
 
-df = df.merge(_mom[['Season', 'Player_Name', 'momentum_cv', 'momentum_disp']],
-              on=['Season', 'Player_Name'], how='left')
-df[['momentum_cv', 'momentum_disp']] = df[['momentum_cv', 'momentum_disp']].fillna(0)
-df.drop(columns=['_gseq', '_ng'], inplace=True)
+
+for _src, _out in (('Coaches_Votes', 'momentum_cv'), ('Disposals', 'momentum_disp')):
+    df[_out] = (df.groupby(['Season', 'Player_Name'])[_src]
+                  .transform(_pit_momentum)
+                  .fillna(0))
 
 FORM_FEATURES = ['late_form_ewm', 'momentum_cv', 'momentum_disp']
 
@@ -213,6 +223,15 @@ if 'BOG_Rating' in df.columns:
 
 FEATURES = list(dict.fromkeys(BASE_FEATURES + WHEELO_FEATURES + RELATIVE_FEATURES + FORM_FEATURES))
 FEATURES = [f for f in FEATURES if f in df.columns]
+
+# The no-coaches feature set, for the count-night variant: the six same-game
+# coaches features drop out. momentum_cv stays — since the point-in-time fix it
+# reads prior rounds only, and in the target scenario those rounds' votes have
+# long been published. This mirrors NO_COACHES=1 / DROP_MOMENTUM_CV=0 in
+# brownlow_model.py, which is the variant whose artifacts ship.
+FEATURES_NOCV = [f for f in FEATURES if 'Coaches' not in f]
+assert not [f for f in FEATURES_NOCV if 'Coaches' in f], "no-coaches set still has a coaches feature"
+
 TARGET = 'Brownlow.Votes'
 
 extra_cols = [c for c in [TARGET, 'Player_Name', 'Playing.for', 'Round_num', 'Season']
@@ -229,7 +248,16 @@ print(f"Full dataset: {len(model_df):,} rows | {len(FEATURES)} features")
 _all_seasons   = sorted(model_df['Season'].unique().astype(int).tolist())
 BACKTEST_SEASONS = _all_seasons[1:]  # skip first season (nothing to train on before it)
 print(f"Backtest seasons: {BACKTEST_SEASONS}")
+
+# Which feature set this pass measures. FULL is the shipping model; NOCV is the
+# count-night variant, run over the SAME folds so the two are comparable.
+_PASS = os.environ.get('BACKTEST_FEATURES', 'FULL').upper()
+_FEATS = FEATURES_NOCV if _PASS == 'NOCV' else FEATURES
+_SUFFIX = '_nocv' if _PASS == 'NOCV' else ''
+print(f"Feature set: {_PASS} ({len(_FEATS)} features)")
+
 all_results = []
+_mae_rows = []
 
 for target_season in BACKTEST_SEASONS:
     train = model_df[model_df['Season'] < target_season].copy()
@@ -244,16 +272,28 @@ for target_season in BACKTEST_SEASONS:
         gamma=0.1, reg_alpha=0.2, reg_lambda=2.0,
         eval_metric='mlogloss', random_state=42, n_jobs=-1,
     )
-    model.fit(train[FEATURES], train[TARGET].astype(int),
-              sample_weight=np.ones(len(train)), verbose=False)
+    # Recency weighting, matching brownlow_model.py: the last five rounds of each
+    # training season count double. This was np.ones, which made backtest MAE
+    # measure a differently-fitted model from the one that ships and left the
+    # figure not comparable to the CV baseline.
+    _tr_max = train.groupby('Season')['Round_num'].transform('max')
+    _w = np.where(train['Round_num'] >= _tr_max - 4, 2.0, 1.0)
+    model.fit(train[_FEATS], train[TARGET].astype(int),
+              sample_weight=_w, verbose=False)
 
-    proba  = model.predict_proba(test[FEATURES])
+    proba  = model.predict_proba(test[_FEATS])
     classes = list(model.classes_)
     test = test.copy()
     test['P_1'] = proba[:, classes.index(1)] if 1 in classes else 0.0
     test['P_2'] = proba[:, classes.index(2)] if 2 in classes else 0.0
     test['P_3'] = proba[:, classes.index(3)] if 3 in classes else 0.0
     test['Exp_Votes'] = test['P_1'] * 1 + test['P_2'] * 2 + test['P_3'] * 3
+
+    # Per-game MAE on the same scale as the CV figure: predicted class vs actual.
+    _pred_cls = model.predict(test[_FEATS])
+    _mae = float(np.abs(test[TARGET].astype(int).values - _pred_cls).mean())
+    _mae_rows.append({'Season': target_season, 'MAE': _mae, 'Rows': len(test)})
+    print(f"  MAE: {_mae:.4f}")
 
     season_agg = test.groupby('Player_Name').agg(
         Team=('Playing.for', 'last'),
@@ -289,6 +329,48 @@ results.columns = ['Season','Player','Team','Actual_Votes','Predicted_Votes',
                    'Rank_Predicted','Rank_Actual']
 results['Predicted_Votes'] = results['Predicted_Votes'].round(3)
 
-out = "predictions/backtest_results.csv"
+out = f"predictions/backtest_results{_SUFFIX}.csv"
 results.to_csv(out, index=False)
+
+# ── Headline accuracy ─────────────────────────────────────────
+# The figures the app quotes publicly, recomputed every run rather than written
+# down anywhere — a hardcoded claim is how the pre-audit 86% outlived the model
+# it described.
+_mae_df = pd.DataFrame(_mae_rows)
+_top10 = []
+_med_top3 = []
+for _s in BACKTEST_SEASONS:
+    _sr = results[results['Season'] == _s]
+    # Top-10 accuracy: how much of the actual top 10 the model put in its top 10.
+    _act10 = set(_sr.nsmallest(10, 'Rank_Actual')['Player'])
+    _prd10 = set(_sr.nsmallest(10, 'Rank_Predicted')['Player'])
+    _top10.append({'Season': _s, 'Hits': len(_act10 & _prd10), 'Pct': len(_act10 & _prd10) / 10.0})
+    _meds = get_medallists(_s)
+    _rk = [int(_sr[(_sr['Player'] == _n) & (_sr['Team'] == _t)]['Rank_Predicted'].iloc[0])
+           for _n, _t in _meds
+           if not _sr[(_sr['Player'] == _n) & (_sr['Team'] == _t)].empty]
+    _med_top3.append({'Season': _s, 'BestRank': min(_rk) if _rk else None,
+                      'InTop3': bool(_rk) and min(_rk) <= 3})
+
+_t10 = pd.DataFrame(_top10)
+_m3 = pd.DataFrame(_med_top3)
+_summary = _mae_df.merge(_t10[['Season', 'Hits', 'Pct']], on='Season') \
+                  .merge(_m3[['Season', 'BestRank', 'InTop3']], on='Season')
+_summary.to_csv(f"predictions/backtest_summary{_SUFFIX}.csv", index=False)
+
+print(f"\n{'='*62}")
+print(f"HEADLINE ACCURACY — {_PASS} feature set ({len(_FEATS)} features)")
+print('='*62)
+print(f"{'Season':>7}{'MAE':>9}{'Top10':>8}{'Medallist rank':>17}{'In top 3':>10}")
+print('-'*62)
+for _, r in _summary.iterrows():
+    _br = int(r['BestRank']) if pd.notna(r['BestRank']) else '-'
+    print(f"{int(r['Season']):>7}{r['MAE']:>9.4f}{int(r['Hits']):>6}/10"
+          f"{str(_br):>17}{('yes' if r['InTop3'] else 'no'):>10}")
+print('-'*62)
+print(f"  Overall MAE              : {_mae_df['MAE'].mean():.4f}")
+print(f"  Top-10 accuracy          : {_summary['Pct'].mean()*100:.1f}%")
+print(f"  Medallist in top 3       : {_summary['InTop3'].mean()*100:.1f}% "
+      f"({int(_summary['InTop3'].sum())}/{len(_summary)} seasons)")
+print(f"  Medallist median rank    : {_summary['BestRank'].median():.1f}")
 print(f"\nDone. {len(results):,} player-seasons saved -> {out}")
