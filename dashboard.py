@@ -718,6 +718,41 @@ st.markdown("""
         margin: 0 !important;
     }
 
+    /* Compare tab — "Track this H2H" (and its "…instead" variant, same button).
+       Streamlit's default is a dark grey fill that all but disappears on the MT
+       background, so this is the emerald outline treatment.
+       Scoped to the keyed container, never a global button selector: the
+       Untrack button in the sibling branch is deliberately left default so a
+       destructive-ish secondary doesn't compete with the primary action.
+       .stApp .st-key-* scores (0,2,1) against theme.py's `.stButton button`
+       (0,1,1) !important — and theme injects AFTER this block, so specificity
+       is what wins, not order. Same lesson as the banner and nav CSS.
+       The bare `button` child is deliberate too: Streamlit's button testids
+       (stBaseButton-secondary et al) have moved between releases, but a
+       <button> inside the container is stable across 1.57 and 1.59. */
+    .stApp .st-key-h2h_track_ctl button {
+        background: transparent !important;
+        border: 1px solid #34d399 !important;
+        box-shadow: none !important;
+    }
+    .stApp .st-key-h2h_track_ctl button:hover {
+        background: rgba(52,211,153,0.10) !important;
+        border-color: #34d399 !important;
+    }
+    .stApp .st-key-h2h_track_ctl button,
+    .stApp .st-key-h2h_track_ctl button p {
+        color: #34d399 !important;
+    }
+    /* Same trick the banner needs: the markdown block's default paragraph
+       margins make its BOX taller than its text, so vertical_alignment="center"
+       centres a box whose text sits low. Zeroing them is what actually puts the
+       helper line on the button's centreline. */
+    .stApp .st-key-h2h_track_ctl [data-testid="stMarkdownContainer"],
+    .stApp .st-key-h2h_track_ctl [data-testid="stMarkdownContainer"] p {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
     /* The account group: chip immediately left of the button, hard right.
        st.container(key=...) stamps the class on the stVerticalBlock ITSELF, so
        this node is the flex container — no descendant hop needed. A column
@@ -4895,7 +4930,23 @@ if _page == 'Player Profile':
                                 else:
                                     _h2h_btn = ("Track this H2H instead" if _h2h_saved
                                                 else "Track this H2H")
-                                    if st.button(_h2h_btn, key="h2h_track"):
+                                    # Keyed container so the emerald button CSS has
+                                    # something to scope to. Only this branch is wrapped
+                                    # — the Untrack button above stays default on purpose.
+                                    with st.container(key="h2h_track_ctl"):
+                                        _h2h_bc, _h2h_hc = st.columns(
+                                            [2, 5], vertical_alignment="center")
+                                        with _h2h_bc:
+                                            _h2h_go = st.button(_h2h_btn, key="h2h_track")
+                                        with _h2h_hc:
+                                            st.markdown(
+                                                '<div style="font-family:\'Sora\',sans-serif;'
+                                                'font-size:12px;color:#8a9aa9">'
+                                                'Shows in the Live Tracker during the count.'
+                                                '</div>',
+                                                unsafe_allow_html=True,
+                                            )
+                                    if _h2h_go:
                                         _h2h_ok, _h2h_msg = user_auth.save_h2h_pair(
                                             _cp1, _cp2, selected_season,
                                             _h2h_pid1, _h2h_pid2,
