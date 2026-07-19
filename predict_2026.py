@@ -5,6 +5,7 @@ Uses saved model with Wheelo features, late-season form, and momentum features
 
 import pandas as pd
 import numpy as np
+import features as feat
 from sklearn.preprocessing import LabelEncoder
 import xgboost as xgb
 import pickle
@@ -52,8 +53,7 @@ else:
 # published as if it were real: with no votes in a game, rank(method='min')
 # gives EVERY player rank 1, so BOG_Coaches and Top3_Coaches would read 1 for
 # all 22 — the exact inverse of what they mean.
-COACHES_FEATURES = ['Coaches_Votes', 'Coaches_Votes_game_rank', 'Coaches_Votes_game_pct',
-                    'Coaches_Votes_game_z', 'Top3_Coaches', 'BOG_Coaches']
+COACHES_FEATURES = feat.COACHES_FEATURES
 
 TARGET = 'Brownlow.Votes'
 
@@ -118,17 +118,8 @@ if os.path.exists("data_2026/coaches_votes_2026.csv"):
     # also the legitimate value for the ~86% of rows that poll nothing.
     # The team code is in the source file all along: "Justin McInerney (SYD)".
     #
-    # Same abbreviation map as the training path. Kept in step with it: the two
-    # scripts share no module, and a code missing from one but not the other
-    # would zero-fill a whole club's coaches votes without raising anything.
-    CV_TEAM_ABBREV = {
-        'ADEL': 'Adelaide', 'BL': 'Brisbane Lions', 'CARL': 'Carlton',
-        'COLL': 'Collingwood', 'ESS': 'Essendon', 'FRE': 'Fremantle',
-        'GCFC': 'Gold Coast', 'GEEL': 'Geelong', 'GWS': 'Greater Western Sydney',
-        'HAW': 'Hawthorn', 'MELB': 'Melbourne', 'NMFC': 'North Melbourne',
-        'PORT': 'Port Adelaide', 'RICH': 'Richmond', 'STK': 'St Kilda',
-        'SYD': 'Sydney', 'WB': 'Western Bulldogs', 'WCE': 'West Coast',
-    }
+    # Abbreviation map from features.py, shared with the training path.
+    CV_TEAM_ABBREV = feat.TEAM_ABBREV
     cv26['CV_Player'] = cv26['Player.Name'].str.extract(r'^(.+?)\s*\(')[0].str.strip()
     cv26['CV_Code'] = cv26['Player.Name'].str.extract(r'\(([^)]+)\)')[0]
     cv26['CV_Team'] = cv26['CV_Code'].map(CV_TEAM_ABBREV)
@@ -161,7 +152,7 @@ if os.path.exists(wheelo_2026_path) and WHEELO_FEATURES:
     # Playing.for says 'Brisbane Lions', so normalise BEFORE the rename or every
     # Brisbane player silently loses all 18 Wheelo features to the 0-fill below.
     # Training applies the identical replace for the identical reason.
-    w26['Team'] = w26['Team'].replace({'Brisbane': 'Brisbane Lions'})
+    w26['Team'] = w26['Team'].replace(feat.WHEELO_TEAM_FIXES)
     w26 = w26.rename(columns={'Team': 'Playing.for'})
     wheelo_cols = [c for c in WHEELO_FEATURES if c in w26.columns]
     df26 = df26.merge(w26[['Player_Name', 'Playing.for', 'Round_num'] + wheelo_cols],
@@ -183,73 +174,14 @@ if 'Rating_Q4' in df26.columns and 'Rating_Q1' in df26.columns:
 print("Building relative features...")
 df26['Game_ID'] = df26['Season'].astype(str)+'_'+df26['Round_num'].astype(str)+'_'+df26['Home.team'].astype(str)+'_'+df26['Away.team'].astype(str)
 
-for stat in RANK_STATS:
-    if stat in df26.columns:
-        df26[f'{stat}_game_rank'] = df26.groupby('Game_ID')[stat].rank(ascending=False, method='min')
-        df26[f'{stat}_game_pct'] = df26.groupby('Game_ID')[stat].rank(pct=True)
-        df26[f'{stat}_game_z'] = df26.groupby('Game_ID')[stat].transform(lambda x: (x-x.mean())/(x.std()+0.001))
-    else:
-        df26[f'{stat}_game_rank'] = 0
-        df26[f'{stat}_game_pct'] = 0
-        df26[f'{stat}_game_z'] = 0
-
-df26['Top3_Disposals'] = (df26['Disposals_game_rank']<=3).astype(int)
-df26['Top3_Coaches'] = (df26['Coaches_Votes_game_rank']<=3).astype(int)
-df26['Top3_Impact'] = (df26['Impact_Score_game_rank']<=3).astype(int)
-df26['BOG_Disposals'] = (df26['Disposals_game_rank']==1).astype(int)
-df26['BOG_Coaches'] = (df26['Coaches_Votes_game_rank']==1).astype(int)
-df26['BOG_Impact'] = (df26['Impact_Score_game_rank']==1).astype(int)
-if 'RatingPoints_game_rank' in df26.columns:
-    df26['BOG_Rating'] = (df26['RatingPoints_game_rank']==1).astype(int)
-    df26['Top3_Rating'] = (df26['RatingPoints_game_rank']<=3).astype(int)
+df26 = feat.build_game_rank_features(df26, RANK_STATS, fill_missing=True)
+df26 = feat.build_rank_flags(df26)
 
 # Form and momentum features
 print("Building form and momentum features...")
 df26 = df26.sort_values(['Player_Name', 'Round_num']).reset_index(drop=True)
 
-_form_src = 'ExpVotes' if 'ExpVotes' in df26.columns else 'Coaches_Votes'
-if _form_src in df26.columns:
-    df26['late_form_ewm'] = (
-        df26.groupby('Player_Name')[_form_src]
-        .transform(lambda x: x.shift(1).ewm(span=5, min_periods=1).mean())
-        .fillna(0)
-    )
-else:
-    df26['late_form_ewm'] = 0
-
-# Momentum: recent form minus earlier form, POINT-IN-TIME.
-#
-# Character-for-character the same construction as brownlow_model.py's
-# _pit_momentum, and it has to stay that way — the two scripts share no module,
-# so any change here must be mirrored there or the model reads a feature that
-# means something different at predict time than it did at train time.
-#
-# The previous version took the last 6 games minus the first 6 of the season and
-# broadcast one value onto every row, which leaked future rounds backwards. Now
-# it is a trailing window over strictly prior rounds, shift(1) first, exactly as
-# late_form_ewm above does it.
-_MOM_RECENT = 6
-_MOM_MIN_EARLIER = 2
-
-
-def _pit_momentum(s):
-    """Trailing recent-minus-earlier for one player, in round order."""
-    prior = s.shift(1)                                        # current game excluded
-    recent_sum = prior.rolling(_MOM_RECENT, min_periods=_MOM_RECENT).sum()
-    recent_mean = recent_sum / _MOM_RECENT
-    all_sum = prior.expanding(min_periods=1).sum()
-    all_cnt = prior.expanding(min_periods=1).count()
-    earlier_sum = all_sum - recent_sum
-    earlier_cnt = all_cnt - _MOM_RECENT
-    _ok = earlier_cnt >= _MOM_MIN_EARLIER
-    earlier_mean = earlier_sum.where(_ok) / earlier_cnt.where(_ok)
-    return recent_mean - earlier_mean
-
-
-for _src, _out in (('Coaches_Votes', 'momentum_cv'), ('Disposals', 'momentum_disp')):
-    df26[_out] = (df26.groupby('Player_Name')[_src]
-                      .transform(_pit_momentum)
-                      .fillna(0))
+df26 = feat.build_form_features(df26, ['Player_Name'])
 
 # Fill any missing features
 for f in FEATURES:

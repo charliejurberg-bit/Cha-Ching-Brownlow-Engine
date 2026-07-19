@@ -11,6 +11,7 @@ import numpy as np
 from sklearn.preprocessing import LabelEncoder
 import xgboost as xgb
 import os, warnings
+import features as feat
 from brownlow_medallists import get_medallists
 warnings.filterwarnings('ignore')
 
@@ -135,102 +136,20 @@ print("Building relative game features...")
 df['Game_ID'] = (df['Season'].astype(str) + '_' + df['Round_num'].astype(str) + '_' +
                  df['Home.team'].astype(str) + '_' + df['Away.team'].astype(str))
 
-RANK_STATS = ['Disposals','Goals','Contested.Possessions','Clearances',
-              'Kicks','Impact_Score','Score_Involvements','Coaches_Votes','Tackles']
-if 'RatingPoints' in df.columns:
-    RANK_STATS += ['RatingPoints','ExpVotes']
+RANK_STATS = feat.rank_stats_for(df)
+df = feat.build_game_rank_features(df, RANK_STATS)
+df = feat.build_rank_flags(df)
 
-for stat in RANK_STATS:
-    if stat in df.columns:
-        df[f'{stat}_game_rank'] = df.groupby('Game_ID')[stat].rank(ascending=False, method='min')
-        df[f'{stat}_game_pct'] = df.groupby('Game_ID')[stat].rank(pct=True)
-        df[f'{stat}_game_z'] = df.groupby('Game_ID')[stat].transform(
-            lambda x: (x - x.mean()) / (x.std() + 0.001))
-
-df['Top3_Disposals'] = (df['Disposals_game_rank'] <= 3).astype(int)
-df['Top3_Coaches']   = (df['Coaches_Votes_game_rank'] <= 3).astype(int)
-df['Top3_Impact']    = (df['Impact_Score_game_rank'] <= 3).astype(int)
-df['BOG_Disposals']  = (df['Disposals_game_rank'] == 1).astype(int)
-df['BOG_Coaches']    = (df['Coaches_Votes_game_rank'] == 1).astype(int)
-df['BOG_Impact']     = (df['Impact_Score_game_rank'] == 1).astype(int)
-if 'RatingPoints_game_rank' in df.columns:
-    df['BOG_Rating']  = (df['RatingPoints_game_rank'] == 1).astype(int)
-    df['Top3_Rating'] = (df['RatingPoints_game_rank'] <= 3).astype(int)
-
-# ── Build form and momentum features ──────────────────────────
-# THIRD COPY of this logic — brownlow_model.py and predict_2026.py carry the
-# other two, and the three share no module. That duplication is exactly how this
-# block went stale: it kept the pre-audit whole-season momentum for a while after
-# brownlow_model.py was fixed, under a comment claiming the two were identical.
-# A backtest measuring a leak the trained model no longer has is worse than no
-# backtest. Change one copy, change all three.
+# ── Form and momentum ─────────────────────────────────────────
 print("Building form and momentum features...")
 df = df.sort_values(['Season', 'Player_Name', 'Round_num']).reset_index(drop=True)
+df = feat.build_form_features(df, ['Season', 'Player_Name'])
+FORM_FEATURES = feat.form_feature_names(df)
 
-_form_src = 'ExpVotes' if 'ExpVotes' in df.columns else 'Coaches_Votes'
-df['late_form_ewm'] = (
-    df.groupby(['Season', 'Player_Name'])[_form_src]
-    .transform(lambda x: x.shift(1).ewm(span=5, min_periods=1).mean())
-    .fillna(0)
-)
-
-# Point-in-time momentum: recent form minus earlier form over strictly PRIOR
-# rounds. shift(1) first, so the current game is never part of its own feature.
-# A row needs _MOM_RECENT prior games for the recent window plus _MOM_MIN_EARLIER
-# more to compare against — 8 in total — below which it is NaN and fills to 0.
-_MOM_RECENT = 6
-_MOM_MIN_EARLIER = 2
-
-
-def _pit_momentum(s):
-    """Trailing recent-minus-earlier for one player-season, in round order."""
-    prior = s.shift(1)                                        # current game excluded
-    recent_sum = prior.rolling(_MOM_RECENT, min_periods=_MOM_RECENT).sum()
-    recent_mean = recent_sum / _MOM_RECENT
-    all_sum = prior.expanding(min_periods=1).sum()
-    all_cnt = prior.expanding(min_periods=1).count()
-    earlier_sum = all_sum - recent_sum
-    earlier_cnt = all_cnt - _MOM_RECENT
-    _ok = earlier_cnt >= _MOM_MIN_EARLIER
-    earlier_mean = earlier_sum.where(_ok) / earlier_cnt.where(_ok)
-    return recent_mean - earlier_mean
-
-
-for _src, _out in (('Coaches_Votes', 'momentum_cv'), ('Disposals', 'momentum_disp')):
-    df[_out] = (df.groupby(['Season', 'Player_Name'])[_src]
-                  .transform(_pit_momentum)
-                  .fillna(0))
-
-FORM_FEATURES = ['late_form_ewm', 'momentum_cv', 'momentum_disp']
-
-# ── Feature set (identical to brownlow_model.py) ──────────────
-BASE_FEATURES = ['Kicks','Handballs','Disposals','Goals','Marks','Tackles','Hit.Outs',
-                 'Clearances','Contested.Possessions','Uncontested.Possessions',
-                 'Contested.Marks','Marks.Inside.50','Goal.Assists','Inside.50s',
-                 'Rebounds','One.Percenters','Clangers','Kick_to_HB_ratio',
-                 'Contested_rate','Disposal_efficiency','Score_Involvements',
-                 'Impact_Score','Is_Win','Is_Loss','Margin','Abs_Margin',
-                 'Coaches_Votes','Season','Margin_Bucket_enc']
-
-RELATIVE_FEATURES = (
-    [f'{s}_game_rank' for s in RANK_STATS if f'{s}_game_rank' in df.columns] +
-    [f'{s}_game_pct'  for s in RANK_STATS if f'{s}_game_pct'  in df.columns] +
-    [f'{s}_game_z'    for s in RANK_STATS if f'{s}_game_z'    in df.columns] +
-    ['Top3_Disposals','Top3_Coaches','Top3_Impact','BOG_Disposals','BOG_Coaches','BOG_Impact']
-)
-if 'BOG_Rating' in df.columns:
-    RELATIVE_FEATURES += ['BOG_Rating','Top3_Rating']
-
-FEATURES = list(dict.fromkeys(BASE_FEATURES + WHEELO_FEATURES + RELATIVE_FEATURES + FORM_FEATURES))
-FEATURES = [f for f in FEATURES if f in df.columns]
-
-# The no-coaches feature set, for the count-night variant: the six same-game
-# coaches features drop out. momentum_cv stays — since the point-in-time fix it
-# reads prior rounds only, and in the target scenario those rounds' votes have
-# long been published. This mirrors NO_COACHES=1 / DROP_MOMENTUM_CV=0 in
-# brownlow_model.py, which is the variant whose artifacts ship.
-FEATURES_NOCV = [f for f in FEATURES if 'Coaches' not in f]
-assert not [f for f in FEATURES_NOCV if 'Coaches' in f], "no-coaches set still has a coaches feature"
+# ── Feature set (shared with training via features.py) ────────
+FEATURES = feat.assemble_features(df, RANK_STATS, WHEELO_FEATURES, FORM_FEATURES)
+FEATURES_NOCV = feat.assemble_features(
+    df, RANK_STATS, WHEELO_FEATURES, FORM_FEATURES, include_coaches=False)
 
 TARGET = 'Brownlow.Votes'
 

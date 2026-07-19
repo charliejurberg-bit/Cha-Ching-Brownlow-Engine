@@ -18,6 +18,7 @@ from sklearn.preprocessing import LabelEncoder
 import xgboost as xgb
 import pickle
 import os, warnings
+import features as feat
 warnings.filterwarnings('ignore')
 
 os.makedirs("predictions", exist_ok=True)
@@ -185,155 +186,40 @@ if wheelo is not None:
 print("Building relative game features...")
 df['Game_ID'] = df['Season'].astype(str)+'_'+df['Round_num'].astype(str)+'_'+df['Home.team'].astype(str)+'_'+df['Away.team'].astype(str)
 
-RANK_STATS = ['Disposals','Goals','Contested.Possessions','Clearances',
-              'Kicks','Impact_Score','Score_Involvements','Coaches_Votes','Tackles']
+RANK_STATS = feat.rank_stats_for(df)
 if NO_COACHES:
     RANK_STATS = [s for s in RANK_STATS if s != 'Coaches_Votes']
 
-# Add Wheelo stats to ranking if available
-if 'RatingPoints' in df.columns:
-    RANK_STATS += ['RatingPoints','ExpVotes']
-
-for stat in RANK_STATS:
-    if stat in df.columns:
-        df[f'{stat}_game_rank'] = df.groupby('Game_ID')[stat].rank(ascending=False, method='min')
-        df[f'{stat}_game_pct'] = df.groupby('Game_ID')[stat].rank(pct=True)
-        df[f'{stat}_game_z'] = df.groupby('Game_ID')[stat].transform(lambda x: (x-x.mean())/(x.std()+0.001))
-
-df['Top3_Disposals'] = (df['Disposals_game_rank']<=3).astype(int)
-df['Top3_Impact'] = (df['Impact_Score_game_rank']<=3).astype(int)
-df['BOG_Disposals'] = (df['Disposals_game_rank']==1).astype(int)
-df['BOG_Impact'] = (df['Impact_Score_game_rank']==1).astype(int)
-# Guarded: NO_COACHES takes Coaches_Votes out of RANK_STATS above, so the rank
-# column these read does not exist in that variant.
-if not NO_COACHES:
-    df['Top3_Coaches'] = (df['Coaches_Votes_game_rank']<=3).astype(int)
-    df['BOG_Coaches'] = (df['Coaches_Votes_game_rank']==1).astype(int)
-if 'RatingPoints_game_rank' in df.columns:
-    df['BOG_Rating'] = (df['RatingPoints_game_rank']==1).astype(int)
-    df['Top3_Rating'] = (df['RatingPoints_game_rank']<=3).astype(int)
+df = feat.build_game_rank_features(df, RANK_STATS)
+df = feat.build_rank_flags(df, include_coaches=not NO_COACHES)
 
 # ── Build form and momentum features ─────────────────────────
 print("Building form and momentum features...")
 df = df.sort_values(['Season', 'Player_Name', 'Round_num']).reset_index(drop=True)
 
-# Late season form: EWMA (span=5) of prior rounds — shift(1) prevents lookahead
-_form_src = 'ExpVotes' if 'ExpVotes' in df.columns else 'Coaches_Votes'
-df['late_form_ewm'] = (
-    df.groupby(['Season', 'Player_Name'])[_form_src]
-    .transform(lambda x: x.shift(1).ewm(span=5, min_periods=1).mean())
-    .fillna(0)
+df = feat.build_form_features(
+    df, ['Season', 'Player_Name'],
+    include_momentum_cv=not (NO_COACHES and DROP_MOMENTUM_CV),
 )
 
-# Momentum: recent form minus earlier form, POINT-IN-TIME.
-#
-# The previous version computed the last 6 games minus the first 6 games of the
-# COMPLETED season and merged that single value onto every row of the player's
-# season — so a round 2 row carried information from round 23. That is future
-# leakage, and it flattered the CV score it was measured by.
-#
-# This version is built the same way late_form_ewm above is: shift(1) first, so
-# the current game is never part of its own feature, then everything is a
-# trailing window over strictly prior rounds.
-#
-#   recent  = mean of the previous _MOM_RECENT games
-#   earlier = mean of every game before those
-#   value   = recent - earlier
-#
-# A row needs _MOM_RECENT prior games to have a `recent` window at all, plus
-# _MOM_MIN_EARLIER more to have anything to compare it against — 8 prior games
-# in total. Below that the result is NaN and fills to 0, matching how the old
-# block's missing values were handled.
-_MOM_RECENT = 6
-_MOM_MIN_EARLIER = 2
-
-
-def _pit_momentum(s):
-    """Trailing recent-minus-earlier for one player-season, in round order.
-
-    Kept in step with the identical helper in predict_2026.py — the two scripts
-    share no module, so a change here must be made there or train and predict
-    drift apart on a feature the model reads.
-    """
-    prior = s.shift(1)                                        # current game excluded
-    recent_sum = prior.rolling(_MOM_RECENT, min_periods=_MOM_RECENT).sum()
-    recent_mean = recent_sum / _MOM_RECENT
-    all_sum = prior.expanding(min_periods=1).sum()
-    all_cnt = prior.expanding(min_periods=1).count()
-    earlier_sum = all_sum - recent_sum
-    earlier_cnt = all_cnt - _MOM_RECENT
-    _ok = earlier_cnt >= _MOM_MIN_EARLIER
-    earlier_mean = earlier_sum.where(_ok) / earlier_cnt.where(_ok)
-    return recent_mean - earlier_mean
-
-
-_MOM_SPECS = [('Coaches_Votes', 'momentum_cv'), ('Disposals', 'momentum_disp')]
-if NO_COACHES and DROP_MOMENTUM_CV:
-    _MOM_SPECS = [(s, o) for s, o in _MOM_SPECS if o != 'momentum_cv']
-for _src, _out in _MOM_SPECS:
-    df[_out] = (df.groupby(['Season', 'Player_Name'])[_src]
-                  .transform(_pit_momentum)
-                  .fillna(0))
-
-FORM_FEATURES = [f for f in ('late_form_ewm', 'momentum_cv', 'momentum_disp')
-                 if f in df.columns]
-# late_form_ewm stays in every variant: _form_src resolves to ExpVotes (Wheelo),
-# not Coaches_Votes. The Coaches_Votes fallback on that line never fires with the
-# current data — wheelo_all_seasons.csv carries ExpVotes for every season — so
-# this feature is Wheelo-derived, not coaches-derived. If a future dataset ever
-# lacks ExpVotes the fallback WOULD fire and silently make late_form_ewm a
-# coaches feature, which the NO_COACHES assertion below is there to catch.
+FORM_FEATURES = feat.form_feature_names(df)
 print(f"  Form/momentum features: {FORM_FEATURES}")
 
 # ── Define all features ──────────────────────────────────────
-BASE_FEATURES = ['Kicks','Handballs','Disposals','Goals','Marks','Tackles','Hit.Outs',
-                 'Clearances','Contested.Possessions','Uncontested.Possessions',
-                 'Contested.Marks','Marks.Inside.50','Goal.Assists','Inside.50s',
-                 'Rebounds','One.Percenters','Clangers','Kick_to_HB_ratio',
-                 'Contested_rate','Disposal_efficiency','Score_Involvements',
-                 'Impact_Score','Is_Win','Is_Loss','Margin','Abs_Margin',
-                 'Coaches_Votes','Season','Margin_Bucket_enc']
-
-RELATIVE_FEATURES = [f'{s}_game_rank' for s in RANK_STATS if f'{s}_game_rank' in df.columns] + \
-                    [f'{s}_game_pct' for s in RANK_STATS if f'{s}_game_pct' in df.columns] + \
-                    [f'{s}_game_z' for s in RANK_STATS if f'{s}_game_z' in df.columns] + \
-                    ['Top3_Disposals','Top3_Coaches','Top3_Impact',
-                     'BOG_Disposals','BOG_Coaches','BOG_Impact']
-
-if 'BOG_Rating' in df.columns:
-    RELATIVE_FEATURES += ['BOG_Rating','Top3_Rating']
-
-FEATURES = BASE_FEATURES + WHEELO_FEATURES + RELATIVE_FEATURES + FORM_FEATURES
+FEATURES = feat.assemble_features(
+    df, RANK_STATS, WHEELO_FEATURES, FORM_FEATURES,
+    include_coaches=not NO_COACHES,
+    include_momentum_cv=not (NO_COACHES and DROP_MOMENTUM_CV),
+)
+BASE_FEATURES = feat.BASE_FEATURES
 TARGET = 'Brownlow.Votes'
 
-# Remove any duplicates
-FEATURES = list(dict.fromkeys(FEATURES))
-# Keep only features that exist in df
-FEATURES = [f for f in FEATURES if f in df.columns]
-
+print(f"\nTotal features: {len(FEATURES)}")
 if NO_COACHES:
-    FEATURES = [f for f in FEATURES if 'Coaches' not in f]
-    if DROP_MOMENTUM_CV:
-        FEATURES = [f for f in FEATURES if f != 'momentum_cv']
-    # Assert rather than trust the filters above. A coaches feature surviving
-    # into this variant is the one failure that matters — it would be trained on
-    # data that does not exist at predict time, and nothing downstream would say
-    # so. The momentum_cv check is by NAME because its dependency is in how it is
-    # built, not in what it is called.
-    _leaked = [f for f in FEATURES if 'Coaches' in f]
-    if DROP_MOMENTUM_CV:
-        _leaked += [f for f in FEATURES if f == 'momentum_cv']
-    assert not _leaked, f"NO_COACHES variant still carries: {_leaked}"
-    print(f"  NO_COACHES: {len(_leaked)} coaches features remain (asserted 0)")
+    print("  NO_COACHES: coaches features excluded (asserted in features.assemble_features)")
     if not DROP_MOMENTUM_CV and 'momentum_cv' in FEATURES:
         print("  NOTE: momentum_cv retained — built from Coaches_Votes over PRIOR "
               "rounds only, so it needs published history but not the current game.")
-
-print(f"\nTotal features: {len(FEATURES)}")
-print(f"  Base: {len(BASE_FEATURES)}")
-print(f"  Wheelo: {len(WHEELO_FEATURES)}")
-print(f"  Relative: {len(RELATIVE_FEATURES)}")
-print(f"  Form/Momentum: {len(FORM_FEATURES)}")
 
 _id_cols = ['ID'] if 'ID' in df.columns else []
 model_df = df[FEATURES+[TARGET,'Player_Name','Playing.for','Round_num']+_id_cols]\

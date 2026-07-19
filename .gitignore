@@ -21,7 +21,8 @@ betfair_debug.html
 espn_debug*.html
 
 # Local Claude settings (may contain credentials)
-.claude/settings.local.json
+# Claude Code workspace config — local tooling, not project source
+.claude/
 
 # Nested repo (kept locally, not part of this repo)
 /cha-ching-brownlow-engine/
@@ -31,4 +32,5 @@ espn_debug*.html
 *_debug*.py
 debug_*.py
 
-.claude/settings.local.json
+# Claude Code workspace config — local tooling, not project source
+.claude/
