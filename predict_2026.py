@@ -89,10 +89,38 @@ if os.path.exists("data_2026/coaches_votes_2026.csv"):
     cv26 = pd.read_csv("data_2026/coaches_votes_2026.csv")
     cv26['Round'] = pd.to_numeric(cv26['Round'], errors='coerce')
     cv26['Coaches.Votes'] = pd.to_numeric(cv26['Coaches.Votes'], errors='coerce').fillna(0)
+    # Team is part of the key, matching brownlow_model.py. It was dropped here,
+    # so two players sharing a name in one round had their votes SUMMED onto
+    # both — silently, because an unmatched or wrong merge lands as 0 and 0 is
+    # also the legitimate value for the ~86% of rows that poll nothing.
+    # The team code is in the source file all along: "Justin McInerney (SYD)".
+    #
+    # Same abbreviation map as the training path. Kept in step with it: the two
+    # scripts share no module, and a code missing from one but not the other
+    # would zero-fill a whole club's coaches votes without raising anything.
+    CV_TEAM_ABBREV = {
+        'ADEL': 'Adelaide', 'BL': 'Brisbane Lions', 'CARL': 'Carlton',
+        'COLL': 'Collingwood', 'ESS': 'Essendon', 'FRE': 'Fremantle',
+        'GCFC': 'Gold Coast', 'GEEL': 'Geelong', 'GWS': 'Greater Western Sydney',
+        'HAW': 'Hawthorn', 'MELB': 'Melbourne', 'NMFC': 'North Melbourne',
+        'PORT': 'Port Adelaide', 'RICH': 'Richmond', 'STK': 'St Kilda',
+        'SYD': 'Sydney', 'WB': 'Western Bulldogs', 'WCE': 'West Coast',
+    }
     cv26['CV_Player'] = cv26['Player.Name'].str.extract(r'^(.+?)\s*\(')[0].str.strip()
-    cv26_agg = cv26.groupby(['Round','CV_Player'])['Coaches.Votes'].sum().reset_index()
-    cv26_agg.columns = ['Round_num','Player_Name','Coaches_Votes']
-    df26 = df26.merge(cv26_agg, on=['Round_num','Player_Name'], how='left')
+    cv26['CV_Code'] = cv26['Player.Name'].str.extract(r'\(([^)]+)\)')[0]
+    cv26['CV_Team'] = cv26['CV_Code'].map(CV_TEAM_ABBREV)
+
+    # An unmapped code would quietly drop that club's votes to zero on a merge
+    # this feature set leans on heavily, so say so rather than absorb it.
+    _unmapped = sorted(cv26.loc[cv26['CV_Team'].isna(), 'CV_Code'].dropna().unique())
+    if _unmapped:
+        print(f"  WARNING: unmapped coaches-vote team code(s): {_unmapped}")
+        print("           those rows will not merge — add them to CV_TEAM_ABBREV")
+
+    cv26_agg = (cv26.groupby(['Round', 'CV_Player', 'CV_Team'])['Coaches.Votes']
+                    .sum().reset_index())
+    cv26_agg.columns = ['Round_num', 'Player_Name', 'Playing.for', 'Coaches_Votes']
+    df26 = df26.merge(cv26_agg, on=['Round_num', 'Player_Name', 'Playing.for'], how='left')
     df26['Coaches_Votes'] = df26['Coaches_Votes'].fillna(0)
     print("  Coaches votes merged")
 else:
@@ -104,10 +132,17 @@ if os.path.exists(wheelo_2026_path) and WHEELO_FEATURES:
     print("  Merging 2026 Wheelo data...")
     w26 = pd.read_csv(wheelo_2026_path, low_memory=False)
     w26['Round_num'] = pd.to_numeric(w26['Round'], errors='coerce')
-    w26 = w26.rename(columns={'Player':'Player_Name'})
+    w26 = w26.rename(columns={'Player': 'Player_Name'})
+    # Team joins the key, matching brownlow_model.py — without it two players
+    # sharing a name take each other's ratings. Wheelo says 'Brisbane' where
+    # Playing.for says 'Brisbane Lions', so normalise BEFORE the rename or every
+    # Brisbane player silently loses all 18 Wheelo features to the 0-fill below.
+    # Training applies the identical replace for the identical reason.
+    w26['Team'] = w26['Team'].replace({'Brisbane': 'Brisbane Lions'})
+    w26 = w26.rename(columns={'Team': 'Playing.for'})
     wheelo_cols = [c for c in WHEELO_FEATURES if c in w26.columns]
-    df26 = df26.merge(w26[['Player_Name','Round_num']+wheelo_cols],
-                     on=['Player_Name','Round_num'], how='left')
+    df26 = df26.merge(w26[['Player_Name', 'Playing.for', 'Round_num'] + wheelo_cols],
+                      on=['Player_Name', 'Playing.for', 'Round_num'], how='left')
 
 # Fill missing Wheelo features with 0
 for f in WHEELO_FEATURES:
