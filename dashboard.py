@@ -4671,10 +4671,33 @@ if _page == 'Player Profile':
                                     if pd.notna(_f) and pd.notna(_a):
                                         _h2h_abbr.setdefault(str(_f), str(_a))
 
-                            def _h2h_short(name):
-                                """Surname for chips — strips any '(Team)' disambiguation suffix."""
-                                _n = str(name).split(' (')[0].strip()
-                                return _n.split()[-1] if _n else str(name)
+                            def _h2h_short_pair(n1, n2):
+                                """Shortest labels that still tell these two players apart.
+
+                                A bare surname reads best, but two different players can share
+                                one — upstream only appends '(Team)' for genuine fitzRoy-ID
+                                collisions, so 'Ryan' v 'Ryan' is reachable with plain names.
+                                Widen both labels together, only as far as needed: surname,
+                                then initial + surname, then the full given name. Shared
+                                initials are why the third rung exists (Luke / Liam Ryan)."""
+                                def _base(_n):
+                                    return str(_n).split(' (')[0].strip()
+
+                                def _sur(_n):
+                                    _b = _base(_n)
+                                    return _b.split()[-1] if _b else str(_n)
+
+                                def _init(_n):
+                                    _p = _base(_n).split()
+                                    return f"{_p[0][0]}. {_p[-1]}" if len(_p) > 1 else _sur(_n)
+
+                                for _form in (_sur, _init, _base):
+                                    _a, _b = _form(n1), _form(n2)
+                                    if _a != _b:
+                                        return _a, _b
+                                # Identical full names — only reachable in the disambiguated
+                                # 'Name (Team)' form, where the suffix is the differentiator.
+                                return str(n1), str(n2)
 
                             def _h2h_opp(row):
                                 """Opponent abbreviation, from Home.team/Away.team + Home.Away."""
@@ -4696,7 +4719,7 @@ if _page == 'Player Profile':
                                 return (f"{_h2h_abbr.get(str(_h), str(_h))} v "
                                         f"{_h2h_abbr.get(str(_a), str(_a))}")
 
-                            _h2h_s1, _h2h_s2 = _h2h_short(_cp1), _h2h_short(_cp2)
+                            _h2h_s1, _h2h_s2 = _h2h_short_pair(_cp1, _cp2)
                             _h2h_recs = []
                             for _rn in _h2h_axis:
                                 _row1, _row2 = _h2h_r1.get(_rn), _h2h_r2.get(_rn)
