@@ -3267,7 +3267,19 @@ animate(document.getElementById('votes'), votesTarget, function(v){ return v.toF
     st.iframe(_stat_html, height='content')
 
     # ── Destination panels ──
-    _lc1, _lc2 = st.columns(2, gap="medium")
+    # The Betting card was the last public sight of the hub: it rendered for
+    # everyone with blurred figures and a button that routed straight into the
+    # admin chokepoint. Admin-only now, so the private section is invisible
+    # rather than merely locked.
+    #
+    # Dropping the second card out of st.columns(2) would leave the Brownlow
+    # card at half width with an empty right half, which reads as broken rather
+    # than deliberate. A visitor therefore gets a plain container — one
+    # full-width card — until the Engine/Count re-card lands next session.
+    if _is_admin:
+        _lc1, _lc2 = st.columns(2, gap="medium")
+    else:
+        _lc1 = st.container()
     with _lc1:
         with st.container(key="card_brownlow"):
             st.markdown(f"""
@@ -3285,8 +3297,8 @@ animate(document.getElementById('votes'), votesTarget, function(v){ return v.toF
                 st.session_state["active_hub"] = "brownlow"
                 st.session_state.page = 'Leaderboard'
                 st.rerun()
-    with _lc2:
-        with st.container(key="card_betting"):
+    if _is_admin:
+        with _lc2, st.container(key="card_betting"):
             st.markdown(f"""
 <div class="dest-content">
   <span class="dest-tag bh">Live Tracking</span>
