@@ -4787,14 +4787,100 @@ if _page == 'Player Profile':
                                 )
 
                             _h2h_pct = lambda _v: f"{_v * 100:.0f}%"
+                            # Header and stamp render on their own so the tracked-pair
+                            # control can sit directly beneath them, above the figures.
                             st.markdown(
                                 _cmp_header('Head to head votes')
                                 + '<div style="display:flex;align-items:baseline;justify-content:space-between;'
-                                  'margin:-4px 0 14px">'
+                                  'margin:-4px 0 10px">'
                                   '<div style="font-family:\'DM Mono\',monospace;font-size:11px;'
                                   'letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)">'
-                                  f'Through round {_h2h_last}</div></div>'
-                                + '<div style="display:flex;gap:18px;margin-bottom:18px">'
+                                  f'Through round {_h2h_last}</div></div>',
+                                unsafe_allow_html=True,
+                            )
+
+                            # ── tracked pair ──────────────────────────────
+                            # Saved so the Live Tracker can surface this pair during
+                            # the count. One pair per user per season: saving a new
+                            # one overwrites, which the upsert does in a single
+                            # statement (see 06_h2h_pairs.sql).
+                            _h2h_user = user_auth.current_user()
+                            _h2h_uid  = _h2h_user.get("id") if _h2h_user else None
+
+                            def _h2h_pid(g):
+                                """This player's fitzRoy ID, or None when the frame has
+                                none. Arrives as a float ('13054.0'), so normalise to a
+                                bare integer string before it is stored or compared."""
+                                if 'ID' not in g.columns or g.empty:
+                                    return None
+                                for _v in g['ID']:
+                                    if pd.notna(_v):
+                                        try:
+                                            return str(int(float(_v)))
+                                        except (TypeError, ValueError):
+                                            return str(_v)
+                                return None
+
+                            _h2h_pid1, _h2h_pid2 = _h2h_pid(_cg1), _h2h_pid(_cg2)
+
+                            def _h2h_is_saved(saved):
+                                """Order-insensitive match against the saved pair.
+
+                                fitzRoy IDs win when both sides carry them: display
+                                names pick up a '(Team)' suffix only in seasons where
+                                they collide, so a pair saved one season can come back
+                                spelled differently the next. Names are the fallback
+                                for frames with no ID source."""
+                                if not saved:
+                                    return False
+                                _sid1, _sid2 = saved.get('player1_id'), saved.get('player2_id')
+                                if _sid1 and _sid2 and _h2h_pid1 and _h2h_pid2:
+                                    return ({str(_sid1), str(_sid2)}
+                                            == {str(_h2h_pid1), str(_h2h_pid2)})
+                                return ({str(saved.get('player1')), str(saved.get('player2'))}
+                                        == {str(_cp1), str(_cp2)})
+
+                            if _h2h_uid:
+                                _h2h_saved = user_auth.load_h2h_pair(_h2h_uid, selected_season)
+                                if _h2h_is_saved(_h2h_saved):
+                                    st.markdown(
+                                        '<div style="font-family:\'DM Mono\',monospace;font-size:11px;'
+                                        'letter-spacing:1.5px;text-transform:uppercase;color:#f0b429;'
+                                        'margin-bottom:6px">&#9733; Tracked for live count</div>',
+                                        unsafe_allow_html=True,
+                                    )
+                                    if st.button("Untrack", key="h2h_untrack"):
+                                        _h2h_ok, _h2h_msg = user_auth.clear_h2h_pair(selected_season)
+                                        if _h2h_ok:
+                                            # Default scope: st.rerun() must rerun the whole
+                                            # script so bootstrap_session() flushes the cookie
+                                            # at the top. Never scope='fragment' — see
+                                            # _auth_dialog for the bug that causes.
+                                            st.rerun()
+                                        else:
+                                            st.error(_h2h_msg)
+                                else:
+                                    _h2h_btn = ("Track this H2H instead" if _h2h_saved
+                                                else "Track this H2H")
+                                    if st.button(_h2h_btn, key="h2h_track"):
+                                        _h2h_ok, _h2h_msg = user_auth.save_h2h_pair(
+                                            _cp1, _cp2, selected_season,
+                                            _h2h_pid1, _h2h_pid2,
+                                        )
+                                        if _h2h_ok:
+                                            st.rerun()
+                                        else:
+                                            st.error(_h2h_msg)
+                            else:
+                                st.markdown(
+                                    '<div style="font-family:\'Sora\',sans-serif;font-size:12px;'
+                                    'color:var(--muted);margin-bottom:6px">'
+                                    'Sign in to track this head-to-head on the live tracker.</div>',
+                                    unsafe_allow_html=True,
+                                )
+
+                            st.markdown(
+                                '<div style="display:flex;gap:18px;margin:14px 0 18px">'
                                 + _h2h_fig(f'Projected · {_h2h_s1}', f"{_h2h_e1:.1f}", '#34d399')
                                 + _h2h_fig('Projected margin',
                                            f"{'+' if _h2h_marg >= 0 else '−'}{abs(_h2h_marg):.1f}", '#f0b429')
