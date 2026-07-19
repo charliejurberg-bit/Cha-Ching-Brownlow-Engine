@@ -2825,22 +2825,27 @@ div[data-testid="stHorizontalBlock"]:has(.lb-controls-marker) label {
 def _render_hub_tabs():
     # key=ccnav_hub puts st-key-ccnav_hub on the container's stVerticalBlock; the
     # nav CSS keys off that instead of a hidden .nav-hub-anchor marker + :has().
+    # ENGINE | THE COUNT is public; the Betting pill is appended only for the
+    # admin, so a visitor is never shown a switch onto a locked door. The row's
+    # CSS selects columns as plain descendants with no nth-child anywhere, so it
+    # takes a third pill without changes.
+    _hubs = [("brownlow", "ENGINE"), ("count", "THE COUNT")]
+    if _is_admin:
+        _hubs.append(("betting", "Betting Hub"))
+
     with st.container(key="ccnav_hub"):
-        _hc1, _hc2 = st.columns(2)
-        with _hc1:
-            if st.button("Brownlow", key="pill_brownlow",
-                         type="primary" if _hub == "brownlow" else "secondary"):
-                st.session_state["active_hub"] = "brownlow"
-                if st.session_state.page in _BH_PAGES:
-                    st.session_state.page = "Leaderboard"
-                st.rerun()
-        with _hc2:
-            if st.button("Betting Hub", key="pill_betting",
-                         type="primary" if _hub == "betting" else "secondary"):
-                st.session_state["active_hub"] = "betting"
-                if st.session_state.page not in _BH_PAGES:
-                    st.session_state.page = "Performance"
-                st.rerun()
+        _hcols = st.columns(len(_hubs))
+        for _hcol, (_hid, _hlabel) in zip(_hcols, _hubs):
+            with _hcol:
+                if st.button(_hlabel, key=f"pill_{_hid}",
+                             type="primary" if _hub == _hid else "secondary"):
+                    st.session_state["active_hub"] = _hid
+                    # One reconciliation rule for every hub: if the page on
+                    # screen isn't in the hub being entered, fall to that hub's
+                    # default. Replaces the two hand-written per-pill variants.
+                    if st.session_state.page not in _HUB_PAGES[_hid]:
+                        st.session_state.page = _HUB_DEFAULT[_hid]
+                    st.rerun()
 
 def _render_page_nav():
     # key=ccnav_page puts st-key-ccnav_page on the container's stVerticalBlock
@@ -2858,14 +2863,18 @@ def _render_page_nav():
                     st.rerun()
 
 if _page != 'Landing':
-    # The hub pill is admin-only: every _BH_PAGES page is gated on the admin
-    # check anyway, so for anyone else it is a switch onto a locked door. It
-    # stays its OWN row rather than folding into the banner — st.columns wrap is
-    # not ours to drive, and a pill squeezed into row 1 would clip before it
-    # wrapped. Admin sees three rows, everyone else two.
-    if _is_admin:
-        _render_hub_tabs()
-    _render_page_nav()
+    # The hub row is public now — it carries ENGINE | THE COUNT for everyone,
+    # and _render_hub_tabs appends the Betting pill only for the admin, so a
+    # visitor still never sees a switch onto a locked door. It stays its OWN row
+    # rather than folding into the banner — st.columns wrap is not ours to
+    # drive, and a pill squeezed into row 1 would clip before it wrapped.
+    _render_hub_tabs()
+    # A one-page hub needs no strip: st.columns(1) would draw a single
+    # full-width button repeating the hub label directly above it. The Count is
+    # that case today; the guard is written on the length rather than the hub id
+    # so it holds if the lists change.
+    if len(_snav_pages) > 1:
+        _render_page_nav()
 
 # ── Controls row (season + odds timestamp) ──────────────────
 # Only show controls for Brownlow pages, not Betting Hub or Landing
