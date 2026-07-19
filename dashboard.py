@@ -3214,7 +3214,10 @@ html,body{background:transparent;height:110px;overflow:hidden;font-family:'IBM P
 .label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#7e8c99;}
 .value{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:28px;color:#e9eef3;letter-spacing:.02em;}
 .value.leader{color:#34d399;}
-.lockblur{color:#f0b429;filter:blur(5px);user-select:none;}
+/* Gold, like the Live Tracker's own +N CLEAR stat — the same number, named the
+   same way, so the strip and the tracker agree. (This replaces .lockblur, which
+   blurred a fake Betting P&L figure behind a padlock.) */
+.value.clear{color:#f0b429;}
 /* Phone: repeat(4,1fr) is minmax(auto,1fr), so the tracks could not shrink
    below min-content and never wrapped — the leader cell alone wants ~245px
    (28px mono name + 60px padding) against ~97px available at 390px. The
@@ -3235,7 +3238,7 @@ html,body{background:transparent;height:110px;overflow:hidden;font-family:'IBM P
   <div class="cell"><div class="label">Round</div><div class="value">__ROUND__</div></div>
   <div class="cell"><div class="label">Current Leader</div><div class="value leader">__LEADER__</div></div>
   <div class="cell"><div class="label">Predicted Votes</div><div class="value" id="votes">0.0</div></div>
-  <div class="cell"><div class="label">Betting P&amp;L</div><div class="value"><span class="lockblur">+&ndash;&ndash;.&ndash;&ndash;u</span></div></div>
+  <div class="cell"><div class="label">Votes Clear</div><div class="value clear">__LEAD__</div></div>
 </div>
 <script>
 var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -3263,6 +3266,9 @@ animate(document.getElementById('votes'), votesTarget, function(v){ return v.toF
         .replace("__ROUND__", str(_land_round))
         .replace("__LEADER__", str(_land_leader))
         .replace("__VOTES__", f"{_land_votes:.4f}")
+        # Already formatted ("+7.5", or an em dash when there is no runner-up),
+        # so it is substituted as-is rather than animated like __VOTES__.
+        .replace("__LEAD__", str(_land_lead))
     )
     # height='content', not 110: the phone breakpoint above lets the strip grow
     # to two rows, and a fixed height would clip it exactly as before. Verified
@@ -3299,7 +3305,6 @@ animate(document.getElementById('votes'), votesTarget, function(v){ return v.toF
   <div class="dest-data-row">
     <div><span class="dr-label">Brownlow Night</span><span class="dr-value">Sept 21</span></div>
     <div><span class="dr-label">Countdown</span><span class="dr-value" style="color:var(--gold)">{_land_countdown}</span></div>
-    <div><span class="dr-label">Lead</span><span class="dr-value">{_land_lead}</span></div>
   </div>
 </div>""", unsafe_allow_html=True)
             if st.button("Open Live Tracker", key="land_bh"):
