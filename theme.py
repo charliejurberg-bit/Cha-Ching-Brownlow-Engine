@@ -11,6 +11,29 @@ betting_hub.py can both import it without a circular dependency.
 import streamlit as st
 
 
+# Render-time Plotly config, passed at every st.plotly_chart call site.
+#
+# It lives here because theme.py is the one module BOTH dashboard.py and
+# betting_hub.py already import — they each carry their own apply_chart_theme,
+# so this is the only shared place a single definition can sit.
+#
+# It cannot be applied centrally the way the axis lock in apply_chart_theme is:
+# `config` is a per-call keyword on st.plotly_chart with no app-wide equivalent
+# (keyword-only, default None — checked on 1.57 local and 1.59.2 Cloud). So the
+# constant is the single source of truth and each site passes it by name.
+#
+#   scrollZoom  — the wheel/pinch zoom that hijacks a mobile scroll
+#   doubleClick — double-tap autoscale, easy to trigger by accident on touch
+#   displayModeBar — the hover toolbar, noise on a phone
+#
+# NOT staticPlot: that would disable hover, which these charts read out through.
+PLOTLY_TOUCH_CONFIG = {
+    "displayModeBar": False,
+    "scrollZoom": False,
+    "doubleClick": False,
+}
+
+
 def inject_global_theme():
     st.markdown("""
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">

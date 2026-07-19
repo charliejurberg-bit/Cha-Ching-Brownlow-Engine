@@ -11,7 +11,7 @@ import plotly.graph_objects as go
 import os, json, uuid, time, requests, re, hmac
 from datetime import datetime, timedelta, date
 from io import StringIO, BytesIO
-from theme import inject_global_theme
+from theme import inject_global_theme, PLOTLY_TOUCH_CONFIG
 
 # ── Constants ──────────────────────────────────────────────────────────────────
 
@@ -1797,7 +1797,7 @@ def render_bh_dashboard():
                                  height=260, margin=dict(l=48, r=12, t=10, b=30))
         _bh_pl_fig.update_xaxes(tickfont=dict(family='IBM Plex Mono, monospace', color='#7e8c99', size=11))
         _bh_pl_fig.update_yaxes(tickfont=dict(family='IBM Plex Mono, monospace', color='#7e8c99', size=11))
-        st.plotly_chart(_bh_pl_fig, use_container_width=True, key='bh_pl_chart')
+        st.plotly_chart(_bh_pl_fig, use_container_width=True, key='bh_pl_chart', config=PLOTLY_TOUCH_CONFIG)
 
     # ── 3. Metadata strip (hit rate · avg odds · avg stake · streak) ──────────
     def _strip_cell(value, sub, first=False, value_color='#e9eef3'):
@@ -3022,7 +3022,7 @@ def render_trends_analysis():
         fig.update_layout(margin=dict(l=10, r=64, t=8, b=24))
         fig.update_yaxes(automargin=True)
         fig.update_xaxes(automargin=True)
-        st.plotly_chart(fig, use_container_width=True, key='tr_mkt_roi')
+        st.plotly_chart(fig, use_container_width=True, key='tr_mkt_roi', config=PLOTLY_TOUCH_CONFIG)
     else:
         st.markdown(_empty, unsafe_allow_html=True)
 
@@ -3054,7 +3054,7 @@ def render_trends_analysis():
             )
             fig.update_layout(height=260)
             fig = apply_chart_theme(fig)
-            st.plotly_chart(fig, use_container_width=True, key='tr_bk_hit')
+            st.plotly_chart(fig, use_container_width=True, key='tr_bk_hit', config=PLOTLY_TOUCH_CONFIG)
         else:
             st.markdown(_empty, unsafe_allow_html=True)
 
@@ -3085,7 +3085,7 @@ def render_trends_analysis():
             )
             fig.update_layout(height=260)
             fig = apply_chart_theme(fig)
-            st.plotly_chart(fig, use_container_width=True, key='tr_ods_roi')
+            st.plotly_chart(fig, use_container_width=True, key='tr_ods_roi', config=PLOTLY_TOUCH_CONFIG)
         else:
             st.markdown(_empty, unsafe_allow_html=True)
 
@@ -3106,7 +3106,7 @@ def render_trends_analysis():
         )
         fig.update_layout(height=300)
         fig = apply_chart_theme(fig)
-        st.plotly_chart(fig, use_container_width=True, key='tr_monthly')
+        st.plotly_chart(fig, use_container_width=True, key='tr_monthly', config=PLOTLY_TOUCH_CONFIG)
     else:
         st.markdown(_empty, unsafe_allow_html=True)
 
@@ -3132,7 +3132,7 @@ def render_trends_analysis():
             )
             fig.update_layout(height=280)
             fig = apply_chart_theme(fig)
-            st.plotly_chart(fig, use_container_width=True, key='tr_cc_hit')
+            st.plotly_chart(fig, use_container_width=True, key='tr_cc_hit', config=PLOTLY_TOUCH_CONFIG)
         with rc2:
             fig = _bar_chart(
                 ['Cha Ching', 'Non-CC'], [cc_roi, non_roi],
@@ -3141,7 +3141,7 @@ def render_trends_analysis():
             )
             fig.update_layout(height=280)
             fig = apply_chart_theme(fig)
-            st.plotly_chart(fig, use_container_width=True, key='tr_cc_roi')
+            st.plotly_chart(fig, use_container_width=True, key='tr_cc_roi', config=PLOTLY_TOUCH_CONFIG)
 
 
 # ── Public dispatch ────────────────────────────────────────────────────────────

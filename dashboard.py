@@ -14,7 +14,7 @@ import subprocess
 import sys
 import betting_hub
 import user_auth
-from theme import inject_global_theme
+from theme import inject_global_theme, PLOTLY_TOUCH_CONFIG
 from brownlow_medallists import get_medallists
 
 st.set_page_config(page_title="Cha Ching | AFL Brownlow Medal Predictor", page_icon="assets/favicon.png", layout="wide", initial_sidebar_state="collapsed")
@@ -4171,7 +4171,7 @@ if _page == 'Player Profile':
                 fig = apply_chart_theme(fig)
                 fig.update_xaxes(tickfont=dict(family="IBM Plex Mono, monospace", color="#7e8c99", size=11))
                 fig.update_yaxes(tickfont=dict(family="IBM Plex Mono, monospace", color="#7e8c99", size=11))
-                st.plotly_chart(fig, width='stretch', key="chart_003")
+                st.plotly_chart(fig, width='stretch', key="chart_003", config=PLOTLY_TOUCH_CONFIG)
 
                 st.markdown(
                     '<div style="font-family:\'IBM Plex Mono\',monospace;font-size:11px;'
@@ -4225,7 +4225,7 @@ if _page == 'Player Profile':
                 fig2 = apply_chart_theme(fig2)
                 fig2.update_xaxes(tickfont=dict(family="IBM Plex Mono, monospace", color="#7e8c99", size=11))
                 fig2.update_yaxes(tickfont=dict(family="IBM Plex Mono, monospace", color="#7e8c99", size=11))
-                st.plotly_chart(fig2, width='stretch', key="chart_004")
+                st.plotly_chart(fig2, width='stretch', key="chart_004", config=PLOTLY_TOUCH_CONFIG)
 
                 st.markdown('<div class="section-header">Game Log</div>', unsafe_allow_html=True)
                 log = player_games.copy()
@@ -4660,7 +4660,7 @@ if _page == 'Player Profile':
                             legend=dict(orientation='h', y=1.1),
                             margin=dict(t=20, b=40), height=300, hovermode='x unified',
                         )
-                        st.plotly_chart(_fig_cmp, width='stretch', key="chart_020")
+                        st.plotly_chart(_fig_cmp, width='stretch', key="chart_020", config=PLOTLY_TOUCH_CONFIG)
 
                     # ── Market edge ──
                     # Model probability = each player's share of the pair's expected
@@ -5549,7 +5549,7 @@ def _render_stat_filter():
                     legend=dict(orientation='h', y=1.14),
                     margin=dict(t=20, b=40), height=320, hovermode='x unified',
                 )
-                st.plotly_chart(fig_sweep, width='stretch', key="sf_sweep_chart")
+                st.plotly_chart(fig_sweep, width='stretch', key="sf_sweep_chart", config=PLOTLY_TOUCH_CONFIG)
             else:
                 st.markdown('<div style="color:#7e8c99;font-size:13px;margin:8px 0">'
                             'Not enough games to draw a threshold curve.</div>',
@@ -7306,7 +7306,7 @@ if _page == 'Model Comparison':
             )
             fig_scatter.update_xaxes(tickfont=dict(family="IBM Plex Mono, monospace", color="#7e8c99", size=11))
             fig_scatter.update_yaxes(tickfont=dict(family="IBM Plex Mono, monospace", color="#7e8c99", size=11))
-            st.plotly_chart(fig_scatter, width='stretch', key='pred_actual_scatter_insights')
+            st.plotly_chart(fig_scatter, width='stretch', key='pred_actual_scatter_insights', config=PLOTLY_TOUCH_CONFIG)
             st.caption('Gold = actual winner · emerald = other top-10 predicted · dashed line = perfect prediction')
 
             # ── 4. Feature importance ──
@@ -7353,11 +7353,13 @@ if _page == 'Model Comparison':
                 _show_all = st.toggle("All features", value=False, key="show_all_feats_insights")
                 if not _show_all:
                     st.plotly_chart(_imp_bar_fig(_imp_sorted.head(15)), width='stretch',
-                                    key="feat_top15_insights")
+                                    key="feat_top15_insights",
+                                    config=PLOTLY_TOUCH_CONFIG)
                 else:
                     _n_bars = 25
                     st.plotly_chart(_imp_bar_fig(_imp_sorted.head(_n_bars)), width='stretch',
-                                    key="feat_all_insights")
+                                    key="feat_all_insights",
+                                    config=PLOTLY_TOUCH_CONFIG)
                     _rest = _imp_sorted.iloc[_n_bars:].reset_index(drop=True)
                     if not _rest.empty:
                         _cells = ''
