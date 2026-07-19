@@ -772,6 +772,33 @@ st.markdown("""
         padding: 0 !important;
     }
 
+    /* Compare tab — H2H round ledger reflow.
+       The desktop grid is an INLINE style on each generated row
+       (_H2H_GRID: 46px 1fr 88px 88px 150px + 4x12px gaps), whose fixed tracks
+       alone come to 420px — wider than a phone before any text. Inline styles
+       sit above every stylesheet rule in the cascade, so !important is the only
+       way to override them from here. That is normally a smell; it is
+       acceptable because the reach is exactly one generated class and the
+       desktop base stays where it is authored, next to the markup it sizes.
+       Four columns below the breakpoint: the class chip moves to a second line
+       spanning the full row, so p(poll) figures keep their own columns. */
+    @media (max-width: 700px) {
+        .stApp .h2h-lrow {
+            grid-template-columns: 38px 1fr 64px 64px !important;
+            gap: 8px !important;
+        }
+        .stApp .h2h-lrow > :nth-child(5) {
+            grid-column: 1 / -1 !important;
+            justify-self: start !important;
+            text-align: left !important;
+            margin-top: 2px !important;
+        }
+        /* The head row's fifth cell is the "Class" label — redundant once the
+           chip sits on its own line, and it would otherwise leave a stray
+           heading with nothing under it. */
+        .stApp .h2h-lhead > :nth-child(5) { display: none !important; }
+    }
+
     /* The account group: chip immediately left of the button, hard right.
        st.container(key=...) stamps the class on the stVerticalBlock ITSELF, so
        this node is the flex container — no descendant hop needed. A column
@@ -5007,7 +5034,7 @@ if _page == 'Player Profile':
                                 )
 
                             st.markdown(
-                                '<div style="display:flex;gap:18px;margin:14px 0 18px">'
+                                '<div style="display:flex;flex-wrap:wrap;gap:18px;margin:14px 0 18px">'
                                 + _h2h_fig(f'Projected · {_h2h_s1}', f"{_h2h_e1:.1f}", '#34d399')
                                 + _h2h_fig('Projected margin',
                                            f"{'+' if _h2h_marg >= 0 else '−'}{abs(_h2h_marg):.1f}", '#f0b429')
@@ -5071,7 +5098,7 @@ if _page == 'Player Profile':
                             def _h2h_row_html(rec):
                                 _chip = _h2h_chip_style(rec)
                                 return (
-                                    f'<div style="{_H2H_GRID};padding:9px 0;'
+                                    f'<div class="h2h-lrow" style="{_H2H_GRID};padding:9px 0;'
                                     'border-bottom:1px solid rgba(233,238,243,0.06)">'
                                     '<span style="font-family:\'DM Mono\',monospace;font-size:12px;'
                                     f'color:var(--muted)">R{_display_round(rec["rn"], selected_season)}</span>'
@@ -5086,7 +5113,7 @@ if _page == 'Player Profile':
                                 )
 
                             _h2h_head = (
-                                f'<div style="{_H2H_GRID};padding:0 0 7px;'
+                                f'<div class="h2h-lrow h2h-lhead" style="{_H2H_GRID};padding:0 0 7px;'
                                 'border-bottom:1px solid var(--line);font-size:9.5px;font-weight:700;'
                                 'letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">'
                                 '<span>Rd</span><span>Matchup</span>'
