@@ -2790,9 +2790,12 @@ div[data-testid="stHorizontalBlock"]:has(.lb-controls-marker) label {
     font-weight: 700 !important;
 }
 .st-key-land_bh button:hover { filter: brightness(1.08); }
-/* Private padlock sits inline to the right of the Open Betting Hub button */
-.st-key-land_bh { display: flex !important; align-items: center !important; gap: 10px !important; }
-.st-key-land_bh::after { content: "🔒"; font-size: 16px; margin-top: 16px; line-height: 1; }
+/* The padlock that sat to the right of this button is gone with the card it
+   belonged to: land_bh now opens the public Personalised Tracker, not the
+   private Betting Hub, so a lock would advertise a gate that isn't there. The
+   flex row it needed went with it. The KEY is deliberately still land_bh —
+   ten rules above target it, and renaming for tidiness would churn every one
+   of them for no behavioural gain. */
 
 </style>
 """.replace("__ICON_CSS__", _nav_icon_css)
@@ -2965,6 +2968,23 @@ if _page == 'Landing':
             _land_odds = f"${float(_lo_row.iloc[0]['best_odds']):.1f}"
 
     _land_round = _display_round(max_season_rounds, 2026)
+
+    # Countdown to the 2026 count. Computed at render, so it needs no upkeep and
+    # cannot go stale between deploys. Local import matches the house style for
+    # datetime in this file (see _file_ts and the odds-year helper).
+    import datetime as _dt_land
+    _BROWNLOW_NIGHT = _dt_land.date(2026, 9, 21)
+    _land_days = (_BROWNLOW_NIGHT - _dt_land.date.today()).days
+    if _land_days > 1:
+        _land_countdown = f"{_land_days} days"
+    elif _land_days == 1:
+        _land_countdown = "1 day"
+    elif _land_days == 0:
+        _land_countdown = "Tonight"
+    else:
+        # Past the count: no countdown to show, and "-3 days" would be worse
+        # than saying nothing.
+        _land_countdown = "—"
 
     # Latest round's predicted 3-2-1 vote read
     _TEAM_ABBR = {
@@ -3274,17 +3294,17 @@ animate(document.getElementById('votes'), votesTarget, function(v){ return v.toF
             st.markdown(f"""
 <div class="dest-content">
   <span class="dest-tag bh">Live Tracking</span>
-  <h2>Betting Hub</h2>
-  <div class="dest-desc">Track bets, log P&amp;L, flag Cha Ching tips and analyse hit rates and ROI across markets.</div>
+  <h2>Personalised Tracker</h2>
+  <div class="dest-desc">Follow the count your way &mdash; track head-to-heads, build a watchlist, and watch your calls settle live as the votes are read.</div>
   <div class="dest-data-row">
-    <div><span class="dr-label">Season</span><span class="dr-value" style="filter:blur(5px);user-select:none">&ndash;&ndash; bets</span></div>
-    <div><span class="dr-label">P&amp;L</span><span class="dr-value" style="color:var(--gold);filter:blur(5px);user-select:none">+&ndash;&ndash;.&ndash;&ndash;u</span></div>
-    <div><span class="dr-label">Fade Hit Rate</span><span class="dr-value" style="filter:blur(5px);user-select:none">&ndash;/&ndash;</span></div>
+    <div><span class="dr-label">Brownlow Night</span><span class="dr-value">Sept 21</span></div>
+    <div><span class="dr-label">Countdown</span><span class="dr-value" style="color:var(--gold)">{_land_countdown}</span></div>
+    <div><span class="dr-label">Lead</span><span class="dr-value">{_land_lead}</span></div>
   </div>
 </div>""", unsafe_allow_html=True)
-            if st.button("Open Betting Hub", key="land_bh"):
-                st.session_state["active_hub"] = "betting"
-                st.session_state.page = 'Performance'
+            if st.button("Open Live Tracker", key="land_bh"):
+                st.session_state["active_hub"] = "brownlow"
+                st.session_state.page = 'Live Tracker'
                 st.rerun()
 
 # ════════════════════════════════════════════════════════════
