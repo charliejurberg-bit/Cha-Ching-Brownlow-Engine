@@ -3831,6 +3831,14 @@ SCOPE .lb-bar-lo{text-align:right;}
     if is_2026 and _fg:
         st.caption("Form (last 3 rounds): emerald = predicted to poll (≥30%) · grey = quiet · faint = did not play")
 
+# ── H2H votes (Compare tab) ──────────────────────────────────
+# Poll_Prob at or above which a player counts as "likely to poll" in a round.
+# 0.35 sits just above the Form-guide dot threshold (0.30) so the ledger flags
+# genuine swing rounds rather than every mildly live game.
+H2H_POLL_LIKELY = 0.35
+# Rounds shown in the ledger before the rest move into the "All rounds" expander.
+H2H_LEDGER_ROWS = 8
+
 # ════════════════════════════════════════════════════════════
 # PLAYER PROFILE
 # ════════════════════════════════════════════════════════════
@@ -4594,6 +4602,260 @@ if _page == 'Player Profile':
                         '</div>',
                         unsafe_allow_html=True,
                     )
+
+                    # ── H2H votes ─────────────────────────────────────
+                    # Season-only: the career frame has no P_1/P_2/P_3, so this
+                    # sits inside the non-career branch and is column-guarded.
+                    _h2h_need = ('Round_num', 'P_1', 'P_2', 'P_3', 'Poll_Prob', 'Exp_Votes')
+                    if all(_c in game_df.columns for _c in _h2h_need):
+
+                        def _h2h_rounds(g):
+                            """Round_num -> row. DNP/bye rounds are absent rows upstream,
+                            so a missing key IS the did-not-play signal."""
+                            _out = {}
+                            for _, _r in g.iterrows():
+                                try:
+                                    _out[int(_r['Round_num'])] = _r
+                                except (TypeError, ValueError):
+                                    continue
+                            return _out
+
+                        _h2h_r1, _h2h_r2 = _h2h_rounds(_cg1), _h2h_rounds(_cg2)
+                        _h2h_axis = sorted(set(_h2h_r1) | set(_h2h_r2))
+
+                        if _h2h_axis:
+                            def _h2h_num(row, col):
+                                if row is None:
+                                    return 0.0
+                                _x = row.get(col)
+                                return float(_x) if pd.notna(_x) else 0.0
+
+                            def _h2h_pmf(row):
+                                """Vote pmf over {0,1,2,3}. An absent round is a certain 0."""
+                                if row is None:
+                                    return np.array([1.0, 0.0, 0.0, 0.0])
+                                _p1 = _h2h_num(row, 'P_1')
+                                _p2 = _h2h_num(row, 'P_2')
+                                _p3 = _h2h_num(row, 'P_3')
+                                return np.array([max(0.0, 1.0 - _p1 - _p2 - _p3), _p1, _p2, _p3])
+
+                            def _h2h_total_dist(rmap):
+                                """Exact season-total distribution: convolve the per-round pmfs.
+                                No simulation — 3 votes x ~23 rounds is a tiny support."""
+                                _d = np.array([1.0])
+                                for _rn in _h2h_axis:
+                                    _d = np.convolve(_d, _h2h_pmf(rmap.get(_rn)))
+                                return _d
+
+                            _h2h_d1 = _h2h_total_dist(_h2h_r1)
+                            _h2h_d2 = _h2h_total_dist(_h2h_r2)
+
+                            # Joint over (P1 total, P2 total) assuming independence. This is a
+                            # v1 approximation: in rounds where both play the SAME game the two
+                            # totals are negatively coupled (the 3/2/1 votes on offer are shared,
+                            # so both cannot take 3), which independence slightly over-disperses.
+                            # Those rounds are flagged SAME GAME in the ledger below.
+                            _h2h_m = np.outer(_h2h_d1, _h2h_d2)
+                            _h2h_w1 = float(np.tril(_h2h_m, -1).sum())   # P1 total > P2 total
+                            _h2h_tie = float(np.trace(_h2h_m))
+                            _h2h_w2 = float(np.triu(_h2h_m, 1).sum())
+
+                            _h2h_e1 = sum(_h2h_num(_h2h_r1.get(_rn), 'Exp_Votes') for _rn in _h2h_axis)
+                            _h2h_e2 = sum(_h2h_num(_h2h_r2.get(_rn), 'Exp_Votes') for _rn in _h2h_axis)
+                            _h2h_marg = _h2h_e1 - _h2h_e2
+
+                            # Full team name -> abbreviation, straight off the frame.
+                            _h2h_abbr = {}
+                            if 'Playing.for' in game_df.columns and 'Team' in game_df.columns:
+                                for _f, _a in zip(game_df['Playing.for'], game_df['Team']):
+                                    if pd.notna(_f) and pd.notna(_a):
+                                        _h2h_abbr.setdefault(str(_f), str(_a))
+
+                            def _h2h_short(name):
+                                """Surname for chips — strips any '(Team)' disambiguation suffix."""
+                                _n = str(name).split(' (')[0].strip()
+                                return _n.split()[-1] if _n else str(name)
+
+                            def _h2h_opp(row):
+                                """Opponent abbreviation, from Home.team/Away.team + Home.Away."""
+                                if row is None:
+                                    return None
+                                _ha = str(row.get('Home.Away') or '').strip().lower()
+                                _side = row.get('Away.team') if _ha == 'home' else row.get('Home.team')
+                                if pd.isna(_side):
+                                    return None
+                                return _h2h_abbr.get(str(_side), str(_side))
+
+                            def _h2h_fixture(row):
+                                """The whole fixture, abbreviated — used for shared-game rounds."""
+                                if row is None:
+                                    return '—'
+                                _h, _a = row.get('Home.team'), row.get('Away.team')
+                                if pd.isna(_h) or pd.isna(_a):
+                                    return '—'
+                                return (f"{_h2h_abbr.get(str(_h), str(_h))} v "
+                                        f"{_h2h_abbr.get(str(_a), str(_a))}")
+
+                            _h2h_s1, _h2h_s2 = _h2h_short(_cp1), _h2h_short(_cp2)
+                            _h2h_recs = []
+                            for _rn in _h2h_axis:
+                                _row1, _row2 = _h2h_r1.get(_rn), _h2h_r2.get(_rn)
+                                _dnp1, _dnp2 = _row1 is None, _row2 is None
+                                _pp1 = None if _dnp1 else _h2h_num(_row1, 'Poll_Prob')
+                                _pp2 = None if _dnp2 else _h2h_num(_row2, 'Poll_Prob')
+                                _g1 = None if _dnp1 else _row1.get('Game_ID')
+                                _g2 = None if _dnp2 else _row2.get('Game_ID')
+                                _same = (not _dnp1 and not _dnp2 and pd.notna(_g1)
+                                         and pd.notna(_g2) and _g1 == _g2)
+
+                                _hot1 = (_pp1 is not None and _pp1 >= H2H_POLL_LIKELY)
+                                _hot2 = (_pp2 is not None and _pp2 >= H2H_POLL_LIKELY)
+                                if _same:
+                                    _cls, _matchup = 'SAME GAME', _h2h_fixture(_row1)
+                                else:
+                                    if _dnp1 or _dnp2:
+                                        _live = _hot2 if _dnp1 else _hot1
+                                        _who = _h2h_s2 if _dnp1 else _h2h_s1
+                                        _cls = f'FREE &rarr; {_who}' if _live else 'DEAD'
+                                    elif _hot1 and _hot2:
+                                        _cls = 'CONTESTED'
+                                    elif _hot1:
+                                        _cls = f'SWING &rarr; {_h2h_s1}'
+                                    elif _hot2:
+                                        _cls = f'SWING &rarr; {_h2h_s2}'
+                                    else:
+                                        _cls = 'DEAD'
+                                    _o1, _o2 = _h2h_opp(_row1), _h2h_opp(_row2)
+                                    _parts = [f"v {_o}" for _o in (_o1, _o2) if _o]
+                                    _matchup = ' / '.join(_parts) if _parts else '—'
+
+                                _h2h_recs.append({
+                                    'rn': _rn, 'matchup': _matchup, 'cls': _cls,
+                                    'pp1': _pp1, 'pp2': _pp2,
+                                    # Swing impact: how lopsided the round is between the two.
+                                    'impact': abs((_pp1 or 0.0) - (_pp2 or 0.0)),
+                                })
+
+                            _h2h_recs.sort(key=lambda _r: _r['impact'], reverse=True)
+
+                            # ── chrome ──
+                            _h2h_last = _display_round(max(_h2h_axis), selected_season)
+
+                            def _h2h_fig(label, value, colour):
+                                return (
+                                    '<div style="flex:1">'
+                                    '<div style="font-size:10px;font-weight:700;letter-spacing:1.5px;'
+                                    'text-transform:uppercase;color:var(--muted)">'
+                                    f'{label}</div>'
+                                    '<div style="font-family:\'DM Mono\',monospace;font-size:26px;'
+                                    f'font-weight:500;color:{colour};margin-top:4px">{value}</div></div>'
+                                )
+
+                            _h2h_pct = lambda _v: f"{_v * 100:.0f}%"
+                            st.markdown(
+                                _cmp_header('Head to head votes')
+                                + '<div style="display:flex;align-items:baseline;justify-content:space-between;'
+                                  'margin:-4px 0 14px">'
+                                  '<div style="font-family:\'DM Mono\',monospace;font-size:11px;'
+                                  'letter-spacing:1.5px;text-transform:uppercase;color:var(--muted)">'
+                                  f'Through round {_h2h_last}</div></div>'
+                                + '<div style="display:flex;gap:18px;margin-bottom:18px">'
+                                + _h2h_fig(f'Projected · {_h2h_s1}', f"{_h2h_e1:.1f}", '#34d399')
+                                + _h2h_fig('Projected margin',
+                                           f"{'+' if _h2h_marg >= 0 else '−'}{abs(_h2h_marg):.1f}", '#f0b429')
+                                + _h2h_fig(f'Projected · {_h2h_s2}', f"{_h2h_e2:.1f}", '#e9eef3')
+                                + '</div>'
+                                # Win-probability bar. The P2 segment is a dark MT fill, so the
+                                # track carries a hairline to keep it legible on --surface.
+                                + '<div style="display:flex;height:10px;border-radius:5px;overflow:hidden;'
+                                  'border:1px solid var(--line)">'
+                                + f'<div style="width:{_h2h_w1 * 100:.2f}%;background:#34d399"></div>'
+                                + f'<div style="width:{_h2h_tie * 100:.2f}%;background:#5a6b7a"></div>'
+                                + f'<div style="width:{_h2h_w2 * 100:.2f}%;background:#1a2632"></div>'
+                                + '</div>'
+                                + '<div style="display:flex;justify-content:space-between;'
+                                  'font-family:\'DM Mono\',monospace;font-size:11px;margin-top:7px">'
+                                + f'<span style="color:#34d399">{_h2h_s1} {_h2h_pct(_h2h_w1)}</span>'
+                                + f'<span style="color:#5a6b7a">TIE {_h2h_pct(_h2h_tie)}</span>'
+                                + f'<span style="color:#e9eef3">{_h2h_s2} {_h2h_pct(_h2h_w2)}</span>'
+                                + '</div>',
+                                unsafe_allow_html=True,
+                            )
+
+                            # ── round ledger ──
+                            _H2H_CHIP = {
+                                'SAME GAME': 'background:#3d3110;color:#f0b429',
+                                'SWING1':    'background:#0f3d31;color:#34d399',
+                                'SWING2':    'background:var(--surface);color:#e9eef3;'
+                                             'box-shadow:inset 0 0 0 1px var(--line)',
+                                'FREE1':     'background:#0f3d31;color:#34d399',
+                                'FREE2':     'background:#0f3d31;color:#34d399',
+                                # Not in the brief's chip set — both players live in separate
+                                # games needs its own read, and gold/emerald are taken. Steel
+                                # keeps it inside the MT palette and out of the colour law.
+                                'CONTESTED': 'background:rgba(159,176,191,.10);color:#9fb0bf',
+                                'DEAD':      'background:var(--surface);color:#5a6b7a',
+                            }
+
+                            def _h2h_chip_key(cls):
+                                if cls.startswith('SWING'):
+                                    return 'SWING1' if cls.endswith(_h2h_s1) else 'SWING2'
+                                if cls.startswith('FREE'):
+                                    return 'FREE1' if cls.endswith(_h2h_s1) else 'FREE2'
+                                return cls
+
+                            _H2H_GRID = ('display:grid;grid-template-columns:46px 1fr 88px 88px 150px;'
+                                         'gap:12px;align-items:center')
+
+                            def _h2h_pp_cell(val, is_p1):
+                                if val is None:
+                                    return ('<span style="font-family:\'DM Mono\',monospace;font-size:13px;'
+                                            'color:#5a6b7a">DNP</span>')
+                                _hot = val >= H2H_POLL_LIKELY
+                                _c = ('#34d399' if is_p1 else '#e9eef3') if _hot else '#5a6b7a'
+                                return ('<span style="font-family:\'DM Mono\',monospace;font-size:13px;'
+                                        f'color:{_c}">{val:.2f}</span>')
+
+                            def _h2h_row_html(rec):
+                                _chip = _H2H_CHIP.get(_h2h_chip_key(rec['cls']), _H2H_CHIP['DEAD'])
+                                return (
+                                    f'<div style="{_H2H_GRID};padding:9px 0;'
+                                    'border-bottom:1px solid rgba(233,238,243,0.06)">'
+                                    '<span style="font-family:\'DM Mono\',monospace;font-size:12px;'
+                                    f'color:var(--muted)">R{_display_round(rec["rn"], selected_season)}</span>'
+                                    '<span style="font-family:\'Sora\',sans-serif;font-size:12px;'
+                                    f'color:var(--text)">{rec["matchup"]}</span>'
+                                    + _h2h_pp_cell(rec['pp1'], True)
+                                    + _h2h_pp_cell(rec['pp2'], False)
+                                    + '<span style="font-family:\'DM Mono\',monospace;font-size:9.5px;'
+                                      'font-weight:500;letter-spacing:.06em;padding:3px 9px;border-radius:10px;'
+                                      f'text-align:center;{_chip}">{rec["cls"]}</span>'
+                                    '</div>'
+                                )
+
+                            _h2h_head = (
+                                f'<div style="{_H2H_GRID};padding:0 0 7px;'
+                                'border-bottom:1px solid var(--line);font-size:9.5px;font-weight:700;'
+                                'letter-spacing:.12em;text-transform:uppercase;color:var(--muted)">'
+                                '<span>Rd</span><span>Matchup</span>'
+                                f'<span>{_h2h_s1} p(poll)</span><span>{_h2h_s2} p(poll)</span>'
+                                '<span style="text-align:center">Class</span></div>'
+                            )
+
+                            st.markdown(
+                                _cmp_header('Round ledger')
+                                + _h2h_head
+                                + ''.join(_h2h_row_html(_r) for _r in _h2h_recs[:H2H_LEDGER_ROWS]),
+                                unsafe_allow_html=True,
+                            )
+                            _h2h_rest = _h2h_recs[H2H_LEDGER_ROWS:]
+                            if _h2h_rest:
+                                with st.expander("All rounds", expanded=False):
+                                    st.markdown(
+                                        _h2h_head
+                                        + ''.join(_h2h_row_html(_r) for _r in _h2h_rest),
+                                        unsafe_allow_html=True,
+                                    )
 
 # ════════════════════════════════════════════════════════════
 # GAME ANALYSIS
