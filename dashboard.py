@@ -4710,27 +4710,39 @@ if _page == 'Player Profile':
 
                                 _hot1 = (_pp1 is not None and _pp1 >= H2H_POLL_LIKELY)
                                 _hot2 = (_pp2 is not None and _pp2 >= H2H_POLL_LIKELY)
+                                # Each branch settles three things at once: the stable `kind`,
+                                # the beneficiary `owner` (1, 2 or None) and the display label.
+                                # Rendering reads kind/owner only — never the label — so two
+                                # players sharing a surname cannot misroute the colours.
                                 if _same:
+                                    _kind, _owner = 'SAME GAME', None
                                     _cls, _matchup = 'SAME GAME', _h2h_fixture(_row1)
                                 else:
                                     if _dnp1 or _dnp2:
                                         _live = _hot2 if _dnp1 else _hot1
                                         _who = _h2h_s2 if _dnp1 else _h2h_s1
-                                        _cls = f'FREE &rarr; {_who}' if _live else 'DEAD'
+                                        if _live:
+                                            _kind, _owner = 'FREE', (2 if _dnp1 else 1)
+                                            _cls = f'FREE &rarr; {_who}'
+                                        else:
+                                            _kind, _owner, _cls = 'DEAD', None, 'DEAD'
                                     elif _hot1 and _hot2:
-                                        _cls = 'CONTESTED'
+                                        _kind, _owner, _cls = 'CONTESTED', None, 'CONTESTED'
                                     elif _hot1:
+                                        _kind, _owner = 'SWING', 1
                                         _cls = f'SWING &rarr; {_h2h_s1}'
                                     elif _hot2:
+                                        _kind, _owner = 'SWING', 2
                                         _cls = f'SWING &rarr; {_h2h_s2}'
                                     else:
-                                        _cls = 'DEAD'
+                                        _kind, _owner, _cls = 'DEAD', None, 'DEAD'
                                     _o1, _o2 = _h2h_opp(_row1), _h2h_opp(_row2)
                                     _parts = [f"v {_o}" for _o in (_o1, _o2) if _o]
                                     _matchup = ' / '.join(_parts) if _parts else '—'
 
                                 _h2h_recs.append({
                                     'rn': _rn, 'matchup': _matchup, 'cls': _cls,
+                                    'kind': _kind, 'owner': _owner,
                                     'pp1': _pp1, 'pp2': _pp2,
                                     # Swing impact: how lopsided the round is between the two.
                                     'impact': abs((_pp1 or 0.0) - (_pp2 or 0.0)),
@@ -4785,8 +4797,9 @@ if _page == 'Player Profile':
                             # ── round ledger ──
                             _H2H_CHIP = {
                                 'SAME GAME': 'background:#3d3110;color:#f0b429',
-                                'SWING1':    'background:#0f3d31;color:#34d399',
-                                'SWING2':    'background:var(--surface);color:#e9eef3;'
+                                # Owned rounds (SWING or FREE) take the beneficiary's scheme.
+                                'OWNER1':    'background:#0f3d31;color:#34d399',
+                                'OWNER2':    'background:var(--surface);color:#e9eef3;'
                                              'box-shadow:inset 0 0 0 1px var(--line)',
                                 # Not in the brief's chip set — both players live in separate
                                 # games needs its own read, and gold/emerald are taken. Steel
@@ -4795,14 +4808,17 @@ if _page == 'Player Profile':
                                 'DEAD':      'background:var(--surface);color:#5a6b7a',
                             }
 
-                            def _h2h_chip_key(cls):
-                                # FREE inherits the beneficiary's SWING scheme: the chip says
-                                # "this round belongs to <player>", and which player that is
-                                # matters more than whether he got it by outpolling the other
-                                # or by the other not playing.
-                                if cls.startswith('SWING') or cls.startswith('FREE'):
-                                    return 'SWING1' if cls.endswith(_h2h_s1) else 'SWING2'
-                                return cls
+                            def _h2h_chip_style(rec):
+                                """Chip styling from the record's own kind/owner fields.
+
+                                Never inspects the label: two players sharing a surname
+                                (different people, so no '(Team)' suffix is added upstream)
+                                would make any name-matching on the label ambiguous."""
+                                if rec['kind'] == 'SAME GAME':
+                                    return _H2H_CHIP['SAME GAME']
+                                if rec['owner'] is not None:
+                                    return _H2H_CHIP['OWNER1' if rec['owner'] == 1 else 'OWNER2']
+                                return _H2H_CHIP.get(rec['kind'], _H2H_CHIP['DEAD'])
 
                             _H2H_GRID = ('display:grid;grid-template-columns:46px 1fr 88px 88px 150px;'
                                          'gap:12px;align-items:center')
@@ -4817,7 +4833,7 @@ if _page == 'Player Profile':
                                         f'color:{_c}">{val:.2f}</span>')
 
                             def _h2h_row_html(rec):
-                                _chip = _H2H_CHIP.get(_h2h_chip_key(rec['cls']), _H2H_CHIP['DEAD'])
+                                _chip = _h2h_chip_style(rec)
                                 return (
                                     f'<div style="{_H2H_GRID};padding:9px 0;'
                                     'border-bottom:1px solid rgba(233,238,243,0.06)">'
