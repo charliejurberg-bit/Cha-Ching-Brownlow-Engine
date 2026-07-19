@@ -5575,7 +5575,13 @@ def _render_stat_filter():
                 )
 
             st.markdown(
-                '<div style="display:grid;grid-template-columns:repeat(4,1fr);margin:18px 0 4px">' +
+                # auto-fit + minmax, not repeat(4,1fr): a 1fr track is minmax(auto,1fr)
+            # and cannot shrink below its own min-content, so four readouts with
+            # sub-captions ("vs 12.3% at zero") forced the page wider than a phone
+            # rather than wrapping. auto-fit reflows to 2x2 then a single column
+            # with no breakpoint to maintain.
+            '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));'
+            'margin:18px 0 4px">' +
                 _readout_cell('Matching games', f'{cur_games:,}', '#e9eef3',
                               f'≥ {active_val} {active_label.lower()}', first=True) +
                 _readout_cell('Poll rate', f'{cur_poll:.1f}%', '#34d399',
