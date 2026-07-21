@@ -584,17 +584,15 @@ st.markdown("""
     /* Collapse the leading gap above the banner: the global CSS/JS-injection
        element containers (style/link tags + the animated-counter iframe) are
        zero-height but each still adds a 16px flex gap in the outer
-       stVerticalBlock. Same fix as the landing page (.landing-top-anchor
-       rules), scoped to pages that render .cc-banner — landing never does. */
+       stVerticalBlock. Scoped to pages that render .cc-banner. */
     .stApp:has(.cc-banner) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > style:only-child),
     .stApp:has(.cc-banner) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > link:only-child),
     .stApp:has(.cc-banner) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > link:first-child + style:last-child),
     .stApp:has(.cc-banner) div[data-testid="stElementContainer"]:has(> iframe[srcdoc*="_ccAnimated"]) {
         display: none !important;
     }
-    /* Row 1: wordmark + round stamp. The oval/44px hero treatment lives on the
-       landing page only now — interior pages get this compact row so the page
-       itself starts near the top. */
+    /* Row 1: wordmark + round stamp. A compact row, so the page itself starts
+       near the top. */
     .cc-banner {
         display: flex;
         align-items: baseline;
@@ -2160,7 +2158,7 @@ if not AVAILABLE_SEASONS:
 DEFAULT_SEASON = AVAILABLE_SEASONS[0]
 if 'season_by_page' not in st.session_state:
     st.session_state.season_by_page = {}
-_season_page = st.session_state.get('page', 'Landing')
+_season_page = st.session_state.get('page', 'Leaderboard')
 selected_season = st.session_state.season_by_page.get(_season_page, DEFAULT_SEASON)
 # CAREER is a valid selection (offered only on Player Profile); anything else
 # unknown falls back to the default season.
@@ -2191,10 +2189,9 @@ max_season_rounds = int(game_df['Round_num'].max()) if game_df is not None and l
 if 'active_hub' not in st.session_state:
     st.session_state.active_hub = 'brownlow'
 if 'page' not in st.session_state:
-    st.session_state.page = 'Landing'
+    st.session_state.page = 'Leaderboard'
 
-if st.session_state.page != 'Landing':
-    render_banner()
+render_banner()
 
 # Membership here is what the password gate keys off (see the chokepoint below),
 # so a page leaves the gate by leaving this set. Polls a Vote did exactly that in
@@ -2294,8 +2291,8 @@ else:
 # The tabler-icons webfont the icon rules depend on is loaded as a pinned <link>
 # in inject_global_css — see _TABLER_HREF. __ICON_CSS__ is substituted rather
 # than injected as a second st.markdown on purpose: this block must stay a
-# single <style> in a single element container, because the landing/banner gap
-# rules find these injections via `stMarkdownContainer > style:only-child`.
+# single <style> in a single element container, because the banner gap rules
+# find these injections via `stMarkdownContainer > style:only-child`.
 st.markdown("""
 <style>
 /* ── Hub row container — keyed via st.container(key="ccnav_hub"). For a plain
@@ -2481,38 +2478,6 @@ __ICON_CSS__
     }
 }
 
-/* ════════════════════════════════════════════════════════════
-   LANDING PAGE
-   ════════════════════════════════════════════════════════════ */
-
-/* App background + block-container padding, scoped to landing */
-.stApp:has(.landing-top-anchor),
-.stApp:has(.landing-top-anchor) [data-testid="stAppViewContainer"] {
-    background: #0a1017 !important;
-}
-.stApp:has(.landing-top-anchor) .block-container {
-    padding-top: 0 !important;
-}
-
-/* Collapse leading gap above hero / ticker: the global CSS/JS-injection
-   element containers (style/link tags, the animated-counter iframe, and the
-   landing-top-anchor marker itself) are zero-height but each still adds a
-   16px flex `gap` in the outer stVerticalBlock. Removing them from layout
-   eliminates that stacked gap so the ticker sits flush at the top. */
-.stApp:has(.landing-top-anchor) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > style:only-child),
-.stApp:has(.landing-top-anchor) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > link:only-child),
-.stApp:has(.landing-top-anchor) div[data-testid="stElementContainer"]:has(div[data-testid="stMarkdownContainer"] > div.landing-top-anchor:only-child),
-.stApp:has(.landing-top-anchor) div[data-testid="stElementContainer"]:has(> iframe[srcdoc*="_ccAnimated"]) {
-    display: none !important;
-}
-
-/* Ticker bar: kill the top gap and go full-bleed (landing only) */
-.stApp:has(.landing-top-anchor) header[data-testid="stHeader"] {
-    display: none !important;
-}
-.stApp:has(.landing-top-anchor) div[data-testid="stMainBlockContainer"] {
-    padding-top: 0 !important;
-}
 /* Ticker bar — keyed via st.container(key="cc_ticker"); .st-key-cc_ticker is the
    block. .stApp prefix is a specificity bump (see the nav block): the old
    marker :has():not(:has()) idiom scored ~(0,4,2) and outranked the global
@@ -2838,19 +2803,18 @@ def _render_page_nav():
                     st.session_state.page = _sp
                     st.rerun()
 
-if _page != 'Landing':
-    # The hub pill is admin-only: every _BH_PAGES page is gated on the admin
-    # check anyway, so for anyone else it is a switch onto a locked door. It
-    # stays its OWN row rather than folding into the banner — st.columns wrap is
-    # not ours to drive, and a pill squeezed into row 1 would clip before it
-    # wrapped. Admin sees three rows, everyone else two.
-    if _is_admin:
-        _render_hub_tabs()
-    _render_page_nav()
+# The hub pill is admin-only: every _BH_PAGES page is gated on the admin
+# check anyway, so for anyone else it is a switch onto a locked door. It
+# stays its OWN row rather than folding into the banner — st.columns wrap is
+# not ours to drive, and a pill squeezed into row 1 would clip before it
+# wrapped. Admin sees three rows, everyone else two.
+if _is_admin:
+    _render_hub_tabs()
+_render_page_nav()
 
 # ── Controls row (season + odds timestamp) ──────────────────
-# Only show controls for Brownlow pages, not Betting Hub or Landing
-_show_controls = _page not in _BH_PAGES and _page != 'Landing'
+# Only show controls for Brownlow pages, not Betting Hub
+_show_controls = _page not in _BH_PAGES
 
 def _season_changed(page):
     # Persist this page's choice into the durable per-page store.
@@ -2922,400 +2886,11 @@ if _page in _BH_PAGES and not _is_admin:
             )
     st.stop()
 
-# ════════════════════════════════════════════════════════════
-# LANDING PAGE
-# ════════════════════════════════════════════════════════════
-if _page == 'Landing':
-    st.markdown('<div class="landing-top-anchor"></div>', unsafe_allow_html=True)
-
-    # ── Live context: leader + projections (public model output only; betting
-    #    P&L is private and never surfaced to anonymous landing visitors) ──
-    # Same call the module-level `predictions` already made, so reuse it rather
-    # than take a second cache_data copy of the identical frame. (The ticker's
-    # load_game(2026) below is NOT the same as game_df — it pins 2026 where
-    # game_df follows selected_season — so that one genuinely is its own load.)
-    _land_df = predictions
-    _land_leader = "—"
-    _land_votes = 0.0
-    _land_lead = "—"
-    if _land_df is not None and not _land_df.empty and 'Exp_Total_Votes' in _land_df.columns:
-        _land_top = (
-            _land_df.groupby("Player_Name")["Exp_Total_Votes"]
-            .sum()
-            .sort_values(ascending=False)
-        )
-        if len(_land_top):
-            _land_leader = _land_top.index[0]
-            _land_votes = float(_land_top.iloc[0])
-        # Margin over the runner-up, off the same sorted series. An em dash when
-        # there is no second player to be ahead of.
-        if len(_land_top) > 1:
-            _land_lead = f"+{float(_land_top.iloc[0]) - float(_land_top.iloc[1]):.1f}"
-
-    # Leader's best market price. Plain-name equality against best_odds.csv's
-    # `player` column is the join this project already uses everywhere odds meet
-    # players — the Leaderboard's dict(zip(...)) and the Compare tab's _odds_for
-    # both do exactly this. normalise_name belongs to the LIVE FEED's names, not
-    # to this file, so it is deliberately not used here.
-    # An em dash covers both misses: a leader absent from the odds file, and a
-    # disambiguated 'Name (Team)' that the plain-name file cannot match.
-    _land_odds = "—"
-    _land_odds_df = load_best_odds()
-    if (_land_odds_df is not None and len(_land_odds_df)
-            and 'player' in _land_odds_df.columns and 'best_odds' in _land_odds_df.columns):
-        _lo_row = _land_odds_df[_land_odds_df['player'] == _land_leader]
-        if not _lo_row.empty and pd.notna(_lo_row.iloc[0]['best_odds']):
-            _land_odds = f"${float(_lo_row.iloc[0]['best_odds']):.1f}"
-
-    _land_round = _display_round(max_season_rounds, 2026)
-
-    # Countdown to the 2026 count. Computed at render, so it needs no upkeep and
-    # cannot go stale between deploys. Local import matches the house style for
-    # datetime in this file (see _file_ts and the odds-year helper).
-    import datetime as _dt_land
-    _BROWNLOW_NIGHT = _dt_land.date(2026, 9, 21)
-    _land_days = (_BROWNLOW_NIGHT - _dt_land.date.today()).days
-    if _land_days > 1:
-        _land_countdown = f"{_land_days} days"
-    elif _land_days == 1:
-        _land_countdown = "1 day"
-    elif _land_days == 0:
-        _land_countdown = "Tonight"
-    else:
-        # Past the count: no countdown to show, and "-3 days" would be worse
-        # than saying nothing.
-        _land_countdown = "—"
-
-    # Latest round's predicted 3-2-1 vote read
-    _TEAM_ABBR = {
-        "Adelaide": "ADE", "Brisbane Lions": "BRI", "Carlton": "CAR", "Collingwood": "COL",
-        "Essendon": "ESS", "Fremantle": "FRE", "Geelong": "GEE", "Gold Coast": "GCS",
-        "Greater Western Sydney": "GWS", "GWS": "GWS", "GWS Giants": "GWS", "Hawthorn": "HAW",
-        "Melbourne": "MEL", "North Melbourne": "NTH", "Port Adelaide": "PTA", "Richmond": "RIC",
-        "St Kilda": "STK", "Sydney": "SYD", "West Coast": "WCE", "Western Bulldogs": "WB",
-    }
-
-    def _initial_surname(_name):
-        _parts = str(_name).split()
-        return f"{_parts[0][0]}. {' '.join(_parts[1:])}" if len(_parts) >= 2 else str(_name)
-
-    _chip_fallback = [
-        {"name": "Lachie Neale", "team": "Brisbane Lions", "exp_votes": 2.4},
-        {"name": "Kysaiah Pickett", "team": "Melbourne", "exp_votes": 1.8},
-        {"name": "Logan Morris", "team": "Brisbane Lions", "exp_votes": 1.3},
-    ]
-    _chip_players = []
-    if game_df is not None and len(game_df):
-        _latest_round = game_df['Round_num'].max()
-        _latest_df = (
-            game_df[game_df['Round_num'] == _latest_round]
-            .sort_values('Exp_Votes', ascending=False)
-            .head(3)
-        )
-        for _, _r in _latest_df.iterrows():
-            _chip_players.append({
-                "name": str(_r.get("Player_Name", "—")),
-                "team": str(_r.get("Team", "")),
-                "exp_votes": float(_r["Exp_Votes"]) if pd.notna(_r.get("Exp_Votes")) else 0.0,
-            })
-    # TODO: wire to predictions — fall back to placeholder leaders if the latest round has < 3 players
-    for _i in range(len(_chip_players), 3):
-        _chip_players.append(_chip_fallback[_i])
-    _chip1, _chip2, _chip3 = _chip_players[0], _chip_players[1], _chip_players[2]
-
-    def _chip_stats(_c):
-        _abbr = _TEAM_ABBR.get(_c['team'], _c['team'][:3].upper())
-        return f"&middot; {_abbr} &middot; {_c['exp_votes']:.1f}"
-
-    # ── Ticker bar: model's projected 3-2-1 per game of the most recent round.
-    #    Public-safe — no betting data. Highest Exp_Votes in each game → 3, then
-    #    2, then 1. Leading label flags these as projections, not results. ──
-    def _ticker_surname(_name):
-        _n = re.sub(r'\s*\(.*\)$', '', str(_name)).strip()
-        _parts = _n.split()
-        if not _parts:
-            return _n
-        # Keep a lowercase nobiliary particle with the surname (e.g. "van Rooyen")
-        if len(_parts) >= 2 and _parts[-2].islower():
-            return f'{_parts[-2]} {_parts[-1]}'
-        return _parts[-1]
-
-    _ticker_items_html = []
-    _ticker_game_df = load_game(2026)
-    if _ticker_game_df is not None and len(_ticker_game_df):
-        _tk_round = int(_ticker_game_df['Round_num'].max())
-        _tk_disp = _display_round(_tk_round, 2026)
-        _tk_latest = _ticker_game_df[_ticker_game_df['Round_num'] == _tk_round]
-        _ticker_items_html.append(
-            f'<span style="color:#f0b429;font-weight:500">MODEL 3-2-1 &middot; R{_tk_disp}</span>'
-        )
-        for _gid, _gg in _tk_latest.groupby('Game_ID', sort=True):
-            _top3 = _gg.sort_values('Exp_Votes', ascending=False).head(3)
-            if len(_top3) < 3:
-                continue
-            _home = _gg['Home.team'].iloc[0]
-            _away = _gg['Away.team'].iloc[0]
-            _ha = _TEAM_ABBR.get(_home, str(_home)[:3].upper())
-            _aa = _TEAM_ABBR.get(_away, str(_away)[:3].upper())
-            _picks = ' '.join(
-                f'<span style="color:#f0b429">{_v}</span> {_ticker_surname(_r["Player_Name"])}'
-                for _v, (_, _r) in zip((3, 2, 1), _top3.iterrows())
-            )
-            _ticker_items_html.append(f'{_ha} v {_aa} &nbsp;{_picks}')
-    if not _ticker_items_html:
-        _ticker_items_html = ['MODEL 3-2-1 PROJECTIONS']
-    _ticker_sep = ' &nbsp;&nbsp;&middot;&nbsp;&nbsp; '
-    _ticker_segment = (_ticker_sep.join(_ticker_items_html)) + _ticker_sep
-    _ticker_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{background:transparent;height:40px;overflow:hidden;}
-.bar{height:40px;background:#0d141d;border-bottom:1px solid rgba(140,165,185,.14);overflow:hidden;display:flex;align-items:center;}
-.ticker-track{
-  display:inline-block;
-  white-space:nowrap;
-  font-family:'IBM Plex Mono',monospace;
-  font-size:11px;
-  text-transform:uppercase;
-  letter-spacing:.08em;
-  color:#7e8c99;
-  padding:11px 0;
-  animation:ticker 38s linear infinite;
-  will-change:transform;
-}
-@keyframes ticker{from{transform:translateX(0);}to{transform:translateX(-50%);}}
-</style></head><body>
-<div class="bar"><div class="ticker-track" id="track">__SEG__</div></div>
-<script>
-var track = document.getElementById('track');
-track.innerHTML += track.innerHTML;
-</script>
-</body></html>"""
-    _ticker_html = _ticker_html.replace("__SEG__", _ticker_segment)
-    # key=cc_ticker → .st-key-cc_ticker on this container's stVerticalBlock; the
-    # ticker CSS keys off it instead of a hidden .cc-ticker-marker + :has().
-    with st.container(key="cc_ticker"):
-        st.iframe(_ticker_html, height=40)
-
-    # Account control — additive, and placed AFTER the ticker so it cannot
-    # overlap it or push it off the flush top edge. The hero below is untouched.
-    with st.container(key="ccland"):
-        _lsp, _lac = st.columns([6, 4], vertical_alignment="center")
-        with _lac:
-            _render_account_control("ccl")
-
-    # ── Hero ──
-    _hero_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,400..900&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{background:transparent;height:440px;overflow:hidden;}
-.hero{position:relative;width:100%;height:440px;display:flex;align-items:center;justify-content:center;font-family:'Archivo',sans-serif;}
-.oval{position:absolute;top:0;left:0;width:100%;height:100%;opacity:.5;}
-.oval ellipse,.oval path,.oval circle,.oval rect{
-  fill:none;stroke:rgba(126,156,178,.32);stroke-width:1.1;
-  stroke-dasharray:2400;stroke-dashoffset:2400;
-  animation:draw 2.4s cubic-bezier(0.23,1,0.32,1) forwards;
-}
-.g1 *{animation-delay:0s;}
-.g2 *{animation-delay:.25s;}
-.g3 *{animation-delay:.5s;}
-.g4 *{animation-delay:.75s;}
-@keyframes draw{to{stroke-dashoffset:0;}}
-.content{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;
-text-align:center;padding:0 24px;max-width:900px;}
-.eyebrow{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.34em;
-text-transform:uppercase;color:#34d399;margin-bottom:8px;}
-.wordmark{font-family:'Archivo',sans-serif;font-weight:900;font-variation-settings:'wdth' 122;
-font-size:clamp(44px,9vw,110px);line-height:.94;white-space:nowrap;margin:0;}
-.cha{background:linear-gradient(180deg,#ffffff,#9fb3c4);-webkit-background-clip:text;background-clip:text;color:transparent;}
-.ching{background:linear-gradient(120deg,#34d399,#f0b429);-webkit-background-clip:text;background-clip:text;color:transparent;}
-.subtitle{font-size:15px;color:#7e8c99;margin:14px 0 26px;}
-@keyframes rise{from{opacity:0;transform:translateY(14px);}to{opacity:1;transform:translateY(0);}}
-.rise{opacity:0;animation:rise 650ms cubic-bezier(0.23,1,0.32,1) forwards;}
-.r1{animation-delay:.2s;}
-.r2{animation-delay:.32s;}
-.r3{animation-delay:.44s;}
-.chips-label{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:700;letter-spacing:.18em;
-text-transform:uppercase;color:#7e8c99;margin-bottom:10px;opacity:0;animation:fade 400ms ease-out .4s forwards;}
-.chips{display:flex;gap:10px;flex-wrap:nowrap;justify-content:center;margin-top:0;max-width:100%;}
-.chip{display:flex;align-items:center;gap:8px;background:#101a24;border:1px solid rgba(140,165,185,.14);
-border-radius:999px;padding:10px 18px 10px 10px;opacity:0;animation:chipIn 500ms ease-out forwards;white-space:nowrap;}
-@keyframes chipIn{from{opacity:0;transform:translateY(10px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);}}
-@keyframes chipInDim{from{opacity:0;transform:translateY(10px) scale(.97);}to{opacity:.85;transform:translateY(0) scale(1);}}
-.chip-1{animation-delay:1.5s;}
-.chip-2{animation-delay:1.0s;animation-name:chipInDim;}
-.chip-3{animation-delay:.6s;animation-name:chipInDim;}
-.badge{display:flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:6px;
-font-family:'Archivo',sans-serif;font-weight:800;font-size:14px;flex-shrink:0;}
-.badge-1{background:#34d399;color:#0a1017;}
-.badge-2{background:#3a4753;color:#e9eef3;}
-.badge-3{background:#1c2530;color:#7e8c99;}
-.chip-name{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:#e9eef3;}
-.chip-stats{font-family:'IBM Plex Mono',monospace;font-size:11px;color:#7e8c99;}
-@media (max-width:700px){
-  .chips{flex-wrap:wrap;}
-  .chip{white-space:normal;}
-}
-@media (prefers-reduced-motion: reduce){
-  .oval ellipse,.oval path,.oval circle,.oval rect{animation:none;stroke-dashoffset:0;}
-  .rise,.chip{animation:fade 400ms ease-out forwards;}
-}
-@keyframes fade{from{opacity:0;}to{opacity:1;}}
-</style></head><body>
-<div class="hero">
-  <svg class="oval" viewBox="0 0 1000 600" preserveAspectRatio="xMidYMid meet">
-    <g class="g1"><ellipse cx="500" cy="300" rx="460" ry="270"/></g>
-    <g class="g2">
-      <path d="M500 255 L545 300 L500 345 L455 300 Z"/>
-      <circle cx="500" cy="300" r="45"/>
-      <circle cx="500" cy="300" r="8"/>
-    </g>
-    <g class="g3">
-      <path d="M115 95 A235 235 0 0 0 115 505"/>
-      <path d="M885 95 A235 235 0 0 1 885 505"/>
-    </g>
-    <g class="g4">
-      <rect x="40" y="270" width="35" height="60"/>
-      <rect x="925" y="270" width="35" height="60"/>
-    </g>
-  </svg>
-  <div class="content">
-    <div class="eyebrow rise r1">BROWNLOW PREDICTOR &middot; THROUGH ROUND __ROUND__</div>
-    <h1 class="wordmark rise r2"><span class="cha">CHA</span> <span class="ching">CHING</span></h1>
-    <p class="subtitle rise r3">Everything you need for an edge on Brownlow night.</p>
-    <div class="chips-label">ROUND __ROUND__ &middot; MOST LIKELY TO POLL</div>
-    <div class="chips">
-      <div class="chip chip-1"><span class="badge badge-1">1</span><span class="chip-name">__NAME1__</span><span class="chip-stats">__STATS1__</span></div>
-      <div class="chip chip-2"><span class="badge badge-2">2</span><span class="chip-name">__NAME2__</span><span class="chip-stats">__STATS2__</span></div>
-      <div class="chip chip-3"><span class="badge badge-3">3</span><span class="chip-name">__NAME3__</span><span class="chip-stats">__STATS3__</span></div>
-    </div>
-  </div>
-</div>
-</body></html>"""
-    _hero_html = (
-        _hero_html
-        .replace("__ROUND__", str(_land_round))
-        .replace("__NAME1__", _initial_surname(_chip1["name"])).replace("__STATS1__", _chip_stats(_chip1))
-        .replace("__NAME2__", _initial_surname(_chip2["name"])).replace("__STATS2__", _chip_stats(_chip2))
-        .replace("__NAME3__", _initial_surname(_chip3["name"])).replace("__STATS3__", _chip_stats(_chip3))
-    )
-    st.iframe(_hero_html, height=440)
-
-    # ── Stat strip ──
-    _stat_html = """<!DOCTYPE html><html><head><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62.5..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{background:transparent;height:110px;overflow:hidden;font-family:'IBM Plex Mono',monospace;}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;height:110px;max-width:1180px;margin:0 auto;background:rgba(140,165,185,.14);}
-.cell{background:#0a1017;padding:26px 30px;display:flex;flex-direction:column;justify-content:center;gap:8px;}
-.label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:#7e8c99;}
-.value{font-family:'IBM Plex Mono',monospace;font-weight:600;font-size:28px;color:#e9eef3;letter-spacing:.02em;}
-.value.leader{color:#34d399;}
-/* Gold, like the Live Tracker's own +N CLEAR stat — the same number, named the
-   same way, so the strip and the tracker agree. (This replaces .lockblur, which
-   blurred a fake Betting P&L figure behind a padlock.) */
-.value.clear{color:#f0b429;}
-/* Phone: repeat(4,1fr) is minmax(auto,1fr), so the tracks could not shrink
-   below min-content and never wrapped — the leader cell alone wants ~245px
-   (28px mono name + 60px padding) against ~97px available at 390px. The
-   fourth column fell off the edge and the fixed 110px height plus
-   overflow:hidden clipped the leader name at the container's bottom.
-   Two columns, content height, and a name that ellipsises instead of being
-   cut. Pairs with height='content' on the st.iframe call: without that the
-   taller stacked strip would simply be re-clipped at 110px. */
-@media(max-width:500px){
-  html,body{height:auto;overflow:visible;}
-  .grid{grid-template-columns:repeat(2,1fr);height:auto;}
-  .cell{padding:16px 14px;gap:6px;}
-  .value{font-size:clamp(18px,5vw,28px);}
-  .value.leader{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-}
-</style></head><body>
-<div class="grid">
-  <div class="cell"><div class="label">Round</div><div class="value">__ROUND__</div></div>
-  <div class="cell"><div class="label">Current Leader</div><div class="value leader">__LEADER__</div></div>
-  <div class="cell"><div class="label">Predicted Votes</div><div class="value" id="votes">0.0</div></div>
-  <div class="cell"><div class="label">Votes Clear</div><div class="value clear">__LEAD__</div></div>
-</div>
-<script>
-var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-var votesTarget = __VOTES__;
-function easeOut(p){ return 1 - Math.pow(1 - p, 4); }
-function animate(el, target, formatter, duration, delay){
-  if(reduced){ el.textContent = formatter(target); return; }
-  setTimeout(function(){
-    var start = null;
-    function step(ts){
-      if(!start) start = ts;
-      var p = Math.min((ts - start) / duration, 1);
-      el.textContent = formatter(target * easeOut(p));
-      if(p < 1) requestAnimationFrame(step);
-      else el.textContent = formatter(target);
-    }
-    requestAnimationFrame(step);
-  }, delay);
-}
-animate(document.getElementById('votes'), votesTarget, function(v){ return v.toFixed(1); }, 1400, 700);
-</script>
-</body></html>"""
-    _stat_html = (
-        _stat_html
-        .replace("__ROUND__", str(_land_round))
-        .replace("__LEADER__", str(_land_leader))
-        .replace("__VOTES__", f"{_land_votes:.4f}")
-        # Already formatted ("+7.5", or an em dash when there is no runner-up),
-        # so it is substituted as-is rather than animated like __VOTES__.
-        .replace("__LEAD__", str(_land_lead))
-    )
-    # height='content', not 110: the phone breakpoint above lets the strip grow
-    # to two rows, and a fixed height would clip it exactly as before. Verified
-    # on the deployed Live Tracker that 'content' measures a srcdoc frame
-    # correctly (frame height == body scrollHeight, no gap, no inner scrollbar).
-    st.iframe(_stat_html, height='content')
-
-    # ── Destination panels ──
-    _lc1, _lc2 = st.columns(2, gap="medium")
-    with _lc1:
-        with st.container(key="card_brownlow"):
-            st.markdown(f"""
-<div class="dest-content">
-  <span class="dest-tag bw">Prediction Engine</span>
-  <h2>Brownlow Engine</h2>
-  <div class="dest-desc">Vote projections for every player in every game. Live leaderboard, player profiles, comparison tools and more.</div>
-  <div class="dest-data-row">
-    <div><span class="dr-label">Leader</span><span class="dr-value">{_land_leader}</span></div>
-    <div><span class="dr-label">Proj. Votes</span><span class="dr-value">{_land_votes:.1f}</span></div>
-    <div><span class="dr-label">Best Odds</span><span class="dr-value">{_land_odds}</span></div>
-  </div>
-</div>""", unsafe_allow_html=True)
-            if st.button("Open Leaderboard", type="primary", key="land_bw"):
-                st.session_state["active_hub"] = "brownlow"
-                st.session_state.page = 'Leaderboard'
-                st.rerun()
-    with _lc2:
-        with st.container(key="card_betting"):
-            st.markdown(f"""
-<div class="dest-content">
-  <span class="dest-tag bh">Live Tracking</span>
-  <h2>Personalised Tracker</h2>
-  <div class="dest-desc">Your picks, your players, live on the night. Track head-to-heads and watch your watchlist settle as the votes are read.</div>
-  <div class="dest-data-row">
-    <div><span class="dr-label">Brownlow Night</span><span class="dr-value">Sept 21</span></div>
-    <div><span class="dr-label">Countdown</span><span class="dr-value" style="color:var(--gold)">{_land_countdown}</span></div>
-  </div>
-</div>""", unsafe_allow_html=True)
-            if st.button("Open Live Tracker", key="land_bh"):
-                st.session_state["active_hub"] = "brownlow"
-                st.session_state.page = 'Live Tracker'
-                st.rerun()
 
 # ════════════════════════════════════════════════════════════
 # BETTING HUB pages
 # ════════════════════════════════════════════════════════════
-elif _page in _BH_PAGES and _page != 'Predictions':
+if _page in _BH_PAGES and _page != 'Predictions':
     betting_hub.render_page(_page)
 
 # ════════════════════════════════════════════════════════════
@@ -8214,24 +7789,14 @@ if _page == 'Polls a Vote':
 
 
 # ── Global footer ────────────────────────────────────────────
-if _page == 'Landing':
-    st.markdown(
-        '<div style="border-top:1px solid rgba(140,165,185,.14);margin-top:40px;padding:14px 0;'
-        'color:#7e8c99;font-family:\'IBM Plex Mono\',monospace;font-size:11px;letter-spacing:.18em;'
-        'text-align:center;text-transform:uppercase;font-weight:500;">'
-        f'MODEL V4.0 &nbsp;&nbsp;&middot;&nbsp;&nbsp; DATA {_TRAIN_MIN}–{_TRAIN_MAX} &nbsp;&nbsp;&middot;&nbsp;&nbsp; 93 FEATURES &nbsp;&nbsp;&middot;&nbsp;&nbsp; MAE 0.095'
-        '</div>',
-        unsafe_allow_html=True,
-    )
-else:
-    st.markdown(
-        '<div style="border-top:1px solid var(--line);margin-top:40px;padding:14px 0;'
-        'color:var(--muted);font-size:10px;letter-spacing:1.2px;text-align:center;'
-        'text-transform:uppercase;font-weight:600;">'
-        f'Model v4.0 &nbsp;&nbsp;·&nbsp;&nbsp; Data: {_TRAIN_MIN}–{_TRAIN_MAX} &nbsp;&nbsp;·&nbsp;&nbsp; 93 features &nbsp;&nbsp;·&nbsp;&nbsp; MAE 0.095'
-        '</div>',
-        unsafe_allow_html=True,
-    )
+st.markdown(
+    '<div style="border-top:1px solid var(--line);margin-top:40px;padding:14px 0;'
+    'color:var(--muted);font-size:10px;letter-spacing:1.2px;text-align:center;'
+    'text-transform:uppercase;font-weight:600;">'
+    f'Model v4.0 &nbsp;&nbsp;·&nbsp;&nbsp; Data: {_TRAIN_MIN}–{_TRAIN_MAX} &nbsp;&nbsp;·&nbsp;&nbsp; 93 features &nbsp;&nbsp;·&nbsp;&nbsp; MAE 0.095'
+    '</div>',
+    unsafe_allow_html=True,
+)
 
 # ── Responsible-gambling footer (public/Brownlow pages only) ──
 # Reached by every page that renders a body. Betting Hub pages are excluded
