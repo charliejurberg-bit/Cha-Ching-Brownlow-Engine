@@ -2158,6 +2158,24 @@ if not AVAILABLE_SEASONS:
 DEFAULT_SEASON = AVAILABLE_SEASONS[0]
 if 'season_by_page' not in st.session_state:
     st.session_state.season_by_page = {}
+
+# ── URL deep-link (?page=...) ────────────────────────────────
+# Applied once, before anything reads `page` below, so an external link can land
+# on a specific page. First-run only: after this the in-app nav owns `page`, and
+# a stale query param must not yank the user back on every rerun. Whitelisted to
+# public Brownlow pages — Betting Hub pages are admin-gated, so a deep link into
+# one is ignored and the default stands. st.query_params already URL-decodes, so
+# the match is exact by name.
+_DEEPLINK_PAGES = {
+    'Leaderboard', 'Player Profile', 'Stat Filter', 'Game Analysis',
+    'Model Comparison', 'Live Tracker', 'Polls a Vote',
+}
+if not st.session_state.get('_deeplink_done'):
+    st.session_state['_deeplink_done'] = True
+    _qp_page = st.query_params.get('page')
+    if _qp_page in _DEEPLINK_PAGES:
+        st.session_state.page = _qp_page
+
 _season_page = st.session_state.get('page', 'Leaderboard')
 selected_season = st.session_state.season_by_page.get(_season_page, DEFAULT_SEASON)
 # CAREER is a valid selection (offered only on Player Profile); anything else
