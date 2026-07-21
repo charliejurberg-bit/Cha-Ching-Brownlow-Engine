@@ -123,10 +123,11 @@ TARGET = 'Brownlow.Votes'
 
 extra_cols = [c for c in [TARGET, 'Player_Name', 'Playing.for', 'Round_num', 'Season']
               if c not in FEATURES]
-# Wheelo-derived features are NaN in all-zero-source games by design (see
-# features.build_game_rank_features); excluding them from dropna keeps pre-2015
+# Wheelo- and coaches-derived features are NaN in all-zero-source games by design
+# (see features.build_game_rank_features); excluding them from dropna keeps those
 # rows, matching brownlow_model.py so the two measure the same training set.
-_dropna_subset = [f for f in FEATURES if f not in set(feat.wheelo_derived_features(df))] + [TARGET]
+_excluded = set(feat.wheelo_derived_features(df)) | set(feat.COACHES_FEATURES)
+_dropna_subset = [f for f in FEATURES if f not in _excluded] + [TARGET]
 model_df = (df[FEATURES + extra_cols]
             .dropna(subset=_dropna_subset)
             .reset_index(drop=True))

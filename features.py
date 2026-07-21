@@ -182,13 +182,15 @@ def rank_stats_for(df):
     return stats
 
 
-# Rank stats whose source can be entirely absent for whole seasons (Wheelo began
-# in 2015; ExpVotes only exists for 2026). A game with an all-zero source has no
-# real ranking, so its rank/pct/flags are neutralised to NaN — see the guard in
-# build_game_rank_features. Scoped to the Wheelo family deliberately: base stats
-# (Disposals etc.) are never all-zero, and all-zero-coaches games are a separate,
-# pre-existing case handled by the NO_COACHES variant, not touched here.
-ZERO_SOURCE_GUARD_STATS = set(RANK_STATS_WHEELO)
+# Rank stats whose source can be entirely absent within a game. Wheelo began in
+# 2015 (ExpVotes only exists for 2026); coaches votes are missing for 50 training
+# games — whole rounds the fitzRoy source never covered (2011 R24, recent seasons'
+# final H&A round, the 2025 Opening Round), NOT games where no votes were awarded.
+# A game with an all-zero source has no real ranking, so its rank/pct/flags are
+# neutralised to NaN — see build_game_rank_features. Base stats (Disposals etc.)
+# are never all-zero and so never trigger it. (Predict handles the same coaches
+# gap differently, by routing whole games to the NO_COACHES variant.)
+ZERO_SOURCE_GUARD_STATS = set(RANK_STATS_WHEELO) | {'Coaches_Votes'}
 
 
 def build_game_rank_features(df, rank_stats, fill_missing=False):
@@ -197,9 +199,10 @@ def build_game_rank_features(df, rank_stats, fill_missing=False):
     Within-game only, so no cross-season leakage: these describe how a player
     compared to the 43 others in the game whose votes are being predicted.
 
-    All-zero-source guard (ZERO_SOURCE_GUARD_STATS): when a Wheelo source is
+    All-zero-source guard (ZERO_SOURCE_GUARD_STATS): when a guarded source is
     entirely absent/zero within a game — every pre-2015 game for RatingPoints,
-    every pre-2026 game for ExpVotes — the "rank" is a meaningless tie: rank 1
+    every pre-2026 game for ExpVotes, 50 missing-data games for Coaches_Votes —
+    the "rank" is a meaningless tie: rank 1
     for all 44 players, pct a game-size proxy (~0.5114), z 0. That asserts every
     player led the game. The raw value and its rank/pct/z are set to NaN instead,
     so XGBoost learns a default direction rather than a false leader. Same defect,

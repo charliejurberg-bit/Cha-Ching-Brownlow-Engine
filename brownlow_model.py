@@ -192,11 +192,13 @@ if NO_COACHES:
               "rounds only, so it needs published history but not the current game.")
 
 _id_cols = ['ID'] if 'ID' in df.columns else []
-# Wheelo-derived features are NaN in all-zero-source games (every pre-2015 game;
-# every game for ExpVotes) by design — see features.build_game_rank_features. They
-# must NOT gate dropna, or every pre-Wheelo row (40% of training) is deleted and
-# the model silently trains on 2015+ only. Base + coaches features still gate it.
-_dropna_subset = [f for f in FEATURES if f not in set(feat.wheelo_derived_features(df))] + [TARGET]
+# Wheelo- and coaches-derived features are NaN in all-zero-source games (every
+# pre-2015 game; every game for ExpVotes; 50 missing-data games for coaches) by
+# design — see features.build_game_rank_features. They must NOT gate dropna, or
+# those rows (40% of training for Wheelo, 2,282 for coaches) are deleted and the
+# model silently narrows its training set. Base stats still gate it.
+_excluded = set(feat.wheelo_derived_features(df)) | set(feat.COACHES_FEATURES)
+_dropna_subset = [f for f in FEATURES if f not in _excluded] + [TARGET]
 model_df = df[FEATURES+[TARGET,'Player_Name','Playing.for','Round_num']+_id_cols]\
     .dropna(subset=_dropna_subset).reset_index(drop=True)
 
