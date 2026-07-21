@@ -213,15 +213,31 @@ model = xgb.XGBClassifier(n_estimators=300, max_depth=7, learning_rate=0.05,
                            gamma=0.1, reg_alpha=0.2, reg_lambda=2.0,
                            eval_metric='mlogloss', random_state=42, n_jobs=-1)
 
+# MAE is also split by round bucket so the late-season 2x weighting's effect is
+# visible rather than assumed: early R1-8, mid R9-16, late R17+ (the weighted
+# tail). Buckets are averaged across folds the same way overall MAE is.
+_ROUND_BUCKETS = [('early (R1-8)', 1, 8), ('mid (R9-16)', 9, 16), ('late (R17+)', 17, 99)]
+_rnd_vals = model_df['Round_num'].values
+
 fold_scores = []
+_bucket_scores = {b: [] for b, _, _ in _ROUND_BUCKETS}
 for fold, (train_idx, val_idx) in enumerate(gkf.split(X, y, groups)):
     model.fit(X.iloc[train_idx], y.iloc[train_idx], sample_weight=w[train_idx],
               eval_set=[(X.iloc[val_idx], y.iloc[val_idx])], verbose=False)
-    mae = mean_absolute_error(y.iloc[val_idx], model.predict(X.iloc[val_idx]))
+    _pred = model.predict(X.iloc[val_idx])
+    _true = y.iloc[val_idx].values
+    mae = mean_absolute_error(_true, _pred)
     fold_scores.append(mae)
+    _vr = _rnd_vals[val_idx]
+    for _b, _lo, _hi in _ROUND_BUCKETS:
+        _m = (_vr >= _lo) & (_vr <= _hi)
+        if _m.any():
+            _bucket_scores[_b].append(np.abs(_true[_m] - _pred[_m]).mean())
     print(f"  Fold {fold+1} | Seasons {np.unique(groups[val_idx])} | MAE: {mae:.4f}")
 
 print(f"\nMean CV MAE: {np.mean(fold_scores):.4f}")
+print("  By round bucket: " + " | ".join(
+    f"{_b} {np.mean(_s):.4f}" for (_b, _, _), _s in zip(_ROUND_BUCKETS, _bucket_scores.values())))
 print("  Baselines: 0.0953 full model | 0.1013 no-coaches variant.")
 print("  (Pre-2026-audit figures — v1 0.0954 / v2 0.0910 / v3 0.0902 / v4 0.0904 —")
 print("   were all measured with the momentum leak in place, so none of them is")
