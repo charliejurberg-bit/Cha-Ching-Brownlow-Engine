@@ -182,14 +182,32 @@ def rank_stats_for(df):
     return stats
 
 
+# Rank stats whose source can be entirely absent for whole seasons (Wheelo began
+# in 2015; ExpVotes only exists for 2026). A game with an all-zero source has no
+# real ranking, so its rank/pct/flags are neutralised to NaN — see the guard in
+# build_game_rank_features. Scoped to the Wheelo family deliberately: base stats
+# (Disposals etc.) are never all-zero, and all-zero-coaches games are a separate,
+# pre-existing case handled by the NO_COACHES variant, not touched here.
+ZERO_SOURCE_GUARD_STATS = set(RANK_STATS_WHEELO)
+
+
 def build_game_rank_features(df, rank_stats, fill_missing=False):
     """Per-game rank / percentile / z-score for each stat.
 
     Within-game only, so no cross-season leakage: these describe how a player
     compared to the 43 others in the game whose votes are being predicted.
 
-    fill_missing=True zero-fills a triplet whose source stat is absent — the
-    predict path needs a row for every player and cannot drop them.
+    All-zero-source guard (ZERO_SOURCE_GUARD_STATS): when a Wheelo source is
+    entirely absent/zero within a game — every pre-2015 game for RatingPoints,
+    every pre-2026 game for ExpVotes — the "rank" is a meaningless tie: rank 1
+    for all 44 players, pct a game-size proxy (~0.5114), z 0. That asserts every
+    player led the game. The raw value and its rank/pct/z are set to NaN instead,
+    so XGBoost learns a default direction rather than a false leader. Same defect,
+    same fix as the coaches-vote degeneracy.
+
+    fill_missing=True leaves a triplet NaN when its source stat is absent from the
+    whole frame — the predict path needs a row for every player and cannot drop
+    them, and NaN (not 0) is the correct neutral value here too.
     """
     for stat in rank_stats:
         if stat in df.columns:
@@ -197,11 +215,25 @@ def build_game_rank_features(df, rank_stats, fill_missing=False):
             df[f'{stat}_game_rank'] = g.rank(ascending=False, method='min')
             df[f'{stat}_game_pct'] = g.rank(pct=True)
             df[f'{stat}_game_z'] = g.transform(lambda x: (x - x.mean()) / (x.std() + 0.001))
+            if stat in ZERO_SOURCE_GUARD_STATS:
+                dead = g.transform(lambda x: x.abs().max()).fillna(0).eq(0)
+                if dead.any():
+                    df.loc[dead, [stat, f'{stat}_game_rank',
+                                  f'{stat}_game_pct', f'{stat}_game_z']] = np.nan
         elif fill_missing:
-            df[f'{stat}_game_rank'] = 0
-            df[f'{stat}_game_pct'] = 0
-            df[f'{stat}_game_z'] = 0
+            df[f'{stat}_game_rank'] = np.nan
+            df[f'{stat}_game_pct'] = np.nan
+            df[f'{stat}_game_z'] = np.nan
     return df
+
+
+def _rank_flag(df, rank_col, threshold):
+    """(rank <= threshold) as float, but NaN where the rank itself is NaN — so an
+    all-zero-source game does not claim every player as BOG/Top3."""
+    r = df[rank_col]
+    out = (r <= threshold).astype(float)
+    out[r.isna()] = np.nan
+    return out
 
 
 def build_rank_flags(df, include_coaches=True):
@@ -209,19 +241,36 @@ def build_rank_flags(df, include_coaches=True):
     # Assignment order is deliberate: it reproduces the column order the scripts
     # produced before this module existed, so the output CSVs stay byte-identical
     # across the refactor rather than differing only by column position.
+    # rank == 1 and rank <= 1 coincide (ranks are >= 1), so BOG uses threshold 1.
     _cv = include_coaches and 'Coaches_Votes_game_rank' in df.columns
-    df['Top3_Disposals'] = (df['Disposals_game_rank'] <= 3).astype(int)
+    df['Top3_Disposals'] = _rank_flag(df, 'Disposals_game_rank', 3)
     if _cv:
-        df['Top3_Coaches'] = (df['Coaches_Votes_game_rank'] <= 3).astype(int)
-    df['Top3_Impact'] = (df['Impact_Score_game_rank'] <= 3).astype(int)
-    df['BOG_Disposals'] = (df['Disposals_game_rank'] == 1).astype(int)
+        df['Top3_Coaches'] = _rank_flag(df, 'Coaches_Votes_game_rank', 3)
+    df['Top3_Impact'] = _rank_flag(df, 'Impact_Score_game_rank', 3)
+    df['BOG_Disposals'] = _rank_flag(df, 'Disposals_game_rank', 1)
     if _cv:
-        df['BOG_Coaches'] = (df['Coaches_Votes_game_rank'] == 1).astype(int)
-    df['BOG_Impact'] = (df['Impact_Score_game_rank'] == 1).astype(int)
+        df['BOG_Coaches'] = _rank_flag(df, 'Coaches_Votes_game_rank', 1)
+    df['BOG_Impact'] = _rank_flag(df, 'Impact_Score_game_rank', 1)
     if 'RatingPoints_game_rank' in df.columns:
-        df['BOG_Rating'] = (df['RatingPoints_game_rank'] == 1).astype(int)
-        df['Top3_Rating'] = (df['RatingPoints_game_rank'] <= 3).astype(int)
+        df['BOG_Rating'] = _rank_flag(df, 'RatingPoints_game_rank', 1)
+        df['Top3_Rating'] = _rank_flag(df, 'RatingPoints_game_rank', 3)
     return df
+
+
+def wheelo_derived_features(df):
+    """Feature names derived from a Wheelo source and present in df: the base
+    Wheelo columns plus the RatingPoints/ExpVotes rank triplets and Rating flags.
+
+    These are legitimately NaN in all-zero-source games (every pre-2015 game, and
+    every training game for ExpVotes), so the trainer must keep them OUT of its
+    dropna subset or it silently deletes every pre-Wheelo row — turning the fix
+    into "train on 2015+ only". Base stats and coaches features stay in dropna."""
+    cols = [c for c in WHEELO_COLS if c in df.columns]
+    cols += [c for c in ('Rating_Q4_premium', 'Best_quarter_rating') if c in df.columns]
+    for s in RANK_STATS_WHEELO:
+        cols += [f'{s}_game_rank', f'{s}_game_pct', f'{s}_game_z']
+    cols += ['BOG_Rating', 'Top3_Rating']
+    return [c for c in dict.fromkeys(cols) if c in df.columns]
 
 
 def build_form_features(df, group_keys, include_momentum_cv=True):
