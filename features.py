@@ -50,6 +50,77 @@ TEAM_ABBREV = {
 # Wheelo's own spelling, normalised before it meets Playing.for.
 WHEELO_TEAM_FIXES = {'Brisbane': 'Brisbane Lions'}
 
+# ── Row-local derived stats ──────────────────────────────────
+# Everything computable from a single player-game row, in the exact order the
+# three scripts built it. Centralised because it was NOT before: predict_2026.py
+# carried a stale four-term Impact_Score (Goals/Clearances/Contested/Kicks) while
+# training and backtest used the six-term formula below, so the model was scored
+# on an Impact_Score it had never been trained on. One definition now, imported
+# by all three, so that can't recur — see the module docstring.
+
+# Coerced to numeric (missing columns tolerated) before the ratios/Impact build.
+NUMERIC_STATS = ['Kicks', 'Handballs', 'Disposals', 'Goals', 'Marks', 'Tackles',
+                 'Hit.Outs', 'Clearances', 'Contested.Possessions',
+                 'Uncontested.Possessions', 'Contested.Marks', 'Marks.Inside.50',
+                 'Goal.Assists', 'Inside.50s', 'Rebounds', 'One.Percenters', 'Clangers']
+
+# LabelEncoder classes for Margin_Bucket. Already sorted, so a fresh fit and the
+# pickled encoder agree; the encoder itself stays script-side (fit in training,
+# unpickled at predict).
+MARGIN_BUCKETS = ['big_loss', 'big_win', 'close_loss', 'close_win',
+                  'comfortable_loss', 'comfortable_win', 'draw', 'unknown']
+
+
+def get_outcome(row):
+    """W/L/D and signed margin from the player's team's perspective."""
+    h, a = row['Home.score'], row['Away.score']
+    if pd.isna(h) or pd.isna(a):
+        return pd.Series({'Outcome': 'U', 'Margin': 0})
+    margin = h - a if row['Home.Away'] == 'Home' else a - h
+    return pd.Series({'Outcome': 'W' if margin > 0 else ('L' if margin < 0 else 'D'), 'Margin': margin})
+
+
+def margin_bucket(m):
+    """Signed margin -> a MARGIN_BUCKETS label (never 'unknown'; that's for NaN)."""
+    if m > 0:
+        return 'close_win' if m <= 15 else ('comfortable_win' if m <= 40 else 'big_win')
+    elif m < 0:
+        return 'close_loss' if m >= -15 else ('comfortable_loss' if m >= -40 else 'big_loss')
+    return 'draw'
+
+
+def add_row_stats(df):
+    """All single-row derived stats, in the scripts' original order.
+
+    Outcome/Margin/Abs_Margin/Is_Win/Is_Loss, then numeric coercion, the four
+    ratios, Score_Involvements, the six-term Impact_Score, and the Margin_Bucket
+    string. Margin_Bucket_enc is left to the caller: its LabelEncoder is fit in
+    training but unpickled at predict, so the source differs by script.
+
+    Assumes Home.score / Away.score / Home.Away already coerced upstream, as all
+    three scripts do immediately before calling this.
+    """
+    df[['Outcome', 'Margin']] = df.apply(get_outcome, axis=1)
+    df['Abs_Margin'] = df['Margin'].abs()
+    df['Is_Win'] = (df['Outcome'] == 'W').astype(int)
+    df['Is_Loss'] = (df['Outcome'] == 'L').astype(int)
+
+    for col in NUMERIC_STATS:
+        df[col] = pd.to_numeric(df.get(col, 0), errors='coerce').fillna(0)
+
+    df['Kick_to_HB_ratio'] = df['Kicks'] / (df['Handballs'] + 1)
+    df['Contested_rate'] = df['Contested.Possessions'] / (df['Disposals'] + 1)
+    df['Disposal_efficiency'] = (df['Disposals'] - df['Clangers']) / (df['Disposals'] + 1)
+    df['Score_Involvements'] = (df['Goals'] + df['Goal.Assists'] +
+                                df['Marks.Inside.50'] + df['Inside.50s'])
+    df['Impact_Score'] = (df['Contested.Possessions'] * 2.85 + df['Hit.Outs'] * 1.51 +
+                          df['Marks'] * 3.5 + df['Marks.Inside.50'] * 3.81 +
+                          df['Score_Involvements'] * 1.65 + df['Tackles'] * 2.93)
+
+    df['Margin_Bucket'] = df['Margin'].apply(margin_bucket)
+    return df
+
+
 # ── Feature groups ───────────────────────────────────────────
 BASE_FEATURES = ['Kicks', 'Handballs', 'Disposals', 'Goals', 'Marks', 'Tackles', 'Hit.Outs',
                  'Clearances', 'Contested.Possessions', 'Uncontested.Possessions',

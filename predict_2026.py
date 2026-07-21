@@ -77,34 +77,7 @@ print(f"  {len(df26)} rows through Round {max_ha_round} (max H&A round detected 
 df26['Home.score'] = pd.to_numeric(df26['Home.score'], errors='coerce')
 df26['Away.score'] = pd.to_numeric(df26['Away.score'], errors='coerce')
 
-def get_outcome(row):
-    h, a = row['Home.score'], row['Away.score']
-    if pd.isna(h) or pd.isna(a): return pd.Series({'Outcome':'U','Margin':0})
-    margin = h-a if row['Home.Away']=='Home' else a-h
-    return pd.Series({'Outcome':'W' if margin>0 else ('L' if margin<0 else 'D'),'Margin':margin})
-
-df26[['Outcome','Margin']] = df26.apply(get_outcome, axis=1)
-df26['Abs_Margin'] = df26['Margin'].abs()
-df26['Is_Win'] = (df26['Outcome']=='W').astype(int)
-df26['Is_Loss'] = (df26['Outcome']=='L').astype(int)
-
-for col in ['Kicks','Handballs','Disposals','Goals','Marks','Tackles','Hit.Outs',
-            'Clearances','Contested.Possessions','Uncontested.Possessions',
-            'Contested.Marks','Marks.Inside.50','Goal.Assists','Inside.50s',
-            'Rebounds','One.Percenters','Clangers']:
-    df26[col] = pd.to_numeric(df26.get(col, 0), errors='coerce').fillna(0)
-
-df26['Kick_to_HB_ratio'] = df26['Kicks']/(df26['Handballs']+1)
-df26['Contested_rate'] = df26['Contested.Possessions']/(df26['Disposals']+1)
-df26['Disposal_efficiency'] = (df26['Disposals']-df26['Clangers'])/(df26['Disposals']+1)
-df26['Score_Involvements'] = df26['Goals']+df26['Goal.Assists']+df26['Marks.Inside.50']+df26['Inside.50s']
-df26['Impact_Score'] = df26['Goals']*3+df26['Clearances']*1.5+df26['Contested.Possessions']*1.2+df26['Kicks']*0.8
-
-def margin_bucket(m):
-    if m>0: return 'close_win' if m<=15 else ('comfortable_win' if m<=40 else 'big_win')
-    elif m<0: return 'close_loss' if m>=-15 else ('comfortable_loss' if m>=-40 else 'big_loss')
-    return 'draw'
-df26['Margin_Bucket'] = df26['Margin'].apply(margin_bucket)
+df26 = feat.add_row_stats(df26)
 df26['Margin_Bucket_enc'] = le.transform(df26['Margin_Bucket'].fillna('unknown'))
 
 # Merge coaches votes

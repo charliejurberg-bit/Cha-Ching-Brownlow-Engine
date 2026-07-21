@@ -45,41 +45,9 @@ stats['Player_Name'] = stats['First.name'].str.strip() + ' ' + stats['Surname'].
 stats['Home.score'] = pd.to_numeric(stats['Home.score'], errors='coerce')
 stats['Away.score'] = pd.to_numeric(stats['Away.score'], errors='coerce')
 
-def get_outcome(row):
-    h, a = row['Home.score'], row['Away.score']
-    if pd.isna(h) or pd.isna(a): return pd.Series({'Outcome': 'U', 'Margin': 0})
-    margin = h - a if row['Home.Away'] == 'Home' else a - h
-    return pd.Series({'Outcome': 'W' if margin > 0 else ('L' if margin < 0 else 'D'), 'Margin': margin})
-
-stats[['Outcome', 'Margin']] = stats.apply(get_outcome, axis=1)
-stats['Abs_Margin'] = stats['Margin'].abs()
-stats['Is_Win'] = (stats['Outcome'] == 'W').astype(int)
-stats['Is_Loss'] = (stats['Outcome'] == 'L').astype(int)
-
-for col in ['Kicks','Handballs','Disposals','Goals','Marks','Tackles','Hit.Outs',
-            'Clearances','Contested.Possessions','Uncontested.Possessions',
-            'Contested.Marks','Marks.Inside.50','Goal.Assists','Inside.50s',
-            'Rebounds','One.Percenters','Clangers']:
-    stats[col] = pd.to_numeric(stats[col], errors='coerce').fillna(0)
-
-stats['Kick_to_HB_ratio'] = stats['Kicks'] / (stats['Handballs'] + 1)
-stats['Contested_rate'] = stats['Contested.Possessions'] / (stats['Disposals'] + 1)
-stats['Disposal_efficiency'] = (stats['Disposals'] - stats['Clangers']) / (stats['Disposals'] + 1)
-stats['Score_Involvements'] = (stats['Goals'] + stats['Goal.Assists'] +
-                               stats['Marks.Inside.50'] + stats['Inside.50s'])
-stats['Impact_Score'] = (stats['Contested.Possessions'] * 2.85 + stats['Hit.Outs'] * 1.51 +
-                         stats['Marks'] * 3.5 + stats['Marks.Inside.50'] * 3.81 +
-                         stats['Score_Involvements'] * 1.65 + stats['Tackles'] * 2.93)
-
-def margin_bucket(m):
-    if m > 0: return 'close_win' if m <= 15 else ('comfortable_win' if m <= 40 else 'big_win')
-    elif m < 0: return 'close_loss' if m >= -15 else ('comfortable_loss' if m >= -40 else 'big_loss')
-    return 'draw'
-
-stats['Margin_Bucket'] = stats['Margin'].apply(margin_bucket)
+stats = feat.add_row_stats(stats)
 le = LabelEncoder()
-all_buckets = ['big_loss','big_win','close_loss','close_win','comfortable_loss','comfortable_win','draw','unknown']
-le.fit(all_buckets)
+le.fit(feat.MARGIN_BUCKETS)
 stats['Margin_Bucket_enc'] = le.transform(stats['Margin_Bucket'].fillna('unknown'))
 
 # ── Merge coaches votes ───────────────────────────────────────
