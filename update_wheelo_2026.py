@@ -22,6 +22,26 @@ DOWNLOAD_DIR = os.path.abspath("data_wheelo/downloads")
 OUTPUT_CSV = "data_wheelo/wheelo_2026.csv"
 BASE_URL = "https://www.wheeloratings.com/afl_match_stats.html"
 
+# ── Round numbering rule ─────────────────────────────────────
+# The AFL introduced a standalone "Opening Round" in 2024. Wheelo numbers that
+# fixture Round 0, so for any season with an Opening Round every Wheelo round
+# sits one behind the AFLTables convention this repo uses everywhere:
+#
+#     afltables_round = wheelo_round + 1   for 2024, 2025, 2026
+#     afltables_round = wheelo_round       for 2015-2023
+#
+# 2023 does NOT get the +1 — the AFL had no Opening Round that year, and
+# wheelo_2023.csv on disk carries no offset, matching fitzroy_stats_all.csv on
+# Disposals at 100% (n=7,730) with the round used as-is. The rule was
+# previously written as `season >= 2023`, which would have applied a spurious
+# +1 to 2023 and broken that alignment on any re-scrape.
+#
+# This script only ever runs for SEASON = 2026, which is on the +1 side of the
+# rule, so the offset is unconditional here. The guard below keeps that
+# assumption honest if SEASON is ever bumped or reused.
+OPENING_ROUND_FIRST_SEASON = 2024
+ROUND_OFFSET = 1 if SEASON >= OPENING_ROUND_FIRST_SEASON else 0
+
 # Wheelo's own published per-game Brownlow vote predictions. The dashboard's
 # Model Comparison sums the 'Votes' column per player to reproduce
 # wheeloratings.com's published leaderboard exactly (not our match-stats sum).
@@ -197,13 +217,13 @@ def main():
 
     print(f"Existing AFLTables rounds: {sorted(existing_rounds)}")
 
-    # For 2026 (season >= 2023): afltables_round = wheelo_round + 1
-    # Wheelo rounds 0-24 → AFLTables rounds 1-25
-    # Fetch rounds not already in the CSV, up to AFLTables round 24
+    # 2026 has an Opening Round, so afltables_round = wheelo_round + ROUND_OFFSET
+    # (see the rule at the top of this file). Wheelo rounds 0-23 → AFLTables 1-24.
+    # Fetch rounds not already in the CSV, up to AFLTables round 24.
     max_wheelo_round = 23  # try up to Wheelo round 23 (AFLTables 24)
     rounds_to_fetch = [
         r for r in range(0, max_wheelo_round + 1)
-        if (r + 1) not in existing_rounds
+        if (r + ROUND_OFFSET) not in existing_rounds
     ]
     print(f"Wheelo rounds to fetch: {rounds_to_fetch}")
 
@@ -218,7 +238,7 @@ def main():
     try:
         print(f"\nFetching {SEASON} missing rounds from wheeloratings.com...\n")
         for wheelo_round in rounds_to_fetch:
-            afltables_round = wheelo_round + 1
+            afltables_round = wheelo_round + ROUND_OFFSET
             df = fetch_round(driver, wheelo_round)
             if df is not None and len(df) > 0:
                 df['Season'] = SEASON

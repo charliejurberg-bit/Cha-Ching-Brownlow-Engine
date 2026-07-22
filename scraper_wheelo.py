@@ -29,6 +29,31 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 BASE_URL = "https://www.wheeloratings.com/afl_match_stats.html"
 
+# ── Round numbering rule ─────────────────────────────────────
+# The AFL introduced a standalone "Opening Round" in 2024. Wheelo numbers
+# that fixture Round 0 and keeps its own Round 1 for the week after, so for
+# any season with an Opening Round every Wheelo round sits one behind the
+# AFLTables convention this repo uses everywhere:
+#
+#     afltables_round = wheelo_round + 1   for 2024, 2025, 2026
+#     afltables_round = wheelo_round       for 2015-2023
+#
+# 2023 does NOT get the +1. The AFL had no Opening Round that year — 2023
+# ran Round 1 through Round 24 with no round 0 — and wheelo_2023.csv on
+# disk carries no offset, matching fitzroy_stats_all.csv on Disposals at
+# 100% (n=7,730) with the round used as-is. The previous condition here was
+# `season >= 2023`, which would have applied a spurious +1 to 2023 and
+# broken that alignment on any re-scrape. The file on disk predates that
+# condition, which is why the bug never surfaced for 2023.
+OPENING_ROUND_FIRST_SEASON = 2024
+
+
+def has_opening_round(season):
+    """True if `season` has an AFL Opening Round, i.e. Wheelo round 0 exists
+    and every Wheelo round needs +1 to reach AFLTables numbering."""
+    return season >= OPENING_ROUND_FIRST_SEASON
+
+
 def get_driver():
     options = Options()
     options.add_argument("--headless=new")
@@ -191,10 +216,10 @@ def scrape_all():
             season_rows = []
             print(f"\nSeason {season}:")
             
-            # Wheelo uses Round 0 for the Opening Round (AFL seasons from 2023+),
-            # which corresponds to Round 1 in AFLTables. We scrape from Round 0
-            # and store the round as round_num+1 to align with AFLTables numbering.
-            wheelo_start = 0 if season >= 2023 else 1
+            # Wheelo uses Round 0 for the Opening Round (2024 onwards — see
+            # OPENING_ROUND_FIRST_SEASON). Those seasons are scraped from Round 0
+            # and stored as round_num+1 to align with AFLTables numbering.
+            wheelo_start = 0 if has_opening_round(season) else 1
             for round_num in range(wheelo_start, 30):
                 clear_downloads()
 
@@ -208,8 +233,9 @@ def scrape_all():
                     print(f"  Round {round_num}: no page data — stopping season")
                     break
 
-                # AFLTables round number: Opening Round (Wheelo 0) → stored as Round 1
-                afltables_round = round_num + 1 if season >= 2023 else round_num
+                # AFLTables round number: Opening Round (Wheelo 0) → stored as Round 1.
+                # 2023 and earlier have no Opening Round and take no offset.
+                afltables_round = round_num + 1 if has_opening_round(season) else round_num
 
                 # Try download button first
                 downloaded = False
