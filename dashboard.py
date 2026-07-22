@@ -2839,7 +2839,7 @@ def _season_changed(page):
     st.session_state.season_by_page[page] = st.session_state[f"_ctrl_season::{page}"]
 
 _SEASON_PAGES = {
-    'Leaderboard', 'Player Profile', 'Game Analysis',
+    'Leaderboard', 'Player Profile',
 }
 
 if _show_controls:
@@ -4796,7 +4796,7 @@ if _page == 'Player Profile':
 # ════════════════════════════════════════════════════════════
 if _page == 'Game Analysis':
     st.markdown(
-        f'<div class="lb-header"><h2 class="lb-title">Game Analysis — {selected_season}</h2>'
+        f'<div class="lb-header"><h2 class="lb-title">Game Analysis — 2026</h2>'
         f'<p class="lb-subtitle">Round-by-round match predictions</p></div>',
         unsafe_allow_html=True,
     )
