@@ -2839,7 +2839,7 @@ def _season_changed(page):
     st.session_state.season_by_page[page] = st.session_state[f"_ctrl_season::{page}"]
 
 _SEASON_PAGES = {
-    'Leaderboard', 'Player Profile',
+    'Leaderboard', 'Player Profile', 'Game Analysis',
 }
 
 if _show_controls:
@@ -4796,7 +4796,7 @@ if _page == 'Player Profile':
 # ════════════════════════════════════════════════════════════
 if _page == 'Game Analysis':
     st.markdown(
-        f'<div class="lb-header"><h2 class="lb-title">Game Analysis — 2026</h2>'
+        f'<div class="lb-header"><h2 class="lb-title">Game Analysis — {selected_season}</h2>'
         f'<p class="lb-subtitle">Round-by-round match predictions</p></div>',
         unsafe_allow_html=True,
     )
@@ -4804,9 +4804,14 @@ if _page == 'Game Analysis':
 
     # ── Round by Round ────────────────────────────────────────
     with _ga_rbr_tab:
-        rr = load_game(2026)
+        rr = load_game(selected_season)
         if rr is None:
-            st.error("No 2026 game-level predictions found. Run predict_2026.py first.")
+            st.error(
+                f"No {selected_season} game-level predictions found "
+                f"(predictions/game_level_{selected_season}.csv). "
+                "Run predict_2026.py for the current season, or brownlow_model.py "
+                "to rebuild the historical files."
+            )
         else:
             rr = rr.copy()
             rr['Match'] = rr['Home.team'] + ' vs ' + rr['Away.team']
@@ -4816,15 +4821,18 @@ if _page == 'Game Analysis':
             with sel_col:
                 selected_round = st.selectbox(
                     "Select Round", available_rounds,
-                    format_func=lambda r: f"Round {_display_round(r, 2026)}",
+                    format_func=lambda r: f"Round {_display_round(r, selected_season)}",
                     index=max(0, len(available_rounds) - 1),
-                    key="rbr_round",
+                    # Season-scoped: an unscoped key made Streamlit carry the old
+                    # round across a season switch, so picking 2020 (18 rounds)
+                    # after 2015 (23) kept a round the new season does not have.
+                    key=f"rbr_round::{selected_season}",
                 )
             rnd = rr[rr['Round_num'] == selected_round].copy()
             with info_col:
                 st.markdown(
                     f'<div style="line-height:38px;color:var(--muted);font-size:14px;">'
-                    f'Round {_display_round(selected_round, 2026)} &nbsp;·&nbsp; {rnd["Match"].nunique()} matches &nbsp;·&nbsp; {len(rnd)} players'
+                    f'Round {_display_round(selected_round, selected_season)} &nbsp;·&nbsp; {rnd["Match"].nunique()} matches &nbsp;·&nbsp; {len(rnd)} players'
                     f'</div>',
                     unsafe_allow_html=True,
                 )
@@ -4976,7 +4984,10 @@ if _page == 'Game Analysis':
                 max_exp = max(exps) if exps else 0.0
 
                 n_total    = len(gp)
-                expand_key = f"rr_expand_{selected_round}_{game_idx}"
+                # Season-scoped too: game_idx is positional within a round, so
+                # without the season the expanded state leaked onto whatever
+                # game happened to sit at the same index in the new season.
+                expand_key = f"rr_expand::{selected_season}_{selected_round}_{game_idx}"
                 if expand_key not in st.session_state:
                     st.session_state[expand_key] = False
                 show_all = st.session_state[expand_key]
@@ -5020,7 +5031,7 @@ if _page == 'Game Analysis':
 
                 st.markdown(
                     f'<div class="ga-game"><style>{_GA_CSS}</style>'
-                    f'<div class="ga-overline">GAME {game_idx + 1} · ROUND {_display_round(selected_round, 2026)}</div>'
+                    f'<div class="ga-overline">GAME {game_idx + 1} · ROUND {_display_round(selected_round, selected_season)}</div>'
                     f'<div class="ga-result">{result_html}</div>'
                     f'<div class="ga-rule"></div>'
                     f'<div class="ga-section-label">PREDICTED VOTES'
@@ -5043,7 +5054,7 @@ if _page == 'Game Analysis':
 
                 if n_total > 10:
                     _exp_lbl = "↑ Show less" if show_all else f"↓ Show all {n_total} players  (+{n_total - 10} more)"
-                    if st.button(_exp_lbl, key=f"rr_btn_{selected_round}_{game_idx}"):
+                    if st.button(_exp_lbl, key=f"rr_btn::{selected_season}_{selected_round}_{game_idx}"):
                         st.session_state[expand_key] = not show_all
                         st.rerun()
 
