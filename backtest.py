@@ -121,8 +121,15 @@ FEATURES_NOCV = feat.assemble_features(
 
 TARGET = 'Brownlow.Votes'
 
-extra_cols = [c for c in [TARGET, 'Player_Name', 'Playing.for', 'Round_num', 'Season']
-              if c not in FEATURES]
+# Home.team / Away.team / ID are carried through purely so the per-game output
+# below can be keyed and joined. They are NOT features: the model only ever sees
+# train[_FEATS] / test[_FEATS], and _dropna_subset is built from FEATURES, so
+# widening this projection cannot change which rows survive or how the model is
+# fitted. brownlow_model.py already carries ID the same way via its _id_cols.
+_passthrough = [TARGET, 'Player_Name', 'Playing.for', 'Round_num', 'Season',
+                'Home.team', 'Away.team', 'ID']
+extra_cols = [c for c in _passthrough
+              if c not in FEATURES and c in df.columns]
 # Wheelo- and coaches-derived features are NaN in all-zero-source games by design
 # (see features.build_game_rank_features); excluding them from dropna keeps those
 # rows, matching brownlow_model.py so the two measure the same training set.
@@ -148,8 +155,15 @@ _FEATS = FEATURES_NOCV if _PASS == 'NOCV' else FEATURES
 _SUFFIX = '_nocv' if _PASS == 'NOCV' else ''
 print(f"Feature set: {_PASS} ({len(_FEATS)} features)")
 
+# Column order of the per-game output. Written in addition to the existing
+# aggregate outputs, which are unchanged.
+_GAME_COLS = ['Season', 'Round_num', 'Player_Name', 'Playing.for',
+              'Home.team', 'Away.team', 'Exp_Votes', 'P_3', 'P_2', 'P_1',
+              'Poll_Prob', 'Brownlow.Votes', 'ID']
+
 all_results = []
 _mae_rows = []
+_game_rows = []   # per-player-game predictions, one block per test season
 
 for target_season in BACKTEST_SEASONS:
     train = model_df[model_df['Season'] < target_season].copy()
@@ -180,6 +194,12 @@ for target_season in BACKTEST_SEASONS:
     test['P_2'] = proba[:, classes.index(2)] if 2 in classes else 0.0
     test['P_3'] = proba[:, classes.index(3)] if 3 in classes else 0.0
     test['Exp_Votes'] = test['P_1'] * 1 + test['P_2'] * 2 + test['P_3'] * 3
+    test['Poll_Prob'] = test['P_1'] + test['P_2'] + test['P_3']
+
+    # Capture the per-game frame BEFORE the player-season groupby below throws the
+    # per-game structure away. These rows are genuinely out-of-sample: target_season
+    # was never in this fold's training window.
+    _game_rows.append(test[[c for c in _GAME_COLS if c in test.columns]].copy())
 
     # Per-game MAE on the same scale as the CV figure: predicted class vs actual.
     _pred_cls = model.predict(test[_FEATS])
@@ -223,6 +243,19 @@ results['Predicted_Votes'] = results['Predicted_Votes'].round(3)
 
 out = f"predictions/backtest_results{_SUFFIX}.csv"
 results.to_csv(out, index=False)
+
+# ── Per-game out-of-sample predictions ────────────────────────
+# One row per player-game across every walk-forward test season. This is the
+# honest source for per-game accuracy: predictions/game_level_*.csv is written
+# by brownlow_model.py from a model refit on ALL seasons, so it is in-sample.
+_games = pd.concat(_game_rows, ignore_index=True)
+_games = _games[[c for c in _GAME_COLS if c in _games.columns]]
+_game_out = f"predictions/backtest_game_level{_SUFFIX}.csv"
+_games.to_csv(_game_out, index=False)
+print(f"Per-game out-of-sample rows: {len(_games):,} -> {_game_out}")
+_missing = [c for c in _GAME_COLS if c not in _games.columns]
+if _missing:
+    print(f"  WARNING: per-game output missing columns: {_missing}")
 
 # ── Headline accuracy ─────────────────────────────────────────
 # The figures the app quotes publicly, recomputed every run rather than written

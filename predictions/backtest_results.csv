@@ -10285,1327 +10285,1327 @@ Season,Player,Team,Actual_Votes,Predicted_Votes,Rank_Predicted,Rank_Actual
 2023,Zak Butters,Port Adelaide,27.0,22.893,4,4
 2023,Zak Jones,St Kilda,0.0,0.007,517,201
 2023,Zane Trew,West Coast,0.0,0.001,624,201
-2024,Aaron Cadman,Greater Western Sydney,0.0,0.11,347,197
-2024,Aaron Francis,Sydney,0.0,0.007,527,197
-2024,Aaron Naughton,Western Bulldogs,4.0,2.946,113,78
-2024,Adam Cerra,Carlton,0.0,1.05,192,197
-2024,Adam Saad,Carlton,0.0,0.232,309,197
-2024,Adam Tomlinson,Melbourne,0.0,0.315,282,197
-2024,Adam Treloar,Western Bulldogs,26.0,21.491,7,7
-2024,Aidan Corr,North Melbourne,0.0,0.116,343,197
-2024,Alex Cincotta,Carlton,0.0,0.047,403,197
-2024,Alex Davies,Gold Coast,1.0,0.178,319,152
-2024,Alex Keath,Western Bulldogs,0.0,0.004,555,197
-2024,Alex Neal-Bullen,Melbourne,0.0,1.935,140,197
-2024,Alex Pearce,Fremantle,2.0,0.527,240,124
-2024,Alex Sexton,Gold Coast,0.0,0.338,277,197
-2024,Alex Witherden,West Coast,0.0,0.054,391,197
-2024,Aliir Aliir,Port Adelaide,0.0,0.632,225,197
-2024,Alwyn Davey,Essendon,0.0,0.005,546,197
-2024,Andrew Brayshaw,Fremantle,22.0,16.921,14,12
-2024,Andrew Gaff,West Coast,0.0,0.021,472,197
-2024,Andrew McGrath,Essendon,2.0,2.815,118,124
-2024,Andy Moniz-Wakefield,Melbourne,0.0,0.01,507,197
+2024,Aaron Cadman,Greater Western Sydney,0.0,0.174,325,197
+2024,Aaron Francis,Sydney,0.0,0.007,531,197
+2024,Aaron Naughton,Western Bulldogs,4.0,3.103,111,78
+2024,Adam Cerra,Carlton,0.0,1.167,183,197
+2024,Adam Saad,Carlton,0.0,0.245,305,197
+2024,Adam Tomlinson,Melbourne,0.0,0.287,293,197
+2024,Adam Treloar,Western Bulldogs,26.0,21.06,7,7
+2024,Aidan Corr,North Melbourne,0.0,0.084,367,197
+2024,Alex Cincotta,Carlton,0.0,0.042,420,197
+2024,Alex Davies,Gold Coast,1.0,0.141,335,152
+2024,Alex Keath,Western Bulldogs,0.0,0.005,549,197
+2024,Alex Neal-Bullen,Melbourne,0.0,1.959,142,197
+2024,Alex Pearce,Fremantle,2.0,0.589,234,124
+2024,Alex Sexton,Gold Coast,0.0,0.335,277,197
+2024,Alex Witherden,West Coast,0.0,0.056,395,197
+2024,Aliir Aliir,Port Adelaide,0.0,0.682,222,197
+2024,Alwyn Davey,Essendon,0.0,0.005,550,197
+2024,Andrew Brayshaw,Fremantle,22.0,16.983,14,12
+2024,Andrew Gaff,West Coast,0.0,0.016,485,197
+2024,Andrew McGrath,Essendon,2.0,2.943,113,124
+2024,Andy Moniz-Wakefield,Melbourne,0.0,0.007,529,197
 2024,Angus Hastie,St Kilda,0.0,0.001,597,197
-2024,Angus McLennan,St Kilda,0.0,0.001,603,197
-2024,Anthony Caminiti,St Kilda,0.0,0.102,352,197
-2024,Anthony Scott,Western Bulldogs,0.0,0.003,571,197
-2024,Archie Perkins,Essendon,3.0,2.867,115,96
-2024,Archie Roberts,Essendon,0.0,0.041,417,197
+2024,Angus McLennan,St Kilda,0.0,0.001,614,197
+2024,Anthony Caminiti,St Kilda,0.0,0.152,332,197
+2024,Anthony Scott,Western Bulldogs,0.0,0.002,585,197
+2024,Archie Perkins,Essendon,3.0,2.836,119,96
+2024,Archie Roberts,Essendon,0.0,0.025,463,197
 2024,Arie Schoenmaker,St Kilda,0.0,0.003,576,197
-2024,Arthur Jones,Western Bulldogs,0.0,0.003,570,197
-2024,Ash Johnson,Collingwood,0.0,0.0,640,197
-2024,Ashton Moir,Carlton,0.0,0.002,593,197
-2024,Bailey Banfield,Fremantle,1.0,0.197,314,152
-2024,Bailey Dale,Western Bulldogs,9.0,7.099,48,41
-2024,Bailey Humphrey,Gold Coast,0.0,0.908,199,197
-2024,Bailey Laurie,Melbourne,0.0,0.006,535,197
-2024,Bailey Scott,North Melbourne,0.0,0.786,205,197
-2024,Bailey Williams,Western Bulldogs,0.0,0.615,226,197
-2024,Bayley Fritsch,Melbourne,4.0,1.704,151,78
-2024,Beau McCreery,Collingwood,1.0,0.036,432,152
-2024,Ben Ainsworth,Gold Coast,0.0,0.395,264,197
-2024,Ben Brown,Melbourne,0.0,0.012,500,197
-2024,Ben Hobbs,Essendon,0.0,0.032,442,197
-2024,Ben Keays,Adelaide,4.0,5.35,63,78
-2024,Ben King,Gold Coast,3.0,2.114,136,96
-2024,Ben Long,Gold Coast,0.0,0.369,270,197
-2024,Ben McKay,Essendon,0.0,0.283,292,197
-2024,Ben Miller,Richmond,0.0,0.036,430,197
-2024,Ben Paton,St Kilda,0.0,0.001,609,197
-2024,Bigoa Nyuon,North Melbourne,0.0,0.001,617,197
-2024,Billy Dowling,Adelaide,0.0,0.052,393,197
-2024,Billy Frampton,Collingwood,0.0,0.078,373,197
-2024,Blake Acres,Carlton,4.0,1.362,170,78
-2024,Blake Drury,North Melbourne,0.0,0.001,602,197
-2024,Blake Hardwick,Hawthorn,2.0,3.273,106,124
-2024,Blake Howes,Melbourne,0.0,0.051,397,197
-2024,Bobby Hill,Collingwood,0.0,1.658,154,197
-2024,Bodhi Uwland,Gold Coast,0.0,0.568,235,197
-2024,Brad Close,Geelong,2.0,0.401,262,124
-2024,Brad Crouch,St Kilda,0.0,0.001,608,197
-2024,Bradley Hill,St Kilda,5.0,1.555,161,67
-2024,Brady Hough,West Coast,0.0,0.086,367,197
-2024,Braeden Campbell,Sydney,0.0,0.05,398,197
-2024,Brandan Parfitt,Geelong,0.0,0.483,252,197
-2024,Brandon Ellis,Gold Coast,0.0,0.004,564,197
-2024,Brandon Ryan,Brisbane Lions,0.0,0.0,654,197
-2024,Brandon Starcevich,Brisbane Lions,0.0,0.135,336,197
-2024,Brandon Walker,Fremantle,0.0,0.081,369,197
-2024,Brandon Zerk-Thatcher,Port Adelaide,0.0,0.232,310,197
-2024,Brayden Cook,Adelaide,0.0,0.049,400,197
-2024,Brayden Fiorini,Gold Coast,0.0,0.096,358,197
-2024,Brayden Maynard,Collingwood,0.0,0.224,311,197
-2024,Brennan Cox,Fremantle,0.0,0.024,463,197
-2024,Brent Daniels,Greater Western Sydney,0.0,4.97,71,197
-2024,Brodie Grundy,Sydney,1.0,8.586,40,152
-2024,Brodie Kemp,Carlton,0.0,0.894,201,197
-2024,Brodie Smith,Adelaide,0.0,0.07,381,197
-2024,Brody Mihocek,Collingwood,0.0,0.589,231,197
-2024,Bruce Reville,Brisbane Lions,0.0,0.017,482,197
-2024,Brynn Teakle,North Melbourne,0.0,0.01,508,197
-2024,Buku Khamis,Western Bulldogs,0.0,0.041,415,197
-2024,Caiden Cleary,Sydney,0.0,0.009,511,197
-2024,Caleb Daniel,Western Bulldogs,0.0,0.108,349,197
-2024,Caleb Marchbank,Carlton,0.0,0.002,592,197
-2024,Caleb Mitchell,Sydney,0.0,0.001,610,197
-2024,Caleb Poulter,Western Bulldogs,0.0,0.078,371,197
-2024,Caleb Serong,Fremantle,28.0,23.674,5,4
-2024,Caleb Windsor,Melbourne,0.0,1.142,183,197
-2024,Callan Ward,Greater Western Sydney,0.0,1.071,188,197
-2024,Callum Ah Chee,Brisbane Lions,0.0,0.571,234,197
-2024,Callum Brown,Greater Western Sydney,2.0,1.568,159,124
+2024,Arthur Jones,Western Bulldogs,0.0,0.002,580,197
+2024,Ash Johnson,Collingwood,0.0,0.0,637,197
+2024,Ashton Moir,Carlton,0.0,0.001,593,197
+2024,Bailey Banfield,Fremantle,1.0,0.319,285,152
+2024,Bailey Dale,Western Bulldogs,9.0,6.824,47,41
+2024,Bailey Humphrey,Gold Coast,0.0,1.307,174,197
+2024,Bailey Laurie,Melbourne,0.0,0.005,543,197
+2024,Bailey Scott,North Melbourne,0.0,0.754,216,197
+2024,Bailey Williams,Western Bulldogs,0.0,0.666,225,197
+2024,Bayley Fritsch,Melbourne,4.0,1.804,151,78
+2024,Beau McCreery,Collingwood,1.0,0.038,427,152
+2024,Ben Ainsworth,Gold Coast,0.0,0.429,257,197
+2024,Ben Brown,Melbourne,0.0,0.014,491,197
+2024,Ben Hobbs,Essendon,0.0,0.034,437,197
+2024,Ben Keays,Adelaide,4.0,5.476,61,78
+2024,Ben King,Gold Coast,3.0,2.316,131,96
+2024,Ben Long,Gold Coast,0.0,0.422,258,197
+2024,Ben McKay,Essendon,0.0,0.275,298,197
+2024,Ben Miller,Richmond,0.0,0.033,441,197
+2024,Ben Paton,St Kilda,0.0,0.001,613,197
+2024,Bigoa Nyuon,North Melbourne,0.0,0.001,607,197
+2024,Billy Dowling,Adelaide,0.0,0.059,391,197
+2024,Billy Frampton,Collingwood,0.0,0.105,348,197
+2024,Blake Acres,Carlton,4.0,1.38,169,78
+2024,Blake Drury,North Melbourne,0.0,0.001,601,197
+2024,Blake Hardwick,Hawthorn,2.0,3.75,96,124
+2024,Blake Howes,Melbourne,0.0,0.044,414,197
+2024,Bobby Hill,Collingwood,0.0,1.837,150,197
+2024,Bodhi Uwland,Gold Coast,0.0,0.469,249,197
+2024,Brad Close,Geelong,2.0,0.741,217,124
+2024,Brad Crouch,St Kilda,0.0,0.001,596,197
+2024,Bradley Hill,St Kilda,5.0,1.525,160,67
+2024,Brady Hough,West Coast,0.0,0.079,369,197
+2024,Braeden Campbell,Sydney,0.0,0.049,404,197
+2024,Brandan Parfitt,Geelong,0.0,0.406,261,197
+2024,Brandon Ellis,Gold Coast,0.0,0.004,555,197
+2024,Brandon Ryan,Brisbane Lions,0.0,0.0,653,197
+2024,Brandon Starcevich,Brisbane Lions,0.0,0.136,342,197
+2024,Brandon Walker,Fremantle,0.0,0.073,375,197
+2024,Brandon Zerk-Thatcher,Port Adelaide,0.0,0.274,300,197
+2024,Brayden Cook,Adelaide,0.0,0.075,373,197
+2024,Brayden Fiorini,Gold Coast,0.0,0.096,356,197
+2024,Brayden Maynard,Collingwood,0.0,0.217,316,197
+2024,Brennan Cox,Fremantle,0.0,0.019,474,197
+2024,Brent Daniels,Greater Western Sydney,0.0,5.032,71,197
+2024,Brodie Grundy,Sydney,1.0,7.952,42,152
+2024,Brodie Kemp,Carlton,0.0,0.866,205,197
+2024,Brodie Smith,Adelaide,0.0,0.066,384,197
+2024,Brody Mihocek,Collingwood,0.0,0.518,241,197
+2024,Bruce Reville,Brisbane Lions,0.0,0.019,475,197
+2024,Brynn Teakle,North Melbourne,0.0,0.01,507,197
+2024,Buku Khamis,Western Bulldogs,0.0,0.043,415,197
+2024,Caiden Cleary,Sydney,0.0,0.009,514,197
+2024,Caleb Daniel,Western Bulldogs,0.0,0.113,346,197
+2024,Caleb Marchbank,Carlton,0.0,0.001,595,197
+2024,Caleb Mitchell,Sydney,0.0,0.001,619,197
+2024,Caleb Poulter,Western Bulldogs,0.0,0.074,374,197
+2024,Caleb Serong,Fremantle,28.0,22.39,6,4
+2024,Caleb Windsor,Melbourne,0.0,1.172,182,197
+2024,Callan Ward,Greater Western Sydney,0.0,0.819,207,197
+2024,Callum Ah Chee,Brisbane Lions,0.0,0.616,230,197
+2024,Callum Brown,Greater Western Sydney,2.0,1.523,161,124
 2024,Callum Coleman-Jones,North Melbourne,0.0,0.001,628,197
-2024,Callum Jamieson,West Coast,0.0,0.001,600,197
-2024,Callum Mills,Sydney,1.0,0.298,287,152
-2024,Callum Wilkie,St Kilda,3.0,1.475,166,96
-2024,Calsher Dear,Hawthorn,0.0,0.076,374,197
-2024,Cam Mackenzie,Hawthorn,0.0,0.151,327,197
-2024,Cam Rayner,Brisbane Lions,6.0,2.705,121,60
-2024,Cameron Guthrie,Geelong,0.0,0.101,353,197
-2024,Cameron Zurhaar,North Melbourne,1.0,0.592,230,152
-2024,Campbell Chesser,West Coast,0.0,0.01,503,197
-2024,Chad Warner,Sydney,23.0,19.635,9,11
-2024,Changkuoth Jiath,Hawthorn,0.0,0.026,459,197
-2024,Charlie Ballard,Gold Coast,1.0,0.097,354,152
-2024,Charlie Cameron,Brisbane Lions,1.0,0.46,254,152
-2024,Charlie Clarke,Western Bulldogs,0.0,0.0,649,197
-2024,Charlie Comben,North Melbourne,0.0,0.09,363,197
-2024,Charlie Curnow,Carlton,2.0,4.711,74,124
-2024,Charlie Dean,Collingwood,0.0,0.009,517,197
-2024,Charlie Dixon,Port Adelaide,3.0,2.456,127,96
-2024,Charlie Lazzaro,North Melbourne,0.0,0.003,580,197
-2024,Charlie Spargo,Melbourne,0.0,0.0,648,197
-2024,Chayce Jones,Adelaide,0.0,0.29,289,197
-2024,Chris Burgess,Adelaide,0.0,0.008,519,197
-2024,Christian Petracca,Melbourne,16.0,9.634,33,19
-2024,Christian Salem,Melbourne,1.0,1.066,189,152
-2024,Clay Hall,West Coast,0.0,0.001,623,197
-2024,Clayton Oliver,Melbourne,5.0,5.091,68,67
-2024,Cody Weightman,Western Bulldogs,2.0,1.76,147,124
-2024,Colby McKercher,North Melbourne,1.0,1.171,182,152
-2024,Connor Budarick,Gold Coast,0.0,0.027,456,197
-2024,Connor Idun,Greater Western Sydney,0.0,0.361,271,197
-2024,Connor Macdonald,Hawthorn,1.0,1.356,171,152
-2024,Connor OSullivan,Geelong,0.0,0.002,594,197
-2024,Connor Rozee,Port Adelaide,12.0,12.62,24,29
-2024,Conor McKenna,Brisbane Lions,0.0,0.052,395,197
-2024,Conor Nash,Hawthorn,2.0,4.575,78,124
+2024,Callum Jamieson,West Coast,0.0,0.001,610,197
+2024,Callum Mills,Sydney,1.0,0.29,292,152
+2024,Callum Wilkie,St Kilda,3.0,1.477,165,96
+2024,Calsher Dear,Hawthorn,0.0,0.063,387,197
+2024,Cam Mackenzie,Hawthorn,0.0,0.171,327,197
+2024,Cam Rayner,Brisbane Lions,6.0,2.918,117,60
+2024,Cameron Guthrie,Geelong,0.0,0.071,378,197
+2024,Cameron Zurhaar,North Melbourne,1.0,0.579,235,152
+2024,Campbell Chesser,West Coast,0.0,0.009,510,197
+2024,Chad Warner,Sydney,23.0,19.664,8,11
+2024,Changkuoth Jiath,Hawthorn,0.0,0.023,467,197
+2024,Charlie Ballard,Gold Coast,1.0,0.101,350,152
+2024,Charlie Cameron,Brisbane Lions,1.0,0.674,224,152
+2024,Charlie Clarke,Western Bulldogs,0.0,0.0,650,197
+2024,Charlie Comben,North Melbourne,0.0,0.093,360,197
+2024,Charlie Curnow,Carlton,2.0,5.264,64,124
+2024,Charlie Dean,Collingwood,0.0,0.007,530,197
+2024,Charlie Dixon,Port Adelaide,3.0,2.887,118,96
+2024,Charlie Lazzaro,North Melbourne,0.0,0.002,588,197
+2024,Charlie Spargo,Melbourne,0.0,0.0,642,197
+2024,Chayce Jones,Adelaide,0.0,0.348,274,197
+2024,Chris Burgess,Adelaide,0.0,0.009,516,197
+2024,Christian Petracca,Melbourne,16.0,9.593,33,19
+2024,Christian Salem,Melbourne,1.0,0.971,196,152
+2024,Clay Hall,West Coast,0.0,0.001,624,197
+2024,Clayton Oliver,Melbourne,5.0,5.139,68,67
+2024,Cody Weightman,Western Bulldogs,2.0,1.876,148,124
+2024,Colby McKercher,North Melbourne,1.0,1.19,181,152
+2024,Connor Budarick,Gold Coast,0.0,0.029,450,197
+2024,Connor Idun,Greater Western Sydney,0.0,0.323,282,197
+2024,Connor Macdonald,Hawthorn,1.0,1.31,173,152
+2024,Connor OSullivan,Geelong,0.0,0.002,592,197
+2024,Connor Rozee,Port Adelaide,12.0,12.545,24,29
+2024,Conor McKenna,Brisbane Lions,0.0,0.048,405,197
+2024,Conor Nash,Hawthorn,2.0,4.869,75,124
 2024,Conor Stone,Greater Western Sydney,0.0,0.001,612,197
-2024,Cooper Lord,Carlton,0.0,0.021,471,197
-2024,Cooper Sharman,St Kilda,0.0,2.216,133,197
-2024,Cooper Simpson,Fremantle,0.0,0.001,606,197
-2024,Corey Durdin,Carlton,0.0,0.01,506,197
-2024,Corey Wagner,Fremantle,0.0,0.042,410,197
-2024,Corey Warner,Sydney,0.0,0.003,581,197
-2024,Curtis Taylor,North Melbourne,0.0,0.017,483,197
-2024,Dan Butler,St Kilda,0.0,0.04,420,197
-2024,Dan Houston,Port Adelaide,4.0,4.64,77,78
-2024,Dane Rampe,Sydney,0.0,0.399,263,197
-2024,Daniel Curtin,Adelaide,0.0,0.007,521,197
-2024,Daniel McStay,Collingwood,0.0,0.015,489,197
-2024,Daniel Rioli,Richmond,4.0,1.854,142,78
-2024,Daniel Turner,Melbourne,0.0,0.648,220,197
-2024,Dante Visentini,Port Adelaide,0.0,0.01,504,197
-2024,Darcy Byrne-Jones,Port Adelaide,0.0,0.159,324,197
-2024,Darcy Cameron,Collingwood,0.0,2.846,116,197
-2024,Darcy Fogarty,Adelaide,2.0,4.013,88,124
-2024,Darcy Fort,Brisbane Lions,0.0,0.004,552,197
+2024,Cooper Lord,Carlton,0.0,0.022,468,197
+2024,Cooper Sharman,St Kilda,0.0,2.053,139,197
+2024,Cooper Simpson,Fremantle,0.0,0.001,618,197
+2024,Corey Durdin,Carlton,0.0,0.015,489,197
+2024,Corey Wagner,Fremantle,0.0,0.038,425,197
+2024,Corey Warner,Sydney,0.0,0.003,577,197
+2024,Curtis Taylor,North Melbourne,0.0,0.016,484,197
+2024,Dan Butler,St Kilda,0.0,0.036,429,197
+2024,Dan Houston,Port Adelaide,4.0,4.836,76,78
+2024,Dane Rampe,Sydney,0.0,0.395,263,197
+2024,Daniel Curtin,Adelaide,0.0,0.025,464,197
+2024,Daniel McStay,Collingwood,0.0,0.017,480,197
+2024,Daniel Rioli,Richmond,4.0,1.775,153,78
+2024,Daniel Turner,Melbourne,0.0,0.79,210,197
+2024,Dante Visentini,Port Adelaide,0.0,0.011,500,197
+2024,Darcy Byrne-Jones,Port Adelaide,0.0,0.184,323,197
+2024,Darcy Cameron,Collingwood,0.0,2.705,123,197
+2024,Darcy Fogarty,Adelaide,2.0,4.434,84,124
+2024,Darcy Fort,Brisbane Lions,0.0,0.004,561,197
 2024,Darcy Gardiner,Brisbane Lions,0.0,0.005,545,197
-2024,Darcy Jones,Greater Western Sydney,1.0,0.129,339,152
-2024,Darcy Macpherson,Gold Coast,0.0,0.001,625,197
-2024,Darcy Moore,Collingwood,0.0,0.263,295,197
-2024,Darcy Parish,Essendon,1.0,3.203,111,152
-2024,Darcy Tucker,North Melbourne,0.0,0.112,345,197
-2024,Darcy Wilmot,Brisbane Lions,0.0,0.513,244,197
-2024,Darcy Wilson,St Kilda,0.0,1.571,157,197
-2024,Darragh Joyce,Brisbane Lions,0.0,0.033,438,197
-2024,David Cuningham,Carlton,0.0,0.003,569,197
-2024,David Swallow,Gold Coast,0.0,0.052,394,197
-2024,Dayne Zorko,Brisbane Lions,12.0,8.964,37,29
-2024,Deven Robertson,Brisbane Lions,0.0,0.0,635,197
-2024,Dion Prestia,Richmond,0.0,0.464,253,197
-2024,Dom Sheed,West Coast,0.0,0.042,412,197
-2024,Dougal Howard,St Kilda,0.0,0.043,408,197
-2024,Dustin Martin,Richmond,1.0,0.833,204,152
-2024,Dylan Grimes,Richmond,0.0,0.002,595,197
-2024,Dylan Moore,Hawthorn,9.0,9.043,36,41
-2024,Dylan Shiel,Essendon,0.0,0.485,251,197
-2024,Dylan Stephens,North Melbourne,0.0,0.01,509,197
-2024,Dylan Williams,Port Adelaide,0.0,0.003,579,197
-2024,Dyson Heppell,Essendon,0.0,0.392,265,197
-2024,Ed Langdon,Melbourne,5.0,2.786,120,67
-2024,Ed Richards,Western Bulldogs,6.0,6.263,55,60
+2024,Darcy Jones,Greater Western Sydney,1.0,0.194,320,152
+2024,Darcy Macpherson,Gold Coast,0.0,0.001,611,197
+2024,Darcy Moore,Collingwood,0.0,0.236,310,197
+2024,Darcy Parish,Essendon,1.0,3.742,97,152
+2024,Darcy Tucker,North Melbourne,0.0,0.09,364,197
+2024,Darcy Wilmot,Brisbane Lions,0.0,0.553,238,197
+2024,Darcy Wilson,St Kilda,0.0,1.48,164,197
+2024,Darragh Joyce,Brisbane Lions,0.0,0.032,444,197
+2024,David Cuningham,Carlton,0.0,0.004,558,197
+2024,David Swallow,Gold Coast,0.0,0.066,383,197
+2024,Dayne Zorko,Brisbane Lions,12.0,9.064,35,29
+2024,Deven Robertson,Brisbane Lions,0.0,0.0,638,197
+2024,Dion Prestia,Richmond,0.0,0.449,251,197
+2024,Dom Sheed,West Coast,0.0,0.038,426,197
+2024,Dougal Howard,St Kilda,0.0,0.053,400,197
+2024,Dustin Martin,Richmond,1.0,0.795,208,152
+2024,Dylan Grimes,Richmond,0.0,0.001,594,197
+2024,Dylan Moore,Hawthorn,9.0,9.0,37,41
+2024,Dylan Shiel,Essendon,0.0,0.441,254,197
+2024,Dylan Stephens,North Melbourne,0.0,0.009,511,197
+2024,Dylan Williams,Port Adelaide,0.0,0.002,582,197
+2024,Dyson Heppell,Essendon,0.0,0.462,250,197
+2024,Ed Langdon,Melbourne,5.0,2.708,122,67
+2024,Ed Richards,Western Bulldogs,6.0,5.684,58,60
 2024,Eddie Ford,North Melbourne,0.0,0.036,431,197
-2024,Edward Allan,Collingwood,0.0,0.152,326,197
-2024,Elijah Hollands,Carlton,3.0,1.798,145,96
-2024,Elijah Tsatas,Essendon,0.0,0.012,493,197
-2024,Elliot Yeo,West Coast,8.0,8.353,41,45
-2024,Elliott Himmelberg,Adelaide,0.0,0.038,426,197
-2024,Eric Hipwood,Brisbane Lions,4.0,3.476,101,78
-2024,Errol Gulden,Sydney,25.0,19.221,11,8
-2024,Esava Ratugolea,Port Adelaide,0.0,0.139,335,197
-2024,Ethan Hughes,Fremantle,0.0,0.009,516,197
-2024,Ethan Phillips,Hawthorn,0.0,0.001,620,197
-2024,Ethan Read,Gold Coast,0.0,0.001,607,197
-2024,Finlay Macrae,Collingwood,0.0,0.046,405,197
-2024,Finn Callaghan,Greater Western Sydney,6.0,4.457,80,60
-2024,Finn Maginness,Hawthorn,0.0,0.042,411,197
+2024,Edward Allan,Collingwood,0.0,0.189,322,197
+2024,Elijah Hollands,Carlton,3.0,1.972,141,96
+2024,Elijah Tsatas,Essendon,0.0,0.01,505,197
+2024,Elliot Yeo,West Coast,8.0,8.012,40,45
+2024,Elliott Himmelberg,Adelaide,0.0,0.032,442,197
+2024,Eric Hipwood,Brisbane Lions,4.0,3.705,98,78
+2024,Errol Gulden,Sydney,25.0,19.409,9,8
+2024,Esava Ratugolea,Port Adelaide,0.0,0.124,344,197
+2024,Ethan Hughes,Fremantle,0.0,0.008,519,197
+2024,Ethan Phillips,Hawthorn,0.0,0.001,608,197
+2024,Ethan Read,Gold Coast,0.0,0.002,591,197
+2024,Finlay Macrae,Collingwood,0.0,0.075,371,197
+2024,Finn Callaghan,Greater Western Sydney,6.0,4.589,79,60
+2024,Finn Maginness,Hawthorn,0.0,0.036,428,197
 2024,Francis Evans,Port Adelaide,0.0,0.028,452,197
-2024,Gary Rohan,Geelong,0.0,0.037,428,197
-2024,George Hewett,Carlton,3.0,7.4,44,96
-2024,George Wardlaw,North Melbourne,2.0,1.262,177,124
-2024,Griffin Logue,North Melbourne,0.0,0.001,618,197
-2024,Gryan Miers,Geelong,2.0,4.714,73,124
-2024,Harley Reid,West Coast,7.0,3.923,90,53
-2024,Harris Andrews,Brisbane Lions,3.0,0.928,196,96
-2024,Harry Barnett,West Coast,0.0,0.0,657,197
-2024,Harry Cunningham,Sydney,0.0,0.065,384,197
-2024,Harry Edwards,West Coast,0.0,0.004,565,197
-2024,Harry Himmelberg,Greater Western Sydney,0.0,0.646,222,197
-2024,Harry Jones,Essendon,0.0,0.045,406,197
-2024,Harry McKay,Carlton,6.0,5.168,65,60
-2024,Harry Morrison,Hawthorn,0.0,0.283,291,197
-2024,Harry Perryman,Greater Western Sydney,0.0,0.292,288,197
+2024,Gary Rohan,Geelong,0.0,0.043,418,197
+2024,George Hewett,Carlton,3.0,6.593,50,96
+2024,George Wardlaw,North Melbourne,2.0,1.024,191,124
+2024,Griffin Logue,North Melbourne,0.0,0.001,599,197
+2024,Gryan Miers,Geelong,2.0,4.718,77,124
+2024,Harley Reid,West Coast,7.0,4.452,83,53
+2024,Harris Andrews,Brisbane Lions,3.0,0.908,201,96
+2024,Harry Barnett,West Coast,0.0,0.0,656,197
+2024,Harry Cunningham,Sydney,0.0,0.067,382,197
+2024,Harry Edwards,West Coast,0.0,0.004,556,197
+2024,Harry Himmelberg,Greater Western Sydney,0.0,0.787,211,197
+2024,Harry Jones,Essendon,0.0,0.047,408,197
+2024,Harry McKay,Carlton,6.0,5.31,63,60
+2024,Harry Morrison,Hawthorn,0.0,0.335,276,197
+2024,Harry Perryman,Greater Western Sydney,0.0,0.343,275,197
 2024,Harry Petty,Melbourne,3.0,0.086,366,96
 2024,Harry Schoenberg,Adelaide,0.0,0.004,562,197
-2024,Harry Sharp,Brisbane Lions,0.0,0.012,497,197
-2024,Harry Sheezel,North Melbourne,15.0,11.512,27,23
-2024,Harvey Gallagher,Western Bulldogs,0.0,0.129,340,197
-2024,Harvey Harrison,Collingwood,0.0,0.029,448,197
-2024,Harvey Johnston,West Coast,0.0,0.002,591,197
-2024,Harvey Thomas,Greater Western Sydney,0.0,0.094,360,197
-2024,Hayden McLean,Sydney,0.0,0.276,294,197
-2024,Hayden Young,Fremantle,12.0,12.047,25,29
-2024,Heath Chapman,Fremantle,0.0,0.105,350,197
+2024,Harry Sharp,Brisbane Lions,0.0,0.022,469,197
+2024,Harry Sheezel,North Melbourne,15.0,11.547,28,23
+2024,Harvey Gallagher,Western Bulldogs,0.0,0.176,324,197
+2024,Harvey Harrison,Collingwood,0.0,0.055,397,197
+2024,Harvey Johnston,West Coast,0.0,0.002,590,197
+2024,Harvey Thomas,Greater Western Sydney,0.0,0.07,380,197
+2024,Hayden McLean,Sydney,0.0,0.253,303,197
+2024,Hayden Young,Fremantle,12.0,11.275,29,29
+2024,Heath Chapman,Fremantle,0.0,0.094,357,197
 2024,Henry Hustwaite,Hawthorn,0.0,0.001,598,197
-2024,Henry Smith,Brisbane Lions,0.0,0.007,529,197
-2024,Hugh Bond,Adelaide,0.0,0.004,560,197
-2024,Hugh Davies,Fremantle,0.0,0.001,624,197
+2024,Henry Smith,Brisbane Lions,0.0,0.007,532,197
+2024,Hugh Bond,Adelaide,0.0,0.004,557,197
+2024,Hugh Davies,Fremantle,0.0,0.001,625,197
 2024,Hugh Greenwood,North Melbourne,0.0,0.001,629,197
-2024,Hugh McCluggage,Brisbane Lions,12.0,13.642,23,29
-2024,Hugo Garcia,St Kilda,0.0,0.007,528,197
-2024,Hugo Ralphsmith,Richmond,0.0,0.021,470,197
-2024,Hunter Clark,St Kilda,0.0,0.277,293,197
-2024,Isaac Cumming,Greater Western Sydney,0.0,0.039,423,197
-2024,Isaac Heeney,Sydney,28.0,24.736,4,4
-2024,Isaac Quaynor,Collingwood,0.0,0.041,416,197
-2024,Ivan Soldo,Port Adelaide,0.0,0.598,228,197
-2024,Izak Rankine,Adelaide,5.0,8.599,39,67
-2024,Jack Billings,Melbourne,0.0,0.26,297,197
-2024,Jack Bowes,Geelong,4.0,5.113,67,78
-2024,Jack Buckley,Greater Western Sydney,0.0,0.494,249,197
-2024,Jack Bytel,Collingwood,0.0,0.047,404,197
-2024,Jack Carroll,Carlton,0.0,0.031,444,197
-2024,Jack Crisp,Collingwood,5.0,6.697,51,67
-2024,Jack Darling,West Coast,0.0,0.249,304,197
-2024,Jack Ginnivan,Hawthorn,3.0,3.222,107,96
-2024,Jack Graham,Richmond,0.0,0.057,390,197
-2024,Jack Gunston,Hawthorn,3.0,2.803,119,96
-2024,Jack Hayes,St Kilda,1.0,0.065,383,152
-2024,Jack Henry,Geelong,0.0,0.117,342,197
-2024,Jack Higgins,St Kilda,1.0,0.714,214,152
-2024,Jack Hutchinson,West Coast,0.0,0.01,505,197
-2024,Jack Lukosius,Gold Coast,2.0,0.718,213,124
-2024,Jack Macrae,Western Bulldogs,0.0,0.635,224,197
-2024,Jack Martin,Carlton,0.0,0.002,589,197
-2024,Jack Payne,Brisbane Lions,0.0,0.445,256,197
-2024,Jack Petruccelle,West Coast,0.0,0.029,447,197
-2024,Jack Ross,Richmond,0.0,0.043,407,197
-2024,Jack Scrimshaw,Hawthorn,0.0,0.254,300,197
-2024,Jack Sinclair,St Kilda,11.0,9.636,32,35
-2024,Jack Steele,St Kilda,9.0,10.835,30,41
-2024,Jack Viney,Melbourne,8.0,6.146,56,45
-2024,Jack Williams,West Coast,0.0,0.041,413,197
-2024,Jackson Archer,North Melbourne,0.0,0.093,362,197
-2024,Jackson Mead,Port Adelaide,0.0,0.14,334,197
-2024,Jacob Bauer,Richmond,0.0,0.005,547,197
-2024,Jacob Blight,Richmond,0.0,0.001,604,197
-2024,Jacob Hopper,Richmond,0.0,0.233,308,197
-2024,Jacob Koschitzke,Richmond,0.0,0.009,514,197
-2024,Jacob Wehr,Greater Western Sydney,0.0,0.012,494,197
-2024,Jacob Weitering,Carlton,0.0,0.917,198,197
-2024,Jacob van Rooyen,Melbourne,1.0,1.099,187,152
-2024,Jade Gresham,Essendon,0.0,0.354,274,197
-2024,Jaeger OMeara,Fremantle,0.0,0.35,275,197
-2024,Jai Culley,West Coast,0.0,0.001,599,197
-2024,Jai Newcombe,Hawthorn,24.0,15.089,19,10
-2024,Jai Serong,Hawthorn,0.0,0.002,584,197
-2024,Jaidyn Stephenson,North Melbourne,0.0,0.018,479,197
-2024,Jake Bowey,Melbourne,0.0,0.034,434,197
-2024,Jake Kelly,Essendon,0.0,0.039,424,197
-2024,Jake Kolodjashnij,Geelong,0.0,0.059,385,197
-2024,Jake Lever,Melbourne,0.0,1.608,156,197
-2024,Jake Lloyd,Sydney,0.0,0.594,229,197
-2024,Jake Melksham,Melbourne,0.0,0.024,462,197
-2024,Jake Riccardi,Greater Western Sydney,2.0,1.054,191,124
-2024,Jake Rogers,Gold Coast,0.0,0.217,312,197
-2024,Jake Soligo,Adelaide,7.0,5.131,66,53
-2024,Jake Stringer,Essendon,1.0,3.22,108,152
-2024,Jake Waterman,West Coast,7.0,7.723,42,53
+2024,Hugh McCluggage,Brisbane Lions,12.0,12.742,23,29
+2024,Hugo Garcia,St Kilda,0.0,0.006,533,197
+2024,Hugo Ralphsmith,Richmond,0.0,0.015,488,197
+2024,Hunter Clark,St Kilda,0.0,0.326,281,197
+2024,Isaac Cumming,Greater Western Sydney,0.0,0.054,399,197
+2024,Isaac Heeney,Sydney,28.0,25.475,3,4
+2024,Isaac Quaynor,Collingwood,0.0,0.041,421,197
+2024,Ivan Soldo,Port Adelaide,0.0,0.567,237,197
+2024,Izak Rankine,Adelaide,5.0,8.15,39,67
+2024,Jack Billings,Melbourne,0.0,0.307,289,197
+2024,Jack Bowes,Geelong,4.0,4.987,72,78
+2024,Jack Buckley,Greater Western Sydney,0.0,0.448,252,197
+2024,Jack Bytel,Collingwood,0.0,0.054,398,197
+2024,Jack Carroll,Carlton,0.0,0.036,430,197
+2024,Jack Crisp,Collingwood,5.0,6.184,55,67
+2024,Jack Darling,West Coast,0.0,0.292,291,197
+2024,Jack Ginnivan,Hawthorn,3.0,3.157,109,96
+2024,Jack Graham,Richmond,0.0,0.046,411,197
+2024,Jack Gunston,Hawthorn,3.0,2.93,116,96
+2024,Jack Hayes,St Kilda,1.0,0.092,363,152
+2024,Jack Henry,Geelong,0.0,0.125,343,197
+2024,Jack Higgins,St Kilda,1.0,0.908,202,152
+2024,Jack Hutchinson,West Coast,0.0,0.012,497,197
+2024,Jack Lukosius,Gold Coast,2.0,1.004,192,124
+2024,Jack Macrae,Western Bulldogs,0.0,0.663,226,197
+2024,Jack Martin,Carlton,0.0,0.002,587,197
+2024,Jack Payne,Brisbane Lions,0.0,0.262,302,197
+2024,Jack Petruccelle,West Coast,0.0,0.039,423,197
+2024,Jack Ross,Richmond,0.0,0.043,416,197
+2024,Jack Scrimshaw,Hawthorn,0.0,0.228,313,197
+2024,Jack Sinclair,St Kilda,11.0,9.213,34,35
+2024,Jack Steele,St Kilda,9.0,11.223,30,41
+2024,Jack Viney,Melbourne,8.0,6.202,54,45
+2024,Jack Williams,West Coast,0.0,0.048,406,197
+2024,Jackson Archer,North Melbourne,0.0,0.076,370,197
+2024,Jackson Mead,Port Adelaide,0.0,0.14,337,197
+2024,Jacob Bauer,Richmond,0.0,0.005,551,197
+2024,Jacob Blight,Richmond,0.0,0.001,605,197
+2024,Jacob Hopper,Richmond,0.0,0.243,307,197
+2024,Jacob Koschitzke,Richmond,0.0,0.009,509,197
+2024,Jacob Wehr,Greater Western Sydney,0.0,0.013,495,197
+2024,Jacob Weitering,Carlton,0.0,1.031,190,197
+2024,Jacob van Rooyen,Melbourne,1.0,1.206,178,152
+2024,Jade Gresham,Essendon,0.0,0.33,279,197
+2024,Jaeger OMeara,Fremantle,0.0,0.366,268,197
+2024,Jai Culley,West Coast,0.0,0.001,604,197
+2024,Jai Newcombe,Hawthorn,24.0,13.913,21,10
+2024,Jai Serong,Hawthorn,0.0,0.003,579,197
+2024,Jaidyn Stephenson,North Melbourne,0.0,0.018,477,197
+2024,Jake Bowey,Melbourne,0.0,0.035,434,197
+2024,Jake Kelly,Essendon,0.0,0.032,443,197
+2024,Jake Kolodjashnij,Geelong,0.0,0.059,392,197
+2024,Jake Lever,Melbourne,0.0,1.376,170,197
+2024,Jake Lloyd,Sydney,0.0,0.606,231,197
+2024,Jake Melksham,Melbourne,0.0,0.02,472,197
+2024,Jake Riccardi,Greater Western Sydney,2.0,1.338,172,124
+2024,Jake Rogers,Gold Coast,0.0,0.244,306,197
+2024,Jake Soligo,Adelaide,7.0,5.354,62,53
+2024,Jake Stringer,Essendon,1.0,3.33,103,152
+2024,Jake Waterman,West Coast,7.0,7.982,41,53
 2024,Jamaine Jones,West Coast,0.0,0.003,572,197
-2024,Jamarra Ugle-Hagan,Western Bulldogs,3.0,4.505,79,96
-2024,James Aish,Fremantle,0.0,0.454,255,197
-2024,James Borlase,Adelaide,0.0,0.025,460,197
-2024,James Harmes,Western Bulldogs,4.0,1.692,152,78
-2024,James Jordon,Sydney,0.0,0.104,351,197
-2024,James ODonnell,Western Bulldogs,0.0,0.038,425,197
-2024,James Peatling,Greater Western Sydney,1.0,2.912,114,152
-2024,James Rowbottom,Sydney,4.0,3.541,99,78
-2024,James Sicily,Hawthorn,4.0,4.4,83,78
-2024,James Trezise,Richmond,0.0,0.004,557,197
-2024,James Tunstill,Brisbane Lions,0.0,0.001,596,197
-2024,James Worpel,Hawthorn,14.0,9.093,35,26
-2024,Jamie Cripps,West Coast,0.0,0.318,281,197
-2024,Jamie Elliott,Collingwood,3.0,1.503,164,96
-2024,Jarman Impey,Hawthorn,1.0,1.845,143,152
-2024,Jarrod Berry,Brisbane Lions,0.0,1.941,139,197
-2024,Jarrod Witts,Gold Coast,1.0,3.529,100,152
-2024,Jarryd Lyons,Brisbane Lions,0.0,0.026,457,197
-2024,Jase Burgoyne,Port Adelaide,0.0,2.233,132,197
-2024,Jason Horne-Francis,Port Adelaide,19.0,15.469,17,14
-2024,Jason Johannisen,Western Bulldogs,0.0,0.326,278,197
-2024,Jaspa Fletcher,Brisbane Lions,0.0,0.059,388,197
-2024,Jaxon Binns,Carlton,0.0,0.019,474,197
-2024,Jaxon Prior,Brisbane Lions,0.0,0.007,523,197
-2024,Jayden Hunt,West Coast,0.0,0.123,341,197
-2024,Jayden Laverde,Essendon,0.0,0.32,280,197
-2024,Jayden Short,Richmond,1.0,0.689,217,152
-2024,Jed Bews,Geelong,0.0,0.004,554,197
-2024,Jed McEntee,Port Adelaide,0.0,0.012,499,197
-2024,Jed Walter,Gold Coast,0.0,0.009,515,197
-2024,Jeremy Cameron,Geelong,16.0,14.259,21,19
-2024,Jeremy Finlayson,Port Adelaide,0.0,0.567,236,197
-2024,Jeremy Howe,Collingwood,0.0,0.655,219,197
-2024,Jeremy McGovern,West Coast,0.0,1.142,184,197
-2024,Jeremy Sharp,Fremantle,0.0,0.635,223,197
-2024,Jesse Hogan,Greater Western Sydney,15.0,14.278,20,23
-2024,Jesse Motlop,Carlton,0.0,0.007,526,197
-2024,Jhye Clark,Geelong,0.0,0.027,454,197
-2024,Jimmy Webster,St Kilda,0.0,0.022,469,197
-2024,Joe Daniher,Brisbane Lions,8.0,7.17,46,45
-2024,Joe Fonti,Greater Western Sydney,0.0,0.003,578,197
-2024,Joe Richards,Collingwood,0.0,0.133,338,197
-2024,Joel Amartey,Sydney,3.0,3.051,112,96
-2024,Joel Freijah,Western Bulldogs,0.0,0.207,313,197
-2024,Joel Jeffrey,Gold Coast,0.0,0.262,296,197
-2024,John Noble,Collingwood,3.0,0.419,261,96
-2024,Jordan Boyd,Carlton,0.0,0.028,453,197
-2024,Jordan Clark,Fremantle,4.0,5.052,69,78
-2024,Jordan Dawson,Adelaide,18.0,11.572,26,16
-2024,Jordan Ridley,Essendon,3.0,2.411,129,96
-2024,Jordan de Goey,Collingwood,8.0,3.574,98,45
-2024,Jordon Butts,Adelaide,0.0,0.018,480,197
-2024,Jordon Sweet,Port Adelaide,0.0,0.648,221,197
-2024,Josh Battle,St Kilda,0.0,1.3,174,197
-2024,Josh Daicos,Collingwood,3.0,6.332,54,96
-2024,Josh Draper,Fremantle,1.0,0.071,380,152
-2024,Josh Dunkley,Brisbane Lions,11.0,13.951,22,35
-2024,Josh Gibcus,Richmond,0.0,0.001,626,197
-2024,Josh Goater,North Melbourne,0.0,0.0,647,197
-2024,Josh Kelly,Greater Western Sydney,6.0,4.198,87,60
-2024,Josh Rachele,Adelaide,0.0,0.135,337,197
-2024,Josh Rotham,West Coast,0.0,0.008,518,197
-2024,Josh Schache,Melbourne,0.0,0.0,652,197
-2024,Josh Sinn,Port Adelaide,0.0,0.006,541,197
-2024,Josh Treacy,Fremantle,2.0,4.438,81,124
-2024,Josh Ward,Hawthorn,0.0,0.014,491,197
-2024,Josh Weddle,Hawthorn,3.0,0.195,315,96
-2024,Josh Worrell,Adelaide,0.0,0.249,303,197
-2024,Judd McVee,Melbourne,1.0,0.709,215,152
-2024,Judson Clarke,Richmond,0.0,0.0,653,197
-2024,Justin McInerney,Sydney,0.0,0.384,267,197
-2024,Jy Simpkin,North Melbourne,1.0,3.273,105,152
-2024,Jye Amiss,Fremantle,1.0,0.256,299,152
-2024,Jye Caldwell,Essendon,8.0,7.048,49,45
-2024,Jye Menzie,Essendon,0.0,0.014,490,197
-2024,Kade Chandler,Melbourne,0.0,0.09,364,197
-2024,Kai Lohmann,Brisbane Lions,1.0,1.348,172,152
-2024,Kaleb Smith,Richmond,0.0,0.001,611,197
-2024,Kallan Dawson,North Melbourne,0.0,0.004,550,197
-2024,Kamdyn McIntosh,Richmond,0.0,0.024,465,197
-2024,Kane Farrell,Port Adelaide,1.0,0.562,238,152
-2024,Kane McAuliffe,Richmond,0.0,0.006,536,197
-2024,Karl Amon,Hawthorn,3.0,1.82,144,96
-2024,Karl Worner,Fremantle,0.0,0.002,585,197
-2024,Keidean Coleman,Brisbane Lions,0.0,0.0,645,197
-2024,Kieran Strachan,Adelaide,0.0,0.002,586,197
-2024,Kieren Briggs,Greater Western Sydney,1.0,3.796,94,152
-2024,Koltyn Tholstrup,Melbourne,0.0,0.072,378,197
-2024,Kyle Langford,Essendon,6.0,3.805,93,60
-2024,Kynan Brown,Melbourne,0.0,0.0,637,197
-2024,Kysaiah Pickett,Melbourne,3.0,3.953,89,96
-2024,Lachie Ash,Greater Western Sydney,0.0,0.497,248,197
-2024,Lachie Fogarty,Carlton,0.0,0.051,396,197
-2024,Lachie Hunter,Melbourne,0.0,0.002,583,197
-2024,Lachie Jones,Port Adelaide,0.0,0.028,450,197
-2024,Lachie Neale,Brisbane Lions,22.0,29.195,2,12
-2024,Lachie Schultz,Collingwood,0.0,0.094,359,197
-2024,Lachie Weller,Gold Coast,0.0,0.016,485,197
-2024,Lachie Whitfield,Greater Western Sydney,9.0,7.684,43,41
-2024,Lachlan Bramble,Western Bulldogs,1.0,0.504,246,152
-2024,Lachlan Cowan,Carlton,0.0,0.043,409,197
-2024,Lachlan Gollant,Adelaide,0.0,0.001,614,197
-2024,Lachlan Keeffe,Greater Western Sydney,0.0,0.007,530,197
-2024,Lachlan McNeil,Western Bulldogs,0.0,0.026,458,197
-2024,Lachlan Murphy,Adelaide,0.0,0.028,451,197
-2024,Lachlan Sholl,Adelaide,0.0,2.819,117,197
-2024,Lachlan Sullivan,Collingwood,0.0,0.033,440,197
-2024,Laitham Vandermeer,Western Bulldogs,0.0,0.15,329,197
-2024,Lance Collard,St Kilda,0.0,0.0,638,197
-2024,Lawson Humphries,Geelong,0.0,0.087,365,197
-2024,Leek Aleer,Greater Western Sydney,0.0,0.059,387,197
-2024,Levi Casboult,Gold Coast,0.0,0.002,588,197
-2024,Lewis Melican,Sydney,0.0,0.034,435,197
-2024,Lewis Young,Carlton,0.0,0.027,455,197
-2024,Liam Baker,Richmond,0.0,2.278,131,197
-2024,Liam Duggan,West Coast,2.0,1.252,179,124
-2024,Liam Henry,St Kilda,0.0,0.159,323,197
-2024,Liam Jones,Western Bulldogs,3.0,0.956,195,96
-2024,Liam Reidy,Fremantle,0.0,0.003,577,197
-2024,Liam Ryan,West Coast,0.0,0.149,330,197
-2024,Liam Shiels,North Melbourne,0.0,0.013,492,197
-2024,Liam Stocker,St Kilda,0.0,0.025,461,197
-2024,Lincoln McCarthy,Brisbane Lions,0.0,0.035,433,197
-2024,Lloyd Johnston,Gold Coast,0.0,0.006,534,197
-2024,Lloyd Meek,Hawthorn,0.0,1.262,176,197
-2024,Loch Rawlinson,West Coast,0.0,0.0,651,197
-2024,Logan Evans,Port Adelaide,0.0,0.172,321,197
-2024,Logan McDonald,Sydney,1.0,1.369,169,152
-2024,Logan Morris,Brisbane Lions,0.0,0.033,441,197
-2024,Luke Breust,Hawthorn,0.0,0.244,305,197
-2024,Luke Cleary,Western Bulldogs,0.0,0.002,587,197
-2024,Luke Davies-Uniacke,North Melbourne,18.0,11.297,28,16
-2024,Luke Edwards,West Coast,0.0,0.005,549,197
-2024,Luke Jackson,Fremantle,4.0,4.655,76,78
-2024,Luke McDonald,North Melbourne,0.0,0.02,473,197
-2024,Luke Nankervis,Adelaide,0.0,0.241,306,197
-2024,Luke Parker,Sydney,0.0,0.309,285,197
-2024,Luke Pedlar,Adelaide,0.0,0.001,605,197
-2024,Luke Ryan,Fremantle,7.0,3.9,91,53
-2024,Mabior Chol,Hawthorn,0.0,0.756,210,197
-2024,Mac Andrew,Gold Coast,0.0,1.731,149,197
-2024,Malcolm Rosas,Gold Coast,0.0,0.033,436,197
-2024,Marc Pittonet,Carlton,0.0,0.349,276,197
-2024,Marcus Bontempelli,Western Bulldogs,19.0,23.674,6,14
-2024,Marcus Windhager,St Kilda,1.0,0.767,206,152
-2024,Mark Blicavs,Geelong,0.0,0.371,269,197
-2024,Mark Keane,Adelaide,0.0,0.512,245,197
-2024,Mark OConnor,Geelong,0.0,0.038,427,197
-2024,Marlion Pickett,Richmond,0.0,0.03,446,197
-2024,Marty Hore,Melbourne,0.0,0.024,464,197
-2024,Mason Cox,Collingwood,0.0,0.04,419,197
-2024,Mason Redman,Essendon,0.0,0.983,194,197
-2024,Mason Wood,St Kilda,3.0,2.194,134,96
-2024,Massimo DAmbrosio,Hawthorn,5.0,2.425,128,67
-2024,Matt Crouch,Adelaide,4.0,5.602,61,78
-2024,Matt Flynn,West Coast,0.0,0.009,512,197
-2024,Matt Guelfi,Essendon,0.0,0.309,286,197
-2024,Matt Roberts,Sydney,3.0,0.767,207,96
-2024,Matt Rowell,Gold Coast,25.0,15.659,15,8
-2024,Mattaes Phillipou,St Kilda,0.0,2.664,122,197
+2024,Jamarra Ugle-Hagan,Western Bulldogs,3.0,4.27,87,96
+2024,James Aish,Fremantle,0.0,0.573,236,197
+2024,James Borlase,Adelaide,0.0,0.025,462,197
+2024,James Harmes,Western Bulldogs,4.0,1.697,154,78
+2024,James Jordon,Sydney,0.0,0.105,349,197
+2024,James ODonnell,Western Bulldogs,0.0,0.039,424,197
+2024,James Peatling,Greater Western Sydney,1.0,2.21,133,152
+2024,James Rowbottom,Sydney,4.0,3.396,102,78
+2024,James Sicily,Hawthorn,4.0,4.221,88,78
+2024,James Trezise,Richmond,0.0,0.005,554,197
+2024,James Tunstill,Brisbane Lions,0.0,0.001,609,197
+2024,James Worpel,Hawthorn,14.0,9.004,36,26
+2024,Jamie Cripps,West Coast,0.0,0.236,311,197
+2024,Jamie Elliott,Collingwood,3.0,1.88,147,96
+2024,Jarman Impey,Hawthorn,1.0,2.092,138,152
+2024,Jarrod Berry,Brisbane Lions,0.0,1.79,152,197
+2024,Jarrod Witts,Gold Coast,1.0,3.398,101,152
+2024,Jarryd Lyons,Brisbane Lions,0.0,0.027,458,197
+2024,Jase Burgoyne,Port Adelaide,0.0,2.489,130,197
+2024,Jason Horne-Francis,Port Adelaide,19.0,15.71,15,14
+2024,Jason Johannisen,Western Bulldogs,0.0,0.208,317,197
+2024,Jaspa Fletcher,Brisbane Lions,0.0,0.068,381,197
+2024,Jaxon Binns,Carlton,0.0,0.02,471,197
+2024,Jaxon Prior,Brisbane Lions,0.0,0.006,536,197
+2024,Jayden Hunt,West Coast,0.0,0.158,330,197
+2024,Jayden Laverde,Essendon,0.0,0.359,272,197
+2024,Jayden Short,Richmond,1.0,0.533,240,152
+2024,Jed Bews,Geelong,0.0,0.004,564,197
+2024,Jed McEntee,Port Adelaide,0.0,0.009,515,197
+2024,Jed Walter,Gold Coast,0.0,0.009,513,197
+2024,Jeremy Cameron,Geelong,16.0,14.736,19,19
+2024,Jeremy Finlayson,Port Adelaide,0.0,0.388,265,197
+2024,Jeremy Howe,Collingwood,0.0,0.727,218,197
+2024,Jeremy McGovern,West Coast,0.0,1.299,175,197
+2024,Jeremy Sharp,Fremantle,0.0,0.949,199,197
+2024,Jesse Hogan,Greater Western Sydney,15.0,14.202,20,23
+2024,Jesse Motlop,Carlton,0.0,0.01,508,197
+2024,Jhye Clark,Geelong,0.0,0.027,455,197
+2024,Jimmy Webster,St Kilda,0.0,0.023,466,197
+2024,Joe Daniher,Brisbane Lions,8.0,7.65,44,45
+2024,Joe Fonti,Greater Western Sydney,0.0,0.003,570,197
+2024,Joe Richards,Collingwood,0.0,0.111,347,197
+2024,Joel Amartey,Sydney,3.0,3.079,112,96
+2024,Joel Freijah,Western Bulldogs,0.0,0.238,309,197
+2024,Joel Jeffrey,Gold Coast,0.0,0.141,336,197
+2024,John Noble,Collingwood,3.0,0.486,244,96
+2024,Jordan Boyd,Carlton,0.0,0.027,459,197
+2024,Jordan Clark,Fremantle,4.0,5.217,66,78
+2024,Jordan Dawson,Adelaide,18.0,11.813,25,16
+2024,Jordan Ridley,Essendon,3.0,2.502,128,96
+2024,Jordan de Goey,Collingwood,8.0,3.846,94,45
+2024,Jordon Butts,Adelaide,0.0,0.016,486,197
+2024,Jordon Sweet,Port Adelaide,0.0,0.55,239,197
+2024,Josh Battle,St Kilda,0.0,1.248,177,197
+2024,Josh Daicos,Collingwood,3.0,5.826,57,96
+2024,Josh Draper,Fremantle,1.0,0.071,379,152
+2024,Josh Dunkley,Brisbane Lions,11.0,13.08,22,35
+2024,Josh Gibcus,Richmond,0.0,0.001,621,197
+2024,Josh Goater,North Melbourne,0.0,0.0,649,197
+2024,Josh Kelly,Greater Western Sydney,6.0,4.307,85,60
+2024,Josh Rachele,Adelaide,0.0,0.15,333,197
+2024,Josh Rotham,West Coast,0.0,0.01,504,197
+2024,Josh Schache,Melbourne,0.0,0.0,651,197
+2024,Josh Sinn,Port Adelaide,0.0,0.005,552,197
+2024,Josh Treacy,Fremantle,2.0,4.883,74,124
+2024,Josh Ward,Hawthorn,0.0,0.013,494,197
+2024,Josh Weddle,Hawthorn,3.0,0.275,299,96
+2024,Josh Worrell,Adelaide,0.0,0.282,296,197
+2024,Judd McVee,Melbourne,1.0,0.711,219,152
+2024,Judson Clarke,Richmond,0.0,0.0,654,197
+2024,Justin McInerney,Sydney,0.0,0.361,270,197
+2024,Jy Simpkin,North Melbourne,1.0,3.248,105,152
+2024,Jye Amiss,Fremantle,1.0,0.322,283,152
+2024,Jye Caldwell,Essendon,8.0,6.935,46,45
+2024,Jye Menzie,Essendon,0.0,0.011,503,197
+2024,Kade Chandler,Melbourne,0.0,0.094,358,197
+2024,Kai Lohmann,Brisbane Lions,1.0,1.54,159,152
+2024,Kaleb Smith,Richmond,0.0,0.001,615,197
+2024,Kallan Dawson,North Melbourne,0.0,0.006,540,197
+2024,Kamdyn McIntosh,Richmond,0.0,0.029,448,197
+2024,Kane Farrell,Port Adelaide,1.0,0.599,233,152
+2024,Kane McAuliffe,Richmond,0.0,0.006,537,197
+2024,Karl Amon,Hawthorn,3.0,1.898,145,96
+2024,Karl Worner,Fremantle,0.0,0.002,584,197
+2024,Keidean Coleman,Brisbane Lions,0.0,0.0,641,197
+2024,Kieran Strachan,Adelaide,0.0,0.002,583,197
+2024,Kieren Briggs,Greater Western Sydney,1.0,2.783,121,152
+2024,Koltyn Tholstrup,Melbourne,0.0,0.062,389,197
+2024,Kyle Langford,Essendon,6.0,3.538,99,60
+2024,Kynan Brown,Melbourne,0.0,0.0,639,197
+2024,Kysaiah Pickett,Melbourne,3.0,4.509,82,96
+2024,Lachie Ash,Greater Western Sydney,0.0,0.475,246,197
+2024,Lachie Fogarty,Carlton,0.0,0.071,377,197
+2024,Lachie Hunter,Melbourne,0.0,0.002,586,197
+2024,Lachie Jones,Port Adelaide,0.0,0.028,454,197
+2024,Lachie Neale,Brisbane Lions,22.0,28.655,2,12
+2024,Lachie Schultz,Collingwood,0.0,0.097,355,197
+2024,Lachie Weller,Gold Coast,0.0,0.014,493,197
+2024,Lachie Whitfield,Greater Western Sydney,9.0,7.769,43,41
+2024,Lachlan Bramble,Western Bulldogs,1.0,0.417,259,152
+2024,Lachlan Cowan,Carlton,0.0,0.052,401,197
+2024,Lachlan Gollant,Adelaide,0.0,0.001,617,197
+2024,Lachlan Keeffe,Greater Western Sydney,0.0,0.008,524,197
+2024,Lachlan McNeil,Western Bulldogs,0.0,0.027,457,197
+2024,Lachlan Murphy,Adelaide,0.0,0.029,449,197
+2024,Lachlan Sholl,Adelaide,0.0,2.936,115,197
+2024,Lachlan Sullivan,Collingwood,0.0,0.035,432,197
+2024,Laitham Vandermeer,Western Bulldogs,0.0,0.137,341,197
+2024,Lance Collard,St Kilda,0.0,0.0,640,197
+2024,Lawson Humphries,Geelong,0.0,0.075,372,197
+2024,Leek Aleer,Greater Western Sydney,0.0,0.062,388,197
+2024,Levi Casboult,Gold Coast,0.0,0.003,571,197
+2024,Lewis Melican,Sydney,0.0,0.031,446,197
+2024,Lewis Young,Carlton,0.0,0.028,453,197
+2024,Liam Baker,Richmond,0.0,2.796,120,197
+2024,Liam Duggan,West Coast,2.0,1.202,179,124
+2024,Liam Henry,St Kilda,0.0,0.144,334,197
+2024,Liam Jones,Western Bulldogs,3.0,0.791,209,96
+2024,Liam Reidy,Fremantle,0.0,0.003,566,197
+2024,Liam Ryan,West Coast,0.0,0.168,328,197
+2024,Liam Shiels,North Melbourne,0.0,0.014,492,197
+2024,Liam Stocker,St Kilda,0.0,0.026,461,197
+2024,Lincoln McCarthy,Brisbane Lions,0.0,0.034,435,197
+2024,Lloyd Johnston,Gold Coast,0.0,0.007,526,197
+2024,Lloyd Meek,Hawthorn,0.0,1.476,166,197
+2024,Loch Rawlinson,West Coast,0.0,0.0,652,197
+2024,Logan Evans,Port Adelaide,0.0,0.2,319,197
+2024,Logan McDonald,Sydney,1.0,1.438,167,152
+2024,Logan Morris,Brisbane Lions,0.0,0.027,456,197
+2024,Luke Breust,Hawthorn,0.0,0.241,308,197
+2024,Luke Cleary,Western Bulldogs,0.0,0.002,589,197
+2024,Luke Davies-Uniacke,North Melbourne,18.0,11.751,26,16
+2024,Luke Edwards,West Coast,0.0,0.005,553,197
+2024,Luke Jackson,Fremantle,4.0,4.3,86,78
+2024,Luke McDonald,North Melbourne,0.0,0.018,476,197
+2024,Luke Nankervis,Adelaide,0.0,0.233,312,197
+2024,Luke Parker,Sydney,0.0,0.36,271,197
+2024,Luke Pedlar,Adelaide,0.0,0.001,606,197
+2024,Luke Ryan,Fremantle,7.0,3.813,95,53
+2024,Mabior Chol,Hawthorn,0.0,0.879,204,197
+2024,Mac Andrew,Gold Coast,0.0,1.912,144,197
+2024,Malcolm Rosas,Gold Coast,0.0,0.031,447,197
+2024,Marc Pittonet,Carlton,0.0,0.333,278,197
+2024,Marcus Bontempelli,Western Bulldogs,19.0,22.882,5,14
+2024,Marcus Windhager,St Kilda,1.0,0.692,221,152
+2024,Mark Blicavs,Geelong,0.0,0.366,269,197
+2024,Mark Keane,Adelaide,0.0,0.432,256,197
+2024,Mark OConnor,Geelong,0.0,0.042,419,197
+2024,Marlion Pickett,Richmond,0.0,0.032,445,197
+2024,Marty Hore,Melbourne,0.0,0.028,451,197
+2024,Mason Cox,Collingwood,0.0,0.055,396,197
+2024,Mason Redman,Essendon,0.0,0.953,198,197
+2024,Mason Wood,St Kilda,3.0,2.497,129,96
+2024,Massimo DAmbrosio,Hawthorn,5.0,2.519,127,67
+2024,Matt Crouch,Adelaide,4.0,5.079,69,78
+2024,Matt Flynn,West Coast,0.0,0.008,520,197
+2024,Matt Guelfi,Essendon,0.0,0.396,262,197
+2024,Matt Roberts,Sydney,3.0,0.755,215,96
+2024,Matt Rowell,Gold Coast,25.0,15.241,17,8
+2024,Mattaes Phillipou,St Kilda,0.0,2.278,132,197
 2024,Matthew Cottrell,Carlton,0.0,0.033,439,197
-2024,Matthew Coulthard,Richmond,0.0,0.0,646,197
-2024,Matthew Johnson,Fremantle,0.0,0.177,320,197
-2024,Matthew Kennedy,Carlton,2.0,1.128,186,124
-2024,Matthew Owies,Carlton,0.0,0.072,377,197
-2024,Matthew Taberner,Fremantle,0.0,0.009,513,197
-2024,Maurice Rioli,Richmond,0.0,0.007,531,197
-2024,Max Gawn,Melbourne,13.0,11.185,29,28
-2024,Max Gruzewski,Greater Western Sydney,0.0,0.001,615,197
-2024,Max Holmes,Geelong,10.0,6.745,50,38
-2024,Max King,St Kilda,0.0,0.25,302,197
-2024,Max Michalanney,Adelaide,0.0,0.096,356,197
-2024,Max Ramsden,Hawthorn,0.0,0.001,622,197
-2024,Michael Frederick,Fremantle,0.0,0.039,422,197
-2024,Michael Walters,Fremantle,0.0,0.757,209,197
-2024,Miles Bergman,Port Adelaide,0.0,0.311,283,197
-2024,Miller Bergman,North Melbourne,0.0,0.001,619,197
-2024,Mitch Duncan,Geelong,0.0,1.548,162,197
-2024,Mitch Georgiades,Port Adelaide,1.0,2.511,126,152
-2024,Mitch Hinge,Adelaide,0.0,0.691,216,197
-2024,Mitch Knevitt,Geelong,0.0,0.004,556,197
-2024,Mitch Lewis,Hawthorn,0.0,0.003,573,197
-2024,Mitch McGovern,Carlton,2.0,1.332,173,124
-2024,Mitch Owens,St Kilda,0.0,0.15,328,197
-2024,Mykelti Lefau,Richmond,0.0,0.016,484,197
-2024,Nasiah Wanganeen-Milera,St Kilda,8.0,4.27,86,45
-2024,Nat Fyfe,Fremantle,3.0,1.717,150,96
-2024,Nate Caddy,Essendon,0.0,0.016,486,197
-2024,Nathan Broad,Richmond,1.0,0.736,212,152
-2024,Nathan Kreuger,Collingwood,0.0,0.03,445,197
-2024,Nathan ODriscoll,Fremantle,0.0,0.006,538,197
-2024,Ned Long,Collingwood,0.0,0.006,540,197
-2024,Ned McHenry,Adelaide,0.0,0.006,542,197
-2024,Ned Moyle,Gold Coast,0.0,0.385,266,197
-2024,Ned Reeves,Hawthorn,0.0,0.007,525,197
-2024,Neil Erasmus,Fremantle,0.0,0.001,613,197
-2024,Nic Martin,Essendon,15.0,8.667,38,23
-2024,Nic Newman,Carlton,2.0,3.219,109,124
-2024,Nick Blakey,Sydney,4.0,4.423,82,78
-2024,Nick Bryan,Essendon,0.0,0.012,498,197
-2024,Nick Coffield,Western Bulldogs,0.0,0.007,524,197
-2024,Nick Daicos,Collingwood,38.0,29.959,1,2
-2024,Nick Haynes,Greater Western Sydney,0.0,0.04,418,197
-2024,Nick Hind,Essendon,0.0,0.578,232,197
-2024,Nick Holman,Gold Coast,0.0,0.037,429,197
-2024,Nick Larkey,North Melbourne,3.0,3.211,110,96
-2024,Nick Murray,Adelaide,0.0,0.018,481,197
-2024,Nick Vlastuin,Richmond,0.0,1.548,163,197
-2024,Nick Watson,Hawthorn,0.0,0.078,370,197
-2024,Nik Cox,Essendon,0.0,0.033,437,197
-2024,Noah Anderson,Gold Coast,14.0,19.3,10,26
-2024,Noah Answerth,Brisbane Lions,0.0,0.048,401,197
-2024,Noah Balta,Richmond,1.0,1.452,167,152
-2024,Noah Cumberland,Richmond,0.0,0.004,559,197
-2024,Noah Long,West Coast,0.0,0.004,553,197
-2024,Oisin Mullin,Geelong,0.0,0.012,496,197
-2024,Oleg Markov,Collingwood,0.0,0.006,533,197
-2024,Oliver Dempsey,Geelong,3.0,3.739,95,96
-2024,Oliver Florent,Sydney,0.0,2.612,124,197
-2024,Oliver Henry,Geelong,2.0,0.675,218,124
-2024,Oliver Hollands,Carlton,0.0,0.096,355,197
-2024,Ollie Lord,Port Adelaide,0.0,0.005,548,197
-2024,Ollie Wines,Port Adelaide,11.0,9.977,31,35
-2024,Orazio Fantasia,Carlton,0.0,0.115,344,197
-2024,Oscar Allen,West Coast,1.0,1.224,181,152
-2024,Oscar McDonald,Fremantle,0.0,0.001,631,197
-2024,Oscar McInerney,Brisbane Lions,2.0,3.38,103,124
-2024,Oskar Baker,Western Bulldogs,0.0,0.096,357,197
-2024,Paddy Dow,St Kilda,0.0,0.516,243,197
-2024,Patrick Cripps,Carlton,45.0,26.096,3,1
-2024,Patrick Dangerfield,Geelong,3.0,6.663,52,96
-2024,Patrick Lipinski,Collingwood,5.0,2.595,125,67
-2024,Patrick Parnell,Adelaide,0.0,0.0,639,197
-2024,Patrick Voss,Fremantle,0.0,0.008,520,197
-2024,Paul Curtis,North Melbourne,0.0,0.147,331,197
+2024,Matthew Coulthard,Richmond,0.0,0.0,645,197
+2024,Matthew Johnson,Fremantle,0.0,0.204,318,197
+2024,Matthew Kennedy,Carlton,2.0,1.056,189,124
+2024,Matthew Owies,Carlton,0.0,0.139,338,197
+2024,Matthew Taberner,Fremantle,0.0,0.009,512,197
+2024,Maurice Rioli,Richmond,0.0,0.007,525,197
+2024,Max Gawn,Melbourne,13.0,11.658,27,28
+2024,Max Gruzewski,Greater Western Sydney,0.0,0.001,616,197
+2024,Max Holmes,Geelong,10.0,6.627,49,38
+2024,Max King,St Kilda,0.0,0.314,287,197
+2024,Max Michalanney,Adelaide,0.0,0.072,376,197
+2024,Max Ramsden,Hawthorn,0.0,0.001,626,197
+2024,Michael Frederick,Fremantle,0.0,0.047,409,197
+2024,Michael Walters,Fremantle,0.0,0.711,220,197
+2024,Miles Bergman,Port Adelaide,0.0,0.287,294,197
+2024,Miller Bergman,North Melbourne,0.0,0.001,627,197
+2024,Mitch Duncan,Geelong,0.0,1.54,158,197
+2024,Mitch Georgiades,Port Adelaide,1.0,1.896,146,152
+2024,Mitch Hinge,Adelaide,0.0,0.776,213,197
+2024,Mitch Knevitt,Geelong,0.0,0.006,539,197
+2024,Mitch Lewis,Hawthorn,0.0,0.003,569,197
+2024,Mitch McGovern,Carlton,2.0,0.928,200,124
+2024,Mitch Owens,St Kilda,0.0,0.138,339,197
+2024,Mykelti Lefau,Richmond,0.0,0.013,496,197
+2024,Nasiah Wanganeen-Milera,St Kilda,8.0,4.197,89,45
+2024,Nat Fyfe,Fremantle,3.0,1.569,157,96
+2024,Nate Caddy,Essendon,0.0,0.017,479,197
+2024,Nathan Broad,Richmond,1.0,0.989,194,152
+2024,Nathan Kreuger,Collingwood,0.0,0.033,440,197
+2024,Nathan ODriscoll,Fremantle,0.0,0.008,523,197
+2024,Ned Long,Collingwood,0.0,0.006,542,197
+2024,Ned McHenry,Adelaide,0.0,0.007,528,197
+2024,Ned Moyle,Gold Coast,0.0,0.294,290,197
+2024,Ned Reeves,Hawthorn,0.0,0.015,490,197
+2024,Neil Erasmus,Fremantle,0.0,0.001,603,197
+2024,Nic Martin,Essendon,15.0,8.951,38,23
+2024,Nic Newman,Carlton,2.0,3.213,107,124
+2024,Nick Blakey,Sydney,4.0,5.246,65,78
+2024,Nick Bryan,Essendon,0.0,0.016,482,197
+2024,Nick Coffield,Western Bulldogs,0.0,0.008,521,197
+2024,Nick Daicos,Collingwood,38.0,29.659,1,2
+2024,Nick Haynes,Greater Western Sydney,0.0,0.051,402,197
+2024,Nick Hind,Essendon,0.0,0.505,242,197
+2024,Nick Holman,Gold Coast,0.0,0.034,436,197
+2024,Nick Larkey,North Melbourne,3.0,3.216,106,96
+2024,Nick Murray,Adelaide,0.0,0.019,473,197
+2024,Nick Vlastuin,Richmond,0.0,1.498,163,197
+2024,Nick Watson,Hawthorn,0.0,0.098,354,197
+2024,Nik Cox,Essendon,0.0,0.035,433,197
+2024,Noah Anderson,Gold Coast,14.0,19.051,11,26
+2024,Noah Answerth,Brisbane Lions,0.0,0.047,407,197
+2024,Noah Balta,Richmond,1.0,1.093,188,152
+2024,Noah Cumberland,Richmond,0.0,0.005,548,197
+2024,Noah Long,West Coast,0.0,0.004,563,197
+2024,Oisin Mullin,Geelong,0.0,0.009,518,197
+2024,Oleg Markov,Collingwood,0.0,0.006,534,197
+2024,Oliver Dempsey,Geelong,3.0,3.873,93,96
+2024,Oliver Florent,Sydney,0.0,2.529,126,197
+2024,Oliver Henry,Geelong,2.0,0.68,223,124
+2024,Oliver Hollands,Carlton,0.0,0.1,352,197
+2024,Ollie Lord,Port Adelaide,0.0,0.003,568,197
+2024,Ollie Wines,Port Adelaide,11.0,9.682,32,35
+2024,Orazio Fantasia,Carlton,0.0,0.282,295,197
+2024,Oscar Allen,West Coast,1.0,1.616,156,152
+2024,Oscar McDonald,Fremantle,0.0,0.001,630,197
+2024,Oscar McInerney,Brisbane Lions,2.0,3.15,110,124
+2024,Oskar Baker,Western Bulldogs,0.0,0.1,351,197
+2024,Paddy Dow,St Kilda,0.0,0.384,266,197
+2024,Patrick Cripps,Carlton,45.0,24.644,4,1
+2024,Patrick Dangerfield,Geelong,3.0,6.513,51,96
+2024,Patrick Lipinski,Collingwood,5.0,2.938,114,67
+2024,Patrick Parnell,Adelaide,0.0,0.0,636,197
+2024,Patrick Voss,Fremantle,0.0,0.006,535,197
+2024,Paul Curtis,North Melbourne,0.0,0.099,353,197
 2024,Peter Ladhams,Sydney,0.0,0.0,655,197
-2024,Peter Wright,Essendon,2.0,2.063,138,124
-2024,Quinton Narkle,Port Adelaide,0.0,0.011,501,197
-2024,Reef McInnes,Collingwood,0.0,0.019,477,197
-2024,Reilly OBrien,Adelaide,2.0,0.918,197,124
-2024,Reuben Ginbey,West Coast,0.0,0.181,318,197
-2024,Rhett Bazzo,West Coast,0.0,0.0,656,197
-2024,Rhyan Mansell,Richmond,0.0,0.059,386,197
-2024,Rhylee West,Western Bulldogs,0.0,0.357,273,197
-2024,Rhys Stanley,Geelong,0.0,0.428,260,197
-2024,Riley Bonner,St Kilda,0.0,0.359,272,197
-2024,Riley Garcia,Western Bulldogs,0.0,0.052,392,197
+2024,Peter Wright,Essendon,2.0,2.17,136,124
+2024,Quinton Narkle,Port Adelaide,0.0,0.01,506,197
+2024,Reef McInnes,Collingwood,0.0,0.026,460,197
+2024,Reilly OBrien,Adelaide,2.0,0.967,197,124
+2024,Reuben Ginbey,West Coast,0.0,0.269,301,197
+2024,Rhett Bazzo,West Coast,0.0,0.0,657,197
+2024,Rhyan Mansell,Richmond,0.0,0.058,393,197
+2024,Rhylee West,Western Bulldogs,0.0,0.6,232,197
+2024,Rhys Stanley,Geelong,0.0,0.492,243,197
+2024,Riley Bonner,St Kilda,0.0,0.369,267,197
+2024,Riley Garcia,Western Bulldogs,0.0,0.046,412,197
 2024,Riley Hardeman,North Melbourne,0.0,0.0,632,197
-2024,Riley Thilthorpe,Adelaide,0.0,0.437,258,197
-2024,Robbie Fox,Sydney,0.0,0.167,322,197
-2024,Robert Hansen,North Melbourne,0.0,0.001,601,197
-2024,Rory Atkins,Gold Coast,0.0,0.002,590,197
-2024,Rory Laird,Adelaide,7.0,7.353,45,53
-2024,Rory Lobb,Western Bulldogs,0.0,1.256,178,197
-2024,Rowan Marshall,St Kilda,16.0,15.215,18,19
-2024,Ryan Angwin,Greater Western Sydney,0.0,0.016,487,197
-2024,Ryan Burton,Port Adelaide,0.0,0.309,284,197
-2024,Ryan Byrnes,St Kilda,0.0,0.068,382,197
-2024,Ryan Lester,Brisbane Lions,0.0,0.185,316,197
-2024,Ryan Maric,West Coast,0.0,0.019,475,197
-2024,Ryley Sanders,Western Bulldogs,1.0,0.072,376,152
-2024,Sam Banks,Richmond,0.0,0.007,522,197
-2024,Sam Berry,Adelaide,3.0,0.184,317,96
-2024,Sam Butler,Hawthorn,0.0,0.0,643,197
-2024,Sam Clohesy,Gold Coast,0.0,0.524,242,197
-2024,Sam Collins,Gold Coast,0.0,0.897,200,197
-2024,Sam Darcy,Western Bulldogs,3.0,3.389,102,96
-2024,Sam Day,Gold Coast,0.0,0.078,372,197
-2024,Sam De Koning,Geelong,0.0,1.402,168,197
-2024,Sam Docherty,Carlton,0.0,0.0,634,197
-2024,Sam Draper,Essendon,2.0,0.258,298,124
-2024,Sam Durdin,Carlton,0.0,0.001,616,197
-2024,Sam Durham,Essendon,6.0,5.71,59,60
-2024,Sam Flanders,Gold Coast,12.0,9.435,34,29
-2024,Sam Frost,Hawthorn,0.0,0.032,443,197
-2024,Sam Naismith,Richmond,0.0,0.002,582,197
-2024,Sam Powell-Pepper,Port Adelaide,0.0,0.004,551,197
-2024,Sam Sturt,Fremantle,0.0,0.029,449,197
-2024,Sam Switkowski,Fremantle,0.0,0.438,257,197
-2024,Sam Taylor,Greater Western Sydney,2.0,0.85,203,124
-2024,Sam Walsh,Carlton,16.0,15.471,16,19
-2024,Sam Weideman,Essendon,0.0,0.0,633,197
-2024,Sam Wicks,Sydney,0.0,0.022,467,197
-2024,Samson Ryan,Richmond,0.0,0.005,544,197
-2024,Scott Pendlebury,Collingwood,2.0,3.656,96,124
-2024,Seamus Mitchell,Hawthorn,0.0,0.004,561,197
-2024,Sean Darcy,Fremantle,0.0,1.25,180,197
-2024,Sean Lemmens,Gold Coast,0.0,0.022,468,197
-2024,Sebastian Ross,St Kilda,4.0,0.575,233,78
-2024,Seth Campbell,Richmond,0.0,0.015,488,197
-2024,Shadeau Brain,Brisbane Lions,0.0,0.012,495,197
-2024,Shai Bolton,Richmond,5.0,4.32,85,67
-2024,Shane McAdam,Melbourne,0.0,0.001,621,197
-2024,Shannon Neale,Geelong,0.0,0.048,402,197
-2024,Shaun Mannagh,Geelong,0.0,0.55,239,197
-2024,Steele Sidebottom,Collingwood,0.0,1.669,153,197
-2024,Steely Green,Richmond,0.0,0.003,574,197
-2024,Stephen Coniglio,Greater Western Sydney,1.0,3.809,92,152
-2024,Steven May,Melbourne,0.0,1.27,175,197
-2024,Taj Woewodin,Melbourne,0.0,0.006,537,197
-2024,Tanner Bruhn,Geelong,7.0,1.756,148,53
-2024,Taylor Adams,Sydney,0.0,0.29,290,197
-2024,Taylor Duryea,Western Bulldogs,0.0,0.082,368,197
-2024,Taylor Walker,Adelaide,0.0,0.753,211,197
-2024,Ted Clohesy,Geelong,0.0,0.0,641,197
-2024,Tew Jiath,Collingwood,0.0,0.0,644,197
-2024,Thomson Dow,Richmond,0.0,0.073,375,197
-2024,Tim English,Western Bulldogs,0.0,2.143,135,197
-2024,Tim Kelly,West Coast,5.0,5.587,62,67
-2024,Tim Membrey,St Kilda,1.0,2.622,123,152
-2024,Tim Taranto,Richmond,5.0,4.879,72,67
-2024,Toby Bedford,Greater Western Sydney,2.0,0.995,193,124
-2024,Toby Conway,Geelong,0.0,0.039,421,197
-2024,Toby Greene,Greater Western Sydney,10.0,5.787,58,38
-2024,Toby McMullin,Greater Western Sydney,0.0,0.01,510,197
-2024,Toby Nankervis,Richmond,1.0,2.322,130,152
-2024,Toby Pink,North Melbourne,0.0,0.004,558,197
-2024,Todd Goldstein,Essendon,0.0,0.141,333,197
-2024,Todd Marshall,Port Adelaide,4.0,1.763,146,78
-2024,Tom Atkins,Geelong,1.0,1.066,190,152
-2024,Tom Barrass,West Coast,0.0,0.499,247,197
-2024,Tom Berry,Gold Coast,0.0,0.041,414,197
-2024,Tom Brown,Richmond,0.0,0.019,476,197
-2024,Tom Campbell,St Kilda,0.0,0.001,627,197
-2024,Tom Cole,West Coast,0.0,0.111,346,197
-2024,Tom De Koning,Carlton,1.0,5.679,60,152
-2024,Tom Emmett,Fremantle,0.0,0.011,502,197
-2024,Tom Green,Greater Western Sydney,27.0,20.045,8,6
-2024,Tom Hawkins,Geelong,0.0,0.858,202,197
-2024,Tom Liberatore,Western Bulldogs,10.0,4.365,84,38
-2024,Tom Lynch,Richmond,0.0,0.049,399,197
-2024,Tom McCartin,Sydney,0.0,0.093,361,197
-2024,Tom McDonald,Melbourne,0.0,0.252,301,197
-2024,Tom Mitchell,Collingwood,0.0,1.874,141,197
-2024,Tom Papley,Sydney,8.0,3.282,104,45
-2024,Tom Powell,North Melbourne,0.0,1.5,165,197
-2024,Tom Sparrow,Melbourne,0.0,0.156,325,197
-2024,Tom Stewart,Geelong,12.0,6.472,53,29
-2024,Touk Miller,Gold Coast,5.0,7.153,47,67
-2024,Travis Boak,Port Adelaide,0.0,1.128,185,197
-2024,Trent Rivers,Melbourne,7.0,5.339,64,53
-2024,Tristan Xerri,North Melbourne,1.0,4.699,75,152
-2024,Tylar Young,Richmond,0.0,0.003,568,197
-2024,Tyler Brockman,West Coast,0.0,0.003,566,197
-2024,Tyler Sellers,North Melbourne,0.0,0.0,650,197
-2024,Tyler Sonsie,Richmond,0.0,0.005,543,197
-2024,Tyrell Dewar,West Coast,0.0,0.003,567,197
-2024,Tyson Stengle,Geelong,2.0,2.102,137,124
-2024,Wayne Milera,Adelaide,0.0,0.003,575,197
-2024,Wil Dawson,North Melbourne,0.0,0.001,630,197
-2024,Wil Parker,Collingwood,0.0,0.057,389,197
-2024,Wil Powell,Gold Coast,0.0,1.558,160,197
-2024,Will Ashcroft,Brisbane Lions,0.0,3.631,97,197
-2024,Will Day,Hawthorn,8.0,5.024,70,45
-2024,Will Graham,Gold Coast,0.0,0.109,348,197
-2024,Will Hamill,Adelaide,0.0,0.006,532,197
-2024,Will Hayward,Sydney,2.0,1.571,158,124
-2024,Will Hoskin-Elliott,Collingwood,0.0,0.606,227,197
-2024,Will Lorenz,Port Adelaide,0.0,0.0,642,197
-2024,Will Phillips,North Melbourne,0.0,0.019,478,197
-2024,Will Setterfield,Essendon,0.0,0.564,237,197
-2024,Willem Drew,Port Adelaide,0.0,6.047,57,197
-2024,Willie Rioli,Port Adelaide,0.0,0.525,241,197
-2024,Xavier Duursma,Essendon,0.0,0.765,208,197
-2024,Xavier OHalloran,Greater Western Sydney,0.0,0.431,259,197
-2024,Zac Bailey,Brisbane Lions,0.0,0.325,279,197
-2024,Zac Fisher,North Melbourne,0.0,0.488,250,197
-2024,Zac Taylor,Adelaide,0.0,0.071,379,197
-2024,Zac Williams,Carlton,1.0,0.236,307,152
-2024,Zach Guthrie,Geelong,4.0,1.651,155,78
-2024,Zach Merrett,Essendon,18.0,18.237,13,16
-2024,Zach Reid,Essendon,0.0,0.0,636,197
-2024,Zach Tuohy,Geelong,0.0,0.375,268,197
-2024,Zaine Cordy,St Kilda,0.0,0.006,539,197
-2024,Zak Butters,Port Adelaide,29.0,19.035,12,3
-2024,Zak Jones,St Kilda,1.0,0.146,332,152
-2024,Zane Duursma,North Melbourne,0.0,0.004,563,197
-2024,Zane Trew,West Coast,0.0,0.022,466,197
-2025,Aaron Cadman,Greater Western Sydney,6.0,4.524,82,62
-2025,Aaron Francis,Sydney,0.0,0.026,453,189
-2025,Aaron Naughton,Western Bulldogs,6.0,8.858,38,62
-2025,Adam Cerra,Carlton,5.0,5.885,63,74
-2025,Adam Saad,Carlton,0.0,0.2,311,189
-2025,Adam Treloar,Western Bulldogs,0.0,0.329,276,189
-2025,Aidan Corr,North Melbourne,0.0,0.014,500,189
-2025,Aidan Johnson,Melbourne,0.0,0.002,591,189
-2025,Alex Cincotta,Carlton,0.0,0.026,454,189
-2025,Alex Davies,Gold Coast,0.0,0.468,253,189
-2025,Alex Dodson,St Kilda,0.0,0.0,637,189
-2025,Alex Neal-Bullen,Adelaide,6.0,4.178,87,62
-2025,Alex Pearce,Fremantle,2.0,0.114,345,122
+2024,Riley Thilthorpe,Adelaide,0.0,0.393,264,197
+2024,Robbie Fox,Sydney,0.0,0.222,315,197
+2024,Robert Hansen,North Melbourne,0.0,0.001,602,197
+2024,Rory Atkins,Gold Coast,0.0,0.001,600,197
+2024,Rory Laird,Adelaide,7.0,7.288,45,53
+2024,Rory Lobb,Western Bulldogs,0.0,1.137,186,197
+2024,Rowan Marshall,St Kilda,16.0,14.822,18,19
+2024,Ryan Angwin,Greater Western Sydney,0.0,0.011,499,197
+2024,Ryan Burton,Port Adelaide,0.0,0.329,280,197
+2024,Ryan Byrnes,St Kilda,0.0,0.061,390,197
+2024,Ryan Lester,Brisbane Lions,0.0,0.189,321,197
+2024,Ryan Maric,West Coast,0.0,0.016,483,197
+2024,Ryley Sanders,Western Bulldogs,1.0,0.082,368,152
+2024,Sam Banks,Richmond,0.0,0.008,522,197
+2024,Sam Berry,Adelaide,3.0,0.172,326,96
+2024,Sam Butler,Hawthorn,0.0,0.0,646,197
+2024,Sam Clohesy,Gold Coast,0.0,0.651,228,197
+2024,Sam Collins,Gold Coast,0.0,0.833,206,197
+2024,Sam Darcy,Western Bulldogs,3.0,3.419,100,96
+2024,Sam Day,Gold Coast,0.0,0.066,385,197
+2024,Sam De Koning,Geelong,0.0,1.157,185,197
+2024,Sam Docherty,Carlton,0.0,0.001,631,197
+2024,Sam Draper,Essendon,2.0,0.248,304,124
+2024,Sam Durdin,Carlton,0.0,0.001,622,197
+2024,Sam Durham,Essendon,6.0,5.507,59,60
+2024,Sam Flanders,Gold Coast,12.0,9.936,31,29
+2024,Sam Frost,Hawthorn,0.0,0.033,438,197
+2024,Sam Naismith,Richmond,0.0,0.003,574,197
+2024,Sam Powell-Pepper,Port Adelaide,0.0,0.004,560,197
+2024,Sam Sturt,Fremantle,0.0,0.04,422,197
+2024,Sam Switkowski,Fremantle,0.0,0.317,286,197
+2024,Sam Taylor,Greater Western Sydney,2.0,0.779,212,124
+2024,Sam Walsh,Carlton,16.0,15.242,16,19
+2024,Sam Weideman,Essendon,0.0,0.0,635,197
+2024,Sam Wicks,Sydney,0.0,0.024,465,197
+2024,Samson Ryan,Richmond,0.0,0.006,541,197
+2024,Scott Pendlebury,Collingwood,2.0,3.164,108,124
+2024,Seamus Mitchell,Hawthorn,0.0,0.005,546,197
+2024,Sean Darcy,Fremantle,0.0,1.133,187,197
+2024,Sean Lemmens,Gold Coast,0.0,0.011,498,197
+2024,Sebastian Ross,St Kilda,4.0,0.474,248,78
+2024,Seth Campbell,Richmond,0.0,0.016,487,197
+2024,Shadeau Brain,Brisbane Lions,0.0,0.011,502,197
+2024,Shai Bolton,Richmond,5.0,4.534,80,67
+2024,Shane McAdam,Melbourne,0.0,0.001,623,197
+2024,Shannon Neale,Geelong,0.0,0.049,403,197
+2024,Shaun Mannagh,Geelong,0.0,0.474,247,197
+2024,Steele Sidebottom,Collingwood,0.0,1.868,149,197
+2024,Steely Green,Richmond,0.0,0.002,581,197
+2024,Stephen Coniglio,Greater Western Sydney,1.0,3.893,92,152
+2024,Steven May,Melbourne,0.0,1.198,180,197
+2024,Taj Woewodin,Melbourne,0.0,0.005,544,197
+2024,Tanner Bruhn,Geelong,7.0,1.518,162,53
+2024,Taylor Adams,Sydney,0.0,0.319,284,197
+2024,Taylor Duryea,Western Bulldogs,0.0,0.093,359,197
+2024,Taylor Walker,Adelaide,0.0,0.98,195,197
+2024,Ted Clohesy,Geelong,0.0,0.0,643,197
+2024,Tew Jiath,Collingwood,0.0,0.0,647,197
+2024,Thomson Dow,Richmond,0.0,0.092,362,197
+2024,Tim English,Western Bulldogs,0.0,2.582,125,197
+2024,Tim Kelly,West Coast,5.0,5.18,67,67
+2024,Tim Membrey,St Kilda,1.0,2.705,124,152
+2024,Tim Taranto,Richmond,5.0,4.711,78,67
+2024,Toby Bedford,Greater Western Sydney,2.0,1.16,184,124
+2024,Toby Conway,Geelong,0.0,0.047,410,197
+2024,Toby Greene,Greater Western Sydney,10.0,6.812,48,38
+2024,Toby McMullin,Greater Western Sydney,0.0,0.009,517,197
+2024,Toby Nankervis,Richmond,1.0,2.208,134,152
+2024,Toby Pink,North Melbourne,0.0,0.003,567,197
+2024,Todd Goldstein,Essendon,0.0,0.138,340,197
+2024,Todd Marshall,Port Adelaide,4.0,2.172,135,78
+2024,Tom Atkins,Geelong,1.0,0.891,203,152
+2024,Tom Barrass,West Coast,0.0,0.437,255,197
+2024,Tom Berry,Gold Coast,0.0,0.043,417,197
+2024,Tom Brown,Richmond,0.0,0.022,470,197
+2024,Tom Campbell,St Kilda,0.0,0.001,620,197
+2024,Tom Cole,West Coast,0.0,0.093,361,197
+2024,Tom De Koning,Carlton,1.0,5.061,70,152
+2024,Tom Emmett,Fremantle,0.0,0.011,501,197
+2024,Tom Green,Greater Western Sydney,27.0,19.392,10,6
+2024,Tom Hawkins,Geelong,0.0,1.381,168,197
+2024,Tom Liberatore,Western Bulldogs,10.0,3.902,91,38
+2024,Tom Lynch,Richmond,0.0,0.045,413,197
+2024,Tom McCartin,Sydney,0.0,0.087,365,197
+2024,Tom McDonald,Melbourne,0.0,0.225,314,197
+2024,Tom Mitchell,Collingwood,0.0,1.993,140,197
+2024,Tom Papley,Sydney,8.0,4.081,90,45
+2024,Tom Powell,North Melbourne,0.0,1.261,176,197
+2024,Tom Sparrow,Melbourne,0.0,0.166,329,197
+2024,Tom Stewart,Geelong,12.0,6.025,56,29
+2024,Touk Miller,Gold Coast,5.0,6.328,52,67
+2024,Travis Boak,Port Adelaide,0.0,0.991,193,197
+2024,Trent Rivers,Melbourne,7.0,5.506,60,53
+2024,Tristan Xerri,North Melbourne,1.0,4.531,81,152
+2024,Tylar Young,Richmond,0.0,0.003,575,197
+2024,Tyler Brockman,West Coast,0.0,0.003,565,197
+2024,Tyler Sellers,North Melbourne,0.0,0.0,648,197
+2024,Tyler Sonsie,Richmond,0.0,0.005,547,197
+2024,Tyrell Dewar,West Coast,0.0,0.003,573,197
+2024,Tyson Stengle,Geelong,2.0,2.142,137,124
+2024,Wayne Milera,Adelaide,0.0,0.003,578,197
+2024,Wil Dawson,North Melbourne,0.0,0.0,633,197
+2024,Wil Parker,Collingwood,0.0,0.056,394,197
+2024,Wil Powell,Gold Coast,0.0,1.678,155,197
+2024,Will Ashcroft,Brisbane Lions,0.0,3.315,104,197
+2024,Will Day,Hawthorn,8.0,4.931,73,45
+2024,Will Graham,Gold Coast,0.0,0.12,345,197
+2024,Will Hamill,Adelaide,0.0,0.007,527,197
+2024,Will Hayward,Sydney,2.0,1.93,143,124
+2024,Will Hoskin-Elliott,Collingwood,0.0,0.629,229,197
+2024,Will Lorenz,Port Adelaide,0.0,0.0,644,197
+2024,Will Phillips,North Melbourne,0.0,0.017,481,197
+2024,Will Setterfield,Essendon,0.0,0.353,273,197
+2024,Willem Drew,Port Adelaide,0.0,6.222,53,197
+2024,Willie Rioli,Port Adelaide,0.0,0.654,227,197
+2024,Xavier Duursma,Essendon,0.0,0.762,214,197
+2024,Xavier OHalloran,Greater Western Sydney,0.0,0.486,245,197
+2024,Zac Bailey,Brisbane Lions,0.0,0.443,253,197
+2024,Zac Fisher,North Melbourne,0.0,0.415,260,197
+2024,Zac Taylor,Adelaide,0.0,0.063,386,197
+2024,Zac Williams,Carlton,1.0,0.278,297,152
+2024,Zach Guthrie,Geelong,4.0,1.366,171,78
+2024,Zach Merrett,Essendon,18.0,17.749,13,16
+2024,Zach Reid,Essendon,0.0,0.0,634,197
+2024,Zach Tuohy,Geelong,0.0,0.311,288,197
+2024,Zaine Cordy,St Kilda,0.0,0.006,538,197
+2024,Zak Butters,Port Adelaide,29.0,18.79,12,3
+2024,Zak Jones,St Kilda,1.0,0.152,331,152
+2024,Zane Duursma,North Melbourne,0.0,0.004,559,197
+2024,Zane Trew,West Coast,0.0,0.018,478,197
+2025,Aaron Cadman,Greater Western Sydney,6.0,5.033,75,61
+2025,Aaron Francis,Sydney,0.0,0.049,405,189
+2025,Aaron Naughton,Western Bulldogs,6.0,8.857,40,61
+2025,Adam Cerra,Carlton,5.0,5.505,67,74
+2025,Adam Saad,Carlton,0.0,0.176,323,189
+2025,Adam Treloar,Western Bulldogs,0.0,0.329,277,189
+2025,Aidan Corr,North Melbourne,0.0,0.015,491,189
+2025,Aidan Johnson,Melbourne,0.0,0.003,577,189
+2025,Alex Cincotta,Carlton,0.0,0.022,470,189
+2025,Alex Davies,Gold Coast,0.0,0.3,287,189
+2025,Alex Dodson,St Kilda,0.0,0.001,637,189
+2025,Alex Neal-Bullen,Adelaide,6.0,4.217,88,61
+2025,Alex Pearce,Fremantle,2.0,0.132,339,122
 2025,Alex Sexton,Gold Coast,0.0,0.001,608,189
-2025,Aliir Aliir,Port Adelaide,1.0,1.201,175,152
-2025,Alix Tauru,St Kilda,0.0,0.008,528,189
-2025,Andrew Brayshaw,Fremantle,26.0,16.692,17,6
-2025,Andrew McGrath,Essendon,9.0,3.937,93,42
-2025,Angus Clarke,Essendon,0.0,0.219,303,189
+2025,Aliir Aliir,Port Adelaide,1.0,1.541,157,152
+2025,Alix Tauru,St Kilda,0.0,0.009,524,189
+2025,Andrew Brayshaw,Fremantle,26.0,17.513,13,5
+2025,Andrew McGrath,Essendon,6.0,3.814,95,61
+2025,Angus Clarke,Essendon,0.0,0.257,294,189
 2025,Angus Hastie,St Kilda,0.0,0.003,576,189
-2025,Angus McLennan,St Kilda,0.0,0.0,660,189
-2025,Angus Sheldrick,Sydney,0.0,0.387,265,189
-2025,Anthony Caminiti,St Kilda,0.0,0.064,385,189
-2025,Archer Day-Wicks,Essendon,0.0,0.001,618,189
-2025,Archer Reid,West Coast,0.0,0.005,555,189
-2025,Archie May,Essendon,0.0,0.006,543,189
-2025,Archie Perkins,Essendon,0.0,0.707,223,189
-2025,Archie Roberts,Essendon,0.0,1.228,172,189
-2025,Arie Schoenmaker,St Kilda,0.0,0.002,588,189
-2025,Arthur Jones,Western Bulldogs,0.0,0.001,623,189
-2025,Ashton Moir,Carlton,0.0,0.218,304,189
-2025,Bailey Banfield,Fremantle,0.0,0.108,350,189
-2025,Bailey Dale,Western Bulldogs,7.0,6.776,55,52
-2025,Bailey Humphrey,Gold Coast,2.0,3.276,106,122
-2025,Bailey Laurie,Melbourne,0.0,0.0,663,189
-2025,Bailey Macdonald,Hawthorn,0.0,0.004,567,189
-2025,Bailey Scott,North Melbourne,0.0,0.016,489,189
-2025,Bailey Smith,Geelong,29.0,26.038,3,3
-2025,Bailey Williams,Western Bulldogs,0.0,1.095,184,189
-2025,Bayley Fritsch,Melbourne,0.0,1.13,180,189
-2025,Beau McCreery,Collingwood,0.0,0.137,332,189
-2025,Ben Ainsworth,Gold Coast,0.0,0.256,290,189
-2025,Ben Hobbs,Essendon,0.0,0.068,380,189
-2025,Ben Jepson,Gold Coast,0.0,0.0,658,189
-2025,Ben Keays,Adelaide,9.0,5.134,69,42
-2025,Ben King,Gold Coast,7.0,8.023,49,52
-2025,Ben Long,Gold Coast,1.0,1.478,155,152
-2025,Ben McKay,Essendon,0.0,0.014,495,189
-2025,Ben Miller,Richmond,0.0,0.093,359,189
-2025,Ben Paton,Sydney,0.0,0.001,630,189
-2025,Billy Dowling,Adelaide,0.0,0.012,510,189
-2025,Billy Frampton,Collingwood,0.0,0.114,346,189
-2025,Billy Wilson,Carlton,0.0,0.015,490,189
-2025,Blake Acres,Carlton,0.0,0.682,229,189
-2025,Blake Hardwick,Hawthorn,1.0,1.679,144,152
-2025,Blake Howes,Melbourne,0.0,0.007,533,189
-2025,Bo Allan,West Coast,0.0,0.001,603,189
-2025,Bobby Hill,Collingwood,1.0,0.11,347,152
-2025,Bodhi Uwland,Gold Coast,0.0,0.132,340,189
-2025,Brad Close,Geelong,0.0,0.108,349,189
-2025,Bradley Hill,St Kilda,0.0,0.403,261,189
-2025,Brady Hough,West Coast,2.0,0.74,219,122
-2025,Braeden Campbell,Sydney,0.0,0.065,383,189
-2025,Brandon Starcevich,Brisbane Lions,0.0,0.013,502,189
+2025,Angus McLennan,St Kilda,0.0,0.0,661,189
+2025,Angus Sheldrick,Sydney,0.0,0.411,262,189
+2025,Anthony Caminiti,St Kilda,0.0,0.076,376,189
+2025,Archer Day-Wicks,Essendon,0.0,0.001,614,189
+2025,Archer Reid,West Coast,0.0,0.005,556,189
+2025,Archie May,Essendon,0.0,0.008,529,189
+2025,Archie Perkins,Essendon,0.0,0.577,241,189
+2025,Archie Roberts,Essendon,0.0,1.173,180,189
+2025,Arie Schoenmaker,St Kilda,0.0,0.002,589,189
+2025,Arthur Jones,Western Bulldogs,0.0,0.001,619,189
+2025,Ashton Moir,Carlton,0.0,0.184,321,189
+2025,Bailey Banfield,Fremantle,0.0,0.091,364,189
+2025,Bailey Dale,Western Bulldogs,7.0,6.941,54,51
+2025,Bailey Humphrey,Gold Coast,2.0,3.719,99,122
+2025,Bailey Laurie,Melbourne,0.0,0.0,664,189
+2025,Bailey Macdonald,Hawthorn,0.0,0.003,575,189
+2025,Bailey Scott,North Melbourne,0.0,0.017,485,189
+2025,Bailey Smith,Geelong,29.0,25.22,3,3
+2025,Bailey Williams,Western Bulldogs,0.0,1.014,194,189
+2025,Bayley Fritsch,Melbourne,0.0,1.622,150,189
+2025,Beau McCreery,Collingwood,0.0,0.118,345,189
+2025,Ben Ainsworth,Gold Coast,0.0,0.407,263,189
+2025,Ben Hobbs,Essendon,0.0,0.062,387,189
+2025,Ben Jepson,Gold Coast,0.0,0.0,652,189
+2025,Ben Keays,Adelaide,9.0,5.515,66,42
+2025,Ben King,Gold Coast,7.0,8.155,46,51
+2025,Ben Long,Gold Coast,1.0,1.595,153,152
+2025,Ben McKay,Essendon,0.0,0.015,496,189
+2025,Ben Miller,Richmond,0.0,0.108,353,189
+2025,Ben Paton,Sydney,0.0,0.001,628,189
+2025,Billy Dowling,Adelaide,0.0,0.009,526,189
+2025,Billy Frampton,Collingwood,0.0,0.173,325,189
+2025,Billy Wilson,Carlton,0.0,0.008,528,189
+2025,Blake Acres,Carlton,0.0,0.359,271,189
+2025,Blake Hardwick,Hawthorn,1.0,1.48,161,152
+2025,Blake Howes,Melbourne,0.0,0.007,534,189
+2025,Bo Allan,West Coast,0.0,0.001,605,189
+2025,Bobby Hill,Collingwood,1.0,0.152,329,152
+2025,Bodhi Uwland,Gold Coast,0.0,0.145,331,189
+2025,Brad Close,Geelong,0.0,0.112,348,189
+2025,Bradley Hill,St Kilda,0.0,0.488,254,189
+2025,Brady Hough,West Coast,2.0,0.671,229,122
+2025,Braeden Campbell,Sydney,0.0,0.054,399,189
+2025,Brandon Starcevich,Brisbane Lions,0.0,0.017,484,189
 2025,Brandon Walker,Fremantle,0.0,0.0,647,189
-2025,Brandon Zerk-Thatcher,Port Adelaide,0.0,0.02,470,189
-2025,Brayden Cook,Adelaide,0.0,0.002,594,189
-2025,Brayden Fiorini,Gold Coast,1.0,0.832,207,152
-2025,Brayden Maynard,Collingwood,0.0,0.181,314,189
-2025,Brennan Cox,Fremantle,0.0,0.133,338,189
-2025,Brent Daniels,Greater Western Sydney,0.0,0.09,361,189
-2025,Brodie Grundy,Sydney,6.0,10.569,32,62
-2025,Brodie Kemp,Carlton,1.0,1.034,193,152
-2025,Brodie Smith,Adelaide,0.0,0.063,387,189
-2025,Brody Mihocek,Collingwood,0.0,1.772,135,189
-2025,Bruce Reville,Brisbane Lions,0.0,0.019,475,189
-2025,Brynn Teakle,North Melbourne,0.0,0.022,462,189
-2025,Buku Khamis,Western Bulldogs,0.0,0.08,369,189
-2025,Caiden Cleary,Sydney,0.0,0.011,512,189
-2025,Caleb Daniel,North Melbourne,0.0,0.697,226,189
-2025,Caleb Mitchell,Sydney,0.0,0.0,655,189
-2025,Caleb Poulter,Western Bulldogs,0.0,0.013,508,189
-2025,Caleb Serong,Fremantle,25.0,22.141,4,7
-2025,Caleb Windsor,Melbourne,0.0,0.089,362,189
-2025,Callan Ward,Greater Western Sydney,0.0,0.376,269,189
-2025,Callum Ah Chee,Brisbane Lions,2.0,1.367,162,122
-2025,Callum Brown,Greater Western Sydney,2.0,0.371,270,122
-2025,Callum Coleman-Jones,North Melbourne,0.0,0.0,665,189
-2025,Callum Mills,Sydney,0.0,1.596,147,189
-2025,Callum Wilkie,St Kilda,3.0,4.39,84,96
-2025,Calsher Dear,Hawthorn,0.0,0.056,392,189
-2025,Cam Mackenzie,Hawthorn,3.0,0.836,206,96
-2025,Cam Rayner,Brisbane Lions,6.0,0.829,208,62
-2025,Cameron Zurhaar,North Melbourne,1.0,1.779,134,152
-2025,Campbell Chesser,West Coast,0.0,0.004,558,189
-2025,Campbell Gray,Richmond,0.0,0.002,596,189
-2025,Chad Warner,Sydney,21.0,9.08,36,11
-2025,Changkuoth Jiath,Hawthorn,0.0,1.593,148,189
-2025,Charlie Ballard,Gold Coast,0.0,0.0,641,189
-2025,Charlie Cameron,Brisbane Lions,0.0,0.388,264,189
-2025,Charlie Comben,North Melbourne,1.0,0.455,255,152
-2025,Charlie Curnow,Carlton,1.0,1.231,171,152
-2025,Charlie Dean,Collingwood,0.0,0.006,537,189
-2025,Charlie Spargo,Melbourne,0.0,0.017,481,189
-2025,Charlie West,Collingwood,0.0,0.0,646,189
-2025,Chayce Jones,Adelaide,0.0,0.003,583,189
-2025,Chris Burgess,Adelaide,0.0,0.001,617,189
-2025,Christian Moraes,Port Adelaide,0.0,0.03,438,189
-2025,Christian Petracca,Melbourne,16.0,10.202,34,23
-2025,Christian Salem,Melbourne,3.0,2.586,114,96
-2025,Clay Hall,West Coast,0.0,0.027,449,189
-2025,Clayton Oliver,Melbourne,0.0,3.974,92,189
-2025,Cody Angove,Greater Western Sydney,0.0,0.006,546,189
-2025,Colby McKercher,North Melbourne,3.0,3.555,100,96
-2025,Connor Budarick,Gold Coast,0.0,0.035,425,189
-2025,Connor Idun,Greater Western Sydney,0.0,0.479,251,189
-2025,Connor Macdonald,Hawthorn,0.0,0.565,239,189
-2025,Connor OSullivan,Geelong,0.0,0.176,316,189
-2025,Connor Rozee,Port Adelaide,16.0,13.095,24,23
-2025,Conor McKenna,Brisbane Lions,0.0,0.003,578,189
-2025,Conor Nash,Hawthorn,0.0,1.077,187,189
-2025,Conor Stone,Greater Western Sydney,0.0,0.008,526,189
-2025,Cooper Harvey,North Melbourne,0.0,0.013,505,189
-2025,Cooper Hynes,Western Bulldogs,0.0,0.008,527,189
-2025,Cooper Lord,Carlton,0.0,0.242,297,189
-2025,Cooper Sharman,St Kilda,2.0,1.767,136,122
-2025,Cooper Simpson,Fremantle,0.0,0.004,562,189
-2025,Cooper Trembath,North Melbourne,0.0,0.041,417,189
-2025,Corey Durdin,Carlton,0.0,0.248,291,189
-2025,Corey Wagner,Fremantle,0.0,0.134,334,189
-2025,Corey Warner,Sydney,0.0,0.033,430,189
-2025,Dan Butler,St Kilda,0.0,0.458,254,189
-2025,Dan Houston,Collingwood,3.0,0.826,209,96
-2025,Dane Rampe,Sydney,0.0,0.078,370,189
-2025,Daniel Curtin,Adelaide,0.0,2.769,112,189
-2025,Daniel McStay,Collingwood,1.0,0.805,210,152
-2025,Daniel Rioli,Gold Coast,0.0,1.061,189,189
-2025,Daniel Turner,Melbourne,0.0,0.529,241,189
-2025,Dante Visentini,Port Adelaide,0.0,0.049,401,189
-2025,Darcy Byrne-Jones,Port Adelaide,0.0,0.146,327,189
-2025,Darcy Cameron,Collingwood,0.0,5.76,65,189
-2025,Darcy Fogarty,Adelaide,0.0,0.723,221,189
-2025,Darcy Fort,Brisbane Lions,0.0,0.236,299,189
-2025,Darcy Gardiner,Brisbane Lions,0.0,0.129,342,189
-2025,Darcy Jones,Greater Western Sydney,0.0,0.576,238,189
-2025,Darcy Moore,Collingwood,3.0,0.503,247,96
-2025,Darcy Parish,Essendon,0.0,0.135,333,189
-2025,Darcy Tucker,North Melbourne,0.0,0.004,557,189
-2025,Darcy Wilmot,Brisbane Lions,3.0,1.36,163,96
-2025,Darcy Wilson,St Kilda,0.0,1.346,164,189
-2025,David Swallow,Gold Coast,0.0,0.003,579,189
-2025,Dayne Zorko,Brisbane Lions,14.0,5.802,64,27
-2025,Deven Robertson,Brisbane Lions,0.0,0.001,620,189
-2025,Dion Prestia,Richmond,0.0,1.415,159,189
-2025,Dougal Howard,St Kilda,0.0,0.003,570,189
-2025,Dylan Moore,Hawthorn,5.0,7.659,51,74
-2025,Dylan Shiel,Essendon,3.0,1.699,140,96
-2025,Dylan Stephens,North Melbourne,0.0,0.106,351,189
-2025,Dylan Williams,Port Adelaide,0.0,0.0,652,189
-2025,Ed Langdon,Melbourne,0.0,0.732,220,189
-2025,Ed Richards,Western Bulldogs,11.0,17.69,13,33
-2025,Edward Allan,Collingwood,0.0,0.07,379,189
-2025,Elijah Hewett,West Coast,1.0,0.652,231,152
-2025,Elijah Hollands,Carlton,0.0,0.074,376,189
-2025,Elijah Tsatas,Essendon,0.0,0.034,427,189
-2025,Eric Hipwood,Brisbane Lions,0.0,2.365,120,189
-2025,Errol Gulden,Sydney,6.0,4.12,88,62
-2025,Esava Ratugolea,Port Adelaide,1.0,0.888,201,152
-2025,Ethan Read,Gold Coast,0.0,0.087,365,189
-2025,Ewan Mackinlay,Port Adelaide,0.0,0.019,473,189
-2025,Finn Callaghan,Greater Western Sydney,21.0,16.997,16,11
-2025,Finn Maginness,Hawthorn,0.0,0.081,368,189
-2025,Finn OSullivan,North Melbourne,0.0,0.047,403,189
-2025,Finnbar Maley,North Melbourne,0.0,0.002,587,189
-2025,Flynn Young,Carlton,0.0,0.07,378,189
-2025,Francis Evans,Carlton,0.0,0.366,272,189
-2025,Geordie Payne,North Melbourne,0.0,0.002,585,189
-2025,George Hewett,Carlton,10.0,16.24,19,37
-2025,George Stevens,Geelong,1.0,0.046,407,152
-2025,George Wardlaw,North Melbourne,0.0,0.279,285,189
-2025,Griffin Logue,North Melbourne,0.0,0.028,443,189
-2025,Gryan Miers,Geelong,8.0,5.061,70,46
-2025,Hamish Davis,West Coast,0.0,0.006,545,189
-2025,Harley Reid,West Coast,3.0,1.189,177,96
-2025,Harris Andrews,Brisbane Lions,5.0,3.978,91,74
-2025,Harrison Ramm,Port Adelaide,0.0,0.0,648,189
-2025,Harry Armstrong,Richmond,0.0,0.003,580,189
-2025,Harry Boyd,St Kilda,0.0,0.0,638,189
-2025,Harry Cunningham,Sydney,0.0,0.028,442,189
-2025,Harry Edwards,West Coast,0.0,0.106,352,189
-2025,Harry Himmelberg,Greater Western Sydney,0.0,1.738,138,189
-2025,Harry Jones,Essendon,0.0,0.006,540,189
-2025,Harry McKay,Carlton,10.0,5.199,68,37
-2025,Harry Morrison,Hawthorn,0.0,0.24,298,189
-2025,Harry OFarrell,Carlton,0.0,0.013,504,189
-2025,Harry Perryman,Collingwood,0.0,0.137,331,189
-2025,Harry Petty,Melbourne,0.0,0.265,288,189
-2025,Harry Rowston,Greater Western Sydney,0.0,0.487,249,189
-2025,Harry Schoenberg,Adelaide,0.0,0.0,645,189
-2025,Harry Sharp,Melbourne,0.0,0.006,544,189
-2025,Harry Sheezel,North Melbourne,10.0,6.32,57,37
-2025,Harvey Gallagher,Western Bulldogs,0.0,0.004,563,189
-2025,Harvey Langford,Melbourne,0.0,1.241,170,189
-2025,Harvey Thomas,Greater Western Sydney,0.0,0.076,373,189
-2025,Hayden McLean,Sydney,1.0,0.383,266,152
-2025,Hayden Young,Fremantle,3.0,2.361,121,96
-2025,Heath Chapman,Fremantle,0.0,0.244,295,189
-2025,Henry Hustwaite,Hawthorn,0.0,0.138,330,189
-2025,Henry Smith,Brisbane Lions,0.0,0.007,535,189
-2025,Hudson OKeeffe,Carlton,0.0,0.019,474,189
-2025,Hugh Bond,Adelaide,0.0,0.005,554,189
-2025,Hugh Boxshall,St Kilda,0.0,0.067,381,189
-2025,Hugh Jackson,Port Adelaide,0.0,0.01,516,189
-2025,Hugh McCluggage,Brisbane Lions,21.0,19.929,10,11
-2025,Hugo Garcia,St Kilda,1.0,0.754,216,152
-2025,Hugo Ralphsmith,Richmond,0.0,0.024,458,189
-2025,Hunter Clark,St Kilda,0.0,0.134,335,189
-2025,Isaac Cumming,Adelaide,0.0,0.4,262,189
-2025,Isaac Heeney,Sydney,17.0,17.718,12,20
-2025,Isaac Kako,Essendon,0.0,0.046,405,189
-2025,Isaac Keeler,St Kilda,0.0,0.032,434,189
-2025,Isaac Quaynor,Collingwood,0.0,0.279,284,189
-2025,Isaiah Dudley,Fremantle,0.0,0.021,468,189
-2025,Ivan Soldo,Port Adelaide,0.0,0.0,650,189
-2025,Izak Rankine,Adelaide,15.0,11.529,27,26
+2025,Brandon Zerk-Thatcher,Port Adelaide,0.0,0.016,489,189
+2025,Brayden Cook,Adelaide,0.0,0.002,601,189
+2025,Brayden Fiorini,Gold Coast,1.0,0.871,208,152
+2025,Brayden Maynard,Collingwood,0.0,0.199,315,189
+2025,Brennan Cox,Fremantle,0.0,0.144,332,189
+2025,Brent Daniels,Greater Western Sydney,0.0,0.126,341,189
+2025,Brodie Grundy,Sydney,6.0,10.413,31,61
+2025,Brodie Kemp,Carlton,1.0,1.194,178,152
+2025,Brodie Smith,Adelaide,0.0,0.061,389,189
+2025,Brody Mihocek,Collingwood,0.0,1.811,140,189
+2025,Bruce Reville,Brisbane Lions,0.0,0.02,477,189
+2025,Brynn Teakle,North Melbourne,0.0,0.016,488,189
+2025,Buku Khamis,Western Bulldogs,0.0,0.066,383,189
+2025,Caiden Cleary,Sydney,0.0,0.01,518,189
+2025,Caleb Daniel,North Melbourne,0.0,0.808,215,189
+2025,Caleb Mitchell,Sydney,0.0,0.0,656,189
+2025,Caleb Poulter,Western Bulldogs,0.0,0.015,492,189
+2025,Caleb Serong,Fremantle,25.0,21.015,7,6
+2025,Caleb Windsor,Melbourne,0.0,0.091,363,189
+2025,Callan Ward,Greater Western Sydney,0.0,0.46,255,189
+2025,Callum Ah Chee,Brisbane Lions,2.0,1.534,158,122
+2025,Callum Brown,Greater Western Sydney,2.0,0.435,258,122
+2025,Callum Coleman-Jones,North Melbourne,0.0,0.0,666,189
+2025,Callum Mills,Sydney,0.0,1.627,149,189
+2025,Callum Wilkie,St Kilda,3.0,4.234,86,96
+2025,Calsher Dear,Hawthorn,0.0,0.041,419,189
+2025,Cam Mackenzie,Hawthorn,3.0,0.702,225,96
+2025,Cam Rayner,Brisbane Lions,6.0,0.96,201,61
+2025,Cameron Zurhaar,North Melbourne,1.0,1.814,139,152
+2025,Campbell Chesser,West Coast,0.0,0.004,569,189
+2025,Campbell Gray,Richmond,0.0,0.002,598,189
+2025,Chad Warner,Sydney,21.0,8.984,39,11
+2025,Changkuoth Jiath,Hawthorn,0.0,1.5,160,189
+2025,Charlie Ballard,Gold Coast,0.0,0.001,634,189
+2025,Charlie Cameron,Brisbane Lions,0.0,0.51,251,189
+2025,Charlie Comben,North Melbourne,1.0,0.392,267,152
+2025,Charlie Curnow,Carlton,1.0,0.955,203,152
+2025,Charlie Dean,Collingwood,0.0,0.007,531,189
+2025,Charlie Spargo,Melbourne,0.0,0.016,486,189
+2025,Charlie West,Collingwood,0.0,0.0,648,189
+2025,Chayce Jones,Adelaide,0.0,0.004,566,189
+2025,Chris Burgess,Adelaide,0.0,0.001,613,189
+2025,Christian Moraes,Port Adelaide,0.0,0.03,440,189
+2025,Christian Petracca,Melbourne,16.0,10.094,34,23
+2025,Christian Salem,Melbourne,3.0,2.284,123,96
+2025,Clay Hall,West Coast,0.0,0.031,438,189
+2025,Clayton Oliver,Melbourne,0.0,4.233,87,189
+2025,Cody Angove,Greater Western Sydney,0.0,0.005,559,189
+2025,Colby McKercher,North Melbourne,3.0,3.699,100,96
+2025,Connor Budarick,Gold Coast,0.0,0.032,435,189
+2025,Connor Idun,Greater Western Sydney,0.0,0.427,260,189
+2025,Connor Macdonald,Hawthorn,0.0,0.508,252,189
+2025,Connor OSullivan,Geelong,0.0,0.267,293,189
+2025,Connor Rozee,Port Adelaide,16.0,12.429,25,23
+2025,Conor McKenna,Brisbane Lions,0.0,0.004,567,189
+2025,Conor Nash,Hawthorn,0.0,1.113,184,189
+2025,Conor Stone,Greater Western Sydney,0.0,0.01,520,189
+2025,Cooper Harvey,North Melbourne,0.0,0.014,497,189
+2025,Cooper Hynes,Western Bulldogs,0.0,0.007,536,189
+2025,Cooper Lord,Carlton,0.0,0.223,299,189
+2025,Cooper Sharman,St Kilda,2.0,1.838,137,122
+2025,Cooper Simpson,Fremantle,0.0,0.004,564,189
+2025,Cooper Trembath,North Melbourne,0.0,0.029,442,189
+2025,Corey Durdin,Carlton,0.0,0.186,320,189
+2025,Corey Wagner,Fremantle,0.0,0.135,337,189
+2025,Corey Warner,Sydney,0.0,0.029,446,189
+2025,Dan Butler,St Kilda,0.0,0.648,234,189
+2025,Dan Houston,Collingwood,3.0,0.852,211,96
+2025,Dane Rampe,Sydney,0.0,0.104,356,189
+2025,Daniel Curtin,Adelaide,0.0,3.123,109,189
+2025,Daniel McStay,Collingwood,1.0,1.067,191,152
+2025,Daniel Rioli,Gold Coast,0.0,1.224,175,189
+2025,Daniel Turner,Melbourne,0.0,0.674,228,189
+2025,Dante Visentini,Port Adelaide,0.0,0.053,401,189
+2025,Darcy Byrne-Jones,Port Adelaide,0.0,0.175,324,189
+2025,Darcy Cameron,Collingwood,0.0,6.225,61,189
+2025,Darcy Fogarty,Adelaide,0.0,0.837,213,189
+2025,Darcy Fort,Brisbane Lions,0.0,0.195,316,189
+2025,Darcy Gardiner,Brisbane Lions,0.0,0.106,355,189
+2025,Darcy Jones,Greater Western Sydney,0.0,0.704,224,189
+2025,Darcy Moore,Collingwood,3.0,0.541,246,96
+2025,Darcy Parish,Essendon,0.0,0.141,334,189
+2025,Darcy Tucker,North Melbourne,0.0,0.005,560,189
+2025,Darcy Wilmot,Brisbane Lions,3.0,1.379,165,96
+2025,Darcy Wilson,St Kilda,0.0,1.741,144,189
+2025,David Swallow,Gold Coast,0.0,0.003,574,189
+2025,Dayne Zorko,Brisbane Lions,14.0,6.121,62,27
+2025,Deven Robertson,Brisbane Lions,0.0,0.001,631,189
+2025,Dion Prestia,Richmond,0.0,1.652,148,189
+2025,Dougal Howard,St Kilda,0.0,0.003,571,189
+2025,Dylan Moore,Hawthorn,5.0,7.59,50,74
+2025,Dylan Shiel,Essendon,3.0,1.824,138,96
+2025,Dylan Stephens,North Melbourne,0.0,0.094,361,189
+2025,Dylan Williams,Port Adelaide,0.0,0.0,657,189
+2025,Ed Langdon,Melbourne,0.0,0.684,227,189
+2025,Ed Richards,Western Bulldogs,11.0,17.267,15,33
+2025,Edward Allan,Collingwood,0.0,0.058,392,189
+2025,Elijah Hewett,West Coast,1.0,0.664,232,152
+2025,Elijah Hollands,Carlton,0.0,0.095,360,189
+2025,Elijah Tsatas,Essendon,0.0,0.046,411,189
+2025,Eric Hipwood,Brisbane Lions,0.0,2.377,122,189
+2025,Errol Gulden,Sydney,6.0,4.2,89,61
+2025,Esava Ratugolea,Port Adelaide,1.0,0.854,210,152
+2025,Ethan Read,Gold Coast,0.0,0.129,340,189
+2025,Ewan Mackinlay,Port Adelaide,0.0,0.009,527,189
+2025,Finn Callaghan,Greater Western Sydney,21.0,16.427,17,11
+2025,Finn Maginness,Hawthorn,0.0,0.087,367,189
+2025,Finn OSullivan,North Melbourne,0.0,0.047,410,189
+2025,Finnbar Maley,North Melbourne,0.0,0.002,588,189
+2025,Flynn Young,Carlton,0.0,0.036,427,189
+2025,Francis Evans,Carlton,0.0,0.544,245,189
+2025,Geordie Payne,North Melbourne,0.0,0.003,580,189
+2025,George Hewett,Carlton,10.0,16.193,18,37
+2025,George Stevens,Geelong,1.0,0.085,368,152
+2025,George Wardlaw,North Melbourne,0.0,0.302,286,189
+2025,Griffin Logue,North Melbourne,0.0,0.025,457,189
+2025,Gryan Miers,Geelong,8.0,5.202,71,45
+2025,Hamish Davis,West Coast,0.0,0.005,557,189
+2025,Harley Reid,West Coast,3.0,1.219,177,96
+2025,Harris Andrews,Brisbane Lions,5.0,3.72,98,74
+2025,Harrison Ramm,Port Adelaide,0.0,0.0,649,189
+2025,Harry Armstrong,Richmond,0.0,0.002,587,189
+2025,Harry Boyd,St Kilda,0.0,0.001,630,189
+2025,Harry Cunningham,Sydney,0.0,0.021,472,189
+2025,Harry Edwards,West Coast,0.0,0.146,330,189
+2025,Harry Himmelberg,Greater Western Sydney,0.0,1.871,136,189
+2025,Harry Jones,Essendon,0.0,0.006,544,189
+2025,Harry McKay,Carlton,10.0,4.941,78,37
+2025,Harry Morrison,Hawthorn,0.0,0.223,301,189
+2025,Harry OFarrell,Carlton,0.0,0.021,474,189
+2025,Harry Perryman,Collingwood,0.0,0.211,310,189
+2025,Harry Petty,Melbourne,0.0,0.315,283,189
+2025,Harry Rowston,Greater Western Sydney,0.0,0.356,272,189
+2025,Harry Schoenberg,Adelaide,0.0,0.0,643,189
+2025,Harry Sharp,Melbourne,0.0,0.007,537,189
+2025,Harry Sheezel,North Melbourne,10.0,6.317,57,37
+2025,Harvey Gallagher,Western Bulldogs,0.0,0.005,550,189
+2025,Harvey Langford,Melbourne,0.0,1.351,168,189
+2025,Harvey Thomas,Greater Western Sydney,0.0,0.065,386,189
+2025,Hayden McLean,Sydney,1.0,0.389,269,152
+2025,Hayden Young,Fremantle,3.0,2.393,121,96
+2025,Heath Chapman,Fremantle,0.0,0.214,307,189
+2025,Henry Hustwaite,Hawthorn,0.0,0.136,336,189
+2025,Henry Smith,Brisbane Lions,0.0,0.009,525,189
+2025,Hudson OKeeffe,Carlton,0.0,0.017,483,189
+2025,Hugh Bond,Adelaide,0.0,0.005,558,189
+2025,Hugh Boxshall,St Kilda,0.0,0.056,395,189
+2025,Hugh Jackson,Port Adelaide,0.0,0.014,501,189
+2025,Hugh McCluggage,Brisbane Lions,21.0,20.379,9,11
+2025,Hugo Garcia,St Kilda,1.0,0.775,220,152
+2025,Hugo Ralphsmith,Richmond,0.0,0.026,454,189
+2025,Hunter Clark,St Kilda,0.0,0.121,342,189
+2025,Isaac Cumming,Adelaide,0.0,0.348,274,189
+2025,Isaac Heeney,Sydney,17.0,18.488,11,20
+2025,Isaac Kako,Essendon,0.0,0.073,378,189
+2025,Isaac Keeler,St Kilda,0.0,0.048,409,189
+2025,Isaac Quaynor,Collingwood,0.0,0.244,295,189
+2025,Isaiah Dudley,Fremantle,0.0,0.025,456,189
+2025,Ivan Soldo,Port Adelaide,0.0,0.0,641,189
+2025,Izak Rankine,Adelaide,15.0,11.668,27,26
 2025,Jack Billings,Melbourne,0.0,0.0,651,189
-2025,Jack Bowes,Geelong,0.0,0.248,292,189
-2025,Jack Buckley,Greater Western Sydney,0.0,0.171,319,189
-2025,Jack Buller,Sydney,0.0,0.087,363,189
-2025,Jack Carroll,St Kilda,0.0,0.002,597,189
-2025,Jack Crisp,Collingwood,3.0,3.195,107,96
-2025,Jack Darling,North Melbourne,0.0,0.139,329,189
-2025,Jack Ginnivan,Hawthorn,0.0,1.196,176,189
-2025,Jack Graham,West Coast,0.0,0.914,200,189
-2025,Jack Gunston,Hawthorn,7.0,7.798,50,52
-2025,Jack Henderson,Melbourne,0.0,0.002,601,189
-2025,Jack Henry,Geelong,0.0,0.509,245,189
-2025,Jack Higgins,St Kilda,1.0,0.755,215,152
-2025,Jack Hutchinson,West Coast,0.0,0.013,507,189
-2025,Jack Lukosius,Port Adelaide,0.0,0.012,509,189
-2025,Jack Macrae,St Kilda,8.0,8.28,45,46
-2025,Jack Martin,Geelong,0.0,0.175,317,189
-2025,Jack Payne,Brisbane Lions,1.0,0.216,306,152
-2025,Jack Petruccelle,West Coast,0.0,0.0,654,189
-2025,Jack Ross,Richmond,0.0,2.811,111,189
-2025,Jack Scrimshaw,Hawthorn,0.0,0.051,396,189
-2025,Jack Silvagni,Carlton,0.0,0.208,308,189
-2025,Jack Sinclair,St Kilda,7.0,8.725,39,52
-2025,Jack Steele,St Kilda,2.0,2.405,119,122
-2025,Jack Viney,Melbourne,8.0,3.363,104,46
-2025,Jack Whitlock,Port Adelaide,0.0,0.004,566,189
-2025,Jack Williams,West Coast,0.0,0.044,411,189
-2025,Jackson Archer,North Melbourne,0.0,0.001,619,189
-2025,Jackson Mead,Port Adelaide,0.0,0.093,358,189
-2025,Jacob Bauer,Richmond,0.0,0.002,595,189
-2025,Jacob Blight,Richmond,0.0,0.004,564,189
-2025,Jacob Hopper,Richmond,5.0,6.558,56,74
-2025,Jacob Konstanty,North Melbourne,0.0,0.015,493,189
-2025,Jacob Koschitzke,Richmond,0.0,0.001,602,189
+2025,Jack Bowes,Geelong,0.0,0.316,282,189
+2025,Jack Buckley,Greater Western Sydney,0.0,0.193,317,189
+2025,Jack Buller,Sydney,0.0,0.069,381,189
+2025,Jack Carroll,St Kilda,0.0,0.002,592,189
+2025,Jack Crisp,Collingwood,3.0,3.569,104,96
+2025,Jack Darling,North Melbourne,0.0,0.143,333,189
+2025,Jack Ginnivan,Hawthorn,0.0,1.334,169,189
+2025,Jack Graham,West Coast,0.0,0.999,198,189
+2025,Jack Gunston,Hawthorn,7.0,7.381,51,51
+2025,Jack Henderson,Melbourne,0.0,0.002,600,189
+2025,Jack Henry,Geelong,0.0,0.451,256,189
+2025,Jack Higgins,St Kilda,1.0,0.722,223,152
+2025,Jack Hutchinson,West Coast,0.0,0.019,478,189
+2025,Jack Lukosius,Port Adelaide,0.0,0.011,512,189
+2025,Jack Macrae,St Kilda,8.0,8.103,47,45
+2025,Jack Martin,Geelong,0.0,0.344,276,189
+2025,Jack Payne,Brisbane Lions,1.0,0.137,335,152
+2025,Jack Petruccelle,West Coast,0.0,0.0,658,189
+2025,Jack Ross,Richmond,0.0,2.911,113,189
+2025,Jack Scrimshaw,Hawthorn,0.0,0.052,402,189
+2025,Jack Silvagni,Carlton,0.0,0.244,296,189
+2025,Jack Sinclair,St Kilda,7.0,8.097,48,51
+2025,Jack Steele,St Kilda,2.0,2.243,125,122
+2025,Jack Viney,Melbourne,8.0,3.627,101,45
+2025,Jack Whitlock,Port Adelaide,0.0,0.003,572,189
+2025,Jack Williams,West Coast,0.0,0.058,393,189
+2025,Jackson Archer,North Melbourne,0.0,0.001,622,189
+2025,Jackson Mead,Port Adelaide,0.0,0.108,351,189
+2025,Jacob Bauer,Richmond,0.0,0.001,620,189
+2025,Jacob Blight,Richmond,0.0,0.003,573,189
+2025,Jacob Hopper,Richmond,5.0,6.23,60,74
+2025,Jacob Konstanty,North Melbourne,0.0,0.016,487,189
+2025,Jacob Koschitzke,Richmond,0.0,0.001,611,189
 2025,Jacob Newton,West Coast,0.0,0.0,653,189
-2025,Jacob Wehr,Greater Western Sydney,0.0,0.056,391,189
-2025,Jacob Weitering,Carlton,1.0,0.779,213,152
-2025,Jacob van Rooyen,Melbourne,0.0,0.044,412,189
-2025,Jade Gresham,Essendon,0.0,0.098,357,189
-2025,Jaeger OMeara,Fremantle,1.0,0.533,240,152
-2025,Jai Culley,Melbourne,0.0,0.022,463,189
-2025,Jai Newcombe,Hawthorn,17.0,10.955,29,20
-2025,Jake Bowey,Melbourne,3.0,1.804,132,96
-2025,Jake Lever,Melbourne,0.0,0.034,429,189
-2025,Jake Lloyd,Sydney,0.0,0.71,222,189
-2025,Jake Melksham,Melbourne,2.0,4.265,86,122
-2025,Jake Riccardi,Greater Western Sydney,0.0,0.301,278,189
-2025,Jake Rogers,Gold Coast,0.0,0.016,488,189
-2025,Jake Soligo,Adelaide,5.0,7.092,54,74
-2025,Jake Stringer,Greater Western Sydney,0.0,1.003,194,189
-2025,Jake Waterman,West Coast,0.0,0.152,324,189
-2025,James Aish,Fremantle,0.0,0.001,605,189
-2025,James Borlase,Adelaide,0.0,0.001,610,189
-2025,James Harmes,Western Bulldogs,1.0,1.062,188,152
-2025,James Jordon,Sydney,0.0,1.608,146,189
-2025,James Leake,Greater Western Sydney,0.0,0.003,582,189
-2025,James ODonnell,Western Bulldogs,0.0,0.053,393,189
-2025,James Peatling,Adelaide,1.0,2.333,122,152
-2025,James Rowbottom,Sydney,3.0,0.762,214,96
-2025,James Sicily,Hawthorn,9.0,2.483,117,42
-2025,James Trezise,Richmond,0.0,0.015,494,189
-2025,James Tunstill,Brisbane Lions,0.0,0.001,612,189
-2025,James Worpel,Hawthorn,3.0,3.642,97,96
-2025,Jamie Cripps,West Coast,0.0,0.177,315,189
-2025,Jamie Elliott,Collingwood,9.0,8.406,42,42
-2025,Jarman Impey,Hawthorn,5.0,5.038,72,74
-2025,Jarrod Berry,Brisbane Lions,0.0,1.507,153,189
-2025,Jarrod Witts,Gold Coast,3.0,3.127,108,96
-2025,Jase Burgoyne,Port Adelaide,0.0,1.507,152,189
-2025,Jason Horne-Francis,Port Adelaide,10.0,9.068,37,37
-2025,Jason Johannisen,Western Bulldogs,0.0,0.078,371,189
-2025,Jaspa Fletcher,Brisbane Lions,2.0,1.844,131,122
-2025,Jasper Alger,Richmond,0.0,0.0,640,189
-2025,Jaxon Binns,Carlton,0.0,0.174,318,189
-2025,Jaxon Prior,Essendon,0.0,0.062,389,189
-2025,Jayden Hunt,West Coast,0.0,0.021,465,189
-2025,Jayden Laverde,Essendon,0.0,0.023,461,189
-2025,Jayden Nguyen,Essendon,0.0,0.002,598,189
-2025,Jayden Short,Richmond,0.0,0.417,258,189
-2025,Jed Adams,Melbourne,0.0,0.0,656,189
-2025,Jed Bews,Geelong,0.0,0.014,497,189
-2025,Jed McEntee,Port Adelaide,0.0,0.004,559,189
-2025,Jed Walter,Gold Coast,0.0,0.026,452,189
-2025,Jedd Busslinger,Western Bulldogs,0.0,0.008,525,189
-2025,Jeremy Cameron,Geelong,20.0,17.13,15,15
-2025,Jeremy Finlayson,Port Adelaide,0.0,0.025,456,189
-2025,Jeremy Howe,Collingwood,2.0,1.295,167,122
-2025,Jeremy McGovern,West Coast,0.0,0.046,406,189
-2025,Jeremy Sharp,Fremantle,0.0,0.025,457,189
-2025,Jesse Dattoli,Sydney,0.0,0.002,586,189
-2025,Jesse Hogan,Greater Western Sydney,4.0,8.594,40,87
-2025,Jesse Motlop,Carlton,0.0,0.134,336,189
-2025,Jhye Clark,Geelong,0.0,0.007,530,189
-2025,Jimmy Webster,St Kilda,0.0,0.05,400,189
-2025,Jobe Shanahan,West Coast,0.0,0.008,529,189
-2025,Joe Berry,Port Adelaide,0.0,0.009,523,189
-2025,Joe Fonti,Greater Western Sydney,0.0,0.031,435,189
-2025,Joe Richards,Port Adelaide,0.0,1.107,182,189
-2025,Joel Amartey,Sydney,0.0,0.229,301,189
-2025,Joel Freijah,Western Bulldogs,6.0,3.48,102,62
-2025,Joel Hamling,Sydney,0.0,0.014,501,189
-2025,Joel Jeffrey,Gold Coast,0.0,0.949,199,189
-2025,John Noble,Gold Coast,4.0,3.593,99,87
-2025,Jonty Faull,Richmond,0.0,0.016,487,189
-2025,Jordan Boyd,Carlton,0.0,0.001,633,189
-2025,Jordan Clark,Fremantle,4.0,8.364,43,87
-2025,Jordan Croft,Western Bulldogs,0.0,0.012,511,189
-2025,Jordan Dawson,Adelaide,27.0,21.501,6,4
-2025,Jordan Ridley,Essendon,0.0,0.074,375,189
-2025,Jordan de Goey,Collingwood,1.0,0.7,225,152
-2025,Jordon Butts,Adelaide,0.0,0.027,450,189
-2025,Jordon Sweet,Port Adelaide,0.0,0.378,268,189
-2025,Josaia Delana,Greater Western Sydney,0.0,0.001,634,189
-2025,Josh Battle,Hawthorn,5.0,3.694,95,74
-2025,Josh Daicos,Collingwood,12.0,10.583,31,31
-2025,Josh Dolan,Western Bulldogs,0.0,0.005,551,189
-2025,Josh Draper,Fremantle,0.0,0.007,534,189
-2025,Josh Dunkley,Brisbane Lions,7.0,14.201,21,52
-2025,Josh Gibcus,Richmond,0.0,0.0,657,189
-2025,Josh Kelly,Greater Western Sydney,3.0,3.551,101,96
-2025,Josh Rachele,Adelaide,0.0,1.74,137,189
-2025,Josh Sinn,Port Adelaide,0.0,0.032,432,189
-2025,Josh Treacy,Fremantle,4.0,4.748,80,87
-2025,Josh Ward,Hawthorn,7.0,1.732,139,52
-2025,Josh Weddle,Hawthorn,4.0,0.222,302,87
-2025,Josh Worrell,Adelaide,1.0,1.695,141,152
-2025,Judd McVee,Melbourne,0.0,0.03,436,189
-2025,Justin McInerney,Sydney,0.0,1.553,150,189
-2025,Jy Farrar,Gold Coast,0.0,0.045,409,189
-2025,Jy Simpkin,North Melbourne,6.0,2.082,126,62
-2025,Jye Amiss,Fremantle,0.0,0.851,205,189
-2025,Jye Caldwell,Essendon,2.0,4.285,85,122
-2025,Jye Menzie,Essendon,0.0,1.054,190,189
-2025,Kade Chandler,Melbourne,0.0,0.95,198,189
-2025,Kai Lohmann,Brisbane Lions,0.0,0.092,360,189
-2025,Kaleb Smith,Richmond,0.0,0.003,569,189
-2025,Kallan Dawson,North Melbourne,0.0,0.001,626,189
-2025,Kamdyn McIntosh,Richmond,0.0,0.064,386,189
-2025,Kane Farrell,Port Adelaide,0.0,1.206,174,189
-2025,Kane McAuliffe,Richmond,0.0,0.05,398,189
-2025,Karl Amon,Hawthorn,2.0,4.992,73,122
-2025,Karl Worner,Fremantle,0.0,0.05,399,189
-2025,Keidean Coleman,Brisbane Lions,0.0,0.002,599,189
-2025,Kieren Briggs,Greater Western Sydney,0.0,0.509,246,189
-2025,Koltyn Tholstrup,Melbourne,0.0,0.007,531,189
-2025,Kyle Langford,Essendon,0.0,0.045,410,189
-2025,Kysaiah Pickett,Melbourne,10.0,9.47,35,37
-2025,Lachie Ash,Greater Western Sydney,7.0,4.99,74,52
-2025,Lachie Fogarty,Carlton,0.0,0.153,323,189
-2025,Lachie Jones,Port Adelaide,0.0,0.05,397,189
-2025,Lachie Neale,Brisbane Lions,16.0,15.478,20,23
-2025,Lachie Schultz,Collingwood,3.0,2.059,128,96
-2025,Lachie Weller,Gold Coast,0.0,0.21,307,189
-2025,Lachie Whitfield,Greater Western Sydney,1.0,3.43,103,152
-2025,Lachlan Blakiston,Essendon,0.0,0.02,469,189
-2025,Lachlan Bramble,Western Bulldogs,0.0,0.293,280,189
-2025,Lachlan Cowan,Carlton,0.0,0.067,382,189
-2025,Lachlan Gulbin,Gold Coast,0.0,0.001,613,189
-2025,Lachlan Keeffe,Greater Western Sydney,0.0,0.015,491,189
-2025,Lachlan McNeil,Western Bulldogs,0.0,0.037,424,189
-2025,Lachlan Murphy,Adelaide,0.0,0.004,560,189
-2025,Lachlan Sholl,Adelaide,0.0,0.013,503,189
-2025,Lachlan Sullivan,Collingwood,0.0,0.04,418,189
-2025,Laitham Vandermeer,Western Bulldogs,0.0,0.051,395,189
-2025,Lance Collard,St Kilda,0.0,0.009,520,189
-2025,Lawson Humphries,Geelong,0.0,0.156,322,189
-2025,Leek Aleer,Greater Western Sydney,0.0,0.029,440,189
+2025,Jacob Wehr,Greater Western Sydney,0.0,0.058,394,189
+2025,Jacob Weitering,Carlton,1.0,0.848,212,152
+2025,Jacob van Rooyen,Melbourne,0.0,0.051,403,189
+2025,Jade Gresham,Essendon,0.0,0.109,350,189
+2025,Jaeger OMeara,Fremantle,1.0,0.776,219,152
+2025,Jai Culley,Melbourne,0.0,0.024,461,189
+2025,Jai Newcombe,Hawthorn,17.0,10.122,33,20
+2025,Jake Bowey,Melbourne,3.0,1.531,159,96
+2025,Jake Lever,Melbourne,0.0,0.036,426,189
+2025,Jake Lloyd,Sydney,0.0,0.613,236,189
+2025,Jake Melksham,Melbourne,2.0,4.289,85,122
+2025,Jake Riccardi,Greater Western Sydney,0.0,0.412,261,189
+2025,Jake Rogers,Gold Coast,0.0,0.014,498,189
+2025,Jake Soligo,Adelaide,5.0,6.925,55,74
+2025,Jake Stringer,Greater Western Sydney,0.0,1.003,195,189
+2025,Jake Waterman,West Coast,0.0,0.097,359,189
+2025,James Aish,Fremantle,0.0,0.001,610,189
+2025,James Borlase,Adelaide,0.0,0.001,607,189
+2025,James Harmes,Western Bulldogs,1.0,1.089,188,152
+2025,James Jordon,Sydney,0.0,2.044,129,189
+2025,James Leake,Greater Western Sydney,0.0,0.005,555,189
+2025,James ODonnell,Western Bulldogs,0.0,0.059,391,189
+2025,James Peatling,Adelaide,1.0,3.083,110,152
+2025,James Rowbottom,Sydney,3.0,0.784,217,96
+2025,James Sicily,Hawthorn,9.0,2.968,111,42
+2025,James Trezise,Richmond,0.0,0.012,510,189
+2025,James Tunstill,Brisbane Lions,0.0,0.001,616,189
+2025,James Worpel,Hawthorn,3.0,3.424,105,96
+2025,Jamie Cripps,West Coast,0.0,0.222,302,189
+2025,Jamie Elliott,Collingwood,9.0,9.052,37,42
+2025,Jarman Impey,Hawthorn,5.0,5.08,74,74
+2025,Jarrod Berry,Brisbane Lions,0.0,1.546,156,189
+2025,Jarrod Witts,Gold Coast,3.0,2.892,114,96
+2025,Jase Burgoyne,Port Adelaide,0.0,1.378,166,189
+2025,Jason Horne-Francis,Port Adelaide,10.0,8.495,42,37
+2025,Jason Johannisen,Western Bulldogs,0.0,0.09,366,189
+2025,Jaspa Fletcher,Brisbane Lions,2.0,1.893,134,122
+2025,Jasper Alger,Richmond,0.0,0.001,639,189
+2025,Jaxon Binns,Carlton,0.0,0.216,306,189
+2025,Jaxon Prior,Essendon,0.0,0.066,382,189
+2025,Jayden Hunt,West Coast,0.0,0.018,482,189
+2025,Jayden Laverde,Essendon,0.0,0.023,466,189
+2025,Jayden Nguyen,Essendon,0.0,0.001,603,189
+2025,Jayden Short,Richmond,0.0,0.514,250,189
+2025,Jed Adams,Melbourne,0.0,0.0,654,189
+2025,Jed Bews,Geelong,0.0,0.013,506,189
+2025,Jed McEntee,Port Adelaide,0.0,0.004,563,189
+2025,Jed Walter,Gold Coast,0.0,0.027,453,189
+2025,Jedd Busslinger,Western Bulldogs,0.0,0.01,519,189
+2025,Jeremy Cameron,Geelong,20.0,16.529,16,15
+2025,Jeremy Finlayson,Port Adelaide,0.0,0.031,439,189
+2025,Jeremy Howe,Collingwood,2.0,1.157,182,122
+2025,Jeremy McGovern,West Coast,0.0,0.076,375,189
+2025,Jeremy Sharp,Fremantle,0.0,0.024,463,189
+2025,Jesse Dattoli,Sydney,0.0,0.002,584,189
+2025,Jesse Hogan,Greater Western Sydney,4.0,8.512,41,87
+2025,Jesse Motlop,Carlton,0.0,0.189,318,189
+2025,Jhye Clark,Geelong,0.0,0.007,532,189
+2025,Jimmy Webster,St Kilda,0.0,0.055,397,189
+2025,Jobe Shanahan,West Coast,0.0,0.009,522,189
+2025,Joe Berry,Port Adelaide,0.0,0.008,530,189
+2025,Joe Fonti,Greater Western Sydney,0.0,0.029,443,189
+2025,Joe Richards,Port Adelaide,0.0,1.239,174,189
+2025,Joel Amartey,Sydney,0.0,0.213,308,189
+2025,Joel Freijah,Western Bulldogs,6.0,3.923,94,61
+2025,Joel Hamling,Sydney,0.0,0.012,511,189
+2025,Joel Jeffrey,Gold Coast,0.0,1.111,185,189
+2025,John Noble,Gold Coast,4.0,3.752,96,87
+2025,Jonty Faull,Richmond,0.0,0.014,500,189
+2025,Jordan Boyd,Carlton,0.0,0.001,636,189
+2025,Jordan Clark,Fremantle,4.0,7.654,49,87
+2025,Jordan Croft,Western Bulldogs,0.0,0.014,499,189
+2025,Jordan Dawson,Adelaide,27.0,21.582,4,4
+2025,Jordan Ridley,Essendon,0.0,0.078,372,189
+2025,Jordan de Goey,Collingwood,1.0,0.81,214,152
+2025,Jordon Butts,Adelaide,0.0,0.022,467,189
+2025,Jordon Sweet,Port Adelaide,0.0,0.575,242,189
+2025,Josaia Delana,Greater Western Sydney,0.0,0.001,633,189
+2025,Josh Battle,Hawthorn,5.0,3.739,97,74
+2025,Josh Daicos,Collingwood,12.0,11.045,29,31
+2025,Josh Dolan,Western Bulldogs,0.0,0.006,547,189
+2025,Josh Draper,Fremantle,0.0,0.007,533,189
+2025,Josh Dunkley,Brisbane Lions,7.0,13.819,21,51
+2025,Josh Gibcus,Richmond,0.0,0.0,659,189
+2025,Josh Kelly,Greater Western Sydney,3.0,3.274,107,96
+2025,Josh Rachele,Adelaide,0.0,1.964,133,189
+2025,Josh Sinn,Port Adelaide,0.0,0.034,432,189
+2025,Josh Treacy,Fremantle,4.0,4.797,83,87
+2025,Josh Ward,Hawthorn,7.0,1.774,142,51
+2025,Josh Weddle,Hawthorn,4.0,0.211,311,87
+2025,Josh Worrell,Adelaide,1.0,1.582,155,152
+2025,Judd McVee,Melbourne,0.0,0.028,451,189
+2025,Justin McInerney,Sydney,0.0,1.353,167,189
+2025,Jy Farrar,Gold Coast,0.0,0.034,429,189
+2025,Jy Simpkin,North Melbourne,6.0,1.97,132,61
+2025,Jye Amiss,Fremantle,0.0,0.997,199,189
+2025,Jye Caldwell,Essendon,2.0,3.979,93,122
+2025,Jye Menzie,Essendon,0.0,1.043,193,189
+2025,Kade Chandler,Melbourne,0.0,1.084,189,189
+2025,Kai Lohmann,Brisbane Lions,0.0,0.106,354,189
+2025,Kaleb Smith,Richmond,0.0,0.003,582,189
+2025,Kallan Dawson,North Melbourne,0.0,0.001,623,189
+2025,Kamdyn McIntosh,Richmond,0.0,0.072,379,189
+2025,Kane Farrell,Port Adelaide,0.0,1.188,179,189
+2025,Kane McAuliffe,Richmond,0.0,0.049,406,189
+2025,Karl Amon,Hawthorn,2.0,5.189,72,122
+2025,Karl Worner,Fremantle,0.0,0.055,398,189
+2025,Keidean Coleman,Brisbane Lions,0.0,0.002,602,189
+2025,Kieren Briggs,Greater Western Sydney,0.0,0.638,235,189
+2025,Koltyn Tholstrup,Melbourne,0.0,0.007,538,189
+2025,Kyle Langford,Essendon,0.0,0.034,433,189
+2025,Kysaiah Pickett,Melbourne,10.0,9.959,35,37
+2025,Lachie Ash,Greater Western Sydney,7.0,4.914,79,51
+2025,Lachie Fogarty,Carlton,0.0,0.182,322,189
+2025,Lachie Jones,Port Adelaide,0.0,0.054,400,189
+2025,Lachie Neale,Brisbane Lions,16.0,15.218,20,23
+2025,Lachie Schultz,Collingwood,3.0,1.763,143,96
+2025,Lachie Weller,Gold Coast,0.0,0.221,303,189
+2025,Lachie Whitfield,Greater Western Sydney,1.0,3.234,108,152
+2025,Lachlan Blakiston,Essendon,0.0,0.011,513,189
+2025,Lachlan Bramble,Western Bulldogs,0.0,0.526,248,189
+2025,Lachlan Cowan,Carlton,0.0,0.065,385,189
+2025,Lachlan Gulbin,Gold Coast,0.0,0.001,626,189
+2025,Lachlan Keeffe,Greater Western Sydney,0.0,0.025,458,189
+2025,Lachlan McNeil,Western Bulldogs,0.0,0.041,418,189
+2025,Lachlan Murphy,Adelaide,0.0,0.005,553,189
+2025,Lachlan Sholl,Adelaide,0.0,0.012,509,189
+2025,Lachlan Sullivan,Collingwood,0.0,0.039,423,189
+2025,Laitham Vandermeer,Western Bulldogs,0.0,0.06,390,189
+2025,Lance Collard,St Kilda,0.0,0.01,516,189
+2025,Lawson Humphries,Geelong,0.0,0.159,327,189
+2025,Leek Aleer,Greater Western Sydney,0.0,0.037,425,189
 2025,Leo Lombard,Gold Coast,0.0,0.001,629,189
-2025,Levi Ashcroft,Brisbane Lions,0.0,0.684,228,189
-2025,Lewis Hayes,Essendon,0.0,0.001,631,189
-2025,Lewis Melican,Sydney,0.0,0.03,437,189
-2025,Lewis Young,Carlton,0.0,0.048,402,189
-2025,Liam Baker,West Coast,2.0,1.079,186,122
-2025,Liam Duggan,West Coast,0.0,0.103,355,189
-2025,Liam Fawcett,Richmond,0.0,0.0,662,189
+2025,Levi Ashcroft,Brisbane Lions,0.0,0.587,238,189
+2025,Lewis Hayes,Essendon,0.0,0.001,624,189
+2025,Lewis Melican,Sydney,0.0,0.025,455,189
+2025,Lewis Young,Carlton,0.0,0.042,416,189
+2025,Liam Baker,West Coast,2.0,1.24,173,122
+2025,Liam Duggan,West Coast,0.0,0.109,349,189
+2025,Liam Fawcett,Richmond,0.0,0.0,655,189
 2025,Liam Henry,St Kilda,0.0,0.002,590,189
-2025,Liam Jones,Western Bulldogs,0.0,0.003,577,189
-2025,Liam McMahon,Essendon,0.0,0.035,426,189
-2025,Liam OConnell,St Kilda,0.0,0.002,593,189
-2025,Liam Reidy,Fremantle,0.0,0.0,666,189
-2025,Liam Ryan,West Coast,3.0,0.278,286,96
-2025,Liam Stocker,St Kilda,0.0,0.013,506,189
-2025,Lloyd Meek,Hawthorn,4.0,3.981,90,87
-2025,Logan Evans,Port Adelaide,0.0,0.028,446,189
-2025,Logan Morris,Brisbane Lions,3.0,4.849,77,96
-2025,Luamon Lual,Essendon,0.0,0.004,565,189
-2025,Lucas Camporeale,Carlton,0.0,0.003,571,189
-2025,Lucca Grego,West Coast,0.0,0.001,636,189
-2025,Luke Beecken,Brisbane Lions,0.0,0.0,639,189
-2025,Luke Breust,Hawthorn,0.0,0.006,550,189
-2025,Luke Cleary,Western Bulldogs,0.0,0.034,428,189
-2025,Luke Davies-Uniacke,North Melbourne,11.0,5.497,67,33
-2025,Luke Jackson,Fremantle,17.0,8.277,46,20
-2025,Luke McDonald,North Melbourne,0.0,0.147,326,189
-2025,Luke Nankervis,Adelaide,0.0,0.014,498,189
-2025,Luke Parker,North Melbourne,0.0,2.272,123,189
-2025,Luke Pedlar,Adelaide,0.0,0.018,479,189
-2025,Luke Ryan,Fremantle,2.0,1.104,183,122
-2025,Luke Trainor,Richmond,0.0,0.021,467,189
-2025,Mabior Chol,Hawthorn,1.0,3.101,109,152
-2025,Mac Andrew,Gold Coast,0.0,0.274,287,189
+2025,Liam Jones,Western Bulldogs,0.0,0.003,578,189
+2025,Liam McMahon,Essendon,0.0,0.041,417,189
+2025,Liam OConnell,St Kilda,0.0,0.002,596,189
+2025,Liam Reidy,Fremantle,0.0,0.0,663,189
+2025,Liam Ryan,West Coast,3.0,0.313,284,96
+2025,Liam Stocker,St Kilda,0.0,0.019,481,189
+2025,Lloyd Meek,Hawthorn,4.0,4.825,81,87
+2025,Logan Evans,Port Adelaide,0.0,0.038,424,189
+2025,Logan Morris,Brisbane Lions,3.0,4.893,80,96
+2025,Luamon Lual,Essendon,0.0,0.004,568,189
+2025,Lucas Camporeale,Carlton,0.0,0.002,585,189
+2025,Lucca Grego,West Coast,0.0,0.0,642,189
+2025,Luke Beecken,Brisbane Lions,0.0,0.0,650,189
+2025,Luke Breust,Hawthorn,0.0,0.006,542,189
+2025,Luke Cleary,Western Bulldogs,0.0,0.034,431,189
+2025,Luke Davies-Uniacke,North Melbourne,11.0,5.333,68,33
+2025,Luke Jackson,Fremantle,17.0,8.473,43,20
+2025,Luke McDonald,North Melbourne,0.0,0.157,328,189
+2025,Luke Nankervis,Adelaide,0.0,0.013,502,189
+2025,Luke Parker,North Melbourne,0.0,2.109,127,189
+2025,Luke Pedlar,Adelaide,0.0,0.029,445,189
+2025,Luke Ryan,Fremantle,2.0,0.95,204,122
+2025,Luke Trainor,Richmond,0.0,0.022,469,189
+2025,Mabior Chol,Hawthorn,1.0,3.289,106,152
+2025,Mac Andrew,Gold Coast,0.0,0.326,278,189
 2025,Malakai Champion,West Coast,0.0,0.0,644,189
 2025,Malcolm Rosas,Gold Coast,0.0,0.003,581,189
-2025,Mani Liddy,Port Adelaide,0.0,0.025,455,189
-2025,Marc Pittonet,Carlton,0.0,0.021,464,189
-2025,Marcus Bontempelli,Western Bulldogs,25.0,20.168,8,7
-2025,Marcus Windhager,St Kilda,5.0,4.108,89,74
-2025,Mark Blicavs,Geelong,3.0,1.125,181,96
-2025,Mark Keane,Adelaide,1.0,0.884,202,152
-2025,Mark OConnor,Geelong,0.0,0.472,252,189
-2025,Mason Cox,Collingwood,0.0,0.009,522,189
-2025,Mason Redman,Essendon,2.0,1.273,169,122
-2025,Mason Wood,St Kilda,0.0,0.62,235,189
-2025,Massimo DAmbrosio,Hawthorn,3.0,2.15,124,96
-2025,Matt Carroll,Carlton,0.0,0.103,354,189
-2025,Matt Crouch,Adelaide,1.0,2.061,127,152
-2025,Matt Flynn,West Coast,0.0,0.329,275,189
-2025,Matt Guelfi,Essendon,0.0,0.018,478,189
-2025,Matt Roberts,Sydney,0.0,0.414,259,189
-2025,Matt Rowell,Gold Coast,39.0,21.864,5,1
+2025,Mani Liddy,Port Adelaide,0.0,0.024,462,189
+2025,Marc Pittonet,Carlton,0.0,0.028,449,189
+2025,Marcus Bontempelli,Western Bulldogs,25.0,21.049,6,6
+2025,Marcus Windhager,St Kilda,5.0,4.014,91,74
+2025,Mark Blicavs,Geelong,3.0,0.972,200,96
+2025,Mark Keane,Adelaide,1.0,0.901,205,152
+2025,Mark OConnor,Geelong,0.0,0.79,216,189
+2025,Mason Cox,Collingwood,0.0,0.013,505,189
+2025,Mason Redman,Essendon,2.0,1.223,176,122
+2025,Mason Wood,St Kilda,0.0,0.668,231,189
+2025,Massimo DAmbrosio,Hawthorn,3.0,2.193,126,96
+2025,Matt Carroll,Carlton,0.0,0.115,346,189
+2025,Matt Crouch,Adelaide,1.0,1.729,145,152
+2025,Matt Flynn,West Coast,0.0,0.275,291,189
+2025,Matt Guelfi,Essendon,0.0,0.019,480,189
+2025,Matt Roberts,Sydney,0.0,0.356,273,189
+2025,Matt Rowell,Gold Coast,40.0,21.327,5,1
 2025,Matt Whitlock,North Melbourne,0.0,0.001,635,189
-2025,Mattaes Phillipou,St Kilda,0.0,0.007,536,189
-2025,Matthew Cottrell,Carlton,0.0,0.077,372,189
-2025,Matthew Jefferson,Melbourne,0.0,0.003,573,189
-2025,Matthew Johnson,Fremantle,0.0,0.852,204,189
-2025,Matthew Kennedy,Western Bulldogs,5.0,6.128,60,74
-2025,Matthew Owies,West Coast,0.0,0.008,524,189
-2025,Maurice Rioli,Richmond,0.0,0.01,515,189
-2025,Max Gawn,Melbourne,23.0,10.238,33,9
-2025,Max Gruzewski,Greater Western Sydney,0.0,0.044,413,189
-2025,Max Hall,St Kilda,1.0,1.983,129,152
-2025,Max Heath,St Kilda,0.0,0.014,499,189
-2025,Max Holmes,Geelong,18.0,18.65,11,19
-2025,Max Michalanney,Adelaide,0.0,0.489,248,189
-2025,Max Ramsden,Hawthorn,0.0,0.018,477,189
-2025,Michael Frederick,Fremantle,0.0,0.782,212,189
-2025,Miles Bergman,Port Adelaide,2.0,2.536,115,122
-2025,Mitch Duncan,Geelong,0.0,0.037,423,189
-2025,Mitch Georgiades,Port Adelaide,5.0,5.945,62,74
-2025,Mitch Hinge,Adelaide,0.0,0.261,289,189
-2025,Mitch Knevitt,Geelong,0.0,0.116,344,189
-2025,Mitch Lewis,Hawthorn,0.0,0.042,416,189
-2025,Mitch McGovern,Carlton,0.0,0.705,224,189
-2025,Mitch Owens,St Kilda,0.0,0.983,195,189
-2025,Murphy Reid,Fremantle,1.0,1.793,133,152
+2025,Mattaes Phillipou,St Kilda,0.0,0.005,549,189
+2025,Matthew Cottrell,Carlton,0.0,0.077,373,189
+2025,Matthew Jefferson,Melbourne,0.0,0.002,586,189
+2025,Matthew Johnson,Fremantle,0.0,0.898,206,189
+2025,Matthew Kennedy,Western Bulldogs,5.0,6.257,58,74
+2025,Matthew Owies,West Coast,0.0,0.009,523,189
+2025,Maurice Rioli,Richmond,0.0,0.013,504,189
+2025,Max Gawn,Melbourne,23.0,10.212,32,9
+2025,Max Gruzewski,Greater Western Sydney,0.0,0.071,380,189
+2025,Max Hall,St Kilda,1.0,2.411,120,152
+2025,Max Heath,St Kilda,0.0,0.016,490,189
+2025,Max Holmes,Geelong,18.0,18.354,12,19
+2025,Max Michalanney,Adelaide,0.0,0.669,230,189
+2025,Max Ramsden,Hawthorn,0.0,0.02,476,189
+2025,Michael Frederick,Fremantle,0.0,1.093,187,189
+2025,Miles Bergman,Port Adelaide,2.0,2.787,116,122
+2025,Mitch Duncan,Geelong,0.0,0.034,430,189
+2025,Mitch Georgiades,Port Adelaide,5.0,6.092,63,74
+2025,Mitch Hinge,Adelaide,0.0,0.303,285,189
+2025,Mitch Knevitt,Geelong,0.0,0.083,371,189
+2025,Mitch Lewis,Hawthorn,0.0,0.049,407,189
+2025,Mitch McGovern,Carlton,0.0,0.779,218,189
+2025,Mitch Owens,St Kilda,0.0,1.167,181,189
+2025,Murphy Reid,Fremantle,1.0,1.999,131,152
 2025,Mykelti Lefau,Richmond,0.0,0.0,667,189
-2025,Nasiah Wanganeen-Milera,St Kilda,23.0,17.335,14,9
+2025,Nasiah Wanganeen-Milera,St Kilda,23.0,17.448,14,9
 2025,Nat Fyfe,Fremantle,0.0,0.004,561,189
-2025,Nate Caddy,Essendon,0.0,0.208,309,189
-2025,Nathan Broad,Richmond,0.0,0.043,414,189
-2025,Nathan ODriscoll,Fremantle,0.0,0.753,217,189
-2025,Ned Long,Collingwood,0.0,4.909,76,189
-2025,Ned Moyle,Gold Coast,0.0,0.039,419,189
-2025,Ned Reeves,Hawthorn,0.0,0.001,606,189
-2025,Neil Erasmus,Fremantle,0.0,0.394,263,189
-2025,Nic Martin,Essendon,6.0,7.214,53,62
-2025,Nick Blakey,Sydney,7.0,4.578,81,52
-2025,Nick Bryan,Essendon,0.0,0.009,521,189
-2025,Nick Coffield,Western Bulldogs,0.0,0.006,548,189
-2025,Nick Daicos,Collingwood,32.0,26.921,2,2
-2025,Nick Haynes,Carlton,0.0,0.87,203,189
-2025,Nick Holman,Gold Coast,0.0,0.021,466,189
-2025,Nick Larkey,North Melbourne,1.0,0.444,257,152
-2025,Nick Madden,Greater Western Sydney,0.0,0.01,517,189
-2025,Nick Murray,Adelaide,0.0,0.018,476,189
-2025,Nick Vlastuin,Richmond,4.0,2.11,125,87
-2025,Nick Watson,Hawthorn,0.0,1.043,191,189
-2025,Noah Anderson,Gold Coast,27.0,27.025,1,4
-2025,Noah Answerth,Brisbane Lions,0.0,0.1,356,189
-2025,Noah Balta,Richmond,0.0,0.134,337,189
-2025,Noah Long,West Coast,0.0,0.002,592,189
-2025,Oisin Mullin,Geelong,0.0,0.063,388,189
-2025,Oleg Markov,Collingwood,0.0,0.005,556,189
-2025,Oliver Dempsey,Geelong,0.0,0.952,197,189
-2025,Oliver Florent,Sydney,0.0,0.071,377,189
-2025,Oliver Henry,Geelong,0.0,0.023,460,189
-2025,Oliver Hollands,Carlton,0.0,0.247,294,189
-2025,Oliver Wiltshire,Geelong,0.0,0.001,622,189
-2025,Ollie Lord,Port Adelaide,0.0,0.016,483,189
-2025,Ollie Wines,Port Adelaide,2.0,3.623,98,122
-2025,Orazio Fantasia,Carlton,0.0,0.014,496,189
-2025,Oscar Adams,Gold Coast,0.0,0.006,538,189
-2025,Oscar Allen,West Coast,0.0,0.027,451,189
-2025,Oscar McDonald,Fremantle,0.0,0.02,471,189
-2025,Oscar McInerney,Brisbane Lions,1.0,0.369,271,152
-2025,Oskar Baker,Western Bulldogs,0.0,0.033,431,189
-2025,Oskar Smartt,Essendon,0.0,0.001,621,189
-2025,Patrick Cripps,Carlton,19.0,8.085,48,18
-2025,Patrick Dangerfield,Geelong,8.0,5.573,66,46
-2025,Patrick Lipinski,Collingwood,0.0,1.218,173,189
-2025,Patrick Voss,Fremantle,3.0,2.415,118,96
-2025,Paul Curtis,North Melbourne,0.0,1.477,157,189
-2025,Peter Ladhams,Sydney,0.0,0.075,374,189
-2025,Peter Wright,Essendon,3.0,2.82,110,96
-2025,Quinton Narkle,Fremantle,0.0,0.001,628,189
-2025,Reef McInnes,Collingwood,0.0,0.001,607,189
-2025,Reilly OBrien,Adelaide,5.0,1.691,142,74
-2025,Reuben Ginbey,West Coast,0.0,0.032,433,189
-2025,Rhett Bazzo,West Coast,0.0,0.002,584,189
-2025,Rhyan Mansell,Richmond,0.0,0.198,312,189
-2025,Rhylee West,Western Bulldogs,0.0,1.485,154,189
-2025,Rhys Stanley,Geelong,0.0,0.281,282,189
-2025,Rhys Unwin,Essendon,0.0,0.002,600,189
-2025,Riley Bice,Sydney,0.0,1.034,192,189
-2025,Riley Garcia,Western Bulldogs,0.0,0.064,384,189
-2025,Riley Hardeman,North Melbourne,0.0,0.028,448,189
-2025,Riley Thilthorpe,Adelaide,14.0,10.893,30,27
-2025,Roan Steele,Collingwood,0.0,0.005,552,189
+2025,Nate Caddy,Essendon,0.0,0.204,313,189
+2025,Nathan Broad,Richmond,0.0,0.05,404,189
+2025,Nathan ODriscoll,Fremantle,0.0,0.957,202,189
+2025,Ned Long,Collingwood,0.0,4.582,84,189
+2025,Ned Moyle,Gold Coast,0.0,0.035,428,189
+2025,Ned Reeves,Hawthorn,0.0,0.002,597,189
+2025,Neil Erasmus,Fremantle,0.0,0.325,279,189
+2025,Nic Martin,Essendon,6.0,7.01,53,61
+2025,Nick Blakey,Sydney,7.0,4.803,82,51
+2025,Nick Bryan,Essendon,0.0,0.015,493,189
+2025,Nick Coffield,Western Bulldogs,0.0,0.006,545,189
+2025,Nick Daicos,Collingwood,32.0,27.675,1,2
+2025,Nick Haynes,Carlton,0.0,0.866,209,189
+2025,Nick Holman,Gold Coast,0.0,0.023,465,189
+2025,Nick Larkey,North Melbourne,1.0,0.399,265,152
+2025,Nick Madden,Greater Western Sydney,0.0,0.012,507,189
+2025,Nick Murray,Adelaide,0.0,0.015,495,189
+2025,Nick Vlastuin,Richmond,4.0,2.798,115,87
+2025,Nick Watson,Hawthorn,0.0,1.153,183,189
+2025,Noah Anderson,Gold Coast,25.0,25.294,2,6
+2025,Noah Answerth,Brisbane Lions,0.0,0.092,362,189
+2025,Noah Balta,Richmond,0.0,0.12,343,189
+2025,Noah Long,West Coast,0.0,0.002,595,189
+2025,Oisin Mullin,Geelong,0.0,0.099,358,189
+2025,Oleg Markov,Collingwood,0.0,0.005,548,189
+2025,Oliver Dempsey,Geelong,0.0,1.058,192,189
+2025,Oliver Florent,Sydney,0.0,0.062,388,189
+2025,Oliver Henry,Geelong,0.0,0.022,471,189
+2025,Oliver Hollands,Carlton,0.0,0.233,298,189
+2025,Oliver Wiltshire,Geelong,0.0,0.001,625,189
+2025,Ollie Lord,Port Adelaide,0.0,0.019,479,189
+2025,Ollie Wines,Port Adelaide,2.0,3.573,103,122
+2025,Orazio Fantasia,Carlton,0.0,0.012,508,189
+2025,Oscar Adams,Gold Coast,0.0,0.007,535,189
+2025,Oscar Allen,West Coast,0.0,0.028,450,189
+2025,Oscar McDonald,Fremantle,0.0,0.043,414,189
+2025,Oscar McInerney,Brisbane Lions,1.0,0.276,290,152
+2025,Oskar Baker,Western Bulldogs,0.0,0.028,447,189
+2025,Oskar Smartt,Essendon,0.0,0.001,627,189
+2025,Patrick Cripps,Carlton,19.0,8.994,38,18
+2025,Patrick Dangerfield,Geelong,8.0,5.83,65,45
+2025,Patrick Lipinski,Collingwood,0.0,1.296,172,189
+2025,Patrick Voss,Fremantle,3.0,2.554,117,96
+2025,Paul Curtis,North Melbourne,0.0,1.616,151,189
+2025,Peter Ladhams,Sydney,0.0,0.076,374,189
+2025,Peter Wright,Essendon,3.0,2.966,112,96
+2025,Quinton Narkle,Fremantle,0.0,0.001,638,189
+2025,Reef McInnes,Collingwood,0.0,0.002,599,189
+2025,Reilly OBrien,Adelaide,5.0,2.435,119,74
+2025,Reuben Ginbey,West Coast,0.0,0.028,452,189
+2025,Rhett Bazzo,West Coast,0.0,0.002,591,189
+2025,Rhyan Mansell,Richmond,0.0,0.375,270,189
+2025,Rhylee West,Western Bulldogs,0.0,1.799,141,189
+2025,Rhys Stanley,Geelong,0.0,0.269,292,189
+2025,Rhys Unwin,Essendon,0.0,0.001,615,189
+2025,Riley Bice,Sydney,0.0,1.003,196,189
+2025,Riley Garcia,Western Bulldogs,0.0,0.055,396,189
+2025,Riley Hardeman,North Melbourne,0.0,0.029,441,189
+2025,Riley Thilthorpe,Adelaide,14.0,11.113,28,27
+2025,Roan Steele,Collingwood,0.0,0.004,565,189
 2025,Robert Hansen,North Melbourne,0.0,0.006,541,189
-2025,Rory Atkins,Port Adelaide,0.0,0.006,549,189
-2025,Rory Laird,Adelaide,5.0,2.514,116,74
-2025,Rory Lobb,Western Bulldogs,1.0,0.749,218,152
-2025,Rowan Marshall,St Kilda,2.0,5.977,61,122
-2025,Ryan Angwin,Greater Western Sydney,0.0,0.281,283,189
-2025,Ryan Burton,Port Adelaide,0.0,0.084,367,189
+2025,Rory Atkins,Port Adelaide,0.0,0.006,543,189
+2025,Rory Laird,Adelaide,5.0,2.247,124,74
+2025,Rory Lobb,Western Bulldogs,1.0,0.687,226,152
+2025,Rowan Marshall,St Kilda,2.0,6.243,59,122
+2025,Ryan Angwin,Greater Western Sydney,0.0,0.189,319,189
+2025,Ryan Burton,Port Adelaide,0.0,0.075,377,189
 2025,Ryan Byrnes,St Kilda,0.0,0.043,415,189
-2025,Ryan Gardner,Western Bulldogs,0.0,0.0,661,189
-2025,Ryan Lester,Brisbane Lions,0.0,0.204,310,189
-2025,Ryan Maric,West Coast,1.0,0.148,325,152
-2025,Ryley Sanders,Western Bulldogs,2.0,1.184,178,122
-2025,Saad El-Hawli,Essendon,0.0,0.015,492,189
-2025,Sam Banks,Richmond,2.0,1.303,166,122
-2025,Sam Berry,Adelaide,1.0,1.384,160,152
-2025,Sam Butler,Hawthorn,0.0,0.028,444,189
-2025,Sam Clohesy,Gold Coast,0.0,0.087,364,189
-2025,Sam Collins,Gold Coast,2.0,0.243,296,122
-2025,Sam Darcy,Western Bulldogs,6.0,8.546,41,62
-2025,Sam Davidson,Western Bulldogs,0.0,1.686,143,189
-2025,Sam Day,Brisbane Lions,0.0,0.017,482,189
-2025,Sam De Koning,Geelong,2.0,0.636,232,122
-2025,Sam Docherty,Carlton,0.0,0.358,274,189
-2025,Sam Draper,Essendon,0.0,0.484,250,189
-2025,Sam Durham,Essendon,4.0,3.295,105,87
-2025,Sam Flanders,Gold Coast,3.0,0.446,256,96
-2025,Sam Frost,Hawthorn,0.0,0.001,627,189
-2025,Sam Lalor,Richmond,0.0,0.143,328,189
-2025,Sam Marshall,Brisbane Lions,0.0,0.028,445,189
-2025,Sam Powell-Pepper,Port Adelaide,2.0,0.217,305,122
-2025,Sam Switkowski,Fremantle,0.0,1.276,168,189
-2025,Sam Taylor,Greater Western Sydney,2.0,1.158,179,122
-2025,Sam Walsh,Carlton,6.0,6.17,59,62
-2025,Sam Wicks,Sydney,0.0,0.086,366,189
-2025,Samson Ryan,Richmond,0.0,0.001,616,189
-2025,Sandy Brock,West Coast,0.0,0.011,514,189
-2025,Scott Pendlebury,Collingwood,2.0,5.038,71,122
-2025,Seamus Mitchell,Hawthorn,0.0,0.003,568,189
-2025,Sean Darcy,Fremantle,0.0,0.518,244,189
-2025,Sean Lemmens,Gold Coast,0.0,0.0,649,189
-2025,Seth Campbell,Richmond,0.0,0.297,279,189
-2025,Shai Bolton,Fremantle,0.0,4.941,75,189
-2025,Shannon Neale,Geelong,2.0,1.449,158,122
-2025,Shaun Mannagh,Geelong,2.0,4.831,78,122
-2025,Sid Draper,Adelaide,0.0,0.009,519,189
-2025,Steele Sidebottom,Collingwood,11.0,8.317,44,33
-2025,Steely Green,Richmond,0.0,0.007,532,189
-2025,Stephen Coniglio,Greater Western Sydney,0.0,0.36,273,189
-2025,Steven May,Melbourne,0.0,0.527,242,189
-2025,Taj Hotton,Richmond,0.0,0.019,472,189
-2025,Taj Woewodin,Melbourne,0.0,0.0,659,189
-2025,Taylor Adams,Sydney,0.0,0.001,604,189
-2025,Taylor Duryea,Western Bulldogs,0.0,0.003,572,189
-2025,Taylor Walker,Adelaide,1.0,1.088,185,152
-2025,Ted Clohesy,Geelong,0.0,0.016,484,189
-2025,Thomson Dow,Richmond,0.0,0.13,341,189
-2025,Tim English,Western Bulldogs,8.0,6.266,58,46
-2025,Tim Kelly,West Coast,0.0,1.551,151,189
-2025,Tim Membrey,Collingwood,0.0,0.652,230,189
-2025,Tim Taranto,Richmond,20.0,12.679,25,15
-2025,Tobie Travaglia,St Kilda,0.0,0.011,513,189
-2025,Toby Bedford,Greater Western Sydney,0.0,0.133,339,189
-2025,Toby Greene,Greater Western Sydney,14.0,12.409,26,27
-2025,Toby McMullin,Greater Western Sydney,0.0,0.016,486,189
-2025,Toby Nankervis,Richmond,2.0,2.609,113,122
-2025,Toby Pink,North Melbourne,0.0,0.046,408,189
-2025,Todd Goldstein,Essendon,0.0,0.123,343,189
-2025,Tom Atkins,Geelong,3.0,3.65,96,96
-2025,Tom Barrass,Hawthorn,0.0,0.306,277,189
-2025,Tom Brown,Richmond,0.0,0.16,320,189
-2025,Tom Cochrane,Port Adelaide,0.0,0.003,575,189
-2025,Tom Cole,West Coast,0.0,0.029,441,189
-2025,Tom De Koning,Carlton,7.0,4.5,83,52
-2025,Tom Doedee,Brisbane Lions,0.0,0.0,642,189
-2025,Tom Edwards,Essendon,0.0,0.0,643,189
-2025,Tom Fullarton,Melbourne,0.0,0.001,611,189
-2025,Tom Green,Greater Western Sydney,20.0,20.067,9,15
-2025,Tom Gross,West Coast,0.0,0.003,574,189
-2025,Tom Hanily,Sydney,0.0,0.009,518,189
-2025,Tom Liberatore,Western Bulldogs,12.0,14.082,22,31
-2025,Tom Lynch,Richmond,0.0,0.158,321,189
-2025,Tom McCarthy,West Coast,0.0,0.409,260,189
-2025,Tom McCartin,Sydney,0.0,0.382,267,189
-2025,Tom McDonald,Melbourne,0.0,0.104,353,189
-2025,Tom Mitchell,Collingwood,0.0,0.585,237,189
-2025,Tom Papley,Sydney,0.0,1.894,130,189
-2025,Tom Powell,North Melbourne,5.0,4.819,79,74
-2025,Tom Sims,Richmond,0.0,0.006,539,189
-2025,Tom Sparrow,Melbourne,0.0,0.11,348,189
-2025,Tom Stewart,Geelong,0.0,0.791,211,189
-2025,Touk Miller,Gold Coast,8.0,11.024,28,46
-2025,Travis Boak,Port Adelaide,0.0,0.288,281,189
-2025,Trent Rivers,Melbourne,0.0,0.692,227,189
-2025,Tristan Xerri,North Melbourne,7.0,7.273,52,52
+2025,Ryan Gardner,Western Bulldogs,0.0,0.0,662,189
+2025,Ryan Lester,Brisbane Lions,0.0,0.211,312,189
+2025,Ryan Maric,West Coast,1.0,0.219,304,152
+2025,Ryley Sanders,Western Bulldogs,2.0,1.106,186,122
+2025,Saad El-Hawli,Essendon,0.0,0.021,475,189
+2025,Sam Banks,Richmond,2.0,1.323,170,122
+2025,Sam Berry,Adelaide,1.0,1.472,162,152
+2025,Sam Butler,Hawthorn,0.0,0.022,468,189
+2025,Sam Clohesy,Gold Coast,0.0,0.085,369,189
+2025,Sam Collins,Gold Coast,2.0,0.243,297,122
+2025,Sam Darcy,Western Bulldogs,6.0,8.301,44,61
+2025,Sam Davidson,Western Bulldogs,0.0,1.874,135,189
+2025,Sam Day,Brisbane Lions,0.0,0.015,494,189
+2025,Sam De Koning,Geelong,2.0,0.767,221,122
+2025,Sam Docherty,Carlton,0.0,0.29,288,189
+2025,Sam Draper,Essendon,0.0,0.752,222,189
+2025,Sam Durham,Essendon,4.0,3.605,102,87
+2025,Sam Flanders,Gold Coast,3.0,0.399,266,96
+2025,Sam Frost,Hawthorn,0.0,0.001,612,189
+2025,Sam Lalor,Richmond,0.0,0.2,314,189
+2025,Sam Marshall,Brisbane Lions,0.0,0.028,448,189
+2025,Sam Powell-Pepper,Port Adelaide,2.0,0.219,305,122
+2025,Sam Switkowski,Fremantle,0.0,1.316,171,189
+2025,Sam Taylor,Greater Western Sydney,2.0,1.382,164,122
+2025,Sam Walsh,Carlton,6.0,6.041,64,61
+2025,Sam Wicks,Sydney,0.0,0.09,365,189
+2025,Samson Ryan,Richmond,0.0,0.002,593,189
+2025,Sandy Brock,West Coast,0.0,0.013,503,189
+2025,Scott Pendlebury,Collingwood,2.0,4.98,76,122
+2025,Seamus Mitchell,Hawthorn,0.0,0.003,570,189
+2025,Sean Darcy,Fremantle,0.0,0.403,264,189
+2025,Sean Lemmens,Gold Coast,0.0,0.0,646,189
+2025,Seth Campbell,Richmond,0.0,0.32,280,189
+2025,Shai Bolton,Fremantle,0.0,5.221,70,189
+2025,Shannon Neale,Geelong,2.0,1.61,152,122
+2025,Shaun Mannagh,Geelong,2.0,5.149,73,122
+2025,Sid Draper,Adelaide,0.0,0.01,517,189
+2025,Steele Sidebottom,Collingwood,11.0,9.171,36,33
+2025,Steely Green,Richmond,0.0,0.01,521,189
+2025,Stephen Coniglio,Greater Western Sydney,0.0,0.391,268,189
+2025,Steven May,Melbourne,0.0,0.534,247,189
+2025,Taj Hotton,Richmond,0.0,0.011,515,189
+2025,Taj Woewodin,Melbourne,0.0,0.0,660,189
+2025,Taylor Adams,Sydney,0.0,0.001,606,189
+2025,Taylor Duryea,Western Bulldogs,0.0,0.005,554,189
+2025,Taylor Walker,Adelaide,1.0,0.872,207,152
+2025,Ted Clohesy,Geelong,0.0,0.024,464,189
+2025,Thomson Dow,Richmond,0.0,0.133,338,189
+2025,Tim English,Western Bulldogs,8.0,6.585,56,45
+2025,Tim Kelly,West Coast,0.0,1.386,163,189
+2025,Tim Membrey,Collingwood,0.0,0.506,253,189
+2025,Tim Taranto,Richmond,20.0,13.181,24,15
+2025,Tobie Travaglia,St Kilda,0.0,0.011,514,189
+2025,Toby Bedford,Greater Western Sydney,0.0,0.119,344,189
+2025,Toby Greene,Greater Western Sydney,14.0,12.426,26,27
+2025,Toby McMullin,Greater Western Sydney,0.0,0.024,460,189
+2025,Toby Nankervis,Richmond,2.0,2.52,118,122
+2025,Toby Pink,North Melbourne,0.0,0.045,412,189
+2025,Todd Goldstein,Essendon,0.0,0.084,370,189
+2025,Tom Atkins,Geelong,3.0,4.119,90,96
+2025,Tom Barrass,Hawthorn,0.0,0.43,259,189
+2025,Tom Brown,Richmond,0.0,0.108,352,189
+2025,Tom Cochrane,Port Adelaide,0.0,0.003,579,189
+2025,Tom Cole,West Coast,0.0,0.031,437,189
+2025,Tom De Koning,Carlton,7.0,4.966,77,51
+2025,Tom Doedee,Brisbane Lions,0.0,0.0,645,189
+2025,Tom Edwards,Essendon,0.0,0.0,640,189
+2025,Tom Fullarton,Melbourne,0.0,0.001,604,189
+2025,Tom Green,Greater Western Sydney,20.0,20.05,10,15
+2025,Tom Gross,West Coast,0.0,0.005,552,189
+2025,Tom Hanily,Sydney,0.0,0.006,540,189
+2025,Tom Liberatore,Western Bulldogs,12.0,13.206,23,31
+2025,Tom Lynch,Richmond,0.0,0.171,326,189
+2025,Tom McCarthy,West Coast,0.0,0.443,257,189
+2025,Tom McCartin,Sydney,0.0,0.288,289,189
+2025,Tom McDonald,Melbourne,0.0,0.101,357,189
+2025,Tom Mitchell,Collingwood,0.0,0.571,243,189
+2025,Tom Papley,Sydney,0.0,2.048,128,189
+2025,Tom Powell,North Melbourne,5.0,5.292,69,74
+2025,Tom Sims,Richmond,0.0,0.006,546,189
+2025,Tom Sparrow,Melbourne,0.0,0.114,347,189
+2025,Tom Stewart,Geelong,0.0,0.601,237,189
+2025,Touk Miller,Gold Coast,8.0,10.884,30,45
+2025,Travis Boak,Port Adelaide,0.0,0.318,281,189
+2025,Trent Rivers,Melbourne,0.0,0.652,233,189
+2025,Tristan Xerri,North Melbourne,7.0,7.192,52,51
 2025,Ty Gallop,Brisbane Lions,0.0,0.001,632,189
-2025,Tylar Young,Richmond,0.0,0.052,394,189
-2025,Tyler Brockman,West Coast,0.0,0.047,404,189
-2025,Tyler Sonsie,Richmond,0.0,0.038,422,189
-2025,Tyrell Dewar,West Coast,0.0,0.039,421,189
-2025,Tyson Stengle,Geelong,2.0,1.376,161,122
-2025,Vigo Visentini,Essendon,0.0,0.001,614,189
-2025,Wayne Milera,Adelaide,1.0,0.634,233,152
-2025,Wil Dawson,North Melbourne,0.0,0.001,624,189
+2025,Tylar Young,Richmond,0.0,0.065,384,189
+2025,Tyler Brockman,West Coast,0.0,0.04,420,189
+2025,Tyler Sonsie,Richmond,0.0,0.033,434,189
+2025,Tyrell Dewar,West Coast,0.0,0.04,421,189
+2025,Tyson Stengle,Geelong,2.0,1.583,154,122
+2025,Vigo Visentini,Essendon,0.0,0.002,594,189
+2025,Wayne Milera,Adelaide,1.0,0.586,239,152
+2025,Wil Dawson,North Melbourne,0.0,0.001,617,189
 2025,Wil Parker,Collingwood,0.0,0.001,609,189
-2025,Wil Powell,Gold Coast,0.0,0.187,313,189
-2025,Will Ashcroft,Brisbane Lions,11.0,16.511,18,33
-2025,Will Day,Hawthorn,4.0,3.93,94,87
-2025,Will Graham,Gold Coast,0.0,0.023,459,189
-2025,Will Hayes,Collingwood,0.0,0.001,615,189
-2025,Will Hayward,Sydney,3.0,1.56,149,96
-2025,Will Hoskin-Elliott,Collingwood,0.0,0.029,439,189
-2025,Will Lorenz,Port Adelaide,0.0,0.006,547,189
-2025,Will McLachlan,Brisbane Lions,0.0,0.005,553,189
-2025,Will Phillips,North Melbourne,0.0,0.016,485,189
-2025,Will Setterfield,Essendon,0.0,0.626,234,189
-2025,Will White,Carlton,0.0,0.028,447,189
-2025,Willem Drew,Port Adelaide,0.0,0.961,196,189
-2025,Willie Rioli,Port Adelaide,0.0,0.247,293,189
-2025,Xavier Duursma,Essendon,0.0,1.344,165,189
-2025,Xavier Lindsay,Melbourne,0.0,0.039,420,189
-2025,Xavier OHalloran,Greater Western Sydney,2.0,1.478,156,122
-2025,Zac Bailey,Brisbane Lions,6.0,8.15,47,62
-2025,Zac Banch,North Melbourne,0.0,0.001,625,189
-2025,Zac Fisher,North Melbourne,0.0,0.017,480,189
-2025,Zac Taylor,Adelaide,0.0,0.056,390,189
-2025,Zac Williams,Carlton,0.0,0.617,236,189
-2025,Zach Guthrie,Geelong,1.0,1.651,145,152
-2025,Zach Merrett,Essendon,14.0,13.591,23,27
-2025,Zach Reid,Essendon,0.0,0.523,243,189
-2025,Zaine Cordy,St Kilda,0.0,0.0,664,189
-2025,Zak Butters,Port Adelaide,21.0,20.711,7,11
-2025,Zak Johnson,Essendon,0.0,0.006,542,189
-2025,Zak Jones,St Kilda,0.0,0.232,300,189
-2025,Zane Duursma,North Melbourne,0.0,0.002,589,189
+2025,Wil Powell,Gold Coast,0.0,0.223,300,189
+2025,Will Ashcroft,Brisbane Lions,11.0,15.732,19,33
+2025,Will Day,Hawthorn,4.0,4.007,92,87
+2025,Will Graham,Gold Coast,0.0,0.029,444,189
+2025,Will Hayes,Collingwood,0.0,0.001,618,189
+2025,Will Hayward,Sydney,3.0,1.718,146,96
+2025,Will Hoskin-Elliott,Collingwood,0.0,0.032,436,189
+2025,Will Lorenz,Port Adelaide,0.0,0.004,562,189
+2025,Will McLachlan,Brisbane Lions,0.0,0.005,551,189
+2025,Will Phillips,North Melbourne,0.0,0.021,473,189
+2025,Will Setterfield,Essendon,0.0,0.581,240,189
+2025,Will White,Carlton,0.0,0.048,408,189
+2025,Willem Drew,Port Adelaide,0.0,1.0,197,189
+2025,Willie Rioli,Port Adelaide,0.0,0.347,275,189
+2025,Xavier Duursma,Essendon,0.0,1.076,190,189
+2025,Xavier Lindsay,Melbourne,0.0,0.039,422,189
+2025,Xavier OHalloran,Greater Western Sydney,2.0,1.701,147,122
+2025,Zac Bailey,Brisbane Lions,6.0,8.286,45,61
+2025,Zac Banch,North Melbourne,0.0,0.001,621,189
+2025,Zac Fisher,North Melbourne,0.0,0.025,459,189
+2025,Zac Taylor,Adelaide,0.0,0.044,413,189
+2025,Zac Williams,Carlton,0.0,0.518,249,189
+2025,Zach Guthrie,Geelong,1.0,2.009,130,152
+2025,Zach Merrett,Essendon,14.0,13.448,22,27
+2025,Zach Reid,Essendon,0.0,0.559,244,189
+2025,Zaine Cordy,St Kilda,0.0,0.0,665,189
+2025,Zak Butters,Port Adelaide,21.0,20.384,8,11
+2025,Zak Johnson,Essendon,0.0,0.006,539,189
+2025,Zak Jones,St Kilda,0.0,0.213,309,189
+2025,Zane Duursma,North Melbourne,0.0,0.003,583,189
