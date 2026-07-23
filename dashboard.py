@@ -4387,7 +4387,7 @@ if _page == 'Player Profile':
                     else:
                         _mkt1 = _mkt2 = _edge1 = _edge2 = None
 
-                    def _edge_card(name, model_pct, best_odds, mkt_pct, edge):
+                    def _edge_card(name, model_pct, best_odds, mkt_pct):
                         def _cell(lbl, val, col='var(--text)'):
                             return ('<div style="display:flex;justify-content:space-between;align-items:baseline;'
                                     'padding:7px 0;border-bottom:1px solid rgba(233,238,243,0.06)">'
@@ -4397,27 +4397,21 @@ if _page == 'Player Profile':
                         _mp = f"{model_pct:.1f}%" if model_pct is not None else "—"
                         _bo = f"${best_odds:.1f}" if best_odds is not None else "—"
                         _mv = f"{mkt_pct:.1f}%" if mkt_pct is not None else "—"
-                        if edge is None:
-                            _ev, _ec = "—", 'var(--muted)'
-                        else:
-                            _ev = f"{'+' if edge >= 0 else ''}{edge:.1f}%"
-                            _ec = '#34d399' if edge > 0 else 'var(--muted)'  # never red (losses only)
                         return (
                             '<div style="background:var(--surface);border:1px solid var(--line);'
                             'border-radius:8px;padding:16px 18px">'
                             '<div style="font-family:\'Archivo\',sans-serif;font-size:16px;font-weight:800;'
                             f'color:var(--text);margin-bottom:8px">{name}</div>'
-                            + _cell('Model probability', _mp)
+                            + _cell('Model vote share', _mp)
                             + _cell('Best odds', _bo)
-                            + _cell('Market implied', _mv)
-                            + _cell('Edge', _ev, _ec)
+                            + _cell('Market win share', _mv)
                             + '</div>'
                         )
                     _me1, _me2 = st.columns(2)
                     with _me1:
-                        st.markdown(_edge_card(_cp1, _mod1, _bo1, _mkt1, _edge1), unsafe_allow_html=True)
+                        st.markdown(_edge_card(_cp1, _mod1, _bo1, _mkt1), unsafe_allow_html=True)
                     with _me2:
-                        st.markdown(_edge_card(_cp2, _mod2, _bo2, _mkt2, _edge2), unsafe_allow_html=True)
+                        st.markdown(_edge_card(_cp2, _mod2, _bo2, _mkt2), unsafe_allow_html=True)
 
                     _lean = None
                     if _edge1 is not None:
