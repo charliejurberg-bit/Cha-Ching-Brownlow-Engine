@@ -4352,12 +4352,14 @@ if _page == 'Player Profile':
                         )
                         st.plotly_chart(_fig_cmp, width='stretch', key="chart_020", config=PLOTLY_TOUCH_CONFIG)
 
-                    # ── Market edge ──
-                    # Model probability = each player's share of the pair's expected
-                    # votes; market implied = normalised share of implied prob — exactly
-                    # as the old Head to Head tab computed them. Odds via load_best_odds();
-                    # projections aren't surfaced here, so load_season_projection() is unused.
-                    st.markdown(_cmp_header('Market edge'), unsafe_allow_html=True)
+                    # ── Model vs market ──
+                    # Two different quantities, shown side by side and deliberately NOT
+                    # differenced. _mod1 is a share of the pair's expected VOTES; _mkt1 is
+                    # a conditional WIN probability renormalised over the pair. Subtracting
+                    # one from the other does not measure an edge, so none is derived or
+                    # displayed. Odds via load_best_odds(); projections aren't surfaced
+                    # here, so load_season_projection() is unused.
+                    st.markdown(_cmp_header('Model vs market'), unsafe_allow_html=True)
                     _cmp_odds = load_best_odds()
                     _e1 = _cmp_pred(_cp1, 'Exp_Total_Votes') or 0.0
                     _e2 = _cmp_pred(_cp2, 'Exp_Total_Votes') or 0.0
@@ -4382,10 +4384,8 @@ if _page == 'Player Profile':
                         _msum = _mi1 + _mi2
                         _mkt1 = round(_mi1 / _msum * 100, 1) if _msum > 0 else 50.0
                         _mkt2 = round(100.0 - _mkt1, 1)
-                        _edge1 = round(_mod1 - _mkt1, 1)
-                        _edge2 = round(_mod2 - _mkt2, 1)
                     else:
-                        _mkt1 = _mkt2 = _edge1 = _edge2 = None
+                        _mkt1 = _mkt2 = None
 
                     def _edge_card(name, model_pct, best_odds, mkt_pct):
                         def _cell(lbl, val, col='var(--text)'):
@@ -4412,32 +4412,6 @@ if _page == 'Player Profile':
                         st.markdown(_edge_card(_cp1, _mod1, _bo1, _mkt1), unsafe_allow_html=True)
                     with _me2:
                         st.markdown(_edge_card(_cp2, _mod2, _bo2, _mkt2), unsafe_allow_html=True)
-
-                    _lean = None
-                    if _edge1 is not None:
-                        if _edge1 > 0:
-                            _lean = (_cp1, _edge1)
-                        elif _edge2 > 0:
-                            _lean = (_cp2, _edge2)
-                    if _lean:
-                        _vtag = "MODEL LEANS"
-                        _vtxt = (f"{_lean[0]} — model probability exceeds market implied by "
-                                 f"+{_lean[1]:.1f}%. Informational only, not betting advice.")
-                    else:
-                        _vtag = "NO EDGE"
-                        _vtxt = ("Market implied probability exceeds the model for both players. "
-                                 "Informational only, not betting advice.")
-                    st.markdown(
-                        '<div style="background:rgba(52,211,153,0.07);border:1px solid rgba(52,211,153,0.3);'
-                        'border-radius:8px;padding:14px 18px;margin-top:14px">'
-                        '<span style="font-family:\'Archivo\',sans-serif;font-size:11px;font-weight:800;'
-                        'letter-spacing:2px;text-transform:uppercase;color:#34d399;margin-right:10px">'
-                        f'{_vtag}</span>'
-                        '<span style="font-family:\'Sora\',sans-serif;font-size:13px;'
-                        f'color:var(--text)">{_vtxt}</span>'
-                        '</div>',
-                        unsafe_allow_html=True,
-                    )
 
                     # ── H2H votes ─────────────────────────────────────
                     # Season-only: the career frame has no P_1/P_2/P_3, so this
