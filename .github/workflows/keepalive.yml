@@ -4,7 +4,7 @@ name: Keep-alive
 
 on:
   schedule:
-    # Every 10 minutes. GitHub's floor is 5, and scheduled runs are queued
+    # Every 15 minutes. GitHub's floor is 5, and scheduled runs are queued
     # rather than guaranteed, so treat the interval as a target not a promise.
     - cron: '*/15 * * * *'
   workflow_dispatch:
