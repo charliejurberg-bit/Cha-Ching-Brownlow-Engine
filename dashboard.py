@@ -5326,18 +5326,24 @@ def _render_stat_filter():
                     _SF_NO_VOTES if s == 2026 or pd.isna(v) else f'{v:.1f}'
                     for v, s in zip(_sf_disp['Votes'], _sf_disp['Season'])
                 ]
-            # Denominator is cur_games, the same pre-2026 count the readout strip
-            # calls "Matching games" — `total` counted 2026 in and put two
-            # different numbers behind the same word. The numerator has to sit on
-            # that basis too: with a narrow filter the 200-row cap never binds, so
-            # counting displayed 2026 rows against a 2026-less denominator reads
-            # "showing 47 of 35".
+            # Two bases on one line, so both get named. cur_games is the same
+            # pre-2026 count the readout strip calls "Matching games" (`total`
+            # counted 2026 in and put two different numbers behind the same
+            # word). The 2026 rows are on screen but carry no votes, so they get
+            # their own clause instead of being folded into either figure or
+            # dropped from both: _shown_sf + _shown26_sf is exactly the row
+            # count, so anyone counting rows on screen lands on a number the
+            # caption shows. Sort is Season-descending, so the 2026 rows are the
+            # ones the 200-row cap keeps.
             _shown_sf = int((_sf_disp['Season'] < 2026).sum())
+            _shown26_sf = len(_sf_disp) - _shown_sf
+            _pending_sf = (f', plus {_shown26_sf:,} from 2026 pending votes'
+                           if _shown26_sf else '')
             st.markdown(
                 f'<div style="margin:22px 0 6px;font-size:10px;font-weight:700;letter-spacing:1.5px;'
                 f'text-transform:uppercase;color:#7e8c99">Sample games '
                 f'<span style="font-weight:400;letter-spacing:0;text-transform:none">— showing '
-                f'{_shown_sf:,} of {cur_games:,} matching</span></div>',
+                f'{_shown_sf:,} of {cur_games:,} matching{_pending_sf}</span></div>',
                 unsafe_allow_html=True,
             )
             st.dataframe(_quiet_sf_table(_sf_disp), width='stretch', hide_index=True)
