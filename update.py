@@ -77,6 +77,7 @@ if __name__ == "__main__":
         ("scraper_afl.py",         "Scraping AFL Predictor Brownlow votes"),
         ("update_wheelo_2026.py",  "Updating Wheelo 2026 ratings"),
         ("predict_2026.py",        "Generating 2026 predictions"),
+        ("draft_posts.py",         "Generating draft posts"),
     ]
     for script, description in py_scripts:
         if os.path.exists(script):

@@ -32,5 +32,9 @@ espn_debug*.html
 *_debug*.py
 debug_*.py
 
+# Generated post drafts (unreviewed) + the week-over-week snapshot they diff against
+drafts/
+predictions/_snapshot_season.csv
+
 # Claude Code workspace config — local tooling, not project source
 .claude/
