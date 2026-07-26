@@ -5082,8 +5082,7 @@ def _render_stat_filter():
                                      (int(hist['Season'].min()), int(hist['Season'].max())), key="sf_seasons")
 
         # Assemble the filter mask from components so the active stat's own
-        # constraint can be dropped for the threshold sweep. The final `mask`
-        # is identical to the previous single-expression version.
+        # constraint can be dropped for the threshold sweep.
         _base_mask = (
             (hist['Season'] >= season_range[0]) & (hist['Season'] <= season_range[1]) &
             (hist['Player_Name'].isin(selected_players_sf) if selected_players_sf else pd.Series(True, index=hist.index))
@@ -5105,9 +5104,17 @@ def _render_stat_filter():
         if has_rating:
             _stat_sliders.append(('Wheelo rating pts', 'RatingPoints', min_rating, 0, 100))
 
+        # A slider still at its minimum is "no constraint", so skip the column
+        # rather than comparing against it. `NaN >= 0` is False, so the old
+        # unconditional comparison quietly dropped every row missing a stat even
+        # when the user had asked for nothing: RatingPoints is null for all of
+        # 2007–2014, so the default view lost those eight seasons entirely (and
+        # Coaches_Votes nulls cost ~2.3k more rows). Above the minimum the
+        # comparison is applied as before, NaN rows included in what it drops.
         mask = _base_mask.copy()
         for _lab, _col, _val, _mn, _mx in _stat_sliders:
-            mask &= (hist[_col] >= _val)
+            if _val > _mn:
+                mask &= (hist[_col] >= _val)
 
         filtered_sf = hist[mask]
         total = len(filtered_sf)
@@ -5132,7 +5139,7 @@ def _render_stat_filter():
             #    the full sweep shows. Votes only exist pre-2026.
             _sweep_mask = _base_mask & (hist['Season'] < 2026)
             for _lab, _col, _val, _mn, _mx in _stat_sliders:
-                if _col != active_col:
+                if _col != active_col and _val > _mn:
                     _sweep_mask &= (hist[_col] >= _val)
             # Only the stat columns (any may be the active one) + votes are read
             # from _sweep_base below — carry just those, not the full frame.
