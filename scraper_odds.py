@@ -2,7 +2,17 @@
 Brownlow Odds Scraper — Oddschecker
 Scrapes multi-bookmaker Brownlow winner odds from Oddschecker's comparison table.
 Output: data_2026/bookmaker_odds.csv  (wide: Player | Bookie1 | Bookie2 | …)
-        data_2026/best_odds.csv       (long: player, best_odds, implied_prob, best_bookie)
+        data_2026/best_odds.csv       (long: player, best_odds, implied_prob, best_bookie, scraped_at)
+
+Both of the above are rewritten in full on every run. Two append-only archives
+sit alongside them so the odds history survives:
+        data_2026/best_odds_history.csv       (best_odds.csv schema, one block per run)
+        data_2026/bookmaker_odds_history.csv  (long: player, bookie, odds, scraped_at)
+
+The bookmaker archive is long-format on purpose: the wide frame's bookmaker
+columns vary run to run, so it cannot be appended to safely. Each append is
+keyed on scraped_at, so re-running the scraper without a fresh scrape is a
+no-op rather than a duplicate block.
 """
 
 import os
@@ -212,6 +222,30 @@ def scrape_oddschecker(driver) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def _append_history(df, hist_path):
+    """Append df to hist_path, writing the header only on first creation.
+    Skips the append if the newest scraped_at already present in the file
+    matches the newest scraped_at in df."""
+    os.makedirs(os.path.dirname(hist_path) or ".", exist_ok=True)
+
+    # Dedupe on scraped_at so a re-run against an unchanged scrape is a no-op.
+    # Only the timestamp column is read — the archive grows all season and
+    # there is no reason to parse the rest of it.
+    try:
+        if os.path.exists(hist_path):
+            prev = pd.read_csv(hist_path, usecols=["scraped_at"])
+            if not prev.empty and prev["scraped_at"].max() == df["scraped_at"].max():
+                print(f"  Skipped -> {hist_path} (already holds {df['scraped_at'].max()})")
+                return
+    except Exception as e:
+        # A truncated or malformed archive must never abort the scrape; fall
+        # through and append, and let the duplicate be sorted out downstream.
+        print(f"  Warning: could not read {hist_path} ({e}) — appending anyway")
+
+    df.to_csv(hist_path, mode="a", index=False, header=not os.path.exists(hist_path))
+    print(f"Saved -> {hist_path}  (+{len(df)} rows)")
+
+
 # ── Main ─────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
@@ -239,6 +273,18 @@ if __name__ == "__main__":
 
         # ── Wide-format CSV ──────────────────────────────────────
         df.to_csv("data_2026/bookmaker_odds.csv", index=False)
+
+        # Archive it long-format: the wide frame's bookmaker columns depend on
+        # what Oddschecker rendered that run, so appending it as-is would go
+        # ragged the first time a bookie drops off the page.
+        long_df = (
+            df.melt(id_vars="Player", var_name="bookie", value_name="odds")
+              .dropna(subset=["odds"])
+              .rename(columns={"Player": "player"})
+        )
+        long_df["scraped_at"] = now
+        long_df = long_df[["player", "bookie", "odds", "scraped_at"]]
+        _append_history(long_df, "data_2026/bookmaker_odds_history.csv")
 
         # ── Best-odds CSV (dashboard compat) ─────────────────────
         # Filter Betfair prices below 1.5 — those are lay prices, not back prices.
@@ -271,6 +317,7 @@ if __name__ == "__main__":
             .reset_index(drop=True)
         )
         best_df.to_csv("data_2026/best_odds.csv", index=False)
+        _append_history(best_df, "data_2026/best_odds_history.csv")
 
         # ── Summary ──────────────────────────────────────────────
         print(f"Players found  : {n_players}")
