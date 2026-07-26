@@ -1,0 +1,37 @@
+# Keep-alive ping for the deployed Streamlit Cloud app.
+# No secrets, no checkout, no Python setup: one HTTP GET and a status check.
+name: Keep-alive
+
+on:
+  schedule:
+    # Every 10 minutes. GitHub's floor is 5, and scheduled runs are queued
+    # rather than guaranteed, so treat the interval as a target not a promise.
+    - cron: '*/10 * * * *'
+  workflow_dispatch:
+
+# One line to change if the app moves.
+# The /~/+/ suffix is load-bearing, not a typo. The bare app URL 303s into a
+# cookie handshake (share.streamlit.io/-/auth/app then back to /-/login) that a
+# browser completes but a plain curl cannot, so it redirect-loops to curl's cap
+# and reports 303. Not an auth wall: curl -c/-b a cookie jar and the same URL
+# lands on 200 in 3 hops. /~/+/ is the app unwrapped and answers 200 in 0 hops,
+# which is why it is here instead of the jar.
+env:
+  APP_URL: https://chachingbrownlow.streamlit.app/~/+/
+
+# Nothing here touches the repo, so the job gets no token scopes.
+permissions: {}
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping app
+        run: |
+          code=$(curl --silent --location --max-time 30 \
+                      --output /dev/null --write-out '%{http_code}' "$APP_URL")
+          echo "HTTP $code from $APP_URL"
+          case "$code" in
+            2*) ;;
+            *) echo "Expected 2xx, got $code"; exit 1 ;;
+          esac
