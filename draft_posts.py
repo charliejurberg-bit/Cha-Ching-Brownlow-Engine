@@ -56,6 +56,7 @@ _GAME_COLS = (
 
 TOP_N_PER_GAME = 3      # the 3/2/1
 MOVERS_N = 5            # risers and fallers each
+MOVERS_POOL_RANK = 50   # movers must sit inside this rank now or in the snapshot
 SPOTLIGHT_VOTE_RANK = 2     # Exp_Votes rank of 1 or 2 inside the game
 SPOTLIGHT_DISPOSAL_RANK = 4  # Disposals rank of 4 or worse inside the game
 
@@ -129,8 +130,15 @@ def section_movers(season_now, disp_round, snapshot_path=SNAPSHOT):
 
     Left join on Player_Name, never positional: the player pool grows week to
     week, so row N of one file is not row N of the other. Anyone missing from
-    the snapshot is a new entrant and is reported as such rather than being
-    handed a fabricated rank to move from.
+    the snapshot is a new entrant, and is dropped rather than being handed a
+    fabricated rank to move from.
+
+    Movement is measured across the full field, so a climb from 60 to 45 reads
+    as +15. Only eligibility for the printed list is capped, at MOVERS_POOL_RANK
+    now or in the snapshot. Exp_Total_Votes is cumulative from zero, so without
+    the cap the list fills with fringe players vaulting hundreds of ranks off a
+    single game while the contenders barely shuffle. Keeping last week's top 50
+    eligible is what lets a player who drops out of it still show as a faller.
     """
     out = ["## Biggest movers", ""]
     if not os.path.exists(snapshot_path):
@@ -148,9 +156,20 @@ def section_movers(season_now, disp_round, snapshot_path=SNAPSHOT):
     prev['rank_prev'] = _rank_desc(prev['Exp_Total_Votes'])
 
     merged = cur.merge(prev[['Player_Name', 'rank_prev']], on='Player_Name', how='left')
-    entrants = merged[merged['rank_prev'].isna()]
+    # Absent from the snapshot means no rank to move from, so no delta exists.
     movers = merged[merged['rank_prev'].notna()].copy()
     movers['delta'] = movers['rank_prev'] - movers['rank_now']
+    movers = movers[
+        (movers['rank_now'] <= MOVERS_POOL_RANK)
+        | (movers['rank_prev'] <= MOVERS_POOL_RANK)
+    ]
+
+    out.append(
+        f"Round {disp_round}. Pool is the top {MOVERS_POOL_RANK} by "
+        f"Exp_Total_Votes now or in the previous snapshot. Movement is measured "
+        f"across the full field."
+    )
+    out.append("")
 
     risers = movers[movers['delta'] > 0].sort_values(
         ['delta', 'rank_now'], ascending=[False, True]
@@ -179,22 +198,6 @@ def section_movers(season_now, disp_round, snapshot_path=SNAPSHOT):
 
     _block("Risers", risers, "+")
     _block("Fallers", fallers, "-")
-
-    out.append("### New entrants")
-    out.append("")
-    if entrants.empty:
-        out.append("None.")
-    else:
-        out.append(f"{len(entrants)} not in the previous snapshot, so not ranked as movers:")
-        out.append("")
-        for _, r in entrants.sort_values(
-            ['Exp_Total_Votes', 'Player_Name'], ascending=[False, True]
-        ).iterrows():
-            out.append(
-                f"- {r['Player_Name']} ({r['Team']}) "
-                f"{r['Exp_Total_Votes']:.1f}, rank {int(r['rank_now'])}"
-            )
-    out.append("")
     return out
 
 
