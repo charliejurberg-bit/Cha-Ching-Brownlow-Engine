@@ -5030,6 +5030,11 @@ if _page == 'Game Analysis':
 # ════════════════════════════════════════════════════════════
 # STAT FILTER
 # ════════════════════════════════════════════════════════════
+# Sample-games placeholder for a Votes cell with no vote assigned yet (2026).
+# Deliberately not the "—" used elsewhere in the app.
+_SF_NO_VOTES = '-'
+
+
 @st.fragment
 def _render_stat_filter():
     # ── 1. Header — no box ────────────────────────────────────
@@ -5176,7 +5181,7 @@ def _render_stat_filter():
                 _n26 = int((filtered_sf['Season'] == 2026).sum())
                 st.markdown(
                     f'<div style="color:#7e8c99;font-size:12px;margin:2px 0 6px">'
-                    f'{_n26:,} of these are 2026 games — votes not yet assigned, so all '
+                    f'{_n26:,} of these are 2026 games. Votes not yet assigned, so all '
                     f'rates below use {season_range[0]}–2025.</div>',
                     unsafe_allow_html=True,
                 )
@@ -5310,11 +5315,29 @@ def _render_stat_filter():
             _sf_disp['Rnd'] = [_display_round(r, s) for r, s in zip(_sf_disp['Rnd'], _sf_disp['Season'])]
             for col in _sf_disp.select_dtypes(include='float').columns:
                 _sf_disp[col] = _sf_disp[col].round(1)
+            # 2026 votes are 0-filled, not awarded, so a bare 0.0 here reads as
+            # "did not poll". Blank those cells only; the rows stay (they still
+            # show the stat line that matched) and every rate above already
+            # drops them. Pre-formatted to the same '{:.1f}' the float path in
+            # _quiet_sf_table would have applied, because the mixed column is
+            # object dtype and no longer picked up by that formatter.
+            if 'Votes' in _sf_disp.columns:
+                _sf_disp['Votes'] = [
+                    _SF_NO_VOTES if s == 2026 or pd.isna(v) else f'{v:.1f}'
+                    for v, s in zip(_sf_disp['Votes'], _sf_disp['Season'])
+                ]
+            # Denominator is cur_games, the same pre-2026 count the readout strip
+            # calls "Matching games" — `total` counted 2026 in and put two
+            # different numbers behind the same word. The numerator has to sit on
+            # that basis too: with a narrow filter the 200-row cap never binds, so
+            # counting displayed 2026 rows against a 2026-less denominator reads
+            # "showing 47 of 35".
+            _shown_sf = int((_sf_disp['Season'] < 2026).sum())
             st.markdown(
                 f'<div style="margin:22px 0 6px;font-size:10px;font-weight:700;letter-spacing:1.5px;'
                 f'text-transform:uppercase;color:#7e8c99">Sample games '
                 f'<span style="font-weight:400;letter-spacing:0;text-transform:none">— showing '
-                f'{len(_sf_disp):,} of {total:,} matching</span></div>',
+                f'{_shown_sf:,} of {cur_games:,} matching</span></div>',
                 unsafe_allow_html=True,
             )
             st.dataframe(_quiet_sf_table(_sf_disp), width='stretch', hide_index=True)
