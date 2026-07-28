@@ -37,3 +37,6 @@ drafts/
 
 # Claude Code workspace config — local tooling, not project source
 .claude/
+
+# Claude Code local config and scratch scripts
+_tmp/

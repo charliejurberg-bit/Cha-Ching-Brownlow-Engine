@@ -122,3 +122,20 @@ before drafting.
 Cross-check any number that will appear in copy against a second block. Block 2
 and block 7 should agree on polls and votes for the same player; where they do
 not, the scoping question above is usually why.
+
+## Script hygiene
+
+Write throwaway scripts to _tmp/ inside the working directory, never to
+$env:TEMP. Run them as: python _tmp/name.py
+
+Use literal relative paths only. No $env: variables, no PowerShell script
+blocks, no inline multi-line PowerShell. If logic is needed, put it in a .py
+file and run that file.
+
+Clean up with: Remove-Item _tmp/*.py
+
+This exists because every permission prompt in the first autonomous run was
+triggered by the same two things: $env:TEMP expanding to an unknown value, and
+inline script blocks. Both are avoidable. Literal paths and .py files are
+matched by the allow rules in .claude/settings.local.json and run without
+prompting.
