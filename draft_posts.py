@@ -50,6 +50,10 @@ DRAFTS_DIR = "drafts"
 # Snapshots are named _snapshot_season_r<raw Round_num>.csv inside SNAPSHOT_DIR.
 _SNAPSHOT_RE = re.compile(r"^_snapshot_season_r(\d+)\.csv$")
 
+# A trailing parenthetical on a player name, which is how same-name players are
+# stored disambiguated. See _label_with_team().
+_TEAM_SUFFIX_RE = re.compile(r"\([^()]*\)$")
+
 # First season with an AFL Opening Round. Kept in step with dashboard.py:407.
 _OPENING_ROUND_FROM = 2024
 
@@ -131,6 +135,24 @@ def _rank_desc(s):
     return s.rank(ascending=False, method='min')
 
 
+def _label_with_team(player_name, team):
+    """Player name followed by their team, unless the name already carries one.
+
+    Players sharing a name are stored disambiguated, so 2026 holds both
+    'Bailey Williams (Western Bulldogs)' and 'Bailey Williams (West Coast)'.
+    Appending Playing.for to that printed the team twice.
+
+    The test is on the name alone and never compares the suffix to `team`. If
+    the two ever disagree, printing the stored name once is the honest
+    rendering of what the data says; printing two different teams side by side
+    is not, and silently replacing one with the other would hide the conflict.
+    """
+    name = str(player_name).strip()
+    if _TEAM_SUFFIX_RE.search(name):
+        return name
+    return f"{name} ({team})"
+
+
 def load_latest_round(path=GAME_LEVEL):
     """The latest round's player-games, with in-game ranks attached.
 
@@ -164,7 +186,7 @@ def section_three_two_one(rnd, disp_round):
         out.append(f"{home} v {away}")
         for slot, (_, r) in zip(range(TOP_N_PER_GAME, 0, -1), top.iterrows()):
             out.append(
-                f"{slot}. {r['Player_Name']} ({r['Playing.for']}) "
+                f"{slot}. {_label_with_team(r['Player_Name'], r['Playing.for'])} "
                 f"{r['Exp_Votes']:.2f}"
             )
         out.append("")
