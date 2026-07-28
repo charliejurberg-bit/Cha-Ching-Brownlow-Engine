@@ -51,7 +51,7 @@ D. Roster check. For every player named in blocks 2, 4, 6 and 7, report whether
    describes a player as current. This check exists because a draft described
    Jack Steele as a fading St Kilda player when he is not on the list at all.
 
-## The seven blocks
+## The blocks
 
 1. Active streaks. Any player at either club with a run of 3 or more consecutive
    games ranked top three by Exp_Votes in game_level_2026.csv. Give raw
@@ -90,6 +90,46 @@ D. Roster check. For every player named in blocks 2, 4, 6 and 7, report whether
    8: meetings played, polls, votes, and the date and vote value of the most
    recent poll. Flag anyone with three or more meetings and zero career polls
    against this opponent.
+
+## Block 8, player deep dive
+
+Run this automatically on every player who survives the judgment pass in step 2,
+before drafting. It is the difference between a number and an insight: a
+fixture record means nothing until it is read against the player's own baseline.
+
+For each shortlisted player, from fitzroy_stats_all.csv, home and away only:
+
+  a. Career votes by opponent. For each opponent: meetings played, polls, zeros,
+     total votes, votes per game, and the season and vote value of the most
+     recent poll. Sort by votes per game ascending. State where this fixture's
+     opponent ranks among opponents faced five or more times, and how many
+     opponents clear that threshold.
+
+  b. Career votes by venue, same shape, sorted by votes per game ascending.
+     State where this fixture's ground ranks among grounds played five or more
+     times.
+
+  c. Career totals: games, polls, votes, votes per game. This is the baseline
+     both tables are read against. A rate is meaningless without it.
+
+  d. Vote composition against this opponent and at this ground: how the total
+     splits across 1, 2 and 3 vote games. Three single votes and one 3-vote game
+     both total 3, and they are different stories.
+
+  e. If the player has changed clubs, label which club each opponent and venue
+     record was earned at. A record earned elsewhere is still true and still
+     usable, but the copy must name the club or the tweet asserts something
+     false.
+
+Reading it. The opponent or venue is only worth writing about when it sits near
+an extreme of the player's own distribution. Isaac Heeney against St Kilda was
+second lowest of 17 opponents at 0.23 against a career 0.44, which is the story.
+Mid-table is not a story and should be discarded rather than dressed up.
+
+Also check that the claim is not an artefact of the fixture list. Clayton Oliver
+had never faced Port Adelaide as a Giant, which was true and meant nothing: the
+two clubs had not met since he moved. Before drafting a never or a first, check
+whether the opportunity existed.
 
 ## Three unsettled scoping questions
 
@@ -164,43 +204,3 @@ Footscray against Home.team = Western Bulldogs, Kangaroos against North
 Melbourne. Canonicalise both sides before comparing or check D flags every
 player at those clubs as a club change every run. In the Port Adelaide v GWS run
 it produced three false positives. Report the canonical mapping used.
-
-## Block 8, player deep dive
-
-Run this automatically on every player who survives the judgment pass in step 2,
-before drafting. It is the difference between a number and an insight: a
-fixture record means nothing until it is read against the player's own baseline.
-
-For each shortlisted player, from fitzroy_stats_all.csv, home and away only:
-
-  a. Career votes by opponent. For each opponent: meetings played, polls, zeros,
-     total votes, votes per game, and the season and vote value of the most
-     recent poll. Sort by votes per game ascending. State where this fixture's
-     opponent ranks among opponents faced five or more times, and how many
-     opponents clear that threshold.
-
-  b. Career votes by venue, same shape, sorted by votes per game ascending.
-     State where this fixture's ground ranks among grounds played five or more
-     times.
-
-  c. Career totals: games, polls, votes, votes per game. This is the baseline
-     both tables are read against. A rate is meaningless without it.
-
-  d. Vote composition against this opponent and at this ground: how the total
-     splits across 1, 2 and 3 vote games. Three single votes and one 3-vote game
-     both total 3, and they are different stories.
-
-  e. If the player has changed clubs, label which club each opponent and venue
-     record was earned at. A record earned elsewhere is still true and still
-     usable, but the copy must name the club or the tweet asserts something
-     false.
-
-Reading it. The opponent or venue is only worth writing about when it sits near
-an extreme of the player's own distribution. Isaac Heeney against St Kilda was
-second lowest of 17 opponents at 0.23 against a career 0.44, which is the story.
-Mid-table is not a story and should be discarded rather than dressed up.
-
-Also check that the claim is not an artefact of the fixture list. Clayton Oliver
-had never faced Port Adelaide as a Giant, which was true and meant nothing: the
-two clubs had not met since he moved. Before drafting a never or a first, check
-whether the opportunity existed.
