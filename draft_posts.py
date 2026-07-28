@@ -61,11 +61,18 @@ _GAME_COLS = (
     'Disposals', 'Goals', 'Clearances',
 )
 
+SITE_URL = "chachingbrownlow.com"
+
 TOP_N_PER_GAME = 3      # the 3/2/1
 MOVERS_N = 5            # risers and fallers each
 MOVERS_POOL_RANK = 50   # movers must sit inside this rank now or in the snapshot
 SPOTLIGHT_VOTE_RANK = 2     # Exp_Votes rank of 1 or 2 inside the game
-SPOTLIGHT_DISPOSAL_RANK = 4  # Disposals rank of 4 or worse inside the game
+# Disposals rank of 10 or worse inside the game. Rank 4 admitted players on 26
+# disposals, which is not the low-volume profile this section exists to surface.
+SPOTLIGHT_DISPOSAL_RANK = 10
+# Floor on the projection itself. Topping a game on Exp_Votes says little when
+# the value is under 1.0, so the rank conditions alone were not enough.
+SPOTLIGHT_MIN_VOTES = 1.4
 
 
 def _display_round(round_num, season):
@@ -153,13 +160,15 @@ def section_three_two_one(rnd, disp_round):
         out.append(f"### {home} v {away}")
         out.append("")
         out.append("```")
-        out.append(f"Round {disp_round} projected votes")
+        out.append(f"Round {disp_round} Predicted Votes")
         out.append(f"{home} v {away}")
         for slot, (_, r) in zip(range(TOP_N_PER_GAME, 0, -1), top.iterrows()):
             out.append(
                 f"{slot}. {r['Player_Name']} ({r['Playing.for']}) "
                 f"{r['Exp_Votes']:.2f}"
             )
+        out.append("")
+        out.append(f"See them all on the Game Analysis tab at {SITE_URL}")
         out.append("```")
         out.append("")
     return out
@@ -213,13 +222,6 @@ def section_movers(season_now, disp_round, snapshot_path=None, played=None):
         | (movers['rank_prev'] <= MOVERS_POOL_RANK)
     ]
 
-    out.append(
-        f"Round {disp_round}. Pool is the top {MOVERS_POOL_RANK} by "
-        f"Exp_Total_Votes now or in the previous snapshot. Movement is measured "
-        f"across the full field."
-    )
-    out.append("")
-
     risers = movers[movers['delta'] > 0].sort_values(
         ['delta', 'rank_now'], ascending=[False, True]
     ).head(MOVERS_N)
@@ -232,7 +234,13 @@ def section_movers(season_now, disp_round, snapshot_path=None, played=None):
         ['delta', 'rank_now'], ascending=[True, True]
     ).head(MOVERS_N)
 
-    def _block(title, rows, sign):
+    def _block(title, rows):
+        """One pasteable fence. The link goes inside it, not after it, because
+        each block is copied out on its own.
+
+        The sign comes from the delta itself rather than from a per-block
+        argument, so a riser prints +21 and a faller -4 off one template.
+        """
         out.append(f"### {title}")
         out.append("")
         if rows.empty:
@@ -240,35 +248,46 @@ def section_movers(season_now, disp_round, snapshot_path=None, played=None):
             out.append("")
             return
         out.append("```")
-        out.append(f"Round {disp_round} {title.lower()}")
+        out.append(f"Round {disp_round} Movement - Biggest {title}")
+        out.append("")
         for _, r in rows.iterrows():
             out.append(
-                f"{r['Player_Name']} ({r['Team']}) "
-                f"{int(r['rank_prev'])} to {int(r['rank_now'])} "
-                f"({sign}{abs(int(r['delta']))}), {r['Exp_Total_Votes']:.1f}"
+                f"{r['Player_Name']} {int(r['delta']):+d} "
+                f"from {int(r['rank_prev'])} to {int(r['rank_now'])}"
             )
+        out.append("")
+        out.append(f"See the full leaderboard at {SITE_URL}")
         out.append("```")
         out.append("")
 
-    _block("Risers", risers, "+")
-    _block("Fallers", fallers, "-")
+    _block("Risers", risers)
+    _block("Fallers", fallers)
     return out
 
 
 def section_spotlight(rnd, disp_round):
     """Shortlist, not a draft: model rates the game high, disposals do not.
 
-    Exp_Votes rank 1 or 2 inside the game while sitting 4th or worse for
-    disposals in that same game.
+    Three conditions, all required. Exp_Votes rank 1 or 2 inside the game, an
+    Exp_Votes value of at least SPOTLIGHT_MIN_VOTES, and disposals rank
+    SPOTLIGHT_DISPOSAL_RANK or worse in that same game.
+
+    The value floor and the disposal rank are what make this a low-volume
+    shortlist rather than a list of whoever happened to top a quiet game.
+    Ranking first on Exp_Votes means little at 0.8 votes, and a disposal rank
+    of 4 still admits players on 26 disposals.
     """
     out = ["## Spotlight candidates", ""]
     out.append(
-        f"Round {disp_round}. Not drafts. Exp_Votes rank 1 or 2 in the game, "
-        f"disposals rank {SPOTLIGHT_DISPOSAL_RANK} or worse in the same game."
+        f"Round {disp_round}. Not drafts. Exp_Votes rank 1 or "
+        f"{SPOTLIGHT_VOTE_RANK} in the game, Exp_Votes at least "
+        f"{SPOTLIGHT_MIN_VOTES}, disposals rank {SPOTLIGHT_DISPOSAL_RANK} or "
+        f"worse in the same game."
     )
     out.append("")
     sel = rnd[
         (rnd['vote_rank'] <= SPOTLIGHT_VOTE_RANK)
+        & (rnd['Exp_Votes'] >= SPOTLIGHT_MIN_VOTES)
         & (rnd['disp_rank'] >= SPOTLIGHT_DISPOSAL_RANK)
     ].sort_values(['Exp_Votes', 'Player_Name'], ascending=[False, True])
 
