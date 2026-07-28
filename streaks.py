@@ -75,6 +75,13 @@ and select_longest(), and the same preamble copy, built once by the notes_*
 functions. Nothing is computed twice, so the file and the terminal cannot
 disagree.
 
+Headings come from the title_* functions in sentence case, which is what the
+markdown file uses. The terminal uppercases them at render time for the banner.
+Only report 3 carries a top N label, because the row cap is the only thing
+limiting it. Report 1 is cut by MIN_ACTIVE_STREAK as well, usually to far fewer
+rows than the cap, so a top N there would describe a table that does not exist.
+Its preamble states the floor and the exclusion count instead.
+
 COPY RULES
 Inherited from draft_posts.py, since this writes into the same drafts/ folder.
   * No accuracy percentages of any kind in generated text.
@@ -291,19 +298,22 @@ def _missing_prev(live, prev_idx):
 # Written once and rendered twice. The terminal keeps these as separate
 # lines; markdown joins each list into one paragraph.
 # ----------------------------------------------------------------------
-def title_active(top_n):
-    return (f"1. LONGEST ACTIVE PROJECTED-POLL STREAKS, {CUR_SEASON} "
-            f"(top {top_n})")
+def title_active():
+    """No top N label. MIN_ACTIVE_STREAK cuts this table before the row cap
+    does, so claiming a top N would describe rows that were never eligible.
+    """
+    return f"1. Longest active projected-poll streaks, {CUR_SEASON}"
 
 
 def title_side_by_side():
-    return (f"2. THOSE SAME PLAYERS, {CUR_SEASON} PROJECTED NEXT TO "
-            f"{PREV_SEASON} ACTUAL")
+    return (f"2. Those same players, {CUR_SEASON} projected next to "
+            f"{PREV_SEASON} actual")
 
 
-def title_longest(top_n):
-    return (f"3. LONGEST PROJECTED-POLL STREAKS OF {CUR_SEASON}, ACTIVE OR "
-            f"ENDED (top {top_n})")
+def title_longest():
+    """The row cap is the only limit here, so print_longest() appends it."""
+    return (f"3. Longest projected-poll streaks of {CUR_SEASON}, active or "
+            f"ended")
 
 
 def notes_active(latest_raw, below):
@@ -345,8 +355,8 @@ def notes_longest():
 # ----------------------------------------------------------------------
 # terminal rendering
 # ----------------------------------------------------------------------
-def print_active(live, notes, top_n):
-    _banner(title_active(top_n))
+def print_active(live, notes):
+    _banner(title_active().upper())
     for line in notes:
         print(line)
     print()
@@ -366,7 +376,7 @@ def print_active(live, notes, top_n):
 
 
 def print_side_by_side(live, prev_idx, notes):
-    _banner(title_side_by_side())
+    _banner(title_side_by_side().upper())
     for line in notes:
         print(line)
     print()
@@ -394,7 +404,8 @@ def print_side_by_side(live, prev_idx, notes):
 
 
 def print_longest(best, notes, top_n):
-    _banner(title_longest(top_n))
+    # Parenthetical stays lowercase, outside the .upper() on the title.
+    _banner(f"{title_longest().upper()} (top {top_n})")
     for line in notes:
         print(line)
     print()
@@ -420,6 +431,16 @@ def print_longest(best, notes, top_n):
 # Same frames, same copy, different layout. Terminal sub-labels become part
 # of the header cell, since a markdown table has only one header row.
 # ----------------------------------------------------------------------
+def _posix(path):
+    """Forward slashes for generated copy.
+
+    os.path.join gives backslashes on Windows, while draft_posts.py writes its
+    paths as literal forward-slash strings. Both files land in drafts/ and get
+    read side by side, so they should not disagree on separators.
+    """
+    return path.replace(os.sep, "/")
+
+
 def _md_table(headers, rows):
     out = ["| " + " | ".join(headers) + " |",
            "|" + "|".join(["---"] * len(headers)) + "|"]
@@ -441,13 +462,13 @@ def _md_section(title, notes, headers, rows, empty_note="None."):
     return out
 
 
-def build_markdown(live, best, prev_idx, latest_raw, disp_round,
-                   top_active, top_ever, below):
+def build_markdown(live, best, prev_idx, latest_raw, disp_round, below):
     lines = [
         f"# Round {disp_round} streaks",
         "",
         f"Generated {datetime.now().strftime('%Y-%m-%d %H:%M')} from "
-        f"{_source_path(CUR_SEASON)} and {_source_path(PREV_SEASON)}.",
+        f"{_posix(_source_path(CUR_SEASON))} and "
+        f"{_posix(_source_path(PREV_SEASON))}.",
         f"AFLTables Round_num {latest_raw}, shown throughout as "
         f"Round {disp_round}.",
         "Templated from CSV values. Review before posting.",
@@ -455,7 +476,7 @@ def build_markdown(live, best, prev_idx, latest_raw, disp_round,
     ]
 
     lines += _md_section(
-        title_active(top_active),
+        title_active(),
         notes_active(latest_raw, below),
         ["#", "player", "team", "streak (games)", "played (games)",
          "streak began"],
@@ -480,11 +501,12 @@ def build_markdown(live, best, prev_idx, latest_raw, disp_round,
     missing = _missing_prev(live, prev_idx)
     if missing:
         lines.append(f"{_NA} means no {PREV_SEASON} home and away games in "
-                     f"{_source_path(PREV_SEASON)}: {', '.join(missing)}.")
+                     f"{_posix(_source_path(PREV_SEASON))}: "
+                     f"{', '.join(missing)}.")
         lines.append("")
 
     lines += _md_section(
-        title_longest(top_ever),
+        title_longest(),
         notes_longest(),
         ["#", "player", "team", "streak (games)", "played (games)",
          "streak began", "still alive"],
@@ -534,14 +556,14 @@ def main():
     best = select_longest(cur_st, args.top_ever)
     prev_idx = prev_st.set_index("Player_Name")
 
-    print_active(live, notes_active(latest_raw, below), args.top_active)
+    print_active(live, notes_active(latest_raw, below))
     print_side_by_side(live, prev_idx, notes_side_by_side())
     print_longest(best, notes_longest(), args.top_ever)
     print()
 
     if not args.no_file:
         lines = build_markdown(live, best, prev_idx, latest_raw, disp_round,
-                               args.top_active, args.top_ever, below)
+                               below)
         out_path = write_markdown(lines, disp_round)
         print(f"OK wrote {out_path} ({len(lines)} lines)")
     return 0
