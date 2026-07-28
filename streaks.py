@@ -64,18 +64,38 @@ more than one name. Name and ID give the same 544 player overlap, so name is
 used because it also covers the null-ID rows. If a future season brings two
 players sharing a name, this join needs ID with a name fallback.
 
+OUTPUT
+Prints three reports to the terminal and writes the same three to
+drafts/streaks_r<display round>.md as markdown tables. The file is in addition
+to the terminal output, never instead of it, and is overwritten on a re-run the
+way draft_posts.py overwrites its own draft. Pass --no-file for terminal only.
+
+Both renderings read the same selected frames, built once by select_active()
+and select_longest(), and the same preamble copy, built once by the notes_*
+functions. Nothing is computed twice, so the file and the terminal cannot
+disagree.
+
+COPY RULES
+Inherited from draft_posts.py, since this writes into the same drafts/ folder.
+  * No accuracy percentages of any kind in generated text.
+  * No em dashes.
+  * Every table carries the display round number.
+
 Run:
     python streaks.py
     python streaks.py --top-active 25 --top-ever 20
+    python streaks.py --no-file
 """
 
 import argparse
 import os
 import sys
+from datetime import datetime
 
 import pandas as pd
 
 PRED_DIR = "predictions"
+DRAFTS_DIR = "drafts"
 CUR_SEASON = 2026
 PREV_SEASON = 2025
 
@@ -127,6 +147,10 @@ def _banner(title):
     print("=" * 96)
 
 
+def _source_path(season):
+    return os.path.join(PRED_DIR, f"game_level_{season}.csv")
+
+
 def _load(season):
     """Read one game_level file, drop finals rows, dedupe player-games.
 
@@ -134,7 +158,7 @@ def _load(season):
     duplicate count is the number most likely to change under the reader's feet
     if predictions are ever regenerated.
     """
-    path = os.path.join(PRED_DIR, f"game_level_{season}.csv")
+    path = _source_path(season)
     if not os.path.exists(path):
         raise SystemExit(f"ABORT: {path} not found. Run predict_2026.py first.")
 
@@ -225,29 +249,111 @@ def _rounds_label(raw, season):
     return f"Round {_display_round(raw, season)}"
 
 
-def report_active(cur_st, top_n, latest_raw):
-    _banner(f"1. LONGEST ACTIVE PROJECTED-POLL STREAKS, {CUR_SEASON} "
-            f"(top {top_n})")
-    print(f"Streaks alive as of AFLTables Round {latest_raw}, shown as "
-          f"Round {_display_round(latest_raw, CUR_SEASON)}.")
-    print("Projected poll means Exp_Votes rank 1, 2 or 3 inside the game.")
-    print("Lengths count consecutive games played, not rounds.")
-    print(f"Minimum streak {MIN_ACTIVE_STREAK} games.")
+# ----------------------------------------------------------------------
+# selection
+#
+# The only place rows are chosen. Both the terminal tables and the markdown
+# file render these same frames, so the two outputs cannot drift apart.
+# ----------------------------------------------------------------------
+def count_below_floor(cur_st):
+    """Players on a live streak too short for report 1."""
+    return int(((cur_st["trailing"] > 0)
+                & (cur_st["trailing"] < MIN_ACTIVE_STREAK)).sum())
 
-    below = int(((cur_st["trailing"] > 0)
-                 & (cur_st["trailing"] < MIN_ACTIVE_STREAK)).sum())
-    print(f"{below} player(s) with a live streak shorter than "
-          f"{MIN_ACTIVE_STREAK} games excluded by the floor.")
-    print()
 
-    live = cur_st[cur_st["trailing"] >= MIN_ACTIVE_STREAK].sort_values(
+def select_active(cur_st, top_n):
+    return cur_st[cur_st["trailing"] >= MIN_ACTIVE_STREAK].sort_values(
         ["trailing", "games_played", "Player_Name"],
         ascending=[False, False, True],
     ).head(top_n)
 
+
+def select_longest(cur_st, top_n):
+    return cur_st[cur_st["longest"] > 0].sort_values(
+        ["longest", "games_played", "Player_Name"],
+        ascending=[False, False, True],
+    ).head(top_n)
+
+
+def _prev_longest(prev_idx, name):
+    if name in prev_idx.index:
+        return f"{int(prev_idx.loc[name]['longest'])}"
+    return _NA
+
+
+def _missing_prev(live, prev_idx):
+    return [n for n in live["Player_Name"] if n not in prev_idx.index]
+
+
+# ----------------------------------------------------------------------
+# preamble copy
+#
+# Written once and rendered twice. The terminal keeps these as separate
+# lines; markdown joins each list into one paragraph.
+# ----------------------------------------------------------------------
+def title_active(top_n):
+    return (f"1. LONGEST ACTIVE PROJECTED-POLL STREAKS, {CUR_SEASON} "
+            f"(top {top_n})")
+
+
+def title_side_by_side():
+    return (f"2. THOSE SAME PLAYERS, {CUR_SEASON} PROJECTED NEXT TO "
+            f"{PREV_SEASON} ACTUAL")
+
+
+def title_longest(top_n):
+    return (f"3. LONGEST PROJECTED-POLL STREAKS OF {CUR_SEASON}, ACTIVE OR "
+            f"ENDED (top {top_n})")
+
+
+def notes_active(latest_raw, below):
+    return [
+        f"Streaks alive as of AFLTables Round {latest_raw}, shown as "
+        f"Round {_display_round(latest_raw, CUR_SEASON)}.",
+        "Projected poll means Exp_Votes rank 1, 2 or 3 inside the game.",
+        "Actual poll means Brownlow.Votes greater than zero.",
+        "Lengths count consecutive games played, not rounds.",
+        f"Minimum streak {MIN_ACTIVE_STREAK} games.",
+        f"{below} player(s) with a live streak shorter than "
+        f"{MIN_ACTIVE_STREAK} games excluded by the floor.",
+    ]
+
+
+def notes_side_by_side():
+    return [
+        "Longest against longest. An active streak is observed at its "
+        "maximum because nothing has",
+        "ended it yet, while a streak measured at a season cutoff is "
+        "truncated by the fixture and",
+        "not by the player, so the two are not comparable. The best run in "
+        "each season is.",
+        f"The live {CUR_SEASON} figure is carried alongside for reference. "
+        f"{PREV_SEASON} covers a completed",
+        f"home and away season, {CUR_SEASON} covers the season so far. "
+        f"Three separate quantities,",
+        "never added together.",
+    ]
+
+
+def notes_longest():
+    return [
+        "Best run anywhere in the season, whether or not it is still alive.",
+        "Equal lengths resolve to the more recent run.",
+    ]
+
+
+# ----------------------------------------------------------------------
+# terminal rendering
+# ----------------------------------------------------------------------
+def print_active(live, notes, top_n):
+    _banner(title_active(top_n))
+    for line in notes:
+        print(line)
+    print()
+
     if live.empty:
         print("None.")
-        return live
+        return
 
     print(f"{'#':>3}  {'player':<24} {'team':<24} {'streak':>7} "
           f"{'played':>7}  {'streak began':<14}")
@@ -257,30 +363,17 @@ def report_active(cur_st, top_n, latest_raw):
         print(f"{i:>3}  {r['Player_Name']:<24} {r['Team']:<24} "
               f"{r['trailing']:>7} {r['games_played']:>7}  "
               f"{_rounds_label(r['trailing_start'], CUR_SEASON):<14}")
-    return live
 
 
-def report_side_by_side(live, prev_st, top_n):
-    _banner(f"2. THOSE SAME PLAYERS, {CUR_SEASON} PROJECTED NEXT TO "
-            f"{PREV_SEASON} ACTUAL")
-    print(f"Longest against longest. An active streak is observed at its "
-          f"maximum because nothing has")
-    print(f"ended it yet, while a streak measured at a season cutoff is "
-          f"truncated by the fixture and")
-    print(f"not by the player, so the two are not comparable. The best run in "
-          f"each season is.")
-    print(f"The live {CUR_SEASON} figure is carried alongside for reference. "
-          f"{PREV_SEASON} covers a completed")
-    print(f"home and away season, {CUR_SEASON} covers the season so far. "
-          f"Three separate quantities,")
-    print("never added together.")
+def print_side_by_side(live, prev_idx, notes):
+    _banner(title_side_by_side())
+    for line in notes:
+        print(line)
     print()
 
     if live.empty:
         print("None.")
         return
-
-    prev_idx = prev_st.set_index("Player_Name")
 
     print(f"{'#':>3}  {'player':<24} {'team':<24} "
           f"{'2026 active':>13} {'2026 longest':>13} {'2025 longest':>13}")
@@ -288,15 +381,11 @@ def report_side_by_side(live, prev_st, top_n):
           f"{'(live)':>13} {'(best so far)':>13} {'(best, full)':>13}")
     print("-" * 96)
     for i, (_, r) in enumerate(live.iterrows(), start=1):
-        name = r["Player_Name"]
-        if name in prev_idx.index:
-            prev_longest = f"{int(prev_idx.loc[name]['longest'])}"
-        else:
-            prev_longest = _NA
-        print(f"{i:>3}  {name:<24} {r['Team']:<24} "
-              f"{r['trailing']:>13} {r['longest']:>13} {prev_longest:>13}")
+        print(f"{i:>3}  {r['Player_Name']:<24} {r['Team']:<24} "
+              f"{r['trailing']:>13} {r['longest']:>13} "
+              f"{_prev_longest(prev_idx, r['Player_Name']):>13}")
 
-    missing = [n for n in live["Player_Name"] if n not in prev_idx.index]
+    missing = _missing_prev(live, prev_idx)
     if missing:
         print()
         print(f"{_NA} means no {PREV_SEASON} home and away games in "
@@ -304,17 +393,11 @@ def report_side_by_side(live, prev_st, top_n):
               f"{', '.join(missing)}.")
 
 
-def report_longest_ever(cur_st, top_n):
-    _banner(f"3. LONGEST PROJECTED-POLL STREAKS OF {CUR_SEASON}, ACTIVE OR "
-            f"ENDED (top {top_n})")
-    print("Best run anywhere in the season, whether or not it is still alive.")
-    print("Equal lengths resolve to the more recent run.")
+def print_longest(best, notes, top_n):
+    _banner(title_longest(top_n))
+    for line in notes:
+        print(line)
     print()
-
-    best = cur_st[cur_st["longest"] > 0].sort_values(
-        ["longest", "games_played", "Player_Name"],
-        ascending=[False, False, True],
-    ).head(top_n)
 
     if best.empty:
         print("None.")
@@ -331,14 +414,107 @@ def report_longest_ever(cur_st, top_n):
               f"{'yes' if r['active'] else 'no':<11}")
 
 
+# ----------------------------------------------------------------------
+# markdown rendering
+#
+# Same frames, same copy, different layout. Terminal sub-labels become part
+# of the header cell, since a markdown table has only one header row.
+# ----------------------------------------------------------------------
+def _md_table(headers, rows):
+    out = ["| " + " | ".join(headers) + " |",
+           "|" + "|".join(["---"] * len(headers)) + "|"]
+    for row in rows:
+        out.append("| " + " | ".join(str(c) for c in row) + " |")
+    return out
+
+
+def _md_section(title, notes, headers, rows, empty_note="None."):
+    out = [f"## {title}", ""]
+    out += notes
+    out.append("")
+    if not rows:
+        out.append(empty_note)
+        out.append("")
+        return out
+    out += _md_table(headers, rows)
+    out.append("")
+    return out
+
+
+def build_markdown(live, best, prev_idx, latest_raw, disp_round,
+                   top_active, top_ever, below):
+    lines = [
+        f"# Round {disp_round} streaks",
+        "",
+        f"Generated {datetime.now().strftime('%Y-%m-%d %H:%M')} from "
+        f"{_source_path(CUR_SEASON)} and {_source_path(PREV_SEASON)}.",
+        f"AFLTables Round_num {latest_raw}, shown throughout as "
+        f"Round {disp_round}.",
+        "Templated from CSV values. Review before posting.",
+        "",
+    ]
+
+    lines += _md_section(
+        title_active(top_active),
+        notes_active(latest_raw, below),
+        ["#", "player", "team", "streak (games)", "played (games)",
+         "streak began"],
+        [[i, r["Player_Name"], r["Team"], r["trailing"], r["games_played"],
+          _rounds_label(r["trailing_start"], CUR_SEASON)]
+         for i, (_, r) in enumerate(live.iterrows(), start=1)],
+    )
+
+    side_rows = [
+        [i, r["Player_Name"], r["Team"], r["trailing"], r["longest"],
+         _prev_longest(prev_idx, r["Player_Name"])]
+        for i, (_, r) in enumerate(live.iterrows(), start=1)
+    ]
+    lines += _md_section(
+        title_side_by_side(),
+        notes_side_by_side(),
+        ["#", "player", "team", f"{CUR_SEASON} active (live)",
+         f"{CUR_SEASON} longest (best so far)",
+         f"{PREV_SEASON} longest (best, full)"],
+        side_rows,
+    )
+    missing = _missing_prev(live, prev_idx)
+    if missing:
+        lines.append(f"{_NA} means no {PREV_SEASON} home and away games in "
+                     f"{_source_path(PREV_SEASON)}: {', '.join(missing)}.")
+        lines.append("")
+
+    lines += _md_section(
+        title_longest(top_ever),
+        notes_longest(),
+        ["#", "player", "team", "streak (games)", "played (games)",
+         "streak began", "still alive"],
+        [[i, r["Player_Name"], r["Team"], r["longest"], r["games_played"],
+          _rounds_label(r["longest_start"], CUR_SEASON),
+          "yes" if r["active"] else "no"]
+         for i, (_, r) in enumerate(best.iterrows(), start=1)],
+    )
+    return lines
+
+
+def write_markdown(lines, disp_round):
+    os.makedirs(DRAFTS_DIR, exist_ok=True)
+    out_path = os.path.join(DRAFTS_DIR, f"streaks_r{disp_round}.md")
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(lines).rstrip() + "\n")
+    return out_path
+
+
 def main():
     ap = argparse.ArgumentParser(
-        description="Consecutive-games polling streaks. Prints to stdout only."
+        description="Consecutive-games polling streaks. Prints to the terminal "
+                    "and writes a markdown file."
     )
     ap.add_argument("--top-active", type=int, default=DEFAULT_TOP_ACTIVE,
                     help=f"rows in report 1 and 2 (default {DEFAULT_TOP_ACTIVE})")
     ap.add_argument("--top-ever", type=int, default=DEFAULT_TOP_EVER,
                     help=f"rows in report 3 (default {DEFAULT_TOP_EVER})")
+    ap.add_argument("--no-file", action="store_true",
+                    help="terminal output only, skip the markdown file")
     args = ap.parse_args()
 
     _banner("SOURCES")
@@ -349,13 +525,25 @@ def main():
     prev["polled"] = prev["Brownlow.Votes"] > 0
 
     latest_raw = int(cur["Round_num"].max())
+    disp_round = _display_round(latest_raw, CUR_SEASON)
     cur_st = streaks(cur, "polled")
     prev_st = streaks(prev, "polled")
 
-    live = report_active(cur_st, args.top_active, latest_raw)
-    report_side_by_side(live, prev_st, args.top_active)
-    report_longest_ever(cur_st, args.top_ever)
+    below = count_below_floor(cur_st)
+    live = select_active(cur_st, args.top_active)
+    best = select_longest(cur_st, args.top_ever)
+    prev_idx = prev_st.set_index("Player_Name")
+
+    print_active(live, notes_active(latest_raw, below), args.top_active)
+    print_side_by_side(live, prev_idx, notes_side_by_side())
+    print_longest(best, notes_longest(), args.top_ever)
     print()
+
+    if not args.no_file:
+        lines = build_markdown(live, best, prev_idx, latest_raw, disp_round,
+                               args.top_active, args.top_ever, below)
+        out_path = write_markdown(lines, disp_round)
+        print(f"OK wrote {out_path} ({len(lines)} lines)")
     return 0
 
 
