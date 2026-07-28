@@ -222,6 +222,15 @@ def section_movers(season_now, disp_round, snapshot_path=None, played=None):
         | (movers['rank_prev'] <= MOVERS_POOL_RANK)
     ]
 
+    # Review context for whoever checks the draft, not post copy. Deliberately
+    # outside both fences so it is never pasted with a block.
+    out.append(
+        f"Round {disp_round}. Pool is the top {MOVERS_POOL_RANK} by "
+        f"Exp_Total_Votes now or in the previous snapshot. Movement is measured "
+        f"across the full field."
+    )
+    out.append("")
+
     risers = movers[movers['delta'] > 0].sort_values(
         ['delta', 'rank_now'], ascending=[False, True]
     ).head(MOVERS_N)
