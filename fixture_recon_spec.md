@@ -91,7 +91,7 @@ D. Roster check. For every player named in blocks 2, 4, 6 and 7, report whether
    recent poll. Flag anyone with three or more meetings and zero career polls
    against this opponent.
 
-## Two unsettled scoping questions
+## Three unsettled scoping questions
 
 Career-scoped vs fixture-scoped. Block 7 currently counts every career meeting
 against the opponent regardless of the player's club at the time, so its meeting
@@ -102,6 +102,12 @@ the script and apply it consistently, or report both columns explicitly.
 
 Club alias merging. Where a club name changed across the period, state whether
 opponent records were merged or split, per club, in the output.
+
+Name-level vs name-and-club grouping. Block 6 grouped on name and club splits a
+player who changed clubs across two rows, which can drop him below a poll cut
+that name-only grouping would clear. Lance Franklin at York Park and Josh
+Kennedy at Adelaide Oval both behave this way. Report block 6 both ways wherever
+the two differ, and label which grouping any drafted number uses.
 
 ## Reading the output
 
@@ -139,3 +145,62 @@ triggered by the same two things: $env:TEMP expanding to an unknown value, and
 inline script blocks. Both are avoidable. Literal paths and .py files are
 matched by the allow rules in .claude/settings.local.json and run without
 prompting.
+
+## Filters that must be applied every run
+
+Finals exclusion. Every block is home and away only. fitzroy_stats_all.csv can
+be filtered on a digit round, but coaches_votes_all.csv numbers finals
+continuously, so a semi-final appears as a plain round number and survives an
+isdigit() filter. In the Port Adelaide v GWS run this smuggled the 2023 semi
+final into block 4 and cost 10 votes from one player and 8 from another before
+it was caught by hand. Filter finals explicitly by season round count or by
+cross-referencing the fitzRoy fixture list, never by isdigit alone. Report the
+number of finals excluded per file.
+
+Club name canonicalisation before check D. Check D compares a player's
+historical club against their 2026 club, and the two sources spell clubs
+differently: Team = GWS against Home.team = Greater Western Sydney, Team =
+Footscray against Home.team = Western Bulldogs, Kangaroos against North
+Melbourne. Canonicalise both sides before comparing or check D flags every
+player at those clubs as a club change every run. In the Port Adelaide v GWS run
+it produced three false positives. Report the canonical mapping used.
+
+## Block 8, player deep dive
+
+Run this automatically on every player who survives the judgment pass in step 2,
+before drafting. It is the difference between a number and an insight: a
+fixture record means nothing until it is read against the player's own baseline.
+
+For each shortlisted player, from fitzroy_stats_all.csv, home and away only:
+
+  a. Career votes by opponent. For each opponent: meetings played, polls, zeros,
+     total votes, votes per game, and the season and vote value of the most
+     recent poll. Sort by votes per game ascending. State where this fixture's
+     opponent ranks among opponents faced five or more times, and how many
+     opponents clear that threshold.
+
+  b. Career votes by venue, same shape, sorted by votes per game ascending.
+     State where this fixture's ground ranks among grounds played five or more
+     times.
+
+  c. Career totals: games, polls, votes, votes per game. This is the baseline
+     both tables are read against. A rate is meaningless without it.
+
+  d. Vote composition against this opponent and at this ground: how the total
+     splits across 1, 2 and 3 vote games. Three single votes and one 3-vote game
+     both total 3, and they are different stories.
+
+  e. If the player has changed clubs, label which club each opponent and venue
+     record was earned at. A record earned elsewhere is still true and still
+     usable, but the copy must name the club or the tweet asserts something
+     false.
+
+Reading it. The opponent or venue is only worth writing about when it sits near
+an extreme of the player's own distribution. Isaac Heeney against St Kilda was
+second lowest of 17 opponents at 0.23 against a career 0.44, which is the story.
+Mid-table is not a story and should be discarded rather than dressed up.
+
+Also check that the claim is not an artefact of the fixture list. Clayton Oliver
+had never faced Port Adelaide as a Giant, which was true and meant nothing: the
+two clubs had not met since he moved. Before drafting a never or a first, check
+whether the opportunity existed.
