@@ -24,6 +24,19 @@ model projects and 2025 is measured on what actually polled. Report 2 prints
 the two next to each other because that comparison is the point, but they are
 different quantities from different seasons and are never added or combined.
 
+WHY REPORT 2 COMPARES LONGEST AGAINST LONGEST
+An active streak and an end-of-season streak are not the same measurement. An
+active streak is observed at its maximum, because it is still running and has
+not yet met the game that ends it. An end-of-season streak is whatever happened
+to be running when the fixture stopped, truncated at a cutoff that has nothing
+to do with the player. Putting one against the other flatters the live figure
+and understates the finished one. Longest against longest is the like-for-like
+pair, so report 2 shows each player's best run in each season and carries the
+live 2026 figure alongside as a third, separately labelled column. The 2025
+number covers a completed home and away season and the 2026 number covers the
+season so far, which is the one asymmetry that remains and cannot be removed
+while 2026 is still being played.
+
 GAME KEY
 2026 has a Game_ID column. 2025 does not, so a game there is Round_num plus
 Home.team plus Away.team, the same key accuracy_report.py uses. Both files were
@@ -77,6 +90,11 @@ USECOLS = ["Season", "Round_num", "Home.team", "Away.team",
 POLL_RANK = 3               # Exp_Votes rank 1, 2 or 3 inside the game
 DEFAULT_TOP_ACTIVE = 15
 DEFAULT_TOP_EVER = 10
+
+# Report 1 floor. Without it the table fills with streaks of one, which is just
+# the list of players who polled in the latest round, ordered by a tiebreak
+# rather than by anything the report is about.
+MIN_ACTIVE_STREAK = 3
 
 # First season with an AFL Opening Round. Kept in step with draft_posts.py:47.
 _OPENING_ROUND_FROM = 2024
@@ -214,9 +232,15 @@ def report_active(cur_st, top_n, latest_raw):
           f"Round {_display_round(latest_raw, CUR_SEASON)}.")
     print("Projected poll means Exp_Votes rank 1, 2 or 3 inside the game.")
     print("Lengths count consecutive games played, not rounds.")
+    print(f"Minimum streak {MIN_ACTIVE_STREAK} games.")
+
+    below = int(((cur_st["trailing"] > 0)
+                 & (cur_st["trailing"] < MIN_ACTIVE_STREAK)).sum())
+    print(f"{below} player(s) with a live streak shorter than "
+          f"{MIN_ACTIVE_STREAK} games excluded by the floor.")
     print()
 
-    live = cur_st[cur_st["trailing"] > 0].sort_values(
+    live = cur_st[cur_st["trailing"] >= MIN_ACTIVE_STREAK].sort_values(
         ["trailing", "games_played", "Player_Name"],
         ascending=[False, False, True],
     ).head(top_n)
@@ -239,14 +263,17 @@ def report_active(cur_st, top_n, latest_raw):
 def report_side_by_side(live, prev_st, top_n):
     _banner(f"2. THOSE SAME PLAYERS, {CUR_SEASON} PROJECTED NEXT TO "
             f"{PREV_SEASON} ACTUAL")
-    print(f"Left column is the {CUR_SEASON} streak the model projects and is "
-          f"still running.")
-    print(f"Right column is the {PREV_SEASON} streak of real votes as it stood "
-          f"at the end of that")
-    print("home and away season, which is zero if the player did not poll in "
-          "their last game.")
-    print("Two different quantities from two different seasons. They are not "
-          "added together.")
+    print(f"Longest against longest. An active streak is observed at its "
+          f"maximum because nothing has")
+    print(f"ended it yet, while a streak measured at a season cutoff is "
+          f"truncated by the fixture and")
+    print(f"not by the player, so the two are not comparable. The best run in "
+          f"each season is.")
+    print(f"The live {CUR_SEASON} figure is carried alongside for reference. "
+          f"{PREV_SEASON} covers a completed")
+    print(f"home and away season, {CUR_SEASON} covers the season so far. "
+          f"Three separate quantities,")
+    print("never added together.")
     print()
 
     if live.empty:
@@ -256,20 +283,18 @@ def report_side_by_side(live, prev_st, top_n):
     prev_idx = prev_st.set_index("Player_Name")
 
     print(f"{'#':>3}  {'player':<24} {'team':<24} "
-          f"{'2026 projected':>15} {'2025 actual':>13} {'2025 played':>12}")
+          f"{'2026 active':>13} {'2026 longest':>13} {'2025 longest':>13}")
     print(f"{'':>3}  {'':<24} {'':<24} "
-          f"{'(games, live)':>15} {'(games, end)':>13} {'(games)':>12}")
+          f"{'(live)':>13} {'(best so far)':>13} {'(best, full)':>13}")
     print("-" * 96)
     for i, (_, r) in enumerate(live.iterrows(), start=1):
         name = r["Player_Name"]
         if name in prev_idx.index:
-            p = prev_idx.loc[name]
-            actual = f"{int(p['trailing'])}"
-            played = f"{int(p['games_played'])}"
+            prev_longest = f"{int(prev_idx.loc[name]['longest'])}"
         else:
-            actual = played = _NA
+            prev_longest = _NA
         print(f"{i:>3}  {name:<24} {r['Team']:<24} "
-              f"{r['trailing']:>15} {actual:>13} {played:>12}")
+              f"{r['trailing']:>13} {r['longest']:>13} {prev_longest:>13}")
 
     missing = [n for n in live["Player_Name"] if n not in prev_idx.index]
     if missing:
