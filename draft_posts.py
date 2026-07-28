@@ -21,17 +21,21 @@ through _display_round() first. That logic is copied from dashboard.py:409
 rather than imported, because importing dashboard.py executes a Streamlit page.
 
 SNAPSHOT
-Section 2 diffs the current season table against predictions/_snapshot_season.csv,
-a copy of season_2026.csv left behind by the previous run. The snapshot is read
-before the new one is written, so each run compares against the run before it.
-On the first run there is no snapshot, and section 2 is skipped with a note in
-the file. Git history is never consulted.
+Section 2 diffs the current season table against a snapshot of season_2026.csv
+kept in predictions/snapshots/, one file per raw Round_num, named
+_snapshot_season_r<raw>.csv. Each run reads the newest snapshot from a round
+strictly earlier than the one it is drafting, then writes its own. Keying on the
+round rather than on run order is what makes a re-run safe: it overwrites only
+this round's snapshot, with identical data, and never touches the earlier round
+the diff depends on. When no earlier snapshot exists, section 2 is skipped with
+a note in the file. Git history is never consulted.
 
 Run standalone, or as the last step of update.py:
     python draft_posts.py
 """
 
 import os
+import re
 import shutil
 import sys
 from datetime import datetime
@@ -40,8 +44,11 @@ import pandas as pd
 
 GAME_LEVEL = "predictions/game_level_2026.csv"
 SEASON = "predictions/season_2026.csv"
-SNAPSHOT = "predictions/_snapshot_season.csv"
+SNAPSHOT_DIR = "predictions/snapshots"
 DRAFTS_DIR = "drafts"
+
+# Snapshots are named _snapshot_season_r<raw Round_num>.csv inside SNAPSHOT_DIR.
+_SNAPSHOT_RE = re.compile(r"^_snapshot_season_r(\d+)\.csv$")
 
 # First season with an AFL Opening Round. Kept in step with dashboard.py:407.
 _OPENING_ROUND_FROM = 2024
@@ -73,6 +80,39 @@ def _display_round(round_num, season):
     except (TypeError, ValueError):
         return round_num
     return rn - 1 if sn >= _OPENING_ROUND_FROM else rn
+
+
+def _snapshot_path(raw_round, snapshot_dir=SNAPSHOT_DIR):
+    """Path this round's snapshot is written to.
+
+    Sole place the filename pattern is built, so _prev_snapshot_path() and the
+    write at the end of main() cannot drift apart.
+    """
+    return os.path.join(snapshot_dir, f"_snapshot_season_r{int(raw_round)}.csv")
+
+
+def _prev_snapshot_path(latest_raw, snapshot_dir=SNAPSHOT_DIR):
+    """Path of the newest snapshot from a round strictly before latest_raw.
+
+    None when the directory is absent or holds nothing earlier, which is also
+    what happens on the first run of a season.
+
+    The round is parsed out of each filename and compared as an int. Sorting the
+    names as strings would put r9 after r21, and would also pick up any unrelated
+    file that happened to sort last, so anything not matching _SNAPSHOT_RE is
+    ignored rather than assumed to be a snapshot.
+    """
+    if not os.path.isdir(snapshot_dir):
+        return None
+    latest_raw = int(latest_raw)
+    earlier = [
+        int(m.group(1))
+        for m in (_SNAPSHOT_RE.match(name) for name in os.listdir(snapshot_dir))
+        if m and int(m.group(1)) < latest_raw
+    ]
+    if not earlier:
+        return None
+    return _snapshot_path(max(earlier), snapshot_dir)
 
 
 def _rank_desc(s):
@@ -125,8 +165,8 @@ def section_three_two_one(rnd, disp_round):
     return out
 
 
-def section_movers(season_now, disp_round, snapshot_path=SNAPSHOT):
-    """Season rank now against the previous run's snapshot.
+def section_movers(season_now, disp_round, snapshot_path=None):
+    """Season rank now against the previous round's snapshot.
 
     Left join on Player_Name, never positional: the player pool grows week to
     week, so row N of one file is not row N of the other. Anyone missing from
@@ -141,10 +181,10 @@ def section_movers(season_now, disp_round, snapshot_path=SNAPSHOT):
     eligible is what lets a player who drops out of it still show as a faller.
     """
     out = ["## Biggest movers", ""]
-    if not os.path.exists(snapshot_path):
+    if snapshot_path is None or not os.path.exists(snapshot_path):
         out.append(
-            f"No snapshot from a previous run, so there is nothing to diff "
-            f"Round {disp_round} against. This section populates next run."
+            f"No snapshot from an earlier round, so there is nothing to diff "
+            f"Round {disp_round} against. This section populates next round."
         )
         out.append("")
         return out
@@ -255,7 +295,7 @@ def main():
         "",
     ]
     lines += section_three_two_one(rnd, disp_round)
-    lines += section_movers(season_now, disp_round)
+    lines += section_movers(season_now, disp_round, _prev_snapshot_path(latest_raw))
     lines += section_spotlight(rnd, disp_round)
 
     os.makedirs(DRAFTS_DIR, exist_ok=True)
@@ -263,11 +303,15 @@ def main():
     with open(out_path, "w", encoding="utf-8") as f:
         f.write("\n".join(lines).rstrip() + "\n")
 
-    # Snapshot last, so the diff above ran against the previous run's copy.
-    shutil.copyfile(SEASON, SNAPSHOT)
+    # Snapshot last, so the diff above ran against the earlier round's copy.
+    # Keyed on the raw round, so a re-run overwrites this round's own snapshot
+    # with identical data and leaves the one the diff reads alone.
+    os.makedirs(SNAPSHOT_DIR, exist_ok=True)
+    snapshot_path = _snapshot_path(latest_raw)
+    shutil.copyfile(SEASON, snapshot_path)
 
     print(f"OK wrote {out_path} ({len(lines)} lines)")
-    print(f"OK snapshot refreshed at {SNAPSHOT}")
+    print(f"OK snapshot written to {snapshot_path}")
     return 0
 
 
