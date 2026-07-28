@@ -165,7 +165,7 @@ def section_three_two_one(rnd, disp_round):
     return out
 
 
-def section_movers(season_now, disp_round, snapshot_path=None):
+def section_movers(season_now, disp_round, snapshot_path=None, played=None):
     """Season rank now against the previous round's snapshot.
 
     Left join on Player_Name, never positional: the player pool grows week to
@@ -179,6 +179,15 @@ def section_movers(season_now, disp_round, snapshot_path=None):
     the cap the list fills with fringe players vaulting hundreds of ranks off a
     single game while the contenders barely shuffle. Keeping last week's top 50
     eligible is what lets a player who drops out of it still show as a faller.
+
+    Fallers are restricted to the players in `played`, the names appearing in
+    the latest round's player-games. Exp_Total_Votes only ever accumulates, so
+    a player who did not play gains nothing while the field scores around them
+    and slides down the rank for as long as they are out. Unfiltered, the block
+    reports the injury list every week instead of form. Risers need no
+    equivalent filter: a flat total against a rising field can fall or hold,
+    never climb, so nobody absent can reach the risers block anyway. Passing
+    played=None filters nothing.
     """
     out = ["## Biggest movers", ""]
     if snapshot_path is None or not os.path.exists(snapshot_path):
@@ -214,7 +223,12 @@ def section_movers(season_now, disp_round, snapshot_path=None):
     risers = movers[movers['delta'] > 0].sort_values(
         ['delta', 'rank_now'], ascending=[False, True]
     ).head(MOVERS_N)
-    fallers = movers[movers['delta'] < 0].sort_values(
+    # Filtered before .head(), so the block still fills to MOVERS_N with players
+    # who actually played rather than returning a short list.
+    fallers_pool = movers[movers['delta'] < 0]
+    if played is not None:
+        fallers_pool = fallers_pool[fallers_pool['Player_Name'].isin(played)]
+    fallers = fallers_pool.sort_values(
         ['delta', 'rank_now'], ascending=[True, True]
     ).head(MOVERS_N)
 
@@ -295,7 +309,12 @@ def main():
         "",
     ]
     lines += section_three_two_one(rnd, disp_round)
-    lines += section_movers(season_now, disp_round, _prev_snapshot_path(latest_raw))
+    # Names from the latest round's player-games, used to keep players who did
+    # not play out of the fallers block.
+    played = set(rnd['Player_Name'])
+    lines += section_movers(
+        season_now, disp_round, _prev_snapshot_path(latest_raw), played
+    )
     lines += section_spotlight(rnd, disp_round)
 
     os.makedirs(DRAFTS_DIR, exist_ok=True)
