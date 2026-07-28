@@ -246,11 +246,13 @@ def section_movers(season_now, disp_round, snapshot_path=None, played=None):
 
     # Review context for whoever checks the draft, not post copy. Deliberately
     # outside both fences so it is never pasted with a block.
+    # Two appends, so this lands as two lines. Implicit concatenation inside a
+    # single append would join the fragments back into one.
     out.append(
         f"Round {disp_round}. Pool is the top {MOVERS_POOL_RANK} by "
-        f"Exp_Total_Votes now or in the previous snapshot. Movement is measured "
-        f"across the full field."
+        f"Exp_Total_Votes now or in the previous snapshot."
     )
+    out.append("Movement is measured across the full field.")
     out.append("")
 
     risers = movers[movers['delta'] > 0].sort_values(
