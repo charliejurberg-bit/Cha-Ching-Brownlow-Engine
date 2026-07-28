@@ -1,30 +1,30 @@
 Player,Team,Total_Votes,Rank
-Nick Daicos,Collingwood,37.0,1
-Marcus Bontempelli,Western Bulldogs,27.0,2
-Bailey Smith,Geelong Cats,24.0,3
-Nasiah Wanganeen-Milera,St Kilda,22.0,4
-Jordan Dawson,Adelaide Crows,21.0,5
-Jai Newcombe,Hawthorn,21.0,6
-Jason Horne-Francis,Port Adelaide,20.0,7
-Will Ashcroft,Brisbane Lions,19.0,8
+Nick Daicos,Collingwood,40.0,1
+Marcus Bontempelli,Western Bulldogs,29.0,2
+Bailey Smith,Geelong Cats,26.0,3
+Nasiah Wanganeen-Milera,St Kilda,25.0,4
+Will Ashcroft,Brisbane Lions,22.0,5
+Jason Horne-Francis,Port Adelaide,22.0,6
+Jordan Dawson,Adelaide Crows,21.0,7
+Jai Newcombe,Hawthorn,21.0,8
 Zak Butters,Port Adelaide,19.0,9
 Lachie Neale,Brisbane Lions,19.0,10
 Kysaiah Pickett,Melbourne,19.0,11
-Max Gawn,Melbourne,18.0,12
-Isaac Heeney,Sydney Swans,18.0,13
-Harry Sheezel,North Melbourne,18.0,14
+Harry Sheezel,North Melbourne,19.0,12
+Max Gawn,Melbourne,18.0,13
+Isaac Heeney,Sydney Swans,18.0,14
 Harley Reid,West Coast Eagles,17.0,15
-Luke Jackson,Fremantle,16.0,16
-Patrick Cripps,Carlton,15.0,17
-Murphy Reid,Fremantle,15.0,18
-Luke Davies-Uniacke,North Melbourne,13.0,19
-Max Holmes,Geelong Cats,13.0,20
-Izak Rankine,Adelaide Crows,13.0,21
-Finn Callaghan,GWS GIANTS,12.0,22
-Brodie Grundy,Sydney Swans,12.0,23
-Clayton Oliver,GWS GIANTS,12.0,24
-Christian Petracca,Gold Coast SUNS,12.0,25
-Ed Richards,Western Bulldogs,11.0,26
+Murphy Reid,Fremantle,17.0,16
+Patrick Cripps,Carlton,16.0,17
+Luke Jackson,Fremantle,16.0,18
+Ed Richards,Western Bulldogs,14.0,19
+Luke Davies-Uniacke,North Melbourne,13.0,20
+Brodie Grundy,Sydney Swans,13.0,21
+Max Holmes,Geelong Cats,13.0,22
+Izak Rankine,Adelaide Crows,13.0,23
+Finn Callaghan,GWS GIANTS,12.0,24
+Clayton Oliver,GWS GIANTS,12.0,25
+Christian Petracca,Gold Coast SUNS,12.0,26
 Shai Bolton,Fremantle,10.0,27
 Andrew Brayshaw,Fremantle,10.0,28
 Caleb Serong,Fremantle,10.0,29
@@ -41,141 +41,141 @@ Patrick Voss,Fremantle,8.0,39
 Lachie Ash,GWS GIANTS,7.0,40
 Sam Berry,Adelaide Crows,7.0,41
 Jack Ginnivan,Hawthorn,7.0,42
-George Hewett,Carlton,7.0,43
-John Noble,Gold Coast SUNS,7.0,44
-Josh Treacy,Fremantle,7.0,45
-Zac Bailey,Brisbane Lions,6.0,46
-Nick Blakey,Sydney Swans,6.0,47
-Josh Daicos,Collingwood,6.0,48
-Toby Greene,GWS GIANTS,6.0,49
-Darcy Parish,Essendon,6.0,50
-Josh Rachele,Adelaide Crows,6.0,51
-Archie Roberts,Essendon,6.0,52
-Tom Sparrow,Melbourne,6.0,53
-Jack Steele,Melbourne,6.0,54
-Dylan Stephens,North Melbourne,6.0,55
-Tim Taranto,Richmond,6.0,56
-Aliir Aliir,Port Adelaide,5.0,57
-Jeremy Cameron,Geelong Cats,5.0,58
-Hugo Garcia,St Kilda,5.0,59
-Jack Gunston,Hawthorn,5.0,60
-Connor Macdonald,Hawthorn,5.0,61
-Shaun Mannagh,Geelong Cats,5.0,62
-Jake Stringer,GWS GIANTS,5.0,63
-Cooper Trembath,North Melbourne,5.0,64
-Charlie Cameron,Brisbane Lions,4.0,65
-Will Day,Hawthorn,4.0,66
-Sam Durham,Essendon,4.0,67
-Max Hall,St Kilda,4.0,68
-Mitch Lewis,Hawthorn,4.0,69
-Rowan Marshall,St Kilda,4.0,70
-Justin Mcinerney,Sydney Swans,4.0,71
-Logan Morris,Brisbane Lions,4.0,72
-Luke Parker,North Melbourne,4.0,73
-James Peatling,Adelaide Crows,4.0,74
-Scott Pendlebury,Collingwood,4.0,75
-Matt Rowell,Gold Coast SUNS,4.0,76
-Liam Ryan,St Kilda,4.0,77
-Jagga Smith,Carlton,4.0,78
-Darcy Wilmot,Brisbane Lions,4.0,79
-Jordan Clark,Fremantle,3.0,80
-Patrick Dangerfield,Geelong Cats,3.0,81
-Joel Freijah,Western Bulldogs,3.0,82
-Mitch Georgiades,Port Adelaide,3.0,83
-Reuben Ginbey,West Coast Eagles,3.0,84
-Phoenix Gothard,GWS GIANTS,3.0,85
-Bradley Hill,St Kilda,3.0,86
-Lawson Humphries,Geelong Cats,3.0,87
-Mark Keane,Adelaide Crows,3.0,88
-Tim Kelly,West Coast Eagles,3.0,89
-Matthew Kennedy,Western Bulldogs,3.0,90
-Ben King,Gold Coast SUNS,3.0,91
-Harvey Langford,Melbourne,3.0,92
-Kane Mcauliffe,Richmond,3.0,93
-Tom Mccartin,Sydney Swans,3.0,94
-Harry Mckay,Carlton,3.0,95
-Colby Mckercher,North Melbourne,3.0,96
-Joe Richards,Port Adelaide,3.0,97
-Malcolm Rosas,Sydney Swans,3.0,98
-Jack Sinclair,St Kilda,3.0,99
-Bodhi Uwland,Gold Coast SUNS,3.0,100
-Josh Weddle,Hawthorn,3.0,101
-Lachie Whitfield,GWS GIANTS,3.0,102
-Bailey J. Williams,West Coast Eagles,3.0,103
-Tristan Xerri,North Melbourne,3.0,104
-Elliot Yeo,West Coast Eagles,3.0,105
-Hayden Young,Fremantle,3.0,106
-Karl Amon,Hawthorn,2.0,107
-Riley Bice,Sydney Swans,2.0,108
-Darcy Cameron,Collingwood,2.0,109
-Matthew Carroll,Carlton,2.0,110
-Daniel Curtin,Adelaide Crows,2.0,111
-Oliver Dempsey,Geelong Cats,2.0,112
-Josh Dunkley,Brisbane Lions,2.0,113
-Errol Gulden,Sydney Swans,2.0,114
-Blake Hardwick,Hawthorn,2.0,115
-Dan Houston,Collingwood,2.0,116
-Jarman Impey,Hawthorn,2.0,117
-Sam Lalor,Richmond,2.0,118
-Ryan Lester,Brisbane Lions,2.0,119
-Patrick Lipinski,Collingwood,2.0,120
-Tom Mccarthy,West Coast Eagles,2.0,121
-Zach Merrett,Essendon,2.0,122
-Touk Miller,Gold Coast SUNS,2.0,123
-Aaron Naughton,Western Bulldogs,2.0,124
-Harry Perryman,Collingwood,2.0,125
-Ethan Read,Gold Coast SUNS,2.0,126
-Patrick Retschko,Richmond,2.0,127
-Jack Ross,Richmond,2.0,128
-Luke Ryan,Fremantle,2.0,129
-Tom Stewart,Geelong Cats,2.0,130
-Jake Waterman,West Coast Eagles,2.0,131
-Caleb Windsor,Melbourne,2.0,132
-Mason Wood,St Kilda,2.0,133
-Josh Worrell,Adelaide Crows,2.0,134
-Joel Amartey,Sydney Swans,1.0,135
-Jye Amiss,Fremantle,1.0,136
-Tom Barrass,Hawthorn,1.0,137
-Jarrod Berry,Brisbane Lions,1.0,138
-Jake Bowey,Melbourne,1.0,139
-Kieren Briggs,GWS GIANTS,1.0,140
-Tanner Bruhn,Geelong Cats,1.0,141
-Nick Bryan,Essendon,1.0,142
-Jordon Butts,Adelaide Crows,1.0,143
-Aaron Cadman,GWS GIANTS,1.0,144
-Kade Chandler,Melbourne,1.0,145
-Paul Curtis,North Melbourne,1.0,146
-Sam Darcy,Western Bulldogs,1.0,147
-Tom De Koning,St Kilda,1.0,148
-Francis Evans,Carlton,1.0,149
-Sam Flanders,St Kilda,1.0,150
-Oliver Florent,Carlton,1.0,151
-Billy Frampton,Collingwood,1.0,152
-Bailey Humphrey,Gold Coast SUNS,1.0,153
-Connor Idun,GWS GIANTS,1.0,154
-Joel Jeffrey,Gold Coast SUNS,1.0,155
-Ed Langdon,Melbourne,1.0,156
-Nick Larkey,North Melbourne,1.0,157
-Kai Lohmann,Brisbane Lions,1.0,158
-Cam Mackenzie,Hawthorn,1.0,159
-Lachlan Mcandrew,Adelaide Crows,1.0,160
-Lloyd Meek,Hawthorn,1.0,161
-Tim Membrey,Collingwood,1.0,162
-Gryan Miers,Geelong Cats,1.0,163
-Shannon Neale,Geelong Cats,1.0,164
-Tom Papley,Sydney Swans,1.0,165
-Cam Rayner,Brisbane Lions,1.0,166
-Deven Robertson,West Coast Eagles,1.0,167
-James Sicily,Hawthorn,1.0,168
-Jy Simpkin,North Melbourne,1.0,169
-Jake Soligo,Adelaide Crows,1.0,170
-Josh Ward,Hawthorn,1.0,171
-George Wardlaw,North Melbourne,1.0,172
-Bailey Williams,Western Bulldogs,1.0,173
-Darcy Wilson,St Kilda,1.0,174
-Ollie Wines,Port Adelaide,1.0,175
-Jarrod Witts,Gold Coast SUNS,1.0,176
-Peter Wright,Essendon,1.0,177
-Blake Acres,Carlton,0.0,178
-Jed Adams,Melbourne,0.0,179
-Oscar Adams,Gold Coast SUNS,0.0,180
+Jack Gunston,Hawthorn,7.0,43
+George Hewett,Carlton,7.0,44
+John Noble,Gold Coast SUNS,7.0,45
+Jagga Smith,Carlton,7.0,46
+Jack Steele,Melbourne,7.0,47
+Josh Treacy,Fremantle,7.0,48
+Zac Bailey,Brisbane Lions,6.0,49
+Nick Blakey,Sydney Swans,6.0,50
+Josh Daicos,Collingwood,6.0,51
+Toby Greene,GWS GIANTS,6.0,52
+Darcy Parish,Essendon,6.0,53
+Josh Rachele,Adelaide Crows,6.0,54
+Archie Roberts,Essendon,6.0,55
+Tom Sparrow,Melbourne,6.0,56
+Dylan Stephens,North Melbourne,6.0,57
+Tim Taranto,Richmond,6.0,58
+Aliir Aliir,Port Adelaide,5.0,59
+Jeremy Cameron,Geelong Cats,5.0,60
+Hugo Garcia,St Kilda,5.0,61
+Errol Gulden,Sydney Swans,5.0,62
+Jarman Impey,Hawthorn,5.0,63
+Connor Macdonald,Hawthorn,5.0,64
+Shaun Mannagh,Geelong Cats,5.0,65
+Scott Pendlebury,Collingwood,5.0,66
+Jake Stringer,GWS GIANTS,5.0,67
+Cooper Trembath,North Melbourne,5.0,68
+Charlie Cameron,Brisbane Lions,4.0,69
+Darcy Cameron,Collingwood,4.0,70
+Will Day,Hawthorn,4.0,71
+Sam Durham,Essendon,4.0,72
+Joel Freijah,Western Bulldogs,4.0,73
+Max Hall,St Kilda,4.0,74
+Mitch Lewis,Hawthorn,4.0,75
+Rowan Marshall,St Kilda,4.0,76
+Justin Mcinerney,Sydney Swans,4.0,77
+Logan Morris,Brisbane Lions,4.0,78
+Shannon Neale,Geelong Cats,4.0,79
+Luke Parker,North Melbourne,4.0,80
+James Peatling,Adelaide Crows,4.0,81
+Matt Rowell,Gold Coast SUNS,4.0,82
+Liam Ryan,St Kilda,4.0,83
+Darcy Wilmot,Brisbane Lions,4.0,84
+Jordan Clark,Fremantle,3.0,85
+Patrick Dangerfield,Geelong Cats,3.0,86
+Mitch Georgiades,Port Adelaide,3.0,87
+Reuben Ginbey,West Coast Eagles,3.0,88
+Phoenix Gothard,GWS GIANTS,3.0,89
+Bradley Hill,St Kilda,3.0,90
+Lawson Humphries,Geelong Cats,3.0,91
+Matthew Johnson,Fremantle,3.0,92
+Mark Keane,Adelaide Crows,3.0,93
+Tim Kelly,West Coast Eagles,3.0,94
+Matthew Kennedy,Western Bulldogs,3.0,95
+Ben King,Gold Coast SUNS,3.0,96
+Harvey Langford,Melbourne,3.0,97
+Kane Mcauliffe,Richmond,3.0,98
+Tom Mccartin,Sydney Swans,3.0,99
+Harry Mckay,Carlton,3.0,100
+Colby Mckercher,North Melbourne,3.0,101
+Joe Richards,Port Adelaide,3.0,102
+Malcolm Rosas,Sydney Swans,3.0,103
+Jack Sinclair,St Kilda,3.0,104
+Bodhi Uwland,Gold Coast SUNS,3.0,105
+Josh Weddle,Hawthorn,3.0,106
+Lachie Whitfield,GWS GIANTS,3.0,107
+Bailey J. Williams,West Coast Eagles,3.0,108
+Darcy Wilson,St Kilda,3.0,109
+Tristan Xerri,North Melbourne,3.0,110
+Elliot Yeo,West Coast Eagles,3.0,111
+Hayden Young,Fremantle,3.0,112
+Jye Amiss,Fremantle,2.0,113
+Karl Amon,Hawthorn,2.0,114
+Riley Bice,Sydney Swans,2.0,115
+Talor Byrne,Carlton,2.0,116
+Matthew Carroll,Carlton,2.0,117
+Daniel Curtin,Adelaide Crows,2.0,118
+Oliver Dempsey,Geelong Cats,2.0,119
+Josh Dunkley,Brisbane Lions,2.0,120
+Blake Hardwick,Hawthorn,2.0,121
+Dan Houston,Collingwood,2.0,122
+Sam Lalor,Richmond,2.0,123
+Ryan Lester,Brisbane Lions,2.0,124
+Patrick Lipinski,Collingwood,2.0,125
+Tom Mccarthy,West Coast Eagles,2.0,126
+Zach Merrett,Essendon,2.0,127
+Touk Miller,Gold Coast SUNS,2.0,128
+Aaron Naughton,Western Bulldogs,2.0,129
+Harry Perryman,Collingwood,2.0,130
+Ethan Read,Gold Coast SUNS,2.0,131
+Patrick Retschko,Richmond,2.0,132
+Jack Ross,Richmond,2.0,133
+James Rowbottom,Sydney Swans,2.0,134
+Luke Ryan,Fremantle,2.0,135
+Tom Stewart,Geelong Cats,2.0,136
+Josh Ward,Hawthorn,2.0,137
+Jake Waterman,West Coast Eagles,2.0,138
+Caleb Windsor,Melbourne,2.0,139
+Mason Wood,St Kilda,2.0,140
+Josh Worrell,Adelaide Crows,2.0,141
+Joel Amartey,Sydney Swans,1.0,142
+Tom Barrass,Hawthorn,1.0,143
+Jarrod Berry,Brisbane Lions,1.0,144
+Jake Bowey,Melbourne,1.0,145
+Kieren Briggs,GWS GIANTS,1.0,146
+Tanner Bruhn,Geelong Cats,1.0,147
+Nick Bryan,Essendon,1.0,148
+Jordon Butts,Adelaide Crows,1.0,149
+Aaron Cadman,GWS GIANTS,1.0,150
+Kade Chandler,Melbourne,1.0,151
+Paul Curtis,North Melbourne,1.0,152
+Sam Darcy,Western Bulldogs,1.0,153
+Tom De Koning,St Kilda,1.0,154
+Francis Evans,Carlton,1.0,155
+Sam Flanders,St Kilda,1.0,156
+Oliver Florent,Carlton,1.0,157
+Billy Frampton,Collingwood,1.0,158
+Bailey Humphrey,Gold Coast SUNS,1.0,159
+Connor Idun,GWS GIANTS,1.0,160
+Joel Jeffrey,Gold Coast SUNS,1.0,161
+Ed Langdon,Melbourne,1.0,162
+Nick Larkey,North Melbourne,1.0,163
+Kai Lohmann,Brisbane Lions,1.0,164
+Cam Mackenzie,Hawthorn,1.0,165
+Lachlan Mcandrew,Adelaide Crows,1.0,166
+Hugh Mccluggage,Brisbane Lions,1.0,167
+Lloyd Meek,Hawthorn,1.0,168
+Tim Membrey,Collingwood,1.0,169
+Gryan Miers,Geelong Cats,1.0,170
+Tom Papley,Sydney Swans,1.0,171
+Cam Rayner,Brisbane Lions,1.0,172
+Deven Robertson,West Coast Eagles,1.0,173
+James Sicily,Hawthorn,1.0,174
+Jy Simpkin,North Melbourne,1.0,175
+Jake Soligo,Adelaide Crows,1.0,176
+George Wardlaw,North Melbourne,1.0,177
+Bailey Williams,Western Bulldogs,1.0,178
+Ollie Wines,Port Adelaide,1.0,179
+Jarrod Witts,Gold Coast SUNS,1.0,180
