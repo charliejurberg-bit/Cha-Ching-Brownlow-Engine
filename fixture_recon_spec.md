@@ -131,7 +131,7 @@ had never faced Port Adelaide as a Giant, which was true and meant nothing: the
 two clubs had not met since he moved. Before drafting a never or a first, check
 whether the opportunity existed.
 
-## Three unsettled scoping questions
+## Four unsettled scoping questions
 
 Career-scoped vs fixture-scoped. Block 7 currently counts every career meeting
 against the opponent regardless of the player's club at the time, so its meeting
@@ -148,6 +148,16 @@ player who changed clubs across two rows, which can drop him below a poll cut
 that name-only grouping would clear. Lance Franklin at York Park and Josh
 Kennedy at Adelaide Oval both behave this way. Report block 6 both ways wherever
 the two differ, and label which grouping any drafted number uses.
+
+Current-season games in career rates. 2026 votes are not public until count
+night, so 2026 rows behave exactly like finals rows: the game was played and the
+votes column is null. Whether they belong in a career denominator is unsettled.
+Excluding them keeps a career rate comparable across the season but makes it
+answer a narrower question than "per game played". Including them drags every
+career rate down by however many 2026 games the player has, for no reason except
+that the votes have not been published yet. Pick one and apply it in every
+block, because the current position is that .mean() decides it implicitly and
+differently depending on which rows a given filter happened to leave in.
 
 ## Reading the output
 
@@ -168,6 +178,26 @@ before drafting.
 Cross-check any number that will appear in copy against a second block. Block 2
 and block 7 should agree on polls and votes for the same player; where they do
 not, the scoping question above is usually why.
+
+Superlative claims must print the table they came from. Any draft containing
+"only", "no other", "best", "worst", "highest" or "lowest" must print the full
+ranked table it is drawn from, not just the leading entry. The Sam Walsh v
+Brisbane draft claimed Brisbane was the only opponent he averaged more than a
+vote against. Geelong at 1.14 and Port Adelaide at 1.11 also cleared it. The
+recon had the data and the draft never asked for the ranking. A superlative is
+the one claim shape where the supporting figure and the copy can diverge without
+either being individually wrong: "highest of 17" was true, "the only one" was
+not, and only the full table shows the difference.
+
+Finals denominator. Votes per game is computed over vote-eligible games, meaning
+home and away rows only. Finals rows carry null votes, not zero, and pandas
+.mean() silently drops them, so any figure computed with .mean() over a column
+that still contains finals is already using this convention by accident rather
+than by choice. State the convention in every report. The consequence is that
+one record yields two defensible numbers: Walsh v Brisbane is 1.20 per
+vote-eligible game and 0.86 per game played, from 5 H&A meetings and 2 finals.
+Both answer "how often does he poll against Brisbane" and they disagree, so the
+denominator has to be named wherever the figure appears.
 
 ## Script hygiene
 
