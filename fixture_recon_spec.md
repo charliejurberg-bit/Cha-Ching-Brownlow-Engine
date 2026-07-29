@@ -8,12 +8,15 @@ can be built from. Everything is retrospective. The recon never projects and
 never comments on the upcoming game.
 
 Intended end state: a script taking two team names, so this becomes a command
-rather than a session. Two scoping decisions below must be settled first.
+rather than a session. Four scoping decisions below must be settled first.
 
 ## Standing preamble
 
-Recon only. Read-only. Do not edit, commit, or run anything. PowerShell and
-Select-String only. Report and stop.
+Interactive mode, default: read-only. Do not edit, commit, or run anything.
+PowerShell and Select-String only. Report and stop.
+
+Autonomous mode, only when the prompt says so explicitly: the Script hygiene
+section governs. Throwaway python scripts in _tmp/ are permitted.
 
 For every player-level record, report meetings PLAYED, polls, and zero-vote
 games as three separate numbers. Never report a poll count in language that
@@ -75,6 +78,11 @@ D. Roster check. For every player named in blocks 2, 4, 6 and 7, report whether
    known duplication is per-fixture, not season-wide, appearing as identical
    per-player vote values repeated across R18 to R23. Exclude 2020 only if that
    pattern is present here, and say which way you went.
+
+   Exemption to the three-number rule: coaches_votes_all.csv holds rows only
+   for players who polled. Meetings played and zero-vote games are not
+   derivable from this file. Report total votes and poll counts only, and
+   state that the denominator is unavailable rather than inferring one.
 
 5. 2026 Exp_Votes season totals, top 8 per club, with games played.
 
@@ -211,6 +219,8 @@ them and drags every career average down. Recon reads the first, the app reads
 the third. Any average votes per game figure must state which file it came from.
 
 ## Script hygiene
+
+This section applies in autonomous mode only.
 
 Write throwaway scripts to _tmp/ inside the working directory, never to
 $env:TEMP. Run them as: python _tmp/name.py
