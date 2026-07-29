@@ -40,3 +40,6 @@ drafts/
 
 # Claude Code local config and scratch scripts
 _tmp/
+
+# Local editor config
+.vscode/
