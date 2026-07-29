@@ -150,8 +150,12 @@ Kennedy at Adelaide Oval both behave this way. Report block 6 both ways wherever
 the two differ, and label which grouping any drafted number uses.
 
 Current-season games in career rates. 2026 votes are not public until count
-night, so 2026 rows behave exactly like finals rows: the game was played and the
-votes column is null. Whether they belong in a career denominator is unsettled.
+night, so how a 2026 row reads depends on which file it came from. In
+data_2026/afltables_2026.csv the votes column is null and those rows behave
+exactly like the finals rows in fitzroy_stats_all.csv. In
+predictions/game_level_2026.csv the same games are stored as zero, so .mean()
+counts them rather than dropping them. See the finals denominator rule below.
+Whether they belong in a career denominator is unsettled.
 Excluding them keeps a career rate comparable across the season but makes it
 answer a narrower question than "per game played". Including them drags every
 career rate down by however many 2026 games the player has, for no reason except
@@ -198,6 +202,13 @@ one record yields two defensible numbers: Walsh v Brisbane is 1.20 per
 vote-eligible game and 0.86 per game played, from 5 H&A meetings and 2 finals.
 Both answer "how often does he poll against Brisbane" and they disagree, so the
 denominator has to be named wherever the figure appears.
+
+Null versus zero is not consistent across files, so the denominator depends on
+which file the figure came from. fitzroy_stats_all.csv finals rows and
+data_2026/afltables_2026.csv store unscored votes as null, so .mean() drops
+them. predictions/game_level_2026.csv stores them as zero, so .mean() counts
+them and drags every career average down. Recon reads the first, the app reads
+the third. Any average votes per game figure must state which file it came from.
 
 ## Script hygiene
 

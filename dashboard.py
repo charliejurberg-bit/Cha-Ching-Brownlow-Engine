@@ -3783,7 +3783,7 @@ if _page == 'Player Profile':
   </div>
   <div class="pp-strip">
     <div class="pp-item pp-head"><div class="pp-val">{_games}</div><div class="pp-lbl">Games</div></div>
-    <div class="pp-item"><div class="pp-val">{_avg_votes:.2f}</div><div class="pp-lbl">Avg Votes</div></div>
+    <div class="pp-item"><div class="pp-val">{_avg_votes:.2f}</div><div class="pp-lbl">Avg exp votes</div></div>
     <div class="pp-item"><div class="pp-val">{_best_round_lbl}</div><div class="pp-lbl">Best Round</div></div>
     <div class="pp-item"><div class="pp-val">{_avg_poll:.1f}%</div><div class="pp-lbl">Avg Poll</div></div>
   </div>
@@ -4148,7 +4148,7 @@ if _page == 'Player Profile':
   <div class="dna-find-sentence">{_s}</div>
   <div class="dna-find-strip">
     <div class="dfs"><div class="dfs-v">{n_sub} of {n_tot}</div><div class="dfs-l">Games</div></div>
-    <div class="dfs"><div class="dfs-v">{av:.2f}</div><div class="dfs-l">Avg Votes</div></div>
+    <div class="dfs"><div class="dfs-v">{av:.2f}</div><div class="dfs-l">Avg votes polled</div></div>
     <div class="dfs"><div class="dfs-v">{_rate(tvr, n_sub)}</div><div class="dfs-l">3-Vote Rate</div></div>
   </div>
 </div>
