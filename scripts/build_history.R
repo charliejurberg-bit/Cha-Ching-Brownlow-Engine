@@ -1,3 +1,13 @@
+# Build data_history/brownlow_votes_1990_2006.csv
+#
+# Run from the repository root, not from inside scripts/:
+#   Rscript scripts/build_history.R
+# All paths in this file are repo-root-relative. Running it from
+# scripts/ will create a nested scripts/data_history/ directory.
+#
+# Output: 124,171 rows, 10 columns, UTF-8 no BOM, na = "".
+# Closed range 1990-2006. Recon-only, not read by the model pipeline.
+
 # build_history.R — builds data_history/brownlow_votes_1990_2006.csv
 # Recon-only vote history. Raw AFLTables club strings, no canonicalisation.
 # Reads nothing from the repo. Writes exactly one file, to data_history/.
