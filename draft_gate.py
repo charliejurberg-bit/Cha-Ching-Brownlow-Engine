@@ -27,10 +27,12 @@ DENOMINATOR_TYPES = {
     "unavailable",
 }
 
-# Denominators that cannot support a vote rate. A player can accrue votes only
-# in games the umpires polled, so counting every game played inflates nothing
-# and deflates the rate.
-NOT_VOTE_ELIGIBLE = {"games_played"}
+# A player accrues votes only in games the umpires polled, so a vote rate has
+# exactly two defensible bases: the vote-eligible games themselves, or the
+# meetings between the two clubs. Everything else in the enum either counts
+# games no votes were available in, or admits it does not know the count.
+VOTE_ELIGIBLE = {"vote_eligible_games", "matches_between_clubs"}
+NOT_VOTE_ELIGIBLE = DENOMINATOR_TYPES - VOTE_ELIGIBLE
 
 RATE_FIELDS = ("subject", "value", "denominator", "denominator_type", "source_file")
 
@@ -143,8 +145,8 @@ def check_superlative(draft_text, facts, draft_path):
 
 
 def check_denominator(facts, facts_text, facts_path):
-    """Every rate must say what it is a rate of, and vote rates must use a
-    vote-eligible denominator."""
+    """Every rate must say what it is a rate of, no rate may rest on an
+    unavailable denominator, and vote rates must use a vote-eligible one."""
     for i, rate in enumerate(facts.get("rates") or []):
         subject = rate.get("subject", f"rates[{i}]")
 
@@ -172,6 +174,21 @@ def check_denominator(facts, facts_text, facts_path):
                 facts_path,
             )
 
+        # 2b. An unavailable denominator is not a denominator. This fires for
+        # every rate, vote or not: if the base is unknown the rate is unknown.
+        if dtype == "unavailable":
+            lineno, line = find_in_facts(facts_text, str(dtype))
+            fail(
+                "CHECK 2b denominator unavailable",
+                f'rate "{subject}" carries denominator_type "unavailable". A '
+                f"rate cannot be printed on an unavailable denominator, because "
+                f"the figure has no base to be a rate of. State in the copy that "
+                f"the denominator is unavailable rather than publish a rate.",
+                lineno,
+                line,
+                facts_path,
+            )
+
         is_vote_rate = "vote" in f"{subject} {rate['denominator']}".lower()
         if is_vote_rate and dtype in NOT_VOTE_ELIGIBLE:
             lineno, line = find_in_facts(facts_text, str(dtype))
@@ -180,7 +197,8 @@ def check_denominator(facts, facts_text, facts_path):
                 f'rate "{subject}" is a vote rate but carries denominator_type '
                 f'"{dtype}". Vote rates require vote-eligible denominators: a '
                 f"player can only poll in games the umpires voted on, so "
-                f'"{dtype}" is the wrong base. Use "vote_eligible_games".',
+                f'"{dtype}" is the wrong base. Use one of '
+                f"{', '.join(sorted(VOTE_ELIGIBLE))}.",
                 lineno,
                 line,
                 facts_path,
