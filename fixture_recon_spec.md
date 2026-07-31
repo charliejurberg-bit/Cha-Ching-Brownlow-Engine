@@ -255,3 +255,29 @@ Footscray against Home.team = Western Bulldogs, Kangaroos against North
 Melbourne. Canonicalise both sides before comparing or check D flags every
 player at those clubs as a club change every run. In the Port Adelaide v GWS run
 it produced three false positives. Report the canonical mapping used.
+
+## Facts file, required output
+
+Every autonomous run that produces a draft must also write
+drafts/<name>.facts.json alongside it. A draft without a facts file cannot be
+posted, because draft_gate.py hard-fails on the missing sibling.
+
+Schema, which must match draft_gate.py exactly:
+
+    fixture        str
+    round          int, display round
+    source_files   list of str, every file the run read
+    rates          list of {subject, value, denominator,
+                            denominator_type, source_file}
+    ranked_tables  list of {subject, window, rows}
+
+denominator_type is one of the values in draft_gate.DENOMINATOR_TYPES. Vote
+rates may only carry vote_eligible_games or matches_between_clubs. A rate may
+never carry unavailable; where the denominator cannot be derived, state that in
+the copy instead of printing a rate.
+
+Every ranked_tables entry must state its window, including the minimum meetings
+threshold and whether the current season is included.
+
+The run ends by executing python draft_gate.py drafts/<name>.md and reporting
+the exit code. A non-zero exit is a failed run, not a warning.
