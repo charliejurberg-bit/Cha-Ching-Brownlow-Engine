@@ -452,8 +452,13 @@ Copy rules, permanent:
 - Do not round 0.01 to 0.00. It misrepresents data and undermines a checkable
   record.
 - Round number in every post.
-- Two hashtags: match-specific tag + `#Brownlow`. Link on the last tweet of a
-  thread only.
+- Two hashtags: the AFL's official match tag plus `#Brownlow`. The official
+  format is `#AFL` followed by both clubs' nickname stems, with the home club
+  first: `#AFLSunsDees`, `#AFLPowerGiants`, `#AFLBluesLions`. Do not invent an
+  abbreviation format such as `#GCvMelb`, it carries no traffic. If the official
+  tag for a fixture is not known, check the AFL's own posts rather than
+  constructing one. Non-match posts take `#AFL` plus `#Brownlow`.
+- Link on the last tweet of a thread only.
 - No paid tips language, ever.
 - Model-first framing: lead with the insight, not the statline.
 - Fewer, cleaner picks outperform speculative volume.
