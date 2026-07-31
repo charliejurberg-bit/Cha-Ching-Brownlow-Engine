@@ -7,7 +7,8 @@ Reads the draft and its sibling drafts/<name>.facts.json, then runs three
 checks. Any failure prints the offending line and exits 1. All three passing
 exits 0 with a one-line summary.
 
-    CHECK 1  superlative   a superlative claim needs a ranked table behind it
+    CHECK 1  superlative   a superlative claim needs a well-formed ranked
+                           table behind it
     CHECK 2  denominator   every rate declares what it is a rate *of*
     CHECK 3  orphan number every figure in the prose traces back to the facts
 """
@@ -35,6 +36,13 @@ VOTE_ELIGIBLE = {"vote_eligible_games", "matches_between_clubs"}
 NOT_VOTE_ELIGIBLE = DENOMINATOR_TYPES - VOTE_ELIGIBLE
 
 RATE_FIELDS = ("subject", "value", "denominator", "denominator_type", "source_file")
+
+RANKED_TABLE_FIELDS = ("subject", "window", "rows")
+
+# A superlative is a claim about a set, and one row does not establish a
+# ranking. Two is the floor the gate can defend: it cannot know the true size
+# of the set, so it must not demand more.
+MIN_RANKED_ROWS = 2
 
 SUPERLATIVES = ("only", "no other", "best", "worst", "highest", "lowest")
 
@@ -118,10 +126,98 @@ def harvest_numbers(node, sink):
 
 # ---------------------------------------------------------------- checks
 
-def check_superlative(draft_text, facts, draft_path):
+def validate_ranked_tables(ranked):
+    """Shape-check every ranked_tables entry.
+
+    Returns a list of problem strings in entry order, empty if all are sound.
+    Collects every offence rather than stopping at the first, so one run tells
+    the author everything that needs fixing.
+
+    This exists because the mere presence of a ranked table silences a
+    superlative. Before it, an entry of {} silenced the check while proving
+    nothing at all.
+    """
+    # Name the real fault before iterating. A bare string enumerates into one
+    # phantom problem per character, a bare object into one per key, and a
+    # number is not iterable at all.
+    if not isinstance(ranked, list):
+        return [
+            f"ranked_tables must be a list of table objects, got "
+            f"{type(ranked).__name__}."
+        ]
+
+    problems = []
+
+    for i, entry in enumerate(ranked):
+        where = f"ranked_tables[{i}]"
+
+        if not isinstance(entry, dict):
+            problems.append(
+                f"{where}: must be an object carrying "
+                f"{', '.join(RANKED_TABLE_FIELDS)}, got "
+                f"{type(entry).__name__}."
+            )
+            continue
+
+        # subject and window are the reviewer's only handle on what was
+        # ranked and over what period, so neither may be blank.
+        for key in ("subject", "window"):
+            if key not in entry:
+                problems.append(f'{where}: missing key "{key}".')
+            elif not isinstance(entry[key], str):
+                problems.append(
+                    f'{where}: "{key}" must be a non-empty string, got '
+                    f"{type(entry[key]).__name__}."
+                )
+            elif not entry[key].strip():
+                problems.append(f'{where}: "{key}" is an empty string.')
+
+        if "rows" not in entry:
+            problems.append(f'{where}: missing key "rows".')
+        else:
+            rows = entry["rows"]
+            if not isinstance(rows, list):
+                problems.append(
+                    f'{where}: "rows" must be a list, got '
+                    f"{type(rows).__name__}."
+                )
+            elif len(rows) < MIN_RANKED_ROWS:
+                plural = "row" if len(rows) == 1 else "rows"
+                problems.append(
+                    f'{where}: "rows" has {len(rows)} {plural}, and a ranking '
+                    f"needs at least {MIN_RANKED_ROWS}."
+                )
+
+    return problems
+
+
+def report_ranked_tables(ranked):
+    """Print what the superlative was checked against, so a reviewer can judge
+    the ranking without opening the facts file."""
+    for i, entry in enumerate(ranked):
+        rows = len(entry["rows"])
+        print(
+            f"TABLE ranked_tables[{i}]: {entry['subject']} "
+            f"| window: {entry['window']} "
+            f"| {rows} rows"
+        )
+
+
+def check_superlative(draft_text, facts, draft_path, facts_path):
     """A superlative claim is a ranking claim. Rank it or drop it."""
     ranked = facts.get("ranked_tables") or []
+
+    # Shape first: an unsound table must not be allowed to silence anything.
+    problems = validate_ranked_tables(ranked)
+    if problems:
+        fail(
+            "CHECK 1 ranked_tables shape",
+            f"malformed ranked_tables in {facts_path}:\n"
+            + "\n".join(f"        {problem}" for problem in problems),
+        )
+
     if ranked:
+        report_ranked_tables(ranked)
         return
 
     pattern = re.compile(
@@ -272,7 +368,7 @@ def main(argv):
         print(f"      {facts_path}:{exc.lineno}: {exc.msg}")
         return 1
 
-    check_superlative(draft_text, facts, draft_path)
+    check_superlative(draft_text, facts, draft_path, facts_path)
     check_denominator(facts, facts_text, facts_path)
     check_orphan_numbers(draft_text, facts, draft_path)
 
