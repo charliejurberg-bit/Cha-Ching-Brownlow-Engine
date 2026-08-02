@@ -159,15 +159,33 @@ offline CLI, imported by nothing, unreachable from the dashboard by any route.
 `betting_edge_report.py` is **not** a page — there is no "Betting Edge" page.
 
 Other docs: `CLAUDE.md`, `CLAUDE_CODE_BRIEF.md`, `fixture_recon_spec.md`,
-`draft_formats_spec.md`, `landing_spec.md`. `landing_spec.md` describes the
-Vercel landing page and **belongs in this repo**, where it is now tracked.
+`draft_formats_spec.md`. `landing_spec.md` is **not** in this repo and should not
+be added to it. It belongs to the front-end repo, below.
 
-There is no other repo. An earlier brief said this file probably belonged in one.
-`C:\Users\charl\Python\vercel\` is not a separate project: it is a second clone
-of **this** repository, with an identical root commit, and its origin URL differs
-from this one only in case, so both resolve to the same master on GitHub. That
-clone is far behind and holds nothing this one lacks. No Vercel or Next.js
-front-end source exists anywhere on this machine, only the spec.
+### Two repos and one second clone
+
+Three directories, two repositories. Confusing the three has cost two rounds of
+wrong corrections, so the layout in full:
+
+| Path | Repository | What it is |
+|---|---|---|
+| `C:\Users\charl\Python\brownlow_engine\` | `Cha-Ching-Brownlow-Engine`, root `6d08fbc` | This repo. Streamlit app, model, data pipeline. |
+| `C:\Users\charl\Python\vercel\` | the **same** repo, same root `6d08fbc` | A second clone of this repo, despite the directory name. Its origin URL differs from this one only in case, so both resolve to the same `master`. Not a separate project and holds nothing this clone lacks. |
+| `C:\Users\charl\web\cha-ching-brownlow\` | `cha-ching-brownlow`, root `165cbfa` | A **genuinely different repo**. Next.js 16.2.6 app on branch `main`, deployed to Vercel, and the live front door. `vercel.json` redirects `/app` to the Streamlit app. |
+
+`landing_spec.md` lives in that third repo, tracked since `b12873d`, blob
+`6e8aa1b`. Three files there cite it as their source of truth: `app/page.tsx`,
+`components/landing/landing-data.ts`, `components/landing/landing.module.css`.
+It was briefly cherry-picked into this repo on 2 August 2026 and reverted the
+same day.
+
+**Why the earlier claim was wrong, since the failure mode will recur.** A prior
+brief stated there was no other repo and no Next.js source anywhere on this
+machine. The search behind that claim covered `C:\Users\charl\Python\` only, and
+its result was generalised to the whole machine. The front end has never been
+under `Python\`. Before asserting that something does not exist here, search
+`C:\Users\charl\web\` as well, and state the scope searched alongside the
+finding.
 
 Debris to ignore: one-off dev scripts, duplicate snapshots (`dashboard 2.0.py`),
 five `*_debug*.html`, `grid_out.txt`, `grid_err.txt`, `.Rhistory`.
