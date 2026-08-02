@@ -21,6 +21,14 @@ accuracy_report_insample.csv
 accuracy_report_oos.csv
 betting_edge_report.csv
 
+# Owned by the cha-ching-brownlow repo (the Next.js front end at
+# C:\Users\charl\web\cha-ching-brownlow), tracked there since b12873d and cited
+# by app/page.tsx and two components. Any copy in this repo is debris. One was
+# cherry-picked in here on 2 August 2026 and reverted the same day; an earlier
+# stray copy was a corrupted paste with runaway indentation. Ignored so neither
+# happens again unnoticed.
+landing_spec.md
+
 # OS
 .DS_Store
 Thumbs.db
