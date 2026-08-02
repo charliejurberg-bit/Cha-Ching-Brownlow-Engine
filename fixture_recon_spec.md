@@ -347,6 +347,13 @@ no comment fails, a comment with no entry fails, and any superlative word
 sitting outside every scope fails, which is what forces a superlative to carry
 its depth rather than pass by being undeclared.
 
+A claim comment also attributes figures. The orphan-number check normally asks
+whether the subject of the entry carrying a figure is named nearby, but inside
+a claim's scope it accepts any figure that claim's entry carries, because the
+comment has already declared what the sentence is about. That is what lets a
+sentence cite its own window, such as the number of meetings a ranking covers,
+without repeating the player or the clubs to satisfy a name match.
+
 Sentence scope has a cost worth planning for: a claim sentence has to begin at
 the start of a line, so wrapped prose usually needs its line break moved before
 the comment can go in. Inside a tweet the comment goes inside the blockquote,

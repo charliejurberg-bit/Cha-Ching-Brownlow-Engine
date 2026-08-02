@@ -308,6 +308,26 @@ def facts_entries(facts):
     return entries
 
 
+def claim_values(facts):
+    """Every number each superlatives entry carries, keyed by claim_id.
+
+    A claim comment is an explicit statement that a sentence belongs to a claim.
+    That is stronger evidence than a capitalised word appearing in both, so a
+    figure inside a claim's scope and carried by that claim's entry is
+    attributed by declaration rather than by resemblance.
+    """
+    carried = {}
+
+    for claim in facts.get("superlatives") or []:
+        if not isinstance(claim, dict):
+            continue
+        values = set()
+        harvest_numbers(claim, values)
+        carried.setdefault(str(claim.get("claim_id", "")), set()).update(values)
+
+    return carried
+
+
 def subject_tokens(subject):
     """The words in a subject that actually name something."""
     return set(NAME_TOKEN_RE.findall(subject)) - SUBJECT_STOP_TOKENS
@@ -830,6 +850,8 @@ def check_orphan_numbers(draft_text, facts, draft_path):
     because copy names its subject once and then writes normally.
     """
     entries = facts_entries(facts)
+    scopes = claim_scopes(draft_text)
+    carried_by_claim = claim_values(facts)
 
     # The round is a fact about the fixture, not a claim needing a source, and
     # a draft cites both the AFL's number and AFLTables' raw one.
@@ -877,6 +899,16 @@ def check_orphan_numbers(draft_text, facts, draft_path):
                 line,
                 draft_path,
             )
+
+        # Attribution by declaration: the draft has said, with a claim comment,
+        # that this sentence belongs to this claim. A figure the claim carries
+        # needs no name to repeat itself inside its own scope.
+        if any(
+            start <= match.start() < end
+            and value in carried_by_claim.get(slug, ())
+            for slug, start, end in scopes
+        ):
+            continue
 
         context = attribution_context(draft_text, match.start(), match.end())
         if any(
