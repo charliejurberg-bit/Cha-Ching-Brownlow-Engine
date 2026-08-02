@@ -149,14 +149,23 @@ Also present at top level, unmentioned in earlier briefs: `fitzroy_stats_all.csv
 `brownlow_votes_2015_2025.csv`, `brownlow_predictions_2025.csv`,
 `game_level_predictions_2025.csv`, `feature_importance.csv`, `supabase_setup.sql`.
 
-Untracked working-tree analysis scripts: `accuracy_report.py`,
-`betting_edge_report.py`, plus their `*.csv` output. Both are offline CLI,
-imported by nothing, unreachable from the dashboard by any route.
+Analysis scripts `accuracy_report.py` and `betting_edge_report.py` are **both
+tracked**. `accuracy_report.py` always was; an earlier brief called it untracked
+and was wrong. Their four `*.csv` outputs are gitignored by name, since nothing
+reads them back and both scripts regenerate them from tracked inputs. Both are
+offline CLI, imported by nothing, unreachable from the dashboard by any route.
 `betting_edge_report.py` is **not** a page — there is no "Betting Edge" page.
 
 Other docs: `CLAUDE.md`, `CLAUDE_CODE_BRIEF.md`, `fixture_recon_spec.md`,
 `draft_formats_spec.md`, `landing_spec.md`. `landing_spec.md` describes the
-Vercel landing page and probably belongs in the other repo.
+Vercel landing page and **belongs in this repo**, where it is now tracked.
+
+There is no other repo. An earlier brief said this file probably belonged in one.
+`C:\Users\charl\Python\vercel\` is not a separate project: it is a second clone
+of **this** repository, with an identical root commit, and its origin URL differs
+from this one only in case, so both resolve to the same master on GitHub. That
+clone is far behind and holds nothing this one lacks. No Vercel or Next.js
+front-end source exists anywhere on this machine, only the spec.
 
 Debris to ignore: one-off dev scripts, duplicate snapshots (`dashboard 2.0.py`),
 a stale nested clone `cha-ching-brownlow-engine/`, five `*_debug*.html`,
