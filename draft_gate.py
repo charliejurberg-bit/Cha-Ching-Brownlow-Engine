@@ -15,6 +15,8 @@ exits 0 with a one-line summary.
                            entry whose subject is named alongside it
     CHECK 4  depth         a superlative declares the set it won, how far
                            clear it is, and whether its threshold was chosen
+    CHECK 5  finals        a finals decision reconciles: rows in, minus finals
+                           excluded, equals rows out
 """
 
 import json
@@ -85,6 +87,13 @@ SUPERLATIVE_FIELDS = (
 )
 
 TOP5_ROW_FIELDS = ("rank", "name", "value")
+
+# A finals decision is only checkable if the run says what it did: rows read,
+# rows dropped, rows kept. The three share whatever unit the entry counts in,
+# matches for a figure about matches, player rows for a ranking over players.
+FINALS_FIELDS = ("rows_in", "finals_excluded", "rows_out")
+
+FINALS_RE = re.compile(r"\bfinals?\b", re.IGNORECASE)
 
 # Five is the depth a reader needs to see the near misses. A smaller set shows
 # all of itself instead, because there is nothing being held back.
@@ -198,6 +207,11 @@ def numbers_in(s):
 def is_number(value):
     """A real number. Booleans are ints in Python and are not numbers here."""
     return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
+def is_integer(value):
+    """A whole number of rows. Booleans are ints in Python and are not."""
+    return isinstance(value, int) and not isinstance(value, bool)
 
 
 def harvest_numbers(node, sink):
@@ -998,6 +1012,90 @@ def check_superlative_depth(draft_text, facts, facts_text, draft_path, facts_pat
     report_superlatives(supers)
 
 
+def needs_finals_reconciliation(entry):
+    """Whether an entry has to account for what its finals filter did.
+
+    Either it rests on matches between two clubs, where a final is a match that
+    either counts or does not and the answer moves the figure, or its window
+    says something about finals, in which case a decision was taken and the
+    arithmetic behind it has to be shown.
+    """
+    if not isinstance(entry, dict):
+        return False
+    if entry.get("denominator_type") == "matches_between_clubs":
+        return True
+    window = entry.get("window")
+    return isinstance(window, str) and bool(FINALS_RE.search(window))
+
+
+def validate_finals_reconciliation(facts):
+    """Check every finals decision against its own arithmetic.
+
+    Returns a list of problem strings, empty if all reconcile. The identity
+    exists because a filter can drop rows it never meant to touch and still
+    report an honest-looking zero: a season-to-max-round map built from a file
+    that started a year late mapped 2006 to nothing, so every 2006 row compared
+    false in both directions and vanished. 24 meetings went in, 23 came out, and
+    the run reported no finals excluded. Nothing in the output was wrong on its
+    face. Only the arithmetic disagreed, and only because it was checked.
+    """
+    problems = []
+
+    for group in ("rates", "totals", "ranked_tables", "superlatives"):
+        for i, entry in enumerate(facts.get(group) or []):
+            if not needs_finals_reconciliation(entry):
+                continue
+
+            where = f"{group}[{i}]"
+
+            missing = [f for f in FINALS_FIELDS if f not in entry]
+            if missing:
+                problems.append(
+                    f"{where}: states a finals filter but does not reconcile "
+                    f"it, missing {', '.join(missing)}."
+                )
+                continue
+
+            bad = [f for f in FINALS_FIELDS if not is_integer(entry[f])]
+            if bad:
+                problems.append(
+                    f"{where}: "
+                    + ", ".join(
+                        f'"{f}" must be an integer number of rows, got '
+                        f"{type(entry[f]).__name__}"
+                        for f in bad
+                    )
+                    + "."
+                )
+                continue
+
+            rows_in, excluded, rows_out = (entry[f] for f in FINALS_FIELDS)
+            unaccounted = (rows_in - excluded) - rows_out
+            if unaccounted:
+                problems.append(
+                    f"{where}: rows_in {rows_in} minus finals_excluded "
+                    f"{excluded} is {rows_in - excluded}, but rows_out is "
+                    f"{rows_out}. {abs(unaccounted)} row(s) "
+                    f"{'left' if unaccounted > 0 else 'entered'} the population "
+                    f"without being counted as finals, which is what a silently "
+                    f"dropped season looks like."
+                )
+
+    return problems
+
+
+def check_finals_reconciliation(facts, facts_path):
+    """Finals exclusion is right for rates and wrong for counts, so a run has
+    to say which it did and prove the rows add up either way."""
+    problems = validate_finals_reconciliation(facts)
+    if problems:
+        fail(
+            "CHECK 5 finals reconciliation",
+            f"unreconciled finals filter in {facts_path}:\n"
+            + "\n".join(f"        {problem}" for problem in problems),
+        )
+
+
 # ---------------------------------------------------------------- entry
 
 def main(argv):
@@ -1052,6 +1150,7 @@ def main(argv):
     check_denominator(facts, facts_text, facts_path)
     check_orphan_numbers(draft_text, facts, draft_path)
     check_superlative_depth(draft_text, facts, facts_text, draft_path, facts_path)
+    check_finals_reconciliation(facts, facts_path)
 
     n_rates = len(facts.get("rates") or [])
     n_totals = len(facts.get("totals") or [])
@@ -1063,7 +1162,8 @@ def main(argv):
         f"{n_rates} rate(s), {n_totals} total(s), {n_tables} ranked table(s), "
         f"{n_supers} superlative(s), "
         f"{len(facts.get('source_files') or [])} source file(s); "
-        f"superlative, denominator, orphan-number and depth checks all clear."
+        f"superlative, denominator, orphan-number, depth and finals checks "
+        f"all clear."
     )
     return 0
 

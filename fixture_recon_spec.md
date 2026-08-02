@@ -302,6 +302,22 @@ total; putting one in totals would route it around every denominator check.
 Every ranked_tables entry must state its window, including the minimum meetings
 threshold and whether the current season is included.
 
+Any entry whose denominator_type is matches_between_clubs, or whose window says
+anything about finals, must also carry three integers:
+
+    rows_in          rows read for this entry before the finals filter
+    finals_excluded  rows the filter removed
+    rows_out         rows the figure was computed from
+
+and rows_in minus finals_excluded must equal rows_out. The three share whatever
+unit the entry counts in: matches for a figure about matches, player rows for a
+ranking over players. This exists because a filter can drop rows it never meant
+to touch and still report an honest zero. A season-to-max-round map built from
+fitzroy_stats_all.csv, which starts in 2007, mapped 2006 to nothing, so every
+2006 row compared false in both directions and disappeared: 24 meetings in, 23
+out, no finals reported. The arithmetic catches that whether or not the run
+understands why rows went missing.
+
 superlatives records the depth behind a superlative that ranked_tables cannot
 show: the size of the set, the gap from rank 1 to rank 2, and whether the claim
 survives the threshold being moved in both directions. top5 carries five rows,
