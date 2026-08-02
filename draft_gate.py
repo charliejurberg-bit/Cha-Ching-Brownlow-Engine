@@ -94,6 +94,18 @@ TOP5_DEPTH = 5
 # table than the one printed does not fit through.
 GAP_TOLERANCE = 0.001
 
+# <!-- claim: merrett-adelaide-best-vpg --> on the line above what it governs.
+CLAIM_COMMENT_RE = re.compile(r"<!--\s*claim:\s*([A-Za-z0-9][A-Za-z0-9_-]*)\s*-->")
+
+# A whole claim comment line, for stripping before the copy is posted.
+CLAIM_COMMENT_LINE_RE = re.compile(
+    r"[ \t]*<!--\s*claim:\s*[A-Za-z0-9][A-Za-z0-9_-]*\s*-->[ \t]*\n?"
+)
+
+# A markdown heading needs the space: "#AFLBombersCrows" is a hashtag, and a
+# blockquoted hashtag starts with ">" so it never reaches column zero anyway.
+HEADING_RE = re.compile(r"^#{1,6}\s", re.MULTILINE)
+
 YEAR_MIN, YEAR_MAX = 1990, 2026
 
 # Words that look like names and identify nobody. Every subject in the file
@@ -109,7 +121,13 @@ SUBJECT_STOP_TOKENS = {
 # clears a figure that attribution never earned. That is a false clear, and it
 # is the accepted direction of error: this check may not fail correct copy in
 # order to catch incorrect copy.
-NAME_TOKEN_RE = re.compile(r"\b[A-Z][A-Za-z'\-]{2,}\b")
+#
+# The apostrophe is deliberately outside the class. A subject reading "Jordan
+# Dawson's lowest ..." would otherwise yield the token "Dawson's", which never
+# matches prose that says "Dawson". Stopping at the apostrophe yields "Dawson"
+# from the possessive and "Brien" from "O'Brien", and both are substrings of the
+# name as the copy writes it.
+NAME_TOKEN_RE = re.compile(r"\b[A-Z][A-Za-z\-]{2,}\b")
 
 # What a ranked_tables row calls the thing it describes, in preference order.
 ROW_LABEL_KEYS = ("player", "opponent", "venue")
@@ -288,6 +306,52 @@ def heading_above(text, offset):
         start += 1
     end = text.find("\n", start)
     return text[start:end if end != -1 else len(text)]
+
+
+def claim_scopes(draft_text):
+    """Every claim comment and the span of prose it governs.
+
+    A scope opens at the end of the comment's own line and closes at the next
+    claim comment or the next markdown heading, whichever comes first, so a
+    claim can never reach past the section it was written in. The same slug may
+    appear more than once, which is how a claim reclaims prose after an
+    unrelated claim has interrupted it.
+    """
+    comments = list(CLAIM_COMMENT_RE.finditer(draft_text))
+    headings = [m.start() for m in HEADING_RE.finditer(draft_text)]
+
+    scopes = []
+    for i, comment in enumerate(comments):
+        line_end = draft_text.find("\n", comment.end())
+        start = len(draft_text) if line_end == -1 else line_end + 1
+
+        end = len(draft_text)
+        if i + 1 < len(comments):
+            end = min(end, comments[i + 1].start())
+        for heading in headings:
+            if heading >= start:
+                end = min(end, heading)
+                break
+
+        scopes.append((comment.group(1), start, max(start, end)))
+
+    return scopes
+
+
+def strip_claim_comments(text):
+    """The draft with its claim comments removed, for posting."""
+    return CLAIM_COMMENT_LINE_RE.sub("", text)
+
+
+def blank_claim_comments(text):
+    """The draft with claim comments blanked to spaces, offsets preserved.
+
+    A comment is scaffolding, not copy, and its slug must not be read as either
+    kind of claim: "merrett-adelaide-best-vpg" is not a superlative and the 10
+    in "dawson-essendon-lowest-at-10" is not a figure. Offsets survive because
+    scopes and line numbers are measured against the same text.
+    """
+    return CLAIM_COMMENT_RE.sub(lambda m: " " * len(m.group(0)), text)
 
 
 def is_table_row(line):
@@ -616,7 +680,7 @@ def check_superlative(draft_text, facts, draft_path, facts_path):
         report_ranked_tables(ranked)
         return
 
-    match = SUPERLATIVE_RE.search(draft_text)
+    match = SUPERLATIVE_RE.search(blank_claim_comments(draft_text))
     if not match:
         return
 
@@ -729,8 +793,11 @@ def check_orphan_numbers(draft_text, facts, draft_path):
         if isinstance(value, (int, float)) and not isinstance(value, bool):
             exempt.add(float(value))
 
-    # Hashtag digits are decoration, not claims — blank them before scanning.
-    scannable = HASHTAG_RE.sub(lambda m: " " * len(m.group(0)), draft_text)
+    # Hashtag digits are decoration and claim-comment digits are scaffolding.
+    # Neither is a claim, so blank both before scanning.
+    scannable = HASHTAG_RE.sub(
+        lambda m: " " * len(m.group(0)), blank_claim_comments(draft_text)
+    )
 
     for match in NUMBER_RE.finditer(scannable):
         value = float(match.group(0).replace(",", ""))
@@ -786,7 +853,7 @@ def check_orphan_numbers(draft_text, facts, draft_path):
         )
 
 
-def check_superlative_depth(draft_text, facts, facts_text, facts_path):
+def check_superlative_depth(draft_text, facts, facts_text, draft_path, facts_path):
     """A superlative is a ranking claim, and a ranking claim has a depth.
 
     CHECK 1 asks whether a ranking exists. This asks what the ranking is worth:
@@ -798,17 +865,17 @@ def check_superlative_depth(draft_text, facts, facts_text, facts_path):
     so: both the threshold and the size of the set it produced must appear in
     the prose, so the reader sees the claim was cut to shape.
 
-    claim_id is validated as a field but is not yet bound to a sentence, so a
-    draft that declares no superlatives at all still passes here. CHECK 1 owns
-    the unbacked case; this check owns the depth of what is declared.
+    claim_id binds an entry to the prose it governs. Binding runs both ways: an
+    entry with no claim comment is a claim the copy never makes, a comment with
+    no entry is a claim with no depth behind it, and a superlative token sitting
+    outside every scope is a claim nobody declared at all. That last case is why
+    omitting the superlatives field entirely no longer passes.
     """
-    if not SUPERLATIVE_RE.search(draft_text):
+    scannable = blank_claim_comments(draft_text)
+    if not SUPERLATIVE_RE.search(scannable):
         return
 
-    if "superlatives" not in facts:
-        return
-
-    supers = facts["superlatives"]
+    supers = facts.get("superlatives") or []
 
     problems = validate_superlatives(supers)
     if problems:
@@ -818,11 +885,58 @@ def check_superlative_depth(draft_text, facts, facts_text, facts_path):
             + "\n".join(f"        {problem}" for problem in problems),
         )
 
-    prose_numbers = set(numbers_in(draft_text))
+    scopes = claim_scopes(draft_text)
+    declared = [str(entry["claim_id"]) for entry in supers]
+    bound = [slug for slug, _, _ in scopes]
+
+    unbound = [slug for slug in declared if slug not in set(bound)]
+    undeclared = [slug for slug in dict.fromkeys(bound) if slug not in set(declared)]
+    if unbound or undeclared:
+        lines = [
+            f'"{slug}" is declared in the facts but never appears in the draft '
+            f"as <!-- claim: {slug} -->."
+            for slug in unbound
+        ] + [
+            f'<!-- claim: {slug} --> governs prose in the draft, but no '
+            f"superlatives entry declares that claim_id."
+            for slug in undeclared
+        ]
+        fail(
+            "CHECK 4 claim binding",
+            f"the facts and the draft disagree about which claims exist:\n"
+            + "\n".join(f"        {line}" for line in lines),
+        )
+
+    # A superlative outside every scope is the gap that used to let a draft
+    # declare no superlatives at all and pass: nothing forced the claim to
+    # carry its depth, because nothing tied the claim to the sentence.
+    for match in SUPERLATIVE_RE.finditer(scannable):
+        if any(start <= match.start() < end for _, start, end in scopes):
+            continue
+        lineno, line = line_of(draft_text, match.start())
+        fail(
+            "CHECK 4 unclaimed superlative",
+            f'superlative "{match.group(0)}" sits outside every claim scope, so '
+            f"no superlatives entry carries its depth. Open a scope above it "
+            f"with <!-- claim: slug --> and declare the matching entry.\n"
+            f"      sentence: "
+            f"{sentence_of(draft_text, match.start(), match.end())}",
+            lineno,
+            line,
+            draft_path,
+        )
 
     for i, entry in enumerate(supers):
         if not entry["threshold_chosen_to_fit"]:
             continue
+
+        # Scoped, not document-wide. A threshold printed in another section is
+        # not a disclosure to the reader of this claim.
+        slug = str(entry["claim_id"])
+        in_scope = set()
+        for scope_slug, start, end in scopes:
+            if scope_slug == slug:
+                in_scope.update(numbers_in(scannable[start:end]))
 
         undisclosed = [
             f"{label} ({value})"
@@ -830,7 +944,7 @@ def check_superlative_depth(draft_text, facts, facts_text, facts_path):
                 ("threshold", entry["threshold"]),
                 ("set_size", entry["set_size"]),
             )
-            if float(value) not in prose_numbers
+            if float(value) not in in_scope
         ]
         if not undisclosed:
             continue
@@ -839,7 +953,7 @@ def check_superlative_depth(draft_text, facts, facts_text, facts_path):
         fail(
             "CHECK 4 undisclosed threshold",
             f'superlatives[{i}] "{entry["claim_id"]}" declares '
-            f"threshold_chosen_to_fit, but the prose does not disclose "
+            f"threshold_chosen_to_fit, but its scope does not disclose "
             f"{', '.join(undisclosed)}. A superlative that holds only at a "
             f"threshold picked for it must print that threshold and the size "
             f"of the set it produced, or the reader cannot see the claim was "
@@ -855,8 +969,26 @@ def check_superlative_depth(draft_text, facts, facts_text, facts_path):
 # ---------------------------------------------------------------- entry
 
 def main(argv):
+    # Claim comments are scaffolding for the gate and must never reach a post.
+    # There is no generated draft-to-post path to hook: draft_posts.py writes
+    # drafts rather than reading them, and posting is a manual copy out of the
+    # blockquotes. So the strip is offered here, next to the thing that
+    # requires the comments in the first place.
+    if len(argv) == 3 and argv[1] == "--strip":
+        draft_path = Path(argv[2])
+        if not draft_path.is_file():
+            print(f"FAIL  draft not found: {draft_path}", file=sys.stderr)
+            return 1
+        sys.stdout.write(
+            strip_claim_comments(draft_path.read_text(encoding="utf-8"))
+        )
+        return 0
+
     if len(argv) != 2:
-        print("usage: python draft_gate.py drafts/<name>.md", file=sys.stderr)
+        print(
+            "usage: python draft_gate.py [--strip] drafts/<name>.md",
+            file=sys.stderr,
+        )
         return 2
 
     draft_path = Path(argv[1])
@@ -887,7 +1019,7 @@ def main(argv):
     check_superlative(draft_text, facts, draft_path, facts_path)
     check_denominator(facts, facts_text, facts_path)
     check_orphan_numbers(draft_text, facts, draft_path)
-    check_superlative_depth(draft_text, facts, facts_text, facts_path)
+    check_superlative_depth(draft_text, facts, facts_text, draft_path, facts_path)
 
     n_rates = len(facts.get("rates") or [])
     n_totals = len(facts.get("totals") or [])
