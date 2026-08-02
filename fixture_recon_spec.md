@@ -139,6 +139,62 @@ had never faced Port Adelaide as a Giant, which was true and meant nothing: the
 two clubs had not met since he moved. Before drafting a never or a first, check
 whether the opportunity existed.
 
+## Block 9, claim tests before drafting
+
+Block 8 asks what a player's record is. Block 9 asks whether a given sentence
+about that record is worth writing, and each item here has a gate check behind
+it that fails the draft when the answer is not carried in the facts file. Run
+these on every claim that survives the judgment pass, before it is drafted.
+
+Lettering note: 9a and 9c are unallocated. The two items below were built from
+inline specification and are referenced by letter in draft_gate.py and in the
+commit history, so the letters are kept rather than renumbered.
+
+  a. Unallocated.
+
+  b. Zero-count base rate, behind CHECK 6. For any claim that something has not
+     happened, compute four numbers before writing it: the rate the event
+     happens at, the window that rate was measured over, the number of chances
+     the player had, and the probability of observing what was observed. None
+     of never, no votes, yet to, zero, without a, drought, hasn't polled or has
+     not polled says whether the silence is surprising, and that is the only
+     question worth answering. A player who polls in one game in twenty and has
+     not polled in four meetings has done nothing at all.
+
+     Discard the claim where the probability is at or above 0.50. The record
+     predicted the silence, and the sentence is describing the base rate rather
+     than the player. Four Adelaide claims died here: Rachele at 0.93, Milera
+     at 0.90 and Fogarty at 0.78 were all more likely than not, and only
+     Rankine at 0.46 survived. The gate enforces the same line, so a claim
+     kept past it fails the draft rather than reaching a reader.
+
+     Compute the probability as (1 - base_rate) ** trials where nothing was
+     observed. Above zero, decide and state whether the figure is P(X = k) or
+     P(X <= k), because the gate will not recompute a number whose definition
+     it would have to guess.
+
+     The zero trigger does not fire on "zero-vote", which is the count label
+     the three-number rule requires of every player record. A denominator is
+     not a claim that anything is absent.
+
+  c. Unallocated.
+
+  d. Multi-club scope, behind CHECK 7. Where a player has changed clubs, split
+     the record this claim rests on by the club it was earned at, and report
+     rows, polls and votes per club. Block 8e already requires the copy to name
+     the club; this requires the facts file to carry the arithmetic, so the
+     split can be checked rather than trusted.
+
+     Jordan Dawson against Essendon is the worked case: 11 meetings, six as a
+     Sydney player with no polls and no votes, five as an Adelaide player with
+     2 polls and 3 votes. Read as an Adelaide record it is 5 meetings; read as
+     a career record it is 11. Both are true and they are different claims.
+
+     Every club in the split must be named in the window of every entry using
+     that record. A window naming only the current club describes a population
+     the figure was not computed over, which is the failure block 8e exists to
+     prevent, stated in a form the gate can check.
+
 ## Four unsettled scoping questions
 
 Career-scoped vs fixture-scoped. Block 7 currently counts every career meeting
@@ -281,6 +337,9 @@ Schema, which must match draft_gate.py exactly:
     base_rates     list of {claim_id, subject, event, base_rate,
                             base_rate_window, trials, observed_count,
                             p_observed, source_file}
+    club_splits    list of {subject, window, splits [{club, rows, polls,
+                            votes}], source_file, and optionally rows, polls
+                            and votes as totals the splits must sum to}
 
 round and raw_round are both exempt from the orphan-number check, because a
 draft cites the AFL's round number and AFLTables' raw one and neither is a
@@ -398,6 +457,38 @@ inside a base rate claim can cite the entry's own figures. That is what lets a
 sentence say "no votes against Essendon in 6 meetings" without the 6 orphaning
 under the attribution check, since the trial count the claim rests on is
 carried by the entry making the claim.
+
+club_splits carries a record broken across the clubs it was earned at, per
+block 9d. Any entry with more than one split binds to every ranked_tables and
+superlatives entry carrying the same subject, and every club in the split must
+appear in those entries' window strings. Where the entry declares a total for
+rows, polls or votes the splits must sum to it, each total optional and each
+one present checked, so a split can reconcile the meetings it is sure of
+without inventing a vote count it never derived. It is the identity CHECK 5
+applies to a finals filter, aimed at the other way a population goes missing: a
+career record loses a club silently, and what remains still looks complete
+because nothing in it says what it is a part of.
+
+Subjects bind exactly. A club_splits entry reaches a ranked_tables or
+superlatives entry only when the two subject strings are identical character
+for character, so two entries about one thing must carry one string. Matching
+on name tokens instead would reach further by guessing which entries are about
+the same subject. Making the strings agree removes the guess, and a subject
+that has to be guessed at is the defect, not the matcher.
+
+That rule is a convention on the author and is not enforced. Nothing fails a
+run whose subjects drift apart; the binding simply does not happen, and a
+check that would have fired stays silent. Note the failure mode before relying
+on it: the two Jordan Dawson entries in the Essendon v Adelaide facts read
+"... by opponent" and "... lowest ... against any opponent", and no split
+reached either until they were reconciled to one string.
+
+Do not try to enforce this by comparing the name tokens in two subjects. Every
+figure about one player shares that player's tokens, and a facts file holds
+many: a game count, a poll count, a vote count, a rate and two tables all read
+as Zach Merrett. Across the Essendon v Adelaide facts the rule would flag 25 of
+30 subjects, nearly all of them measuring genuinely different things. Same
+player is not same subject.
 
 Sentence scope has a cost worth planning for: a claim sentence has to begin at
 the start of a line, so wrapped prose usually needs its line break moved before

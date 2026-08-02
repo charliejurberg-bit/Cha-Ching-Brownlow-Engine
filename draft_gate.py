@@ -19,6 +19,8 @@ exits 0 with a one-line summary.
                            excluded, equals rows out
     CHECK 6  base rate     a claim that something has not happened carries the
                            odds that it would not have, and clears the ceiling
+    CHECK 7  multi-club    a record split across clubs names every one of them
+                           in the window of every entry that uses it
 """
 
 import json
@@ -156,6 +158,14 @@ P_OBSERVED_CEILING = 0.50
 # trial counts, so a p_observed computed over a different number of meetings
 # than the entry declares does not fit through.
 P_OBSERVED_TOLERANCE = 0.005
+
+CLUB_SPLIT_FIELDS = ("subject", "window", "splits", "source_file")
+
+SPLIT_ROW_FIELDS = ("club", "rows", "polls", "votes")
+
+# Totals a club_splits entry may declare for itself. Each is optional, and each
+# one present is an arithmetic claim the splits have to satisfy.
+SPLIT_TOTAL_FIELDS = ("rows", "polls", "votes")
 
 # Five is the depth a reader needs to see the near misses. A smaller set shows
 # all of itself instead, because there is nothing being held back.
@@ -1403,6 +1413,203 @@ def check_base_rate(draft_text, facts, facts_text, draft_path, facts_path):
     report_base_rates(rates)
 
 
+def validate_club_splits(entries):
+    """Shape-check every club_splits entry and reconcile its splits.
+
+    Returns a list of problem strings in entry order, empty if all are sound.
+
+    Where the entry declares a total for rows, polls or votes, the splits must
+    sum to it. This is the identity CHECK 5 applies to a finals filter, aimed
+    at the other way a population goes missing: a career record broken across
+    clubs loses a club silently, and the remaining split still looks like a
+    complete record because nothing in it says what it is a part of. Each total
+    is optional and each one present is checked, so an entry can reconcile the
+    meetings it is sure of without inventing a vote count it never derived.
+    """
+    if not isinstance(entries, list):
+        return [
+            f"club_splits must be a list of split objects, got "
+            f"{type(entries).__name__}."
+        ]
+
+    problems = []
+
+    for i, entry in enumerate(entries):
+        where = f"club_splits[{i}]"
+
+        if not isinstance(entry, dict):
+            problems.append(
+                f"{where}: must be an object carrying "
+                f"{', '.join(CLUB_SPLIT_FIELDS)}, got {type(entry).__name__}."
+            )
+            continue
+
+        missing = [
+            f
+            for f in CLUB_SPLIT_FIELDS
+            if f not in entry
+            or entry[f] is None
+            or (isinstance(entry[f], str) and not entry[f].strip())
+        ]
+        if missing:
+            problems.append(
+                f"{where}: missing or empty required field(s): "
+                f"{', '.join(missing)}."
+            )
+
+        splits = entry.get("splits")
+        if not isinstance(splits, list):
+            if "splits" in entry:
+                problems.append(
+                    f'{where}: "splits" must be a list of per-club objects, '
+                    f"got {type(splits).__name__}."
+                )
+            continue
+
+        if not splits:
+            problems.append(
+                f'{where}: "splits" is empty. A club split with no clubs in it '
+                f"is not a split."
+            )
+            continue
+
+        sound = True
+        for j, split in enumerate(splits):
+            if not isinstance(split, dict):
+                problems.append(
+                    f"{where}: splits[{j}] must be an object carrying "
+                    f"{', '.join(SPLIT_ROW_FIELDS)}, got "
+                    f"{type(split).__name__}."
+                )
+                sound = False
+                continue
+
+            split_missing = [
+                f
+                for f in SPLIT_ROW_FIELDS
+                if f not in split
+                or split[f] is None
+                or (isinstance(split[f], str) and not split[f].strip())
+            ]
+            if split_missing:
+                problems.append(
+                    f"{where}: splits[{j}] missing or empty field(s): "
+                    f"{', '.join(split_missing)}."
+                )
+                sound = False
+
+            for key in ("rows", "polls", "votes"):
+                if key in split and not is_integer(split[key]):
+                    problems.append(
+                        f'{where}: splits[{j}] "{key}" must be a whole count, '
+                        f"got {type(split[key]).__name__}."
+                    )
+                    sound = False
+
+        if not sound:
+            continue
+
+        for key in SPLIT_TOTAL_FIELDS:
+            if key not in entry:
+                continue
+            if not is_integer(entry[key]):
+                problems.append(
+                    f'{where}: "{key}" must be a whole count, got '
+                    f"{type(entry[key]).__name__}."
+                )
+                continue
+            summed = sum(split[key] for split in splits)
+            if summed != entry[key]:
+                clubs = ", ".join(
+                    f"{split['club']} {split[key]}" for split in splits
+                )
+                problems.append(
+                    f'{where}: "{key}" is {entry[key]}, but the splits sum to '
+                    f"{summed} ({clubs}). A split that does not add up to its "
+                    f"own total has lost a club or double-counted one."
+                )
+
+    return problems
+
+
+def report_club_splits(entries):
+    """Print each club split, so a reviewer can see a career record broken
+    across clubs without opening the facts file."""
+    for i, entry in enumerate(entries):
+        shown = " | ".join(
+            f"{split['club']}: {split['rows']} rows, {split['polls']} polls, "
+            f"{split['votes']} votes"
+            for split in entry["splits"]
+        )
+        print(f"SPLIT club_splits[{i}]: {entry['subject']} | {shown}")
+
+
+def check_club_scope(facts, facts_text, facts_path):
+    """A record earned at two clubs has to say so wherever it is used.
+
+    A player who changed clubs carries a career record assembled from both, and
+    a window that names only the current club describes a different population
+    than the figure was computed over. The record is still true and still
+    usable; what it cannot do is appear under a window that quietly excludes
+    half of where it came from.
+
+    So any subject split across more than one club must have every one of those
+    clubs named in the window of every ranked_tables and superlatives entry
+    sharing that subject. Subjects are matched exactly, because a subject
+    string is the entry's own name for what it is about and a near match is a
+    different claim.
+    """
+    entries = facts.get("club_splits") or []
+    if not entries:
+        return
+
+    problems = validate_club_splits(entries)
+    if problems:
+        fail(
+            "CHECK 7 club splits",
+            f"malformed club_splits in {facts_path}:\n"
+            + "\n".join(f"        {problem}" for problem in problems),
+        )
+
+    for entry in entries:
+        splits = entry["splits"]
+        if len(splits) < 2:
+            continue
+
+        subject = str(entry["subject"])
+        clubs = [str(split["club"]) for split in splits]
+
+        for group in ("ranked_tables", "superlatives"):
+            for i, other in enumerate(facts.get(group) or []):
+                if not isinstance(other, dict):
+                    continue
+                if str(other.get("subject", "")) != subject:
+                    continue
+
+                window = str(other.get("window") or "")
+                unnamed = [c for c in clubs if c.lower() not in window.lower()]
+                if not unnamed:
+                    continue
+
+                lineno, line = find_in_facts(facts_text, subject)
+                fail(
+                    "CHECK 7 multi-club scope",
+                    f'"{subject}" is split across '
+                    f"{', '.join(clubs)}, but {group}[{i}] states a window "
+                    f"that never names {', '.join(unnamed)}. A record earned "
+                    f"at more than one club is still true and still usable, "
+                    f"and the window has to say where it came from or the "
+                    f"entry describes a population the figure was not "
+                    f"computed over.\n"
+                    f"      window: {window}",
+                    lineno,
+                    line,
+                    facts_path,
+                )
+
+    report_club_splits(entries)
+
+
 # ---------------------------------------------------------------- entry
 
 def main(argv):
@@ -1459,6 +1666,7 @@ def main(argv):
     check_superlative_depth(draft_text, facts, facts_text, draft_path, facts_path)
     check_finals_reconciliation(facts, facts_path)
     check_base_rate(draft_text, facts, facts_text, draft_path, facts_path)
+    check_club_scope(facts, facts_text, facts_path)
 
     n_rates = len(facts.get("rates") or [])
     n_totals = len(facts.get("totals") or [])
@@ -1470,8 +1678,8 @@ def main(argv):
         f"{n_rates} rate(s), {n_totals} total(s), {n_tables} ranked table(s), "
         f"{n_supers} superlative(s), "
         f"{len(facts.get('source_files') or [])} source file(s); "
-        f"superlative, denominator, orphan-number, depth, finals and "
-        f"base-rate checks all clear."
+        f"superlative, denominator, orphan-number, depth, finals, base-rate "
+        f"and club-scope checks all clear."
     )
     return 0
 

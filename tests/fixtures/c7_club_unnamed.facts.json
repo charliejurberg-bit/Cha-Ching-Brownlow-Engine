@@ -1,0 +1,50 @@
+{
+  "fixture": "Essendon v Adelaide, Marvel Stadium",
+  "round": 21,
+  "raw_round": 22,
+  "source_files": [
+    "fitzroy_stats_all.csv"
+  ],
+  "club_splits": [
+    {
+      "subject": "Jordan Dawson career votes per vote-eligible game against Essendon",
+      "window": "career home and away meetings with Essendon, 2018-2025",
+      "rows": 11,
+      "polls": 2,
+      "votes": 3,
+      "splits": [
+        {
+          "club": "Sydney",
+          "rows": 6,
+          "polls": 0,
+          "votes": 0
+        },
+        {
+          "club": "Adelaide",
+          "rows": 5,
+          "polls": 2,
+          "votes": 3
+        }
+      ],
+      "source_file": "fitzroy_stats_all.csv"
+    }
+  ],
+  "ranked_tables": [
+    {
+      "subject": "Jordan Dawson career votes per vote-eligible game against Essendon",
+      "window": "career home and away games 2017-2025, Adelaide only, current season 2026 excluded",
+      "rows": [
+        {
+          "opponent": "Essendon",
+          "meetings": 11,
+          "votes_per_game": 0.27
+        },
+        {
+          "opponent": "Collingwood",
+          "meetings": 12,
+          "votes_per_game": 0.33
+        }
+      ]
+    }
+  ]
+}
