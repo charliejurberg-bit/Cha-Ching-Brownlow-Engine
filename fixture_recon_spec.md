@@ -321,6 +321,10 @@ fitzroy_stats_all.csv, which starts in 2007, mapped 2006 to nothing, so every
 out, no finals reported. The arithmetic catches that whether or not the run
 understands why rows went missing.
 
+Commit order note, recorded not fixed: 5ef1fcb landed this check before acac6a0
+landed the CHECK 3 claim attribution, so a checkout of 5ef1fcb fails on any
+draft citing a figure attributed by declaration.
+
 superlatives records the depth behind a superlative that ranked_tables cannot
 show: the size of the set, the gap from rank 1 to rank 2, and whether the claim
 survives the threshold being moved in both directions. top5 carries five rows,
