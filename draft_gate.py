@@ -11,7 +11,8 @@ exits 0 with a one-line summary.
                            table behind it
     CHECK 2  denominator   every rate declares what it is a rate *of*, and no
                            total smuggles a denominator in
-    CHECK 3  orphan number every figure in the prose traces back to the facts
+    CHECK 3  attribution   every figure in the prose traces back to a facts
+                           entry whose subject is named alongside it
 """
 
 import json
@@ -54,6 +55,24 @@ MIN_RANKED_ROWS = 2
 SUPERLATIVES = ("only", "no other", "best", "worst", "highest", "lowest")
 
 YEAR_MIN, YEAR_MAX = 1990, 2026
+
+# Words that look like names and identify nobody. Every subject in the file
+# carries some of them ("Zach Merrett career Brownlow votes per game"), so a
+# match on one would attribute a figure to any entry at all.
+SUBJECT_STOP_TOKENS = {
+    "Brownlow", "AFL", "Round", "Votes", "Vote", "Exp", "Medal", "Total", "Avg",
+}
+
+# A capitalised word of three or more characters, which is how a subject names
+# the thing it is about: a player, a club, a venue. Sentence-initial capitals
+# can match one of these by accident, and so can a stray heading word, which
+# clears a figure that attribution never earned. That is a false clear, and it
+# is the accepted direction of error: this check may not fail correct copy in
+# order to catch incorrect copy.
+NAME_TOKEN_RE = re.compile(r"\b[A-Z][A-Za-z'\-]{2,}\b")
+
+# What a ranked_tables row calls the thing it describes, in preference order.
+ROW_LABEL_KEYS = ("player", "opponent", "venue")
 
 # 1,200 / 17 / 1.20 — commas grouped, optional decimal tail.
 NUMBER_RE = re.compile(r"\d+(?:,\d{3})*(?:\.\d+)?")
@@ -129,6 +148,103 @@ def harvest_numbers(node, sink):
     elif isinstance(node, list):
         for item in node:
             harvest_numbers(item, sink)
+
+
+def facts_entries(facts):
+    """Every attributable entry in the facts file, as (label, subject, values).
+
+    One entry per rate, per total, per ranked table header, and one per ranked
+    table row. A row's values belong to the row alone and are not folded into
+    the parent table, so a figure traces to the line it came from rather than
+    to the whole table.
+    """
+    entries = []
+
+    for i, rate in enumerate(facts.get("rates") or []):
+        values = set()
+        harvest_numbers(rate, values)
+        subject = rate.get("subject", "") if isinstance(rate, dict) else ""
+        entries.append((f"rates[{i}]", str(subject), values))
+
+    for i, total in enumerate(facts.get("totals") or []):
+        values = set()
+        harvest_numbers(total, values)
+        subject = total.get("subject", "") if isinstance(total, dict) else ""
+        entries.append((f"totals[{i}]", str(subject), values))
+
+    for i, table in enumerate(facts.get("ranked_tables") or []):
+        if not isinstance(table, dict):
+            continue
+
+        subject = str(table.get("subject", ""))
+        header = {k: v for k, v in table.items() if k != "rows"}
+        values = set()
+        harvest_numbers(header, values)
+        entries.append((f"ranked_tables[{i}]", subject, values))
+
+        rows = table.get("rows")
+        if not isinstance(rows, list):
+            continue
+
+        for j, row in enumerate(rows):
+            values = set()
+            harvest_numbers(row, values)
+            label = ""
+            if isinstance(row, dict):
+                for key in ROW_LABEL_KEYS:
+                    if key in row:
+                        label = str(row[key])
+                        break
+            entries.append((
+                f"ranked_tables[{i}].rows[{j}]",
+                f"{label} {subject}".strip(),
+                values,
+            ))
+
+    return entries
+
+
+def subject_tokens(subject):
+    """The words in a subject that actually name something."""
+    return set(NAME_TOKEN_RE.findall(subject)) - SUBJECT_STOP_TOKENS
+
+
+def heading_above(text, offset):
+    """The nearest markdown heading at or before an offset, without its newline."""
+    start = text.rfind("\n#", 0, offset)
+    if start == -1:
+        if not text.startswith("#"):
+            return ""
+        start = 0
+    else:
+        start += 1
+    end = text.find("\n", start)
+    return text[start:end if end != -1 else len(text)]
+
+
+def attribution_context(text, start, end):
+    """The text a figure's subject has to appear in for it to be attributed.
+
+    A markdown table row is matched against its own line and nothing else. The
+    row label sits on that line, so attribution inside a table is exact and a
+    figure swapped between two rows of one table is caught.
+
+    Prose is matched against the sentence plus the nearest heading above it,
+    because copy names its subject in the section header and does not repeat it
+    in every sentence.
+    """
+    _, line = line_of(text, start)
+    if line.lstrip().startswith("|"):
+        return line
+    return f"{sentence_of(text, start, end)}\n{heading_above(text, start)}"
+
+
+def name_carriers(carriers):
+    """Name the entries that hold a value, for a failure message."""
+    subjects = [subject for _, subject, _ in carriers]
+    if len(subjects) <= 3:
+        return "; ".join(subjects)
+    return f"{subjects[0]}; and {len(subjects) - 1} others"
 
 
 # ---------------------------------------------------------------- checks
@@ -373,14 +489,30 @@ def check_denominator(facts, facts_text, facts_path):
 
 
 def check_orphan_numbers(draft_text, facts, draft_path):
-    """Every figure in the prose must trace back to the facts file, the round,
-    a hashtag, or be a plain year."""
-    sourced = set()
-    harvest_numbers(facts, sourced)
+    """Every figure in the prose must trace back to a facts entry whose subject
+    is named alongside it, not merely to a value sitting somewhere in the file.
 
-    rnd = facts.get("round")
-    if isinstance(rnd, (int, float)) and not isinstance(rnd, bool):
-        sourced.add(float(rnd))
+    The guarantee this gives is deliberately uneven.
+
+    A table row is strong. It is matched against its own line, where the row
+    label lives, so a figure swapped between two rows of the same table fails.
+
+    Prose is weak. It is matched against the sentence plus the nearest heading,
+    so a name in a heading clears every number underneath it: a "Supporting
+    figures." paragraph listing twenty figures is attributed by its section
+    header alone. That laundering path is deliberate. Requiring the subject in
+    the sentence itself failed 22 correct figures on an already-verified draft,
+    because copy names its subject once and then writes normally.
+    """
+    entries = facts_entries(facts)
+
+    # The round is a fact about the fixture, not a claim needing a source, and
+    # a draft cites both the AFL's number and AFLTables' raw one.
+    exempt = set()
+    for key in ("round", "raw_round"):
+        value = facts.get(key)
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            exempt.add(float(value))
 
     # Hashtag digits are decoration, not claims — blank them before scanning.
     scannable = HASHTAG_RE.sub(lambda m: " " * len(m.group(0)), draft_text)
@@ -388,19 +520,42 @@ def check_orphan_numbers(draft_text, facts, draft_path):
     for match in NUMBER_RE.finditer(scannable):
         value = float(match.group(0).replace(",", ""))
 
-        if value in sourced:
+        if value in exempt:
             continue
         if value.is_integer() and YEAR_MIN <= value <= YEAR_MAX:
             continue
 
         lineno, line = line_of(draft_text, match.start())
         sentence = sentence_of(draft_text, match.start(), match.end())
+        carriers = [e for e in entries if value in e[2]]
+
+        if not carriers:
+            fail(
+                "CHECK 3 orphan numbers",
+                f'unsourced figure "{match.group(0)}": not a value in the facts '
+                f"file, not the round, not in a hashtag, not a year "
+                f"{YEAR_MIN}-{YEAR_MAX}.\n"
+                f"      sentence: {sentence}",
+                lineno,
+                line,
+                draft_path,
+            )
+
+        context = attribution_context(draft_text, match.start(), match.end())
+        if any(
+            token in context
+            for _, subject, _ in carriers
+            for token in subject_tokens(subject)
+        ):
+            continue
+
         fail(
-            "CHECK 3 orphan numbers",
-            f'unsourced figure "{match.group(0)}": not a value in the facts '
-            f"file, not the round, not in a hashtag, not a year "
-            f"{YEAR_MIN}-{YEAR_MAX}.\n"
-            f"      sentence: {sentence}",
+            "CHECK 3 misattributed number",
+            f'figure "{match.group(0)}" is in the facts file, but nothing here '
+            f"names what it belongs to. A value existing somewhere in the facts "
+            f"is not a source for the sentence it was printed in.\n"
+            f"      sentence: {sentence}\n"
+            f"      carried by: {name_carriers(carriers)}",
             lineno,
             line,
             draft_path,

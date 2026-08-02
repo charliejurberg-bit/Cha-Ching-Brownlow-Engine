@@ -266,11 +266,16 @@ Schema, which must match draft_gate.py exactly:
 
     fixture        str
     round          int, display round
+    raw_round      int, the AFLTables round number, one ahead of display
     source_files   list of str, every file the run read
     rates          list of {subject, value, denominator,
                             denominator_type, source_file}
     totals         list of {subject, value, source_file}
     ranked_tables  list of {subject, window, rows}
+
+round and raw_round are both exempt from the orphan-number check, because a
+draft cites the AFL's round number and AFLTables' raw one and neither is a
+claim about a player. Carry raw_round even when the copy never prints it.
 
 denominator_type is one of the values in draft_gate.DENOMINATOR_TYPES. Vote
 rates may only carry vote_eligible_games or matches_between_clubs. A rate may
