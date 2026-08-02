@@ -1,0 +1,25 @@
+{
+  "fixture": "Essendon v Adelaide, Marvel Stadium",
+  "round": 21,
+  "raw_round": 22,
+  "source_files": [
+    "fitzroy_stats_all.csv"
+  ],
+  "totals": [
+    {
+      "subject": "Zach Merrett career vote-eligible home and away games, 2014-2025",
+      "value": 241,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Zach Merrett career vote-eligible home and away games polled in, 2014-2025",
+      "value": 74,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Zach Merrett career Brownlow votes, vote-eligible home and away games 2014-2025",
+      "value": 168,
+      "source_file": "fitzroy_stats_all.csv"
+    }
+  ]
+}

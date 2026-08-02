@@ -1,0 +1,20 @@
+{
+  "fixture": "Essendon v Adelaide, Marvel Stadium",
+  "round": 21,
+  "raw_round": 22,
+  "source_files": [
+    "fitzroy_stats_all.csv"
+  ],
+  "totals": [
+    {
+      "subject": "Zach Merrett's career Brownlow votes",
+      "value": 168,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Zach Merrett career Brownlow votes",
+      "value": 168,
+      "source_file": "fitzroy_stats_all.csv"
+    }
+  ]
+}

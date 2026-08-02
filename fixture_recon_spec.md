@@ -476,19 +476,25 @@ on name tokens instead would reach further by guessing which entries are about
 the same subject. Making the strings agree removes the guess, and a subject
 that has to be guessed at is the defect, not the matcher.
 
-That rule is a convention on the author and is not enforced. Nothing fails a
-run whose subjects drift apart; the binding simply does not happen, and a
-check that would have fired stays silent. Note the failure mode before relying
-on it: the two Jordan Dawson entries in the Essendon v Adelaide facts read
-"... by opponent" and "... lowest ... against any opponent", and no split
-reached either until they were reconciled to one string.
+CHECK 8 enforces that rule, and it has to, because drift fails nothing on its
+own: the binding simply does not happen, and a check that would have fired
+stays silent. Catching the missed binding is not possible, since a binding that
+never happened leaves no evidence, so the gate catches the drift instead. The
+two Jordan Dawson entries are the case it was written from: they read "... by
+opponent" and "... lowest ... against any opponent", and no split reached
+either until they were reconciled to one string.
 
-Do not try to enforce this by comparing the name tokens in two subjects. Every
+It compares normalised subjects, not name tokens. Normalising means lowercased,
+possessives dropped, punctuation replaced by a space and whitespace collapsed,
+so "Zach Merrett's career Brownlow votes" and "Zach Merrett career Brownlow
+votes" are caught as one subject spelled two ways.
+
+Do not replace this with a comparison of the names in two subjects. Every
 figure about one player shares that player's tokens, and a facts file holds
 many: a game count, a poll count, a vote count, a rate and two tables all read
-as Zach Merrett. Across the Essendon v Adelaide facts the rule would flag 25 of
-30 subjects, nearly all of them measuring genuinely different things. Same
-player is not same subject.
+as Zach Merrett. Across the Essendon v Adelaide facts that rule flags 25 of 30
+subjects, nearly all measuring genuinely different things. Same player is not
+same subject.
 
 Sentence scope has a cost worth planning for: a claim sentence has to begin at
 the start of a line, so wrapped prose usually needs its line break moved before

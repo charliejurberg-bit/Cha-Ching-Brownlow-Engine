@@ -21,6 +21,8 @@ exits 0 with a one-line summary.
                            odds that it would not have, and clears the ceiling
     CHECK 7  multi-club    a record split across clubs names every one of them
                            in the window of every entry that uses it
+    CHECK 8  subject drift two spellings of one subject, which bind as two
+                           different subjects and silently reach nothing
 """
 
 import json
@@ -166,6 +168,27 @@ SPLIT_ROW_FIELDS = ("club", "rows", "polls", "votes")
 # Totals a club_splits entry may declare for itself. Each is optional, and each
 # one present is an arithmetic claim the splits have to satisfy.
 SPLIT_TOTAL_FIELDS = ("rows", "polls", "votes")
+
+# Every group that names what its entries are about. A subject in any of them
+# binds by exact string, so all of them are compared against each other.
+SUBJECT_GROUPS = (
+    "rates",
+    "totals",
+    "ranked_tables",
+    "superlatives",
+    "base_rates",
+    "club_splits",
+)
+
+# Possessives go before punctuation, or the apostrophe is stripped first and
+# "Dawson's" normalises to "dawsons" instead of "dawson".
+POSSESSIVE_RE = re.compile(r"['’]s\b")
+
+# Punctuation becomes a space rather than nothing, so "2014-2025" normalises to
+# two numbers rather than one, and "vote-eligible" agrees with "vote eligible".
+PUNCTUATION_RE = re.compile(r"[^\w\s]")
+
+WHITESPACE_RE = re.compile(r"\s+")
 
 # Five is the depth a reader needs to see the near misses. A smaller set shows
 # all of itself instead, because there is nothing being held back.
@@ -1610,6 +1633,80 @@ def check_club_scope(facts, facts_text, facts_path):
     report_club_splits(entries)
 
 
+def normalise_subject(subject):
+    """A subject reduced to the form two spellings of one subject share.
+
+    Lowercased, possessives dropped, punctuation replaced by a space, runs of
+    whitespace collapsed. Punctuation becomes a space rather than nothing so
+    that "vote-eligible" and "vote eligible" agree while "2014-2025" stays two
+    numbers.
+    """
+    text = POSSESSIVE_RE.sub("", subject.lower())
+    text = PUNCTUATION_RE.sub(" ", text)
+    return WHITESPACE_RE.sub(" ", text).strip()
+
+
+def harvest_subjects(facts):
+    """Every subject string in the facts file, as (label, subject)."""
+    found = []
+
+    for group in SUBJECT_GROUPS:
+        for i, entry in enumerate(facts.get(group) or []):
+            if not isinstance(entry, dict):
+                continue
+            subject = entry.get("subject")
+            if isinstance(subject, str) and subject.strip():
+                found.append((f"{group}[{i}]", subject))
+
+    return found
+
+
+def check_subject_drift(facts, facts_text, facts_path):
+    """Two spellings of one subject are a defect, because subjects bind exactly.
+
+    CHECK 7 reaches a ranked_tables or superlatives entry only when its subject
+    matches a club_splits subject character for character. Drift therefore does
+    not fail anything on its own: the binding silently does not happen and a
+    check that would have fired stays quiet. This catches the drift instead of
+    the missed binding, because a missed binding leaves no evidence.
+
+    Normalisation, not name tokens. Comparing the names in two subjects reaches
+    further by guessing which entries are about the same thing, and the guess is
+    wrong far more often than it is right: across the Essendon v Adelaide facts
+    that rule flags 25 of 30 subjects. Six of them are Zach Merrett's, and they
+    are a game count, a poll count, a vote count, a rate and two tables, which
+    are six quantities that must differ as strings because they measure
+    different things. Same player is not same subject. Normalising instead
+    compares what the author actually wrote, so it fires only where two
+    spellings really do denote one subject.
+    """
+    seen = {}
+
+    for label, subject in harvest_subjects(facts):
+        seen.setdefault(normalise_subject(subject), []).append((label, subject))
+
+    for carriers in seen.values():
+        spellings = list(dict.fromkeys(subject for _, subject in carriers))
+        if len(spellings) < 2:
+            continue
+
+        written = "\n".join(
+            f'        {label}: "{subject}"' for label, subject in carriers
+        )
+        lineno, line = find_in_facts(facts_text, spellings[0])
+        fail(
+            "CHECK 8 subject drift",
+            f"{len(spellings)} spellings of one subject. Subjects bind "
+            f"exactly, so these entries read as different subjects and no "
+            f"club_splits entry can reach more than one of them. Pick one "
+            f"string and use it in every entry about this subject.\n"
+            + written,
+            lineno,
+            line,
+            facts_path,
+        )
+
+
 # ---------------------------------------------------------------- entry
 
 def main(argv):
@@ -1667,6 +1764,7 @@ def main(argv):
     check_finals_reconciliation(facts, facts_path)
     check_base_rate(draft_text, facts, facts_text, draft_path, facts_path)
     check_club_scope(facts, facts_text, facts_path)
+    check_subject_drift(facts, facts_text, facts_path)
 
     n_rates = len(facts.get("rates") or [])
     n_totals = len(facts.get("totals") or [])
@@ -1678,8 +1776,8 @@ def main(argv):
         f"{n_rates} rate(s), {n_totals} total(s), {n_tables} ranked table(s), "
         f"{n_supers} superlative(s), "
         f"{len(facts.get('source_files') or [])} source file(s); "
-        f"superlative, denominator, orphan-number, depth, finals, base-rate "
-        f"and club-scope checks all clear."
+        f"superlative, denominator, orphan-number, depth, finals, base-rate, "
+        f"club-scope and subject-drift checks all clear."
     )
     return 0
 
