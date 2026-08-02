@@ -1,0 +1,97 @@
+{
+  "fixture": "Port Adelaide v GWS, Adelaide Oval",
+  "round": 21,
+  "source_files": [
+    "fitzroy_stats_all.csv",
+    "data_history/brownlow_votes_1990_2006.csv",
+    "predictions/game_level_2026.csv"
+  ],
+  "rates": [
+    {
+      "subject": "Toby Greene meetings in the Port Adelaide v GWS fixture",
+      "value": 17,
+      "denominator": "matches between Port Adelaide and GWS since 2012",
+      "denominator_type": "matches_between_clubs",
+      "source_file": "fitzroy_stats_all.csv",
+      "rows_in": 17,
+      "finals_excluded": 0,
+      "rows_out": 17
+    }
+  ],
+  "superlatives": [
+    {
+      "claim_id": "port-gws-most-meetings",
+      "subject": "Most Port Adelaide v GWS meetings played by any player",
+      "scale": "matches played between the two clubs",
+      "window": "all 17 matches between the clubs 2012-2025, from GWS's first season to the last completed one, finals included because this counts appearances and not a rate, the clubs have not met in 2026, no minimum applied, grouped on fitzRoy player ID",
+      "threshold": 1,
+      "threshold_unit": "matches played",
+      "set_size": 184,
+      "top5": [
+        {
+          "rank": 1,
+          "name": "Toby Greene",
+          "value": 17
+        },
+        {
+          "rank": 2,
+          "name": "Travis Boak",
+          "value": 16
+        },
+        {
+          "rank": 3,
+          "name": "Callan Ward",
+          "value": 15
+        },
+        {
+          "rank": 4,
+          "name": "Ollie Wines",
+          "value": 14
+        },
+        {
+          "rank": 5,
+          "name": "Josh Kelly",
+          "value": 13
+        }
+      ],
+      "gap_to_rank_2": 1,
+      "stricter_threshold": 5,
+      "survives_stricter": true,
+      "looser_threshold": 0,
+      "survives_looser": true,
+      "at_set_ceiling": true,
+      "threshold_chosen_to_fit": false,
+      "source_file": "fitzroy_stats_all.csv",
+      "rows_in": 760,
+      "finals_excluded": 0,
+      "rows_out": 760
+    }
+  ],
+  "ranked_tables": [
+    {
+      "subject": "Most Port Adelaide v GWS meetings played",
+      "window": "all 17 matches between the clubs 2012-2025, finals included, the clubs have not met in 2026, no minimum applied",
+      "rows": [
+        {
+          "player": "Toby Greene",
+          "meetings": 17
+        },
+        {
+          "player": "Travis Boak",
+          "meetings": 16
+        },
+        {
+          "player": "Callan Ward",
+          "meetings": 15
+        },
+        {
+          "player": "Ollie Wines",
+          "meetings": 14
+        }
+      ],
+      "rows_in": 760,
+      "finals_excluded": 0,
+      "rows_out": 760
+    }
+  ]
+}

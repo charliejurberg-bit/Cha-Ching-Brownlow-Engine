@@ -1,0 +1,24 @@
+{
+  "fixture": "Essendon v Adelaide, Marvel Stadium",
+  "round": 21,
+  "raw_round": 22,
+  "source_files": [
+    "fitzroy_stats_all.csv"
+  ],
+  "ranked_tables": [
+    {
+      "subject": "Jordan Dawson career votes per game by opponent",
+      "window": "career home and away games, current season excluded",
+      "rows": [
+        {
+          "opponent": "Essendon",
+          "votes_per_game": 0.27
+        },
+        {
+          "opponent": "Collingwood",
+          "votes_per_game": 0.33
+        }
+      ]
+    }
+  ]
+}

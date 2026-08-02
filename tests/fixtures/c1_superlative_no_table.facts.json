@@ -1,0 +1,18 @@
+{
+  "fixture": "Carlton v Brisbane",
+  "round": 21,
+  "source_files": [
+    "fitzroy_stats_all.csv",
+    "predictions/game_level_2026.csv"
+  ],
+  "rates": [
+    {
+      "subject": "Sam Walsh Brownlow votes per game vs Brisbane",
+      "value": 1.20,
+      "denominator": "vote-eligible games vs Brisbane",
+      "denominator_type": "vote_eligible_games",
+      "source_file": "fitzroy_stats_all.csv"
+    }
+  ],
+  "ranked_tables": []
+}

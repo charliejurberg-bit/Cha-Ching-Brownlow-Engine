@@ -1,0 +1,41 @@
+{
+  "fixture": "Port Adelaide v GWS, Adelaide Oval",
+  "round": 21,
+  "source_files": [
+    "fitzroy_stats_all.csv",
+    "predictions/game_level_2026.csv"
+  ],
+  "rates": [
+    {
+      "subject": "Toby Greene meetings in the Port Adelaide v GWS fixture",
+      "value": 17,
+      "denominator": "matches between Port Adelaide and GWS since 2012",
+      "denominator_type": "unavailable",
+      "source_file": "fitzroy_stats_all.csv"
+    }
+  ],
+  "ranked_tables": [
+    {
+      "subject": "Most Port Adelaide v GWS meetings played",
+      "window": "2012-2026",
+      "rows": [
+        {
+          "player": "Toby Greene",
+          "meetings": 17
+        },
+        {
+          "player": "Travis Boak",
+          "meetings": 16
+        },
+        {
+          "player": "Callan Ward",
+          "meetings": 15
+        },
+        {
+          "player": "Ollie Wines",
+          "meetings": 14
+        }
+      ]
+    }
+  ]
+}

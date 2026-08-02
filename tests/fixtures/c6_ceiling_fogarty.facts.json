@@ -1,0 +1,21 @@
+{
+  "fixture": "Essendon v Adelaide, Marvel Stadium",
+  "round": 21,
+  "raw_round": 22,
+  "source_files": [
+    "fitzroy_stats_all.csv"
+  ],
+  "base_rates": [
+    {
+      "claim_id": "fogarty-essendon-drought",
+      "subject": "Darcy Fogarty",
+      "event": "polling a Brownlow vote in a home and away game",
+      "base_rate": 0.06,
+      "base_rate_window": "career home and away games, current season 2026 excluded",
+      "trials": 4,
+      "observed_count": 0,
+      "p_observed": 0.78,
+      "source_file": "fitzroy_stats_all.csv"
+    }
+  ]
+}

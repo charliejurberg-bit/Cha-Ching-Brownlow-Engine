@@ -1,0 +1,26 @@
+{
+  "fixture": "Essendon v Adelaide, Marvel Stadium",
+  "round": 21,
+  "raw_round": 22,
+  "source_files": [
+    "fitzroy_stats_all.csv"
+  ],
+  "ranked_tables": [
+    {
+      "subject": "Coaches votes leaders in the Essendon v Adelaide fixture",
+      "window": "home and away meetings 2006-2025, finals rows excluded",
+      "rows": [
+        {
+          "player": "Player A",
+          "coaches_votes": 55
+        },
+        {
+          "player": "Player B",
+          "coaches_votes": 44
+        }
+      ],
+      "rows_in": 155,
+      "rows_out": 155
+    }
+  ]
+}

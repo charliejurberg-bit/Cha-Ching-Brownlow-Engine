@@ -1,0 +1,15 @@
+{
+  "fixture": "Essendon v Adelaide, Marvel Stadium",
+  "round": 21,
+  "raw_round": 22,
+  "source_files": [
+    "fitzroy_stats_all.csv"
+  ],
+  "totals": [
+    {
+      "subject": "Zach Merrett career disposals",
+      "value": 7421,
+      "source_file": "fitzroy_stats_all.csv"
+    }
+  ]
+}

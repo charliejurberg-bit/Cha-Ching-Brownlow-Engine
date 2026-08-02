@@ -1,0 +1,54 @@
+{
+  "fixture": "Essendon v Adelaide, Marvel Stadium",
+  "round": 21,
+  "raw_round": 22,
+  "source_files": [
+    "fitzroy_stats_all.csv"
+  ],
+  "superlatives": [
+    {
+      "claim_id": "coaches-votes-most",
+      "subject": "Most coaches votes by any player in the Essendon v Adelaide fixture",
+      "scale": "coaches votes in the fixture",
+      "window": "the 24 home and away meetings from 2006 to 2025",
+      "threshold": 1,
+      "threshold_unit": "coaches votes",
+      "set_size": 91,
+      "top5": [
+        {
+          "rank": 1,
+          "name": "Player A",
+          "value": 55
+        },
+        {
+          "rank": 2,
+          "name": "Player B",
+          "value": 44
+        },
+        {
+          "rank": 3,
+          "name": "Player C",
+          "value": 39
+        },
+        {
+          "rank": 4,
+          "name": "Player D",
+          "value": 37
+        },
+        {
+          "rank": 5,
+          "name": "Player E",
+          "value": 31
+        }
+      ],
+      "gap_to_rank_2": 11,
+      "stricter_threshold": 2,
+      "survives_stricter": true,
+      "looser_threshold": 1,
+      "survives_looser": true,
+      "at_set_ceiling": false,
+      "threshold_chosen_to_fit": false,
+      "source_file": "fitzroy_stats_all.csv"
+    }
+  ]
+}

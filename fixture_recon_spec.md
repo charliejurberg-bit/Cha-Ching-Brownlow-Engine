@@ -408,3 +408,8 @@ which removes the whole line either way.
 
 The run ends by executing python draft_gate.py drafts/<name>.md and reporting
 the exit code. A non-zero exit is a failed run, not a warning.
+
+The gate's own regression suite is tests/run_gate_tests.py, which runs every
+fixture in tests/fixtures/ and compares each exit code against the one declared
+alongside it. Any change to draft_gate.py runs it, and a non-zero exit is a
+failed change, not a warning.

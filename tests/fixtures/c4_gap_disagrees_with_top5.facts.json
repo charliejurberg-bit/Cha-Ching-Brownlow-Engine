@@ -1,0 +1,72 @@
+{
+  "fixture": "Essendon v Adelaide, Marvel Stadium",
+  "round": 21,
+  "raw_round": 22,
+  "source_files": [
+    "fitzroy_stats_all.csv"
+  ],
+  "superlatives": [
+    {
+      "claim_id": "dawson-essendon-lowest",
+      "subject": "Jordan Dawson's lowest career votes per vote-eligible game against any opponent",
+      "scale": "Brownlow votes per vote-eligible home and away game",
+      "window": "career home and away games 2017-2025, current season excluded",
+      "threshold": 10,
+      "threshold_unit": "meetings",
+      "set_size": 6,
+      "top5": [
+        {
+          "rank": 1,
+          "name": "Essendon",
+          "value": 0.2727
+        },
+        {
+          "rank": 2,
+          "name": "Collingwood",
+          "value": 0.3333
+        },
+        {
+          "rank": 3,
+          "name": "Greater Western Sydney",
+          "value": 0.5
+        },
+        {
+          "rank": 4,
+          "name": "Gold Coast",
+          "value": 0.7
+        },
+        {
+          "rank": 5,
+          "name": "West Coast",
+          "value": 0.8
+        }
+      ],
+      "gap_to_rank_2": 0.5,
+      "stricter_threshold": 12,
+      "survives_stricter": true,
+      "looser_threshold": 5,
+      "survives_looser": true,
+      "at_set_ceiling": false,
+      "threshold_chosen_to_fit": false,
+      "source_file": "fitzroy_stats_all.csv"
+    }
+  ],
+  "ranked_tables": [
+    {
+      "subject": "Jordan Dawson career votes per game by opponent",
+      "window": "career home and away games 2017-2025, minimum ten meetings",
+      "rows": [
+        {
+          "opponent": "Essendon",
+          "meetings": 11,
+          "votes_per_game": 0.27
+        },
+        {
+          "opponent": "Collingwood",
+          "meetings": 12,
+          "votes_per_game": 0.33
+        }
+      ]
+    }
+  ]
+}
