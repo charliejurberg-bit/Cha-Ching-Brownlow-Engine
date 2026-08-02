@@ -1,7 +1,9 @@
 # Cha Ching — Project Brief
 
 > Do not paste full source files. Locate code by function name, never by line number.
-> Last corrected: 29 July 2026, against a full-file recon pass over the live repo.
+> Last full-file recon pass over the live repo: 29 July 2026. Last edited:
+> 2 August 2026, targeted corrections only. Nothing outside the lines those
+> corrections touched has been re-verified since 29 July.
 >
 > **This file and the Project Knowledge copy must be kept in sync.** On 29 July they
 > had diverged badly: the repo copy was several sessions stale and asserted three
@@ -168,8 +170,7 @@ clone is far behind and holds nothing this one lacks. No Vercel or Next.js
 front-end source exists anywhere on this machine, only the spec.
 
 Debris to ignore: one-off dev scripts, duplicate snapshots (`dashboard 2.0.py`),
-a stale nested clone `cha-ching-brownlow-engine/`, five `*_debug*.html`,
-`grid_out.txt`, `grid_err.txt`, `.Rhistory`.
+five `*_debug*.html`, `grid_out.txt`, `grid_err.txt`, `.Rhistory`.
 
 ## Page structure
 
