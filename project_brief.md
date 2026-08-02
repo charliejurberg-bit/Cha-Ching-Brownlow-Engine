@@ -470,21 +470,19 @@ Copy rules, permanent:
 
 ## Current priorities
 
-1. **Keep-alive GitHub Actions cron.** Workflow file exists; runs never confirmed
-   firing. Check the Actions tab. Launch blocker, outstanding four sessions.
-2. Superlative and denominator gates: a script that fails the build when a draft
+1. Superlative and denominator gates: a script that fails the build when a draft
    makes a superlative claim without a ranked table, or states a per-game rate
    without a denominator and source file.
-3. `scraper_odds.py` append-with-timestamp instead of overwrite.
-4. Remove the Streamlit landing page — Vercel is the front door.
-5. Script the deterministic post-round chain (`update.py`, `draft_posts.py`,
+2. `scraper_odds.py` append-with-timestamp instead of overwrite.
+3. Remove the Streamlit landing page — Vercel is the front door.
+4. Script the deterministic post-round chain (`update.py`, `draft_posts.py`,
    `streaks.py`) with exit-code checks, stopping on failure.
-6. Forum post and first weekly scorecard, built on the calibration table.
-7. Resolve the MAE question above.
-8. Result posts for the Mullin and Bontempelli previews. Three handovers
+5. Forum post and first weekly scorecard, built on the calibration table.
+6. Resolve the MAE question above.
+7. Result posts for the Mullin and Bontempelli previews. Three handovers
    outstanding. Previews without results are the half of the record that does not
    count.
-9. Resend SMTP wiring, once the custom domain is live.
+8. Resend SMTP wiring, once the custom domain is live.
 
 ## Known deferred, non-blocking
 
@@ -519,3 +517,12 @@ for rounds 1–19 from weekly data-update commits.
   list ranking byte-for-byte identical. No player on a 2026 list debuted before
   2007. The payoff is entirely in all-time claims; future active-player rankings
   can run on `fitzroy_stats_all.csv` alone.
+- **Keep-alive GitHub Actions cron.** Firing, and not a launch blocker. It never
+  was one. Runs 82 to 104 are all labelled Scheduled, confirming delivery since
+  at least 1 August 2026, mostly green with scattered failures. Two things to
+  know before re-raising it. GitHub delivers the cron roughly hourly rather than
+  the requested 15 minutes, because short intervals get dropped under load, so
+  the interval is a target and not a promise. The intermittent 400s are endpoint
+  flake, not a broken workflow. The ping moved off the `/~/+/` suffix to the bare
+  app URL with a cookie jar in 648c6a7, which was hardening plus header dumps on
+  failure, not a repair of a dead cron.
