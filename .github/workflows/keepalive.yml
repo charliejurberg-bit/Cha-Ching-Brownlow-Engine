@@ -10,14 +10,22 @@ on:
   workflow_dispatch:
 
 # One line to change if the app moves.
-# The /~/+/ suffix is load-bearing, not a typo. The bare app URL 303s into a
-# cookie handshake (share.streamlit.io/-/auth/app then back to /-/login) that a
-# browser completes but a plain curl cannot, so it redirect-loops to curl's cap
-# and reports 303. Not an auth wall: curl -c/-b a cookie jar and the same URL
-# lands on 200 in 3 hops. /~/+/ is the app unwrapped and answers 200 in 0 hops,
-# which is why it is here instead of the jar.
+#
+# Do not put /~/+/ back on this URL as an optimisation. That suffix used to be
+# here because it answered 200 in 0 hops and skipped the handshake below, but as
+# of 2 August 2026 it returns 400 from GitHub Actions runners while the app
+# itself is healthy. It is edge dependent, not dead: from a home connection the
+# same suffix still answered 200 in 0 hops on that date, three times running, so
+# reproducing it from a laptop proves nothing about what the runner sees. The
+# cookie jar is the mechanism now.
+#
+# Why the jar is needed at all: the bare app URL 303s into a cookie handshake
+# (share.streamlit.io/-/auth/app then back to /-/login) that a browser completes
+# but a cookie-less curl cannot, so it redirect-loops to curl's cap of 50 and
+# reports 303. Not an auth wall. Give curl -c/-b a jar and the same URL lands on
+# 200 in 3 hops, verified 2 August 2026.
 env:
-  APP_URL: https://chachingbrownlow.streamlit.app/~/+/
+  APP_URL: https://chachingbrownlow.streamlit.app/
 
 # Nothing here touches the repo, so the job gets no token scopes.
 permissions: {}
@@ -28,10 +36,23 @@ jobs:
     steps:
       - name: Ping app
         run: |
+          # -c and -b point at the same jar so cookies set on the first hop of
+          # the handshake are replayed on the next one. Headers go to a file
+          # rather than the terminal so a passing run stays one line, and a
+          # failing run can dump every hop.
+          jar=$(mktemp)
+          hdrs=$(mktemp)
           code=$(curl --silent --location --max-time 30 \
+                      --cookie-jar "$jar" --cookie "$jar" \
+                      --dump-header "$hdrs" \
                       --output /dev/null --write-out '%{http_code}' "$APP_URL")
           echo "HTTP $code from $APP_URL"
           case "$code" in
             2*) ;;
-            *) echo "Expected 2xx, got $code"; exit 1 ;;
+            *)
+              echo "Expected 2xx, got $code"
+              echo "--- response headers, all hops ---"
+              cat "$hdrs"
+              exit 1
+              ;;
           esac
