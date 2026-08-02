@@ -276,8 +276,8 @@ Schema, which must match draft_gate.py exactly:
                             threshold_unit, set_size, top5 [{rank, name,
                             value}], gap_to_rank_2, stricter_threshold,
                             survives_stricter, looser_threshold,
-                            survives_looser, threshold_chosen_to_fit,
-                            source_file}
+                            survives_looser, at_set_ceiling,
+                            threshold_chosen_to_fit, source_file}
 
 round and raw_round are both exempt from the orphan-number check, because a
 draft cites the AFL's round number and AFLTables' raw one and neither is a
@@ -312,15 +312,31 @@ finding the admission in another section. gap_to_rank_2 is checked against the f
 top5 rows and must agree with them to within 0.001, so carry top5 values at the
 precision the gap was computed at rather than at display precision.
 
+at_set_ceiling is true when rank 1 holds the maximum attainable value for the
+set rather than the highest one observed: a player who has appeared in every
+meeting the two clubs have played is at the ceiling, and no threshold can
+dislodge him. Both survival flags must then be true, and the gate says so on
+stdout, because survival proves nothing about a claim that had nowhere to fall.
+A rate is almost never at a ceiling, so it is false there.
+
 Every claim_id must appear in the draft as an HTML comment, <!-- claim: slug -->,
-on the line above the block it governs. Its scope runs to the next claim comment
-or the next markdown heading, whichever comes first, and the same slug may be
-repeated to reclaim prose after another claim has interrupted it. An entry with
+on the line immediately above the sentence it governs, not above the block that
+sentence sits in. Its scope runs from the comment to the first sentence
+terminator after it, which is ". ", "! ", "? " or a blank line. A comment covers
+a sentence pair only where no terminator falls between them; a claim that
+genuinely needs two sentences is written as two comments sharing one claim_id,
+and the scope is their union. Both the superlative scan and the threshold
+disclosure scan run against that narrowed scope. An entry with
 no comment fails, a comment with no entry fails, and any superlative word
 sitting outside every scope fails, which is what forces a superlative to carry
-its depth rather than pass by being undeclared. Strip the comments before
-posting with python draft_gate.py --strip drafts/&lt;name&gt;.md. claim_id is carried now and is not yet bound to
-a sentence, so declaring no superlatives leaves the check silent.
+its depth rather than pass by being undeclared.
+
+Sentence scope has a cost worth planning for: a claim sentence has to begin at
+the start of a line, so wrapped prose usually needs its line break moved before
+the comment can go in. Inside a tweet the comment goes inside the blockquote,
+&gt; &lt;!-- claim: slug --&gt;, or the unquoted line breaks the quote. Strip the
+comments before posting with python draft_gate.py --strip drafts/&lt;name&gt;.md,
+which removes the whole line either way.
 
 The run ends by executing python draft_gate.py drafts/<name>.md and reporting
 the exit code. A non-zero exit is a failed run, not a warning.

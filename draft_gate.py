@@ -79,6 +79,7 @@ SUPERLATIVE_FIELDS = (
     "survives_stricter",
     "looser_threshold",
     "survives_looser",
+    "at_set_ceiling",
     "threshold_chosen_to_fit",
     "source_file",
 )
@@ -97,9 +98,12 @@ GAP_TOLERANCE = 0.001
 # <!-- claim: merrett-adelaide-best-vpg --> on the line above what it governs.
 CLAIM_COMMENT_RE = re.compile(r"<!--\s*claim:\s*([A-Za-z0-9][A-Za-z0-9_-]*)\s*-->")
 
-# A whole claim comment line, for stripping before the copy is posted.
+# A whole claim comment line, for stripping before the copy is posted. The
+# optional "> " matters: a sentence-scoped claim inside a tweet needs its
+# comment inside the blockquote, or the unquoted line breaks the quote. Such a
+# comment is still a whole line and the whole line goes.
 CLAIM_COMMENT_LINE_RE = re.compile(
-    r"[ \t]*<!--\s*claim:\s*[A-Za-z0-9][A-Za-z0-9_-]*\s*-->[ \t]*\n?"
+    r"[ \t]*>?[ \t]*<!--\s*claim:\s*[A-Za-z0-9][A-Za-z0-9_-]*\s*-->[ \t]*\n?"
 )
 
 # A markdown heading needs the space: "#AFLBombersCrows" is a hashtag, and a
@@ -311,27 +315,30 @@ def heading_above(text, offset):
 def claim_scopes(draft_text):
     """Every claim comment and the span of prose it governs.
 
-    A scope opens at the end of the comment's own line and closes at the next
-    claim comment or the next markdown heading, whichever comes first, so a
-    claim can never reach past the section it was written in. The same slug may
-    appear more than once, which is how a claim reclaims prose after an
-    unrelated claim has interrupted it.
-    """
-    comments = list(CLAIM_COMMENT_RE.finditer(draft_text))
-    headings = [m.start() for m in HEADING_RE.finditer(draft_text)]
+    A scope opens at the end of the comment's own line and closes at the first
+    sentence terminator after it, so a comment governs one sentence and not the
+    section it happens to sit in. A comment therefore belongs immediately above
+    the sentence making the claim, not above the block containing it.
 
+    A claim spanning a sentence pair is covered only where no terminator falls
+    between the two, which is to say where they are really one sentence. A claim
+    that genuinely needs two sentences is written as two comments sharing a
+    claim_id, and the scope is their union: every reader of these scopes either
+    tests membership across all of them or gathers the ones matching a slug.
+    """
     scopes = []
-    for i, comment in enumerate(comments):
+
+    for comment in CLAIM_COMMENT_RE.finditer(draft_text):
         line_end = draft_text.find("\n", comment.end())
         start = len(draft_text) if line_end == -1 else line_end + 1
 
+        # The same terminators sentence_of breaks on, so a scope and a quoted
+        # sentence never disagree about where the sentence ended.
         end = len(draft_text)
-        if i + 1 < len(comments):
-            end = min(end, comments[i + 1].start())
-        for heading in headings:
-            if heading >= start:
-                end = min(end, heading)
-                break
+        for term in (". ", "! ", "? ", "\n\n"):
+            hit = draft_text.find(term, start)
+            if hit != -1:
+                end = min(end, hit + 1)
 
         scopes.append((comment.group(1), start, max(start, end)))
 
@@ -546,11 +553,29 @@ def validate_superlatives(supers):
         # A survival flag read from a string is always truthy, so "false" would
         # silently report that the claim held.
         for key in ("survives_stricter", "survives_looser",
-                    "threshold_chosen_to_fit"):
+                    "threshold_chosen_to_fit", "at_set_ceiling"):
             if key in entry and not isinstance(entry[key], bool):
                 problems.append(
                     f'{where}: "{key}" must be true or false, got '
                     f"{type(entry[key]).__name__}."
+                )
+
+        # Rank 1 at the ceiling cannot be dislodged by moving the threshold,
+        # because there is nothing above it to move to. An entry claiming the
+        # ceiling and a failed survival is describing two different rankings.
+        if entry.get("at_set_ceiling") is True:
+            broken = [
+                key
+                for key in ("survives_stricter", "survives_looser")
+                if entry.get(key) is False
+            ]
+            if broken:
+                problems.append(
+                    f"{where}: at_set_ceiling is true but "
+                    f"{' and '.join(broken)} "
+                    f"{'is' if len(broken) == 1 else 'are'} false. A rank 1 at "
+                    f"the maximum attainable value survives every threshold, so "
+                    f"either the ceiling claim or the survival flag is wrong."
                 )
 
         if "gap_to_rank_2" in entry and not is_number(entry["gap_to_rank_2"]):
@@ -649,6 +674,13 @@ def report_superlatives(supers):
             f"| set: {entry['set_size']} "
             f"| gap to rank 2: {entry['gap_to_rank_2']}"
         )
+        if entry.get("at_set_ceiling") is True:
+            print(
+                f"CEIL  superlatives[{i}]: rank 1 sits at the ceiling of the "
+                f"set, the maximum attainable value rather than the highest "
+                f"observed, so survives_stricter and survives_looser are "
+                f"trivially true and are not evidence for the claim."
+            )
 
 
 def report_ranked_tables(ranked):
