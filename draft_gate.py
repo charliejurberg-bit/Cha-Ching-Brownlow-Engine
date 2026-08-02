@@ -3,8 +3,8 @@
 Usage:
     python draft_gate.py drafts/<name>.md
 
-Reads the draft and its sibling drafts/<name>.facts.json, then runs three
-checks. Any failure prints the offending line and exits 1. All three passing
+Reads the draft and its sibling drafts/<name>.facts.json, then runs the checks
+below. Any failure prints the offending line and exits 1. All of them passing
 exits 0 with a one-line summary.
 
     CHECK 1  superlative   a superlative claim needs a well-formed ranked
@@ -17,6 +17,8 @@ exits 0 with a one-line summary.
                            clear it is, and whether its threshold was chosen
     CHECK 5  finals        a finals decision reconciles: rows in, minus finals
                            excluded, equals rows out
+    CHECK 6  base rate     a claim that something has not happened carries the
+                           odds that it would not have, and clears the ceiling
 """
 
 import json
@@ -94,6 +96,66 @@ TOP5_ROW_FIELDS = ("rank", "name", "value")
 FINALS_FIELDS = ("rows_in", "finals_excluded", "rows_out")
 
 FINALS_RE = re.compile(r"\bfinals?\b", re.IGNORECASE)
+
+# A claim that something has not happened is a claim about a probability, and
+# these are the words the copy reaches for to make one.
+ABSENCE_TOKENS = (
+    "never",
+    "no votes",
+    "yet to",
+    "zero",
+    "without a",
+    "drought",
+    "hasn't polled",
+    "has not polled",
+)
+
+# "zero-vote games" is the count label the three-number rule in the standing
+# preamble requires of every player record, and a denominator is not a claim
+# that anything is absent. The token stops short of that compound and of
+# nothing else: every other use of "zero" still triggers.
+ABSENCE_LOOKAHEAD = {"zero": r"(?![-\s]vote)"}
+
+# re.escape leaves a straight apostrophe alone, so swapping it on the escaped
+# pattern is safe and picks up the typographic form a draft carries in from a
+# word processor.
+ABSENCE_RE = re.compile(
+    "|".join(
+        r"\b"
+        + r"\s+".join(re.escape(word) for word in token.split()).replace(
+            "'", "['’]"
+        )
+        + r"\b"
+        + ABSENCE_LOOKAHEAD.get(token, "")
+        for token in ABSENCE_TOKENS
+    ),
+    re.IGNORECASE,
+)
+
+BASE_RATE_FIELDS = (
+    "claim_id",
+    "subject",
+    "event",
+    "base_rate",
+    "base_rate_window",
+    "trials",
+    "observed_count",
+    "p_observed",
+    "source_file",
+)
+
+# An absence is worth writing about when the record did not predict it. At even
+# odds the record predicted it exactly, so half is the line: at or above it the
+# silence is the most likely single outcome, and the claim is arithmetic
+# dressed as a story.
+P_OBSERVED_CEILING = 0.50
+
+# Slack between the declared probability and the one base_rate and trials
+# imply. Wide enough for a probability quoted to two decimal places, which is
+# how the copy prints it, and still far narrower than the step between adjacent
+# trial counts, so a p_observed computed over a different number of meetings
+# than the entry declares does not fit through.
+P_OBSERVED_TOLERANCE = 0.005
 
 # Five is the depth a reader needs to see the near misses. A smaller set shows
 # all of itself instead, because there is nothing being held back.
@@ -252,6 +314,16 @@ def facts_entries(facts):
         harvest_numbers(total, values)
         subject = total.get("subject", "") if isinstance(total, dict) else ""
         entries.append((f"totals[{i}]", str(subject), values))
+
+    # A base rate sources figures like any other entry. It has to, because the
+    # sentence CHECK 6 governs is usually the one that prints the trial count:
+    # "no votes in 6 meetings" cites the entry's own trials, and without this
+    # the figure the check demands would orphan under CHECK 3.
+    for i, entry in enumerate(facts.get("base_rates") or []):
+        values = set()
+        harvest_numbers(entry, values)
+        subject = entry.get("subject", "") if isinstance(entry, dict) else ""
+        entries.append((f"base_rates[{i}]", str(subject), values))
 
     # A superlative entry sources figures like any other. It has to, because
     # CHECK 4 makes a chosen threshold disclose itself in the prose, and a
@@ -1128,6 +1200,209 @@ def check_finals_reconciliation(facts, facts_path):
         )
 
 
+def validate_base_rates(rates):
+    """Shape-check every base_rates entry, and recompute the ones that can be.
+
+    Returns a list of problem strings in entry order, empty if all are sound,
+    the same collect-everything contract validate_superlatives keeps.
+
+    Only the zero case is recomputed. At observed_count 0 the two readings of
+    "how unlikely was this" agree, because P(X = 0) and P(X <= 0) are the same
+    number, (1 - base_rate) ** trials, so there is one answer to check against.
+    Above zero they diverge, an exact count and a tail are different figures,
+    and the entry does not say which one it holds. A gate cannot verify a
+    number whose definition it would have to guess, so it does not pretend to:
+    non-zero entries are still shape-checked and still face the ceiling, but
+    their p_observed is taken on trust and the reviewer is told the figure by
+    report_base_rates rather than told it is correct.
+    """
+    if not isinstance(rates, list):
+        return [
+            f"base_rates must be a list of claim objects, got "
+            f"{type(rates).__name__}."
+        ]
+
+    problems = []
+
+    for i, entry in enumerate(rates):
+        where = f"base_rates[{i}]"
+
+        if not isinstance(entry, dict):
+            problems.append(
+                f"{where}: must be an object carrying "
+                f"{', '.join(BASE_RATE_FIELDS)}, got {type(entry).__name__}."
+            )
+            continue
+
+        missing = [
+            f
+            for f in BASE_RATE_FIELDS
+            if f not in entry
+            or entry[f] is None
+            or (isinstance(entry[f], str) and not entry[f].strip())
+        ]
+        if missing:
+            problems.append(
+                f"{where}: missing or empty required field(s): "
+                f"{', '.join(missing)}."
+            )
+
+        # A rate written as a percentage is how a probability leaves [0, 1]:
+        # 12 meant as 12% raised to any power is astronomical, and an absence
+        # would read as miraculous rather than routine.
+        for key in ("base_rate", "p_observed"):
+            if key not in entry:
+                continue
+            if not is_number(entry[key]):
+                problems.append(
+                    f'{where}: "{key}" must be a number between 0 and 1, got '
+                    f"{type(entry[key]).__name__}."
+                )
+            elif not 0 <= entry[key] <= 1:
+                problems.append(
+                    f'{where}: "{key}" is {entry[key]}, which is not a '
+                    f"probability. Give a proportion between 0 and 1 rather "
+                    f"than a percentage."
+                )
+
+        for key in ("trials", "observed_count"):
+            if key in entry and not is_integer(entry[key]):
+                problems.append(
+                    f'{where}: "{key}" must be a whole count, got '
+                    f"{type(entry[key]).__name__}."
+                )
+
+        # The declared probability is checked against the two numbers it was
+        # computed from, the way gap_to_rank_2 is checked against the rows it
+        # was drawn from. A slot in the schema exists to be verified, not
+        # believed, and a p_observed that disagrees with its own base rate is
+        # a figure carried over from a different window.
+        if (
+            is_number(entry.get("base_rate"))
+            and is_number(entry.get("p_observed"))
+            and is_integer(entry.get("trials"))
+            and is_integer(entry.get("observed_count"))
+            and 0 <= entry["base_rate"] <= 1
+            and entry["trials"] >= 0
+            and entry["observed_count"] == 0
+        ):
+            implied = (1 - entry["base_rate"]) ** entry["trials"]
+            declared = entry["p_observed"]
+            if abs(implied - declared) > P_OBSERVED_TOLERANCE:
+                problems.append(
+                    f'{where}: "p_observed" is {declared}, but a base rate of '
+                    f"{entry['base_rate']} over {entry['trials']} trial(s) "
+                    f"implies {implied:.4g}."
+                )
+
+    return problems
+
+
+def report_base_rates(rates):
+    """Print the arithmetic behind each absence, so a reviewer can judge the
+    angle without opening the facts file."""
+    for i, entry in enumerate(rates):
+        print(
+            f"BASE  base_rates[{i}]: {entry['subject']} "
+            f"| event: {entry['event']} "
+            f"| base rate: {entry['base_rate']} "
+            f"over {entry['base_rate_window']} "
+            f"| observed {entry['observed_count']} in {entry['trials']} "
+            f"| p: {entry['p_observed']}"
+        )
+
+
+def check_base_rate(draft_text, facts, facts_text, draft_path, facts_path):
+    """A claim that something has not happened is a claim about a probability.
+
+    "Never", "yet to", "drought" all assert that a record is quiet, and none of
+    them says whether the quiet is surprising. That depends entirely on how
+    often the thing happens and how many chances there were: a player who polls
+    in one game in twenty and has not polled in four meetings has done nothing
+    at all, because silence was the overwhelmingly likely outcome. The claim is
+    true and it is not an angle.
+
+    So an absence token must sit inside a claim scope, as a superlative must
+    under CHECK 4, and the claim it names must carry the arithmetic: the base
+    rate, the window that rate was measured over, the number of chances, what
+    was observed, and the probability of seeing that little. Where the
+    probability is at or above the ceiling the draft is stopped, because the
+    record predicted the silence and the sentence is describing the base rate
+    rather than the player.
+    """
+    scannable = blank_claim_comments(draft_text)
+    if not ABSENCE_RE.search(scannable):
+        return
+
+    rates = facts.get("base_rates") or []
+
+    problems = validate_base_rates(rates)
+    if problems:
+        fail(
+            "CHECK 6 base rate",
+            f"malformed base_rates in {facts_path}:\n"
+            + "\n".join(f"        {problem}" for problem in problems),
+        )
+
+    scopes = claim_scopes(draft_text)
+    declared = {str(entry["claim_id"]) for entry in rates}
+
+    for match in ABSENCE_RE.finditer(scannable):
+        owners = [
+            slug for slug, start, end in scopes if start <= match.start() < end
+        ]
+        lineno, line = line_of(draft_text, match.start())
+        quoted = sentence_of(draft_text, match.start(), match.end())
+
+        if not owners:
+            fail(
+                "CHECK 6 unclaimed absence",
+                f'"{match.group(0)}" asserts that something has not happened, '
+                f"but sits outside every claim scope, so no base_rates entry "
+                f"carries the probability that it would not have. Open a scope "
+                f"above it with <!-- claim: slug --> and declare the matching "
+                f"entry.\n"
+                f"      sentence: {quoted}",
+                lineno,
+                line,
+                draft_path,
+            )
+
+        if not any(slug in declared for slug in owners):
+            named = ", ".join(f'"{slug}"' for slug in dict.fromkeys(owners))
+            fail(
+                "CHECK 6 missing base rate",
+                f'"{match.group(0)}" is governed by {named}, but no base_rates '
+                f"entry declares that claim_id. An absence with no base rate "
+                f"behind it is a claim nobody has checked against how often the "
+                f"thing happens.\n"
+                f"      sentence: {quoted}",
+                lineno,
+                line,
+                draft_path,
+            )
+
+    for i, entry in enumerate(rates):
+        if entry["p_observed"] < P_OBSERVED_CEILING:
+            continue
+        lineno, line = find_in_facts(facts_text, str(entry["claim_id"]))
+        fail(
+            "CHECK 6 unremarkable absence",
+            f'base_rates[{i}] "{entry["claim_id"]}": {entry["subject"]} has a '
+            f"p_observed of {entry['p_observed']}, at or above "
+            f"{P_OBSERVED_CEILING}. At a base rate of {entry['base_rate']} over "
+            f"{entry['trials']} chance(s), observing {entry['observed_count']} "
+            f"is the most likely outcome, not a departure from it. An absence "
+            f"that is the most likely outcome is not an angle: the sentence is "
+            f"describing the base rate rather than the subject.",
+            lineno,
+            line,
+            facts_path,
+        )
+
+    report_base_rates(rates)
+
+
 # ---------------------------------------------------------------- entry
 
 def main(argv):
@@ -1183,6 +1458,7 @@ def main(argv):
     check_orphan_numbers(draft_text, facts, draft_path)
     check_superlative_depth(draft_text, facts, facts_text, draft_path, facts_path)
     check_finals_reconciliation(facts, facts_path)
+    check_base_rate(draft_text, facts, facts_text, draft_path, facts_path)
 
     n_rates = len(facts.get("rates") or [])
     n_totals = len(facts.get("totals") or [])
@@ -1194,8 +1470,8 @@ def main(argv):
         f"{n_rates} rate(s), {n_totals} total(s), {n_tables} ranked table(s), "
         f"{n_supers} superlative(s), "
         f"{len(facts.get('source_files') or [])} source file(s); "
-        f"superlative, denominator, orphan-number, depth and finals checks "
-        f"all clear."
+        f"superlative, denominator, orphan-number, depth, finals and "
+        f"base-rate checks all clear."
     )
     return 0
 

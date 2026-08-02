@@ -278,6 +278,9 @@ Schema, which must match draft_gate.py exactly:
                             survives_stricter, looser_threshold,
                             survives_looser, at_set_ceiling,
                             threshold_chosen_to_fit, source_file}
+    base_rates     list of {claim_id, subject, event, base_rate,
+                            base_rate_window, trials, observed_count,
+                            p_observed, source_file}
 
 round and raw_round are both exempt from the orphan-number check, because a
 draft cites the AFL's round number and AFLTables' raw one and neither is a
@@ -353,6 +356,44 @@ a claim's scope it accepts any figure that claim's entry carries, because the
 comment has already declared what the sentence is about. That is what lets a
 sentence cite its own window, such as the number of meetings a ranking covers,
 without repeating the player or the clubs to satisfy a name match.
+
+base_rates carries the arithmetic behind a claim that something has not
+happened. Copy asserts absence with a small set of words, and the gate treats
+any of them as a trigger: never, no votes, yet to, zero, without a, drought,
+hasn't polled, has not polled. A trigger must sit inside a claim scope, exactly
+as a superlative must, and the claim governing it must carry a base_rates
+entry.
+
+The entry exists because none of those words says whether the silence is
+surprising. That depends on how often the thing happens and how many chances
+there were. A player who polls in one game in twenty and has not polled in four
+meetings has done nothing at all: the record predicted the silence. So the
+entry states the rate the event happens at, the window that rate was measured
+over, the number of chances, what was observed, and the probability of seeing
+that little. Where p_observed is at or above 0.50 the gate stops the draft,
+because the absence is the most likely single outcome and the sentence is
+describing the base rate rather than the player.
+
+p_observed is checked against base_rate and trials the way gap_to_rank_2 is
+checked against top5, to within 0.005, which is the slack a probability quoted
+to two decimal places needs. Only observed_count of zero is recomputed, where
+the expected value is (1 - base_rate) ** trials. Above zero, P(X = k) and
+P(X <= k) are different numbers and the entry does not say which one it holds,
+so the figure is shape-checked, faces the ceiling, and is otherwise taken on
+trust rather than checked against a definition the gate would have to guess.
+
+The zero trigger does not match "zero-vote" or "zero vote". That phrase is the
+count label the three-number rule in the standing preamble requires of every
+player record, and a denominator is not a claim that anything is absent. No
+other token is narrowed and no category of prose is exempt: method prose
+asserting that a filter never used isdigit is reworded, not excused, because a
+check that exempts the sections its author finds inconvenient is not a check.
+
+base_rates entries are attributable sources like rates and totals, so prose
+inside a base rate claim can cite the entry's own figures. That is what lets a
+sentence say "no votes against Essendon in 6 meetings" without the 6 orphaning
+under the attribution check, since the trial count the claim rests on is
+carried by the entry making the claim.
 
 Sentence scope has a cost worth planning for: a claim sentence has to begin at
 the start of a line, so wrapped prose usually needs its line break moved before
