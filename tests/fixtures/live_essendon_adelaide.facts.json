@@ -1,0 +1,956 @@
+{
+  "fixture": "Essendon v Adelaide, Marvel Stadium, raw Round_num 22, Sunday 2 August 2026",
+  "round": 21,
+  "raw_round": 22,
+  "source_files": [
+    "fitzroy_stats_all.csv",
+    "data_history/brownlow_votes_1990_2006.csv",
+    "predictions/game_level_2026.csv",
+    "coaches_votes_all.csv",
+    "fixture_recon_spec.md",
+    "project_brief.md"
+  ],
+  "rates": [
+    {
+      "subject": "Zach Merrett Brownlow votes per game against Adelaide",
+      "value": 1.36,
+      "denominator": "11 vote-eligible home and away meetings with Adelaide, 1990-2025",
+      "denominator_type": "vote_eligible_games",
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Zach Merrett career Brownlow votes per game",
+      "value": 0.65,
+      "denominator": "247 vote-eligible home and away games, 2014-2025, 2026 excluded",
+      "denominator_type": "vote_eligible_games",
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Zach Merrett Brownlow votes per game at Docklands",
+      "value": 0.74,
+      "denominator": "88 vote-eligible home and away games at Docklands, 2014-2025",
+      "denominator_type": "vote_eligible_games",
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Jordan Dawson Brownlow votes per game against Essendon",
+      "value": 0.27,
+      "denominator": "11 vote-eligible home and away meetings with Essendon, 2018-2025, earned across Sydney and Adelaide",
+      "denominator_type": "vote_eligible_games",
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Jordan Dawson career Brownlow votes per game",
+      "value": 0.52,
+      "denominator": "153 vote-eligible home and away games, 2017-2025, 2026 excluded",
+      "denominator_type": "vote_eligible_games",
+      "source_file": "fitzroy_stats_all.csv"
+    }
+  ],
+  "totals": [
+    {
+      "subject": "Zach Merrett career vote-eligible home and away games, 2014-2025, 2026 excluded",
+      "value": 247,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Zach Merrett career vote-eligible home and away games polled in, 2014-2025",
+      "value": 74,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Zach Merrett career Brownlow votes, vote-eligible home and away games 2014-2025",
+      "value": 160,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Jordan Dawson career vote-eligible home and away games, 2017-2025, 2026 excluded",
+      "value": 153,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Jordan Dawson career vote-eligible home and away games polled in, 2017-2025",
+      "value": 40,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Jordan Dawson career Brownlow votes, vote-eligible home and away games 2017-2025",
+      "value": 80,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Jordan Dawson home and away meetings with Essendon as a Sydney player, 2018-2021",
+      "value": 6,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Jordan Dawson Brownlow votes against Essendon as a Sydney player, 2018-2021",
+      "value": 0,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Jordan Dawson home and away meetings with Essendon as an Adelaide player, 2022-2025",
+      "value": 5,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Jordan Dawson Brownlow votes against Essendon as an Adelaide player, 2022-2025",
+      "value": 3,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Essendon's rank among the opponents Jordan Dawson has met five or more times, votes per game ascending",
+      "value": 4,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "subject": "Essendon v Adelaide home and away meetings for which coaches votes exist, 2006-2025",
+      "value": 24,
+      "source_file": "coaches_votes_all.csv"
+    },
+    {
+      "subject": "Essendon v Adelaide home and away meetings all time, 1991-2025",
+      "value": 44,
+      "source_file": "fitzroy_stats_all.csv"
+    }
+  ],
+  "superlatives": [
+    {
+      "claim_id": "merrett-adelaide-best-vpg",
+      "subject": "Zach Merrett's best career Brownlow votes per vote-eligible game against any opponent",
+      "scale": "Brownlow votes per vote-eligible home and away game",
+      "window": "career home and away games 1990-2025, current season 2026 excluded because 2026 votes are not public until count night, grouped on fitzRoy player ID",
+      "threshold": 5,
+      "threshold_unit": "meetings",
+      "set_size": 17,
+      "top5": [
+        {
+          "rank": 1,
+          "name": "Adelaide",
+          "value": 1.3636
+        },
+        {
+          "rank": 2,
+          "name": "North Melbourne",
+          "value": 1.1875
+        },
+        {
+          "rank": 3,
+          "name": "Melbourne",
+          "value": 0.9091
+        },
+        {
+          "rank": 4,
+          "name": "Hawthorn",
+          "value": 0.8
+        },
+        {
+          "rank": 5,
+          "name": "Brisbane Lions",
+          "value": 0.7857
+        }
+      ],
+      "gap_to_rank_2": 0.1761,
+      "stricter_threshold": 8,
+      "survives_stricter": true,
+      "looser_threshold": 3,
+      "survives_looser": true,
+      "at_set_ceiling": false,
+      "threshold_chosen_to_fit": false,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "claim_id": "essendon-adelaide-fixture-most-votes",
+      "subject": "Most Brownlow votes by any player in the Essendon v Adelaide fixture",
+      "scale": "total Brownlow votes in home and away meetings between the two clubs",
+      "window": "all 44 home and away meetings 1991-2025, current season 2026 excluded and the clubs have not met in 2026, grouped on fitzRoy player ID, data_history/brownlow_votes_1990_2006.csv concatenated with fitzroy_stats_all.csv",
+      "threshold": 1,
+      "threshold_unit": "votes in the fixture",
+      "set_size": 81,
+      "top5": [
+        {
+          "rank": 1,
+          "name": "Scott Thompson",
+          "value": 18
+        },
+        {
+          "rank": 2,
+          "name": "Zach Merrett",
+          "value": 15
+        },
+        {
+          "rank": 3,
+          "name": "Jobe Watson",
+          "value": 8
+        },
+        {
+          "rank": 4,
+          "name": "Ben Keays",
+          "value": 8
+        },
+        {
+          "rank": 5,
+          "name": "Simon Goodwin",
+          "value": 7
+        }
+      ],
+      "gap_to_rank_2": 3,
+      "stricter_threshold": 5,
+      "survives_stricter": true,
+      "looser_threshold": 0,
+      "survives_looser": true,
+      "at_set_ceiling": false,
+      "threshold_chosen_to_fit": false,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "claim_id": "essendon-adelaide-coaches-votes-most",
+      "subject": "Most coaches votes by any player in the Essendon v Adelaide fixture",
+      "scale": "total coaches votes in home and away meetings between the two clubs",
+      "window": "the 24 home and away meetings from 2006 to 2025 for which coaches votes exist, out of 44 meetings all time, so this is the coaches-votes era and not the whole fixture history, 0 finals rows excluded after cross-referencing the maximum home and away round per season rather than by isdigit alone, current season 2026 excluded and the clubs have not met in 2026, grouped on name and club suffix because coaches_votes_all.csv carries no player ID, and the file holds rows only for players who polled so a player with no coaches votes is absent from the set rather than present on zero",
+      "threshold": 1,
+      "threshold_unit": "coaches votes in the fixture",
+      "set_size": 91,
+      "top5": [
+        {
+          "rank": 1,
+          "name": "Zach Merrett (ESS)",
+          "value": 55
+        },
+        {
+          "rank": 2,
+          "name": "Scott Thompson (ADEL)",
+          "value": 44
+        },
+        {
+          "rank": 3,
+          "name": "Brodie Smith (ADEL)",
+          "value": 28
+        },
+        {
+          "rank": 4,
+          "name": "Eddie Betts (ADEL)",
+          "value": 28
+        },
+        {
+          "rank": 5,
+          "name": "Rory Sloane (ADEL)",
+          "value": 23
+        }
+      ],
+      "gap_to_rank_2": 11,
+      "stricter_threshold": 20,
+      "survives_stricter": true,
+      "looser_threshold": 0,
+      "survives_looser": true,
+      "at_set_ceiling": false,
+      "threshold_chosen_to_fit": false,
+      "source_file": "coaches_votes_all.csv",
+      "rows_in": 155,
+      "finals_excluded": 0,
+      "rows_out": 155
+    },
+    {
+      "claim_id": "dawson-essendon-lowest-at-10",
+      "subject": "Jordan Dawson career Brownlow votes per vote-eligible game by opponent",
+      "scale": "Brownlow votes per vote-eligible home and away game",
+      "window": "career home and away games 2017-2025, current season 2026 excluded, career-scoped across Sydney and Adelaide",
+      "threshold": 10,
+      "threshold_unit": "meetings",
+      "set_size": 6,
+      "top5": [
+        {
+          "rank": 1,
+          "name": "Essendon",
+          "value": 0.2727
+        },
+        {
+          "rank": 2,
+          "name": "Collingwood",
+          "value": 0.3333
+        },
+        {
+          "rank": 3,
+          "name": "Greater Western Sydney",
+          "value": 0.5
+        },
+        {
+          "rank": 4,
+          "name": "Gold Coast",
+          "value": 0.7
+        },
+        {
+          "rank": 5,
+          "name": "West Coast",
+          "value": 0.8
+        }
+      ],
+      "gap_to_rank_2": 0.0606,
+      "stricter_threshold": 12,
+      "survives_stricter": false,
+      "looser_threshold": 5,
+      "survives_looser": false,
+      "at_set_ceiling": false,
+      "threshold_chosen_to_fit": true,
+      "source_file": "fitzroy_stats_all.csv"
+    }
+  ],
+  "ranked_tables": [
+    {
+      "subject": "Zach Merrett career Brownlow votes per vote-eligible game by opponent",
+      "window": "career home and away games 1990-2025, minimum 5 meetings, current season 2026 excluded because 2026 votes are not public until count night, all 17 opponents clear the threshold",
+      "rows": [
+        {
+          "opponent": "Adelaide",
+          "meetings": 11,
+          "polls": 6,
+          "zeros": 5,
+          "votes": 15,
+          "votes_per_game": 1.36
+        },
+        {
+          "opponent": "North Melbourne",
+          "meetings": 16,
+          "polls": 8,
+          "zeros": 8,
+          "votes": 19,
+          "votes_per_game": 1.19
+        },
+        {
+          "opponent": "Melbourne",
+          "meetings": 11,
+          "polls": 4,
+          "zeros": 7,
+          "votes": 10,
+          "votes_per_game": 0.91
+        },
+        {
+          "opponent": "Hawthorn",
+          "meetings": 15,
+          "polls": 7,
+          "zeros": 8,
+          "votes": 12,
+          "votes_per_game": 0.8
+        },
+        {
+          "opponent": "Brisbane Lions",
+          "meetings": 14,
+          "polls": 5,
+          "zeros": 9,
+          "votes": 11,
+          "votes_per_game": 0.79
+        },
+        {
+          "opponent": "Gold Coast",
+          "meetings": 14,
+          "polls": 4,
+          "zeros": 10,
+          "votes": 11,
+          "votes_per_game": 0.79
+        },
+        {
+          "opponent": "West Coast",
+          "meetings": 14,
+          "polls": 5,
+          "zeros": 9,
+          "votes": 11,
+          "votes_per_game": 0.79
+        },
+        {
+          "opponent": "Sydney",
+          "meetings": 18,
+          "polls": 6,
+          "zeros": 12,
+          "votes": 14,
+          "votes_per_game": 0.78
+        },
+        {
+          "opponent": "Collingwood",
+          "meetings": 18,
+          "polls": 5,
+          "zeros": 13,
+          "votes": 11,
+          "votes_per_game": 0.61
+        },
+        {
+          "opponent": "Richmond",
+          "meetings": 17,
+          "polls": 5,
+          "zeros": 12,
+          "votes": 10,
+          "votes_per_game": 0.59
+        },
+        {
+          "opponent": "Greater Western Sydney",
+          "meetings": 14,
+          "polls": 4,
+          "zeros": 10,
+          "votes": 8,
+          "votes_per_game": 0.57
+        },
+        {
+          "opponent": "Fremantle",
+          "meetings": 13,
+          "polls": 3,
+          "zeros": 10,
+          "votes": 7,
+          "votes_per_game": 0.54
+        },
+        {
+          "opponent": "Geelong",
+          "meetings": 15,
+          "polls": 3,
+          "zeros": 12,
+          "votes": 6,
+          "votes_per_game": 0.4
+        },
+        {
+          "opponent": "Port Adelaide",
+          "meetings": 15,
+          "polls": 4,
+          "zeros": 11,
+          "votes": 6,
+          "votes_per_game": 0.4
+        },
+        {
+          "opponent": "Western Bulldogs",
+          "meetings": 14,
+          "polls": 2,
+          "zeros": 12,
+          "votes": 4,
+          "votes_per_game": 0.29
+        },
+        {
+          "opponent": "St Kilda",
+          "meetings": 13,
+          "polls": 2,
+          "zeros": 11,
+          "votes": 3,
+          "votes_per_game": 0.23
+        },
+        {
+          "opponent": "Carlton",
+          "meetings": 15,
+          "polls": 1,
+          "zeros": 14,
+          "votes": 2,
+          "votes_per_game": 0.13
+        }
+      ]
+    },
+    {
+      "subject": "Zach Merrett career Brownlow votes per vote-eligible game by venue",
+      "window": "career home and away games 1990-2025, minimum 5 games at the ground, current season 2026 excluded",
+      "rows": [
+        {
+          "venue": "Adelaide Oval",
+          "games": 16,
+          "polls": 6,
+          "votes": 17,
+          "votes_per_game": 1.06
+        },
+        {
+          "venue": "S.C.G.",
+          "games": 9,
+          "polls": 3,
+          "votes": 7,
+          "votes_per_game": 0.78
+        },
+        {
+          "venue": "Docklands",
+          "games": 88,
+          "polls": 30,
+          "votes": 65,
+          "votes_per_game": 0.74
+        },
+        {
+          "venue": "Gabba",
+          "games": 11,
+          "polls": 3,
+          "votes": 8,
+          "votes_per_game": 0.73
+        },
+        {
+          "venue": "Carrara",
+          "games": 14,
+          "polls": 4,
+          "votes": 10,
+          "votes_per_game": 0.71
+        },
+        {
+          "venue": "Perth Stadium",
+          "games": 12,
+          "polls": 4,
+          "votes": 8,
+          "votes_per_game": 0.67
+        },
+        {
+          "venue": "M.C.G.",
+          "games": 78,
+          "polls": 20,
+          "votes": 40,
+          "votes_per_game": 0.51
+        },
+        {
+          "venue": "Sydney Showground",
+          "games": 7,
+          "polls": 1,
+          "votes": 1,
+          "votes_per_game": 0.14
+        },
+        {
+          "venue": "Subiaco",
+          "games": 5,
+          "polls": 0,
+          "votes": 0,
+          "votes_per_game": 0.0
+        }
+      ]
+    },
+    {
+      "subject": "Most Brownlow votes in the Essendon v Adelaide fixture, all time",
+      "window": "all 44 home and away meetings 1991-2025, no minimum applied, current season 2026 excluded, the clubs have not met in 2026, grouped on fitzRoy player ID",
+      "rows": [
+        {
+          "player": "Scott Thompson",
+          "meetings": 14,
+          "polls": 7,
+          "zeros": 7,
+          "votes": 18
+        },
+        {
+          "player": "Zach Merrett",
+          "meetings": 11,
+          "polls": 6,
+          "zeros": 5,
+          "votes": 15
+        },
+        {
+          "player": "Jobe Watson",
+          "meetings": 10,
+          "polls": 3,
+          "zeros": 7,
+          "votes": 8
+        },
+        {
+          "player": "Ben Keays",
+          "meetings": 7,
+          "polls": 3,
+          "zeros": 4,
+          "votes": 8
+        },
+        {
+          "player": "Simon Goodwin",
+          "meetings": 14,
+          "polls": 3,
+          "zeros": 11,
+          "votes": 7
+        },
+        {
+          "player": "Gavin Wanganeen",
+          "meetings": 8,
+          "polls": 3,
+          "zeros": 5,
+          "votes": 7
+        },
+        {
+          "player": "Matthew Lloyd",
+          "meetings": 18,
+          "polls": 3,
+          "zeros": 15,
+          "votes": 7
+        },
+        {
+          "player": "Patrick Dangerfield",
+          "meetings": 8,
+          "polls": 3,
+          "zeros": 5,
+          "votes": 7
+        },
+        {
+          "player": "Mark Ricciuto",
+          "meetings": 18,
+          "polls": 4,
+          "zeros": 14,
+          "votes": 6
+        },
+        {
+          "player": "Jason Johnson",
+          "meetings": 6,
+          "polls": 3,
+          "zeros": 3,
+          "votes": 6
+        }
+      ]
+    },
+    {
+      "subject": "Most meetings played in the Essendon v Adelaide fixture",
+      "window": "all 44 home and away meetings 1991-2025, no minimum applied, current season 2026 excluded, the clubs have not met in 2026, grouped on fitzRoy player ID",
+      "rows": [
+        {
+          "player": "Dustin Fletcher",
+          "meetings": 22,
+          "polls": 1,
+          "zeros": 21,
+          "votes": 1
+        },
+        {
+          "player": "Andrew McLeod",
+          "meetings": 19,
+          "polls": 0,
+          "zeros": 19,
+          "votes": 0
+        },
+        {
+          "player": "Tyson Edwards",
+          "meetings": 18,
+          "polls": 2,
+          "zeros": 16,
+          "votes": 6
+        },
+        {
+          "player": "Mark Ricciuto",
+          "meetings": 18,
+          "polls": 4,
+          "zeros": 14,
+          "votes": 6
+        },
+        {
+          "player": "Matthew Lloyd",
+          "meetings": 18,
+          "polls": 3,
+          "zeros": 15,
+          "votes": 7
+        },
+        {
+          "player": "Nigel Smart",
+          "meetings": 18,
+          "polls": 2,
+          "zeros": 16,
+          "votes": 5
+        },
+        {
+          "player": "Ben Hart",
+          "meetings": 17,
+          "polls": 1,
+          "zeros": 16,
+          "votes": 2
+        },
+        {
+          "player": "Scott Lucas",
+          "meetings": 16,
+          "polls": 1,
+          "zeros": 15,
+          "votes": 3
+        }
+      ]
+    },
+    {
+      "subject": "Essendon 2026 expected votes, top 8",
+      "window": "2026 season raw Round_num 1 to 21, minimum 1 game, current season included by definition, expected votes not actual votes",
+      "rows": [
+        {
+          "player": "Zach Merrett",
+          "games": 19,
+          "exp_votes": 6.13
+        },
+        {
+          "player": "Darcy Parish",
+          "games": 14,
+          "exp_votes": 4.7
+        },
+        {
+          "player": "Archie Roberts",
+          "games": 17,
+          "exp_votes": 4.24
+        },
+        {
+          "player": "Sam Durham",
+          "games": 18,
+          "exp_votes": 4.1
+        },
+        {
+          "player": "Nick Bryan",
+          "games": 10,
+          "exp_votes": 0.92
+        },
+        {
+          "player": "Will Setterfield",
+          "games": 7,
+          "exp_votes": 0.86
+        },
+        {
+          "player": "Peter Wright",
+          "games": 14,
+          "exp_votes": 0.52
+        },
+        {
+          "player": "Elijah Tsatas",
+          "games": 6,
+          "exp_votes": 0.4
+        }
+      ]
+    },
+    {
+      "subject": "Adelaide 2026 expected votes, top 8",
+      "window": "2026 season raw Round_num 1 to 21, minimum 1 game, current season included by definition, expected votes not actual votes",
+      "rows": [
+        {
+          "player": "Jordan Dawson",
+          "games": 16,
+          "exp_votes": 15.9
+        },
+        {
+          "player": "Izak Rankine",
+          "games": 16,
+          "exp_votes": 9.7
+        },
+        {
+          "player": "Sam Berry",
+          "games": 19,
+          "exp_votes": 7.36
+        },
+        {
+          "player": "Wayne Milera",
+          "games": 17,
+          "exp_votes": 6.6
+        },
+        {
+          "player": "Darcy Fogarty",
+          "games": 12,
+          "exp_votes": 3.74
+        },
+        {
+          "player": "Josh Rachele",
+          "games": 19,
+          "exp_votes": 3.5
+        },
+        {
+          "player": "Taylor Walker",
+          "games": 13,
+          "exp_votes": 3.07
+        },
+        {
+          "player": "James Peatling",
+          "games": 19,
+          "exp_votes": 1.99
+        }
+      ]
+    },
+    {
+      "subject": "Jordan Dawson career Brownlow votes per vote-eligible game by opponent",
+      "window": "career home and away games 2017-2025, minimum 5 meetings, 17 of his 18 opponents clear the threshold and Adelaide does not because he met them only twice as a Sydney player, career-scoped across both his clubs so meetings earned at Sydney are counted here and Sydney itself appears as an opponent for the meetings played since he joined Adelaide, current season 2026 excluded because 2026 votes are not public until count night, sorted by votes per game ascending per block 8a",
+      "rows": [
+        {
+          "opponent": "Sydney",
+          "meetings": 5,
+          "polls": 0,
+          "zeros": 5,
+          "votes": 0,
+          "votes_per_game": 0.0
+        },
+        {
+          "opponent": "Melbourne",
+          "meetings": 9,
+          "polls": 1,
+          "zeros": 8,
+          "votes": 1,
+          "votes_per_game": 0.11
+        },
+        {
+          "opponent": "Carlton",
+          "meetings": 9,
+          "polls": 1,
+          "zeros": 8,
+          "votes": 2,
+          "votes_per_game": 0.22
+        },
+        {
+          "opponent": "Essendon",
+          "meetings": 11,
+          "polls": 2,
+          "zeros": 9,
+          "votes": 3,
+          "votes_per_game": 0.27
+        },
+        {
+          "opponent": "Collingwood",
+          "meetings": 12,
+          "polls": 3,
+          "zeros": 9,
+          "votes": 4,
+          "votes_per_game": 0.33
+        },
+        {
+          "opponent": "Geelong",
+          "meetings": 9,
+          "polls": 1,
+          "zeros": 8,
+          "votes": 3,
+          "votes_per_game": 0.33
+        },
+        {
+          "opponent": "Brisbane Lions",
+          "meetings": 8,
+          "polls": 2,
+          "zeros": 6,
+          "votes": 3,
+          "votes_per_game": 0.38
+        },
+        {
+          "opponent": "Fremantle",
+          "meetings": 7,
+          "polls": 1,
+          "zeros": 6,
+          "votes": 3,
+          "votes_per_game": 0.43
+        },
+        {
+          "opponent": "Hawthorn",
+          "meetings": 9,
+          "polls": 2,
+          "zeros": 7,
+          "votes": 4,
+          "votes_per_game": 0.44
+        },
+        {
+          "opponent": "Greater Western Sydney",
+          "meetings": 10,
+          "polls": 2,
+          "zeros": 8,
+          "votes": 5,
+          "votes_per_game": 0.5
+        },
+        {
+          "opponent": "North Melbourne",
+          "meetings": 9,
+          "polls": 4,
+          "zeros": 5,
+          "votes": 6,
+          "votes_per_game": 0.67
+        },
+        {
+          "opponent": "Gold Coast",
+          "meetings": 10,
+          "polls": 3,
+          "zeros": 7,
+          "votes": 7,
+          "votes_per_game": 0.7
+        },
+        {
+          "opponent": "Western Bulldogs",
+          "meetings": 7,
+          "polls": 3,
+          "zeros": 4,
+          "votes": 5,
+          "votes_per_game": 0.71
+        },
+        {
+          "opponent": "West Coast",
+          "meetings": 10,
+          "polls": 3,
+          "zeros": 7,
+          "votes": 8,
+          "votes_per_game": 0.8
+        },
+        {
+          "opponent": "Port Adelaide",
+          "meetings": 11,
+          "polls": 4,
+          "zeros": 7,
+          "votes": 9,
+          "votes_per_game": 0.82
+        },
+        {
+          "opponent": "St Kilda",
+          "meetings": 8,
+          "polls": 4,
+          "zeros": 4,
+          "votes": 9,
+          "votes_per_game": 1.13
+        },
+        {
+          "opponent": "Richmond",
+          "meetings": 7,
+          "polls": 4,
+          "zeros": 3,
+          "votes": 8,
+          "votes_per_game": 1.14
+        }
+      ]
+    },
+    {
+      "subject": "Coaches votes leaders in the Essendon v Adelaide fixture",
+      "window": "home and away meetings 2006-2025, 0 finals rows excluded, denominator unavailable because the file holds rows only for players who polled",
+      "rows": [
+        {
+          "player": "Zach Merrett (ESS)",
+          "coaches_votes": 55,
+          "polls": 7
+        },
+        {
+          "player": "Scott Thompson (ADEL)",
+          "coaches_votes": 44,
+          "polls": 7
+        },
+        {
+          "player": "Brodie Smith (ADEL)",
+          "coaches_votes": 28,
+          "polls": 5
+        },
+        {
+          "player": "Eddie Betts (ADEL)",
+          "coaches_votes": 28,
+          "polls": 4
+        },
+        {
+          "player": "Rory Sloane (ADEL)",
+          "coaches_votes": 23,
+          "polls": 4
+        },
+        {
+          "player": "Rory Laird (ADEL)",
+          "coaches_votes": 20,
+          "polls": 6
+        },
+        {
+          "player": "Darcy Parish (ESS)",
+          "coaches_votes": 20,
+          "polls": 3
+        },
+        {
+          "player": "Jobe Watson (ESS)",
+          "coaches_votes": 20,
+          "polls": 3
+        }
+      ],
+      "rows_in": 155,
+      "finals_excluded": 0,
+      "rows_out": 155
+    }
+  ],
+  "club_splits": [
+    {
+      "subject": "Jordan Dawson career Brownlow votes per vote-eligible game by opponent",
+      "window": "career home and away meetings with Essendon, 2018-2025, career-scoped across Sydney and Adelaide",
+      "rows": 11,
+      "polls": 2,
+      "votes": 3,
+      "splits": [
+        {
+          "club": "Sydney",
+          "rows": 6,
+          "polls": 0,
+          "votes": 0
+        },
+        {
+          "club": "Adelaide",
+          "rows": 5,
+          "polls": 2,
+          "votes": 3
+        }
+      ],
+      "source_file": "fitzroy_stats_all.csv"
+    }
+  ]
+}
