@@ -8,7 +8,7 @@
   "superlatives": [
     {
       "claim_id": "dawson-essendon-lowest",
-      "subject": "Jordan Dawson's lowest career votes per vote-eligible game against any opponent",
+      "subject": "Jordan Dawson career votes per game by opponent",
       "scale": "Brownlow votes per vote-eligible home and away game",
       "window": "career home and away games 2017-2025, current season excluded",
       "threshold": 10,

@@ -62,10 +62,20 @@ RANKED_TABLE_FIELDS = ("subject", "window", "rows")
 # of the set, so it must not demand more.
 MIN_RANKED_ROWS = 2
 
-SUPERLATIVES = ("only", "no other", "best", "worst", "highest", "lowest")
+SUPERLATIVES = (
+    "only", "no other", "best", "worst", "highest", "lowest", "most", "fewest",
+)
+
+# "the most recent meeting" is a date, not a ranking. Same treatment as the
+# zero-vote lookahead and for the same reason: a compound where the trigger
+# word does different work. Every other use of "most" still triggers.
+SUPERLATIVE_LOOKAHEAD = {"most": r"(?!\s+recent\b)"}
 
 SUPERLATIVE_RE = re.compile(
-    "|".join(rf"\b{w.replace(' ', r'\s+')}\b" for w in SUPERLATIVES),
+    "|".join(
+        rf"\b{w.replace(' ', r'\s+')}\b" + SUPERLATIVE_LOOKAHEAD.get(w, "")
+        for w in SUPERLATIVES
+    ),
     re.IGNORECASE,
 )
 
@@ -835,8 +845,24 @@ def report_ranked_tables(ranked):
 
 
 def check_superlative(draft_text, facts, draft_path, facts_path):
-    """A superlative claim is a ranking claim. Rank it or drop it."""
+    """A superlative claim is a ranking claim. Rank the thing it claims.
+
+    A non-empty ranked_tables used to satisfy this check for a whole draft, so
+    eight tables and a ninth unbacked claim passed: the question asked was
+    whether a ranking existed somewhere in the file, not whether one ranked the
+    thing being claimed. Backing now binds by subject, the exact-string rule
+    CHECK 7 uses, so a claim is backed only by an entry about its own subject.
+
+    A claim's own superlatives entry does not back it. That entry is the claim,
+    and CHECK 4 already makes it carry its depth; letting it satisfy this check
+    too would make the check vacuous for every claim CHECK 4 passes.
+
+    Two cases are left to CHECK 4, which reports them better than this can: a
+    superlative token outside every claim scope, and a scope whose claim_id has
+    no superlatives entry.
+    """
     ranked = facts.get("ranked_tables") or []
+    supers = facts.get("superlatives") or []
 
     # Shape first: an unsound table must not be allowed to silence anything.
     problems = validate_ranked_tables(ranked)
@@ -847,24 +873,74 @@ def check_superlative(draft_text, facts, draft_path, facts_path):
             + "\n".join(f"        {problem}" for problem in problems),
         )
 
+    scannable = blank_claim_comments(draft_text)
+    first = SUPERLATIVE_RE.search(scannable)
+
+    # Nothing to rank against at all, which is the whole-draft case: no table
+    # exists for any claim to bind to, so subject matching cannot even start.
+    if first and not ranked:
+        lineno, line = line_of(draft_text, first.start())
+        fail(
+            "CHECK 1 superlative",
+            f'superlative "{first.group(0)}" with no ranked_tables to back '
+            f"it.\n"
+            f"      sentence: "
+            f"{sentence_of(draft_text, first.start(), first.end())}",
+            lineno,
+            line,
+            draft_path,
+        )
+
+    scopes = claim_scopes(draft_text)
+    by_claim = {}
+    for i, entry in enumerate(supers):
+        if isinstance(entry, dict):
+            by_claim.setdefault(str(entry.get("claim_id", "")), (i, entry))
+
+    for match in SUPERLATIVE_RE.finditer(scannable):
+        owned = None
+        for slug, start, end in scopes:
+            if start <= match.start() < end and slug in by_claim:
+                owned = (slug,) + by_claim[slug]
+                break
+        if owned is None:
+            continue
+
+        slug, index, entry = owned
+        subject = str(entry.get("subject", ""))
+        if not subject:
+            continue
+
+        backing = [
+            f"{group}[{j}]"
+            for group, items in (("ranked_tables", ranked),
+                                 ("superlatives", supers))
+            for j, other in enumerate(items)
+            if isinstance(other, dict)
+            and not (group == "superlatives" and j == index)
+            and str(other.get("subject", "")) == subject
+        ]
+        if backing:
+            continue
+
+        lineno, line = line_of(draft_text, match.start())
+        fail(
+            "CHECK 1 unbacked superlative",
+            f'superlative "{match.group(0)}" is claimed by "{slug}", whose '
+            f'subject is "{subject}", and no ranked_tables or superlatives '
+            f"entry carries that subject. A ranking somewhere in the file is "
+            f"not a ranking of the thing being claimed. Give the claim a table "
+            f"about its own subject, or make the subjects agree if one already "
+            f"ranks it.\n"
+            f"      sentence: "
+            f"{sentence_of(draft_text, match.start(), match.end())}",
+            lineno,
+            line,
+            draft_path,
+        )
+
     if ranked:
         report_ranked_tables(ranked)
-        return
-
-    match = SUPERLATIVE_RE.search(blank_claim_comments(draft_text))
-    if not match:
-        return
-
-    lineno, line = line_of(draft_text, match.start())
-    sentence = sentence_of(draft_text, match.start(), match.end())
-    fail(
-        "CHECK 1 superlative",
-        f'superlative "{match.group(0)}" with no ranked_tables to back it.\n'
-        f"      sentence: {sentence}",
-        lineno,
-        line,
-        draft_path,
-    )
 
 
 def check_denominator(facts, facts_text, facts_path):

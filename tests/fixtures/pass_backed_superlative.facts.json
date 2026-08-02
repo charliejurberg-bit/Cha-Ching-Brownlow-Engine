@@ -21,7 +21,7 @@
   "superlatives": [
     {
       "claim_id": "port-gws-most-meetings",
-      "subject": "Most Port Adelaide v GWS meetings played by any player",
+      "subject": "Most Port Adelaide v GWS meetings played",
       "scale": "matches played between the two clubs",
       "window": "all 17 matches between the clubs 2012-2025, from GWS's first season to the last completed one, finals included because this counts appearances and not a rate, the clubs have not met in 2026, no minimum applied, grouped on fitzRoy player ID",
       "threshold": 1,
