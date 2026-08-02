@@ -44,9 +44,11 @@ tag is looked up rather than constructed.
 The clubs have met **44 times** in home and away football, 1991 to 2025.
 Adelaide entered the competition in 1991, so 44 is the ceiling and a low meeting
 count is a function of a player's career span, not an absence worth writing
-about. No player is near
-it: Dustin Fletcher leads on 22, and the most by anyone currently listed is well
-below that.
+about.
+
+<!-- claim: essendon-adelaide-current-most-meetings -->
+No player is near it: Dustin Fletcher leads on 22, and the most by anyone
+currently listed is well below that.
 
 ---
 

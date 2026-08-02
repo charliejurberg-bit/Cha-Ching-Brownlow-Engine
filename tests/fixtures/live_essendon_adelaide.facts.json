@@ -117,7 +117,7 @@
   "superlatives": [
     {
       "claim_id": "merrett-adelaide-best-vpg",
-      "subject": "Zach Merrett's best career Brownlow votes per vote-eligible game against any opponent",
+      "subject": "Zach Merrett career Brownlow votes per vote-eligible game by opponent",
       "scale": "Brownlow votes per vote-eligible home and away game",
       "window": "career home and away games 1990-2025, current season 2026 excluded because 2026 votes are not public until count night, grouped on fitzRoy player ID",
       "threshold": 5,
@@ -161,7 +161,7 @@
     },
     {
       "claim_id": "essendon-adelaide-fixture-most-votes",
-      "subject": "Most Brownlow votes by any player in the Essendon v Adelaide fixture",
+      "subject": "Most Brownlow votes in the Essendon v Adelaide fixture, all time",
       "scale": "total Brownlow votes in home and away meetings between the two clubs",
       "window": "all 44 home and away meetings 1991-2025, current season 2026 excluded and the clubs have not met in 2026, grouped on fitzRoy player ID, data_history/brownlow_votes_1990_2006.csv concatenated with fitzroy_stats_all.csv",
       "threshold": 1,
@@ -205,7 +205,7 @@
     },
     {
       "claim_id": "essendon-adelaide-coaches-votes-most",
-      "subject": "Most coaches votes by any player in the Essendon v Adelaide fixture",
+      "subject": "Coaches votes leaders in the Essendon v Adelaide fixture",
       "scale": "total coaches votes in home and away meetings between the two clubs",
       "window": "the 24 home and away meetings from 2006 to 2025 for which coaches votes exist, out of 44 meetings all time, so this is the coaches-votes era and not the whole fixture history, 0 finals rows excluded after cross-referencing the maximum home and away round per season rather than by isdigit alone, current season 2026 excluded and the clubs have not met in 2026, grouped on name and club suffix because coaches_votes_all.csv carries no player ID, and the file holds rows only for players who polled so a player with no coaches votes is absent from the set rather than present on zero",
       "threshold": 1,
@@ -292,6 +292,50 @@
       "survives_looser": false,
       "at_set_ceiling": false,
       "threshold_chosen_to_fit": true,
+      "source_file": "fitzroy_stats_all.csv"
+    },
+    {
+      "claim_id": "essendon-adelaide-current-most-meetings",
+      "subject": "Most Essendon v Adelaide meetings played by a player listed in 2026",
+      "scale": "home and away meetings in the Essendon v Adelaide fixture",
+      "window": "all 44 home and away meetings 1991-2025, restricted to players listed at Essendon or Adelaide in predictions/game_level_2026.csv, no minimum applied, current season 2026 excluded, the clubs have not met in 2026, grouped on fitzRoy player ID",
+      "threshold": 1,
+      "threshold_unit": "meetings",
+      "set_size": 54,
+      "top5": [
+        {
+          "rank": 1,
+          "name": "Taylor Walker",
+          "value": 14
+        },
+        {
+          "rank": 2,
+          "name": "Rory Laird",
+          "value": 14
+        },
+        {
+          "rank": 3,
+          "name": "Zach Merrett",
+          "value": 11
+        },
+        {
+          "rank": 4,
+          "name": "Kyle Langford",
+          "value": 10
+        },
+        {
+          "rank": 5,
+          "name": "Andrew McGrath",
+          "value": 10
+        }
+      ],
+      "gap_to_rank_2": 0,
+      "stricter_threshold": 5,
+      "survives_stricter": true,
+      "looser_threshold": 0,
+      "survives_looser": true,
+      "at_set_ceiling": false,
+      "threshold_chosen_to_fit": false,
       "source_file": "fitzroy_stats_all.csv"
     }
   ],
@@ -927,6 +971,36 @@
       "rows_in": 155,
       "finals_excluded": 0,
       "rows_out": 155
+    },
+    {
+      "subject": "Most Essendon v Adelaide meetings played by a player listed in 2026",
+      "window": "all 44 home and away meetings 1991-2025, restricted to players listed at Essendon or Adelaide in predictions/game_level_2026.csv, no minimum applied, current season 2026 excluded, the clubs have not met in 2026, grouped on fitzRoy player ID",
+      "rows": [
+        {
+          "player": "Taylor Walker",
+          "meetings": 14
+        },
+        {
+          "player": "Rory Laird",
+          "meetings": 14
+        },
+        {
+          "player": "Zach Merrett",
+          "meetings": 11
+        },
+        {
+          "player": "Kyle Langford",
+          "meetings": 10
+        },
+        {
+          "player": "Andrew McGrath",
+          "meetings": 10
+        },
+        {
+          "player": "Darcy Parish",
+          "meetings": 10
+        }
+      ]
     }
   ],
   "club_splits": [
