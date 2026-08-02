@@ -222,6 +222,11 @@ def heading_above(text, offset):
     return text[start:end if end != -1 else len(text)]
 
 
+def is_table_row(line):
+    """Whether a line is a markdown table row, which is its own unit of claim."""
+    return line.lstrip().startswith("|")
+
+
 def attribution_context(text, start, end):
     """The text a figure's subject has to appear in for it to be attributed.
 
@@ -234,7 +239,7 @@ def attribution_context(text, start, end):
     in every sentence.
     """
     _, line = line_of(text, start)
-    if line.lstrip().startswith("|"):
+    if is_table_row(line):
         return line
     return f"{sentence_of(text, start, end)}\n{heading_above(text, start)}"
 
@@ -526,16 +531,25 @@ def check_orphan_numbers(draft_text, facts, draft_path):
             continue
 
         lineno, line = line_of(draft_text, match.start())
-        sentence = sentence_of(draft_text, match.start(), match.end())
         carriers = [e for e in entries if value in e[2]]
+
+        # A markdown table holds no blank line, so sentence_of returns the whole
+        # table for a figure inside one, twenty rows wide to report one cell.
+        # There the row is the claim, and fail() already echoes it with its file
+        # and line number, so the quote is left to that rather than repeated.
+        quoted = (
+            ""
+            if is_table_row(line)
+            else "\n      sentence: "
+            + sentence_of(draft_text, match.start(), match.end())
+        )
 
         if not carriers:
             fail(
                 "CHECK 3 orphan numbers",
                 f'unsourced figure "{match.group(0)}": not a value in the facts '
                 f"file, not the round, not in a hashtag, not a year "
-                f"{YEAR_MIN}-{YEAR_MAX}.\n"
-                f"      sentence: {sentence}",
+                f"{YEAR_MIN}-{YEAR_MAX}.{quoted}",
                 lineno,
                 line,
                 draft_path,
@@ -553,8 +567,8 @@ def check_orphan_numbers(draft_text, facts, draft_path):
             "CHECK 3 misattributed number",
             f'figure "{match.group(0)}" is in the facts file, but nothing here '
             f"names what it belongs to. A value existing somewhere in the facts "
-            f"is not a source for the sentence it was printed in.\n"
-            f"      sentence: {sentence}\n"
+            f"is not a source for the sentence it was printed in."
+            f"{quoted}\n"
             f"      carried by: {name_carriers(carriers)}",
             lineno,
             line,
