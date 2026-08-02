@@ -307,7 +307,9 @@ show: the size of the set, the gap from rank 1 to rank 2, and whether the claim
 survives the threshold being moved in both directions. top5 carries five rows,
 or the whole set when it is smaller than five. Where threshold_chosen_to_fit is
 true the copy must print both the threshold and the set size, so the reader can
-see the claim was cut to shape. claim_id is carried now and is not yet bound to
+see the claim was cut to shape. gap_to_rank_2 is checked against the first two
+top5 rows and must agree with them to within 0.001, so carry top5 values at the
+precision the gap was computed at rather than at display precision. claim_id is carried now and is not yet bound to
 a sentence, so declaring no superlatives leaves the check silent.
 
 The run ends by executing python draft_gate.py drafts/<name>.md and reporting

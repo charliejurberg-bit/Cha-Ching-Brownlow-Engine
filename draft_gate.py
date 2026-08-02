@@ -89,6 +89,11 @@ TOP5_ROW_FIELDS = ("rank", "name", "value")
 # all of itself instead, because there is nothing being held back.
 TOP5_DEPTH = 5
 
+# Slack between the declared gap and the one the rows imply. Wide enough for
+# rounding in the facts file, narrow enough that a gap taken from a different
+# table than the one printed does not fit through.
+GAP_TOLERANCE = 0.001
+
 YEAR_MIN, YEAR_MAX = 1990, 2026
 
 # Words that look like names and identify nobody. Every subject in the file
@@ -543,6 +548,27 @@ def validate_superlatives(supers):
                 problems.append(
                     f"{where}: top5[{j}] missing or empty field(s): "
                     f"{', '.join(row_missing)}."
+                )
+
+        # The gap is the whole point of declaring rank 2, so it is checked
+        # against the rows rather than taken on trust. A declared gap that
+        # disagrees with the table it was drawn from is the same defect as a
+        # window describing a population the rows do not hold: a slot in the
+        # schema exists to be verified, not believed.
+        top_two = top5[:2]
+        if (
+            is_number(entry.get("gap_to_rank_2"))
+            and len(top_two) == 2
+            and all(isinstance(row, dict) for row in top_two)
+            and all(is_number(row.get("value")) for row in top_two)
+        ):
+            implied = abs(top_two[0]["value"] - top_two[1]["value"])
+            declared = entry["gap_to_rank_2"]
+            if abs(implied - declared) > GAP_TOLERANCE:
+                problems.append(
+                    f'{where}: "gap_to_rank_2" is {declared}, but top5 rank 1 '
+                    f"({top_two[0]['value']}) and rank 2 "
+                    f"({top_two[1]['value']}) are {implied:g} apart."
                 )
 
     return problems
