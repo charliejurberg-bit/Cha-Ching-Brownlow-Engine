@@ -13,6 +13,8 @@ exits 0 with a one-line summary.
                            total smuggles a denominator in
     CHECK 3  attribution   every figure in the prose traces back to a facts
                            entry whose subject is named alongside it
+    CHECK 4  depth         a superlative declares the set it won, how far
+                           clear it is, and whether its threshold was chosen
 """
 
 import json
@@ -53,6 +55,39 @@ RANKED_TABLE_FIELDS = ("subject", "window", "rows")
 MIN_RANKED_ROWS = 2
 
 SUPERLATIVES = ("only", "no other", "best", "worst", "highest", "lowest")
+
+SUPERLATIVE_RE = re.compile(
+    "|".join(rf"\b{w.replace(' ', r'\s+')}\b" for w in SUPERLATIVES),
+    re.IGNORECASE,
+)
+
+# A ranked table shows that a ranking exists. These fields show how much the
+# ranking is worth: how big the set was, how far clear the winner is, and
+# whether the threshold defining the set was chosen to fit or survived a move
+# in both directions.
+SUPERLATIVE_FIELDS = (
+    "claim_id",
+    "subject",
+    "scale",
+    "window",
+    "threshold",
+    "threshold_unit",
+    "set_size",
+    "top5",
+    "gap_to_rank_2",
+    "stricter_threshold",
+    "survives_stricter",
+    "looser_threshold",
+    "survives_looser",
+    "threshold_chosen_to_fit",
+    "source_file",
+)
+
+TOP5_ROW_FIELDS = ("rank", "name", "value")
+
+# Five is the depth a reader needs to see the near misses. A smaller set shows
+# all of itself instead, because there is nothing being held back.
+TOP5_DEPTH = 5
 
 YEAR_MIN, YEAR_MAX = 1990, 2026
 
@@ -133,6 +168,11 @@ def numbers_in(s):
     return [float(m.group(0).replace(",", "")) for m in NUMBER_RE.finditer(s)]
 
 
+def is_number(value):
+    """A real number. Booleans are ints in Python and are not numbers here."""
+    return isinstance(value, (int, float)) and not isinstance(value, bool)
+
+
 def harvest_numbers(node, sink):
     """Walk the facts JSON and collect every number, including those inside
     strings (so "17 meetings" and 17 both count)."""
@@ -171,6 +211,29 @@ def facts_entries(facts):
         harvest_numbers(total, values)
         subject = total.get("subject", "") if isinstance(total, dict) else ""
         entries.append((f"totals[{i}]", str(subject), values))
+
+    # A superlative entry sources figures like any other. It has to, because
+    # CHECK 4 makes a chosen threshold disclose itself in the prose, and a
+    # figure the copy is required to print must have somewhere to come from.
+    for i, claim in enumerate(facts.get("superlatives") or []):
+        if not isinstance(claim, dict):
+            continue
+
+        subject = str(claim.get("subject", ""))
+        header = {k: v for k, v in claim.items() if k != "top5"}
+        values = set()
+        harvest_numbers(header, values)
+        entries.append((f"superlatives[{i}]", subject, values))
+
+        for j, row in enumerate(claim.get("top5") or []):
+            values = set()
+            harvest_numbers(row, values)
+            name = str(row.get("name", "")) if isinstance(row, dict) else ""
+            entries.append((
+                f"superlatives[{i}].top5[{j}]",
+                f"{name} {subject}".strip(),
+                values,
+            ))
 
     for i, table in enumerate(facts.get("ranked_tables") or []):
         if not isinstance(table, dict):
@@ -373,6 +436,131 @@ def validate_totals(totals):
     return problems
 
 
+def validate_superlatives(supers):
+    """Shape-check every superlatives entry.
+
+    Returns a list of problem strings in entry order, empty if all are sound.
+    Collects every offence rather than stopping at the first, so one run tells
+    the author everything that needs fixing.
+    """
+    if not isinstance(supers, list):
+        return [
+            f"superlatives must be a list of claim objects, got "
+            f"{type(supers).__name__}."
+        ]
+
+    problems = []
+
+    for i, entry in enumerate(supers):
+        where = f"superlatives[{i}]"
+
+        if not isinstance(entry, dict):
+            problems.append(
+                f"{where}: must be an object carrying "
+                f"{', '.join(SUPERLATIVE_FIELDS)}, got {type(entry).__name__}."
+            )
+            continue
+
+        missing = [
+            f
+            for f in SUPERLATIVE_FIELDS
+            if f not in entry
+            or entry[f] is None
+            or (isinstance(entry[f], str) and not entry[f].strip())
+        ]
+        if missing:
+            problems.append(
+                f"{where}: missing or empty required field(s): "
+                f"{', '.join(missing)}."
+            )
+
+        # A survival flag read from a string is always truthy, so "false" would
+        # silently report that the claim held.
+        for key in ("survives_stricter", "survives_looser",
+                    "threshold_chosen_to_fit"):
+            if key in entry and not isinstance(entry[key], bool):
+                problems.append(
+                    f'{where}: "{key}" must be true or false, got '
+                    f"{type(entry[key]).__name__}."
+                )
+
+        if "gap_to_rank_2" in entry and not is_number(entry["gap_to_rank_2"]):
+            problems.append(
+                f'{where}: "gap_to_rank_2" must be a number, got '
+                f"{type(entry['gap_to_rank_2']).__name__}."
+            )
+
+        # threshold is compared against the prose when the claim admits its
+        # threshold was chosen, so it has to be a figure rather than prose.
+        if "threshold" in entry and not is_number(entry["threshold"]):
+            problems.append(
+                f'{where}: "threshold" must be a number, got '
+                f"{type(entry['threshold']).__name__}."
+            )
+
+        set_size = entry.get("set_size")
+        set_size_ok = isinstance(set_size, int) and not isinstance(set_size, bool)
+        if "set_size" in entry and not set_size_ok:
+            problems.append(
+                f'{where}: "set_size" must be an integer, got '
+                f"{type(set_size).__name__}."
+            )
+
+        if "top5" not in entry:
+            continue
+
+        top5 = entry["top5"]
+        if not isinstance(top5, list):
+            problems.append(
+                f'{where}: "top5" must be a list, got {type(top5).__name__}.'
+            )
+            continue
+
+        if set_size_ok:
+            wanted = set_size if set_size < TOP5_DEPTH else TOP5_DEPTH
+            if len(top5) != wanted:
+                plural = "row" if len(top5) == 1 else "rows"
+                problems.append(
+                    f'{where}: "top5" has {len(top5)} {plural}, and a set of '
+                    f"{set_size} requires {wanted}."
+                )
+
+        for j, row in enumerate(top5):
+            if not isinstance(row, dict):
+                problems.append(
+                    f"{where}: top5[{j}] must be an object carrying "
+                    f"{', '.join(TOP5_ROW_FIELDS)}, got {type(row).__name__}."
+                )
+                continue
+            row_missing = [
+                f
+                for f in TOP5_ROW_FIELDS
+                if f not in row
+                or row[f] is None
+                or (isinstance(row[f], str) and not row[f].strip())
+            ]
+            if row_missing:
+                problems.append(
+                    f"{where}: top5[{j}] missing or empty field(s): "
+                    f"{', '.join(row_missing)}."
+                )
+
+    return problems
+
+
+def report_superlatives(supers):
+    """Print the depth behind each superlative, so a reviewer can judge the
+    claim without opening the facts file."""
+    for i, entry in enumerate(supers):
+        print(
+            f"SUPER superlatives[{i}]: {entry['subject']} "
+            f"| window: {entry['window']} "
+            f"| threshold: {entry['threshold']} {entry['threshold_unit']} "
+            f"| set: {entry['set_size']} "
+            f"| gap to rank 2: {entry['gap_to_rank_2']}"
+        )
+
+
 def report_ranked_tables(ranked):
     """Print what the superlative was checked against, so a reviewer can judge
     the ranking without opening the facts file."""
@@ -402,11 +590,7 @@ def check_superlative(draft_text, facts, draft_path, facts_path):
         report_ranked_tables(ranked)
         return
 
-    pattern = re.compile(
-        "|".join(rf"\b{w.replace(' ', r'\s+')}\b" for w in SUPERLATIVES),
-        re.IGNORECASE,
-    )
-    match = pattern.search(draft_text)
+    match = SUPERLATIVE_RE.search(draft_text)
     if not match:
         return
 
@@ -576,6 +760,72 @@ def check_orphan_numbers(draft_text, facts, draft_path):
         )
 
 
+def check_superlative_depth(draft_text, facts, facts_text, facts_path):
+    """A superlative is a ranking claim, and a ranking claim has a depth.
+
+    CHECK 1 asks whether a ranking exists. This asks what the ranking is worth:
+    how large the set was, how far clear rank 1 is of rank 2, and whether the
+    threshold that defines the set survives being moved in either direction. A
+    claim that is true only at one threshold is a claim about the threshold.
+
+    Where the entry admits the threshold was chosen to fit, the copy has to say
+    so: both the threshold and the size of the set it produced must appear in
+    the prose, so the reader sees the claim was cut to shape.
+
+    claim_id is validated as a field but is not yet bound to a sentence, so a
+    draft that declares no superlatives at all still passes here. CHECK 1 owns
+    the unbacked case; this check owns the depth of what is declared.
+    """
+    if not SUPERLATIVE_RE.search(draft_text):
+        return
+
+    if "superlatives" not in facts:
+        return
+
+    supers = facts["superlatives"]
+
+    problems = validate_superlatives(supers)
+    if problems:
+        fail(
+            "CHECK 4 superlative depth",
+            f"malformed superlatives in {facts_path}:\n"
+            + "\n".join(f"        {problem}" for problem in problems),
+        )
+
+    prose_numbers = set(numbers_in(draft_text))
+
+    for i, entry in enumerate(supers):
+        if not entry["threshold_chosen_to_fit"]:
+            continue
+
+        undisclosed = [
+            f"{label} ({value})"
+            for label, value in (
+                ("threshold", entry["threshold"]),
+                ("set_size", entry["set_size"]),
+            )
+            if float(value) not in prose_numbers
+        ]
+        if not undisclosed:
+            continue
+
+        lineno, line = find_in_facts(facts_text, str(entry["claim_id"]))
+        fail(
+            "CHECK 4 undisclosed threshold",
+            f'superlatives[{i}] "{entry["claim_id"]}" declares '
+            f"threshold_chosen_to_fit, but the prose does not disclose "
+            f"{', '.join(undisclosed)}. A superlative that holds only at a "
+            f"threshold picked for it must print that threshold and the size "
+            f"of the set it produced, or the reader cannot see the claim was "
+            f"cut to shape.",
+            lineno,
+            line,
+            facts_path,
+        )
+
+    report_superlatives(supers)
+
+
 # ---------------------------------------------------------------- entry
 
 def main(argv):
@@ -611,16 +861,19 @@ def main(argv):
     check_superlative(draft_text, facts, draft_path, facts_path)
     check_denominator(facts, facts_text, facts_path)
     check_orphan_numbers(draft_text, facts, draft_path)
+    check_superlative_depth(draft_text, facts, facts_text, facts_path)
 
     n_rates = len(facts.get("rates") or [])
     n_totals = len(facts.get("totals") or [])
     n_tables = len(facts.get("ranked_tables") or [])
+    n_supers = len(facts.get("superlatives") or [])
     print(
         f"PASS  {draft_path.name}: "
         f"{facts.get('fixture', '?')}, round {facts.get('round', '?')}, "
         f"{n_rates} rate(s), {n_totals} total(s), {n_tables} ranked table(s), "
+        f"{n_supers} superlative(s), "
         f"{len(facts.get('source_files') or [])} source file(s); "
-        f"superlative, denominator and orphan-number checks all clear."
+        f"superlative, denominator, orphan-number and depth checks all clear."
     )
     return 0
 

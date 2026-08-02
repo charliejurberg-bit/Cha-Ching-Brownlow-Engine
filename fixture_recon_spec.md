@@ -272,6 +272,12 @@ Schema, which must match draft_gate.py exactly:
                             denominator_type, source_file}
     totals         list of {subject, value, source_file}
     ranked_tables  list of {subject, window, rows}
+    superlatives   list of {claim_id, subject, scale, window, threshold,
+                            threshold_unit, set_size, top5 [{rank, name,
+                            value}], gap_to_rank_2, stricter_threshold,
+                            survives_stricter, looser_threshold,
+                            survives_looser, threshold_chosen_to_fit,
+                            source_file}
 
 round and raw_round are both exempt from the orphan-number check, because a
 draft cites the AFL's round number and AFLTables' raw one and neither is a
@@ -295,6 +301,14 @@ total; putting one in totals would route it around every denominator check.
 
 Every ranked_tables entry must state its window, including the minimum meetings
 threshold and whether the current season is included.
+
+superlatives records the depth behind a superlative that ranked_tables cannot
+show: the size of the set, the gap from rank 1 to rank 2, and whether the claim
+survives the threshold being moved in both directions. top5 carries five rows,
+or the whole set when it is smaller than five. Where threshold_chosen_to_fit is
+true the copy must print both the threshold and the set size, so the reader can
+see the claim was cut to shape. claim_id is carried now and is not yet bound to
+a sentence, so declaring no superlatives leaves the check silent.
 
 The run ends by executing python draft_gate.py drafts/<name>.md and reporting
 the exit code. A non-zero exit is a failed run, not a warning.
