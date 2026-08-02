@@ -9,7 +9,8 @@ exits 0 with a one-line summary.
 
     CHECK 1  superlative   a superlative claim needs a well-formed ranked
                            table behind it
-    CHECK 2  denominator   every rate declares what it is a rate *of*
+    CHECK 2  denominator   every rate declares what it is a rate *of*, and no
+                           total smuggles a denominator in
     CHECK 3  orphan number every figure in the prose traces back to the facts
 """
 
@@ -36,6 +37,12 @@ VOTE_ELIGIBLE = {"vote_eligible_games", "matches_between_clubs"}
 NOT_VOTE_ELIGIBLE = DENOMINATOR_TYPES - VOTE_ELIGIBLE
 
 RATE_FIELDS = ("subject", "value", "denominator", "denominator_type", "source_file")
+
+# A total is a raw count — career games, polls, votes — and carries no base,
+# because it is the base. The two keys a rate needs are exactly the two a total
+# must not have: anything divided by something is a rate and belongs in rates.
+TOTALS_FIELDS = ("subject", "value", "source_file")
+TOTALS_FORBIDDEN_FIELDS = ("denominator", "denominator_type")
 
 RANKED_TABLE_FIELDS = ("subject", "window", "rows")
 
@@ -191,6 +198,60 @@ def validate_ranked_tables(ranked):
     return problems
 
 
+def validate_totals(totals):
+    """Shape-check every totals entry.
+
+    Returns a list of problem strings in entry order, empty if all are sound.
+    Collects every offence rather than stopping at the first, so one run tells
+    the author everything that needs fixing.
+
+    A total exists so a rate has something to be read against: block 8c's career
+    games, polls and votes sit here while votes per game sits in rates. The slot
+    earns its keep only if the two stay separate, which is why a denominator
+    appearing on a total is fatal rather than ignored.
+    """
+    # Name the real fault before iterating, for the same reason
+    # validate_ranked_tables does: a bare string enumerates into one phantom
+    # problem per character, and a number is not iterable at all.
+    if not isinstance(totals, list):
+        return [
+            f"totals must be a list of total objects, got "
+            f"{type(totals).__name__}."
+        ]
+
+    problems = []
+
+    for i, entry in enumerate(totals):
+        where = f"totals[{i}]"
+
+        if not isinstance(entry, dict):
+            problems.append(
+                f"{where}: must be an object carrying "
+                f"{', '.join(TOTALS_FIELDS)}, got {type(entry).__name__}."
+            )
+            continue
+
+        missing = [
+            f for f in TOTALS_FIELDS if f not in entry or entry[f] in (None, "")
+        ]
+        if missing:
+            problems.append(
+                f"{where}: missing or empty required field(s): "
+                f"{', '.join(missing)}."
+            )
+
+        smuggled = [f for f in TOTALS_FORBIDDEN_FIELDS if f in entry]
+        if smuggled:
+            problems.append(
+                f"{where}: carries {', '.join(smuggled)}. A total is a raw "
+                f"count and has no denominator. A figure that needs one is a "
+                f"rate and belongs in rates, where the denominator checks can "
+                f"see it."
+            )
+
+    return problems
+
+
 def report_ranked_tables(ranked):
     """Print what the superlative was checked against, so a reviewer can judge
     the ranking without opening the facts file."""
@@ -242,7 +303,17 @@ def check_superlative(draft_text, facts, draft_path, facts_path):
 
 def check_denominator(facts, facts_text, facts_path):
     """Every rate must say what it is a rate of, no rate may rest on an
-    unavailable denominator, and vote rates must use a vote-eligible one."""
+    unavailable denominator, vote rates must use a vote-eligible one, and a
+    total must not carry a denominator at all."""
+    if "totals" in facts:
+        problems = validate_totals(facts["totals"])
+        if problems:
+            fail(
+                "CHECK 2 totals shape",
+                f"malformed totals in {facts_path}:\n"
+                + "\n".join(f"        {problem}" for problem in problems),
+            )
+
     for i, rate in enumerate(facts.get("rates") or []):
         subject = rate.get("subject", f"rates[{i}]")
 
@@ -373,11 +444,12 @@ def main(argv):
     check_orphan_numbers(draft_text, facts, draft_path)
 
     n_rates = len(facts.get("rates") or [])
+    n_totals = len(facts.get("totals") or [])
     n_tables = len(facts.get("ranked_tables") or [])
     print(
         f"PASS  {draft_path.name}: "
         f"{facts.get('fixture', '?')}, round {facts.get('round', '?')}, "
-        f"{n_rates} rate(s), {n_tables} ranked table(s), "
+        f"{n_rates} rate(s), {n_totals} total(s), {n_tables} ranked table(s), "
         f"{len(facts.get('source_files') or [])} source file(s); "
         f"superlative, denominator and orphan-number checks all clear."
     )

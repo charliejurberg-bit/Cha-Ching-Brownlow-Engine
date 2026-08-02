@@ -338,6 +338,9 @@ book's line. `BETFAIR_MIN_BACK = 1.5` filters lay prices.
   wrong: Geelong 1.14 and Port 1.11 also cleared 1.00.
 - **Every figure in a report is computed in the run that reports it.** No figure
   carried forward, no figure hand-summed.
+- **Raw counts are sourced like everything else.** A total in a facts file
+  carries a source file, same as a rate; it is exempt from the denominator, not
+  from provenance.
 - **Extending a range can kill a claim rather than strengthen it.** Ablett
   dropped from 2nd to 11th on eight extra meetings and one extra vote when the
   archive went back to 1990. Ask what a wider denominator would do before

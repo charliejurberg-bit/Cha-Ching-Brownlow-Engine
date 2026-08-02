@@ -269,12 +269,24 @@ Schema, which must match draft_gate.py exactly:
     source_files   list of str, every file the run read
     rates          list of {subject, value, denominator,
                             denominator_type, source_file}
+    totals         list of {subject, value, source_file}
     ranked_tables  list of {subject, window, rows}
 
 denominator_type is one of the values in draft_gate.DENOMINATOR_TYPES. Vote
 rates may only carry vote_eligible_games or matches_between_clubs. A rate may
 never carry unavailable; where the denominator cannot be derived, state that in
 the copy instead of printing a rate.
+
+totals holds the raw counts a rate is read against. Block 8c mandates career
+games, polls, votes and votes per game for every shortlisted player: the votes
+per game lives in rates, and the games, polls and votes it is computed from live
+in totals. Without the counts the gate treats them as orphan figures the moment
+the copy prints them, which is the correct answer, because a rate with no
+baseline is the thing block 8c exists to prevent.
+
+A totals entry carries no denominator and no denominator_type, and the gate
+hard-fails if either key appears. A figure with a denominator is a rate, never a
+total; putting one in totals would route it around every denominator check.
 
 Every ranked_tables entry must state its window, including the minimum meetings
 threshold and whether the current season is included.
