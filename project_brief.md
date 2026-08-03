@@ -347,9 +347,24 @@ book's line. `BETFAIR_MIN_BACK = 1.5` filters lay prices.
   Rowell is the only material one, 4.67 expected votes at 501. "Nic Martin" and
   "Tom Green" have no counterpart in the model universe at all.
 - Jason Horne-Francis is genuinely unquoted, rank 11 by expected votes.
-- **`scraper_odds.py` overwrites on every run.** No `_prev`, no timestamped
-  filenames. Git history holds 12 clean distinct snapshots for 2026 — the only
-  price history that will ever exist for this season.
+- **Price history is appended in-repo, not overwritten away.** The two working
+  files are still rewritten whole each run, and there is no `_prev` and no
+  timestamped filename for them. But `_append_history()` writes `mode="a"` to
+  `data_2026/bookmaker_odds_history.csv` (long: player, bookie, odds,
+  scraped_at) and `data_2026/best_odds_history.csv` (best_odds schema, one block
+  per run), both git-tracked. It dedupes on `scraped_at`, so a re-run against an
+  unchanged scrape is a no-op. Earlier briefs said git history was the only price
+  record that would ever exist for this season. It is not: the history files are.
+- **The eight books behind `implied_prob` are UK books**, not the Australian
+  ones: bet365, Unibet, BetMGM UK, Virgin Bet, Betway, Skybet, Paddy Power,
+  Betfair. They are what survives into columns out of 26 bookmaker names detected
+  on the page. Note the scraper prints "Bookmakers found" twice with different
+  meanings, 26 on the page and 8 in the final frame.
+  This is a **different set from the Australian books in CLAUDE.md's Betting Hub
+  section** (Sportsbet, TAB, Betfair, Ladbrokes, Neds, PointsBet, Unibet), and
+  the two are not meant to match: this list is what the Oddschecker scrape
+  returns and feeds the model-vs-market surfaces, that list is the dropdown for
+  manually logging a bet. Only Betfair and Unibet appear in both.
 
 ## Data integrity rules
 
@@ -509,16 +524,15 @@ Copy rules, permanent:
 1. Superlative and denominator gates: a script that fails the build when a draft
    makes a superlative claim without a ranked table, or states a per-game rate
    without a denominator and source file.
-2. `scraper_odds.py` append-with-timestamp instead of overwrite.
-3. Remove the Streamlit landing page — Vercel is the front door.
-4. Script the deterministic post-round chain (`update.py`, `draft_posts.py`,
+2. Remove the Streamlit landing page — Vercel is the front door.
+3. Script the deterministic post-round chain (`update.py`, `draft_posts.py`,
    `streaks.py`) with exit-code checks, stopping on failure.
-5. Forum post and first weekly scorecard, built on the calibration table.
-6. Resolve the MAE question above.
-7. Result posts for the Mullin and Bontempelli previews. Three handovers
+4. Forum post and first weekly scorecard, built on the calibration table.
+5. Resolve the MAE question above.
+6. Result posts for the Mullin and Bontempelli previews. Three handovers
    outstanding. Previews without results are the half of the record that does not
    count.
-8. Resend SMTP wiring, once the custom domain is live.
+7. Resend SMTP wiring, once the custom domain is live.
 
 ## Known deferred, non-blocking
 
