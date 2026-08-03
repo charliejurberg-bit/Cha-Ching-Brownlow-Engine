@@ -186,18 +186,18 @@ def fetch_round(driver, wheelo_round):
         if filepath:
             try:
                 df = pd.read_csv(filepath)
-                print(f"  R{wheelo_round:02d}: downloaded {len(df)} rows")
+                print(f"  Wheelo R{wheelo_round:02d}: downloaded {len(df)} rows")
                 return df
             except Exception as e:
-                print(f"  R{wheelo_round:02d}: download parse error — {e}")
+                print(f"  Wheelo R{wheelo_round:02d}: download parse error — {e}")
 
     # Fallback: parse from page
     df = parse_table_from_page(driver)
     if df is not None:
-        print(f"  R{wheelo_round:02d}: parsed {len(df)} rows from page")
+        print(f"  Wheelo R{wheelo_round:02d}: parsed {len(df)} rows from page")
         return df
 
-    print(f"  R{wheelo_round:02d}: no data")
+    print(f"  Wheelo R{wheelo_round:02d}: no data")
     return None
 
 
@@ -262,7 +262,7 @@ def main():
             shutil.copy2(OUTPUT_CSV, OUTPUT_CSV.replace('.csv', '_prev.csv'))
         combined.to_csv(OUTPUT_CSV, index=False)
         print(f"\nSaved {len(combined)} total rows to {OUTPUT_CSV}")
-        print(f"  Added {len(new_df)} new rows for rounds "
+        print(f"  Added {len(new_df)} new rows for AFLTables rounds "
               f"{sorted(new_df['Round'].unique())}")
 
         # Show updated leaderboard
