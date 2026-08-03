@@ -41,7 +41,11 @@ Twitter/X: `@ChaChingBrwnlow` (no "o" in Brwnlow).
   baseline on all four private tables.
 - **Playwright** — live Betfair + ESPN fetch inside `dashboard.py`
 - **undetected_chromedriver** — Oddschecker scraper (`scraper_odds.py`, local only)
-- **R** — `data_pull.py` and `scripts/build_history.R` (fitzRoy)
+- **R** — two scripts, both fitzRoy: `fetch_extended_data.R` (2007–2014 player
+  stats, 2006–2014 coaches votes) and `scripts/build_history.R` (the 1990–2006
+  archive, run from repo root). **`data_pull.py` does no work: it is 0 bytes**,
+  and has been empty since the initial commit. Earlier briefs listed it here as
+  the historical fetcher.
 - Data sources: fitzRoy, Wheelo ratings, Oddschecker, Betfair, ESPN,
   AFL Predictor API, Squiggle API, AFL public API
 
@@ -122,7 +126,11 @@ brownlow_engine/
 ├── scraper_stats.py          # Squiggle player stats
 ├── scraper_wheelo.py         # Wheelo ratings
 ├── update_wheelo_2026.py     # 2026 Wheelo update
-├── data_pull.py              # Historical fetch (fitzRoy/R)
+├── data_pull.py              # EMPTY, 0 bytes since the initial commit. Does
+│                             #   nothing. The historical fetch is R: see
+│                             #   fetch_extended_data.R and scripts/build_history.R
+├── fetch_extended_data.R     # fitzRoy: 2007–2014 player stats, 2006–2014
+│                             #   coaches votes. Run via source() in R.
 │
 ├── scripts/
 │   └── build_history.R       # Producer for the 1990–2006 archive. Run from repo root.
