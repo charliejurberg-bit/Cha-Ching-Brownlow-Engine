@@ -4,7 +4,7 @@ Marcus Bontempelli,Western Bulldogs,0,19,1.3441,2,2.69,2.69,18.0,33.0
 Bailey Smith,Geelong,0,18,1.2463,2,2.49,2.49,16.0,29.0
 Isaac Heeney,Sydney,0,17,1.159,2,2.32,2.32,13.0,27.0
 Will Ashcroft,Brisbane Lions,0,19,1.0586,2,2.12,2.12,13.0,28.0
-Patrick Cripps,Carlton,0,19,1.0561,2,2.11,2.11,13.0,27.0
+Patrick Cripps,Carlton,0,19,1.0573,2,2.11,2.11,13.0,27.0
 Nasiah Wanganeen-Milera,St Kilda,0,15,1.0453,2,2.09,2.09,9.0,22.0
 Zak Butters,Port Adelaide,0,17,1.0061,2,2.01,2.01,11.0,23.0
 Jordan Dawson,Adelaide,0,16,0.9937,2,1.99,1.99,10.0,23.0
@@ -36,13 +36,13 @@ Finn Callaghan,Greater Western Sydney,0,19,0.5221,2,1.04,1.04,5.0,16.0
 Toby Greene,Greater Western Sydney,0,18,0.5043,2,1.01,1.01,4.0,15.0
 Chad Warner,Sydney,0,19,0.5045,2,1.01,1.01,4.9,15.0
 Luke Davies-Uniacke,North Melbourne,0,19,0.4983,2,1.0,1.0,4.0,15.0
-George Hewett,Carlton,0,15,0.4917,2,0.98,0.98,3.0,13.0
+George Hewett,Carlton,0,15,0.4899,2,0.98,0.98,3.0,13.0
 Murphy Reid,Fremantle,0,19,0.4708,2,0.94,0.94,4.0,15.0
-Rowan Marshall,St Kilda,0,17,0.4217,2,0.84,0.84,2.0,12.0
 Noah Anderson,Gold Coast,0,18,0.4193,2,0.84,0.84,3.0,12.0
+Rowan Marshall,St Kilda,0,17,0.4217,2,0.84,0.84,2.0,12.0
 Hugo Garcia,St Kilda,0,19,0.416,2,0.83,0.83,3.0,13.0
-Jacob van Rooyen,Melbourne,0,19,0.3956,2,0.79,0.79,3.0,12.0
 Jye Amiss,Fremantle,0,19,0.396,2,0.79,0.79,3.0,13.0
+Jacob van Rooyen,Melbourne,0,19,0.3956,2,0.79,0.79,3.0,12.0
 Wayne Milera,Adelaide,0,17,0.3884,2,0.78,0.78,2.0,11.0
 Sam Berry,Adelaide,0,19,0.3871,2,0.77,0.77,3.0,12.0
 Jarman Impey,Hawthorn,0,17,0.378,2,0.76,0.76,2.0,11.0
@@ -68,7 +68,7 @@ Mark Keane,Adelaide,0,5,0.2567,2,0.51,0.51,0.0,3.0
 Archie Roberts,Essendon,0,17,0.2497,2,0.5,0.5,0.0,8.0
 Tristan Xerri,North Melbourne,0,15,0.2509,2,0.5,0.5,0.0,8.0
 Matthew Kennedy,Western Bulldogs,0,19,0.2382,2,0.48,0.48,1.0,9.0
-Jordan de Goey,Collingwood,0,18,0.239,2,0.48,0.48,1.0,8.0
+Jordan de Goey,Collingwood,0,18,0.2392,2,0.48,0.48,1.0,8.0
 Tom Liberatore,Western Bulldogs,0,8,0.2423,2,0.48,0.48,0.0,5.0
 Taylor Walker,Adelaide,0,13,0.2358,2,0.47,0.47,0.0,6.0
 Will Day,Hawthorn,0,7,0.2306,2,0.46,0.46,0.0,4.0
@@ -135,8 +135,8 @@ Kane McAuliffe,Richmond,0,9,0.111,2,0.22,0.22,0.0,3.0
 Charlie Cameron,Brisbane Lions,0,19,0.1106,2,0.22,0.22,0.0,5.0
 Jordan Clark,Fremantle,0,19,0.1082,2,0.22,0.22,0.0,5.0
 Jack Macrae,St Kilda,0,10,0.106,2,0.21,0.21,0.0,3.0
+Dan Houston,Collingwood,0,19,0.1058,2,0.21,0.21,0.0,5.0
 James Peatling,Adelaide,0,19,0.105,2,0.21,0.21,0.0,5.0
-Dan Houston,Collingwood,0,19,0.1038,2,0.21,0.21,0.0,5.0
 Mitch Lewis,Hawthorn,0,19,0.1032,2,0.21,0.21,0.0,4.0
 Jy Simpkin,North Melbourne,0,19,0.1029,2,0.21,0.21,0.0,5.0
 Bailey Williams (West Coast),West Coast,0,15,0.104,2,0.21,0.21,0.0,4.0
