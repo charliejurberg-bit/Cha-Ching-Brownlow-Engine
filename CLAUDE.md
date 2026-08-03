@@ -1,8 +1,12 @@
 # Cha Ching — Brownlow Medal Predictor & Betting Hub
 
-Personal AFL Brownlow Medal prediction + betting tracker. XGBoost model (v4.0) trained on 2015–2025 data. Dashboard runs live during the 2026 season.
+AFL Brownlow Medal predictor plus a betting tracker. XGBoost model (v4.0) trained on 2015–2025 data. Dashboard runs live during the 2026 season.
 
-> **Read `project_brief.md` first.** It contains the current page structure, accurate line numbers for every function, the correct file sizes, the Midnight Turf colour tokens, and up-to-date known issues. The sections below cover architecture and constraints that change rarely.
+**Only the Betting Hub is personal.** The Brownlow section is the free public product, launched to AFL betting forums with no paywall and no paid tips; the Betting Hub is private and admin-gated. Treat any copy decision as public-facing unless it lives behind the gate.
+
+> **Read `project_brief.md` first.** It contains the current page structure, the correct file sizes, the Midnight Turf colour tokens, and up-to-date known issues. The sections below cover architecture and constraints that change rarely.
+>
+> **Anchoring rule: locate code by function name or by a literal string, never by line number.** The brief carries no function line numbers and no function tables, deliberately: two earlier briefs carried tables and both went stale, the last recon finding one false entry for `dashboard.py` and six for `betting_hub.py`. Do not add them here either. Pages in particular are not functions, see "Dashboard pages".
 
 ## Quick start
 
@@ -22,7 +26,9 @@ python predict_2026.py
 
 ```
 brownlow_engine/
-├── dashboard.py          # Main Streamlit app — 4000+ lines, all pages + CSS
+├── dashboard.py          # Main Streamlit app — 7,838 lines. Brownlow pages + hub
+│                         #   router + global CSS. NOT all pages: the Betting Hub
+│                         #   pages render from betting_hub.py (except Predictions)
 ├── betting_hub.py        # Betting Hub module, imported by dashboard.py
 │
 ├── brownlow_model.py     # Model training (v4.0) — runs once per season
@@ -31,7 +37,8 @@ brownlow_engine/
 │
 ├── scraper_stats.py      # Pulls player stats from Squiggle API → data_2026/
 ├── scraper_odds.py       # Scrapes multi-bookie odds from Oddschecker (undetected-chromedriver)
-├── data_pull.py          # Historical data fetcher (fitzRoy / R)
+├── data_pull.py          # EMPTY, 0 bytes. Not a fetcher. The R paths that do
+│                         #   work are fetch_extended_data.R and scripts/build_history.R
 ├── fetch_extended_data.R # R script for fitzRoy data (coaches votes etc.)
 ├── backtest.py           # Backtesting harness
 │
@@ -56,11 +63,16 @@ brownlow_engine/
 │   ├── wheelo_all_seasons.csv
 │   └── wheelo_2026.csv
 │
-├── data_betting/         # Betting Hub persistent storage
+├── data_betting/         # Betting Hub READ-ONLY fallback CSVs (4 files). Not the
+│   │                     #   store — Supabase is. Nothing in the repo writes these.
 │   ├── bets.csv          # Bet log (bet_id, date, match, market, selection, odds, result…)
-│   └── cha_ching_tips.csv
+│   ├── bets_prev.csv
+│   ├── cha_ching_tips.csv
+│   └── player_props_cache.csv
 │
-└── fitzroy_stats_all.csv      # Historical stats 2015–2025 (training data)
+└── fitzroy_stats_all.csv      # Historical stats 2007–2025, 170,028 rows. NOT the
+                               #   training range: 2015–2025 is fitzroy_stats_2015_2025.csv
+                               #   (fitzroy_stats_2007_2014.csv holds the earlier half)
     coaches_votes_all.csv      # Historical coaches votes 2006–2025
 ```
 
@@ -69,7 +81,7 @@ brownlow_engine/
 | Layer | Tech |
 |---|---|
 | Dashboard | Streamlit (wide layout, collapsed sidebar) |
-| Charts | Plotly (paper_bgcolor/plot_bgcolor match earthy palette) |
+| Charts | Plotly. `paper_bgcolor`/`plot_bgcolor` are `rgba(0,0,0,0)`, transparent, so the Midnight Turf page shows through |
 | Model | XGBoost `XGBClassifier` (multiclass: 0/1/2/3 votes) |
 | Data — historical | fitzRoy (R package) via `fetch_extended_data.R` |
 | Data — live stats | Squiggle API (`api.squiggle.com.au`) |
@@ -94,9 +106,15 @@ brownlow_engine/
 
 **Feature groups:**
 1. **Base** (28): raw stats (Kicks, Disposals, Goals, Clearances, etc.) + engineered ratios (`Kick_to_HB_ratio`, `Contested_rate`, `Disposal_efficiency`, `Score_Involvements`, `Impact_Score`) + game context (Margin, Is_Win, Coaches_Votes)
-2. **Wheelo** (18): `RatingPoints`, `ExpVotes`, per-quarter ratings (`Rating_Q1`–`Q4`), equity components, ground ball gets, Supercoach, `TimeOnGround`, `DisposalEfficiency` + `Rating_Q4_premium`, `Best_quarter_rating`
+2. **Wheelo** (20, per `predictions/wheelo_features.pkl`; all 20 are in `features.pkl`): `RatingPoints`, `ExpVotes`, per-quarter ratings (`Rating_Q1`–`Q4`), equity components, ground ball gets, Supercoach, `TimeOnGround`, `DisposalEfficiency` + `Rating_Q4_premium`, `Best_quarter_rating`
 3. **Relative game** (~44): per-stat rank/percentile/z-score within each game (`{stat}_game_rank`, `_game_pct`, `_game_z`); BOG and Top3 flags for disposals, coaches votes, impact, rating
 4. **Form/Momentum** (3): `late_form_ewm` (EWMA span=5 of prior rounds — no lookahead), `momentum_cv`, `momentum_disp` (last-6 vs first-6 game averages)
+
+**These four counts do not sum to 93 and are not all verified.** Only the total
+(93, from `features.pkl`), Wheelo (20) and Form/Momentum (3) are backed by
+artifacts. Base and Relative game are inherited from an earlier brief and no
+artifact defines either group, so treat both as approximate. Count from
+`features.py` before relying on them.
 
 **Prediction outputs** (per game): `P_1`, `P_2`, `P_3`, `Poll_Prob` (P_1+P_2+P_3), `Exp_Votes` (weighted expected value).
 
