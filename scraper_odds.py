@@ -178,7 +178,7 @@ def scrape_oddschecker(driver) -> pd.DataFrame:
         print("  Error: no bookmaker columns found (no data-bk attributes in header)")
         return pd.DataFrame()
 
-    print(f"  Bookmakers found: {len(bk_names)}")
+    print(f"  Bookmakers in page header: {len(bk_names)}")
 
     # ── Extract player rows ──────────────────────────────────────
     rows: list[dict] = []
@@ -321,7 +321,7 @@ if __name__ == "__main__":
 
         # ── Summary ──────────────────────────────────────────────
         print(f"Players found  : {n_players}")
-        print(f"Bookmakers found: {n_bookies}")
+        print(f"Bookmakers kept: {n_bookies}")
         print(f"Bookmakers     : {', '.join(bookie_cols)}")
         print(f"\nSaved -> data_2026/bookmaker_odds.csv  ({n_players} players x {n_bookies} bookmakers)")
         print(f"Saved -> data_2026/best_odds.csv")
