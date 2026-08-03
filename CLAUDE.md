@@ -83,7 +83,13 @@ brownlow_engine/
 - **Training data**: 2015–2025 H&A rounds only (finals filtered; string-labeled rounds → NaN)
 - **CV**: 5-fold `GroupKFold` grouped by season (no data leakage across seasons)
 - **Sample weights**: last-5-rounds of each season weighted 2× (recency bias)
-- **MAE**: 0.0904 (v1: 0.0954, v2: 0.0910, v3: 0.0902)
+- **MAE**: **UNRESOLVED. Do not quote any MAE figure**, public or internal. The
+  v1–v4 numbers (0.0954 / 0.0910 / 0.0902 / 0.0904) that this line previously
+  stated as fact were all measured with a momentum leak in place, so none is
+  comparable to the others or to the current model. `brownlow_model.py` prints
+  them under the label "Pre-2026-audit figures"; its current printed baselines
+  are 0.0953 full model and 0.1013 no-coaches. Re-run against the current model
+  before any MAE figure is used anywhere. See `project_brief.md`, "## Model".
 - **Feature count**: 93 total
 
 **Feature groups:**
@@ -98,7 +104,8 @@ brownlow_engine/
 
 ## Dashboard pages
 
-Navigation is a **two-row tab bar**, and both rows are `st.button`s laid out in
+Navigation is a **tab bar of at most two rows** (the hub row is admin-only, see
+the row table below), and both rows are `st.button`s laid out in
 `st.columns` — *not* `st.selectbox`, `st.sidebar`, or `st.tabs`. They only look
 like tabs because of CSS. Each row's columns live in a **keyed container** —
 `_render_hub_tabs()` → `st.container(key="ccnav_hub")`, `_render_page_nav()` →
@@ -128,7 +135,7 @@ big `st.markdown` in `dashboard.py`) selects off those classes. Grep
 
 | Row | Rendered by | Contents |
 |---|---|---|
-| Hub toggle | `_render_hub_tabs()` | `Brownlow` · `Betting Hub` |
+| Hub toggle | `_render_hub_tabs()` | `Brownlow` · `Betting Hub`. **Admin only** — called under `if _is_admin:`, so an anonymous visitor sees one row, never two, and has no control that writes `active_hub`. |
 | Page strip | `_render_page_nav()` | one button per page of the active hub (`_snav_pages`) |
 
 Two pieces of state, both plain session keys:
@@ -138,12 +145,23 @@ Two pieces of state, both plain session keys:
 
 | Hub | Pages (in strip order) |
 |---|---|
-| Brownlow | Leaderboard, Player Profile, Stat Filter, Game Analysis, Model Comparison, Live Tracker |
-| Betting Hub (`_BH_PAGES`) | Performance, Predictions, Bet Tracker, Cha Ching Tips, Trends & Analysis, Polls a Vote |
+| Brownlow | Leaderboard, Player Profile, Stat Filter, Game Analysis, Model Comparison, Live Tracker, **Polls a Vote** |
+| Betting Hub (`_BH_PAGES`) | Performance, Predictions, Bet Tracker, Cha Ching Tips, Trends & Analysis |
+
+**`_BH_PAGES` has five members and Polls a Vote is not one of them.** It left the
+set and now sits at the end of the seven-button Brownlow strip, scoped per user
+by RLS rather than by the gate. Membership drives three surfaces, not just the
+nav strip: `_show_controls = _page not in _BH_PAGES`, the access gate
+`if _page in _BH_PAGES and not _is_admin:`, and the responsible-gambling footer
+guard `if _page not in _BH_PAGES:`. Filing Polls a Vote under the Betting Hub
+would gate it, suppress the season controls, and drop the RG footer.
 
 Behaviour worth knowing before touching nav:
 
-- **Landing renders no nav at all** — it's gated on `if _page != 'Landing'`.
+- **There is no Landing page**, and no `if _page != 'Landing'` guard. Both
+  `_page == 'Landing'` and `_page != 'Landing'` return zero hits in
+  `dashboard.py`; "Landing" survives only in a stale comment. The page strip
+  renders unconditionally.
 - **Switching hub reassigns `page`** if the current page belongs to the other hub
   (→ `Leaderboard` / `Performance`), so the strip is never showing a page the hub
   doesn't own.
@@ -156,8 +174,15 @@ Behaviour worth knowing before touching nav:
 
 Betting Hub pages render via `betting_hub.render_page(page_name)` (module imported at
 top of `dashboard.py`) — **except `Predictions`, which `dashboard.py` renders itself**.
-All `_BH_PAGES` sit behind a password gate that `st.stop()`s unless
-`st.session_state["bh_authed"]`; the gate runs after nav, so the bar stays visible.
+All `_BH_PAGES` sit behind an **admin-account check, not a password gate**:
+`if _page in _BH_PAGES and not _is_admin:` renders a private panel and calls
+`st.stop()`. `_is_admin = user_auth.is_admin()`, which matches the signed-in user
+against `st.secrets["ADMIN_UID"]` and fails closed on every path;
+`betting_hub.render_page()` carries an independent backstop on `cc_is_admin`.
+**No password is collected anywhere in this flow.** `bh_authed` and
+`BH_PASSWORD` survive only in historical comments and are never read or written.
+The one surviving password, `TIPS_EDIT_PASSWORD`, gates Tips *editing* rather
+than access. The gate runs after nav, so the bar stays visible.
 
 Several pages that this table once listed separately are now `st.tabs` *inside* a page:
 Player Profile → Profile / DNA / Compare · Model Comparison → 2026 (Live) / Insights ·
@@ -167,18 +192,29 @@ Predictions → Home / Value Finder.
 
 CSS lives in **one large `st.markdown()` block** at the top of `dashboard.py` (lines ~20–390) and a `BH_CSS` string constant in `betting_hub.py`. All Streamlit widget overrides use `!important`.
 
-**Earthy colour palette — never change these:**
+**Midnight Turf colour palette — never change these:**
 ```
-Background:    #faf7f2
-Primary green: #2d5016
-Light green:   #4a7a28
-Tan/brown:     #8b6f47
-Card bg:       #f0ece4
-Gold (betting):#c9a84c
-Light gold:    #e8c96d
-Border:        #ddd5c5
-Body text:     #2c2c2c
+Background:    #0a1017
+Surface:       #101a24
+Text:          #e9eef3
+Emerald:       #34d399
+Gold (betting):#f0b429
+Muted red:     #ef7a6d
+Border:        #1a2632
+Muted text:    #7e8c99
+Hairline:      rgba(140,165,185,.14)
 ```
+
+Tokens are defined once in `theme.py` (`--bg`, `--surface`, `--emerald`,
+`--gold`, `--text`, `--muted`, `--line`). `.streamlit/config.toml` sets
+`base = "dark"`, `primaryColor = #34d399`, `backgroundColor = #0a1017`,
+`secondaryBackgroundColor = #101a24`, `textColor = #e9eef3`.
+
+The theme is **dark**. An earlier version of this file listed an "earthy"
+light palette (`#faf7f2` background, `#2d5016` green, `#8b6f47` tan) as
+inviolable; all nine of those values return **zero matches repo-wide**. Red
+`#ef7a6d` is for losses and negative P&L only, never model errors, validation
+nudges, or status indicators.
 
 **Key CSS patterns:**
 - Cards use layered box-shadow: `0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04)`
@@ -191,7 +227,15 @@ Body text:     #2c2c2c
 
 ## Betting Hub data model
 
-Bets stored in `data_betting/bets.csv` with columns:
+**Supabase is the store.** Bets live in the Supabase `bets` table and are written
+only via `.upsert(..., on_conflict="bet_id")`.
+
+`data_betting/bets.csv` is a **read-only local fallback**. Nothing in the repo
+writes it, and `_load_bets` concatenates it *ahead* of the Supabase rows before
+`drop_duplicates(subset=['bet_id'], keep='first')`, so a stale CSV row shadows
+the cloud copy of the same `bet_id`. That shadowing is known and deferred.
+
+Fallback CSV columns:
 `bet_id, date, match, market_type, selection, bookmaker, odds, stake, result, profit_loss, is_cha_ching, cha_ching_criteria, notes`
 
 **Cha Ching tip** = bet flagged by ≥3 checklist items (role change, player in/out, EV positive, line movement, confirmed team selection, custom note). Threshold `CC_THRESHOLD = 3` in `betting_hub.py`.
@@ -201,7 +245,7 @@ Market types: Disposals O/U, Goals O/U, Kicks O/U, Handballs O/U, Marks O/U, Mat
 
 ## Key decisions & constraints
 
-- **Round numbering (2026)**: AFLTables round numbers are **1 ahead** of the AFL's official round count — AFLTables Round N = AFL Round N−1 (confirmed: AFLTables Round 12 = AFL Round 11). **Always subtract 1** when displaying round labels to the user: `format_func=lambda r: f"Round {r - 1}"`, display strings use `selected_round - 1`, chart x-axes use `Round_num - 1`. The underlying data and all filtering always use the raw AFLTables `Round_num` value. Total H&A rounds in AFLTables = 23 (Rounds 1–23).
+- **Round numbering**: from **2024 onward** AFLTables numbers Opening Round as Round 1, so its round numbers run 1 ahead of the AFL's official count (AFLTables Round 12 = AFL Round 11). **The subtraction is conditional on season, not unconditional.** The rule is `rn - 1 if sn >= _OPENING_ROUND_FROM else rn`, with `_OPENING_ROUND_FROM = 2024`; subtracting for a pre-2024 season is wrong. `_display_round` is defined in **three** places, `dashboard.py`, `draft_posts.py` and `streaks.py`, each carrying its own copy of the constant, so changing one means changing all three. Display only: the underlying data and all filtering always use the raw AFLTables `Round_num` value. Total H&A rounds in AFLTables for 2026 = 23 (Rounds 1–23).
 - **Finals excluded**: Rounds with string labels (QF/EF/SF/PF/GF) are coerced to NaN and dropped in both training and prediction. Max H&A round detected dynamically per season (2023 and prior seasons had 24 rounds; current code handles any count).
 - **No lookahead in form**: `late_form_ewm` uses `.shift(1)` before the EWMA so current-round data is never included.
 - **Same-name disambiguation**: Players sharing a name but on different teams get `Name (Team)` appended.
