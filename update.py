@@ -1,6 +1,30 @@
-"""
-One-click update script
-Runs: R stats fetch -> R coaches votes -> odds scrape -> Betfair predictions -> ESPN predictions -> Wheelo ratings -> 2026 prediction -> done
+"""One-click weekly update.
+
+Nine steps in two loops, each run as its own subprocess. The R loop goes first
+because predict_2026.py depends on the CSVs it writes.
+
+R loop:
+    1. data_2026/fetch_stats_2026.R   2026 player stats from AFLTables (fitzRoy)
+    2. data_2026/fetch_coaches.R      2026 coaches votes (fitzRoy)
+
+Python loop:
+    3. scraper_odds.py         Oddschecker bookmaker odds
+    4. scraper_betfair.py      Betfair predictions
+    5. scraper_espn.py         ESPN predictions, season totals and per-round
+    6. scraper_afl.py          AFL Predictor votes
+    7. update_wheelo_2026.py   Wheelo 2026 ratings
+    8. predict_2026.py         2026 predictions
+    9. draft_posts.py          drafts/round_<display>.md
+
+Nothing here stops on failure. A missing target is skipped with a note and a
+non-zero exit only prints a warning, so every step runs regardless of what the
+step before it did.
+
+streaks.py is NOT part of either loop and nothing imports it. The post-round
+sequence is two commands:
+
+    python update.py
+    python streaks.py     writes drafts/streaks_r<display round>.md
 """
 
 import subprocess
@@ -65,7 +89,7 @@ if __name__ == "__main__":
     ]
     for r_script, description in r_scripts:
         if os.path.exists(r_script):
-            print(f"\n&gt;&gt; {description}...")
+            print(f"\n>> {description}...")
             run_r_script(r_script, description)
         else:
             print(f"\n! {r_script} not found — skipping")
@@ -81,7 +105,7 @@ if __name__ == "__main__":
     ]
     for script, description in py_scripts:
         if os.path.exists(script):
-            print(f"\n&gt;&gt; {description}...")
+            print(f"\n>> {description}...")
             run_script(script)
         else:
             print(f"\n! {script} not found — skipping")
