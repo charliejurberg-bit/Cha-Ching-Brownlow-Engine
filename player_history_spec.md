@@ -143,18 +143,31 @@ club. The phrase is accurate only for Goals.
    E. This is the baseline every other block is read against. A rank without it
    is a position with no magnitude.
 
-2. Stat rankings, four scales. For every stat, rank the subject by career total
+2. Stat rankings, three scales. For every stat, rank the subject by career total
    and by per-game rate, on both windows, against each of:
 
      club     every player who recorded the stat for that club
      league   every player who recorded the stat
      active   every player appearing in data_2026/afltables_2026.csv
-     all time the stat's true window, which is the league scale relabelled and
-              may only be called that with the window printed
+
+   Three, not four. An earlier draft listed all time as a fourth scale, and it
+   is not a population: it is the league scale on the stat's true window, which
+   the windows rule already produces for every stat on every run. Listing it
+   separately invites the same figure to be reported twice under two names, and
+   a reader who meets it twice will take it for two findings. Where the copy
+   wants the phrase, it is the league row on the true-window line, and the
+   windows rule already requires that window to be printed beside it.
 
    Active needs its definition printed every time it appears. Appearing in the
    2026 file excludes the season-long injured and the delisted, which is not
    what a reader hears in "active". Say which set was used.
+
+   The Broad run computed 204 ranks across the three scales, two windows and two
+   metrics, of which ten survived suppression and all ten were club scale. Expect
+   the league and active scales to produce nothing for most subjects. They are
+   run anyway, because a subject who does reach the top 20 at league scale has
+   the only rank in the set that needs no qualifying, and not running them makes
+   that indistinguishable from not checking.
 
 3. Venues. Matches by venue, ranked by count, all matches. Then for the two or
    three venues carrying most of the career, the subject's per-game rate at each
@@ -200,10 +213,28 @@ club. The phrase is accurate only for Goals.
       other defender who never went forward.
 
    c. Position group. Where a position is available, the same comparison
-      restricted to the group. Position is not carried in the three sources. It
-      is available only from fetch_player_details_afl, which reaches back to
-      2012, so this comparison cannot run on a career beginning earlier and must
-      say so rather than running on the part it can reach.
+      restricted to the group. Position is not carried in the three sources, and
+      as things stand this block cannot run at all.
+
+      The blocker is identity, not depth. An earlier draft of this spec said
+      position came from fetch_player_details_afl and was limited only by that
+      endpoint reaching back to 2012. The real problem is that the endpoint
+      keys on a different ID namespace: Nathan Broad is id 1032 there against ID
+      12456 in the three stats sources, and 12456 appears nowhere in its output.
+      There is no ID join. Restricting a comparison field by position would mean
+      matching on name, which the preamble forbids, so the block does not run
+      and the report says why.
+
+      Depth is a second, smaller problem, recorded so it is not rediscovered.
+      Even inside the 2012 floor the position column is absent for five of
+      fifteen seasons: 2012, 2015, 2016, 2017 and 2018, leaving 447 of 672
+      Richmond rows populated. Broad carries no position for his own 2016 to
+      2018 seasons and reads MEDIUM_DEFENDER only from 2019. A block built on
+      this would be describing the seasons the AFL happened to publish.
+
+      Do not work around either problem by matching names. If the block is
+      wanted, the fix is an ID crosswalk between the two namespaces, built and
+      verified once, and that has not been done.
 
 ## Field and denominator
 
@@ -238,7 +269,7 @@ the post.
 
 ## Modes
 
-Retirement. The full spec. Blocks 1 through 6, both windows, all four scales.
+Retirement. The full spec. Blocks 1 through 6, both windows, all three scales.
 Emphasis on blocks 4 and 5: the finals record and whether the late-career rate
 held. Career is closed, so every figure is final and no block needs a
 provisional label.
@@ -337,6 +368,20 @@ providerId and is per season, but the earliest season with any data is 2012,
 which is shallower than the stats already are. Adding height means either
 accepting name matching or accepting a 2012 floor, and that decision has not
 been made. Do not add it to a block until it has.
+
+Weight is worse than shallow, it is poisoned. On fetch_player_details_afl the
+weightInKg column stores a missing weight as zero rather than null: 472 of 672
+Richmond rows across 2012 to 2026, including every one of Broad's eleven
+seasons, which read 192cm and 0kg. A zero passes isna, passes notna, passes a
+dropna, and then drags a mean toward nothing while looking like a measurement.
+There is no way to tell a genuine missing weight from a recorded one without
+treating zero as a sentinel, and nothing in the column says it is one.
+
+So weight is excluded, and stays excluded even if height is built. Height on
+the same rows is clean: no nulls, no zeros, and Broad reads a stable 192cm
+across all eleven seasons. The two columns sit side by side and only one of
+them is usable, which is exactly the shape that gets missed when a block pulls
+both because they arrived together.
 
 Team naming differs by file and by column. Playing.for and Home.team do not
 always agree, the Bulldogs store as Footscray in some columns, and GWS stores as
