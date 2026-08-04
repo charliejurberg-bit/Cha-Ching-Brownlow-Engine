@@ -86,10 +86,14 @@ In-sample inflation was severe: exact top-three order 22.23% fitted against
 
 **MAE figures: UNRESOLVED. Do not quote any of them.**
 
-`brownlow_model.py:249` states that the v1–v4 MAE figures (0.0954 / 0.0910 /
-0.0902 / 0.0904) were all measured with a momentum leak in place and none is
-comparable. The current printed baseline at line 248 is **0.0953 full model,
-0.1013 no-coaches**.
+`brownlow_model.py` states that the v1–v4 MAE figures (0.0954 / 0.0910 / 0.0902
+/ 0.0904) were all measured with a momentum leak in place and none is
+comparable. The claim is not one line: it spans three consecutive `print` calls
+opening at `Pre-2026-audit figures`, and the "none of them is comparable"
+conclusion sits in the last of the three, so reading only the first line gets
+the figures without the verdict. The current printed baseline is the line
+anchored at `Baselines: 0.0953 full model` — **0.0953 full model, 0.1013
+no-coaches**.
 
 A separate set attributed to a Wheelo alignment fix (2023 0.1022, 2024 0.0971,
 2025 0.0985, overall 0.0969) appears in the brief's history. It is not known
