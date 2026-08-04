@@ -85,6 +85,47 @@ if os.path.exists("data_2026/coaches_votes_2026.csv"):
     cv26 = pd.read_csv("data_2026/coaches_votes_2026.csv")
     cv26['Round'] = pd.to_numeric(cv26['Round'], errors='coerce')
     cv26['Coaches.Votes'] = pd.to_numeric(cv26['Coaches.Votes'], errors='coerce').fillna(0)
+
+    # ── Staleness guard ──────────────────────────────────────────
+    # The upstream feed has been seen publishing a round that is an exact copy
+    # of the one before it: in 2026 round 23 repeated round 22, same nine
+    # fixtures and same 58 player-and-vote rows. While AFLTables carries no
+    # matching round the copy is inert, because the left join below finds
+    # nothing to attach it to. The moment AFLTables publishes that round the
+    # copy merges, giving it the PREVIOUS round's votes for every player who
+    # appeared in both.
+    #
+    # That is worse than missing data, and silent. The per-game routing further
+    # down keys on whether a game carries any nonzero vote, so a stale copy
+    # reads as "published" and the game takes the full model. The no-coaches
+    # variant, which exists for precisely this gap, never engages.
+    #
+    # A round counts as a duplicate only when BOTH its fixture set and its
+    # (player, votes) rows match the previous round's. Fixtures alone would
+    # false-positive on a repeated fixture list; rows alone would false-positive
+    # on a round nobody polled. Rows are compared as a sorted list rather than a
+    # set, so a differing row count still reads as different.
+    #
+    # The later round is the one dropped: the earlier one is what aligns with
+    # the AFLTables round of the same number.
+    def _cv_payload(_d):
+        _fixtures = set(zip(_d['Home.Team'].astype(str), _d['Away.Team'].astype(str)))
+        _rows = sorted(zip(_d['Player.Name'].astype(str), _d['Coaches.Votes']))
+        return _fixtures, _rows
+
+    # groupby drops NaN rounds, which could never match a numeric Round_num.
+    _cv_payloads = {_r: _cv_payload(_d) for _r, _d in cv26.groupby('Round')}
+    _cv_stale = []
+    for _prev, _cur in zip(sorted(_cv_payloads), sorted(_cv_payloads)[1:]):
+        # Compared against the previous round's original payload, so a run of
+        # copies is caught in full rather than only at its first round.
+        if _cv_payloads[_prev] == _cv_payloads[_cur]:
+            _cv_stale.append(_cur)
+            print(f"  WARNING: coaches votes round {int(_cur)} is an exact copy "
+                  f"of round {int(_prev)}, dropped from the merge")
+    if _cv_stale:
+        cv26 = cv26[~cv26['Round'].isin(_cv_stale)].copy()
+
     # Team is part of the key, matching brownlow_model.py. It was dropped here,
     # so two players sharing a name in one round had their votes SUMMED onto
     # both — silently, because an unmatched or wrong merge lands as 0 and 0 is
