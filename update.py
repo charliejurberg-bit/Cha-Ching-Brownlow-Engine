@@ -18,7 +18,9 @@ Python loop:
 
 Nothing here stops on failure. A missing target is skipped with a note and a
 non-zero exit only prints a warning, so every step runs regardless of what the
-step before it did.
+step before it did. The R steps additionally carry a wall-clock limit
+(R_TIMEOUT); exceeding it kills that step and is logged like any other failure,
+rather than ending the run.
 
 streaks.py is NOT part of either loop and nothing imports it. The post-round
 sequence is two commands:
@@ -41,6 +43,10 @@ R_PATHS = [
     "Rscript",
 ]
 
+# Wall-clock limit for one R step. Quoted in the timeout warning, so it lives
+# here rather than inline at the call.
+R_TIMEOUT = 180
+
 def find_rscript():
     for path in R_PATHS:
         try:
@@ -59,7 +65,24 @@ def run_r_script(r_script_path, description):
     if not rscript:
         print("! Rscript not found — skipping R step. Run manually in RStudio.")
         return 1
-    result = subprocess.run([rscript, r_script_path], capture_output=False, text=True, timeout=180)
+    # A timeout is the one call in here that raises, and an uncaught one took
+    # the whole update down with it — the R steps run first, so the seven
+    # Python steps after them never started. Treated like a failed Python step
+    # instead: logged, non-zero return, chain continues. Nothing is lost from
+    # the console, since capture_output=False means whatever R printed before
+    # the kill has already been written out.
+    #
+    # TimeoutExpired only. A missing binary cannot reach here (find_rscript
+    # validated it with --version) and a missing .R file is checked by the
+    # caller, so a broader catch would bury faults rather than step past a
+    # known one.
+    try:
+        result = subprocess.run([rscript, r_script_path], capture_output=False,
+                                text=True, timeout=R_TIMEOUT)
+    except subprocess.TimeoutExpired:
+        print(f"! {r_script_path} exceeded the {R_TIMEOUT}s limit and was killed, "
+              f"continuing to the next step")
+        return 1
     if result.returncode != 0:
         print(f"! R script finished with warnings (this may be normal)")
     return result.returncode
