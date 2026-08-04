@@ -341,11 +341,32 @@ book's line. `BETFAIR_MIN_BACK = 1.5` filters lay prices.
   `implied_prob` 0.1. That is a board floor, not an opinion. Over half the field
   carries no market view.
 - Book sums to 127.89% across all quoted; 121.89% excluding the 980/1001 tail.
-- Six exact-join failures against `season_2026.csv`, none resolved by
-  `normalise_name()` (it does no nickname mapping): Matthew/Matt Rowell,
-  Samuel/Sam Lalor, Lachlan/Lachie Ash, Jack/Josh Rachele (bookmaker typo).
-  Rowell is the only material one, 4.67 expected votes at 501. "Nic Martin" and
-  "Tom Green" have no counterpart in the model universe at all.
+- Six exact-join failures against `season_2026.csv`: Jordan De Goey, Lachlan Ash,
+  Matthew Rowell, Nic Martin, Samuel Lalor, Tom Green. The earlier "Jack/Josh
+  Rachele" bookmaker typo is resolved — the scrape now returns "Josh Rachele",
+  which matches exactly. "Nic Martin" and "Tom Green" have no counterpart in the
+  model universe at all.
+- **Five of the six survive `normalise_name()`, not all six.** It does no
+  nickname mapping, so Matthew/Matt Rowell, Samuel/Sam Lalor and Lachlan/Lachie
+  Ash stay split, and Nic Martin and Tom Green have nothing to match. But
+  `Jordan De Goey` vs the model's `Jordan de Goey` is a capitalisation
+  difference, and `normalise_name()` opens with `.title()`, so it *does* resolve
+  that one. Consumers joining exactly see six failures; consumers going through
+  `normalise_name()` see five.
+- **`best_odds.csv` carries `Matt Rowell` and `Matthew Rowell` as separate
+  rows**, present since the first commit containing the file (`6c328f6`,
+  21 May 2026). `scrape_oddschecker()` dedupes on the exact `data-bname` string
+  while Oddschecker renders the player under two spellings, so both clear the
+  guard and both propagate into `bookmaker_odds.csv`, the long-form history and
+  `best_odds.csv`.
+  The consequence is **not a wrong best price**. `max()` runs per row, so the
+  two never meet, but the union's longest price is bet365's 1001 either way —
+  merging the rows would return the same `best_odds`, `implied_prob` and
+  `best_bookie`. What it does create is a **phantom row at market rank 26**,
+  inflating `_market_rank` (dashboard.py:3014) by one for every player priced
+  longer than 501, which feeds `_edge` on the Predictions page
+  (dashboard.py:3100). Currently inert: the top-10 model players who reach that
+  loop all price shorter than 501.
 - Jason Horne-Francis is genuinely unquoted, rank 11 by expected votes.
 - **Price history is appended in-repo, not overwritten away.** The two working
   files are still rewritten whole each run, and there is no `_prev` and no
@@ -542,7 +563,10 @@ traceback-in-UI; `uuid[:8]` on import paths; `ADMIN_UID` silent-lockout
 mitigation. Consolidate the three club-alias copies. Rename
 `Avg_Predicted_Per_Game`. Resolve 2026 inclusion across the four actual-votes
 paths. Prune the allow list in `.claude/settings.local.json`. `.claude/` is
-listed twice in `.gitignore`.
+listed twice in `.gitignore`. The `Matt Rowell`/`Matthew Rowell` duplicate in
+`best_odds.csv` — inert while the top-10 all price shorter than 501, but it
+shifts `_market_rank` and would surface if a long-priced player reached the
+Predictions top 10.
 
 Pre-count-night: drop `fetch_live_brownlow_data` TTL and auto-refresh sleep
 together, 300 → ~60.
