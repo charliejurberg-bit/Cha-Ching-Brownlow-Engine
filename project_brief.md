@@ -363,10 +363,11 @@ book's line. `BETFAIR_MIN_BACK = 1.5` filters lay prices.
   two never meet, but the union's longest price is bet365's 1001 either way —
   merging the rows would return the same `best_odds`, `implied_prob` and
   `best_bookie`. What it does create is a **phantom row at market rank 26**,
-  inflating `_market_rank` (dashboard.py:3014) by one for every player priced
-  longer than 501, which feeds `_edge` on the Predictions page
-  (dashboard.py:3100). Currently inert: the top-10 model players who reach that
-  loop all price shorter than 501.
+  inflating `_market_rank` by one for every player priced longer than 501. Both
+  sites are in `dashboard.py`, inside the `if _page == 'Predictions':` block:
+  the rank is built at `_market_rank[_pl] = int(_mr) + 1`, and consumed one
+  screen down at `_edge = _market_rank[_pname] - _rank`. Currently inert: the
+  top-10 model players who reach that loop all price shorter than 501.
 - Jason Horne-Francis is genuinely unquoted, rank 11 by expected votes.
 - **Price history is appended in-repo, not overwritten away.** The two working
   files are still rewritten whole each run, and there is no `_prev` and no
