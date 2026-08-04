@@ -50,6 +50,23 @@ TEAM_ABBREV = {
 # Wheelo's own spelling, normalised before it meets Playing.for.
 WHEELO_TEAM_FIXES = {'Brisbane': 'Brisbane Lions'}
 
+# The coaches feed's spelling of clubs in its Home.Team/Away.Team columns,
+# normalised before those meet the AFLTables fixture columns. Only the six that
+# differ; the other twelve already agree and pass through .replace() untouched.
+#
+# NOT interchangeable with TEAM_ABBREV above. That maps the code bracketed in
+# Player.Name, which says who polled. This maps the fixture columns, which say
+# who played whom, and the feed spells those as marketing names. No suffix rule
+# reconciles them: 'GWS Giants' has to become 'Greater Western Sydney'.
+COACHES_TEAM_FIXES = {
+    'Adelaide Crows': 'Adelaide',
+    'Geelong Cats': 'Geelong',
+    'Gold Coast Suns': 'Gold Coast',
+    'GWS Giants': 'Greater Western Sydney',
+    'Sydney Swans': 'Sydney',
+    'West Coast Eagles': 'West Coast',
+}
+
 # ── Row-local derived stats ──────────────────────────────────
 # Everything computable from a single player-game row, in the exact order the
 # three scripts built it. Centralised because it was NOT before: predict_2026.py

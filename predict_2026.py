@@ -86,45 +86,77 @@ if os.path.exists("data_2026/coaches_votes_2026.csv"):
     cv26['Round'] = pd.to_numeric(cv26['Round'], errors='coerce')
     cv26['Coaches.Votes'] = pd.to_numeric(cv26['Coaches.Votes'], errors='coerce').fillna(0)
 
-    # ── Staleness guard ──────────────────────────────────────────
-    # The upstream feed has been seen publishing a round that is an exact copy
-    # of the one before it: in 2026 round 23 repeated round 22, same nine
-    # fixtures and same 58 player-and-vote rows. While AFLTables carries no
-    # matching round the copy is inert, because the left join below finds
-    # nothing to attach it to. The moment AFLTables publishes that round the
-    # copy merges, giving it the PREVIOUS round's votes for every player who
-    # appeared in both.
+    # ── Fixture guard ────────────────────────────────────────────
+    # Each coaches round is checked against the fixtures AFLTables holds for the
+    # same round number, and dropped if it carries a game that round did not
+    # play. The feed has been seen republishing a round under the next round's
+    # number (2026 round 23 repeated round 22), and while AFLTables has no such
+    # round the copy is inert, because the left join below finds nothing to
+    # attach it to. Once AFLTables publishes that round the copy merges, giving
+    # it the PREVIOUS round's votes for every player in both.
     #
-    # That is worse than missing data, and silent. The per-game routing further
-    # down keys on whether a game carries any nonzero vote, so a stale copy
-    # reads as "published" and the game takes the full model. The no-coaches
+    # That failure is silent and worse than missing data. The per-game routing
+    # further down keys on whether a game carries any nonzero vote, so a stale
+    # round reads as "published" and takes the full model. The no-coaches
     # variant, which exists for precisely this gap, never engages.
     #
-    # A round counts as a duplicate only when BOTH its fixture set and its
-    # (player, votes) rows match the previous round's. Fixtures alone would
-    # false-positive on a repeated fixture list; rows alone would false-positive
-    # on a round nobody polled. Rows are compared as a sorted list rather than a
-    # set, so a differing row count still reads as different.
+    # This supersedes a narrower check that only caught a round byte-identical
+    # to its predecessor. A partial copy, or a copy with one vote edited, walks
+    # straight through an equality test while still carrying the wrong round's
+    # fixtures — which is what is actually checked here.
     #
-    # The later round is the one dropped: the earlier one is what aligns with
-    # the AFLTables round of the same number.
-    def _cv_payload(_d):
-        _fixtures = set(zip(_d['Home.Team'].astype(str), _d['Away.Team'].astype(str)))
-        _rows = sorted(zip(_d['Player.Name'].astype(str), _d['Coaches.Votes']))
-        return _fixtures, _rows
+    # SUBSET, not equality. A round genuinely published in parts holds fewer
+    # fixtures than AFLTables lists and has to survive: routing is per game, so
+    # the games already released keep their real votes while the rest fall to
+    # the variant. Only a fixture AFLTables does NOT have for that round is
+    # evidence of a foreign round. Equality would push a whole partial round
+    # onto the variant and discard good data.
+    def _fixture_pairs(_d, _home, _away, _fixes=None):
+        """Round's fixtures as {frozenset({home, away})}, in AFLTables spelling.
 
-    # groupby drops NaN rounds, which could never match a numeric Round_num.
-    _cv_payloads = {_r: _cv_payload(_d) for _r, _d in cv26.groupby('Round')}
-    _cv_stale = []
-    for _prev, _cur in zip(sorted(_cv_payloads), sorted(_cv_payloads)[1:]):
-        # Compared against the previous round's original payload, so a run of
-        # copies is caught in full rather than only at its first round.
-        if _cv_payloads[_prev] == _cv_payloads[_cur]:
-            _cv_stale.append(_cur)
-            print(f"  WARNING: coaches votes round {int(_cur)} is an exact copy "
-                  f"of round {int(_prev)}, dropped from the merge")
-    if _cv_stale:
-        cv26 = cv26[~cv26['Round'].isin(_cv_stale)].copy()
+        Unordered pairs, so a home/away disagreement between the two sources is
+        not read as a mismatch. They agree across all of 2026; this is
+        defensive.
+        """
+        _h, _a = _d[_home].astype(str), _d[_away].astype(str)
+        if _fixes:
+            _h, _a = _h.replace(_fixes), _a.replace(_fixes)
+        # The Playing.for fix near the top of this file does not cover the
+        # fixture columns, which carry their own copy of the club name.
+        _h = _h.replace('Footscray', 'Western Bulldogs')
+        _a = _a.replace('Footscray', 'Western Bulldogs')
+        return {frozenset(_p) for _p in zip(_h, _a)}
+
+    # groupby drops NaN rounds on both sides. A NaN coaches round could never
+    # match a numeric Round_num, so leaving it in place changes no merge result.
+    _aflt_fixtures = {_r: _fixture_pairs(_d, 'Home.team', 'Away.team')
+                      for _r, _d in df26.groupby('Round_num')}
+
+    _cv_drop = []
+    for _r, _d in cv26.groupby('Round'):
+        # An unmapped club name survives the replace, fails to match, and drops
+        # the round loudly. That is the safe direction: a silent merge of the
+        # wrong votes is the outcome this whole guard exists to prevent.
+        _cvf = _fixture_pairs(_d, 'Home.Team', 'Away.Team', feat.COACHES_TEAM_FIXES)
+        if _r not in _aflt_fixtures:
+            # Routine when the coaches feed leads the stats fetch. The merge
+            # would drop these rows anyway, so this only makes it visible.
+            _cv_drop.append(_r)
+            print(f"  note: coaches votes round {int(_r)} has no matching "
+                  f"AFLTables round yet, not merged")
+            continue
+        _extra = _cvf - _aflt_fixtures[_r]
+        if _extra:
+            _cv_drop.append(_r)
+            _shown = sorted(_extra, key=sorted)[:3]
+            _named = ", ".join(" v ".join(sorted(_p)) for _p in _shown)
+            _more = f" (+{len(_extra) - len(_shown)} more)" if len(_extra) > len(_shown) else ""
+            print(f"  WARNING: coaches votes round {int(_r)} does not match "
+                  f"AFLTables round {int(_r)}: {len(_extra)} of {len(_cvf)} "
+                  f"fixtures were not played in that round, {_named}{_more}. "
+                  f"Dropped from the merge")
+    if _cv_drop:
+        cv26 = cv26[~cv26['Round'].isin(_cv_drop)].copy()
 
     # Team is part of the key, matching brownlow_model.py. It was dropped here,
     # so two players sharing a name in one round had their votes SUMMED onto
