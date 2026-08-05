@@ -1,0 +1,185 @@
+{
+  "round": 21,
+  "brownlowNight": "2026-09-21",
+  "leader": {
+    "name": "Nick Daicos",
+    "votes": 35.1,
+    "clear": 9.6,
+    "bestOdds": "$1.20"
+  },
+  "chips": [
+    {
+      "rank": 1,
+      "name": "J. Newcombe",
+      "team": "HAW",
+      "votes": 2.6
+    },
+    {
+      "rank": 2,
+      "name": "E. Gulden",
+      "team": "SYD",
+      "votes": 2.5
+    },
+    {
+      "rank": 3,
+      "name": "T. Taranto",
+      "team": "RICH",
+      "votes": 2.5
+    }
+  ],
+  "ticker": [
+    {
+      "match": "CARL V BL",
+      "votes": [
+        [
+          3,
+          "HEWETT"
+        ],
+        [
+          2,
+          "SMITH"
+        ],
+        [
+          1,
+          "KEMP"
+        ]
+      ]
+    },
+    {
+      "match": "COLL V GEEL",
+      "votes": [
+        [
+          3,
+          "DEMPSEY"
+        ],
+        [
+          2,
+          "MCSTAY"
+        ],
+        [
+          1,
+          "DAICOS"
+        ]
+      ]
+    },
+    {
+      "match": "ESS V ADEL",
+      "votes": [
+        [
+          3,
+          "THILTHORPE"
+        ],
+        [
+          2,
+          "RANKINE"
+        ],
+        [
+          1,
+          "DAWSON"
+        ]
+      ]
+    },
+    {
+      "match": "FRE V WB",
+      "votes": [
+        [
+          3,
+          "WORNER"
+        ],
+        [
+          2,
+          "MCDONALD"
+        ],
+        [
+          1,
+          "TREACY"
+        ]
+      ]
+    },
+    {
+      "match": "GCFC V MELB",
+      "votes": [
+        [
+          3,
+          "GAWN"
+        ],
+        [
+          2,
+          "ROWELL"
+        ],
+        [
+          1,
+          "SPARROW"
+        ]
+      ]
+    },
+    {
+      "match": "HAW V NMFC",
+      "votes": [
+        [
+          3,
+          "NEWCOMBE"
+        ],
+        [
+          2,
+          "WATSON"
+        ],
+        [
+          1,
+          "IMPEY"
+        ]
+      ]
+    },
+    {
+      "match": "PORT V GWS",
+      "votes": [
+        [
+          3,
+          "WHITFIELD"
+        ],
+        [
+          2,
+          "HORNE-FRANCIS"
+        ],
+        [
+          1,
+          "CONIGLIO"
+        ]
+      ]
+    },
+    {
+      "match": "RICH V WCE",
+      "votes": [
+        [
+          3,
+          "TARANTO"
+        ],
+        [
+          2,
+          "REID"
+        ],
+        [
+          1,
+          "ROSS"
+        ]
+      ]
+    },
+    {
+      "match": "STK V SYD",
+      "votes": [
+        [
+          3,
+          "GULDEN"
+        ],
+        [
+          2,
+          "WARNER"
+        ],
+        [
+          1,
+          "WANGANEEN-MILERA"
+        ]
+      ]
+    }
+  ]
+}

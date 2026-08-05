@@ -58,9 +58,12 @@ _TEAM_SUFFIX_RE = re.compile(r"\([^()]*\)$")
 _OPENING_ROUND_FROM = 2024
 
 # game_level_2026.csv is 167 columns wide and most of them are model features.
-# Read only what the drafts quote.
+# Read only what load_latest_round()'s callers quote. Surname is the exception
+# to "what the drafts quote": the drafts never print it, but landing_summary.py
+# reuses load_latest_round() and needs the stored surname rather than one split
+# out of Player_Name, which carries a team suffix for same-name players.
 _GAME_COLS = (
-    'Season', 'Round_num', 'Game_ID', 'Player_Name', 'Playing.for',
+    'Season', 'Round_num', 'Game_ID', 'Player_Name', 'Surname', 'Playing.for',
     'Home.team', 'Away.team', 'Outcome', 'Exp_Votes',
     'Disposals', 'Goals', 'Clearances',
 )

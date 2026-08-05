@@ -1,6 +1,6 @@
 """One-click weekly update.
 
-Nine steps in two loops, each run as its own subprocess. The R loop goes first
+Ten steps in two loops, each run as its own subprocess. The R loop goes first
 because predict_2026.py depends on the CSVs it writes.
 
 R loop:
@@ -15,12 +15,23 @@ Python loop:
     7. update_wheelo_2026.py   Wheelo 2026 ratings
     8. predict_2026.py         2026 predictions
     9. draft_posts.py          drafts/round_<display>.md
+   10. landing_summary.py      site/landing.json
+
+Step 10 writes an artifact, not a page. site/landing.json is git tracked, so
+running this changes nothing the public can see: the numbers reach the live site
+only once the file is committed and pushed, and an uncommitted run leaves the
+site on last week's figures. Committing is necessary rather than sufficient. The
+front end is a separate repo that statically imports its own copy of the file,
+so the pushed artifact still has to get across to that repo before a build will
+show it.
 
 Nothing here stops on failure. A missing target is skipped with a note and a
 non-zero exit only prints a warning, so every step runs regardless of what the
-step before it did. The R steps additionally carry a wall-clock limit
-(R_TIMEOUT); exceeding it kills that step and is logged like any other failure,
-rather than ending the run.
+step before it did. Each step's own exit code is therefore the only honest
+report of whether it worked, and reading the console is the only way to find
+out. The R steps additionally carry a wall-clock limit (R_TIMEOUT); exceeding it
+kills that step and is logged like any other failure, rather than ending the
+run.
 
 streaks.py is NOT part of either loop and nothing imports it. The post-round
 sequence is two commands:
@@ -66,7 +77,7 @@ def run_r_script(r_script_path, description):
         print("! Rscript not found — skipping R step. Run manually in RStudio.")
         return 1
     # A timeout is the one call in here that raises, and an uncaught one took
-    # the whole update down with it — the R steps run first, so the seven
+    # the whole update down with it — the R steps run first, so the eight
     # Python steps after them never started. Treated like a failed Python step
     # instead: logged, non-zero return, chain continues. Nothing is lost from
     # the console, since capture_output=False means whatever R printed before
@@ -125,6 +136,7 @@ if __name__ == "__main__":
         ("update_wheelo_2026.py",  "Updating Wheelo 2026 ratings"),
         ("predict_2026.py",        "Generating 2026 predictions"),
         ("draft_posts.py",         "Generating draft posts"),
+        ("landing_summary.py",     "Writing site/landing.json for the front door"),
     ]
     for script, description in py_scripts:
         if os.path.exists(script):
