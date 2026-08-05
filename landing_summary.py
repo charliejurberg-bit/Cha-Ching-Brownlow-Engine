@@ -47,10 +47,11 @@ it fails the build.
 
 EXIT CODE
 Non-zero on any failure, by one of two paths. A missing input file prints a `!`
-line and returns 1. Every other fault, an empty round, a team with no
-TEAM_ABBREV entry, a blank surname, raises and propagates as a traceback, which
-also exits non-zero and says more than a swallowed message would. Nothing is
-written in either case, so a failed run leaves the last good artifact in place.
+line and returns 1. Every other fault, an empty round, a club with no
+DISPLAY_CODES entry, a blank surname, raises and propagates as a traceback,
+which also exits non-zero and says more than a swallowed message would. Nothing
+is written in either case, so a failed run leaves the last good artifact in
+place.
 update.py logs a warning and carries on regardless of what it gets back, so this
 exit code is the only honest signal the step emits.
 
@@ -58,7 +59,6 @@ Run standalone, or as step 10 of update.py:
     python landing_summary.py
 """
 
-import ast
 import json
 import os
 import sys
@@ -77,7 +77,6 @@ from draft_posts import (
 )
 
 BEST_ODDS = "data_2026/best_odds.csv"
-MODEL_SRC = "brownlow_model.py"
 
 OUT_DIR = "site"
 OUT_PATH = os.path.join(OUT_DIR, "landing.json")
@@ -95,45 +94,63 @@ CHIPS_N = 3
 EM_DASH = "—"
 
 
-def load_team_codes(path=MODEL_SRC):
-    """Full team name to short code, keyed off TEAM_ABBREV in brownlow_model.py.
+# Club to display code. This is a DISPLAY map owned by the artifact, and it is
+# deliberately not TEAM_ABBREV from brownlow_model.py.
+#
+# TEAM_ABBREV is a modelling map. It exists to parse the club names out of the
+# coaches votes file so they can be merged onto the stats frame, and its codes
+# are whatever that source happens to use. Reading it here coupled a rendered
+# string on the public landing page to a merge key, so a future change to the
+# feature pipeline could silently repaint the page, and it emitted the wrong
+# codes anyway: MELB, BL, COLL, CARL and GEEL where the front end has always
+# rendered MEL, BRI, COL, CAR and GEE, and eleven of its eighteen keys are not
+# three letters at all, which breaches the format landing_spec.md states.
+#
+# Keys are the canonical club names, the same strings TEAM_ABBREV maps to and
+# the same ones the CSVs carry, so the merge and the display still agree about
+# what a club is called. Values are the codes the front end already ships.
+#
+# Ten codes are inherited from the committed data/landing.json and cannot be
+# changed without repainting the page: BRI, CAR, COL, ESS, GEE, GWS, MEL, STK,
+# WB, WCE. The other eight clubs never appear in that file, so they take the
+# standard AFL code: ADE, FRE, GCS, HAW, NTH, PTA, RIC, SYD.
+#
+# WB is the one code that is not three letters. It is what data/landing.json
+# ships for Western Bulldogs and changing it would repaint the page, so the
+# shipped value wins over the stated format here.
+DISPLAY_CODES = {
+    'Adelaide': 'ADE',
+    'Brisbane Lions': 'BRI',
+    'Carlton': 'CAR',
+    'Collingwood': 'COL',
+    'Essendon': 'ESS',
+    'Fremantle': 'FRE',
+    'Geelong': 'GEE',
+    'Gold Coast': 'GCS',
+    'Greater Western Sydney': 'GWS',
+    'Hawthorn': 'HAW',
+    'Melbourne': 'MEL',
+    'North Melbourne': 'NTH',
+    'Port Adelaide': 'PTA',
+    'Richmond': 'RIC',
+    'St Kilda': 'STK',
+    'Sydney': 'SYD',
+    'West Coast': 'WCE',
+    'Western Bulldogs': 'WB',
+}
 
-    TEAM_ABBREV is stored the other way round, code to full name, and the CSVs
-    carry full names, so it is inverted here. Inverted, not retyped: this file
-    defines no team map of its own.
 
-    Parsed out of the source with ast rather than imported. brownlow_model.py is
-    a training script whose statements run at import, and TEAM_ABBREV is defined
-    partway down, after it has already read 170,000 rows of history and built
-    the feature frame. Importing it to reach one dict literal would run the
-    training. Parsing keeps brownlow_model.py the single definition without
-    paying for that.
-    """
-    with open(path, encoding="utf-8") as f:
-        tree = ast.parse(f.read(), filename=path)
-    for node in ast.walk(tree):
-        if not isinstance(node, ast.Assign):
-            continue
-        if not any(getattr(t, "id", None) == "TEAM_ABBREV" for t in node.targets):
-            continue
-        abbrev = ast.literal_eval(node.value)
-        codes = {full: code for code, full in abbrev.items()}
-        if len(codes) != len(abbrev):
-            raise ValueError(f"TEAM_ABBREV in {path} maps two codes to one team")
-        return codes
-    raise ValueError(f"no TEAM_ABBREV assignment found in {path}")
+def _team_code(team):
+    """Display code for a club name, or a hard failure.
 
-
-def _team_code(team_codes, team):
-    """Short code for a team name, or a hard failure.
-
-    An unmapped team would otherwise reach the artifact as a blank or a raw
+    An unmapped club would otherwise reach the artifact as a blank or as a raw
     club name in a field the front end renders as a code, so it stops the run
-    instead.
+    instead. The AFL adding a nineteenth club is exactly the case this is here
+    to catch.
     """
-    code = team_codes.get(str(team).strip())
+    code = DISPLAY_CODES.get(str(team).strip())
     if code is None:
-        raise ValueError(f"no TEAM_ABBREV entry for team {team!r}")
+        raise ValueError(f"no DISPLAY_CODES entry for club {team!r}")
     return code
 
 
@@ -177,7 +194,7 @@ def _chip_name(player_name, surname):
     return f"{name[0].upper()}. {_surname(surname)}"
 
 
-def build_chips(rnd, team_codes):
+def build_chips(rnd):
     """The round's top CHIPS_N by Exp_Votes, ranked 1 upward."""
     top = _by_votes(rnd).head(CHIPS_N)
     if top.empty:
@@ -186,14 +203,14 @@ def build_chips(rnd, team_codes):
         {
             'rank': rank,
             'name': _chip_name(r['Player_Name'], r['Surname']),
-            'team': _team_code(team_codes, r['Playing.for']),
+            'team': _team_code(r['Playing.for']),
             'votes': round(float(r['Exp_Votes']), 1),
         }
         for rank, (_, r) in enumerate(top.iterrows(), start=1)
     ]
 
 
-def build_ticker(rnd, team_codes):
+def build_ticker(rnd):
     """Every fixture in the round, each with its 3/2/1 by Exp_Votes.
 
     The numbers in the pairs are the 3/2/1 slots, not vote values: the ticker
@@ -202,8 +219,8 @@ def build_ticker(rnd, team_codes):
     """
     items = []
     for _gid, g in rnd.groupby('Game_ID', sort=True):
-        home = _team_code(team_codes, g['Home.team'].iloc[0])
-        away = _team_code(team_codes, g['Away.team'].iloc[0])
+        home = _team_code(g['Home.team'].iloc[0])
+        away = _team_code(g['Away.team'].iloc[0])
         top = _by_votes(g).head(TOP_N_PER_GAME)
         votes = [
             [slot, _surname(r['Surname']).upper()]
@@ -277,15 +294,14 @@ def build_summary():
     carries it: `round` is the display number, and the console line prints both
     so a reader can see the conversion that was applied.
     """
-    team_codes = load_team_codes()
     rnd, latest_raw, season = load_latest_round()
     season_now = pd.read_csv(SEASON, usecols=['Player_Name', 'Exp_Total_Votes'])
     return {
         'round': _display_round(latest_raw, season),
         'brownlowNight': BROWNLOW_NIGHT,
         'leader': build_leader(season_now),
-        'chips': build_chips(rnd, team_codes),
-        'ticker': build_ticker(rnd, team_codes),
+        'chips': build_chips(rnd),
+        'ticker': build_ticker(rnd),
     }, latest_raw
 
 
@@ -294,10 +310,6 @@ def main():
         if not os.path.exists(path):
             print(f"! {path} not found. Run predict_2026.py first.")
             return 1
-    if not os.path.exists(MODEL_SRC):
-        print(f"! {MODEL_SRC} not found, so there is no TEAM_ABBREV to read.")
-        return 1
-
     summary, latest_raw = build_summary()
 
     # allow_nan=False so a NaN vote raises here rather than being written as a

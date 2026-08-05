@@ -23,13 +23,13 @@
     {
       "rank": 3,
       "name": "T. Taranto",
-      "team": "RICH",
+      "team": "RIC",
       "votes": 2.5
     }
   ],
   "ticker": [
     {
-      "match": "CARL V BL",
+      "match": "CAR V BRI",
       "votes": [
         [
           3,
@@ -46,7 +46,7 @@
       ]
     },
     {
-      "match": "COLL V GEEL",
+      "match": "COL V GEE",
       "votes": [
         [
           3,
@@ -63,7 +63,7 @@
       ]
     },
     {
-      "match": "ESS V ADEL",
+      "match": "ESS V ADE",
       "votes": [
         [
           3,
@@ -97,7 +97,7 @@
       ]
     },
     {
-      "match": "GCFC V MELB",
+      "match": "GCS V MEL",
       "votes": [
         [
           3,
@@ -114,7 +114,7 @@
       ]
     },
     {
-      "match": "HAW V NMFC",
+      "match": "HAW V NTH",
       "votes": [
         [
           3,
@@ -131,7 +131,7 @@
       ]
     },
     {
-      "match": "PORT V GWS",
+      "match": "PTA V GWS",
       "votes": [
         [
           3,
@@ -148,7 +148,7 @@
       ]
     },
     {
-      "match": "RICH V WCE",
+      "match": "RIC V WCE",
       "votes": [
         [
           3,
