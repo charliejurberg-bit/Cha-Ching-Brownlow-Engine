@@ -3452,11 +3452,15 @@ SCOPE .lb-bar-lo{text-align:right;}
         _merged['Move'] = _merged['Prev_Rank'] - _merged['Curr_Rank']
         _move_map = dict(zip(_merged['Player_Name'], _merged['Move']))
 
+    # Rank is positional over the FULL leaderboard and is assigned BEFORE the
+    # search filter and Show N, so a searched player carries their real standing
+    # through instead of being renumbered from 1. No sort here: predictions
+    # already arrives sorted descending on Exp_Total_Votes.
     display = predictions.copy()
+    display.insert(0, 'Rank', range(1, len(display) + 1))
     if search:
         display = display[display['Player_Name'].str.contains(search, case=False, na=False)]
     display = display.head(show_n).copy()
-    display.insert(0, 'Rank', range(1, len(display) + 1))
     _max_exp = float(display['Exp_Total_Votes'].max()) if len(display) else 1.0
     if _max_exp <= 0:
         _max_exp = 1.0
