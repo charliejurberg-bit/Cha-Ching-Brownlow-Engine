@@ -22,6 +22,35 @@ python brownlow_model.py
 python predict_2026.py
 ```
 
+## Update chain
+
+`python update.py` runs the ten step weekly chain (stats, odds, predictions,
+drafts, landing artifact). One-off checks tied to a particular round are
+recorded here.
+
+**Round 23 2026, first run after AFLTables publishes those stats.** This is the
+first live test of the no-coaches routing predicate, fixed in commit `800acc7`
+(`(s != 0).any()` to `(s > 0).any()`, NaN safe). Every round through 22 had
+published coaches votes, so the fix is proven by reproduction only, never by a
+real unpublished round. Expected console line from `predict_2026.py`:
+
+```
+  Routing: 180 game(s) -> full model, 9 -> no-coaches variant
+```
+
+180 games are complete through Round 22 (all 18 teams on 20 games each) and
+Round 23 adds the last 9, for 189. If it reads `189 -> full, 0 -> no-coaches`
+the predicate is broken again: stop, and do not publish that round's numbers.
+
+Background: the root cause does not live in `predict_2026.py`. The zero-source
+guard in `features.py` (`ZERO_SOURCE_GUARD_STATS`, applied inside
+`build_game_rank_features`) sets the **raw `Coaches_Votes` column** to NaN for a
+game whose votes are all zero, not just the derived rank/pct/z triplet, and it
+runs before the routing test. An unpublished game therefore reaches the
+predicate holding NaN rather than 0, and any NaN-unsafe comparison reads that as
+"votes published" and sends the game to the full model, so `model_nocv.pkl`
+never engages. Keep that predicate NaN safe in any rewrite.
+
 ## Project structure
 
 ```
