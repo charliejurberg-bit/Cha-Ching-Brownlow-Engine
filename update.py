@@ -1,23 +1,25 @@
 """One-click weekly update.
 
-Ten steps in two loops, each run as its own subprocess. The R loop goes first
+Nine steps in two loops, each run as its own subprocess. The R loop goes first
 because predict_2026.py depends on the CSVs it writes.
 
 R loop:
     1. data_2026/fetch_stats_2026.R   2026 player stats from AFLTables (fitzRoy)
-    2. data_2026/fetch_coaches.R      2026 coaches votes (fitzRoy)
+
+The 2026 coaches fetch is commented out of r_scripts for the season end. Read
+the inline comment there before restoring it for 2027.
 
 Python loop:
-    3. scraper_odds.py         Oddschecker bookmaker odds
-    4. scraper_betfair.py      Betfair predictions
-    5. scraper_espn.py         ESPN predictions, season totals and per-round
-    6. scraper_afl.py          AFL Predictor votes
-    7. update_wheelo_2026.py   Wheelo 2026 ratings
-    8. predict_2026.py         2026 predictions
-    9. draft_posts.py          drafts/round_<display>.md
-   10. landing_summary.py      site/landing.json
+    2. scraper_odds.py         Oddschecker bookmaker odds
+    3. scraper_betfair.py      Betfair predictions
+    4. scraper_espn.py         ESPN predictions, season totals and per-round
+    5. scraper_afl.py          AFL Predictor votes
+    6. update_wheelo_2026.py   Wheelo 2026 ratings
+    7. predict_2026.py         2026 predictions
+    8. draft_posts.py          drafts/round_<display>.md
+    9. landing_summary.py      site/landing.json
 
-Step 10 writes an artifact, not a page. site/landing.json is git tracked, so
+Step 9 writes an artifact, not a page. site/landing.json is git tracked, so
 running this changes nothing the public can see: the numbers reach the live site
 only once the file is committed and pushed, and an uncommitted run leaves the
 site on last week's figures. Committing is necessary rather than sufficient. The
@@ -29,8 +31,8 @@ Nothing here stops on failure. A missing target is skipped with a note and a
 non-zero exit only prints a warning, so every step runs regardless of what the
 step before it did. Each step's own exit code is therefore the only honest
 report of whether it worked, and reading the console is the only way to find
-out. The R steps additionally carry a wall-clock limit (R_TIMEOUT); exceeding it
-kills that step and is logged like any other failure, rather than ending the
+out. The R step additionally carries a wall-clock limit (R_TIMEOUT); exceeding
+it kills that step and is logged like any other failure, rather than ending the
 run.
 
 streaks.py is NOT part of either loop and nothing imports it. The post-round
@@ -119,7 +121,17 @@ if __name__ == "__main__":
     # R data fetch first — predict_2026.py depends on these CSVs
     r_scripts = [
         ("data_2026/fetch_stats_2026.R", "Fetching 2026 player stats from AFLTables (R/fitzRoy)"),
-        ("data_2026/fetch_coaches.R", "Fetching 2026 coaches votes (R/fitzRoy)"),
+        # Disabled for this run. The 2026 coaches feed has gone private, so
+        # fetch_coaches_votes() no longer returns the season. fetch_coaches.R's
+        # write.csv is unconditional and unguarded: an empty or truncated frame
+        # is written straight over data_2026/coaches_votes_2026.csv, destroying
+        # all 22 published rounds. That file is already complete through R22 and
+        # no further rounds are coming, so there is nothing to gain by running
+        # it and a whole season of votes to lose. Losing it would also route
+        # every game to the no-coaches variant, not just the unpublished ones.
+        # data_2026/coaches_votes_2026_prev.csv is a byte copy kept as insurance.
+        # Restore this line when the feed returns, or for the 2027 season.
+        # ("data_2026/fetch_coaches.R", "Fetching 2026 coaches votes (R/fitzRoy)"),
     ]
     for r_script, description in r_scripts:
         if os.path.exists(r_script):
