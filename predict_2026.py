@@ -247,7 +247,7 @@ df26_valid['Brownlow.Votes'] = 0
 # Zero votes across a whole game means "not published yet" rather than "nobody
 # polled" — coaches award 5-4-3-2-1 in every game, so a played game always has
 # nonzero votes somewhere once released.
-_has_cv = df26_valid.groupby('Game_ID')['Coaches_Votes'].transform(lambda s: (s != 0).any())
+_has_cv = df26_valid.groupby('Game_ID')['Coaches_Votes'].transform(lambda s: (s > 0).any())
 df26_valid['model_source'] = np.where(_has_cv, 'full', 'no_cv')
 if MODEL_NOCV is None:
     df26_valid['model_source'] = 'full'          # variant unavailable
