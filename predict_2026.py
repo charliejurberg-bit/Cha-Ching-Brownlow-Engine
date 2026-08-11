@@ -180,6 +180,18 @@ if os.path.exists("data_2026/coaches_votes_2026.csv"):
     cv26_agg = (cv26.groupby(['Round', 'CV_Player', 'CV_Team'])['Coaches.Votes']
                     .sum().reset_index())
     cv26_agg.columns = ['Round_num', 'Player_Name', 'Playing.for', 'Coaches_Votes']
+
+    # Reconcile the feed's spelling with AFLTables' before the join. The feed
+    # writes O'Sullivan, Van Rooyen, De Goey, Harrison Petty and Bailey J
+    # Williams where AFLTables writes OSullivan, van Rooyen, de Goey, Harry
+    # Petty and Bailey Williams, and every one of those merged as zero. That is
+    # 66 rows carrying 280 real votes, and unlike a missing rating a coaches
+    # zero is the modal value, so nothing downstream flags it.
+    cv26_agg, _cv_unmatched = feat.resolve_feed_names(
+        cv26_agg, df26, feed_name_col='Player_Name',
+        feed_team_col='Playing.for', feed_round_col='Round_num',
+        label='coaches')
+
     df26 = df26.merge(cv26_agg, on=['Round_num', 'Player_Name', 'Playing.for'], how='left')
     df26['Coaches_Votes'] = df26['Coaches_Votes'].fillna(0)
     print("  Coaches votes merged")
@@ -200,6 +212,16 @@ if os.path.exists(wheelo_2026_path) and WHEELO_FEATURES:
     # Training applies the identical replace for the identical reason.
     w26['Team'] = w26['Team'].replace(feat.WHEELO_TEAM_FIXES)
     w26 = w26.rename(columns={'Team': 'Playing.for'})
+
+    # Same reconciliation as the coaches feed, for the same reason: 297 rows
+    # across 27 players, every one of them missed in every game they played,
+    # each silently zero-filled on all 20 Wheelo features and ranked last in
+    # their game on the two that carry a rank triplet.
+    w26, _w_unmatched = feat.resolve_feed_names(
+        w26, df26, feed_name_col='Player_Name',
+        feed_team_col='Playing.for', feed_round_col='Round_num',
+        label='wheelo')
+
     wheelo_cols = [c for c in WHEELO_FEATURES if c in w26.columns]
     df26 = df26.merge(w26[['Player_Name', 'Playing.for', 'Round_num'] + wheelo_cols],
                       on=['Player_Name', 'Playing.for', 'Round_num'], how='left')

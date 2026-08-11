@@ -14,6 +14,7 @@ import subprocess
 import sys
 import betting_hub
 import user_auth
+import features as feat
 from theme import inject_global_theme, PLOTLY_TOUCH_CONFIG
 from brownlow_medallists import get_medallists
 
@@ -1829,14 +1830,60 @@ def _save_with_backup(df, csv_path):
         shutil.copy2(csv_path, _prev)
     df.to_csv(csv_path, index=False)
 
-def _load_csv_fallback(csv_path, rank_col='Rank'):
-    """Load a predictions CSV; ensure rank_col exists."""
+@st.cache_data(ttl=3600, show_spinner=False)
+def _aflt_name_reference():
+    """AFLTables spelling of every 2026 player, with team and round.
+
+    The target side of the name reconciliation in features.py. Model Comparison
+    joins five feeds on player name, and each spells them differently; this is
+    the one spelling they are all resolved onto."""
+    path = "data_2026/afltables_2026.csv"
+    if not os.path.exists(path):
+        return pd.DataFrame()
+    df = pd.read_csv(path, low_memory=False)
+    df['Round_num'] = pd.to_numeric(df['Round'], errors='coerce')
+    df = df.dropna(subset=['Round_num'])
+    df['Player_Name'] = (df['First.name'].str.strip() + ' '
+                         + df['Surname'].str.strip())
+    return df[['Player_Name', 'Playing.for', 'Round_num']]
+
+
+def _resolve_feed_names(df, player_col='Player', team_col=None,
+                        team_fixes=None, label='feed'):
+    """Rewrite a feed's player names into AFLTables spelling.
+
+    Team-scoped where the feed carries a club (layer 2 can then resolve
+    Brad/Bradley and Cameron/Cam), layer 1 only where it does not. Round is not
+    available on any of these three feeds, so the scope is team+season; the
+    2026 sweep found 14 surname collisions at that scope and zero the rule
+    would accept, so the uniqueness guard still holds."""
+    ref = _aflt_name_reference()
+    if ref.empty or df.empty or player_col not in df.columns:
+        return df
+    if team_col and team_col in df.columns:
+        feed = df.copy()
+        if team_fixes:
+            feed[team_col] = feed[team_col].replace(team_fixes)
+        out, _ = feat.resolve_feed_names(
+            feed, ref, feed_name_col=player_col, feed_team_col=team_col,
+            feed_round_col=None, label=label, verbose=False)
+        out[team_col] = df[team_col].values     # keep the feed's own spelling
+        return out
+    out, _ = feat.resolve_names_simple(
+        df, ref['Player_Name'].unique(), player_col, label=label, verbose=False)
+    return out
+
+
+def _load_csv_fallback(csv_path, rank_col='Rank', player_col='Player',
+                       team_col=None, team_fixes=None, label='feed'):
+    """Load a predictions CSV; ensure rank_col exists, reconcile player names."""
     if not os.path.exists(csv_path):
         return pd.DataFrame()
     df = pd.read_csv(csv_path)
     if rank_col not in df.columns:
         df[rank_col] = df.index + 1
-    return df
+    return _resolve_feed_names(df, player_col=player_col, team_col=team_col,
+                               team_fixes=team_fixes, label=label)
 
 def _rank_change_html(csv_path, current_player, player_col='Player'):
     """HTML snippet showing rank change vs previous scrape (▲N / ▼N / empty)."""
@@ -1972,7 +2019,8 @@ def fetch_betfair_brownlow():
     Like ESPN, the column can be arbitrarily old, so the page shows the file's
     mtime as an 'as of' stamp. ttl matches the other file-derived loaders; the
     button clears it explicitly."""
-    fb = _load_csv_fallback(_BF_CSV, 'Rank')
+    fb = _load_csv_fallback(_BF_CSV, 'Rank', team_col='Team',
+                            team_fixes=feat.BETFAIR_TEAM_FIXES, label='betfair')
     if fb.empty:
         return pd.DataFrame(), "No Betfair data yet — refresh it, or run scraper_betfair.py"
     return fb.rename(columns={'Total_Votes': 'BF_Votes', 'Rank': 'BF_Rank'},
@@ -1992,7 +2040,9 @@ def fetch_afl_predictor_brownlow():
     Returns DataFrame[Player, Team, Total_Votes, Rank] — the page re-ranks and
     renames it itself, so no rename here. Like ESPN and Betfair the column can be
     arbitrarily old, hence the 'as of' stamp on the page."""
-    return _load_csv_fallback(_AFL_CSV, 'Rank')
+    return _load_csv_fallback(_AFL_CSV, 'Rank', team_col='Team',
+                              team_fixes=feat.COACHES_TEAM_FIXES,
+                              label='afl-predictor')
 
 
 def _fetch_espn_live():
@@ -2062,7 +2112,7 @@ def fetch_espn_brownlow():
     assigned and dropped).
 
     ttl matches the other file-derived loaders; the button clears it explicitly."""
-    fb = _load_csv_fallback(_ESPN_CSV, 'Rank')
+    fb = _load_csv_fallback(_ESPN_CSV, 'Rank', label='espn')
     if fb.empty:
         return pd.DataFrame(), "No ESPN data yet — refresh it, or run scraper_espn.py"
     return fb.rename(columns={'Total_Votes': 'ESPN_Votes', 'Rank': 'ESPN_Rank'},
@@ -7318,11 +7368,15 @@ def render_polls_a_vote(season: int):
     _NAME_SUFFIX_RE = _re.compile(r'\s+(Jr\.?|Sr\.?|II|III|IV)$', _re.IGNORECASE)
 
     def _norm(name) -> str:
-        if pd.isna(name):
-            return ''
-        s = str(name).title().strip().replace("'", '').replace('-', ' ')
-        s = _re.sub(r'\s+', ' ', s).strip()
-        return _NAME_SUFFIX_RE.sub('', s).strip()
+        """Join key for the five-way consensus. One definition, in features.py,
+        shared with the Wheelo and coaches merges in predict_2026.py.
+
+        The local version this replaces title-cased and stripped apostrophes,
+        hyphens and suffixes, so it already collapsed McKay/Mckay and
+        O'Sullivan/OSullivan. It did not handle periods, accents or a middle
+        initial, so Wheelo's "Bailey J. Williams" keyed to nobody. Used only as
+        a dict key, never displayed."""
+        return feat.normalise_name(name)
 
     # ── Cross-model consensus thresholds (named) ───────────────────────────────
     CC_ROUND_THRESH     = 0.35   # Cha Ching: round Poll_Prob >= this = tips that round
