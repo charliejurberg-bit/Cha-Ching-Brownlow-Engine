@@ -6,7 +6,8 @@ Brownlow Medal Prediction Engine v4.0
 - Season momentum (last-6 vs first-6 coaches votes + disposals)
 - Late-season sample weighting (last 5 rounds = 2x weight)
 - Finals filtered out
-- 2015-2025 training data
+- 2007-2025 training data (every season in the stats file; there is no season
+  filter below, and fitzroy_stats_all.csv is preferred when present)
 Run: python brownlow_model.py
 """
 

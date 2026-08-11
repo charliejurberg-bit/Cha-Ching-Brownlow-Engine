@@ -1,6 +1,6 @@
 # Cha Ching — Brownlow Medal Predictor & Betting Hub
 
-AFL Brownlow Medal predictor plus a betting tracker. XGBoost model (v4.0) trained on 2015–2025 data. Dashboard runs live during the 2026 season.
+AFL Brownlow Medal predictor plus a betting tracker. XGBoost model (v4.0) trained on 2007–2025 data. Dashboard runs live during the 2026 season.
 
 **Only the Betting Hub is personal.** The Brownlow section is the free public product, launched to AFL betting forums with no paywall and no paid tips; the Betting Hub is private and admin-gated. Treat any copy decision as public-facing unless it lives behind the gate.
 
@@ -99,9 +99,12 @@ brownlow_engine/
 │   ├── cha_ching_tips.csv
 │   └── player_props_cache.csv
 │
-└── fitzroy_stats_all.csv      # Historical stats 2007–2025, 170,028 rows. NOT the
-                               #   training range: 2015–2025 is fitzroy_stats_2015_2025.csv
-                               #   (fitzroy_stats_2007_2014.csv holds the earlier half)
+└── fitzroy_stats_all.csv      # Historical stats 2007–2025, 170,028 rows. This IS
+                               #   the training range: brownlow_model.py and
+                               #   backtest.py both prefer this file when it exists,
+                               #   and neither filters by season
+                               #   (fitzroy_stats_2015_2025.csv is the fallback;
+                               #   fitzroy_stats_2007_2014.csv holds the earlier half)
     coaches_votes_all.csv      # Historical coaches votes 2006–2025
 ```
 
@@ -121,7 +124,9 @@ brownlow_engine/
 ## Model architecture (v4.0)
 
 - **Algorithm**: `XGBClassifier` — predicts 0/1/2/3 Brownlow votes per player per game
-- **Training data**: 2015–2025 H&A rounds only (finals filtered; string-labeled rounds → NaN)
+- **Training data**: 2007–2025 H&A rounds only (finals filtered; string-labeled
+  rounds → NaN). 19 seasons, 162,411 rows, 40.2% of them pre-2015. Measured, not
+  assumed: see `project_brief.md`, "## Model". Do not restate this as 2015–2025
 - **CV**: 5-fold `GroupKFold` grouped by season (no data leakage across seasons)
 - **Sample weights**: last-5-rounds of each season weighted 2× (recency bias)
 - **MAE**: **UNRESOLVED. Do not quote any MAE figure**, public or internal. The

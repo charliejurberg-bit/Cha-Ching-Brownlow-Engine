@@ -53,12 +53,46 @@ Twitter/X: `@ChaChingBrwnlow` (no "o" in Brwnlow).
 
 XGBoost v4.0. 23 H&A rounds modelled per season.
 
-**Training range: 2015–2025.** Settled 29 July 2026. `brownlow_model.py`'s
-docstring is authoritative and recon confirms it. The 2008–2023 backtest cut is
-not a contradiction — those are the out-of-sample seasons, which by definition
-sit outside the training range. The Vercel "a decade of AFL data" line covers
-eleven seasons and is defensible, but "trained on seasons since 2015" is
-preferred because it is exact.
+**Training range: 2007–2025.** Re-settled 11 August 2026, by measurement.
+Nineteen seasons, 162,411 rows, 40.2% of them pre-2015.
+
+The 29 July 2026 entry said 2015–2025 and called `brownlow_model.py`'s docstring
+authoritative. **That was the error: the docstring is a comment, not a filter.**
+There is no season filter anywhere in `brownlow_model.py`. It loads
+`fitzroy_stats_all.csv` (2007–2025) in preference to `fitzroy_stats_2015_2025.csv`
+at line 51, and the only row-dropping is a `dropna` on base stats. The docstring
+went stale when the extended-data work landed and nobody re-read the loader.
+
+How it was measured, so it can be re-checked rather than re-argued:
+
+- Executing `brownlow_model.py`'s own source up to the training step (no retrain,
+  no artifacts touched) and printing `model_df['Season'].value_counts()` gives
+  2007–2025, 19 seasons, 65,340 rows pre-2015.
+- `brownlow_model.py`'s own comment at the `dropna` corroborates it
+  independently: Wheelo features are NaN in "every pre-2015 game", counted there
+  as "40% of training". That matches the measured 40.2% and only makes sense if
+  pre-2015 games are in the training set.
+- `model.pkl` was retrained 21 July 2026, two months after the 2007–2025 archive
+  landed on 17 May 2026, so the shipped model came through this path.
+
+**Do not re-correct this to 2015–2025 from a docstring, a brief, or front-end
+copy.** If it ever needs re-checking, run the measurement above. If the range is
+ever genuinely changed, it must change in `brownlow_model.py` as a season filter
+first, and the docs follow the code.
+
+The 2008–2023 backtest cut is not a contradiction and never was: `backtest.py` is
+walk-forward, fitting a fresh model per target season on strictly prior seasons
+(`train = model_df[model_df['Season'] < target_season]`), so no scored season
+appears in the fold that scored it. Verified 11 August 2026 across all 18 scored
+seasons, zero self-contaminated folds. The calibration table below is therefore
+still out-of-sample and still publishable, and the shipping model's 2007–2025
+range does not touch it: the table is computed from
+`predictions/backtest_game_level.csv`, written per fold, never from the
+full-span model.
+
+The Vercel "a decade of AFL data" line is **wrong**, not merely imprecise:
+nineteen seasons is not a decade. Use "trained on 2007–2025" or "nineteen
+seasons of AFL data".
 
 **Do not cite accuracy percentages in any public-facing copy.** No top-10
 accuracy figure, no variant of it. The "~86% top-10" and "~50% medallist top-3"
@@ -77,7 +111,9 @@ Honest out-of-sample figures, from `accuracy_report.py` against
 | 2.6–2.8 | 78.8% |
 | 2.8–3.0 | 89.2% |
 
-Mean actual tracks mean projected within 0.05 in every bucket above 2.0. No thin
+Mean actual tracks mean projected within 0.06 in every bucket above 2.0 (the
+widest gap is -0.053, in the 2.4–2.6 bucket; "within 0.05" as this line
+previously read was marginally overstated). No thin
 buckets. This is the checkable, defensible claim — a projection of 2.4+ polls
 three votes 65% of the time, on seasons the model never trained on.
 
