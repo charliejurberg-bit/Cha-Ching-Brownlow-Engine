@@ -4,6 +4,22 @@
 
 ---
 
+> **No accuracy figure belongs in this file.** Not MAE, not a top-10 percentage,
+> not a hit rate, not "86%". Mockups here carry `{{NO_ACCURACY_FIGURE}}` where a
+> number would sit, because a placeholder that cannot be mistaken for real is the
+> only safe thing to paste into a layout.
+>
+> This is not a style preference. The "86% top-10 accuracy" that this file
+> published for months **has no source anywhere in the repo** and never did; it
+> entered circulation by being copied out of a brief exactly like this one, into
+> live dashboard copy, and outlived the model it claimed to describe. The MAE
+> figures are separately unresolved: every one on record was measured with a
+> momentum leak in place, so none is comparable to the others or to the current
+> model.
+>
+> The only publishable accuracy claim is the out-of-sample calibration table in
+> `project_brief.md`, "## Model". Take numbers from there, never from here.
+
 ## What this does
 
 Full visual redesign of the Cha Ching Brownlow Medal dashboard.
@@ -314,8 +330,7 @@ def render_page_home():
   </h1>
   <p style="color:#94a3b8;font-size:15px;margin:0;max-width:520px;line-height:1.6;">
     Brownlow Medal predictor · 2026 season · XGBoost v4.0 &nbsp;·&nbsp;
-    <span style="color:#e8f0f8;font-weight:500;">MAE 0.09</span> &nbsp;·&nbsp;
-    <span style="color:#e8f0f8;font-weight:500;">86% top-10 accuracy</span>
+    <span style="color:#e8f0f8;font-weight:500;">{{NO_ACCURACY_FIGURE}}</span>
   </p>
 </div>
 """, unsafe_allow_html=True)
@@ -367,8 +382,8 @@ def render_page_home():
   <div style="font-size:10px;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;
               color:#94a3b8;margin-bottom:6px;">Model accuracy</div>
   <div style="font-size:20px;font-weight:700;color:#e8f0f8;
-              font-family:'Sora',sans-serif;letter-spacing:-0.02em;">86%</div>
-  <div style="font-size:12px;color:#94a3b8;margin-top:4px;">top-10 · MAE 0.09</div>
+              font-family:'Sora',sans-serif;letter-spacing:-0.02em;">{{NO_ACCURACY_FIGURE}}</div>
+  <div style="font-size:12px;color:#94a3b8;margin-top:4px;">{{NO_ACCURACY_FIGURE}}</div>
 </div>""", unsafe_allow_html=True)
 
     with c4:
