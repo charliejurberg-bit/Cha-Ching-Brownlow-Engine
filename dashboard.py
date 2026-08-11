@@ -7773,8 +7773,6 @@ def render_polls_a_vote(season: int):
         model_chips = ''.join(f'<span class="pav-pill-dash">{_rl(r)}</span>' for r in top3)
         chips = (my_chips + model_chips) or '<span style="color:var(--muted);font-size:12px">—</span>'
 
-        odds_str  = f"{float(row['Odds']):.2f}"  if pd.notna(row.get('Odds'))  else '—'
-        stake_str = f"{float(row['Stake']):.2f}u" if pd.notna(row.get('Stake')) else '—'
         _op = 'opacity:.55;' if settled else ''
         sbadge = '<span class="sbadge">SETTLED</span>' if settled else ''
         _na_suffix = (f'<span style="color:#7e8c99"> · {_r_na} n/a</span>'
@@ -7808,11 +7806,6 @@ def render_polls_a_vote(season: int):
             f'<div style="text-align:center;min-width:70px">'
             f'<div class="agree">{_poll_pct_str}</div>'
             f'<div class="lbl" style="margin-top:5px">Season poll %</div>'
-            f'</div>'
-
-            f'<div style="min-width:96px">'
-            f'<div class="lbl">Odds / Stake</div>'
-            f'<div class="os">{odds_str} / {stake_str}</div>'
             f'</div>'
 
             f'</div></div>',
@@ -7900,11 +7893,6 @@ def render_polls_a_vote(season: int):
                                 unsafe_allow_html=True,
                             )
 
-            fo1, fo2 = st.columns(2)
-            with fo1:
-                pav_odds = st.number_input("Odds", min_value=1.01, value=2.0, step=0.05, format="%.2f")
-            with fo2:
-                pav_stake = st.number_input("Stake (u)", min_value=0.0, value=1.0, step=0.5, format="%.2f")
             pav_notes = st.text_input("Notes (optional)")
 
             if st.form_submit_button("Add to Watchlist", type="primary", use_container_width=True):
@@ -7917,13 +7905,18 @@ def render_polls_a_vote(season: int):
                     # save_poll_pick reports the duplicate rather than raising it —
                     # user_poll_picks_active_player is now (user_id, player), so it
                     # can only ever mean this user's own open pick, never another's.
+                    # No Odds/Stake keys: this is a watchlist, not a bet log.
+                    # save_poll_pick filters this dict against POLL_PICK_COLS
+                    # rather than looking keys up, so omitting them drops the
+                    # columns from the upsert instead of writing nulls, and both
+                    # are nullable in supabase/04. The user_poll_picks.odds and
+                    # .stake columns are retained but no longer written or read
+                    # anywhere.
                     _ok, _msg = user_auth.save_poll_pick({
                         'id':        _wl_id,
                         'Player':    pav_player.strip(),
                         'Team':      pav_team.strip(),
                         'My_Rounds': ','.join(str(r) for r in _sel),
-                        'Odds':      round(float(pav_odds), 2),
-                        'Stake':     round(float(pav_stake), 2),
                         'Notes':     pav_notes.strip(),
                         'Settled':   False,
                     }, season)
