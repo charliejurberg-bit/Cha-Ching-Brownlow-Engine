@@ -7932,7 +7932,13 @@ st.markdown(
     '<div style="border-top:1px solid var(--line);margin-top:40px;padding:14px 0;'
     'color:var(--muted);font-size:10px;letter-spacing:1.2px;text-align:center;'
     'text-transform:uppercase;font-weight:600;">'
-    f'Model v4.0 &nbsp;&nbsp;·&nbsp;&nbsp; Data: {_TRAIN_MIN}–{_TRAIN_MAX} &nbsp;&nbsp;·&nbsp;&nbsp; 93 features &nbsp;&nbsp;·&nbsp;&nbsp; MAE 0.095'
+    # No accuracy figure here, deliberately. Every MAE on record (v1-v4) was
+    # measured with a momentum leak in place, so none is comparable to the
+    # others or to the current model, and this footer is public. Do not
+    # reinstate MAE, a top-10 hit rate, or any other accuracy number until one
+    # has been re-measured against the current model. See CLAUDE.md, "## Model
+    # architecture".
+    f'Model v4.0 &nbsp;&nbsp;·&nbsp;&nbsp; Data: {_TRAIN_MIN}–{_TRAIN_MAX} &nbsp;&nbsp;·&nbsp;&nbsp; 93 features'
     '</div>',
     unsafe_allow_html=True,
 )
