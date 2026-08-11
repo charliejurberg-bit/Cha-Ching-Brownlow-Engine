@@ -111,14 +111,31 @@ Honest out-of-sample figures, from `accuracy_report.py` against
 | 2.6–2.8 | 78.8% |
 | 2.8–3.0 | 89.2% |
 
-Mean actual tracks mean projected within 0.06 in every bucket above 2.0 (the
-widest gap is -0.053, in the 2.4–2.6 bucket; "within 0.05" as this line
-previously read was marginally overstated). No thin
-buckets. This is the checkable, defensible claim — a projection of 2.4+ polls
-three votes 65% of the time, on seasons the model never trained on.
+Mean actual tracks mean projected within 0.06 in every bucket above 2.0; the
+widest gap is -0.053, in the 2.4–2.6 bucket. ("Within 0.05", as this line read
+until 11 August 2026, was marginally overstated.) No thin buckets: the smallest
+bucket in the cut holds 231 rows, against `accuracy_report.py`'s THIN threshold
+of 30.
+
+This is the checkable, defensible claim: **a projection in the 2.4–2.6 band
+polls three votes 65% of the time**, on seasons the model never trained on.
+State it as a band, not a threshold. Until 11 August 2026 this line read "a
+projection of 2.4+ polls three votes 65% of the time", which is a different and
+lower claim than the data supports: pooled, every projection at or above 2.4
+polls three votes **75.3%** of the time (n=1,081), because the 2.6–2.8 and
+2.8–3.0 bands sit above 65%. That error ran against our own interest rather than
+for it, but it did not describe the table, so it is fixed here.
 
 In-sample inflation was severe: exact top-three order 22.23% fitted against
-8.38% honest. Never quote in-sample figures.
+8.38% honest. Both are measured on the same 3,054 games; reproducing the
+in-sample side needs `--min-season 2008`, because the walk-forward set cannot
+score 2007 and the default 2007 floor gives 3,230 games and 21.49% instead.
+Never quote in-sample figures.
+
+Every figure in this section was re-verified on 11 August 2026 against
+`predictions/backtest_game_level.csv` (written 22 July 2026) by re-running
+`accuracy_report.py --source backtest`. The bucket percentages, the 3,054 game
+count, the 8.38%, and the 22.23% all reproduce exactly.
 
 **MAE figures: UNRESOLVED. Do not quote any of them.**
 
