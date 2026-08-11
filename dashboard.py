@@ -7803,7 +7803,15 @@ def render_polls_a_vote(season: int):
             f'<div>{chips}</div>'
             f'</div>'
 
-            f'<div style="text-align:center;min-width:70px">'
+            # align-self centres this column against the flex line, whose
+            # cross-size is set by the tallest sibling — the left block or the
+            # chips, whichever runs longer. So it tracks the card height for
+            # free: more chips, a wrapped row, or the radar line appearing all
+            # change the line height and this stays centred against it. The
+            # container keeps align-items:flex-start, so the other two children
+            # are untouched. Do not swap this for a fixed height or a container
+            # -level align-items:center; both move the left content.
+            f'<div style="text-align:center;min-width:70px;align-self:center">'
             f'<div class="agree">{_poll_pct_str}</div>'
             f'<div class="lbl" style="margin-top:5px">Season poll %</div>'
             f'</div>'
