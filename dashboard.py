@@ -2762,8 +2762,20 @@ __ICON_CSS__
     border-bottom: 1px solid var(--line);
     margin-bottom: 16px;
 }
-.lb-controls-marker { display: none; }
-div[data-testid="stHorizontalBlock"]:has(.lb-controls-marker) label {
+/* Full Leaderboard filter row: SEARCH PLAYER / CLUB / SHOW. Scoped off the
+   keyed container st.container(key="lb_filters"), which stamps
+   .st-key-lb_filters on its own stVerticalBlock (not a parent wrapper), so the
+   descendant selector below is correct as written. .stApp is for specificity,
+   matching the nav CSS convention.
+
+   This replaced a hidden `.lb-controls-marker` div plus a
+   stHorizontalBlock:has(.lb-controls-marker) selector. The marker was not free:
+   st.markdown emits its own stElementContainer, which keeps a slot in the
+   column's flex flow even at display:none, and the vertical block's 16px gap
+   then pushed the text input exactly one gap below the two selectboxes
+   (widget top 548px against 532px). Do not put a marker element back in
+   one of these columns. */
+.stApp .st-key-lb_filters label {
     font-family: 'IBM Plex Mono', monospace !important;
     font-size: 10px !important;
     font-weight: 700 !important;
@@ -3478,23 +3490,27 @@ SCOPE .lb-bar-lo{text-align:right;}
     )
 
     st.markdown('<div class="lb-section-label">Full Leaderboard</div>', unsafe_allow_html=True)
-    _cc1, _cc_team, _cc2 = st.columns([4, 1.4, 1])
-    with _cc1:
-        st.markdown('<div class="lb-controls-marker"></div>', unsafe_allow_html=True)
-        search = st.text_input("SEARCH PLAYER", "")
-    with _cc_team:
-        # Club list comes from the loaded frame, never a hardcoded eighteen. The
-        # competition has not always had eighteen clubs and this page serves
-        # every season in AVAILABLE_SEASONS: 2007 and 2010 hold sixteen, 2011
-        # seventeen once Gold Coast enter, eighteen only from 2012. A fixed list
-        # would offer four clubs that did not exist on a 2007 leaderboard.
-        # _fix_team_names has already run in load_season, so the values here are
-        # canonical (Kangaroos read as North Melbourne, Footscray as Western
-        # Bulldogs) and match _LB_ABBR's keys.
-        _team_opts = ['All'] + sorted(predictions['Team'].dropna().astype(str).unique())
-        team_pick = st.selectbox("CLUB", _team_opts, index=0)
-    with _cc2:
-        show_n = st.selectbox("SHOW", [20, 50, 100, 200], index=0)
+    # Keyed container, so the label treatment is scoped by .st-key-lb_filters
+    # instead of a marker div inside the first column. The marker cost a 16px
+    # misalignment: see the .st-key-lb_filters rule in the CSS block for the
+    # measurement. Column ratios are unchanged.
+    with st.container(key="lb_filters"):
+        _cc1, _cc_team, _cc2 = st.columns([4, 1.4, 1])
+        with _cc1:
+            search = st.text_input("SEARCH PLAYER", "")
+        with _cc_team:
+            # Club list comes from the loaded frame, never a hardcoded eighteen.
+            # The competition has not always had eighteen clubs and this page
+            # serves every season in AVAILABLE_SEASONS: 2007 and 2010 hold
+            # sixteen, 2011 seventeen once Gold Coast enter, eighteen only from
+            # 2012. A fixed list would offer four clubs that did not exist on a
+            # 2007 leaderboard. _fix_team_names has already run in load_season,
+            # so the values here are canonical (Kangaroos read as North
+            # Melbourne, Footscray as Western Bulldogs) and match _LB_ABBR's keys.
+            _team_opts = ['All'] + sorted(predictions['Team'].dropna().astype(str).unique())
+            team_pick = st.selectbox("CLUB", _team_opts, index=0)
+        with _cc2:
+            show_n = st.selectbox("SHOW", [20, 50, 100, 200], index=0)
 
     # ── Round-on-round movement (2026 only) ──────────────────
     _move_map = {}
