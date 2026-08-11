@@ -53,3 +53,7 @@ _tmp/
 
 # Local editor config
 .vscode/
+
+# Selenium download scratch for the Wheelo match-stats fetch. Cleared at the
+# start of every round fetch; the parsed result lands in wheelo_2026.csv.
+data_wheelo/downloads/

@@ -1,658 +1,664 @@
 Player,Team,Actual_Votes,Games_Played,Avg_Predicted_Per_Game,Remaining_Rounds,Projected_Remaining,Season_Total_Projected,Floor_Projection,Ceiling_Projection
-Nick Daicos,Collingwood,0,19,1.8496,1,1.85,1.85,28.0,42.0
-Marcus Bontempelli,Western Bulldogs,0,20,1.277,1,1.28,1.28,18.0,33.0
-Bailey Smith,Geelong,0,19,1.2138,1,1.21,1.21,16.0,30.0
-Isaac Heeney,Sydney,0,18,1.118,1,1.12,1.12,13.0,27.0
-Will Ashcroft,Brisbane Lions,0,20,1.0085,1,1.01,1.01,13.0,28.0
-Nasiah Wanganeen-Milera,St Kilda,0,16,1.0064,1,1.01,1.01,10.0,22.0
-Zak Butters,Port Adelaide,0,17,1.0061,1,1.01,1.01,11.0,24.0
-Patrick Cripps,Carlton,0,20,1.0087,1,1.01,1.01,13.0,27.0
-Jordan Dawson,Adelaide,0,17,0.9997,1,1.0,1.0,10.0,24.0
-Harry Sheezel,North Melbourne,0,20,0.9467,1,0.95,0.95,12.0,26.0
-Lachie Neale,Brisbane Lions,0,20,0.9222,1,0.92,0.92,12.0,26.0
-Jason Horne-Francis,Port Adelaide,0,19,0.9205,1,0.92,0.92,11.0,24.0
-Jai Newcombe,Hawthorn,0,20,0.8626,1,0.86,0.86,10.0,24.0
-Errol Gulden,Sydney,0,8,0.8092,1,0.81,0.81,2.0,11.0
-Max Holmes,Geelong,0,18,0.7683,1,0.77,0.77,8.0,20.0
-Kysaiah Pickett,Melbourne,0,20,0.7492,1,0.75,0.75,8.0,22.0
-Shai Bolton,Fremantle,0,19,0.6958,1,0.7,0.7,7.0,20.0
-Max Gawn,Melbourne,0,20,0.6927,1,0.69,0.69,8.0,20.0
-Clayton Oliver,Greater Western Sydney,0,20,0.6701,1,0.67,0.67,8.0,19.0
-Izak Rankine,Adelaide,0,17,0.6741,1,0.67,0.67,6.0,18.0
-Jack Gunston,Hawthorn,0,14,0.6523,1,0.65,0.65,4.0,14.0
-Luke Jackson,Fremantle,0,20,0.6518,1,0.65,0.65,7.0,20.0
-Andrew Brayshaw,Fremantle,0,20,0.635,1,0.64,0.64,7.0,19.0
-Caleb Serong,Fremantle,0,17,0.6301,1,0.63,0.63,5.0,16.0
-Christian Petracca,Gold Coast,0,18,0.6251,1,0.63,0.63,5.0,18.0
-Ed Richards,Western Bulldogs,0,19,0.6191,1,0.62,0.62,6.0,18.0
-Harley Reid,West Coast,0,20,0.6065,1,0.61,0.61,6.0,18.0
-Brodie Grundy,Sydney,0,19,0.5931,1,0.59,0.59,5.0,17.0
-George Hewett,Carlton,0,16,0.5789,1,0.58,0.58,4.0,15.0
-Zac Bailey,Brisbane Lions,0,19,0.5708,1,0.57,0.57,6.0,16.0
-Tom Sparrow,Melbourne,0,20,0.5749,1,0.57,0.57,6.0,18.0
-Chad Warner,Sydney,0,20,0.5539,1,0.55,0.55,6.0,17.0
-Sam Walsh,Carlton,0,20,0.5436,1,0.54,0.54,5.0,17.0
-Justin McInerney,Sydney,0,13,0.5201,1,0.52,0.52,2.0,11.0
-Finn Callaghan,Greater Western Sydney,0,19,0.5221,1,0.52,0.52,5.0,16.0
-Charlie Curnow,Sydney,0,19,0.5093,1,0.51,0.51,4.0,16.0
-Toby Greene,Greater Western Sydney,0,18,0.5043,1,0.5,0.5,4.0,14.0
-Luke Davies-Uniacke,North Melbourne,0,20,0.4874,1,0.49,0.49,5.0,15.0
-Murphy Reid,Fremantle,0,20,0.4504,1,0.45,0.45,4.0,14.0
-Jagga Smith,Carlton,0,20,0.4467,1,0.45,0.45,4.0,14.0
-Tim Taranto,Richmond,0,18,0.4218,1,0.42,0.42,3.0,13.0
-Rowan Marshall,St Kilda,0,18,0.3987,1,0.4,0.4,2.0,13.0
-Jarman Impey,Hawthorn,0,18,0.4027,1,0.4,0.4,2.0,12.0
-Noah Anderson,Gold Coast,0,19,0.3982,1,0.4,0.4,3.0,12.0
-Hugo Garcia,St Kilda,0,20,0.3954,1,0.4,0.4,3.0,13.0
-Sam Berry,Adelaide,0,19,0.3871,1,0.39,0.39,3.0,12.0
-Wayne Milera,Adelaide,0,17,0.3884,1,0.39,0.39,2.0,11.0
-Matt Rowell,Gold Coast,0,15,0.3789,1,0.38,0.38,2.0,10.0
-Jye Amiss,Fremantle,0,20,0.3762,1,0.38,0.38,3.0,13.0
-Jacob van Rooyen,Melbourne,0,20,0.3821,1,0.38,0.38,3.0,13.0
-Josh Treacy,Fremantle,0,20,0.3529,1,0.35,0.35,3.0,12.0
-Nick Watson,Hawthorn,0,18,0.3475,1,0.35,0.35,2.0,10.0
-Darcy Parish,Essendon,0,14,0.3361,1,0.34,0.34,1.0,9.0
-Jake Stringer,Greater Western Sydney,0,20,0.3301,1,0.33,0.33,2.0,12.0
-Shaun Mannagh,Geelong,0,20,0.334,1,0.33,0.33,2.0,12.0
-Caleb Daniel,North Melbourne,0,20,0.317,1,0.32,0.32,2.0,11.0
-Zach Merrett,Essendon,0,20,0.3072,1,0.31,0.31,2.0,11.0
-Darcy Fogarty,Adelaide,0,12,0.3116,1,0.31,0.31,0.0,7.0
-Max Hall,St Kilda,0,20,0.3063,1,0.31,0.31,2.0,11.0
-John Noble,Gold Coast,0,20,0.3071,1,0.31,0.31,2.0,11.0
-Nick Blakey,Sydney,0,20,0.3036,1,0.3,0.3,2.0,11.0
-Jeremy Cameron,Geelong,0,16,0.2925,1,0.29,0.29,1.0,9.0
-Joel Fitzgerald,Melbourne,0,7,0.2877,1,0.29,0.29,0.0,5.0
-Scott Pendlebury,Collingwood,0,15,0.2667,1,0.27,0.27,0.0,8.0
-Callum Wilkie,St Kilda,0,20,0.2623,1,0.26,0.26,1.0,9.0
-Jack Steele,Melbourne,0,20,0.2466,1,0.25,0.25,1.0,9.0
-Lachie Whitfield,Greater Western Sydney,0,18,0.246,1,0.25,0.25,0.0,9.0
-Archie Roberts,Essendon,0,18,0.2359,1,0.24,0.24,0.0,9.0
-Tristan Xerri,North Melbourne,0,16,0.236,1,0.24,0.24,0.0,8.0
-Jordan de Goey,Collingwood,0,19,0.2267,1,0.23,0.23,1.0,8.0
-Matthew Kennedy,Western Bulldogs,0,20,0.2263,1,0.23,0.23,1.0,9.0
-Tom Liberatore,Western Bulldogs,0,9,0.2226,1,0.22,0.22,0.0,5.0
-Darcy Cameron,Collingwood,0,19,0.2159,1,0.22,0.22,0.0,8.0
-Taylor Walker,Adelaide,0,14,0.2192,1,0.22,0.22,0.0,6.0
-Touk Miller,Gold Coast,0,20,0.2167,1,0.22,0.22,1.0,8.0
-Sam Durham,Essendon,0,19,0.2158,1,0.22,0.22,0.0,8.0
-Aaron Naughton,Western Bulldogs,0,19,0.2216,1,0.22,0.22,0.0,8.0
-Bradley Hill,St Kilda,0,20,0.2054,1,0.21,0.21,0.0,8.0
-Lachie Ash,Greater Western Sydney,0,20,0.2143,1,0.21,0.21,1.0,8.0
-Liam Ryan,St Kilda,0,15,0.2113,1,0.21,0.21,0.0,7.0
-Connor Macdonald,Hawthorn,0,20,0.2061,1,0.21,0.21,0.0,8.0
-Mark Keane,Adelaide,0,6,0.2142,1,0.21,0.21,0.0,3.0
-Riley Thilthorpe,Adelaide,0,17,0.2064,1,0.21,0.21,0.0,7.0
-Will Day,Hawthorn,0,8,0.2047,1,0.2,0.2,0.0,4.0
-Tom Papley,Sydney,0,15,0.2029,1,0.2,0.2,0.0,6.0
-Tim Kelly,West Coast,0,18,0.1976,1,0.2,0.2,0.0,7.0
-Logan Morris,Brisbane Lions,0,19,0.1947,1,0.19,0.19,0.0,8.0
-Bailey Dale,Western Bulldogs,0,17,0.1874,1,0.19,0.19,0.0,6.0
-Josh Daicos,Collingwood,0,20,0.1882,1,0.19,0.19,0.0,8.0
-Jack Sinclair,St Kilda,0,15,0.1946,1,0.19,0.19,0.0,6.0
-Patrick Voss,Fremantle,0,19,0.1811,1,0.18,0.18,0.0,7.0
-Josh Rachele,Adelaide,0,20,0.1751,1,0.18,0.18,0.0,7.0
-Jake Waterman,West Coast,0,20,0.1708,1,0.17,0.17,0.0,7.0
-Hugh McCluggage,Brisbane Lions,0,13,0.1668,1,0.17,0.17,0.0,5.0
-Dayne Zorko,Brisbane Lions,0,10,0.1693,1,0.17,0.17,0.0,4.0
-Brent Daniels,Greater Western Sydney,0,10,0.1605,1,0.16,0.16,0.0,4.0
-Oliver Dempsey,Geelong,0,20,0.1556,1,0.16,0.16,0.0,7.0
-Jake Bowey,Melbourne,0,12,0.1559,1,0.16,0.16,0.0,4.0
-Shannon Neale,Geelong,0,20,0.1638,1,0.16,0.16,0.0,7.0
-Luke Parker,North Melbourne,0,20,0.164,1,0.16,0.16,0.0,7.0
-Ryley Sanders,Western Bulldogs,0,18,0.1581,1,0.16,0.16,0.0,6.0
-Bodhi Uwland,Gold Coast,0,20,0.1543,1,0.15,0.15,0.0,7.0
-Noah Balta,Richmond,0,17,0.1514,1,0.15,0.15,0.0,6.0
-Jack Ginnivan,Hawthorn,0,20,0.1517,1,0.15,0.15,0.0,6.0
-Josh Ward,Hawthorn,0,20,0.1544,1,0.15,0.15,0.0,6.0
-Aliir Aliir,Port Adelaide,0,20,0.152,1,0.15,0.15,0.0,7.0
-Blake Hardwick,Hawthorn,0,20,0.142,1,0.14,0.14,0.0,6.0
-Jarrod Berry,Brisbane Lions,0,15,0.1387,1,0.14,0.14,0.0,5.0
-Kade Chandler,Melbourne,0,19,0.1418,1,0.14,0.14,0.0,6.0
-Ben King,Gold Coast,0,20,0.143,1,0.14,0.14,0.0,6.0
-Joel Freijah,Western Bulldogs,0,20,0.13,1,0.13,0.13,0.0,6.0
-Cooper Trembath,North Melbourne,0,20,0.1301,1,0.13,0.13,0.0,6.0
-Harris Andrews,Brisbane Lions,0,17,0.1322,1,0.13,0.13,0.0,5.0
-James Sicily,Hawthorn,0,19,0.1283,1,0.13,0.13,0.0,6.0
-Patrick Dangerfield,Geelong,0,15,0.1256,1,0.13,0.13,0.0,4.0
-Darcy Wilmot,Brisbane Lions,0,20,0.1342,1,0.13,0.13,0.0,6.0
-Karl Worner,Fremantle,0,20,0.1289,1,0.13,0.13,0.0,6.0
-Mitch Georgiades,Port Adelaide,0,19,0.1222,1,0.12,0.12,0.0,5.0
-Oscar McDonald,Fremantle,0,7,0.1166,1,0.12,0.12,0.0,3.0
-Rory Laird,Adelaide,0,15,0.1204,1,0.12,0.12,0.0,4.0
-Malcolm Rosas,Sydney,0,16,0.1233,1,0.12,0.12,0.0,5.0
-Joel Amartey,Sydney,0,15,0.1225,1,0.12,0.12,0.0,4.0
-Tim Membrey,Collingwood,0,16,0.1169,1,0.12,0.12,0.0,4.0
-Harry McKay,Carlton,0,18,0.1078,1,0.11,0.11,0.0,5.0
-Nick Larkey,North Melbourne,0,20,0.1117,1,0.11,0.11,0.0,5.0
-Colby McKercher,North Melbourne,0,20,0.1061,1,0.11,0.11,0.0,5.0
-Harvey Langford,Melbourne,0,20,0.1069,1,0.11,0.11,0.0,5.0
-Jack Macrae,St Kilda,0,10,0.106,1,0.11,0.11,0.0,3.0
-Kane McAuliffe,Richmond,0,9,0.111,1,0.11,0.11,0.0,3.0
-Will Setterfield,Essendon,0,8,0.1086,1,0.11,0.11,0.0,2.0
-Bayley Fritsch,Melbourne,0,18,0.1136,1,0.11,0.11,0.0,5.0
-Charlie Cameron,Brisbane Lions,0,20,0.1051,1,0.11,0.11,0.0,5.0
-Daniel McStay,Collingwood,0,20,0.1052,1,0.11,0.11,0.0,5.0
-Josh Dunkley,Brisbane Lions,0,20,0.1116,1,0.11,0.11,0.0,5.0
-Tom Atkins,Geelong,0,20,0.1118,1,0.11,0.11,0.0,5.0
-Paul Curtis,North Melbourne,0,17,0.109,1,0.11,0.11,0.0,5.0
-Jack Ross,Richmond,0,16,0.1133,1,0.11,0.11,0.0,4.0
-Kai Lohmann,Brisbane Lions,0,20,0.108,1,0.11,0.11,0.0,5.0
-Michael Frederick,Fremantle,0,15,0.1107,1,0.11,0.11,0.0,4.0
-Ollie Wines,Port Adelaide,0,16,0.111,1,0.11,0.11,0.0,4.0
-Lawson Humphries,Geelong,0,19,0.1111,1,0.11,0.11,0.0,5.0
-Gryan Miers,Geelong,0,12,0.1147,1,0.11,0.11,0.0,4.0
-Bailey Williams (West Coast),West Coast,0,16,0.0977,1,0.1,0.1,0.0,4.0
-Jordan Clark,Fremantle,0,20,0.1044,1,0.1,0.1,0.0,5.0
-James Peatling,Adelaide,0,19,0.105,1,0.1,0.1,0.0,5.0
-Mitch Lewis,Hawthorn,0,19,0.1032,1,0.1,0.1,0.0,4.0
-Dan Houston,Collingwood,0,20,0.1006,1,0.1,0.1,0.0,5.0
-Jy Simpkin,North Melbourne,0,20,0.0996,1,0.1,0.1,0.0,5.0
-Esava Ratugolea,Port Adelaide,0,8,0.0995,1,0.1,0.1,0.0,3.0
-James Worpel,Geelong,0,9,0.0954,1,0.1,0.1,0.0,3.0
-Joe Richards,Port Adelaide,0,18,0.0993,1,0.1,0.1,0.0,4.0
-Marcus Herbert,West Coast,0,7,0.0868,1,0.09,0.09,0.0,2.0
-Darcy Wilson,St Kilda,0,19,0.0855,1,0.09,0.09,0.0,4.0
-Brodie Kemp,Carlton,0,20,0.0857,1,0.09,0.09,0.0,4.0
-Cooper Sharman,St Kilda,0,18,0.0924,1,0.09,0.09,0.0,4.0
-Jack Crisp,Collingwood,0,20,0.0871,1,0.09,0.09,0.0,4.0
-Charlie Comben,North Melbourne,0,19,0.0857,1,0.09,0.09,0.0,4.0
-Tim English,Western Bulldogs,0,14,0.0944,1,0.09,0.09,0.0,3.0
-Conor Nash,Hawthorn,0,10,0.0876,1,0.09,0.09,0.0,3.0
-Bailey Williams (Western Bulldogs),Western Bulldogs,0,14,0.0917,1,0.09,0.09,0.0,3.0
-Stephen Coniglio,Greater Western Sydney,0,18,0.0914,1,0.09,0.09,0.0,4.0
-Peter Ladhams,Sydney,0,2,0.0805,1,0.08,0.08,0.0,0.0
-Dylan Stephens,North Melbourne,0,20,0.0844,1,0.08,0.08,0.0,4.0
-Caleb Windsor,Melbourne,0,17,0.0765,1,0.08,0.08,0.0,3.0
-Matthew Johnson,Fremantle,0,19,0.0821,1,0.08,0.08,0.0,4.0
-Dylan Moore,Hawthorn,0,19,0.0826,1,0.08,0.08,0.0,4.0
-Jayden Short,Richmond,0,18,0.0783,1,0.08,0.08,0.0,4.0
-Tanner Bruhn,Geelong,0,18,0.0806,1,0.08,0.08,0.0,4.0
-Jarrod Witts,Gold Coast,0,12,0.0802,1,0.08,0.08,0.0,3.0
-Jack Higgins,St Kilda,0,14,0.0824,1,0.08,0.08,0.0,3.0
-Nick Bryan,Essendon,0,11,0.0835,1,0.08,0.08,0.0,3.0
-Hayden Young,Fremantle,0,11,0.0804,1,0.08,0.08,0.0,3.0
-Peter Wright,Essendon,0,15,0.08,1,0.08,0.08,0.0,3.0
-Jack Darling,North Melbourne,0,19,0.0662,1,0.07,0.07,0.0,3.0
-Daniel Rioli,Gold Coast,0,17,0.0728,1,0.07,0.07,0.0,3.0
-Reuben Ginbey,West Coast,0,13,0.0699,1,0.07,0.07,0.0,3.0
-Elijah Tsatas,Essendon,0,6,0.0662,1,0.07,0.07,0.0,2.0
-Sam Darcy,Western Bulldogs,0,6,0.0743,1,0.07,0.07,0.0,2.0
-Matt Carroll,Carlton,0,10,0.0698,1,0.07,0.07,0.0,3.0
-Bailey Humphrey,Gold Coast,0,17,0.0662,1,0.07,0.07,0.0,3.0
-Ben Ainsworth,Carlton,0,20,0.0672,1,0.07,0.07,0.0,4.0
-Oliver Florent,Carlton,0,20,0.0677,1,0.07,0.07,0.0,4.0
-Darcy Byrne-Jones,Port Adelaide,0,20,0.0615,1,0.06,0.06,0.0,3.0
-Ed Langdon,Melbourne,0,20,0.0588,1,0.06,0.06,0.0,3.0
-Tom McCartin,Sydney,0,17,0.0578,1,0.06,0.06,0.0,3.0
-Tom Stewart,Geelong,0,18,0.0551,1,0.06,0.06,0.0,3.0
-Luke Ryan,Fremantle,0,19,0.0561,1,0.06,0.06,0.0,3.0
-Cam Mackenzie,Hawthorn,0,18,0.0609,1,0.06,0.06,0.0,3.0
-Phoenix Gothard,Greater Western Sydney,0,16,0.0568,1,0.06,0.06,0.0,3.0
-Jordon Sweet,Port Adelaide,0,19,0.0597,1,0.06,0.06,0.0,3.0
-Callum Mills,Sydney,0,19,0.0624,1,0.06,0.06,0.0,3.0
-Kane Farrell,Port Adelaide,0,13,0.0573,1,0.06,0.06,0.0,3.0
-Lachlan McAndrew,Adelaide,0,20,0.0513,1,0.05,0.05,0.0,3.0
-James Rowbottom,Sydney,0,20,0.0516,1,0.05,0.05,0.0,3.0
-Finn OSullivan,North Melbourne,0,16,0.0466,1,0.05,0.05,0.0,3.0
-Angus Sheldrick,Sydney,0,17,0.0519,1,0.05,0.05,0.0,3.0
-Riley Bice,Sydney,0,18,0.0492,1,0.05,0.05,0.0,2.0
-Tom McCarthy,West Coast,0,19,0.0512,1,0.05,0.05,0.0,3.0
-Ryan Lester,Brisbane Lions,0,16,0.0468,1,0.05,0.05,0.0,3.0
-Tom De Koning,St Kilda,0,17,0.0454,1,0.05,0.05,0.0,3.0
-Alex Davies,Gold Coast,0,6,0.0461,1,0.05,0.05,0.0,1.0
-Matthew Jefferson,Melbourne,0,13,0.0512,1,0.05,0.05,0.0,2.0
-Karl Amon,Hawthorn,0,15,0.053,1,0.05,0.05,0.0,3.0
-Daniel Curtin,Adelaide,0,13,0.0464,1,0.05,0.05,0.0,2.0
-Josh Battle,Hawthorn,0,18,0.052,1,0.05,0.05,0.0,3.0
-Billy Dowling,Adelaide,0,2,0.054,1,0.05,0.05,0.0,0.0
-Will Hayward,Carlton,0,19,0.037,1,0.04,0.04,0.0,2.0
-Jase Burgoyne,Port Adelaide,0,20,0.0424,1,0.04,0.04,0.0,3.0
-Daniel Turner,Melbourne,0,16,0.0405,1,0.04,0.04,0.0,2.0
-Josh Worrell,Adelaide,0,19,0.0418,1,0.04,0.04,0.0,2.0
-Lloyd Meek,Hawthorn,0,20,0.0376,1,0.04,0.04,0.0,3.0
-Connor Idun,Greater Western Sydney,0,20,0.0395,1,0.04,0.04,0.0,3.0
-Mabior Chol,Hawthorn,0,15,0.0431,1,0.04,0.04,0.0,2.0
-Milan Murdock,West Coast,0,17,0.0422,1,0.04,0.04,0.0,2.0
-Marcus Windhager,St Kilda,0,20,0.0422,1,0.04,0.04,0.0,3.0
-Ben Long,Gold Coast,0,18,0.0401,1,0.04,0.04,0.0,2.0
-Nick Madden,Greater Western Sydney,0,6,0.0363,1,0.04,0.04,0.0,1.0
-Sam Flanders,St Kilda,0,12,0.0427,1,0.04,0.04,0.0,2.0
-Jai Serong,Sydney,0,19,0.0306,1,0.03,0.03,0.0,2.0
-Alex Neal-Bullen,Adelaide,0,19,0.0304,1,0.03,0.03,0.0,2.0
-Harvey Thomas,Greater Western Sydney,0,19,0.0332,1,0.03,0.03,0.0,2.0
-Sam Draper,Brisbane Lions,0,19,0.0319,1,0.03,0.03,0.0,2.0
-Ned Moyle,Gold Coast,0,13,0.0319,1,0.03,0.03,0.0,2.0
-Oisin Mullin,Geelong,0,20,0.032,1,0.03,0.03,0.0,2.0
-Elliot Yeo,West Coast,0,18,0.0252,1,0.03,0.03,0.0,2.0
-Sam De Koning,Geelong,0,17,0.0264,1,0.03,0.03,0.0,2.0
-George Wardlaw,North Melbourne,0,13,0.0329,1,0.03,0.03,0.0,2.0
-Jeremy Howe,Collingwood,0,16,0.0308,1,0.03,0.03,0.0,2.0
-Sam Collins,Gold Coast,0,20,0.0279,1,0.03,0.03,0.0,2.0
-Willem Duursma,West Coast,0,19,0.0332,1,0.03,0.03,0.0,2.0
-Nathan ODriscoll,Fremantle,0,13,0.0305,1,0.03,0.03,0.0,2.0
-Mac Andrew,Gold Coast,0,20,0.0272,1,0.03,0.03,0.0,2.0
-Toby Bedford,Greater Western Sydney,0,16,0.0304,1,0.03,0.03,0.0,2.0
-Toby Nankervis,Richmond,0,9,0.0284,1,0.03,0.03,0.0,1.0
-Sam Lalor,Richmond,0,10,0.029,1,0.03,0.03,0.0,1.0
-Logan McDonald,Sydney,0,18,0.0262,1,0.03,0.03,0.0,2.0
-Ethan Read,Gold Coast,0,12,0.0333,1,0.03,0.03,0.0,2.0
-Joel Jeffrey,Gold Coast,0,19,0.0291,1,0.03,0.03,0.0,2.0
-Rhys Stanley,Geelong,0,1,0.0309,1,0.03,0.03,0.0,0.0
-Deven Robertson,West Coast,0,4,0.0337,1,0.03,0.03,0.0,0.0
-Harry Morrison,Hawthorn,0,10,0.0302,1,0.03,0.03,0.0,1.0
-Jake Melksham,Melbourne,0,6,0.0282,1,0.03,0.03,0.0,1.0
-Finn Maginness,Hawthorn,0,6,0.0275,1,0.03,0.03,0.0,1.0
-Jamie Elliott,Collingwood,0,11,0.0295,1,0.03,0.03,0.0,1.0
-Patrick Retschko,Richmond,0,15,0.0311,1,0.03,0.03,0.0,2.0
-Levi Ashcroft,Brisbane Lions,0,20,0.0258,1,0.03,0.03,0.0,2.0
-Oliver Henry,Geelong,0,19,0.0304,1,0.03,0.03,0.0,2.0
-Lachie Schultz,Collingwood,0,18,0.0212,1,0.02,0.02,0.0,1.0
-Wil Powell,Gold Coast,0,18,0.0152,1,0.02,0.02,0.0,1.0
-Cam Rayner,Brisbane Lions,0,20,0.0191,1,0.02,0.02,0.0,2.0
-Zeke Uwland,Gold Coast,0,16,0.0232,1,0.02,0.02,0.0,2.0
-Mitch Owens,St Kilda,0,17,0.0218,1,0.02,0.02,0.0,2.0
-Jake Soligo,Adelaide,0,18,0.0202,1,0.02,0.02,0.0,2.0
-Rory Lobb,Western Bulldogs,0,17,0.0212,1,0.02,0.02,0.0,2.0
-Massimo DAmbrosio,Hawthorn,0,20,0.0203,1,0.02,0.02,0.0,2.0
-Neil Erasmus,Fremantle,0,20,0.0204,1,0.02,0.02,0.0,2.0
-Willem Drew,Port Adelaide,0,20,0.0227,1,0.02,0.02,0.0,2.0
-Seth Campbell,Richmond,0,20,0.0225,1,0.02,0.02,0.0,2.0
-Steele Sidebottom,Collingwood,0,18,0.0243,1,0.02,0.02,0.0,2.0
-Tom Barrass,Hawthorn,0,16,0.0224,1,0.02,0.02,0.0,2.0
-Jake Lever,Melbourne,0,19,0.0189,1,0.02,0.02,0.0,2.0
-Ben Keays,Adelaide,0,20,0.0235,1,0.02,0.02,0.0,2.0
-Brayden Maynard,Collingwood,0,17,0.0208,1,0.02,0.02,0.0,2.0
-Kieren Briggs,Greater Western Sydney,0,15,0.0237,1,0.02,0.02,0.0,2.0
-Jack Lukosius,Port Adelaide,0,8,0.0154,1,0.02,0.02,0.0,0.0
-Lachie Jaques,Western Bulldogs,0,8,0.0181,1,0.02,0.02,0.0,0.0
-Dyson Sharp,Essendon,0,12,0.0166,1,0.02,0.02,0.0,1.0
-Jack Graham,West Coast,0,10,0.016,1,0.02,0.02,0.0,0.0
-Matt Roberts,Sydney,0,16,0.0157,1,0.02,0.02,0.0,1.0
-Mattaes Phillipou,St Kilda,0,18,0.0215,1,0.02,0.02,0.0,2.0
-Isaac Kako,Essendon,0,12,0.0218,1,0.02,0.02,0.0,1.0
-Trent Rivers,Melbourne,0,13,0.0228,1,0.02,0.02,0.0,1.0
-Cameron Zurhaar,North Melbourne,0,20,0.0193,1,0.02,0.02,0.0,2.0
-Patrick Lipinski,Collingwood,0,19,0.0206,1,0.02,0.02,0.0,2.0
-James Borlase,Adelaide,0,15,0.0151,1,0.02,0.02,0.0,1.0
-Hayden McLean,Sydney,0,9,0.0214,1,0.02,0.02,0.0,1.0
-Tom Blamires,North Melbourne,0,15,0.0157,1,0.02,0.02,0.0,1.0
-Changkuoth Jiath,Melbourne,0,12,0.0177,1,0.02,0.02,0.0,1.0
-Sullivan Robey,Essendon,0,15,0.0152,1,0.02,0.02,0.0,1.0
-Jaspa Fletcher,Brisbane Lions,0,20,0.0165,1,0.02,0.02,0.0,1.0
-Elijah Hollands,Carlton,0,6,0.018,1,0.02,0.02,0.0,0.0
-Connor Rozee,Port Adelaide,0,2,0.0195,1,0.02,0.02,0.0,0.0
-Christian Salem,Melbourne,0,6,0.0161,1,0.02,0.02,0.0,0.0
-Jhye Clark,Geelong,0,6,0.0192,1,0.02,0.02,0.0,0.0
-Sam Taylor,Greater Western Sydney,0,9,0.0215,1,0.02,0.02,0.0,1.0
-Tom Lynch,Richmond,0,12,0.0197,1,0.02,0.02,0.0,1.0
-Conor McKenna,Brisbane Lions,0,14,0.0163,1,0.02,0.02,0.0,1.0
-Callum Brown,Greater Western Sydney,0,15,0.021,1,0.02,0.02,0.0,1.0
-Jake Riccardi,Greater Western Sydney,0,9,0.023,1,0.02,0.02,0.0,1.0
-Aaron Cadman,Greater Western Sydney,0,15,0.0232,1,0.02,0.02,0.0,1.0
-Alex Pearce,Fremantle,0,18,0.0169,1,0.02,0.02,0.0,1.0
-Henry Hustwaite,Hawthorn,0,1,0.0053,1,0.01,0.01,0.0,0.0
-Ned Long,Collingwood,0,18,0.014,1,0.01,0.01,0.0,1.0
-Jake Lloyd,Sydney,0,20,0.0125,1,0.01,0.01,0.0,1.0
-Jack Whitlock,Port Adelaide,0,20,0.0124,1,0.01,0.01,0.0,1.0
-Brayden Cook,Adelaide,0,19,0.0116,1,0.01,0.01,0.0,1.0
-Connor OSullivan,Geelong,0,20,0.0097,1,0.01,0.01,0.0,1.0
-Francis Evans,Carlton,0,18,0.0106,1,0.01,0.01,0.0,1.0
-Sam Switkowski,Fremantle,0,20,0.0095,1,0.01,0.01,0.0,1.0
-Jobe Shanahan,West Coast,0,20,0.009,1,0.01,0.01,0.0,1.0
-Jacob Hopper,Richmond,0,12,0.0149,1,0.01,0.01,0.0,1.0
-Jayden Laverde,Greater Western Sydney,0,18,0.01,1,0.01,0.01,0.0,1.0
-Jye Caldwell,Essendon,0,14,0.0122,1,0.01,0.01,0.0,1.0
-Heath Chapman,Fremantle,0,20,0.0085,1,0.01,0.01,0.0,1.0
-Darcy Fort,Brisbane Lions,0,19,0.0073,1,0.01,0.01,0.0,0.0
-Corey Wagner,Fremantle,0,13,0.0107,1,0.01,0.01,0.0,0.0
-Bruce Reville,Brisbane Lions,0,18,0.008,1,0.01,0.01,0.0,0.0
-Isaac Quaynor,Collingwood,0,18,0.0112,1,0.01,0.01,0.0,1.0
-Mason Wood,St Kilda,0,19,0.0108,1,0.01,0.01,0.0,1.0
-Jack Silvagni,St Kilda,0,20,0.0103,1,0.01,0.01,0.0,1.0
-Buku Khamis,Western Bulldogs,0,20,0.0069,1,0.01,0.01,0.0,0.0
-Harry Himmelberg,Greater Western Sydney,0,20,0.0101,1,0.01,0.01,0.0,1.0
-Rhylee West,Western Bulldogs,0,19,0.0082,1,0.01,0.01,0.0,0.0
-Connor Budarick,Western Bulldogs,0,13,0.0119,1,0.01,0.01,0.0,1.0
-Nick Haynes,Carlton,0,16,0.0095,1,0.01,0.01,0.0,0.0
-Mark Blicavs,Geelong,0,16,0.0091,1,0.01,0.01,0.0,0.0
-Ned Reeves,Hawthorn,0,14,0.0102,1,0.01,0.01,0.0,0.0
-Brennan Cox,Fremantle,0,15,0.0109,1,0.01,0.01,0.0,1.0
-Mason Redman,Essendon,0,13,0.0093,1,0.01,0.01,0.0,0.0
-Isaiah Dudley,Fremantle,0,20,0.0083,1,0.01,0.01,0.0,1.0
-Lachlan Bramble,Western Bulldogs,0,20,0.0061,1,0.01,0.01,0.0,0.0
-Edward Allan,Collingwood,0,15,0.0139,1,0.01,0.01,0.0,1.0
-Nic Newman,Carlton,0,16,0.0135,1,0.01,0.01,0.0,1.0
-Koltyn Tholstrup,Melbourne,0,20,0.0109,1,0.01,0.01,0.0,1.0
-Harry Perryman,Collingwood,0,16,0.013,1,0.01,0.01,0.0,1.0
-Marc Pittonet,Carlton,0,17,0.0138,1,0.01,0.01,0.0,1.0
-Adam Cerra,Carlton,0,17,0.014,1,0.01,0.01,0.0,1.0
-Zach Reid,Essendon,0,20,0.0115,1,0.01,0.01,0.0,1.0
-Michael Sellwood,Western Bulldogs,0,20,0.0065,1,0.01,0.01,0.0,0.0
-Zach Guthrie,Geelong,0,20,0.0064,1,0.01,0.01,0.0,0.0
-Billy Frampton,Collingwood,0,20,0.0063,1,0.01,0.01,0.0,0.0
-Ryan Angwin,Greater Western Sydney,0,17,0.0073,1,0.01,0.01,0.0,0.0
-Josh Weddle,Hawthorn,0,17,0.0072,1,0.01,0.01,0.0,0.0
-Liam Baker,West Coast,0,17,0.0072,1,0.01,0.01,0.0,0.0
-Talor Byrne,Carlton,0,15,0.0082,1,0.01,0.01,0.0,0.0
-Billy Wilson,Carlton,0,12,0.0114,1,0.01,0.01,0.0,0.0
-Jordon Butts,Adelaide,0,9,0.0108,1,0.01,0.01,0.0,0.0
-Arthur Jones,Western Bulldogs,0,15,0.0092,1,0.01,0.01,0.0,0.0
-Mark OConnor,Geelong,0,17,0.0058,1,0.01,0.01,0.0,0.0
-Blake Acres,Carlton,0,7,0.0142,1,0.01,0.01,0.0,0.0
-Logan Evans,Port Adelaide,0,19,0.0054,1,0.01,0.01,0.0,0.0
-Brody Mihocek,Melbourne,0,10,0.0099,1,0.01,0.01,0.0,0.0
-Harry Petty,Melbourne,0,16,0.0084,1,0.01,0.01,0.0,0.0
-James Jordon,Sydney,0,20,0.0069,1,0.01,0.01,0.0,0.0
-Xavier Duursma,Essendon,0,18,0.006,1,0.01,0.01,0.0,0.0
-Tom Brown,Richmond,0,15,0.0073,1,0.01,0.01,0.0,0.0
-Sam Cumming,Richmond,0,14,0.0079,1,0.01,0.01,0.0,0.0
-Tom Powell,North Melbourne,0,8,0.0137,1,0.01,0.01,0.0,0.0
-Liam Duggan,West Coast,0,20,0.0056,1,0.01,0.01,0.0,0.0
-Miles Bergman,Port Adelaide,0,13,0.0087,1,0.01,0.01,0.0,0.0
-Darcy Gardiner,Brisbane Lions,0,9,0.0089,1,0.01,0.01,0.0,0.0
-Dion Prestia,Richmond,0,15,0.0054,1,0.01,0.01,0.0,0.0
-Toby Murray,Adelaide,0,12,0.0068,1,0.01,0.01,0.0,0.0
-Mitchell Edwards,Geelong,0,16,0.0052,1,0.01,0.01,0.0,0.0
-Jack Watkins,Port Adelaide,0,11,0.0077,1,0.01,0.01,0.0,0.0
-Tyler Sonsie,Richmond,0,14,0.0062,1,0.01,0.01,0.0,0.0
-Ty Gallop,Brisbane Lions,0,17,0.0051,1,0.01,0.01,0.0,0.0
-Jack Carroll,St Kilda,0,12,0.0077,1,0.01,0.01,0.0,0.0
-Keidean Coleman,Brisbane Lions,0,13,0.0082,1,0.01,0.01,0.0,0.0
-Joe Fonti,Greater Western Sydney,0,19,0.007,1,0.01,0.01,0.0,0.0
-Kyle Langford,Essendon,0,16,0.0058,1,0.01,0.01,0.0,0.0
-Jack Martin,Geelong,0,16,0.0058,1,0.01,0.01,0.0,0.0
-Christian Moraes,Port Adelaide,0,10,0.0094,1,0.01,0.01,0.0,0.0
-Oscar Ryan,Adelaide,0,1,0.0109,1,0.01,0.01,0.0,0.0
-Charlie Edwards,Adelaide,0,2,0.0077,1,0.01,0.01,0.0,0.0
-Jay Polkinghorne,Geelong,0,3,0.0074,1,0.01,0.01,0.0,0.0
-George Stevens,Geelong,0,2,0.0062,1,0.01,0.01,0.0,0.0
-Will Lorenz,Port Adelaide,0,2,0.0074,1,0.01,0.01,0.0,0.0
-Lachie Weller,Gold Coast,0,11,0.0064,1,0.01,0.01,0.0,0.0
-Cooper Lord,Carlton,0,6,0.0125,1,0.01,0.01,0.0,0.0
-Hugo Ralphsmith,Richmond,0,10,0.0077,1,0.01,0.01,0.0,0.0
-Jacob Weitering,Carlton,0,10,0.0077,1,0.01,0.01,0.0,0.0
-Wade Derksen,Carlton,0,11,0.0071,1,0.01,0.01,0.0,0.0
-Jack Bowes,Geelong,0,9,0.0087,1,0.01,0.01,0.0,0.0
-Harry Rowston,Greater Western Sydney,0,9,0.0076,1,0.01,0.01,0.0,0.0
-Lincoln McCarthy,Brisbane Lions,0,8,0.0087,1,0.01,0.01,0.0,0.0
-Sam Swadling,Collingwood,0,5,0.0051,1,0.01,0.01,0.0,0.0
-Sam Wicks,Sydney,0,15,0.0053,1,0.01,0.01,0.0,0.0
-Matt Flynn,West Coast,0,4,0.0064,1,0.01,0.01,0.0,0.0
-Jaeger OMeara,Fremantle,0,6,0.0056,1,0.01,0.01,0.0,0.0
-Callum Coleman-Jones,North Melbourne,0,5,0.0087,1,0.01,0.01,0.0,0.0
-Toby Pink,North Melbourne,0,5,0.0095,1,0.01,0.01,0.0,0.0
-Zac Williams,Carlton,0,9,0.0056,1,0.01,0.01,0.0,0.0
-Noah Mraz,Hawthorn,0,4,0.0128,1,0.01,0.01,0.0,0.0
-Liam Henry,St Kilda,0,8,0.0068,1,0.01,0.01,0.0,0.0
-Hugo Hall-Kahan,Adelaide,0,8,0.0069,1,0.01,0.01,0.0,0.0
-Oliver Hollands,Carlton,0,11,0.0055,1,0.01,0.01,0.0,0.0
-Jack Scrimshaw,Hawthorn,0,6,0.0103,1,0.01,0.01,0.0,0.0
-Max Gruzewski,Greater Western Sydney,0,12,0.0053,1,0.01,0.01,0.0,0.0
-Hugh Boxshall,St Kilda,0,7,0.0093,1,0.01,0.01,0.0,0.0
-Oliver Wiltshire,Geelong,0,12,0.0055,1,0.01,0.01,0.0,0.0
-Oscar Allen,Brisbane Lions,0,8,0.0083,1,0.01,0.01,0.0,0.0
-Will McLachlan,Brisbane Lions,0,1,0.0,1,0.0,0.0,0.0,0.0
-Tom Gross,West Coast,0,1,0.0004,1,0.0,0.0,0.0,0.0
-Lachlan Sullivan,Collingwood,0,1,0.0003,1,0.0,0.0,0.0,0.0
-Zane Peucker,Richmond,0,2,0.0001,1,0.0,0.0,0.0,0.0
-Tom Anastasopoulos,Port Adelaide,0,2,0.0001,1,0.0,0.0,0.0,0.0
-Harry Armstrong,Richmond,0,3,0.0001,1,0.0,0.0,0.0,0.0
-Ashton Moir,Carlton,0,2,0.0001,1,0.0,0.0,0.0,0.0
-Brandon Walker,Fremantle,0,1,0.0002,1,0.0,0.0,0.0,0.0
-Max King,St Kilda,0,1,0.0002,1,0.0,0.0,0.0,0.0
-Luke Cleary,Western Bulldogs,0,2,0.0005,1,0.0,0.0,0.0,0.0
-Jayden Nguyen,Essendon,0,5,0.0002,1,0.0,0.0,0.0,0.0
-Jy Farrar,Gold Coast,0,2,0.0006,1,0.0,0.0,0.0,0.0
-Bodie Ryan,Hawthorn,0,5,0.0003,1,0.0,0.0,0.0,0.0
-Harvey Gallagher,Western Bulldogs,0,3,0.0004,1,0.0,0.0,0.0,0.0
-Jordan Boyd,Carlton,0,2,0.0006,1,0.0,0.0,0.0,0.0
-Sandy Brock,West Coast,0,6,0.0002,1,0.0,0.0,0.0,0.0
-Matthew Owies,West Coast,0,3,0.0005,1,0.0,0.0,0.0,0.0
-Max Kondogiannis,Essendon,0,9,0.0002,1,0.0,0.0,0.0,0.0
-Campbell Chesser,Carlton,0,3,0.0005,1,0.0,0.0,0.0,0.0
-Dylan Patterson,Gold Coast,0,5,0.0003,1,0.0,0.0,0.0,0.0
-Luke Kennedy,Western Bulldogs,0,4,0.0004,1,0.0,0.0,0.0,0.0
-Angus Clarke,Essendon,0,4,0.0004,1,0.0,0.0,0.0,0.0
-Zac Banch,North Melbourne,0,5,0.0003,1,0.0,0.0,0.0,0.0
-Brandon Zerk-Thatcher,Port Adelaide,0,4,0.0004,1,0.0,0.0,0.0,0.0
-Ben Jepson,Gold Coast,0,4,0.0004,1,0.0,0.0,0.0,0.0
-Isaac Cumming,Adelaide,0,13,0.0039,1,0.0,0.0,0.0,0.0
-Zac Taylor,Adelaide,0,18,0.0029,1,0.0,0.0,0.0,0.0
-Josh Lai,Port Adelaide,0,16,0.0034,1,0.0,0.0,0.0,0.0
-Xavier OHalloran,Greater Western Sydney,0,12,0.0046,1,0.0,0.0,0.0,0.0
-Will Edwards,Sydney,0,14,0.0039,1,0.0,0.0,0.0,0.0
-Cooper Hynes,Western Bulldogs,0,18,0.0033,1,0.0,0.0,0.0,0.0
-Jacob Farrow,Essendon,0,18,0.0036,1,0.0,0.0,0.0,0.0
-Jed Walter,Gold Coast,0,15,0.0044,1,0.0,0.0,0.0,0.0
-Mitch McGovern,Carlton,0,20,0.0034,1,0.0,0.0,0.0,0.0
-Matt Guelfi,Essendon,0,3,0.0001,1,0.0,0.0,0.0,0.0
-Matt Whitlock,North Melbourne,0,3,0.0002,1,0.0,0.0,0.0,0.0
-Lachie Fogarty,Carlton,0,2,0.0002,1,0.0,0.0,0.0,0.0
-Brayden Fiorini,Essendon,0,2,0.0002,1,0.0,0.0,0.0,0.0
-Laitham Vandermeer,Western Bulldogs,0,2,0.0002,1,0.0,0.0,0.0,0.0
-Mitch Hinge,Adelaide,0,1,0.0005,1,0.0,0.0,0.0,0.0
-Sam Marshall,Brisbane Lions,0,2,0.0003,1,0.0,0.0,0.0,0.0
-Charlie Spargo,North Melbourne,0,16,0.0022,1,0.0,0.0,0.0,0.0
-Oskar Baker,Western Bulldogs,0,9,0.0041,1,0.0,0.0,0.0,0.0
-Caiden Cleary,Sydney,0,8,0.0049,1,0.0,0.0,0.0,0.0
-Ben Miller,Richmond,0,18,0.0023,1,0.0,0.0,0.0,0.0
-Andrew McGrath,Essendon,0,17,0.0025,1,0.0,0.0,0.0,0.0
-Angus Anderson,Collingwood,0,13,0.0032,1,0.0,0.0,0.0,0.0
-Zane Duursma,North Melbourne,0,15,0.0029,1,0.0,0.0,0.0,0.0
-Jaxon Prior,Essendon,0,19,0.0024,1,0.0,0.0,0.0,0.0
-Nate Caddy,Essendon,0,19,0.0024,1,0.0,0.0,0.0,0.0
-Leo Lombard,Gold Coast,0,20,0.0023,1,0.0,0.0,0.0,0.0
-Nick Murray,Adelaide,0,11,0.0043,1,0.0,0.0,0.0,0.0
-Ben McKay,Essendon,0,15,0.0032,1,0.0,0.0,0.0,0.0
-Luke McDonald,North Melbourne,0,17,0.0028,1,0.0,0.0,0.0,0.0
-Lewis Young,Carlton,0,10,0.0049,1,0.0,0.0,0.0,0.0
-Corey Durdin,Port Adelaide,0,20,0.0024,1,0.0,0.0,0.0,0.0
-Will Lewis,Western Bulldogs,0,12,0.0042,1,0.0,0.0,0.0,0.0
-Ryan Byrnes,St Kilda,0,12,0.0024,1,0.0,0.0,0.0,0.0
-Will Graham,Gold Coast,0,12,0.0024,1,0.0,0.0,0.0,0.0
-Brad Close,Geelong,0,13,0.0022,1,0.0,0.0,0.0,0.0
-Hamish Davis,West Coast,0,19,0.0015,1,0.0,0.0,0.0,0.0
-Mason Cox,Fremantle,0,13,0.0023,1,0.0,0.0,0.0,0.0
-Dane Rampe,Sydney,0,13,0.0023,1,0.0,0.0,0.0,0.0
-Oscar Steene,Collingwood,0,8,0.0038,1,0.0,0.0,0.0,0.0
-Anthony Caminiti,St Kilda,0,17,0.0018,1,0.0,0.0,0.0,0.0
-Jordan Ridley,Essendon,0,7,0.0045,1,0.0,0.0,0.0,0.0
-Paddy Cross,Melbourne,0,11,0.0029,1,0.0,0.0,0.0,0.0
-Sam Clohesy,Gold Coast,0,9,0.0036,1,0.0,0.0,0.0,0.0
-Jacob Konstanty,North Melbourne,0,10,0.0033,1,0.0,0.0,0.0,0.0
-Max Michalanney,Adelaide,0,20,0.0017,1,0.0,0.0,0.0,0.0
-Cooper Harvey,North Melbourne,0,7,0.0048,1,0.0,0.0,0.0,0.0
-Lachie Jones,Port Adelaide,0,18,0.0019,1,0.0,0.0,0.0,0.0
-Josh Lindsay,West Coast,0,12,0.0029,1,0.0,0.0,0.0,0.0
-Harry Dean,Carlton,0,17,0.0014,1,0.0,0.0,0.0,0.0
-Matthew Cottrell,Carlton,0,9,0.0026,1,0.0,0.0,0.0,0.0
-Archie May,Essendon,0,10,0.0024,1,0.0,0.0,0.0,0.0
-Harry Sharp,Melbourne,0,20,0.0034,1,0.0,0.0,0.0,0.0
-Nick Vlastuin,Richmond,0,19,0.0036,1,0.0,0.0,0.0,0.0
-Luke Nankervis,Adelaide,0,14,0.005,1,0.0,0.0,0.0,0.0
-Roan Steele,Collingwood,0,15,0.005,1,0.0,0.0,0.0,0.0
-Tylar Young,West Coast,0,20,0.0038,1,0.0,0.0,0.0,0.0
-James ODonnell,Western Bulldogs,0,16,0.0049,1,0.0,0.0,0.0,0.0
-Jack Henry,Geelong,0,16,0.005,1,0.0,0.0,0.0,0.0
-James Trezise,Richmond,0,14,0.0018,1,0.0,0.0,0.0,0.0
-Jack Williams,West Coast,0,9,0.0028,1,0.0,0.0,0.0,0.0
-Jedd Busslinger,Western Bulldogs,0,8,0.0033,1,0.0,0.0,0.0,0.0
-Jesse Hogan,Greater Western Sydney,0,9,0.003,1,0.0,0.0,0.0,0.0
-Sam Banks,Richmond,0,15,0.0018,1,0.0,0.0,0.0,0.0
-Steely Green,Richmond,0,17,0.0016,1,0.0,0.0,0.0,0.0
-Tom McDonald,Melbourne,0,7,0.0029,1,0.0,0.0,0.0,0.0
-Bailey Laurie,Melbourne,0,13,0.0016,1,0.0,0.0,0.0,0.0
-Calsher Dear,Hawthorn,0,5,0.0041,1,0.0,0.0,0.0,0.0
-Aidan Corr,North Melbourne,0,13,0.0016,1,0.0,0.0,0.0,0.0
-Liam Stocker,St Kilda,0,15,0.0014,1,0.0,0.0,0.0,0.0
-Mykelti Lefau,Richmond,0,18,0.0012,1,0.0,0.0,0.0,0.0
-Sean Darcy,Fremantle,0,7,0.003,1,0.0,0.0,0.0,0.0
-Callum Ah Chee,Adelaide,0,5,0.0043,1,0.0,0.0,0.0,0.0
-Dougal Howard,St Kilda,0,6,0.0036,1,0.0,0.0,0.0,0.0
-Beau Addinsall,Gold Coast,0,7,0.0031,1,0.0,0.0,0.0,0.0
-Ewan Mackinlay,Port Adelaide,0,14,0.0016,1,0.0,0.0,0.0,0.0
-Jordan Croft,Western Bulldogs,0,15,0.0015,1,0.0,0.0,0.0,0.0
-Tom Cole,West Coast,0,14,0.0016,1,0.0,0.0,0.0,0.0
-Jai Culley,Melbourne,0,7,0.0033,1,0.0,0.0,0.0,0.0
-Jasper Alger,Richmond,0,8,0.0028,1,0.0,0.0,0.0,0.0
-Jackson Mead,Port Adelaide,0,9,0.0025,1,0.0,0.0,0.0,0.0
-James Tunstill,Brisbane Lions,0,11,0.0016,1,0.0,0.0,0.0,0.0
-Eric Hipwood,Brisbane Lions,0,7,0.0025,1,0.0,0.0,0.0,0.0
-Lachlan McNeil,Western Bulldogs,0,10,0.0018,1,0.0,0.0,0.0,0.0
-Nick Coffield,Western Bulldogs,0,12,0.0015,1,0.0,0.0,0.0,0.0
-Max Heath,Melbourne,0,7,0.0026,1,0.0,0.0,0.0,0.0
-Cody Weightman,Western Bulldogs,0,6,0.003,1,0.0,0.0,0.0,0.0
-Noah Answerth,Brisbane Lions,0,12,0.0015,1,0.0,0.0,0.0,0.0
-Jack Ison,Carlton,0,8,0.0023,1,0.0,0.0,0.0,0.0
-Jacob Wehr,Port Adelaide,0,14,0.0013,1,0.0,0.0,0.0,0.0
-Lachlan Blakiston,Essendon,0,17,0.0011,1,0.0,0.0,0.0,0.0
-Lewis Melican,Sydney,0,9,0.0021,1,0.0,0.0,0.0,0.0
-Jonty Faull,Richmond,0,10,0.0019,1,0.0,0.0,0.0,0.0
-Jack Buckley,Greater Western Sydney,0,9,0.0021,1,0.0,0.0,0.0,0.0
-Rhyan Mansell,Richmond,0,6,0.0033,1,0.0,0.0,0.0,0.0
-Taj Hotton,Richmond,0,7,0.0029,1,0.0,0.0,0.0,0.0
-Bo Allan,West Coast,0,17,0.0012,1,0.0,0.0,0.0,0.0
-Dante Visentini,Port Adelaide,0,12,0.0012,1,0.0,0.0,0.0,0.0
-Braeden Campbell,Sydney,0,3,0.0047,1,0.0,0.0,0.0,0.0
-Lachlan Gulbin,Gold Coast,0,8,0.0018,1,0.0,0.0,0.0,0.0
-Josh Dolan,Western Bulldogs,0,8,0.0019,1,0.0,0.0,0.0,0.0
-Jake Kolodjashnij,Geelong,0,11,0.0014,1,0.0,0.0,0.0,0.0
-Archer Day-Wicks,Essendon,0,18,0.0008,1,0.0,0.0,0.0,0.0
-Oliver Francou,West Coast,0,4,0.0038,1,0.0,0.0,0.0,0.0
-Todd Marshall,Port Adelaide,0,12,0.0013,1,0.0,0.0,0.0,0.0
-Brady Hough,West Coast,0,20,0.0008,1,0.0,0.0,0.0,0.0
-Xavier Lindsay,Melbourne,0,5,0.0032,1,0.0,0.0,0.0,0.0
-Griffin Logue,North Melbourne,0,13,0.0012,1,0.0,0.0,0.0,0.0
-Nathan Broad,Richmond,0,19,0.0009,1,0.0,0.0,0.0,0.0
-Ryan Maric,West Coast,0,12,0.0014,1,0.0,0.0,0.0,0.0
-Jack Ough,Greater Western Sydney,0,5,0.0034,1,0.0,0.0,0.0,0.0
-Sam Butler,Hawthorn,0,7,0.0024,1,0.0,0.0,0.0,0.0
-Latrelle Pickett,Melbourne,0,16,0.0011,1,0.0,0.0,0.0,0.0
-Rhett Bazzo,West Coast,0,11,0.0009,1,0.0,0.0,0.0,0.0
-Ollie Greeves,Hawthorn,0,4,0.0024,1,0.0,0.0,0.0,0.0
-Liam Reidy,Carlton,0,4,0.0025,1,0.0,0.0,0.0,0.0
-Luke Trainor,Richmond,0,9,0.0011,1,0.0,0.0,0.0,0.0
-Jamie Cripps,West Coast,0,5,0.0021,1,0.0,0.0,0.0,0.0
-Sam Davidson,Western Bulldogs,0,13,0.0008,1,0.0,0.0,0.0,0.0
-Joel Hamling,Sydney,0,6,0.0018,1,0.0,0.0,0.0,0.0
-Oscar Adams,Gold Coast,0,13,0.0009,1,0.0,0.0,0.0,0.0
-Archie Perkins,Essendon,0,13,0.0009,1,0.0,0.0,0.0,0.0
-Bailey Macdonald,Hawthorn,0,10,0.0012,1,0.0,0.0,0.0,0.0
-Cooper Duff-Tytler,West Coast,0,13,0.001,1,0.0,0.0,0.0,0.0
-Luke Pedlar,Adelaide,0,10,0.0013,1,0.0,0.0,0.0,0.0
-Conor Stone,Greater Western Sydney,0,8,0.0017,1,0.0,0.0,0.0,0.0
-Sam Grlj,Richmond,0,18,0.0008,1,0.0,0.0,0.0,0.0
-Harry Cunningham,Sydney,0,12,0.0011,1,0.0,0.0,0.0,0.0
-Jamarra Ugle-Hagan,Gold Coast,0,3,0.0046,1,0.0,0.0,0.0,0.0
-Jack Dalton,Hawthorn,0,4,0.0017,1,0.0,0.0,0.0,0.0
-Leek Aleer,Greater Western Sydney,0,7,0.001,1,0.0,0.0,0.0,0.0
-Jake Rogers,Gold Coast,0,6,0.0012,1,0.0,0.0,0.0,0.0
-Adam Treloar,Western Bulldogs,0,5,0.0014,1,0.0,0.0,0.0,0.0
-Archer Reid,West Coast,0,6,0.0012,1,0.0,0.0,0.0,0.0
-Liam OConnell,St Kilda,0,10,0.0008,1,0.0,0.0,0.0,0.0
-Chayce Jones,Adelaide,0,3,0.0025,1,0.0,0.0,0.0,0.0
-Oliver Hayes-Brown,Richmond,0,7,0.0011,1,0.0,0.0,0.0,0.0
-Jade Gresham,Essendon,0,7,0.0011,1,0.0,0.0,0.0,0.0
-Hunter Clark,St Kilda,0,6,0.0013,1,0.0,0.0,0.0,0.0
-Jack Buller,Collingwood,0,10,0.0008,1,0.0,0.0,0.0,0.0
-Chris Scerri,Fremantle,0,7,0.0011,1,0.0,0.0,0.0,0.0
-Brandon Starcevich,West Coast,0,8,0.001,1,0.0,0.0,0.0,0.0
-Harvey Harrison,Collingwood,0,8,0.0011,1,0.0,0.0,0.0,0.0
-Billy Cootee,Sydney,0,6,0.0015,1,0.0,0.0,0.0,0.0
-Campbell Lake,St Kilda,0,7,0.0013,1,0.0,0.0,0.0,0.0
-Xavier Bamert,Port Adelaide,0,8,0.0007,1,0.0,0.0,0.0,0.0
-Kye Annand,Richmond,0,8,0.0007,1,0.0,0.0,0.0,0.0
-Zak Johnson,Essendon,0,6,0.0009,1,0.0,0.0,0.0,0.0
-Lachlan Cowan,Carlton,0,19,0.0042,1,0.0,0.0,0.0,0.0
-Beau McCreery,Collingwood,0,19,0.0045,1,0.0,0.0,0.0,0.0
-Blake Howes,Melbourne,0,20,0.0044,1,0.0,0.0,0.0,0.0
-Joe Berry,Port Adelaide,0,20,0.0044,1,0.0,0.0,0.0,0.0
-Judd McVee,Fremantle,0,19,0.0047,1,0.0,0.0,0.0,0.0
-Harry Kyle,Sydney,0,7,0.0008,1,0.0,0.0,0.0,0.0
-James Leake,Greater Western Sydney,0,5,0.0011,1,0.0,0.0,0.0,0.0
-Mitch Zadow,Port Adelaide,0,6,0.001,1,0.0,0.0,0.0,0.0
-Alix Tauru,St Kilda,0,8,0.0007,1,0.0,0.0,0.0,0.0
-Charlie West,Collingwood,0,5,0.0012,1,0.0,0.0,0.0,0.0
-Riley Hamilton,Greater Western Sydney,0,5,0.0012,1,0.0,0.0,0.0,0.0
-Malakai Champion,West Coast,0,8,0.0008,1,0.0,0.0,0.0,0.0
-Nick Holman,Gold Coast,0,6,0.0011,1,0.0,0.0,0.0,0.0
-Will Brodie,Port Adelaide,0,1,0.0039,1,0.0,0.0,0.0,0.0
-Oliver Hannaford,Greater Western Sydney,0,5,0.0008,1,0.0,0.0,0.0,0.0
-Saad El-Hawli,Essendon,0,8,0.0005,1,0.0,0.0,0.0,0.0
-Wil Dawson,North Melbourne,0,7,0.0006,1,0.0,0.0,0.0,0.0
-Tom Edwards,Essendon,0,7,0.0006,1,0.0,0.0,0.0,0.0
-Tom Hanily,Sydney,0,4,0.0011,1,0.0,0.0,0.0,0.0
-Flynn Perez,Hawthorn,0,7,0.0006,1,0.0,0.0,0.0,0.0
-Josaia Delana,Greater Western Sydney,0,6,0.0008,1,0.0,0.0,0.0,0.0
-Dan Butler,St Kilda,0,8,0.0006,1,0.0,0.0,0.0,0.0
-Nik Cox,Essendon,0,8,0.0006,1,0.0,0.0,0.0,0.0
-Josh Goater,North Melbourne,0,5,0.001,1,0.0,0.0,0.0,0.0
-Hugh Bond,Adelaide,0,7,0.0007,1,0.0,0.0,0.0,0.0
-Toby McMullin,Greater Western Sydney,0,6,0.0009,1,0.0,0.0,0.0,0.0
-Campbell Gray,Richmond,0,9,0.0006,1,0.0,0.0,0.0,0.0
-Charlie Ballard,Gold Coast,0,8,0.0007,1,0.0,0.0,0.0,0.0
-Jai Murray,Gold Coast,0,9,0.0006,1,0.0,0.0,0.0,0.0
-Jeremy Sharp,Fremantle,0,2,0.0014,1,0.0,0.0,0.0,0.0
-Harry Schoenberg,West Coast,0,5,0.0006,1,0.0,0.0,0.0,0.0
-Shadeau Brain,Brisbane Lions,0,2,0.0014,1,0.0,0.0,0.0,0.0
-Will McCabe,Hawthorn,0,4,0.0007,1,0.0,0.0,0.0,0.0
-Jack Hutchinson,West Coast,0,6,0.0005,1,0.0,0.0,0.0,0.0
-Cameron Nairn,Hawthorn,0,4,0.0008,1,0.0,0.0,0.0,0.0
-Liam Fawcett,Richmond,0,7,0.0004,1,0.0,0.0,0.0,0.0
-Darragh Joyce,Brisbane Lions,0,3,0.0011,1,0.0,0.0,0.0,0.0
-Wil Parker,Collingwood,0,5,0.0007,1,0.0,0.0,0.0,0.0
-Tobie Travaglia,St Kilda,0,5,0.0007,1,0.0,0.0,0.0,0.0
-Finnbar Maley,Adelaide,0,6,0.0006,1,0.0,0.0,0.0,0.0
-Elijah Hewett,West Coast,0,6,0.0006,1,0.0,0.0,0.0,0.0
-Lachy Dovaston,North Melbourne,0,6,0.0006,1,0.0,0.0,0.0,0.0
-Tom Burton,Richmond,0,5,0.0007,1,0.0,0.0,0.0,0.0
-Tom Cochrane,Port Adelaide,0,3,0.0012,1,0.0,0.0,0.0,0.0
-Corey Warner,Sydney,0,5,0.0008,1,0.0,0.0,0.0,0.0
-Mitch Podhajski,Collingwood,0,2,0.0008,1,0.0,0.0,0.0,0.0
-Maurice Rioli,Richmond,0,9,0.0002,1,0.0,0.0,0.0,0.0
-Will Hayes,Collingwood,0,6,0.0003,1,0.0,0.0,0.0,0.0
-Bailey Scott,North Melbourne,0,3,0.0006,1,0.0,0.0,0.0,0.0
-Darcy Moore,Collingwood,0,4,0.0004,1,0.0,0.0,0.0,0.0
-Samson Ryan,Richmond,0,4,0.0005,1,0.0,0.0,0.0,0.0
-Adam Saad,Carlton,0,3,0.0007,1,0.0,0.0,0.0,0.0
-Harrison Oliver,Greater Western Sydney,0,5,0.0004,1,0.0,0.0,0.0,0.0
-Liam Puncher,Collingwood,0,5,0.0004,1,0.0,0.0,0.0,0.0
-Riley Hardeman,North Melbourne,0,4,0.0006,1,0.0,0.0,0.0,0.0
-Flynn Young,Carlton,0,3,0.0008,1,0.0,0.0,0.0,0.0
-Xavier Taylor,Melbourne,0,2,0.0012,1,0.0,0.0,0.0,0.0
-Angus Hastie,St Kilda,0,5,0.0005,1,0.0,0.0,0.0,0.0
-Charlie Banfield,St Kilda,0,3,0.0008,1,0.0,0.0,0.0,0.0
-Harvey Johnston,West Coast,0,8,0.0003,1,0.0,0.0,0.0,0.0
-Hussien El Achkar,Essendon,0,8,0.0003,1,0.0,0.0,0.0,0.0
-Ollie Lord,Port Adelaide,0,1,0.0002,1,0.0,0.0,0.0,0.0
-Harrison Ramm,Port Adelaide,0,3,0.0001,1,0.0,0.0,0.0,0.0
-Harry Edwards,West Coast,0,2,0.0002,1,0.0,0.0,0.0,0.0
-Balyn OBrien,Port Adelaide,0,3,0.0001,1,0.0,0.0,0.0,0.0
-Matt Hill,Hawthorn,0,2,0.0004,1,0.0,0.0,0.0,0.0
-Isaac Keeler,St Kilda,0,2,0.0004,1,0.0,0.0,0.0,0.0
-Hudson OKeeffe,Carlton,0,3,0.0003,1,0.0,0.0,0.0,0.0
-Cody Curtin,Brisbane Lions,0,4,0.0002,1,0.0,0.0,0.0,0.0
-Luker Kentfield,Melbourne,0,3,0.0003,1,0.0,0.0,0.0,0.0
-Louis Emmett,Western Bulldogs,0,6,0.0002,1,0.0,0.0,0.0,0.0
-Taylor Goad,North Melbourne,0,2,0.0005,1,0.0,0.0,0.0,0.0
-Aidan Johnson,Melbourne,0,1,0.001,1,0.0,0.0,0.0,0.0
-Harry Jones,Essendon,0,5,0.0002,1,0.0,0.0,0.0,0.0
-Archie Ludowyke,Adelaide,0,1,0.001,1,0.0,0.0,0.0,0.0
-Zane Zakostelsky,Brisbane Lions,0,3,0.0003,1,0.0,0.0,0.0,0.0
-Jaxon Artemis,Essendon,0,3,0.0004,1,0.0,0.0,0.0,0.0
-Aidan Schubert,Hawthorn,0,1,0.0006,1,0.0,0.0,0.0,0.0
-Jacob Newton,West Coast,0,3,0.0002,1,0.0,0.0,0.0,0.0
-Max Ramsden,Hawthorn,0,2,0.0003,1,0.0,0.0,0.0,0.0
-Josh Gibcus,Richmond,0,1,0.0006,1,0.0,0.0,0.0,0.0
-Lukas Cooke,Melbourne,0,2,0.0003,1,0.0,0.0,0.0,0.0
-Lachlan Smith,Western Bulldogs,0,2,0.0003,1,0.0,0.0,0.0,0.0
-Mitch Knevitt,Geelong,0,2,0.0003,1,0.0,0.0,0.0,0.0
-Noah Roberts-Thomson,Richmond,0,3,0.0002,1,0.0,0.0,0.0,0.0
-Andy Moniz-Wakefield,Melbourne,0,2,0.0003,1,0.0,0.0,0.0,0.0
-Rhys Unwin,Essendon,0,1,0.0,1,0.0,0.0,0.0,0.0
-Zac Fisher,North Melbourne,0,1,0.0001,1,0.0,0.0,0.0,0.0
-Ryan Gardner,Western Bulldogs,0,1,0.0001,1,0.0,0.0,0.0,0.0
-Reilly OBrien,Adelaide,0,1,0.0001,1,0.0,0.0,0.0,0.0
-Flynn Riley,Carlton,0,1,0.0001,1,0.0,0.0,0.0,0.0
-Daniel Annable,Brisbane Lions,0,1,0.0002,1,0.0,0.0,0.0,0.0
-Caleb Lewis,Gold Coast,0,2,0.0001,1,0.0,0.0,0.0,0.0
+Nick Daicos,Collingwood,0,20,1.8839,0,0.0,0.0,31.0,45.0
+Marcus Bontempelli,Western Bulldogs,0,21,1.2177,0,0.0,0.0,18.0,33.0
+Bailey Smith,Geelong,0,20,1.2782,0,0.0,0.0,18.0,33.0
+Will Ashcroft,Brisbane Lions,0,21,1.0687,0,0.0,0.0,15.0,30.0
+Lachie Neale,Brisbane Lions,0,21,0.9862,0,0.0,0.0,13.0,28.0
+Patrick Cripps,Carlton,0,21,0.9845,0,0.0,0.0,13.0,28.0
+Isaac Heeney,Sydney,0,19,1.0652,0,0.0,0.0,13.0,28.0
+Harry Sheezel,North Melbourne,0,21,0.9218,0,0.0,0.0,12.0,27.0
+Jordan Dawson,Adelaide,0,18,1.0576,0,0.0,0.0,12.0,26.0
+Jason Horne-Francis,Port Adelaide,0,20,0.8746,0,0.0,0.0,11.0,24.0
+Jai Newcombe,Hawthorn,0,21,0.822,0,0.0,0.0,10.0,24.0
+Zak Butters,Port Adelaide,0,17,1.0061,0,0.0,0.0,11.0,24.0
+Kysaiah Pickett,Melbourne,0,21,0.805,0,0.0,0.0,10.0,24.0
+Nasiah Wanganeen-Milera,St Kilda,0,17,0.9472,0,0.0,0.0,10.0,23.0
+Izak Rankine,Adelaide,0,18,0.7956,0,0.0,0.0,8.0,21.0
+Max Gawn,Melbourne,0,21,0.6634,0,0.0,0.0,8.0,20.0
+Max Holmes,Geelong,0,18,0.7683,0,0.0,0.0,8.0,20.0
+Clayton Oliver,Greater Western Sydney,0,21,0.6401,0,0.0,0.0,8.0,19.0
+Luke Jackson,Fremantle,0,21,0.6322,0,0.0,0.0,7.0,20.0
+Shai Bolton,Fremantle,0,20,0.6625,0,0.0,0.0,7.0,20.0
+Andrew Brayshaw,Fremantle,0,21,0.6062,0,0.0,0.0,7.0,19.0
+Tom Sparrow,Melbourne,0,21,0.605,0,0.0,0.0,7.0,19.0
+Luke Davies-Uniacke,North Melbourne,0,21,0.5873,0,0.0,0.0,7.0,18.0
+Harley Reid,West Coast,0,21,0.5855,0,0.0,0.0,6.0,19.0
+Chad Warner,Sydney,0,21,0.5826,0,0.0,0.0,7.0,18.0
+Ed Richards,Western Bulldogs,0,20,0.599,0,0.0,0.0,6.0,19.0
+Sam Walsh,Carlton,0,21,0.5637,0,0.0,0.0,6.0,18.0
+Brodie Grundy,Sydney,0,19,0.5931,0,0.0,0.0,5.0,17.0
+Christian Petracca,Gold Coast,0,19,0.5923,0,0.0,0.0,5.0,18.0
+Zac Bailey,Brisbane Lions,0,20,0.547,0,0.0,0.0,6.0,16.0
+Caleb Serong,Fremantle,0,18,0.6001,0,0.0,0.0,5.0,17.0
+Charlie Curnow,Sydney,0,20,0.5127,0,0.0,0.0,5.0,16.0
+Finn Callaghan,Greater Western Sydney,0,19,0.5221,0,0.0,0.0,4.0,16.0
+George Hewett,Carlton,0,17,0.5641,0,0.0,0.0,4.0,15.0
+Toby Greene,Greater Western Sydney,0,19,0.4839,0,0.0,0.0,4.0,15.0
+Jack Gunston,Hawthorn,0,15,0.6088,0,0.0,0.0,4.0,14.0
+Murphy Reid,Fremantle,0,21,0.429,0,0.0,0.0,4.0,15.0
+Jagga Smith,Carlton,0,21,0.4264,0,0.0,0.0,4.0,14.0
+Matt Rowell,Gold Coast,0,16,0.5304,0,0.0,0.0,3.0,14.0
+Errol Gulden,Sydney,0,9,0.9403,0,0.0,0.0,3.0,14.0
+Noah Anderson,Gold Coast,0,20,0.4184,0,0.0,0.0,4.0,13.0
+Hugo Garcia,St Kilda,0,21,0.3767,0,0.0,0.0,3.0,13.0
+Sam Berry,Adelaide,0,20,0.3888,0,0.0,0.0,3.0,13.0
+Jye Amiss,Fremantle,0,21,0.369,0,0.0,0.0,3.0,13.0
+Tim Taranto,Richmond,0,19,0.4043,0,0.0,0.0,3.0,13.0
+Jacob van Rooyen,Melbourne,0,21,0.364,0,0.0,0.0,3.0,13.0
+Jarman Impey,Hawthorn,0,19,0.3815,0,0.0,0.0,3.0,13.0
+Rowan Marshall,St Kilda,0,19,0.378,0,0.0,0.0,2.0,12.0
+Caleb Daniel,North Melbourne,0,21,0.3415,0,0.0,0.0,2.0,13.0
+Max Hall,St Kilda,0,21,0.3397,0,0.0,0.0,3.0,12.0
+Josh Treacy,Fremantle,0,21,0.338,0,0.0,0.0,3.0,12.0
+Justin McInerney,Sydney,0,13,0.5201,0,0.0,0.0,2.0,11.0
+Shaun Mannagh,Geelong,0,21,0.3212,0,0.0,0.0,2.0,12.0
+Touk Miller,Gold Coast,0,21,0.3204,0,0.0,0.0,2.0,12.0
+Jake Stringer,Greater Western Sydney,0,21,0.3144,0,0.0,0.0,2.0,12.0
+Wayne Milera,Adelaide,0,17,0.3884,0,0.0,0.0,2.0,11.0
+Nick Blakey,Sydney,0,21,0.2992,0,0.0,0.0,2.0,11.0
+Nick Watson,Hawthorn,0,19,0.3292,0,0.0,0.0,2.0,11.0
+Zach Merrett,Essendon,0,21,0.2949,0,0.0,0.0,2.0,11.0
+John Noble,Gold Coast,0,21,0.2927,0,0.0,0.0,2.0,11.0
+Callum Wilkie,St Kilda,0,21,0.2498,0,0.0,0.0,1.0,10.0
+Josh Daicos,Collingwood,0,21,0.2385,0,0.0,0.0,1.0,9.0
+Jack Steele,Melbourne,0,21,0.2378,0,0.0,0.0,1.0,9.0
+Darcy Cameron,Collingwood,0,20,0.2389,0,0.0,0.0,1.0,9.0
+Darcy Parish,Essendon,0,14,0.3361,0,0.0,0.0,0.0,9.0
+Jeremy Cameron,Geelong,0,16,0.2925,0,0.0,0.0,1.0,9.0
+Lachie Whitfield,Greater Western Sydney,0,19,0.2391,0,0.0,0.0,1.0,9.0
+Matthew Kennedy,Western Bulldogs,0,21,0.2156,0,0.0,0.0,1.0,9.0
+Kai Lohmann,Brisbane Lions,0,21,0.2156,0,0.0,0.0,1.0,9.0
+Oliver Dempsey,Geelong,0,21,0.2073,0,0.0,0.0,0.0,9.0
+Jordan de Goey,Collingwood,0,19,0.2267,0,0.0,0.0,1.0,8.0
+Lachie Ash,Greater Western Sydney,0,21,0.2043,0,0.0,0.0,1.0,8.0
+Archie Roberts,Essendon,0,19,0.2235,0,0.0,0.0,0.0,9.0
+Aaron Naughton,Western Bulldogs,0,20,0.2106,0,0.0,0.0,0.0,8.0
+Logan Morris,Brisbane Lions,0,20,0.2092,0,0.0,0.0,0.0,9.0
+Bradley Hill,St Kilda,0,21,0.198,0,0.0,0.0,0.0,8.0
+Connor Macdonald,Hawthorn,0,21,0.1963,0,0.0,0.0,0.0,8.0
+Sam Durham,Essendon,0,20,0.2051,0,0.0,0.0,0.0,8.0
+Scott Pendlebury,Collingwood,0,15,0.2667,0,0.0,0.0,0.0,8.0
+Tristan Xerri,North Melbourne,0,17,0.2296,0,0.0,0.0,0.0,8.0
+Darcy Fogarty,Adelaide,0,12,0.3116,0,0.0,0.0,1.0,7.0
+Patrick Voss,Fremantle,0,20,0.1787,0,0.0,0.0,0.0,7.0
+Tim Kelly,West Coast,0,19,0.188,0,0.0,0.0,0.0,7.0
+Riley Thilthorpe,Adelaide,0,18,0.1951,0,0.0,0.0,0.0,8.0
+Josh Rachele,Adelaide,0,21,0.1668,0,0.0,0.0,0.0,7.0
+Jake Waterman,West Coast,0,21,0.1628,0,0.0,0.0,0.0,7.0
+Luke Parker,North Melbourne,0,21,0.1612,0,0.0,0.0,0.0,7.0
+Shannon Neale,Geelong,0,21,0.161,0,0.0,0.0,0.0,7.0
+Paul Curtis,North Melbourne,0,18,0.1851,0,0.0,0.0,0.0,7.0
+Bodhi Uwland,Gold Coast,0,21,0.1545,0,0.0,0.0,0.0,7.0
+Bailey Dale,Western Bulldogs,0,17,0.1874,0,0.0,0.0,0.0,6.0
+Liam Ryan,St Kilda,0,16,0.1981,0,0.0,0.0,0.0,7.0
+Josh Ward,Hawthorn,0,21,0.1474,0,0.0,0.0,0.0,6.0
+Tom Papley,Sydney,0,16,0.193,0,0.0,0.0,0.0,7.0
+Taylor Walker,Adelaide,0,15,0.2049,0,0.0,0.0,0.0,6.0
+Daniel McStay,Collingwood,0,21,0.1449,0,0.0,0.0,0.0,6.0
+Aliir Aliir,Port Adelaide,0,21,0.1448,0,0.0,0.0,0.0,7.0
+Jack Ginnivan,Hawthorn,0,21,0.1445,0,0.0,0.0,0.0,6.0
+Jack Sinclair,St Kilda,0,15,0.1946,0,0.0,0.0,0.0,6.0
+Ben King,Gold Coast,0,21,0.1364,0,0.0,0.0,0.0,6.0
+Ryley Sanders,Western Bulldogs,0,19,0.1499,0,0.0,0.0,0.0,6.0
+Blake Hardwick,Hawthorn,0,21,0.1354,0,0.0,0.0,0.0,6.0
+Kade Chandler,Melbourne,0,20,0.1347,0,0.0,0.0,0.0,6.0
+Darcy Wilmot,Brisbane Lions,0,21,0.1279,0,0.0,0.0,0.0,6.0
+Joel Freijah,Western Bulldogs,0,21,0.1241,0,0.0,0.0,0.0,6.0
+Cooper Trembath,North Melbourne,0,21,0.124,0,0.0,0.0,0.0,6.0
+Karl Worner,Fremantle,0,21,0.1228,0,0.0,0.0,0.0,6.0
+Noah Balta,Richmond,0,17,0.1514,0,0.0,0.0,0.0,6.0
+James Sicily,Hawthorn,0,20,0.1219,0,0.0,0.0,0.0,6.0
+Mitch Georgiades,Port Adelaide,0,19,0.1222,0,0.0,0.0,0.0,5.0
+Josh Dunkley,Brisbane Lions,0,21,0.1088,0,0.0,0.0,0.0,5.0
+Harris Andrews,Brisbane Lions,0,18,0.1266,0,0.0,0.0,0.0,5.0
+Tom Atkins,Geelong,0,21,0.1075,0,0.0,0.0,0.0,5.0
+Jake Bowey,Melbourne,0,13,0.1725,0,0.0,0.0,0.0,5.0
+Nick Larkey,North Melbourne,0,21,0.1065,0,0.0,0.0,0.0,5.0
+Colby McKercher,North Melbourne,0,21,0.1059,0,0.0,0.0,0.0,5.0
+Tim Membrey,Collingwood,0,17,0.1306,0,0.0,0.0,0.0,5.0
+Lawson Humphries,Geelong,0,20,0.1099,0,0.0,0.0,0.0,5.0
+Harvey Langford,Melbourne,0,21,0.1033,0,0.0,0.0,0.0,5.0
+Hugh McCluggage,Brisbane Lions,0,13,0.1668,0,0.0,0.0,0.0,5.0
+Jack Ross,Richmond,0,17,0.126,0,0.0,0.0,0.0,5.0
+Charlie Cameron,Brisbane Lions,0,21,0.1012,0,0.0,0.0,0.0,5.0
+Jarrod Berry,Brisbane Lions,0,16,0.1315,0,0.0,0.0,0.0,5.0
+Jordan Clark,Fremantle,0,21,0.0997,0,0.0,0.0,0.0,5.0
+Bayley Fritsch,Melbourne,0,19,0.108,0,0.0,0.0,0.0,5.0
+Joel Fitzgerald,Melbourne,0,8,0.2538,0,0.0,0.0,0.0,5.0
+Dan Houston,Collingwood,0,21,0.0961,0,0.0,0.0,0.0,5.0
+James Peatling,Adelaide,0,20,0.1004,0,0.0,0.0,0.0,5.0
+Jy Simpkin,North Melbourne,0,21,0.0956,0,0.0,0.0,0.0,5.0
+Tom Liberatore,Western Bulldogs,0,10,0.2004,0,0.0,0.0,0.0,5.0
+Harry McKay,Carlton,0,19,0.1046,0,0.0,0.0,0.0,5.0
+Malcolm Rosas,Sydney,0,16,0.1233,0,0.0,0.0,0.0,5.0
+Mitch Lewis,Hawthorn,0,20,0.098,0,0.0,0.0,0.0,4.0
+Dylan Stephens,North Melbourne,0,21,0.0916,0,0.0,0.0,0.0,5.0
+Patrick Dangerfield,Geelong,0,15,0.1256,0,0.0,0.0,0.0,4.0
+Joel Amartey,Sydney,0,15,0.1225,0,0.0,0.0,0.0,5.0
+Rory Laird,Adelaide,0,16,0.1133,0,0.0,0.0,0.0,4.0
+Joe Richards,Port Adelaide,0,18,0.0993,0,0.0,0.0,0.0,4.0
+Ollie Wines,Port Adelaide,0,17,0.1047,0,0.0,0.0,0.0,4.0
+Matthew Johnson,Fremantle,0,20,0.0878,0,0.0,0.0,0.0,4.0
+Jack Crisp,Collingwood,0,21,0.0832,0,0.0,0.0,0.0,4.0
+Dayne Zorko,Brisbane Lions,0,11,0.1567,0,0.0,0.0,0.0,4.0
+Brodie Kemp,Carlton,0,21,0.082,0,0.0,0.0,0.0,4.0
+Cooper Sharman,St Kilda,0,19,0.0875,0,0.0,0.0,0.0,4.0
+Michael Frederick,Fremantle,0,16,0.1038,0,0.0,0.0,0.0,4.0
+Stephen Coniglio,Greater Western Sydney,0,19,0.0871,0,0.0,0.0,0.0,4.0
+Will Day,Hawthorn,0,9,0.182,0,0.0,0.0,0.0,4.0
+Charlie Comben,North Melbourne,0,20,0.0817,0,0.0,0.0,0.0,4.0
+Darcy Wilson,St Kilda,0,20,0.0816,0,0.0,0.0,0.0,4.0
+Brent Daniels,Greater Western Sydney,0,10,0.1605,0,0.0,0.0,0.0,4.0
+Bailey Williams (West Coast),West Coast,0,17,0.0931,0,0.0,0.0,0.0,4.0
+Dylan Moore,Hawthorn,0,20,0.0785,0,0.0,0.0,0.0,4.0
+Oliver Florent,Carlton,0,21,0.0727,0,0.0,0.0,0.0,4.0
+Tanner Bruhn,Geelong,0,19,0.0767,0,0.0,0.0,0.0,4.0
+Jayden Short,Richmond,0,19,0.0744,0,0.0,0.0,0.0,4.0
+Gryan Miers,Geelong,0,13,0.106,0,0.0,0.0,0.0,3.0
+Ben Ainsworth,Carlton,0,21,0.0641,0,0.0,0.0,0.0,4.0
+Tim English,Western Bulldogs,0,15,0.0881,0,0.0,0.0,0.0,3.0
+Mark Keane,Adelaide,0,7,0.1873,0,0.0,0.0,0.0,3.0
+Jack Darling,North Melbourne,0,20,0.0654,0,0.0,0.0,0.0,3.0
+Caleb Windsor,Melbourne,0,18,0.0724,0,0.0,0.0,0.0,4.0
+Bailey Williams (Western Bulldogs),Western Bulldogs,0,15,0.0858,0,0.0,0.0,0.0,3.0
+Daniel Rioli,Gold Coast,0,18,0.0694,0,0.0,0.0,0.0,3.0
+Darcy Byrne-Jones,Port Adelaide,0,21,0.0586,0,0.0,0.0,0.0,3.0
+Callum Mills,Sydney,0,20,0.061,0,0.0,0.0,0.0,3.0
+Peter Wright,Essendon,0,16,0.075,0,0.0,0.0,0.0,3.0
+Bailey Humphrey,Gold Coast,0,18,0.0661,0,0.0,0.0,0.0,3.0
+Ed Langdon,Melbourne,0,21,0.056,0,0.0,0.0,0.0,3.0
+Jack Higgins,St Kilda,0,15,0.0769,0,0.0,0.0,0.0,3.0
+Jordon Sweet,Port Adelaide,0,20,0.0567,0,0.0,0.0,0.0,3.0
+Tom Stewart,Geelong,0,19,0.0579,0,0.0,0.0,0.0,3.0
+Cam Mackenzie,Hawthorn,0,19,0.0578,0,0.0,0.0,0.0,3.0
+Luke Ryan,Fremantle,0,20,0.0534,0,0.0,0.0,0.0,3.0
+Jack Macrae,St Kilda,0,10,0.106,0,0.0,0.0,0.0,3.0
+James Rowbottom,Sydney,0,20,0.0516,0,0.0,0.0,0.0,3.0
+Lachlan McAndrew,Adelaide,0,20,0.0513,0,0.0,0.0,0.0,3.0
+Oliver Henry,Geelong,0,20,0.0508,0,0.0,0.0,0.0,3.0
+Jase Burgoyne,Port Adelaide,0,21,0.0478,0,0.0,0.0,0.0,3.0
+Kane McAuliffe,Richmond,0,9,0.111,0,0.0,0.0,0.0,3.0
+Tom McCarthy,West Coast,0,20,0.0495,0,0.0,0.0,0.0,3.0
+Tom McCartin,Sydney,0,18,0.0547,0,0.0,0.0,0.0,3.0
+Jarrod Witts,Gold Coast,0,12,0.0802,0,0.0,0.0,0.0,3.0
+Josh Battle,Hawthorn,0,19,0.0492,0,0.0,0.0,0.0,3.0
+Nick Bryan,Essendon,0,11,0.0835,0,0.0,0.0,0.0,3.0
+James Worpel,Geelong,0,10,0.0912,0,0.0,0.0,0.0,3.0
+Phoenix Gothard,Greater Western Sydney,0,16,0.0568,0,0.0,0.0,0.0,3.0
+Reuben Ginbey,West Coast,0,13,0.0699,0,0.0,0.0,0.0,3.0
+Riley Bice,Sydney,0,19,0.0474,0,0.0,0.0,0.0,3.0
+Francis Evans,Carlton,0,19,0.0471,0,0.0,0.0,0.0,3.0
+Hayden Young,Fremantle,0,12,0.074,0,0.0,0.0,0.0,3.0
+Angus Sheldrick,Sydney,0,17,0.0519,0,0.0,0.0,0.0,3.0
+Conor Nash,Hawthorn,0,10,0.0876,0,0.0,0.0,0.0,3.0
+Will Setterfield,Essendon,0,9,0.0967,0,0.0,0.0,0.0,3.0
+Marcus Windhager,St Kilda,0,21,0.0406,0,0.0,0.0,0.0,3.0
+Jai Serong,Sydney,0,20,0.0421,0,0.0,0.0,0.0,3.0
+Josh Worrell,Adelaide,0,20,0.0409,0,0.0,0.0,0.0,3.0
+Oscar McDonald,Fremantle,0,8,0.1021,0,0.0,0.0,0.0,3.0
+Esava Ratugolea,Port Adelaide,0,8,0.0995,0,0.0,0.0,0.0,3.0
+Karl Amon,Hawthorn,0,16,0.0497,0,0.0,0.0,0.0,3.0
+Connor Idun,Greater Western Sydney,0,21,0.0377,0,0.0,0.0,0.0,2.0
+Will Hayward,Carlton,0,20,0.0392,0,0.0,0.0,0.0,2.0
+Tom De Koning,St Kilda,0,18,0.0429,0,0.0,0.0,0.0,3.0
+Lloyd Meek,Hawthorn,0,21,0.0359,0,0.0,0.0,0.0,3.0
+Ryan Lester,Brisbane Lions,0,17,0.0442,0,0.0,0.0,0.0,3.0
+Finn OSullivan,North Melbourne,0,17,0.044,0,0.0,0.0,0.0,2.0
+Kane Farrell,Port Adelaide,0,13,0.0573,0,0.0,0.0,0.0,3.0
+Ben Long,Gold Coast,0,19,0.038,0,0.0,0.0,0.0,2.0
+Milan Murdock,West Coast,0,18,0.0399,0,0.0,0.0,0.0,2.0
+Matt Carroll,Carlton,0,10,0.0698,0,0.0,0.0,0.0,3.0
+Oisin Mullin,Geelong,0,21,0.0327,0,0.0,0.0,0.0,2.0
+Matthew Jefferson,Melbourne,0,14,0.0476,0,0.0,0.0,0.0,2.0
+Daniel Turner,Melbourne,0,17,0.0385,0,0.0,0.0,0.0,2.0
+Mabior Chol,Hawthorn,0,16,0.0404,0,0.0,0.0,0.0,2.0
+Harvey Thomas,Greater Western Sydney,0,20,0.0321,0,0.0,0.0,0.0,2.0
+Elliot Yeo,West Coast,0,19,0.0337,0,0.0,0.0,0.0,2.0
+Willem Duursma,West Coast,0,20,0.0316,0,0.0,0.0,0.0,2.0
+Levi Ashcroft,Brisbane Lions,0,21,0.0293,0,0.0,0.0,0.0,2.0
+Daniel Curtin,Adelaide,0,14,0.0439,0,0.0,0.0,0.0,2.0
+Sam Draper,Brisbane Lions,0,20,0.0306,0,0.0,0.0,0.0,2.0
+Marcus Herbert,West Coast,0,8,0.0762,0,0.0,0.0,0.0,2.0
+Alex Neal-Bullen,Adelaide,0,20,0.03,0,0.0,0.0,0.0,2.0
+Marc Pittonet,Carlton,0,18,0.0318,0,0.0,0.0,0.0,2.0
+Ned Moyle,Gold Coast,0,14,0.0406,0,0.0,0.0,0.0,2.0
+Mac Andrew,Gold Coast,0,21,0.0268,0,0.0,0.0,0.0,2.0
+Sam Collins,Gold Coast,0,20,0.0279,0,0.0,0.0,0.0,2.0
+George Wardlaw,North Melbourne,0,14,0.0397,0,0.0,0.0,0.0,2.0
+Joel Jeffrey,Gold Coast,0,20,0.0277,0,0.0,0.0,0.0,2.0
+Sam Flanders,St Kilda,0,12,0.0427,0,0.0,0.0,0.0,2.0
+Logan McDonald,Sydney,0,19,0.0261,0,0.0,0.0,0.0,2.0
+Seth Campbell,Richmond,0,21,0.0236,0,0.0,0.0,0.0,2.0
+Jeremy Howe,Collingwood,0,16,0.0308,0,0.0,0.0,0.0,2.0
+Patrick Retschko,Richmond,0,16,0.0305,0,0.0,0.0,0.0,2.0
+Toby Bedford,Greater Western Sydney,0,17,0.0286,0,0.0,0.0,0.0,2.0
+Sam De Koning,Geelong,0,18,0.0264,0,0.0,0.0,0.0,2.0
+Ben Keays,Adelaide,0,21,0.0224,0,0.0,0.0,0.0,2.0
+Willem Drew,Port Adelaide,0,21,0.0221,0,0.0,0.0,0.0,2.0
+Ned Long,Collingwood,0,19,0.0242,0,0.0,0.0,0.0,2.0
+Trent Rivers,Melbourne,0,14,0.0326,0,0.0,0.0,0.0,2.0
+Mark Blicavs,Geelong,0,17,0.0265,0,0.0,0.0,0.0,2.0
+Sam Darcy,Western Bulldogs,0,6,0.0743,0,0.0,0.0,0.0,2.0
+Cameron Zurhaar,North Melbourne,0,21,0.0211,0,0.0,0.0,0.0,2.0
+Steele Sidebottom,Collingwood,0,19,0.0231,0,0.0,0.0,0.0,2.0
+Lachie Schultz,Collingwood,0,19,0.0222,0,0.0,0.0,0.0,2.0
+Neil Erasmus,Fremantle,0,21,0.0194,0,0.0,0.0,0.0,2.0
+Massimo DAmbrosio,Hawthorn,0,21,0.0194,0,0.0,0.0,0.0,2.0
+Ethan Read,Gold Coast,0,13,0.0308,0,0.0,0.0,0.0,2.0
+Elijah Tsatas,Essendon,0,6,0.0662,0,0.0,0.0,0.0,2.0
+Nathan ODriscoll,Fremantle,0,14,0.0284,0,0.0,0.0,0.0,2.0
+Patrick Lipinski,Collingwood,0,19,0.0206,0,0.0,0.0,0.0,2.0
+Cam Rayner,Brisbane Lions,0,21,0.0185,0,0.0,0.0,0.0,2.0
+Mattaes Phillipou,St Kilda,0,19,0.0204,0,0.0,0.0,0.0,2.0
+Mitch Owens,St Kilda,0,18,0.0208,0,0.0,0.0,0.0,2.0
+Zeke Uwland,Gold Coast,0,17,0.0219,0,0.0,0.0,0.0,2.0
+Jake Soligo,Adelaide,0,18,0.0202,0,0.0,0.0,0.0,2.0
+Rory Lobb,Western Bulldogs,0,18,0.0201,0,0.0,0.0,0.0,2.0
+Jake Lever,Melbourne,0,20,0.018,0,0.0,0.0,0.0,2.0
+Tom Barrass,Hawthorn,0,17,0.0211,0,0.0,0.0,0.0,2.0
+Kieren Briggs,Greater Western Sydney,0,16,0.0224,0,0.0,0.0,0.0,2.0
+Brayden Maynard,Collingwood,0,17,0.0208,0,0.0,0.0,0.0,2.0
+Aaron Cadman,Greater Western Sydney,0,16,0.0219,0,0.0,0.0,0.0,1.0
+Jake Lloyd,Sydney,0,21,0.0159,0,0.0,0.0,0.0,1.0
+Jaspa Fletcher,Brisbane Lions,0,21,0.0158,0,0.0,0.0,0.0,1.0
+Jamie Elliott,Collingwood,0,11,0.0295,0,0.0,0.0,0.0,1.0
+Callum Brown,Greater Western Sydney,0,16,0.0199,0,0.0,0.0,0.0,1.0
+Wil Powell,Gold Coast,0,19,0.0165,0,0.0,0.0,0.0,1.0
+Alex Pearce,Fremantle,0,18,0.0169,0,0.0,0.0,0.0,1.0
+Harry Morrison,Hawthorn,0,11,0.0275,0,0.0,0.0,0.0,1.0
+Edward Allan,Collingwood,0,16,0.0182,0,0.0,0.0,0.0,1.0
+Sam Lalor,Richmond,0,11,0.0264,0,0.0,0.0,0.0,1.0
+Adam Cerra,Carlton,0,18,0.0157,0,0.0,0.0,0.0,1.0
+Alex Davies,Gold Coast,0,6,0.0461,0,0.0,0.0,0.0,1.0
+Toby Nankervis,Richmond,0,10,0.0273,0,0.0,0.0,0.0,1.0
+Isaac Kako,Essendon,0,13,0.0201,0,0.0,0.0,0.0,1.0
+Brayden Cook,Adelaide,0,20,0.0127,0,0.0,0.0,0.0,1.0
+Matt Roberts,Sydney,0,17,0.0149,0,0.0,0.0,0.0,1.0
+Koltyn Tholstrup,Melbourne,0,21,0.012,0,0.0,0.0,0.0,1.0
+Jack Whitlock,Port Adelaide,0,21,0.0118,0,0.0,0.0,0.0,1.0
+Tom Lynch,Richmond,0,13,0.0183,0,0.0,0.0,0.0,1.0
+Tom Blamires,North Melbourne,0,16,0.0148,0,0.0,0.0,0.0,1.0
+Conor McKenna,Brisbane Lions,0,15,0.0155,0,0.0,0.0,0.0,1.0
+Zach Reid,Essendon,0,21,0.011,0,0.0,0.0,0.0,1.0
+Sullivan Robey,Essendon,0,15,0.0152,0,0.0,0.0,0.0,1.0
+James Borlase,Adelaide,0,15,0.0151,0,0.0,0.0,0.0,1.0
+Changkuoth Jiath,Melbourne,0,13,0.0169,0,0.0,0.0,0.0,1.0
+Nick Madden,Greater Western Sydney,0,7,0.0312,0,0.0,0.0,0.0,1.0
+Nic Newman,Carlton,0,16,0.0135,0,0.0,0.0,0.0,1.0
+Dyson Sharp,Essendon,0,13,0.0164,0,0.0,0.0,0.0,1.0
+Harry Perryman,Collingwood,0,16,0.013,0,0.0,0.0,0.0,1.0
+Jake Riccardi,Greater Western Sydney,0,9,0.023,0,0.0,0.0,0.0,1.0
+Jack Silvagni,St Kilda,0,21,0.0099,0,0.0,0.0,0.0,1.0
+Harry Himmelberg,Greater Western Sydney,0,21,0.0098,0,0.0,0.0,0.0,1.0
+Mason Wood,St Kilda,0,20,0.0102,0,0.0,0.0,0.0,1.0
+Isaac Quaynor,Collingwood,0,19,0.0107,0,0.0,0.0,0.0,1.0
+Connor OSullivan,Geelong,0,21,0.0093,0,0.0,0.0,0.0,1.0
+Sam Taylor,Greater Western Sydney,0,10,0.0194,0,0.0,0.0,0.0,1.0
+Hayden McLean,Sydney,0,10,0.0194,0,0.0,0.0,0.0,1.0
+Sam Switkowski,Fremantle,0,21,0.0091,0,0.0,0.0,0.0,1.0
+Jobe Shanahan,West Coast,0,21,0.0086,0,0.0,0.0,0.0,1.0
+James Jordon,Sydney,0,21,0.0086,0,0.0,0.0,0.0,1.0
+Jayden Laverde,Greater Western Sydney,0,19,0.0095,0,0.0,0.0,0.0,1.0
+Jacob Hopper,Richmond,0,12,0.0149,0,0.0,0.0,0.0,1.0
+Nick Haynes,Carlton,0,17,0.0101,0,0.0,0.0,0.0,0.0
+Jye Caldwell,Essendon,0,15,0.0114,0,0.0,0.0,0.0,1.0
+Heath Chapman,Fremantle,0,21,0.0081,0,0.0,0.0,0.0,1.0
+Jake Melksham,Melbourne,0,6,0.0282,0,0.0,0.0,0.0,1.0
+Brennan Cox,Fremantle,0,16,0.0105,0,0.0,0.0,0.0,1.0
+Isaiah Dudley,Fremantle,0,21,0.0079,0,0.0,0.0,0.0,1.0
+Finn Maginness,Hawthorn,0,6,0.0275,0,0.0,0.0,0.0,1.0
+Peter Ladhams,Sydney,0,2,0.0805,0,0.0,0.0,0.0,0.0
+Jack Graham,West Coast,0,11,0.0146,0,0.0,0.0,0.0,0.0
+Rhylee West,Western Bulldogs,0,20,0.008,0,0.0,0.0,0.0,1.0
+Connor Budarick,Western Bulldogs,0,13,0.0119,0,0.0,0.0,0.0,1.0
+Harry Petty,Melbourne,0,17,0.0091,0,0.0,0.0,0.0,0.0
+Jhye Clark,Geelong,0,7,0.0214,0,0.0,0.0,0.0,0.0
+Lachie Jaques,Western Bulldogs,0,9,0.0161,0,0.0,0.0,0.0,0.0
+Billy Frampton,Collingwood,0,21,0.0069,0,0.0,0.0,0.0,0.0
+Bruce Reville,Brisbane Lions,0,18,0.008,0,0.0,0.0,0.0,0.0
+Ned Reeves,Hawthorn,0,15,0.0096,0,0.0,0.0,0.0,0.0
+Darcy Fort,Brisbane Lions,0,20,0.0071,0,0.0,0.0,0.0,0.0
+Billy Wilson,Carlton,0,13,0.0109,0,0.0,0.0,0.0,0.0
+Corey Wagner,Fremantle,0,13,0.0107,0,0.0,0.0,0.0,0.0
+Buku Khamis,Western Bulldogs,0,21,0.0066,0,0.0,0.0,0.0,0.0
+Harry Sharp,Melbourne,0,21,0.0066,0,0.0,0.0,0.0,0.0
+Arthur Jones,Western Bulldogs,0,16,0.0086,0,0.0,0.0,0.0,0.0
+Deven Robertson,West Coast,0,4,0.0337,0,0.0,0.0,0.0,0.0
+Joe Fonti,Greater Western Sydney,0,20,0.0067,0,0.0,0.0,0.0,0.0
+Michael Sellwood,Western Bulldogs,0,21,0.0062,0,0.0,0.0,0.0,0.0
+Lachlan Bramble,Western Bulldogs,0,21,0.0061,0,0.0,0.0,0.0,0.0
+Zach Guthrie,Geelong,0,21,0.0061,0,0.0,0.0,0.0,0.0
+Talor Byrne,Carlton,0,16,0.008,0,0.0,0.0,0.0,0.0
+Ryan Angwin,Greater Western Sydney,0,18,0.007,0,0.0,0.0,0.0,0.0
+Liam Baker,West Coast,0,18,0.0069,0,0.0,0.0,0.0,0.0
+Josh Weddle,Hawthorn,0,18,0.0068,0,0.0,0.0,0.0,0.0
+Jack Lukosius,Port Adelaide,0,8,0.0154,0,0.0,0.0,0.0,0.0
+Mason Redman,Essendon,0,14,0.0086,0,0.0,0.0,0.0,0.0
+Josaia Delana,Greater Western Sydney,0,7,0.0172,0,0.0,0.0,0.0,0.0
+Leo Lombard,Gold Coast,0,21,0.0055,0,0.0,0.0,0.0,0.0
+Tom Brown,Richmond,0,16,0.0071,0,0.0,0.0,0.0,0.0
+Billy Dowling,Adelaide,0,3,0.0379,0,0.0,0.0,0.0,0.0
+Liam Duggan,West Coast,0,21,0.0054,0,0.0,0.0,0.0,0.0
+Blake Acres,Carlton,0,8,0.0141,0,0.0,0.0,0.0,0.0
+Miles Bergman,Port Adelaide,0,14,0.0081,0,0.0,0.0,0.0,0.0
+Sam Cumming,Richmond,0,14,0.0079,0,0.0,0.0,0.0,0.0
+Nick Vlastuin,Richmond,0,20,0.0055,0,0.0,0.0,0.0,0.0
+Tom Powell,North Melbourne,0,8,0.0137,0,0.0,0.0,0.0,0.0
+Xavier Duursma,Essendon,0,18,0.006,0,0.0,0.0,0.0,0.0
+Elijah Hollands,Carlton,0,6,0.018,0,0.0,0.0,0.0,0.0
+Keidean Coleman,Brisbane Lions,0,13,0.0082,0,0.0,0.0,0.0,0.0
+Beau McCreery,Collingwood,0,20,0.0052,0,0.0,0.0,0.0,0.0
+Logan Evans,Port Adelaide,0,19,0.0054,0,0.0,0.0,0.0,0.0
+Mark OConnor,Geelong,0,18,0.0055,0,0.0,0.0,0.0,0.0
+Brody Mihocek,Melbourne,0,10,0.0099,0,0.0,0.0,0.0,0.0
+Jack Henry,Geelong,0,17,0.0057,0,0.0,0.0,0.0,0.0
+Jack Martin,Geelong,0,17,0.0057,0,0.0,0.0,0.0,0.0
+Jordon Butts,Adelaide,0,9,0.0108,0,0.0,0.0,0.0,0.0
+Christian Salem,Melbourne,0,7,0.0138,0,0.0,0.0,0.0,0.0
+Christian Moraes,Port Adelaide,0,11,0.0086,0,0.0,0.0,0.0,0.0
+Kyle Langford,Essendon,0,17,0.0055,0,0.0,0.0,0.0,0.0
+Jack Carroll,St Kilda,0,12,0.0077,0,0.0,0.0,0.0,0.0
+Jesse Dattoli,Sydney,0,1,0.0896,0,0.0,0.0,0.0,0.0
+Judd McVee,Fremantle,0,20,0.0045,0,0.0,0.0,0.0,0.0
+Joe Berry,Port Adelaide,0,21,0.0042,0,0.0,0.0,0.0,0.0
+Harry Rowston,Greater Western Sydney,0,10,0.0088,0,0.0,0.0,0.0,0.0
+Blake Howes,Melbourne,0,20,0.0044,0,0.0,0.0,0.0,0.0
+Tyler Sonsie,Richmond,0,15,0.0058,0,0.0,0.0,0.0,0.0
+Ty Gallop,Brisbane Lions,0,17,0.0051,0,0.0,0.0,0.0,0.0
+Lachlan Cowan,Carlton,0,20,0.0042,0,0.0,0.0,0.0,0.0
+Jack Watkins,Port Adelaide,0,11,0.0077,0,0.0,0.0,0.0,0.0
+Dion Prestia,Richmond,0,16,0.0052,0,0.0,0.0,0.0,0.0
+Wade Derksen,Carlton,0,12,0.0069,0,0.0,0.0,0.0,0.0
+Mitchell Edwards,Geelong,0,16,0.0052,0,0.0,0.0,0.0,0.0
+Toby Murray,Adelaide,0,12,0.0068,0,0.0,0.0,0.0,0.0
+Darcy Gardiner,Brisbane Lions,0,10,0.0081,0,0.0,0.0,0.0,0.0
+Roan Steele,Collingwood,0,16,0.005,0,0.0,0.0,0.0,0.0
+Hugo Ralphsmith,Richmond,0,11,0.0073,0,0.0,0.0,0.0,0.0
+James ODonnell,Western Bulldogs,0,17,0.0047,0,0.0,0.0,0.0,0.0
+Sam Wicks,Sydney,0,16,0.005,0,0.0,0.0,0.0,0.0
+Cooper Lord,Carlton,0,7,0.0112,0,0.0,0.0,0.0,0.0
+Tylar Young,West Coast,0,21,0.0037,0,0.0,0.0,0.0,0.0
+Jack Bowes,Geelong,0,9,0.0087,0,0.0,0.0,0.0,0.0
+Jacob Weitering,Carlton,0,10,0.0077,0,0.0,0.0,0.0,0.0
+Mitch McGovern,Carlton,0,21,0.0036,0,0.0,0.0,0.0,0.0
+Braeden Campbell,Sydney,0,4,0.0177,0,0.0,0.0,0.0,0.0
+Lachie Weller,Gold Coast,0,11,0.0064,0,0.0,0.0,0.0,0.0
+Luke Nankervis,Adelaide,0,14,0.005,0,0.0,0.0,0.0,0.0
+Lincoln McCarthy,Brisbane Lions,0,8,0.0087,0,0.0,0.0,0.0,0.0
+Oliver Wiltshire,Geelong,0,13,0.0053,0,0.0,0.0,0.0,0.0
+Hugh Boxshall,St Kilda,0,8,0.0084,0,0.0,0.0,0.0,0.0
+Jed Walter,Gold Coast,0,16,0.0042,0,0.0,0.0,0.0,0.0
+Oscar Allen,Brisbane Lions,0,9,0.0074,0,0.0,0.0,0.0,0.0
+Jacob Farrow,Essendon,0,19,0.0035,0,0.0,0.0,0.0,0.0
+Max Gruzewski,Greater Western Sydney,0,13,0.005,0,0.0,0.0,0.0,0.0
+Xavier OHalloran,Greater Western Sydney,0,13,0.005,0,0.0,0.0,0.0,0.0
+Ben Miller,Richmond,0,19,0.0033,0,0.0,0.0,0.0,0.0
+Jack Scrimshaw,Hawthorn,0,6,0.0103,0,0.0,0.0,0.0,0.0
+Oliver Hollands,Carlton,0,11,0.0055,0,0.0,0.0,0.0,0.0
+Cooper Hynes,Western Bulldogs,0,19,0.0032,0,0.0,0.0,0.0,0.0
+Hugo Hall-Kahan,Adelaide,0,9,0.0065,0,0.0,0.0,0.0,0.0
+Will Edwards,Sydney,0,14,0.0039,0,0.0,0.0,0.0,0.0
+Isaac Cumming,Adelaide,0,14,0.0039,0,0.0,0.0,0.0,0.0
+Josh Lai,Port Adelaide,0,17,0.0032,0,0.0,0.0,0.0,0.0
+Liam Henry,St Kilda,0,8,0.0068,0,0.0,0.0,0.0,0.0
+Zac Taylor,Adelaide,0,19,0.0028,0,0.0,0.0,0.0,0.0
+Noah Mraz,Hawthorn,0,4,0.0128,0,0.0,0.0,0.0,0.0
+Reilly OBrien,Adelaide,0,2,0.0254,0,0.0,0.0,0.0,0.0
+Lewis Young,Carlton,0,11,0.0046,0,0.0,0.0,0.0,0.0
+Will Lewis,Western Bulldogs,0,12,0.0042,0,0.0,0.0,0.0,0.0
+Zac Williams,Carlton,0,9,0.0056,0,0.0,0.0,0.0,0.0
+Corey Durdin,Port Adelaide,0,21,0.0023,0,0.0,0.0,0.0,0.0
+Luke McDonald,North Melbourne,0,17,0.0028,0,0.0,0.0,0.0,0.0
+Toby Pink,North Melbourne,0,5,0.0095,0,0.0,0.0,0.0,0.0
+Ben McKay,Essendon,0,15,0.0032,0,0.0,0.0,0.0,0.0
+Nick Murray,Adelaide,0,11,0.0043,0,0.0,0.0,0.0,0.0
+Jaxon Prior,Essendon,0,20,0.0023,0,0.0,0.0,0.0,0.0
+Nate Caddy,Essendon,0,20,0.0023,0,0.0,0.0,0.0,0.0
+Bailey Laurie,Melbourne,0,14,0.0031,0,0.0,0.0,0.0,0.0
+Angus Anderson,Collingwood,0,14,0.0031,0,0.0,0.0,0.0,0.0
+Callum Coleman-Jones,North Melbourne,0,5,0.0087,0,0.0,0.0,0.0,0.0
+Zane Duursma,North Melbourne,0,15,0.0029,0,0.0,0.0,0.0,0.0
+Andrew McGrath,Essendon,0,18,0.0024,0,0.0,0.0,0.0,0.0
+Charlie Spargo,North Melbourne,0,17,0.0025,0,0.0,0.0,0.0,0.0
+Caiden Cleary,Sydney,0,8,0.0049,0,0.0,0.0,0.0,0.0
+Connor Rozee,Port Adelaide,0,2,0.0195,0,0.0,0.0,0.0,0.0
+Joel Hamling,Sydney,0,7,0.0054,0,0.0,0.0,0.0,0.0
+Oskar Baker,Western Bulldogs,0,9,0.0041,0,0.0,0.0,0.0,0.0
+Josh Lindsay,West Coast,0,13,0.0027,0,0.0,0.0,0.0,0.0
+Sam Clohesy,Gold Coast,0,10,0.0035,0,0.0,0.0,0.0,0.0
+Max Michalanney,Adelaide,0,21,0.0017,0,0.0,0.0,0.0,0.0
+Lachie Jones,Port Adelaide,0,18,0.0019,0,0.0,0.0,0.0,0.0
+Jaeger OMeara,Fremantle,0,6,0.0056,0,0.0,0.0,0.0,0.0
+Cooper Harvey,North Melbourne,0,7,0.0048,0,0.0,0.0,0.0,0.0
+Jacob Konstanty,North Melbourne,0,10,0.0033,0,0.0,0.0,0.0,0.0
+Paddy Cross,Melbourne,0,11,0.0029,0,0.0,0.0,0.0,0.0
+Brad Close,Geelong,0,14,0.0023,0,0.0,0.0,0.0,0.0
+Anthony Caminiti,St Kilda,0,18,0.0018,0,0.0,0.0,0.0,0.0
+Jordan Ridley,Essendon,0,7,0.0045,0,0.0,0.0,0.0,0.0
+Rhys Stanley,Geelong,0,1,0.0309,0,0.0,0.0,0.0,0.0
+Oscar Steene,Collingwood,0,8,0.0038,0,0.0,0.0,0.0,0.0
+Dane Rampe,Sydney,0,13,0.0023,0,0.0,0.0,0.0,0.0
+Mason Cox,Fremantle,0,14,0.0021,0,0.0,0.0,0.0,0.0
+Ryan Byrnes,St Kilda,0,13,0.0023,0,0.0,0.0,0.0,0.0
+Hamish Davis,West Coast,0,19,0.0015,0,0.0,0.0,0.0,0.0
+Will Graham,Gold Coast,0,12,0.0024,0,0.0,0.0,0.0,0.0
+Steely Green,Richmond,0,18,0.0016,0,0.0,0.0,0.0,0.0
+Sam Banks,Richmond,0,16,0.0017,0,0.0,0.0,0.0,0.0
+Jesse Hogan,Greater Western Sydney,0,9,0.003,0,0.0,0.0,0.0,0.0
+Sam Swadling,Collingwood,0,6,0.0045,0,0.0,0.0,0.0,0.0
+Jedd Busslinger,Western Bulldogs,0,8,0.0033,0,0.0,0.0,0.0,0.0
+Jack Williams,West Coast,0,10,0.0026,0,0.0,0.0,0.0,0.0
+Matthew Cottrell,Carlton,0,10,0.0026,0,0.0,0.0,0.0,0.0
+Matt Flynn,West Coast,0,4,0.0064,0,0.0,0.0,0.0,0.0
+James Trezise,Richmond,0,14,0.0018,0,0.0,0.0,0.0,0.0
+Harry Dean,Carlton,0,18,0.0014,0,0.0,0.0,0.0,0.0
+Mykelti Lefau,Richmond,0,19,0.0013,0,0.0,0.0,0.0,0.0
+Callum Ah Chee,Adelaide,0,6,0.004,0,0.0,0.0,0.0,0.0
+Archie May,Essendon,0,10,0.0024,0,0.0,0.0,0.0,0.0
+Tom Cole,West Coast,0,15,0.0016,0,0.0,0.0,0.0,0.0
+Jackson Mead,Port Adelaide,0,10,0.0023,0,0.0,0.0,0.0,0.0
+Jasper Alger,Richmond,0,8,0.0028,0,0.0,0.0,0.0,0.0
+Jai Culley,Melbourne,0,7,0.0033,0,0.0,0.0,0.0,0.0
+Jay Polkinghorne,Geelong,0,4,0.0057,0,0.0,0.0,0.0,0.0
+Jordan Croft,Western Bulldogs,0,16,0.0014,0,0.0,0.0,0.0,0.0
+Brady Hough,West Coast,0,21,0.0011,0,0.0,0.0,0.0,0.0
+Ewan Mackinlay,Port Adelaide,0,14,0.0016,0,0.0,0.0,0.0,0.0
+Beau Addinsall,Gold Coast,0,7,0.0031,0,0.0,0.0,0.0,0.0
+Liam Stocker,St Kilda,0,16,0.0014,0,0.0,0.0,0.0,0.0
+Dougal Howard,St Kilda,0,6,0.0036,0,0.0,0.0,0.0,0.0
+Taj Hotton,Richmond,0,8,0.0027,0,0.0,0.0,0.0,0.0
+Aidan Corr,North Melbourne,0,14,0.0015,0,0.0,0.0,0.0,0.0
+Sean Darcy,Fremantle,0,7,0.003,0,0.0,0.0,0.0,0.0
+Griffin Logue,North Melbourne,0,14,0.0015,0,0.0,0.0,0.0,0.0
+Tom McDonald,Melbourne,0,8,0.0026,0,0.0,0.0,0.0,0.0
+Bo Allan,West Coast,0,18,0.0011,0,0.0,0.0,0.0,0.0
+Calsher Dear,Hawthorn,0,5,0.0041,0,0.0,0.0,0.0,0.0
+Eric Hipwood,Brisbane Lions,0,8,0.0025,0,0.0,0.0,0.0,0.0
+Rhyan Mansell,Richmond,0,6,0.0033,0,0.0,0.0,0.0,0.0
+Lewis Melican,Sydney,0,10,0.002,0,0.0,0.0,0.0,0.0
+Noah Answerth,Brisbane Lions,0,13,0.0015,0,0.0,0.0,0.0,0.0
+Jack Buckley,Greater Western Sydney,0,9,0.0021,0,0.0,0.0,0.0,0.0
+Jonty Faull,Richmond,0,10,0.0019,0,0.0,0.0,0.0,0.0
+Lachlan Blakiston,Essendon,0,17,0.0011,0,0.0,0.0,0.0,0.0
+Cody Weightman,Western Bulldogs,0,7,0.0027,0,0.0,0.0,0.0,0.0
+Jacob Wehr,Port Adelaide,0,15,0.0012,0,0.0,0.0,0.0,0.0
+Nathan Broad,Richmond,0,20,0.0009,0,0.0,0.0,0.0,0.0
+Nick Coffield,Western Bulldogs,0,13,0.0014,0,0.0,0.0,0.0,0.0
+Jack Ison,Carlton,0,8,0.0023,0,0.0,0.0,0.0,0.0
+Max Heath,Melbourne,0,7,0.0026,0,0.0,0.0,0.0,0.0
+Lachlan McNeil,Western Bulldogs,0,10,0.0018,0,0.0,0.0,0.0,0.0
+James Tunstill,Brisbane Lions,0,11,0.0016,0,0.0,0.0,0.0,0.0
+Sam Butler,Hawthorn,0,8,0.0022,0,0.0,0.0,0.0,0.0
+Latrelle Pickett,Melbourne,0,16,0.0011,0,0.0,0.0,0.0,0.0
+Jack Ough,Greater Western Sydney,0,5,0.0034,0,0.0,0.0,0.0,0.0
+Ryan Maric,West Coast,0,12,0.0014,0,0.0,0.0,0.0,0.0
+Oscar Ryan,Adelaide,0,2,0.0083,0,0.0,0.0,0.0,0.0
+Xavier Lindsay,Melbourne,0,5,0.0032,0,0.0,0.0,0.0,0.0
+Lachlan Gulbin,Gold Coast,0,9,0.0018,0,0.0,0.0,0.0,0.0
+Todd Marshall,Port Adelaide,0,13,0.0012,0,0.0,0.0,0.0,0.0
+Josh Dolan,Western Bulldogs,0,9,0.0017,0,0.0,0.0,0.0,0.0
+Charlie Edwards,Adelaide,0,2,0.0077,0,0.0,0.0,0.0,0.0
+Oliver Francou,West Coast,0,4,0.0038,0,0.0,0.0,0.0,0.0
+Archer Day-Wicks,Essendon,0,19,0.0008,0,0.0,0.0,0.0,0.0
+Jake Kolodjashnij,Geelong,0,11,0.0014,0,0.0,0.0,0.0,0.0
+Will Lorenz,Port Adelaide,0,3,0.005,0,0.0,0.0,0.0,0.0
+Rhett Bazzo,West Coast,0,12,0.0012,0,0.0,0.0,0.0,0.0
+Sam Grlj,Richmond,0,19,0.0007,0,0.0,0.0,0.0,0.0
+Dante Visentini,Port Adelaide,0,13,0.0011,0,0.0,0.0,0.0,0.0
+Jamarra Ugle-Hagan,Gold Coast,0,3,0.0046,0,0.0,0.0,0.0,0.0
+Harry Cunningham,Sydney,0,12,0.0011,0,0.0,0.0,0.0,0.0
+Conor Stone,Greater Western Sydney,0,8,0.0017,0,0.0,0.0,0.0,0.0
+Cooper Duff-Tytler,West Coast,0,14,0.0009,0,0.0,0.0,0.0,0.0
+Luke Pedlar,Adelaide,0,10,0.0013,0,0.0,0.0,0.0,0.0
+Sam Davidson,Western Bulldogs,0,14,0.0009,0,0.0,0.0,0.0,0.0
+Archie Perkins,Essendon,0,14,0.0009,0,0.0,0.0,0.0,0.0
+George Stevens,Geelong,0,2,0.0062,0,0.0,0.0,0.0,0.0
+Bailey Macdonald,Hawthorn,0,10,0.0012,0,0.0,0.0,0.0,0.0
+Oscar Adams,Gold Coast,0,13,0.0009,0,0.0,0.0,0.0,0.0
+Zac Banch,North Melbourne,0,6,0.0019,0,0.0,0.0,0.0,0.0
+Billy Cootee,Sydney,0,7,0.0016,0,0.0,0.0,0.0,0.0
+Harvey Harrison,Collingwood,0,9,0.0012,0,0.0,0.0,0.0,0.0
+Jamie Cripps,West Coast,0,5,0.0021,0,0.0,0.0,0.0,0.0
+Luke Trainor,Richmond,0,9,0.0011,0,0.0,0.0,0.0,0.0
+Liam Reidy,Carlton,0,4,0.0025,0,0.0,0.0,0.0,0.0
+Ollie Greeves,Hawthorn,0,4,0.0024,0,0.0,0.0,0.0,0.0
+Campbell Lake,St Kilda,0,8,0.0012,0,0.0,0.0,0.0,0.0
+Kye Annand,Richmond,0,9,0.0009,0,0.0,0.0,0.0,0.0
+Brandon Starcevich,West Coast,0,9,0.0009,0,0.0,0.0,0.0,0.0
+Hunter Clark,St Kilda,0,7,0.0011,0,0.0,0.0,0.0,0.0
+Chris Scerri,Fremantle,0,7,0.0011,0,0.0,0.0,0.0,0.0
+Jack Buller,Collingwood,0,10,0.0008,0,0.0,0.0,0.0,0.0
+Liam OConnell,St Kilda,0,11,0.0007,0,0.0,0.0,0.0,0.0
+Jade Gresham,Essendon,0,7,0.0011,0,0.0,0.0,0.0,0.0
+Oliver Hayes-Brown,Richmond,0,7,0.0011,0,0.0,0.0,0.0,0.0
+Chayce Jones,Adelaide,0,3,0.0025,0,0.0,0.0,0.0,0.0
+Archer Reid,West Coast,0,6,0.0012,0,0.0,0.0,0.0,0.0
+Jake Rogers,Gold Coast,0,7,0.0011,0,0.0,0.0,0.0,0.0
+Adam Treloar,Western Bulldogs,0,5,0.0014,0,0.0,0.0,0.0,0.0
+Leek Aleer,Greater Western Sydney,0,7,0.001,0,0.0,0.0,0.0,0.0
+Jack Dalton,Hawthorn,0,4,0.0017,0,0.0,0.0,0.0,0.0
+Harry Kyle,Sydney,0,8,0.0008,0,0.0,0.0,0.0,0.0
+Riley Hamilton,Greater Western Sydney,0,6,0.0011,0,0.0,0.0,0.0,0.0
+William Green,Sydney,0,1,0.0066,0,0.0,0.0,0.0,0.0
+Charlie Ballard,Gold Coast,0,9,0.0007,0,0.0,0.0,0.0,0.0
+Nick Holman,Gold Coast,0,6,0.0011,0,0.0,0.0,0.0,0.0
+Malakai Champion,West Coast,0,8,0.0008,0,0.0,0.0,0.0,0.0
+Charlie West,Collingwood,0,6,0.001,0,0.0,0.0,0.0,0.0
+Mitch Zadow,Port Adelaide,0,7,0.0008,0,0.0,0.0,0.0,0.0
+Alix Tauru,St Kilda,0,8,0.0007,0,0.0,0.0,0.0,0.0
+Zak Johnson,Essendon,0,7,0.0008,0,0.0,0.0,0.0,0.0
+James Leake,Greater Western Sydney,0,5,0.0011,0,0.0,0.0,0.0,0.0
+Xavier Bamert,Port Adelaide,0,8,0.0007,0,0.0,0.0,0.0,0.0
+Jai Murray,Gold Coast,0,9,0.0006,0,0.0,0.0,0.0,0.0
+Henry Hustwaite,Hawthorn,0,1,0.0053,0,0.0,0.0,0.0,0.0
+Campbell Gray,Richmond,0,9,0.0006,0,0.0,0.0,0.0,0.0
+Toby McMullin,Greater Western Sydney,0,6,0.0009,0,0.0,0.0,0.0,0.0
+Wil Dawson,North Melbourne,0,8,0.0006,0,0.0,0.0,0.0,0.0
+Hugh Bond,Adelaide,0,7,0.0007,0,0.0,0.0,0.0,0.0
+Josh Goater,North Melbourne,0,5,0.001,0,0.0,0.0,0.0,0.0
+Nik Cox,Essendon,0,8,0.0006,0,0.0,0.0,0.0,0.0
+Dan Butler,St Kilda,0,8,0.0006,0,0.0,0.0,0.0,0.0
+Flynn Perez,Hawthorn,0,7,0.0006,0,0.0,0.0,0.0,0.0
+Tom Hanily,Sydney,0,4,0.0011,0,0.0,0.0,0.0,0.0
+Tom Edwards,Essendon,0,7,0.0006,0,0.0,0.0,0.0,0.0
+Saad El-Hawli,Essendon,0,8,0.0005,0,0.0,0.0,0.0,0.0
+Oliver Hannaford,Greater Western Sydney,0,5,0.0008,0,0.0,0.0,0.0,0.0
+Will Brodie,Port Adelaide,0,1,0.0039,0,0.0,0.0,0.0,0.0
+Corey Warner,Sydney,0,5,0.0008,0,0.0,0.0,0.0,0.0
+Tom Cochrane,Port Adelaide,0,3,0.0012,0,0.0,0.0,0.0,0.0
+Tom Burton,Richmond,0,5,0.0007,0,0.0,0.0,0.0,0.0
+Lachy Dovaston,North Melbourne,0,6,0.0006,0,0.0,0.0,0.0,0.0
+Elijah Hewett,West Coast,0,6,0.0006,0,0.0,0.0,0.0,0.0
+Finnbar Maley,Adelaide,0,6,0.0006,0,0.0,0.0,0.0,0.0
+Tobie Travaglia,St Kilda,0,5,0.0007,0,0.0,0.0,0.0,0.0
+Wil Parker,Collingwood,0,5,0.0007,0,0.0,0.0,0.0,0.0
+Darragh Joyce,Brisbane Lions,0,3,0.0011,0,0.0,0.0,0.0,0.0
+Liam Fawcett,Richmond,0,7,0.0004,0,0.0,0.0,0.0,0.0
+Vigo Visentini,Essendon,0,1,0.0031,0,0.0,0.0,0.0,0.0
+Cameron Nairn,Hawthorn,0,4,0.0008,0,0.0,0.0,0.0,0.0
+Jack Hutchinson,West Coast,0,6,0.0005,0,0.0,0.0,0.0,0.0
+Will McCabe,Hawthorn,0,4,0.0007,0,0.0,0.0,0.0,0.0
+Riley Hardeman,North Melbourne,0,5,0.0006,0,0.0,0.0,0.0,0.0
+Shadeau Brain,Brisbane Lions,0,2,0.0014,0,0.0,0.0,0.0,0.0
+Harry Schoenberg,West Coast,0,5,0.0006,0,0.0,0.0,0.0,0.0
+Jeremy Sharp,Fremantle,0,2,0.0014,0,0.0,0.0,0.0,0.0
+Hussien El Achkar,Essendon,0,9,0.0003,0,0.0,0.0,0.0,0.0
+Liam Puncher,Collingwood,0,6,0.0004,0,0.0,0.0,0.0,0.0
+Harvey Johnston,West Coast,0,8,0.0003,0,0.0,0.0,0.0,0.0
+Tom Gross,West Coast,0,2,0.0013,0,0.0,0.0,0.0,0.0
+Charlie Banfield,St Kilda,0,3,0.0008,0,0.0,0.0,0.0,0.0
+Angus Hastie,St Kilda,0,5,0.0005,0,0.0,0.0,0.0,0.0
+Xavier Taylor,Melbourne,0,2,0.0012,0,0.0,0.0,0.0,0.0
+Flynn Young,Carlton,0,3,0.0008,0,0.0,0.0,0.0,0.0
+Samson Ryan,Richmond,0,5,0.0004,0,0.0,0.0,0.0,0.0
+Will Hayes,Collingwood,0,7,0.0003,0,0.0,0.0,0.0,0.0
+Harrison Oliver,Greater Western Sydney,0,5,0.0004,0,0.0,0.0,0.0,0.0
+Adam Saad,Carlton,0,3,0.0007,0,0.0,0.0,0.0,0.0
+Darcy Moore,Collingwood,0,4,0.0004,0,0.0,0.0,0.0,0.0
+Judson Clarke,Richmond,0,1,0.0018,0,0.0,0.0,0.0,0.0
+Bailey Scott,North Melbourne,0,3,0.0006,0,0.0,0.0,0.0,0.0
+Maurice Rioli,Richmond,0,9,0.0002,0,0.0,0.0,0.0,0.0
+Mitch Podhajski,Collingwood,0,2,0.0008,0,0.0,0.0,0.0,0.0
+Ben Jepson,Gold Coast,0,4,0.0004,0,0.0,0.0,0.0,0.0
+Brandon Zerk-Thatcher,Port Adelaide,0,4,0.0004,0,0.0,0.0,0.0,0.0
+Angus Clarke,Essendon,0,4,0.0004,0,0.0,0.0,0.0,0.0
+Lachlan Sullivan,Collingwood,0,2,0.0008,0,0.0,0.0,0.0,0.0
+Max Kondogiannis,Essendon,0,10,0.0002,0,0.0,0.0,0.0,0.0
+Luke Kennedy,Western Bulldogs,0,4,0.0004,0,0.0,0.0,0.0,0.0
+Dylan Patterson,Gold Coast,0,5,0.0003,0,0.0,0.0,0.0,0.0
+Campbell Chesser,Carlton,0,3,0.0005,0,0.0,0.0,0.0,0.0
+Matthew Owies,West Coast,0,3,0.0005,0,0.0,0.0,0.0,0.0
+Sandy Brock,West Coast,0,6,0.0002,0,0.0,0.0,0.0,0.0
+Jy Farrar,Gold Coast,0,3,0.0005,0,0.0,0.0,0.0,0.0
+Archie Ludowyke,Adelaide,0,2,0.0007,0,0.0,0.0,0.0,0.0
+Jordan Boyd,Carlton,0,2,0.0006,0,0.0,0.0,0.0,0.0
+Harvey Gallagher,Western Bulldogs,0,3,0.0004,0,0.0,0.0,0.0,0.0
+Bodie Ryan,Hawthorn,0,5,0.0003,0,0.0,0.0,0.0,0.0
+Jaxon Artemis,Essendon,0,4,0.0003,0,0.0,0.0,0.0,0.0
+Daniel Annable,Brisbane Lions,0,2,0.0006,0,0.0,0.0,0.0,0.0
+Jayden Nguyen,Essendon,0,5,0.0002,0,0.0,0.0,0.0,0.0
+Luke Cleary,Western Bulldogs,0,2,0.0005,0,0.0,0.0,0.0,0.0
+Zane Zakostelsky,Brisbane Lions,0,3,0.0003,0,0.0,0.0,0.0,0.0
+Harry Jones,Essendon,0,5,0.0002,0,0.0,0.0,0.0,0.0
+Aidan Johnson,Melbourne,0,1,0.001,0,0.0,0.0,0.0,0.0
+Taylor Goad,North Melbourne,0,2,0.0005,0,0.0,0.0,0.0,0.0
+Louis Emmett,Western Bulldogs,0,6,0.0002,0,0.0,0.0,0.0,0.0
+Luker Kentfield,Melbourne,0,3,0.0003,0,0.0,0.0,0.0,0.0
+Cody Curtin,Brisbane Lions,0,4,0.0002,0,0.0,0.0,0.0,0.0
+Hudson OKeeffe,Carlton,0,3,0.0003,0,0.0,0.0,0.0,0.0
+Isaac Keeler,St Kilda,0,2,0.0004,0,0.0,0.0,0.0,0.0
+Matt Hill,Hawthorn,0,2,0.0004,0,0.0,0.0,0.0,0.0
+Andy Moniz-Wakefield,Melbourne,0,2,0.0003,0,0.0,0.0,0.0,0.0
+Noah Roberts-Thomson,Richmond,0,3,0.0002,0,0.0,0.0,0.0,0.0
+Mitch Knevitt,Geelong,0,2,0.0003,0,0.0,0.0,0.0,0.0
+Lachlan Smith,Western Bulldogs,0,2,0.0003,0,0.0,0.0,0.0,0.0
+Lukas Cooke,Melbourne,0,2,0.0003,0,0.0,0.0,0.0,0.0
+Josh Gibcus,Richmond,0,1,0.0006,0,0.0,0.0,0.0,0.0
+Max Ramsden,Hawthorn,0,2,0.0003,0,0.0,0.0,0.0,0.0
+Jacob Newton,West Coast,0,3,0.0002,0,0.0,0.0,0.0,0.0
+Aidan Schubert,Hawthorn,0,1,0.0006,0,0.0,0.0,0.0,0.0
+Sam Marshall,Brisbane Lions,0,2,0.0003,0,0.0,0.0,0.0,0.0
+Mitch Hinge,Adelaide,0,1,0.0005,0,0.0,0.0,0.0,0.0
+Laitham Vandermeer,Western Bulldogs,0,2,0.0002,0,0.0,0.0,0.0,0.0
+Brayden Fiorini,Essendon,0,2,0.0002,0,0.0,0.0,0.0,0.0
+Balyn OBrien,Port Adelaide,0,4,0.0001,0,0.0,0.0,0.0,0.0
+Harrison Ramm,Port Adelaide,0,4,0.0001,0,0.0,0.0,0.0,0.0
+Lachie Fogarty,Carlton,0,2,0.0002,0,0.0,0.0,0.0,0.0
+Matt Whitlock,North Melbourne,0,3,0.0002,0,0.0,0.0,0.0,0.0
+Matt Guelfi,Essendon,0,3,0.0001,0,0.0,0.0,0.0,0.0
+Harry Edwards,West Coast,0,2,0.0002,0,0.0,0.0,0.0,0.0
+Tom Anastasopoulos,Port Adelaide,0,3,0.0001,0,0.0,0.0,0.0,0.0
+Noah Howes,Collingwood,0,1,0.0003,0,0.0,0.0,0.0,0.0
+Zane Peucker,Richmond,0,2,0.0001,0,0.0,0.0,0.0,0.0
+Harry Armstrong,Richmond,0,3,0.0001,0,0.0,0.0,0.0,0.0
+Ashton Moir,Carlton,0,2,0.0001,0,0.0,0.0,0.0,0.0
+Brandon Walker,Fremantle,0,1,0.0002,0,0.0,0.0,0.0,0.0
+Max King,St Kilda,0,1,0.0002,0,0.0,0.0,0.0,0.0
+Ollie Lord,Port Adelaide,0,1,0.0002,0,0.0,0.0,0.0,0.0
+Alex Van Wyk,Port Adelaide,0,1,0.0002,0,0.0,0.0,0.0,0.0
+Caleb Lewis,Gold Coast,0,2,0.0001,0,0.0,0.0,0.0,0.0
+Flynn Riley,Carlton,0,1,0.0001,0,0.0,0.0,0.0,0.0
+Rhys Unwin,Essendon,0,2,0.0001,0,0.0,0.0,0.0,0.0
+Ryan Gardner,Western Bulldogs,0,1,0.0001,0,0.0,0.0,0.0,0.0
+Zac Fisher,North Melbourne,0,1,0.0001,0,0.0,0.0,0.0,0.0
+Will McLachlan,Brisbane Lions,0,1,0.0,0,0.0,0.0,0.0,0.0

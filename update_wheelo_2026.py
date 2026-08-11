@@ -13,6 +13,7 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
@@ -20,7 +21,20 @@ from webdriver_manager.chrome import ChromeDriverManager
 SEASON = 2026
 DOWNLOAD_DIR = os.path.abspath("data_wheelo/downloads")
 OUTPUT_CSV = "data_wheelo/wheelo_2026.csv"
+AFLTABLES_CSV = "data_2026/afltables_2026.csv"
 BASE_URL = "https://www.wheeloratings.com/afl_match_stats.html"
+
+# ── Fetch outcomes ───────────────────────────────────────────
+# These four are kept distinct on purpose. For the whole 2026 season this step
+# collapsed every failure into one "no data" line, so a page that never loaded,
+# a page that loaded with nothing on it, and a page whose round could not be
+# read were indistinguishable in the console. That silence hid a real gap in
+# round 23 (see rounds_needing_fetch) and cost a diagnosis. Any new failure
+# mode gets its own status rather than folding into an existing one.
+STATUS_OK = "OK"
+STATUS_NOT_FETCHED = "NOT_FETCHED"
+STATUS_EMPTY = "EMPTY"
+STATUS_NO_ROUND = "NO_ROUND"
 
 # ── Round numbering rule ─────────────────────────────────────
 # The AFL introduced a standalone "Opening Round" in 2024. Wheelo numbers that
@@ -39,6 +53,13 @@ BASE_URL = "https://www.wheeloratings.com/afl_match_stats.html"
 # This script only ever runs for SEASON = 2026, which is on the +1 side of the
 # rule, so the offset is unconditional here. The guard below keeps that
 # assumption honest if SEASON is ever bumped or reused.
+#
+# The offset is a mapping between two numbering conventions, NOT a way of
+# working out which round was fetched. That comes from Wheelo's own per-row
+# MatchId (see attach_rounds). This distinction matters: the round used to be
+# stamped from the loop counter that built the URL, so the stored round was an
+# assertion about what the page *should* have contained rather than a reading
+# of what it did contain.
 OPENING_ROUND_FIRST_SEASON = 2024
 ROUND_OFFSET = 1 if SEASON >= OPENING_ROUND_FIRST_SEASON else 0
 
@@ -74,6 +95,138 @@ def fetch_brownlow_predictions():
         print("  Top: " + ", ".join(f"{p} {v:.1f}" for p, v in lead.items()))
     except Exception as e:
         print(f"  Brownlow predictions fetch failed: {e}")
+
+
+# ── Round derivation ─────────────────────────────────────────
+def attach_rounds(df, requested_wheelo_round=None, season=SEASON):
+    """Stamp Season/Round from Wheelo's OWN MatchId, never from a counter.
+
+    A Wheelo MatchId is SSSSRRGG: 4-digit season, 2-digit Wheelo round, 2-digit
+    game index. Opening Round is Wheelo round 0, so its first game is 20260001.
+    The round token is page-native, and it is per game rather than per page, so
+    a page that quietly serves a different round cannot be silently absorbed.
+
+    Rows whose MatchId is not exactly 8 digits for the expected season are
+    dropped rather than guessed at. If that leaves nothing, the caller gets
+    STATUS_NO_ROUND and the round is skipped: a round we cannot label is not
+    written under a label we invented.
+
+    Returns (status, df, detail).
+    """
+    if df is None or len(df) == 0:
+        return STATUS_EMPTY, None, "zero rows"
+
+    if "MatchId" not in df.columns:
+        cols = ", ".join(map(str, list(df.columns)[:6]))
+        return STATUS_NO_ROUND, None, f"payload carries no MatchId column (saw: {cols})"
+
+    # Normalise to text before matching. A MatchId column that picked up a NaN
+    # becomes float dtype and renders as "20262206.0", which is still valid.
+    ids = df["MatchId"].astype(str).str.strip().str.replace(r"\.0$", "", regex=True)
+    well_formed = ids.str.fullmatch(r"\d{8}").fillna(False)
+    right_season = ids.str[:4] == str(season)
+    usable = well_formed & right_season
+
+    if not usable.any():
+        sample = ", ".join(repr(v) for v in ids.head(3).tolist())
+        if well_formed.any():
+            return STATUS_NO_ROUND, None, (
+                f"MatchId season token is not {season} (sample: {sample})")
+        return STATUS_NO_ROUND, None, (
+            f"no MatchId parses as a round label (sample: {sample})")
+
+    out = df[usable].copy()
+    wheelo_rounds = ids[usable].str[4:6].astype(int)
+    out["Season"] = season
+    out["Round"] = wheelo_rounds + ROUND_OFFSET
+
+    notes = [f"{len(out)} rows"]
+    dropped = int((~usable).sum())
+    if dropped:
+        notes.append(f"{dropped} row(s) dropped for an unreadable MatchId")
+
+    found = sorted(wheelo_rounds.unique())
+    if len(found) > 1:
+        notes.append(f"page spans Wheelo rounds {found}")
+    if requested_wheelo_round is not None and found != [requested_wheelo_round]:
+        # Trust the payload, flag the disagreement. Overriding the page with the
+        # number we asked for is exactly the inferred-counter bug this replaces.
+        notes.append(f"requested Wheelo round {requested_wheelo_round} "
+                     f"but payload says {found} (payload wins)")
+
+    return STATUS_OK, out, "; ".join(notes)
+
+
+def expected_games_by_round(path=AFLTABLES_CSV, season=SEASON):
+    """AFLTables games per H&A round: the authority on what was actually played.
+
+    Returns {} if the file cannot be read, which makes the completeness test in
+    rounds_needing_fetch fall back to its index-gap heuristic rather than block.
+    """
+    try:
+        a = pd.read_csv(path, usecols=["Round", "Home.team", "Away.team"])
+    except Exception as e:
+        print(f"  (AFLTables fixture list unavailable, "
+              f"falling back to index-gap test: {e})")
+        return {}
+    rn = pd.to_numeric(a["Round"], errors="coerce")   # finals labels -> NaN
+    a = a.assign(_rn=rn).dropna(subset=["_rn"])
+    a["_rn"] = a["_rn"].astype(int)
+    counts = (a.drop_duplicates(subset=["_rn", "Home.team", "Away.team"])
+                .groupby("_rn").size())
+    return {int(k): int(v) for k, v in counts.items()}
+
+
+def rounds_needing_fetch(existing, expected):
+    """Which Wheelo rounds to pull, tested per GAME rather than per round.
+
+    The old test was round-level: "round 23 is already in the CSV, so round 23
+    is done". That permanently freezes any round first fetched while it was
+    still being played. 2026 round 23 was stored with 8 of its 9 games and
+    could never pick up the ninth (St Kilda v Carlton, MatchId 20262206),
+    because its mere presence satisfied the guard every week thereafter.
+
+    A round is refetched when it is absent, when it holds fewer games than
+    AFLTables says were played, when its game indices have a hole in them, or
+    when it is the newest round we hold and we have no fixture list to check it
+    against. Returns [(wheelo_round, reason), ...].
+    """
+    present = {}
+    if existing is not None and not existing.empty:
+        ids = existing["MatchId"].astype(str).str.strip()
+        game_idx = pd.to_numeric(ids.str[6:], errors="coerce")
+        for rnd, grp in existing.assign(_gi=game_idx).groupby("Round"):
+            present[int(rnd)] = (int(grp["MatchId"].nunique()),
+                                 int(grp["_gi"].max()) if grp["_gi"].notna().any() else 0)
+
+    # Ceiling comes from AFLTables, not a hardcoded 23. The old constant probed
+    # Wheelo round 23, which maps to AFLTables round 24 and does not exist in a
+    # 23-round season, so every run ended on a "no data" line for a round that
+    # was never real.
+    max_round = max(expected) if expected else (max(present) if present else 23)
+    newest = max(present) if present else None
+
+    todo = []
+    for aflt_round in range(1, max_round + 1):
+        wheelo_round = aflt_round - ROUND_OFFSET
+        if wheelo_round < 0:
+            continue
+        n_games, max_gi = present.get(aflt_round, (0, 0))
+        exp = expected.get(aflt_round)
+        if n_games == 0:
+            todo.append((wheelo_round, f"R{aflt_round} absent"))
+        elif exp is not None and n_games < exp:
+            todo.append((wheelo_round,
+                         f"R{aflt_round} partial: {n_games} of {exp} games played"))
+        elif max_gi and n_games < max_gi:
+            todo.append((wheelo_round,
+                         f"R{aflt_round} has a hole: {n_games} games "
+                         f"but highest game index is {max_gi}"))
+        elif exp is None and aflt_round == newest:
+            todo.append((wheelo_round,
+                         f"R{aflt_round} is the newest stored round and no "
+                         f"fixture list is available to confirm it is complete"))
+    return todo
 
 
 def get_driver():
@@ -165,19 +318,26 @@ def parse_table_from_page(driver):
 
 
 def fetch_round(driver, wheelo_round):
-    """Fetch one round. Returns DataFrame or None."""
+    """Fetch one round page. Returns (status, df, detail).
+
+    Only transport and parsing happen here; the round label is read from the
+    payload afterwards by attach_rounds, which keeps that logic free of
+    Selenium and therefore testable.
+    """
     url = f"{BASE_URL}?id={SEASON}{wheelo_round:02d}"
-    driver.get(url)
+    try:
+        driver.get(url)
+    except WebDriverException as e:
+        return STATUS_NOT_FETCHED, None, f"navigation failed: {type(e).__name__}: {e}"
     time.sleep(2)
 
-    # Check page has data
     try:
         WebDriverWait(driver, 5).until(
             EC.presence_of_element_located((By.TAG_NAME, "table"))
         )
+        saw_table = True
     except Exception:
-        if str(SEASON) not in driver.title and "Round" not in driver.page_source:
-            return None
+        saw_table = False
 
     # Try download first
     clear_downloads()
@@ -186,19 +346,20 @@ def fetch_round(driver, wheelo_round):
         if filepath:
             try:
                 df = pd.read_csv(filepath)
-                print(f"  Wheelo R{wheelo_round:02d}: downloaded {len(df)} rows")
-                return df
+                if len(df):
+                    return STATUS_OK, df, f"downloaded {len(df)} rows"
             except Exception as e:
-                print(f"  Wheelo R{wheelo_round:02d}: download parse error — {e}")
+                print(f"    (download parsed badly, falling back to page scrape: {e})")
 
     # Fallback: parse from page
     df = parse_table_from_page(driver)
-    if df is not None:
-        print(f"  Wheelo R{wheelo_round:02d}: parsed {len(df)} rows from page")
-        return df
+    if df is not None and len(df):
+        return STATUS_OK, df, f"parsed {len(df)} rows from page"
 
-    print(f"  Wheelo R{wheelo_round:02d}: no data")
-    return None
+    if not saw_table:
+        return STATUS_EMPTY, None, ("page loaded but served no stats table "
+                                    "(round most likely not published yet)")
+    return STATUS_EMPTY, None, "stats table present but no rows could be parsed"
 
 
 def main():
@@ -217,53 +378,75 @@ def main():
 
     print(f"Existing AFLTables rounds: {sorted(existing_rounds)}")
 
-    # 2026 has an Opening Round, so afltables_round = wheelo_round + ROUND_OFFSET
-    # (see the rule at the top of this file). Wheelo rounds 0-23 → AFLTables 1-24.
-    # Fetch rounds not already in the CSV, up to AFLTables round 24.
-    max_wheelo_round = 23  # try up to Wheelo round 23 (AFLTables 24)
-    rounds_to_fetch = [
-        r for r in range(0, max_wheelo_round + 1)
-        if (r + ROUND_OFFSET) not in existing_rounds
-    ]
-    print(f"Wheelo rounds to fetch: {rounds_to_fetch}")
-
-    if not rounds_to_fetch:
-        print("Data already up to date.")
+    expected = expected_games_by_round()
+    todo = rounds_needing_fetch(existing, expected)
+    if todo:
+        print("Rounds to fetch:")
+        for wheelo_round, reason in todo:
+            print(f"  Wheelo R{wheelo_round:02d}  <-  {reason}")
+    else:
+        print("Every round is complete against the AFLTables fixture list.")
         return
 
     driver = get_driver()
-    new_rows = []
-    consecutive_empty = 0
+    new_frames = []
+    tally = {STATUS_OK: 0, STATUS_NOT_FETCHED: 0,
+             STATUS_EMPTY: 0, STATUS_NO_ROUND: 0}
+    consecutive_barren = 0
 
     try:
-        print(f"\nFetching {SEASON} missing rounds from wheeloratings.com...\n")
-        for wheelo_round in rounds_to_fetch:
-            afltables_round = wheelo_round + ROUND_OFFSET
-            df = fetch_round(driver, wheelo_round)
-            if df is not None and len(df) > 0:
-                df['Season'] = SEASON
-                df['Round'] = afltables_round
-                new_rows.extend(df.to_dict('records'))
-                consecutive_empty = 0
+        print(f"\nFetching {SEASON} rounds from wheeloratings.com...\n")
+        for wheelo_round, _reason in todo:
+            status, df, detail = fetch_round(driver, wheelo_round)
+            if status == STATUS_OK:
+                status, df, detail = attach_rounds(df, wheelo_round)
+
+            label = f"  Wheelo R{wheelo_round:02d}"
+            if status == STATUS_OK:
+                rounds = sorted(df['Round'].unique())
+                print(f"{label}: OK -> AFLTables R{rounds} ({detail})")
+                new_frames.append(df)
+                consecutive_barren = 0
+            elif status == STATUS_NOT_FETCHED:
+                print(f"{label}: PAGE NOT FETCHED - {detail}")
+                consecutive_barren += 1
+            elif status == STATUS_EMPTY:
+                print(f"{label}: FETCHED, ZERO ROWS PARSED - {detail}")
+                consecutive_barren += 1
             else:
-                consecutive_empty += 1
-                if consecutive_empty >= 3:
-                    print(f"  3 consecutive empty rounds — stopping.")
-                    break
+                print(f"{label}: FETCHED, ROUND LABEL UNPARSEABLE - {detail}")
+                consecutive_barren += 1
+            tally[status] += 1
+
+            if consecutive_barren >= 3:
+                print("  3 consecutive rounds yielded nothing - stopping.")
+                break
             time.sleep(1)
     finally:
         driver.quit()
 
-    if new_rows:
-        new_df = pd.DataFrame(new_rows)
+    print(f"\nFetch summary: {tally[STATUS_OK]} ok, "
+          f"{tally[STATUS_NOT_FETCHED]} not fetched, "
+          f"{tally[STATUS_EMPTY]} empty, "
+          f"{tally[STATUS_NO_ROUND]} unparseable round label")
+
+    if new_frames:
+        new_df = pd.concat(new_frames, ignore_index=True)
         combined = pd.concat([existing, new_df], ignore_index=True) if not existing.empty else new_df
+        # keep='last' so a refetched game supersedes the stored copy: this is
+        # what lets a round that was first stored mid-play be completed later.
+        before = len(combined)
+        combined = (combined.drop_duplicates(subset=['MatchId', 'Player'], keep='last')
+                            .sort_values(['Round', 'MatchId'])
+                            .reset_index(drop=True))
         # Backup and save
         if os.path.exists(OUTPUT_CSV):
             shutil.copy2(OUTPUT_CSV, OUTPUT_CSV.replace('.csv', '_prev.csv'))
         combined.to_csv(OUTPUT_CSV, index=False)
         print(f"\nSaved {len(combined)} total rows to {OUTPUT_CSV}")
-        print(f"  Added {len(new_df)} new rows for AFLTables rounds "
-              f"{sorted(new_df['Round'].unique())}")
+        print(f"  Fetched {len(new_df)} rows for AFLTables rounds "
+              f"{sorted(new_df['Round'].unique())}; "
+              f"{before - len(combined)} superseded or duplicate row(s) collapsed")
 
         # Show updated leaderboard
         col = next((c for c in ['ExpVotes', 'RatingPoints'] if c in combined.columns), None)

@@ -1,171 +1,137 @@
 {
-  "round": 21,
+  "round": 22,
   "brownlowNight": "2026-09-21",
   "leader": {
     "name": "Nick Daicos",
-    "votes": 35.1,
-    "clear": 9.6,
-    "bestOdds": "$1.14"
+    "votes": 37.7,
+    "clear": 12.1,
+    "bestOdds": "$1.20"
   },
   "chips": [
     {
       "rank": 1,
-      "name": "J. Newcombe",
-      "team": "HAW",
-      "votes": 2.6
+      "name": "I. Rankine",
+      "team": "ADE",
+      "votes": 2.9
     },
     {
       "rank": 2,
-      "name": "E. Gulden",
-      "team": "SYD",
-      "votes": 2.5
+      "name": "M. Rowell",
+      "team": "GCS",
+      "votes": 2.8
     },
     {
       "rank": 3,
-      "name": "T. Taranto",
-      "team": "RIC",
-      "votes": 2.5
+      "name": "L. Davies-Uniacke",
+      "team": "NTH",
+      "votes": 2.6
     }
   ],
   "ticker": [
     {
-      "match": "CAR V BRI",
+      "match": "ADE V RIC",
       "votes": [
         [
           3,
-          "HEWETT"
-        ],
-        [
-          2,
-          "SMITH"
-        ],
-        [
-          1,
-          "KEMP"
-        ]
-      ]
-    },
-    {
-      "match": "COL V GEE",
-      "votes": [
-        [
-          3,
-          "DEMPSEY"
-        ],
-        [
-          2,
-          "MCSTAY"
-        ],
-        [
-          1,
-          "DAICOS"
-        ]
-      ]
-    },
-    {
-      "match": "ESS V ADE",
-      "votes": [
-        [
-          3,
-          "THILTHORPE"
-        ],
-        [
-          2,
           "RANKINE"
         ],
         [
-          1,
+          2,
           "DAWSON"
-        ]
-      ]
-    },
-    {
-      "match": "FRE V WB",
-      "votes": [
-        [
-          3,
-          "WORNER"
-        ],
-        [
-          2,
-          "MCDONALD"
         ],
         [
           1,
-          "TREACY"
+          "BERRY"
         ]
       ]
     },
     {
-      "match": "GCS V MEL",
+      "match": "BRI V HAW",
       "votes": [
         [
           3,
-          "GAWN"
+          "LOHMANN"
         ],
         [
           2,
+          "ASHCROFT"
+        ],
+        [
+          1,
+          "NEALE"
+        ]
+      ]
+    },
+    {
+      "match": "GEE V ESS",
+      "votes": [
+        [
+          3,
+          "SMITH"
+        ],
+        [
+          2,
+          "DEMPSEY"
+        ],
+        [
+          1,
+          "HENRY"
+        ]
+      ]
+    },
+    {
+      "match": "GWS V GCS",
+      "votes": [
+        [
+          3,
           "ROWELL"
         ],
         [
+          2,
+          "MILLER"
+        ],
+        [
           1,
+          "ANDERSON"
+        ]
+      ]
+    },
+    {
+      "match": "MEL V FRE",
+      "votes": [
+        [
+          3,
+          "PICKETT"
+        ],
+        [
+          2,
           "SPARROW"
-        ]
-      ]
-    },
-    {
-      "match": "HAW V NTH",
-      "votes": [
-        [
-          3,
-          "NEWCOMBE"
-        ],
-        [
-          2,
-          "WATSON"
         ],
         [
           1,
-          "IMPEY"
+          "BOWEY"
         ]
       ]
     },
     {
-      "match": "PTA V GWS",
+      "match": "STK V CAR",
       "votes": [
         [
           3,
-          "WHITFIELD"
+          "HALL"
         ],
         [
           2,
-          "HORNE-FRANCIS"
+          "WALSH"
         ],
         [
           1,
-          "CONIGLIO"
+          "CRIPPS"
         ]
       ]
     },
     {
-      "match": "RIC V WCE",
-      "votes": [
-        [
-          3,
-          "TARANTO"
-        ],
-        [
-          2,
-          "REID"
-        ],
-        [
-          1,
-          "ROSS"
-        ]
-      ]
-    },
-    {
-      "match": "STK V SYD",
+      "match": "SYD V PTA",
       "votes": [
         [
           3,
@@ -177,7 +143,41 @@
         ],
         [
           1,
-          "WANGANEEN-MILERA"
+          "CURNOW"
+        ]
+      ]
+    },
+    {
+      "match": "WCE V COL",
+      "votes": [
+        [
+          3,
+          "DAICOS"
+        ],
+        [
+          2,
+          "DAICOS"
+        ],
+        [
+          1,
+          "MCSTAY"
+        ]
+      ]
+    },
+    {
+      "match": "WB V NTH",
+      "votes": [
+        [
+          3,
+          "DAVIES-UNIACKE"
+        ],
+        [
+          2,
+          "CURTIS"
+        ],
+        [
+          1,
+          "DANIEL"
         ]
       ]
     }
