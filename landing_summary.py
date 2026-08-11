@@ -2,8 +2,7 @@
 
 Reads what predict_2026.py wrote and emits site/landing.json, the one file the
 Next.js landing page parses for every live value it shows. That front end is a
-separate repo (cha-ching-brownlow), where this file is committed as
-data/landing.json and imported at build time.
+separate repo (cha-ching-brownlow), deployed to Vercel.
 
 There is no model here, no LLM call and no network access. Every field is a
 number or a string formatted straight out of predictions/game_level_2026.csv,
@@ -22,10 +21,19 @@ outside this machine at all. This repo is public and raw reads answer 200,
 verified 4 August 2026, so once pushed the artifact sits at
 raw.githubusercontent.com/charliejurberg-bit/Cha-Ching-Brownlow-Engine/master/site/landing.json
 
-Running this script changes nothing that is live, and committing it is necessary
-rather than sufficient. The front end imports its own copy at data/landing.json
-(app/page.tsx, a static import, no fetch of any kind), so the pushed file still
-has to get across to that repo before a build will show these numbers.
+PUSHING TO master IS WHAT MAKES IT LIVE. The front end fetches that raw URL and
+revalidates hourly (app/page.tsx, cha-ching-brownlow b4bd45a, 5 August 2026),
+so nothing has to be carried across by hand and no Vercel deploy is involved.
+Running this script alone still changes nothing: the commit and the push are
+what publish it, and the page picks the change up within the hour.
+
+Until 5 August the front end static-imported its own committed copy at
+data/landing.json and that file had to be updated in the other repo for a build
+to show new numbers. That is no longer true, and the stale instruction survived
+here for a week after it stopped being so. data/landing.json still exists in
+that repo but is now only the fallback rendered when the fetch fails, so it
+wants refreshing occasionally to keep a failed fetch from showing numbers
+months old.
 
 SCHEMA
 Fixed by components/landing/landing-data.ts in the front end repo, which
@@ -210,6 +218,47 @@ def build_chips(rnd):
     ]
 
 
+def _colliding_surnames(game):
+    """Uppercased surnames held by more than one player in this fixture.
+
+    Deliberately does NOT go through _surname(). That validator raises on a
+    blank, which is right for a name about to be rendered but wrong here: this
+    reads every player in the game, most of whom never reach the ticker, so
+    borrowing it would let one blank surname on an unshown player abort a run
+    that has nothing to render it in. Blanks are dropped instead, and the three
+    names that do get rendered are still validated on the way out.
+    """
+    per_player = game.drop_duplicates(subset=['Player_Name'])
+    names = per_player['Surname'].astype(str).str.strip().str.upper()
+    names = names[(names != '') & (names != 'NAN')]
+    return set(names[names.duplicated(keep=False)])
+
+
+def _ticker_name(player_name, surname, colliding):
+    """Ticker form: a bare uppercased surname, or "N.DAICOS" on a collision.
+
+    Round 23 sent both Daicoses into the same top three, so West Coast v
+    Collingwood rendered "3 DAICOS  2 DAICOS", which reads as a fault rather
+    than as two brothers. A first initial is prepended only where the fixture
+    actually holds two players of that surname, so every other entry stays the
+    bare surname the front end has always shipped.
+
+    Scoped to the FIXTURE, not to the three shown. A game holding two Kennedys
+    is ambiguous whether or not both poll, and the initial costs nothing when
+    only one appears.
+
+    No space after the period, unlike _chip_name's "M. Bontempelli": the ticker
+    is a dense single line and the chips are not.
+    """
+    last = _surname(surname).upper()
+    if last not in colliding:
+        return last
+    name = str(player_name).strip()
+    if not name:
+        raise ValueError(f"blank Player_Name beside surname {surname!r}")
+    return f"{name[0].upper()}.{last}"
+
+
 def build_ticker(rnd):
     """Every fixture in the round, each with its 3/2/1 by Exp_Votes.
 
@@ -221,9 +270,10 @@ def build_ticker(rnd):
     for _gid, g in rnd.groupby('Game_ID', sort=True):
         home = _team_code(g['Home.team'].iloc[0])
         away = _team_code(g['Away.team'].iloc[0])
+        colliding = _colliding_surnames(g)
         top = _by_votes(g).head(TOP_N_PER_GAME)
         votes = [
-            [slot, _surname(r['Surname']).upper()]
+            [slot, _ticker_name(r['Player_Name'], r['Surname'], colliding)]
             for slot, (_, r) in zip(range(TOP_N_PER_GAME, 0, -1), top.iterrows())
         ]
         items.append({'match': f"{home} V {away}", 'votes': votes})
@@ -330,7 +380,8 @@ def main():
         f"OK AFLTables Round_num {latest_raw}, written as round {summary['round']}, "
         f"{len(summary['chips'])} chips, {len(summary['ticker'])} fixtures"
     )
-    print("OK nothing is live until this is committed, pushed, and carried to the front end repo")
+    print("OK nothing is live until this is committed and pushed to master; "
+          "the front end refetches within the hour")
     return 0
 
 
