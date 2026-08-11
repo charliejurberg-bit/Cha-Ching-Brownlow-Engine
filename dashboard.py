@@ -3478,10 +3478,21 @@ SCOPE .lb-bar-lo{text-align:right;}
     )
 
     st.markdown('<div class="lb-section-label">Full Leaderboard</div>', unsafe_allow_html=True)
-    _cc1, _cc2 = st.columns([5, 1])
+    _cc1, _cc_team, _cc2 = st.columns([4, 1.4, 1])
     with _cc1:
         st.markdown('<div class="lb-controls-marker"></div>', unsafe_allow_html=True)
         search = st.text_input("SEARCH PLAYER", "")
+    with _cc_team:
+        # Club list comes from the loaded frame, never a hardcoded eighteen. The
+        # competition has not always had eighteen clubs and this page serves
+        # every season in AVAILABLE_SEASONS: 2007 and 2010 hold sixteen, 2011
+        # seventeen once Gold Coast enter, eighteen only from 2012. A fixed list
+        # would offer four clubs that did not exist on a 2007 leaderboard.
+        # _fix_team_names has already run in load_season, so the values here are
+        # canonical (Kangaroos read as North Melbourne, Footscray as Western
+        # Bulldogs) and match _LB_ABBR's keys.
+        _team_opts = ['All'] + sorted(predictions['Team'].dropna().astype(str).unique())
+        team_pick = st.selectbox("CLUB", _team_opts, index=0)
     with _cc2:
         show_n = st.selectbox("SHOW", [20, 50, 100, 200], index=0)
 
@@ -3508,9 +3519,35 @@ SCOPE .lb-bar-lo{text-align:right;}
     # already arrives sorted descending on Exp_Total_Votes.
     display = predictions.copy()
     display.insert(0, 'Rank', range(1, len(display) + 1))
+    # Club position is assigned over the WHOLE club, alongside Rank and before
+    # either filter, for exactly the reason Rank is: searching "daicos" inside
+    # Collingwood must leave Josh on his real club position of 3, not renumber
+    # him to 2 because the man above him was filtered out. predictions arrives
+    # sorted descending on Exp_Total_Votes and nothing here re-sorts, so a
+    # per-club running count is the club order.
+    display.insert(1, 'ClubRank', display.groupby('Team', sort=False).cumcount() + 1)
     if search:
         display = display[display['Player_Name'].str.contains(search, case=False, na=False)]
+    if team_pick != 'All':
+        display = display[display['Team'].astype(str) == team_pick]
     display = display.head(show_n).copy()
+
+    # Empty result gets a message instead of an empty table. NOT st.stop():
+    # this block is followed by the responsible-gambling footer, which the guard
+    # at the foot of the page renders for every non-Betting-Hub page, and
+    # stopping here would silently drop it. The table emission below is guarded
+    # instead, so the rest of the page still renders.
+    _lb_rows_exist = not display.empty
+    if not _lb_rows_exist:
+        _bits = []
+        if team_pick != 'All':
+            _bits.append(f'{team_pick}')
+        if search:
+            _bits.append(f'a name matching "{search}"')
+        st.info(
+            f"No {selected_season} players found for {' with '.join(_bits)}."
+            if _bits else f"No {selected_season} players to show."
+        )
     _max_exp = float(display['Exp_Total_Votes'].max()) if len(display) else 1.0
     if _max_exp <= 0:
         _max_exp = 1.0
@@ -3535,6 +3572,7 @@ SCOPE .lb-bar-lo{text-align:right;}
 .lb-table .lb-tbl th.grp-start,.lb-table .lb-tbl td.grp-start{border-left:1px solid var(--hairline-strong);}
 .lb-table .lb-tbl tr.lb-leader{background:rgba(52,211,153,.04);}
 .lb-table .lb-rank{color:var(--text);font-weight:600;}
+.lb-table .lb-clubrank{color:var(--muted);font-weight:600;}
 .lb-table .lb-up{color:var(--emerald);font-size:10px;margin-left:4px;}
 .lb-table .lb-down{color:#f87171;font-size:10px;margin-left:4px;}
 .lb-table .lb-exp{font-weight:700;color:var(--text);}
@@ -3554,16 +3592,20 @@ SCOPE .lb-bar-lo{text-align:right;}
 .lb-table .lb-fc-lo,.lb-table .lb-fc-hi{position:absolute;top:0;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);transform:translateX(-50%);white-space:nowrap;}
 """).replace('\n', '')
 
+    # The club-position column exists only while a club is selected. On "All" it
+    # would be identical to Rank, so it is dropped rather than duplicated.
+    _show_club_rank = team_pick != 'All'
+    _rank_heads = [('Rank', 'lft')] + ([('#', 'lft')] if _show_club_rank else [])
     if is_2026:
-        _heads = [('Rank', 'lft'), ('Player', 'lft'), ('GP', ''), ('Form', 'lft'), ('Exp Votes', '')]
+        _heads = _rank_heads + [('Player', 'lft'), ('GP', ''), ('Form', 'lft'), ('Exp Votes', '')]
         if has_fc:
             _heads.append(('Floor–Ceiling', 'lft'))
         _heads += [('Poll %', ''), ('3V Games', '')]
         if has_odds:
             _heads += [('Best Odds', 'grp-start'), ('Mkt %', '')]
     else:
-        _heads = [('Rank', 'lft'), ('Player', 'lft'), ('GP', ''), ('Exp Votes', ''),
-                  ('Actual', ''), ('Diff', ''), ('Poll %', ''), ('3V Games', '')]
+        _heads = _rank_heads + [('Player', 'lft'), ('GP', ''), ('Exp Votes', ''),
+                                ('Actual', ''), ('Diff', ''), ('Poll %', ''), ('3V Games', '')]
 
     def _th(lbl, cls):
         return f'<th class="{cls}">{lbl}</th>' if cls else f'<th>{lbl}</th>'
@@ -3587,6 +3629,11 @@ SCOPE .lb-bar-lo{text-align:right;}
         _a = 0.22 * (_exp / _max_exp)
         _cells = [
             f'<td class="lft"><span class="lb-rank">{_rank}</span>{_arrow}</td>',
+        ]
+        if _show_club_rank:
+            _cells.append(
+                f'<td class="lft"><span class="lb-clubrank">{int(_row["ClubRank"])}</span></td>')
+        _cells += [
             f'<td class="lft"><span class="lb-pname">{_name}</span><span class="lb-ttag">{_lb_abbr(_team)}</span></td>',
             f'<td>{_gp}</td>',
         ]
@@ -3611,14 +3658,15 @@ SCOPE .lb-bar-lo{text-align:right;}
         _tr_cls = ' class="lb-leader"' if _rank == 1 else ''
         _rows.append(f'<tr{_tr_cls}>{"".join(_cells)}</tr>')
 
-    st.markdown(
-        f'<div class="lb-table"><style>{_LB_TBL_CSS}</style>'
-        f'<div class="lb-tbl-wrap"><table class="lb-tbl">'
-        f'<thead><tr>{_ths}</tr></thead><tbody>{"".join(_rows)}</tbody>'
-        f'</table></div></div>',
-        unsafe_allow_html=True,
-    )
-    if is_2026 and _fg:
+    if _lb_rows_exist:
+        st.markdown(
+            f'<div class="lb-table"><style>{_LB_TBL_CSS}</style>'
+            f'<div class="lb-tbl-wrap"><table class="lb-tbl">'
+            f'<thead><tr>{_ths}</tr></thead><tbody>{"".join(_rows)}</tbody>'
+            f'</table></div></div>',
+            unsafe_allow_html=True,
+        )
+    if is_2026 and _fg and _lb_rows_exist:
         st.caption("Form (last 3 rounds): emerald = predicted to poll (≥30%) · grey = quiet · faint = did not play")
 
 # ── H2H votes (Compare tab) ──────────────────────────────────
