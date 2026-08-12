@@ -22,6 +22,9 @@ Franchise timelines this covers:
     Brisbane Bears    1990-1996  ->  Brisbane Lions
     Brisbane Lions    1997-2025  ->  Brisbane Lions
 
+    South Melbourne   1965-1981  ->  Sydney
+    Sydney            1982-2025  ->  Sydney
+
 Fitzroy is deliberately NOT folded into Brisbane Lions. The 1996 merger created
 a new entity; treating 1990-1996 Fitzroy games as Brisbane Lions games would
 attribute one club's vote history to another. Fitzroy canonicalises to itself
@@ -40,6 +43,10 @@ CLUB_ALIASES = {
     "Kangaroos": "North Melbourne",
     "Footscray": "Western Bulldogs",
     "Brisbane Bears": "Brisbane Lions",
+    # Relocated and renamed after 1981. No row in this repository is earlier
+    # than 1990, so nothing currently reaches this entry; it is here so a
+    # window that widens past 1982 does not silently gain a 19th club.
+    "South Melbourne": "Sydney",
     # Not an AFLTables string, but non-AFLTables feeds in this repo (and
     # dashboard._TEAM_ALIASES) abbreviate it, so recon that mixes sources needs it.
     "GWS": "Greater Western Sydney",
