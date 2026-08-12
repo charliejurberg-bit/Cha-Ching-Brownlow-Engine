@@ -1450,7 +1450,23 @@ _STAT_FILTER_COLS = (
     'Player_Name', 'Season', 'Round_num', 'Playing.for', 'Team', 'Brownlow.Votes',
     'Is_Win', 'Is_Loss', 'Disposals', 'Goals', 'Kicks', 'Clearances',
     'Contested.Possessions', 'Coaches_Votes', 'Tackles', 'Score_Involvements',
-    'RatingPoints', 'Exp_Votes',
+    'RatingPoints', 'Exp_Votes', 'ID',
+)
+
+# Where the 1990-2006 game_level files live. Deliberately not predictions/:
+# AVAILABLE_SEASONS is built by scanning that directory for season_*.csv and it
+# drives the season selector on every page, so a file landing there would offer
+# seasons the rest of the app cannot answer for.
+_HISTORY_DIR = "data_history"
+
+# game_level_2015.csv, and nothing else in either directory. backtest_game_level.csv
+# does not match, which is the point of anchoring the prefix.
+_GAME_LEVEL_RE = re.compile(r"^game_level_(\d{4})\.csv$")
+
+# The nine Stat Filter sliders, by column. Anything not listed carries no floor.
+_SF_SLIDER_COLS = (
+    'Disposals', 'Goals', 'Kicks', 'Clearances', 'Contested.Possessions',
+    'Coaches_Votes', 'Tackles', 'Score_Involvements', 'RatingPoints',
 )
 
 # Columns the career Player Profile path reads — the union of what the profile
@@ -1510,6 +1526,132 @@ def load_all_historical(columns=None, categorize=('Player_Name', 'Playing.for', 
             if _c in g.columns:
                 g[_c] = g[_c].astype('category')
     return g
+
+@st.cache_data(ttl=3600)
+def _load_stat_filter_frame():
+    """Per-game data for Stat Filter across 1990-2026, and the facts about it.
+
+    Stat Filter alone. load_all_historical() still serves the career Player
+    Profile and the leaderboards from predictions/ only, because those group on
+    Player_Name and 22 names carry more than one fitzRoy ID once the pre-2007
+    window is joined on. This frame is keyed on ID instead, which is why it can
+    hold both eras and they cannot.
+
+    Each directory is globbed for its own game_level_*.csv rather than reusing
+    AVAILABLE_SEASONS, which is built from predictions/season_*.csv and so
+    describes only half of this. Season comes from the filename, which is the
+    authority either way.
+
+    _disambiguate_players() is deliberately not called. It resolves identity
+    through _player_id_map(), which reads fitzroy_stats_all.csv and covers
+    2007-2025, so every pre-2007 row would reach it with _pid None: those rows
+    never enter collision detection, and where a name does collide the suffix
+    falls back to the row's own club rather than the person's last club, which
+    splits anyone who changed clubs. Both files carry ID directly, so no map is
+    needed and the display name is left alone.
+
+    Returns (frame, meta). meta carries the null-ID drop count, the per-column
+    first season with data, and the ID -> label map the selector is built from.
+    """
+    want = set(_STAT_FILTER_COLS) | {'Player_Name', 'Round_num', 'Team',
+                                     'Playing.for', 'ID'}
+    frames, per_dir = [], {}
+    for directory in (PRED_DIR, _HISTORY_DIR):
+        if not os.path.isdir(directory):
+            continue
+        seasons = []
+        for fname in sorted(os.listdir(directory)):
+            m = _GAME_LEVEL_RE.match(fname)
+            if not m:
+                continue
+            path = os.path.join(directory, fname)
+            avail = set(pd.read_csv(path, nrows=0).columns)
+            df = _fix_team_names(pd.read_csv(path, usecols=list(want & avail)))
+            df['Season'] = int(m.group(1))
+            frames.append(df)
+            seasons.append(int(m.group(1)))
+        if seasons:
+            per_dir[directory] = (min(seasons), max(seasons), len(seasons))
+
+    if not frames:
+        return None, {}
+
+    g = pd.concat(frames, ignore_index=True)
+    if 'Playing.for' in g.columns:
+        if 'Team' in g.columns:
+            g['Team'] = g['Team'].fillna(g['Playing.for'])
+        else:
+            g['Team'] = g['Playing.for']
+
+    # A null ID is a row with no identity. Grouping or filtering on it would
+    # gather every such row under one key and call them one player, so they are
+    # dropped and the count is reported rather than absorbed.
+    null_ids = int(g['ID'].isna().sum())
+    g = g[g['ID'].notna()].copy()
+    g['ID'] = g['ID'].astype('int64')
+
+    # Measured, not declared. A hardcoded floor table drifts the moment the
+    # converter's column set changes, and the season clamp is only honest if
+    # the floor it enforces is the one the data actually has.
+    floors = {}
+    for col in _SF_SLIDER_COLS:
+        if col not in g.columns:
+            continue
+        seen = g.loc[g[col].notna(), 'Season']
+        if len(seen):
+            floors[col] = int(seen.min())
+
+    # One entry per person. A name carried by more than one ID gets its season
+    # range appended, so the two Gary Abletts are two options; a name carried by
+    # one ID stays bare, which is 483 of the 505 names spanning both eras.
+    span = g.groupby('ID')['Season'].agg(['min', 'max'])
+    # Newest name wins, explicitly rather than by whichever directory was read
+    # first. 15 IDs carry two spellings, because predictions/ stores the
+    # '(Team)' suffix for a player who once shared a name and data_history does
+    # not: ID 755 is 'Scott Thompson' to 2006 and 'Scott Thompson (Adelaide)'
+    # after. The later spelling is the one the rest of the app shows.
+    _newest = g.sort_values('Season').drop_duplicates('ID', keep='last').set_index('ID')
+    name_of = _newest['Player_Name'].astype(str)
+    club_of = _newest['Team'].astype(str)
+    shared = name_of.groupby(name_of).transform('size') > 1
+    labels, extra = {}, {}
+    for pid, nm in name_of.items():
+        if not shared[pid]:
+            labels[pid] = nm
+            continue
+        lo, hi = int(span.loc[pid, 'min']), int(span.loc[pid, 'max'])
+        extra[pid] = [f"{lo}-{hi}" if lo != hi else f"{lo}"]
+        labels[pid] = f"{nm} ({extra[pid][0]})"
+
+    # A season range separates two people only where they played in different
+    # years. Two Mark Williamses and two Michael Kennedys each played their only
+    # season in 1990, so the range leaves the option list showing one string
+    # twice. Club breaks both of those, and the ID breaks anything club cannot,
+    # so no two options can read the same however the data moves.
+    for _tiebreak in (lambda pid: club_of.get(pid, ''), lambda pid: f"#{pid}"):
+        counts = {}
+        for lab in labels.values():
+            counts[lab] = counts.get(lab, 0) + 1
+        clashing = [pid for pid in extra if counts[labels[pid]] > 1]
+        if not clashing:
+            break
+        for pid in clashing:
+            extra[pid].append(_tiebreak(pid))
+            labels[pid] = f"{name_of[pid]} ({', '.join(extra[pid])})"
+
+    for _c in ('Player_Name', 'Playing.for', 'Team'):
+        if _c in g.columns:
+            g[_c] = g[_c].astype('category')
+
+    meta = {
+        'null_ids_dropped': null_ids,
+        'floors': floors,
+        'labels': labels,
+        'per_dir': per_dir,
+        'shared_names': int(shared.sum()),
+    }
+    return g, meta
+
 
 # Sentinel season value meaning "all seasons combined" (career view).
 CAREER = "Career"
@@ -5168,7 +5310,7 @@ def _render_stat_filter():
         unsafe_allow_html=True,
     )
     with st.spinner("Loading historical games…"):
-        hist = load_all_historical(_STAT_FILTER_COLS)
+        hist, _sf_meta = _load_stat_filter_frame()
     if hist is None:
         st.error("No historical game-level data found. Run brownlow_model.py first.")
     else:
@@ -5178,8 +5320,18 @@ def _render_stat_filter():
         # keep unassigned 2026 votes out of every rate.)
 
         # ── 2. Filters — flush, no panel. Widgets + logic unchanged ──
-        all_players_sf = sorted(hist['Player_Name'].dropna().unique().tolist())
-        selected_players_sf = st.multiselect("Player (leave blank for all)", all_players_sf, default=[], placeholder="All players", key="sf_players")
+        # Options are fitzRoy IDs and the label is display text, because a name
+        # is not an identity here: 22 names carry more than one ID across
+        # 1990-2026, of which 8 are one person before 2007 and a different
+        # person after. Selecting by name would fuse them; selecting by ID
+        # cannot. The label appends a season range only where the name is
+        # shared, so the 483 unambiguous cross-era names stay one bare entry.
+        _sf_labels = _sf_meta.get('labels', {})
+        all_players_sf = sorted(_sf_labels, key=lambda pid: _sf_labels[pid])
+        selected_players_sf = st.multiselect(
+            "Player (leave blank for all)", all_players_sf, default=[],
+            format_func=lambda pid: _sf_labels.get(pid, str(pid)),
+            placeholder="All players", key="sf_players")
 
         # Club sits on this row, with Player, because it selects who is in the
         # pool rather than how well they played. It must stay out of col1/col2/
@@ -5221,8 +5373,59 @@ def _render_stat_filter():
             min_score_inv = st.slider("Min score involvements", 0, 15, 0, 1, key="sf_si")
             has_rating = 'RatingPoints' in hist.columns
             min_rating = st.slider("Min Wheelo rating pts", 0, 100, 0, 1, key="sf_rating") if has_rating else 0
-            season_range = st.slider("Season range", int(hist['Season'].min()), int(hist['Season'].max()),
-                                     (int(hist['Season'].min()), int(hist['Season'].max())), key="sf_seasons")
+
+            # _stat_sliders is built here rather than after the column block,
+            # because the season slider below needs to know which stats are
+            # engaged before it can decide what floor to offer. One definition,
+            # read twice.
+            # (label, column, current value, slider min, slider max)
+            _stat_sliders = [
+                ('Disposals', 'Disposals', min_disp, 0, 50),
+                ('Goals', 'Goals', min_goals, 0, 10),
+                ('Kicks', 'Kicks', min_kicks, 0, 40),
+                ('Clearances', 'Clearances', min_clearances, 0, 15),
+                ('Contested possessions', 'Contested.Possessions', min_contested, 0, 25),
+                ('Coaches votes', 'Coaches_Votes', min_coaches, 0, 10),
+                ('Tackles', 'Tackles', min_tackles, 0, 12),
+                ('Score involvements', 'Score_Involvements', min_score_inv, 0, 15),
+            ]
+            if has_rating:
+                _stat_sliders.append(('Wheelo rating pts', 'RatingPoints', min_rating, 0, 100))
+
+            # A stat only exists from the season AFLTables began recording it,
+            # so a window reaching further back than the active filter can fill
+            # is a window of guaranteed-empty seasons. The floor lifts to the
+            # engaged slider that starts latest, and the caption names it: the
+            # alternative is a season range the user set and the data silently
+            # ignored.
+            _sf_floors = _sf_meta.get('floors', {})
+            _season_lo = int(hist['Season'].min())
+            _season_hi = int(hist['Season'].max())
+            _engaged_floors = [
+                (_lab, _sf_floors[_col])
+                for _lab, _col, _val, _mn, _mx in _stat_sliders
+                if _val > _mn and _col in _sf_floors
+            ]
+            _floor_label = None
+            if _engaged_floors:
+                _floor_label, _floor = max(_engaged_floors, key=lambda t: t[1])
+                _season_lo = max(_season_lo, _floor)
+
+            # The stored value has to be lifted before the widget is built, or
+            # Streamlit sees a value below its own min_value.
+            _prev = st.session_state.get("sf_seasons")
+            if _prev and _prev[0] < _season_lo:
+                st.session_state["sf_seasons"] = (_season_lo, max(_prev[1], _season_lo))
+
+            season_range = st.slider("Season range", _season_lo, _season_hi,
+                                     (_season_lo, _season_hi), key="sf_seasons")
+            if _floor_label:
+                st.markdown(
+                    f'<div style="color:#7e8c99;font-size:11px;margin:-6px 0 2px">'
+                    f'Floor lifted to {_season_lo}: {_floor_label.lower()} is not '
+                    f'recorded before then.</div>',
+                    unsafe_allow_html=True,
+                )
 
         # Assemble the filter mask from components so the active stat's own
         # constraint can be dropped for the threshold sweep.
@@ -5234,25 +5437,11 @@ def _render_stat_filter():
         # re-admit unobserved categories as spurious zero rows.
         _base_mask = (
             (hist['Season'] >= season_range[0]) & (hist['Season'] <= season_range[1]) &
-            (hist['Player_Name'].isin(selected_players_sf) if selected_players_sf else pd.Series(True, index=hist.index)) &
+            (hist['ID'].isin(selected_players_sf) if selected_players_sf else pd.Series(True, index=hist.index)) &
             (hist['Team'].isin(selected_clubs_sf) if selected_clubs_sf else pd.Series(True, index=hist.index))
         )
         if result_filter == "Win only": _base_mask &= (hist['Is_Win'] == 1)
         elif result_filter == "Loss only": _base_mask &= (hist['Is_Loss'] == 1)
-
-        # (label, column, current value, slider min, slider max)
-        _stat_sliders = [
-            ('Disposals', 'Disposals', min_disp, 0, 50),
-            ('Goals', 'Goals', min_goals, 0, 10),
-            ('Kicks', 'Kicks', min_kicks, 0, 40),
-            ('Clearances', 'Clearances', min_clearances, 0, 15),
-            ('Contested possessions', 'Contested.Possessions', min_contested, 0, 25),
-            ('Coaches votes', 'Coaches_Votes', min_coaches, 0, 10),
-            ('Tackles', 'Tackles', min_tackles, 0, 12),
-            ('Score involvements', 'Score_Involvements', min_score_inv, 0, 15),
-        ]
-        if has_rating:
-            _stat_sliders.append(('Wheelo rating pts', 'RatingPoints', min_rating, 0, 100))
 
         # A slider still at its minimum is "no constraint", so skip the column
         # rather than comparing against it. `NaN >= 0` is False, so the old
