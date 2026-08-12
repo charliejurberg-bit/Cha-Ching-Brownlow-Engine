@@ -2,8 +2,9 @@
 
 > Do not paste full source files. Locate code by function name, never by line number.
 > Last full-file recon pass over the live repo: 29 July 2026. Last edited:
-> 2 August 2026, targeted corrections only. Nothing outside the lines those
-> corrections touched has been re-verified since 29 July.
+> 12 August 2026, listing every file in `data_history/` and registering
+> `team_h2h_spec.md` and `player_history_spec.md` under Other docs. Nothing
+> outside the lines those edits touched has been re-verified since 29 July.
 >
 > **This file and the Project Knowledge copy must be kept in sync.** On 29 July they
 > had diverged badly: the repo copy was several sessions stale and asserted three
@@ -239,8 +240,10 @@ offline CLI, imported by nothing, unreachable from the dashboard by any route.
 `betting_edge_report.py` is **not** a page — there is no "Betting Edge" page.
 
 Other docs: `CLAUDE.md`, `CLAUDE_CODE_BRIEF.md`, `fixture_recon_spec.md`,
-`draft_formats_spec.md`. `landing_spec.md` is **not** in this repo and should not
-be added to it. It belongs to the front-end repo, below.
+`draft_formats_spec.md`, `player_history_spec.md`, and `team_h2h_spec.md`, which
+governs the team-level head-to-head fixture preview and is distinct from
+`fixture_recon_spec.md`, which is player-level. `landing_spec.md` is **not** in
+this repo and should not be added to it. It belongs to the front-end repo, below.
 
 ### Two repos and one second clone
 
