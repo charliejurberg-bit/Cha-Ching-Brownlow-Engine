@@ -10,12 +10,15 @@ Status: draft, not yet built. Recon completed and reflected below.
 ## 1. Scope and invocation
 
 ```
-python team_h2h.py --teams "Richmond" "St Kilda" [--scope all|ha|finals] [--without "Tim Taranto"]
+python team_h2h.py --teams "Richmond" "St Kilda" [--scope all|ha|finals] [--date 2026-08-15] [--without "Tim Taranto"]
 ```
 
 - First team named is the **subject team**. All records, streaks and quarter
   results are oriented to the subject, never to the home side.
 - `--scope` defaults to `all`.
+- `--date` is the scheduled fixture date and feeds section 6 item 7 only. That
+  section is undefined without a reference date, so omitting the flag reports
+  it as not computed rather than inventing one.
 - `--without` is opt-in only, repeatable, and never runs unless requested.
 - Output is a markdown facts file to `drafts/`. No tweet copy is generated.
   `draft_gate.py` has no team-mode coverage, so no draft is produced here.
@@ -29,13 +32,20 @@ at runtime** from three player-level fitzRoy files:
 
 | File | Seasons | Matches |
 |---|---|---|
-| `data_history/fitzroy_stats_1965_2006.csv.gz` | 1965–2006 | 6,461 |
-| `fitzroy_stats_all.csv` | 2007–2025 | 3,815 |
+| `data_history/fitzroy_stats_1965_2006.csv.gz` | 1965–2006 | 6,464 |
+| `fitzroy_stats_all.csv` | 2007–2025 | 3,816 |
 | `data_2026/afltables_2026.csv` | 2026 | 189 |
 
-Expected derived total: **10,469 matches**. This count is a build assertion.
-If the build produces a different number, it fails and reports rather than
-proceeding.
+Expected derived total: **10,469 matches**, verified by the loader at 644a17e.
+
+These are the **with-Date** counts. An earlier revision of this table read
+6,461 / 3,815 / 189, which are the without-Date counts and sum to 10,465. The
+difference is exactly the four drawn-final replays: three fall in the archive
+(1972 SF, 1977 GF, 1990 QF) and one in 2007–2025 (2010 GF). If a count here
+ever reads 10,465, Date has been dropped from the key.
+
+The 2026 figure moves as the season progresses. Assert against a recomputed
+expectation, never a literal.
 
 `_tmp/match_results_all.csv` is **not** a source. It is untracked, sits under a
 gitignored directory, was produced by a script that no longer exists, and
@@ -137,8 +147,10 @@ Three finals went to extra time: 1994 QF, 2007 SF, 2017 EF. Two of the three
 involve West Coast, so this is live for real fixtures.
 
 - **Match result uses extra time.** `subject_score` and `opp_score` take
-  `HQET`/`AQET` where present, else `HQ4P`/`AQ4P`. The record books use the
-  extra-time result and so does every W-L-D section here.
+  `HQETP`/`AQETP` where present, else `HQ4P`/`AQ4P`. There is no bare `HQET` or
+  `AQET` column; the source carries `HQETG`, `HQETB`, `HQETP` and the away
+  equivalents, all float64 and null on every match except the three. The record
+  books use the extra-time result and so does every W-L-D section here.
 - **Quarter results are regulation only.** `Q4 = P[4] - P[3]`. Extra time is not
   a quarter and is never folded into one.
 - All three matches were drawn at full time, so the regulation result is a draw
@@ -307,8 +319,19 @@ instead of it.
   than one survives, **stops and reports the candidates** with club and season
   range. It never picks the one with more games, the more recent one, or the
   one matching the subject club. `--without` then accepts a `url` directly.
-- The disambiguating parenthetical suffix in `Player_Name` is never stripped.
-  Two Bailey Williamses exist in 2026.
+- `Player_Name` and its parenthetical suffix belong to
+  `predictions/game_level_*.csv`, not to the three sources this tool reads.
+  Keying on `url` means the module is never in a position to strip a suffix.
+  Two Bailey Williamses exist in 2026 and separate cleanly on `url`.
+- **An empty arm is not a contrast.** If either arm has a denominator of zero,
+  the result is a bare record and must not be framed as a with/without finding.
+  Tim Taranto is the worked case: he played all seven Richmond v St Kilda
+  meetings in his Richmond tenure, so "1-6 with Taranto" has no comparator. The
+  facts writer suppresses the framing and states the reason. The numbers are
+  still returned; only the framing is withheld.
+- Expect empty arms to be common. A regular player misses few matches against
+  any single opponent, so the cut is most informative for long tenures, high
+  meeting counts, or players with a significant injury absence.
 - Tenure window is first-to-last appearance **for the subject club specifically**,
   not career-wide. A player who later moves clubs does not extend the window.
 - Both sides reported with denominators: with (n), without (n).
@@ -370,10 +393,10 @@ A check that returns empty is a failed check, not a passed one.
 1. RESOLVED. Player identity is available from 1965. `url` is the key; see
    section 10.
 2. RESOLVED. Finals key verified at 455 keys for 455 matches. See section 2.
-3. **`url` continuity across the three files is untested.** 499 `ID` values are
-   shared between the archive and 2007–2025, so the numbering is continuous, but
-   nobody has confirmed `url` uses an identical format across files rather than
-   full URL in one and filename in another. Build assertion 8 covers it.
+3. RESOLVED at 644a17e by assertion 9. 499 players appear in both the archive
+   and 2007–2025 and their `url` strings match exactly, all three files using
+   the full `https://afltables.com/...` form. The with/without cut spans the
+   join.
 4. Timeslot bin boundaries (section 6) — assumption in place, needs a decision.
 5. Cross-opponent trigger threshold of 4 (section 9) — assumption in place.
 6. RESOLVED. `data_history/` documented in full at 285709c: 19 files, not one.
