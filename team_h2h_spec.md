@@ -100,25 +100,54 @@ explicitly at load rather than relying on inference, and never key on `ID`
 
 ---
 
-## 3. Quarter scores — cumulative
+## 3. Quarter scores — cumulative, and stored as integers
 
-Quarter columns are **progressive cumulative scores**, not per-quarter scores.
-`HQ4` equals the final score. Verified on four sampled matches across 1965,
-2020, 2025 and 2026.
+Quarter columns are **progressive cumulative scores**. `HQ4` equals the
+full-time score.
+
+**Storage format, corrected 12 August 2026.** There are no `G.B` strings. This
+spec previously said there were, inferred from a printed dry run that was
+formatting two columns for display. The sources carry:
+
+- `HQ1G`, `HQ1B` … `AQ4G`, `AQ4B` — separate int64 goal and behind columns
+- `HQ1P` … `AQ4P` — pre-computed points, where `P == G*6 + B` with zero
+  mismatches across all 10,469 matches
+
+Use the `P` columns directly. A string parser crashes on int64. The `G*6 + B`
+identity is retained as a build assertion, not as the conversion path.
 
 Per-quarter result for quarter *n*:
 
 ```
-subject_qn = subject_cumulative[n] - subject_cumulative[n-1]
-opp_qn     = opp_cumulative[n]     - opp_cumulative[n-1]
+subject_qn = subject_P[n] - subject_P[n-1]
+opp_qn     = opp_P[n]     - opp_P[n-1]
 ```
 
-with `cumulative[0] = 0`. Scores are stored as `G.B` strings and must be
-converted to points as `G*6 + B` before differencing.
+with `P[0] = 0`. The loader stores cumulative columns only; **differencing
+belongs to the consumer**, because the cumulative values are also what a
+half-time or three-quarter-time lead figure needs.
 
-A comparison of raw `HQ2` against `AQ2` answers "who led at half time" and is a
-different claim. If a half-time lead figure is ever wanted it gets its own
-labelled section and is never called a quarter result.
+A comparison of raw `HQ2P` against `AQ2P` answers "who led at half time" and is
+a different claim. If that figure is ever wanted it gets its own labelled
+section and is never called a quarter result.
+
+### Extra time
+
+Three finals went to extra time: 1994 QF, 2007 SF, 2017 EF. Two of the three
+involve West Coast, so this is live for real fixtures.
+
+- **Match result uses extra time.** `subject_score` and `opp_score` take
+  `HQET`/`AQET` where present, else `HQ4P`/`AQ4P`. The record books use the
+  extra-time result and so does every W-L-D section here.
+- **Quarter results are regulation only.** `Q4 = P[4] - P[3]`. Extra time is not
+  a quarter and is never folded into one.
+- All three matches were drawn at full time, so the regulation result is a draw
+  and the final result is a win or a loss. Both are true and they are different
+  quantities.
+- Every match row carries a `went_to_extra_time` boolean. Any quarter section
+  whose population includes such a match prints a note naming it. This is the
+  guard against a conditional claim silently mixing a regulation quarter record
+  against an extra-time match record.
 
 ---
 
@@ -315,15 +344,22 @@ The script fails and reports rather than proceeding if any of these break:
    null.
 3. Any match key appears more than once after the date component is included.
 4. Any match has the same value for both teams.
-5. `HQ4` converted to points does not equal the home final score, and likewise
-   for away. This is the cumulative-scores guard and it runs on every match.
-6. Any team value is not handled by `canonical_club()`.
-7. `ID` or `Jumper.No.` arrives as a different dtype than declared at load.
+5. For every match without extra time, `HQ4P` does not equal the home final
+   score, or `AQ4P` does not equal the away final score. For matches with extra
+   time, the same check runs against `HQET`/`AQET`. This is the cumulative-scores
+   guard and it runs on every match.
+6. `HQnP != HQnG*6 + HQnB` for any quarter or either team. The identity is
+   pre-computed in the source and asserted here, not relied upon.
+7. Any team value is not handled by `canonical_club()`.
+8. `ID` or `Jumper.No.` arrives as a different dtype than declared at load.
    Cast explicitly, then assert.
-8. `url` format differs across the three source files. Test by taking players
+9. `url` format differs across the three source files. Test by taking players
    appearing in both the 1965–2006 archive and 2007–2025, and confirming the
    `url` strings match exactly. If they do not, the with/without cut cannot
    span the join and the script says so rather than under-counting.
+10. The extra-time match count for 1965–2025 is not exactly three. A fourth
+    would mean either a new finding or a broken `HQET` read, and both need
+    reporting rather than absorbing.
 
 A check that returns empty is a failed check, not a passed one.
 
