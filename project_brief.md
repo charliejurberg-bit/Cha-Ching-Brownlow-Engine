@@ -195,8 +195,23 @@ brownlow_engine/
 ├── data_2026/                # Live season data (22 files)
 ├── data_wheelo/              # Wheelo 2015–2026 + wheelo_all_seasons.csv (16 files)
 ├── data_betting/             # Betting Hub local fallback CSVs (4 files)
-├── data_history/
-│   └── brownlow_votes_1990_2006.csv   # 124,171 rows, 10 cols, recon-only, git-tracked
+├── data_history/             # Pre-2007 archive (19 files, all git-tracked, 43 MB)
+│   ├── brownlow_votes_1990_2006.csv       # 124,171 rows, 10 cols. Votes ledger,
+│   │                                      #   H&A only, no stat columns. Recon-only
+│   ├── fitzroy_stats_1965_2006.csv.gz     # 266,687 rows, 81 cols, 1965–2006. Same
+│   │                                      #   schema family as fitzroy_stats_all.csv,
+│   │                                      #   incl. venue, date, start time, quarter
+│   │                                      #   scores. Finals included. The producer
+│   │                                      #   source for the game_level files below
+│   └── game_level_1990.csv … game_level_2006.csv   # 17 files, 124,171 rows total,
+│                                          #   33 cols each, one per season. H&A only,
+│                                          #   finals dropped. Subset of the
+│                                          #   predictions/ 108-col schema; Exp_Votes
+│                                          #   null, Coaches_Votes / Score_Involvements
+│                                          #   / RatingPoints omitted. Read by
+│                                          #   dashboard._load_stat_filter_frame()
+│                                          #   for Stat Filter only. Regenerate with
+│                                          #   scripts/convert_history.py
 ├── predictions/              # Model artifacts + output CSVs — git-tracked (75 files)
 ├── page_modules_wip/         # DEAD half-refactor, 13 .py files, nothing imports it
 ├── supabase/                 # SQL / config
