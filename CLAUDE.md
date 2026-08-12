@@ -28,19 +28,35 @@ python predict_2026.py
 drafts, landing artifact). One-off checks tied to a particular round are
 recorded here.
 
-**Round 23 2026, first run after AFLTables publishes those stats.** This is the
-first live test of the no-coaches routing predicate, fixed in commit `800acc7`
-(`(s != 0).any()` to `(s > 0).any()`, NaN safe). Every round through 22 had
-published coaches votes, so the fix is proven by reproduction only, never by a
-real unpublished round. Expected console line from `predict_2026.py`:
+**Routing check, every remaining round of 2026.** `fetch_coaches.R` is commented
+out of `update.py`'s `r_scripts` because the 2026 coaches feed has gone private,
+so `data_2026/coaches_votes_2026.csv` is frozen complete through raw Round_num
+22. The full-model count is therefore pinned at 180 for the rest of the season,
+and every game after that routes to the no-coaches variant. Read the routing
+line `predict_2026.py` prints against this table:
 
-```
-  Routing: 180 game(s) -> full model, 9 -> no-coaches variant
-```
+| Round | Games in file | Expected routing |
+|---|---|---|
+| raw 23 (landed) | 189 | 180 full / 9 no_cv |
+| raw 24 | 198 | 180 full / 18 no_cv |
+| raw 25 | 207 | 180 full / 27 no_cv |
 
-180 games are complete through Round 22 (all 18 teams on 20 games each) and
-Round 23 adds the last 9, for 189. If it reads `189 -> full, 0 -> no-coaches`
-the predicate is broken again: stop, and do not publish that round's numbers.
+Raw 23 is verified: 0 of its 414 rows carried a coaches vote and all 9 games
+routed `no_cv`. The predicate fixed in commit `800acc7` (`(s != 0).any()` to
+`(s > 0).any()`, NaN safe) is therefore proven against a real unpublished round
+rather than by reproduction alone.
+
+Any of the following stops the round. Do not publish its numbers.
+
+- **Full-model count above 180.** `fetch_coaches.R` has been re-enabled after the
+  feed returned, or something outside `update.py` has written the coaches file.
+- **`no_cv` count of 0 on raw 24 or 25.** The predicate is broken again: an
+  unpublished game is reaching it as NaN and being read as published.
+- **Full-model count of 0.** `fetch_coaches.R` has been re-enabled while the feed
+  is still private, and its unguarded `write.csv` has overwritten the coaches
+  file with an empty frame, which routes every game rather than the unpublished
+  ones. Restore from `data_2026/coaches_votes_2026_prev.csv`, the byte copy kept
+  as insurance.
 
 Background: the root cause does not live in `predict_2026.py`. The zero-source
 guard in `features.py` (`ZERO_SOURCE_GUARD_STATS`, applied inside
@@ -297,7 +313,7 @@ Market types: Disposals O/U, Goals O/U, Kicks O/U, Handballs O/U, Marks O/U, Mat
 
 ## Key decisions & constraints
 
-- **Round numbering**: from **2024 onward** AFLTables numbers Opening Round as Round 1, so its round numbers run 1 ahead of the AFL's official count (AFLTables Round 12 = AFL Round 11). **The subtraction is conditional on season, not unconditional.** The rule is `rn - 1 if sn >= _OPENING_ROUND_FROM else rn`, with `_OPENING_ROUND_FROM = 2024`; subtracting for a pre-2024 season is wrong. `_display_round` is defined in **three** places, `dashboard.py`, `draft_posts.py` and `streaks.py`, each carrying its own copy of the constant, so changing one means changing all three. Display only: the underlying data and all filtering always use the raw AFLTables `Round_num` value. Total H&A rounds in AFLTables for 2026 = 23 (Rounds 1–23).
+- **Round numbering**: from **2024 onward** AFLTables numbers Opening Round as Round 1, so its round numbers run 1 ahead of the AFL's official count (AFLTables Round 12 = AFL Round 11). **The subtraction is conditional on season, not unconditional.** The rule is `rn - 1 if sn >= _OPENING_ROUND_FROM else rn`, with `_OPENING_ROUND_FROM = 2024`; subtracting for a pre-2024 season is wrong. `_display_round` is defined in **three** places, `dashboard.py`, `draft_posts.py` and `streaks.py`, each carrying its own copy of the constant, so changing one means changing all three. Display only: the underlying data and all filtering always use the raw AFLTables `Round_num` value. Total H&A rounds in AFLTables for 2026 = 25 (raw Rounds 1–25), a 23-match season of Opening Round plus official Rounds 1–24, for 207 games (18 clubs x 23 / 2). Byes fall in official Rounds 12–14, so a club sitting on fewer than 23 games mid-season is not evidence of a short file.
 - **Finals excluded**: Rounds with string labels (QF/EF/SF/PF/GF) are coerced to NaN and dropped in both training and prediction. Max H&A round detected dynamically per season (2023 and prior seasons had 24 rounds; current code handles any count).
 - **No lookahead in form**: `late_form_ewm` uses `.shift(1)` before the EWMA so current-round data is never included.
 - **Same-name disambiguation**: Players sharing a name but on different teams get `Name (Team)` appended.
