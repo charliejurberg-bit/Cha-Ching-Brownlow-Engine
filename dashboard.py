@@ -5181,6 +5181,31 @@ def _render_stat_filter():
         all_players_sf = sorted(hist['Player_Name'].dropna().unique().tolist())
         selected_players_sf = st.multiselect("Player (leave blank for all)", all_players_sf, default=[], placeholder="All players", key="sf_players")
 
+        # Club sits on this row, with Player, because it selects who is in the
+        # pool rather than how well they played. It must stay out of col1/col2/
+        # col3: everything in those columns is a threshold, `_stat_sliders` is
+        # built from them, and the active-stat sweep picks its subject from that
+        # list. A club entry there would become a sweepable axis.
+        #
+        # Team is already canonical — _fix_team_names() ran inside
+        # load_all_historical() and folded Footscray, GWS and Kangaroos — so no
+        # aliasing belongs here. .tolist() is what makes these plain strings:
+        # Team is category dtype and .unique() alone hands back a Categorical.
+        all_clubs_sf = sorted(hist['Team'].dropna().unique().tolist())
+        selected_clubs_sf = st.multiselect("Club (leave blank for all)", all_clubs_sf, default=[], placeholder="All clubs", key="sf_clubs")
+
+        # A rate computed inside one club reads as a competition-wide rate
+        # unless the text naming its pool says otherwise, so every caption that
+        # names a pool carries this clause. Past three clubs the names stop
+        # fitting the readout sub-caption and a count reads better than a list.
+        if not selected_clubs_sf:
+            _club_scope = ''
+        elif len(selected_clubs_sf) <= 3:
+            _club_scope = ', '.join(selected_clubs_sf)
+        else:
+            _club_scope = f'{len(selected_clubs_sf)} clubs'
+        _club_sub = f' · {_club_scope}' if _club_scope else ''
+
         col1, col2, col3 = st.columns(3)
         with col1:
             result_filter = st.radio("Game result", ["Either", "Win only", "Loss only"], horizontal=True, key="sf_result")
@@ -5201,9 +5226,16 @@ def _render_stat_filter():
 
         # Assemble the filter mask from components so the active stat's own
         # constraint can be dropped for the threshold sweep.
+        # Club joins season, player and result here rather than in the stat loop
+        # below, so the sweep inherits it: `_sweep_mask` is built from
+        # `_base_mask`, which keeps the threshold curve inside the same pool the
+        # readouts count. .isin() on the category column is a row mask and is
+        # safe; a groupby('Team') would not be, because category group keys
+        # re-admit unobserved categories as spurious zero rows.
         _base_mask = (
             (hist['Season'] >= season_range[0]) & (hist['Season'] <= season_range[1]) &
-            (hist['Player_Name'].isin(selected_players_sf) if selected_players_sf else pd.Series(True, index=hist.index))
+            (hist['Player_Name'].isin(selected_players_sf) if selected_players_sf else pd.Series(True, index=hist.index)) &
+            (hist['Team'].isin(selected_clubs_sf) if selected_clubs_sf else pd.Series(True, index=hist.index))
         )
         if result_filter == "Win only": _base_mask &= (hist['Is_Win'] == 1)
         elif result_filter == "Loss only": _base_mask &= (hist['Is_Loss'] == 1)
@@ -5317,7 +5349,7 @@ def _render_stat_filter():
                 f'<div style="font-family:\'Archivo\',sans-serif;font-size:18px;font-weight:700;'
                 f'color:#e9eef3">Poll rate rises with {active_label.lower()}</div>'
                 f'<div style="color:#7e8c99;font-size:12px;margin-top:2px">'
-                f'tracking your active filter, set to {active_val}</div></div>',
+                f'tracking your active filter, set to {active_val}{_club_sub}</div></div>',
                 unsafe_allow_html=True,
             )
             if sweep:
@@ -5382,7 +5414,7 @@ def _render_stat_filter():
             '<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));'
             'margin:18px 0 4px">' +
                 _readout_cell('Matching games', f'{cur_games:,}', '#e9eef3',
-                              f'≥ {active_val} {active_label.lower()}', first=True) +
+                              f'≥ {active_val} {active_label.lower()}{_club_sub}', first=True) +
                 _readout_cell('Poll rate', f'{cur_poll:.1f}%', '#34d399',
                               f'vs {base_poll:.1f}% at zero') +
                 _readout_cell('3-vote rate', f'{cur_three:.1f}%', '#e9eef3',
@@ -5402,7 +5434,7 @@ def _render_stat_filter():
                 '<div style="margin:16px 0 4px;padding-top:13px;'
                 'border-top:1px solid rgba(140,165,185,.14)">'
                 '<span style="font-size:10px;font-weight:700;letter-spacing:1.2px;'
-                'text-transform:uppercase;color:#7e8c99;margin-right:18px">Vote breakdown</span>' +
+                f'text-transform:uppercase;color:#7e8c99;margin-right:18px">Vote breakdown{_club_sub}</span>' +
                 _vb(n3, '3-vote') + _vb(n2, '2-vote') + _vb(n1, '1-vote') +
                 _vb(n0, '0-vote') + _vb(vote_total, 'pool') +
                 '</div>',
@@ -5464,11 +5496,14 @@ def _render_stat_filter():
             _shown26_sf = len(_sf_disp) - _shown_sf
             _pending_sf = (f', plus {_shown26_sf:,} from 2026 pending votes'
                            if _shown26_sf else '')
+            # Club goes before the 2026 clause so the pending-votes count is not
+            # separated from the figure it qualifies.
+            _club_at_sf = f' at {_club_scope}' if _club_scope else ''
             st.markdown(
                 f'<div style="margin:22px 0 6px;font-size:10px;font-weight:700;letter-spacing:1.5px;'
                 f'text-transform:uppercase;color:#7e8c99">Sample games '
                 f'<span style="font-weight:400;letter-spacing:0;text-transform:none">— showing '
-                f'{_shown_sf:,} of {cur_games:,} matching{_pending_sf}</span></div>',
+                f'{_shown_sf:,} of {cur_games:,} matching{_club_at_sf}{_pending_sf}</span></div>',
                 unsafe_allow_html=True,
             )
             st.dataframe(_quiet_sf_table(_sf_disp), width='stretch', hide_index=True)
