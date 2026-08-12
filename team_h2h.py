@@ -52,11 +52,33 @@ def _slug(text):
     return ''.join(c.lower() if c.isalnum() else '' for c in text)
 
 
-def _table(df, cols=None, drop=('source_file',)):
+# Provenance is identical on every table in a run, so it is stated once in the
+# header. The extra-time booleans are dropped as columns and re-expressed as a
+# note under the tables that need one: a False in every row of every table is
+# nine columns of noise, and the flag matters only when it is True.
+DROP_ALWAYS = ('source_file', 'includes_extra_time', 'extra_time_n')
+
+# Seasons arrive as float64 wherever a suppressed row put a NaN in the column,
+# which prints 1972.0. Nullable Int64 keeps the blank and drops the decimal.
+SEASON_COLS = ('season_first', 'season_last', 'start_season', 'end_season',
+               'first_season', 'last_season', 'season')
+
+
+def _ints(df):
+    """Cast season columns to nullable Int64 so a year is not printed as 1972.0."""
+    d = df.copy()
+    for c in SEASON_COLS:
+        if c in d.columns:
+            d[c] = pd.to_numeric(d[c], errors='coerce').astype('Int64')
+    return d
+
+
+def _table(df, cols=None):
     """A markdown table, or a stated absence. Never a silent blank."""
     if df is None or df.empty:
         return '_No rows. An empty section is a failed lookup, not a zero._\n'
-    d = df[cols] if cols else df.drop(columns=[c for c in drop if c in df.columns])
+    d = _ints(df)
+    d = d[cols] if cols else d.drop(columns=[c for c in DROP_ALWAYS if c in d.columns])
     head = '| ' + ' | '.join(str(c) for c in d.columns) + ' |'
     rule = '|' + '---|' * len(d.columns)
     body = '\n'.join(
@@ -70,21 +92,75 @@ def _sources(df):
     if df is None or df.empty or 'source_file' not in df.columns:
         return ''
     seen = sorted({s for s in df.source_file.dropna() for s in str(s).split('; ')})
-    return '\nSource: ' + ', '.join(f'`{s}`' for s in seen) + '\n' if seen else ''
+    return ', '.join(f'`{s}`' for s in seen)
 
 
-def _et_note(df):
-    """Name any section whose population includes an extra-time match."""
-    if df is None or df.empty or 'includes_extra_time' not in df.columns:
+def _et_note(df, meetings):
+    """Name the extra-time matches under a table whose population holds one.
+
+    Fires only when the count is above zero, per spec section 3: the flag has
+    to stay visible when true, and naming the match is what makes it checkable
+    rather than a warning the reader cannot act on.
+    """
+    if df is None or df.empty or 'extra_time_n' not in df.columns:
         return ''
-    hit = df[df.includes_extra_time]
-    if hit.empty:
+    n = int(df.extra_time_n.sum())
+    if n == 0:
         return ''
-    n = int(hit.extra_time_n.sum()) if 'extra_time_n' in hit.columns else len(hit)
-    return (f'\n**Extra time in this population.** {n} match(es) here went to '
-            f'extra time. The match result uses the extra-time score and the '
-            f'quarter results are regulation, so a quarter record and a match '
-            f'record are not the same quantity on those matches.\n')
+    et = meetings[meetings.went_to_extra_time]
+    named = '; '.join(
+        f'{int(r.season)} {r["round"]} v {r.away_team if r.subject_is_home else r.home_team} '
+        f'({r.date.date().isoformat()})'
+        for _, r in et.iterrows()
+    )
+    return (f'\n**Extra time in this population.** {len(et)} match(es) went to '
+            f'extra time: {named}. The match result uses the extra-time score '
+            f'and the quarter results are regulation, so a quarter record and a '
+            f'match record are not the same quantity on those matches.\n')
+
+
+def _venue_home_split(meetings):
+    """Venue crossed with whether the subject was at home.
+
+    A display split of rows the venue table already covers, not a new cut, so
+    it does not enter the cells-tested count. It exists because venue and home
+    ground are collinear for most pairings: a venue table alone reads as a
+    venue effect when part of it is a home effect.
+    """
+    rows = []
+    for (venue, home), g in meetings.groupby(['venue', 'subject_is_home']):
+        counts = g.result.value_counts()
+        w, l, d = (int(counts.get(k, 0)) for k in 'WLD')
+        rows.append({'venue': venue, 'subject': 'home' if home else 'away',
+                     'wins': w, 'losses': l, 'draws': d, 'denominator': w + l + d,
+                     'season_first': int(g.season.min()),
+                     'season_last': int(g.season.max())})
+    out = pd.DataFrame(rows)
+    order = (out.groupby('venue').denominator.sum()
+             .sort_values(ascending=False).index.tolist())
+    out['_o'] = out.venue.map({v: i for i, v in enumerate(order)})
+    return out.sort_values(['_o', 'subject']).drop(columns='_o').reset_index(drop=True)
+
+
+def _streak_cols():
+    return ['basis', 'kind', 'length', 'composition', 'phrase', 'start_season',
+            'end_season', 'start_date', 'end_date', 'finals_in_window']
+
+
+def _live_summary(f):
+    """One line for the live rows when they all say the same thing.
+
+    Ten identical suppressed rows, one per basis per definition, is a table the
+    eye slides off. Where every live row carries the same reason it collapses
+    to a sentence; where any basis has a live streak the rows are kept.
+    """
+    live = f[f.kind == 'live']
+    if live.empty:
+        return None
+    if (live.length > 0).any():
+        return None
+    reasons = set(live.reason.dropna())
+    return reasons.pop() if len(reasons) == 1 else None
 
 
 def build_facts(subject, opponent, scope='all', fixture_date=None,
@@ -119,6 +195,8 @@ def build_facts(subject, opponent, scope='all', fixture_date=None,
     a(f'- Meetings in scope: **{int(ov.denominator)}**')
     a(f'- Fixture date supplied: {fixture_date or "none, section 7 not computed"}')
     a(f'- Conditional cells tested across sections 3 to 8: **{cuts_tested}**')
+    a(f'- Source, identical for every table below: '
+      f'{_sources(rec["series_overview"])}')
     a(f'- Generated by `team_h2h.py`. Facts only: no tweet copy, no draft, '
       f'and `draft_gate.py` has no team-mode coverage.\n')
     # FLOOR_CAVEAT already opens with "Archive floor 1965.", so it is quoted
@@ -133,12 +211,10 @@ def build_facts(subject, opponent, scope='all', fixture_date=None,
 
     a('## 1. Series overview\n')
     a(_table(rec['series_overview']))
-    a(_sources(rec['series_overview']))
-    a(_et_note(rec['series_overview']))
+    a(_et_note(rec['series_overview'], m))
 
     a('\n## 2. Scope split, home and away against finals\n')
     a(_table(rec['scope_split']))
-    a(_sources(rec['scope_split']))
 
     for n, key, title in ((3, 'by_venue', 'Venue'),
                           (4, 'by_timeslot', 'Timeslot'),
@@ -154,8 +230,14 @@ def build_facts(subject, opponent, scope='all', fixture_date=None,
             a('_Cells with no matches are suppressed. A suppressed cell never '
               'existed rather than having been filtered out._\n')
         a(_table(rec[key]))
-        a(_sources(rec[key]))
-        a(_et_note(rec[key]))
+        a(_et_note(rec[key], m))
+        if key == 'by_venue':
+            a('\n_Venue split by whether the subject was at home. Venue and '
+              'home ground are collinear for most pairings, so the table above '
+              'reads as a venue effect when part of it is a home effect. This '
+              'is a display split of the same rows, not an additional cut, and '
+              'it does not enter the cells-tested count._\n')
+            a(_table(_venue_home_split(m)))
 
     a('\n## 7. Same calendar date\n')
     if fixture_date is None:
@@ -172,8 +254,7 @@ def build_facts(subject, opponent, scope='all', fixture_date=None,
     a('_Regulation quarters, differenced from the cumulative scores. Extra '
       'time is not a quarter and is never folded into one._\n')
     a(_table(rec['by_quarter']))
-    a(_sources(rec['by_quarter']))
-    a(_et_note(rec['by_quarter']))
+    a(_et_note(rec['by_quarter'], m))
 
     a('\n## 9. Streaks\n')
     a(f'_Streaks compute on **all {len(stk["population"])} meetings** whatever '
@@ -183,15 +264,37 @@ def build_facts(subject, opponent, scope='all', fixture_date=None,
     a(f'_A loss breaks a run, a draw does not. Win streaks and non-loss '
       f'streaks are separate definitions and are never mixed. Archive floor '
       f'{FLOOR_SEASON}: say "since {FLOOR_SEASON}", never "ever"._\n')
+    # Where a run contains no draw the two definitions land on the same rows.
+    # The underlying computations stay separate, per spec section 8; only the
+    # printing of an identical row is collapsed, and the reason is stated.
+    cmp_cols = ['length', 'composition', 'start_date', 'end_date']
+    wl = stk['win_streaks'].set_index(['basis', 'kind'])
+    nl = stk['non_loss_streaks'].set_index(['basis', 'kind'])
+    same = [ix for ix in wl.index
+            if ix in nl.index and wl.loc[ix, cmp_cols].equals(nl.loc[ix, cmp_cols])]
+    same_longest = sorted({b for b, k in same if k == 'longest'})
+
     for label, key in (('Win streaks', 'win_streaks'),
                        ('Non-loss streaks', 'non_loss_streaks')):
         f = stk[key]
         a(f'\n### {label}\n')
-        a(_table(f, cols=['basis', 'kind', 'length', 'composition', 'phrase',
-                          'start_season', 'end_season', 'start_date',
-                          'end_date', 'finals_in_window', 'suppressed',
-                          'reason']))
-        a(_et_note(f))
+        live_line = _live_summary(f)
+        if live_line:
+            a(f'_No live streak on any basis: {live_line}. The live rows are '
+              f'collapsed to this line rather than repeated per basis._\n')
+            f = f[f.kind != 'live']
+        if key == 'non_loss_streaks' and same_longest:
+            a(f'_Identical to the win streak on {", ".join(same_longest)}, '
+              f'because those runs contain no draw and the two definitions '
+              f'coincide there. Those bases are omitted below rather than '
+              f'printed twice; the definitions themselves stay separate._\n')
+            f = f[~((f.kind == 'longest') & (f.basis.isin(same_longest)))]
+        if f.empty:
+            a('_Every row on this definition coincided with the win streak '
+              'above. Nothing differs._\n')
+        else:
+            a(_table(f, cols=_streak_cols()))
+        a(_et_note(f, m))
         if scope == 'ha':
             a('\n**Finals inside these streak windows.** Scope is `ha`, but '
               'streaks still count finals. Each one inside a window is named '
