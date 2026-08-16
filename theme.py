@@ -129,11 +129,14 @@ div[data-testid="stMultiSelect"] > div > div,
    Markup is st.markdown'd into an st.empty() by the page that is loading, so
    the rules live here rather than in a page-local <style>: this is the one
    stylesheet every page already has. Deliberately no new exported name.
-   The 350ms delay on cc-skel is load-bearing — a cached page renders inside
-   that window and never flashes a skeleton it didn't need. Measured: a warm
-   Live Tracker holds the skeleton 262ms, a cold one 4270ms, so the delay has
-   to clear the former without eating the latter. */
-.cc-skel { opacity: 0; animation: cc-skel-in 200ms ease-out 350ms forwards; }
+   The 700ms delay on cc-skel is load-bearing — a cached page renders inside
+   that window and never flashes a skeleton it didn't need. Tune it against
+   DEPLOYED numbers, never local ones. Measured on the Live Tracker, warm
+   st.cache_data hit: 262ms local but 407-602ms on Streamlit Cloud, which is
+   what an earlier 350ms missed — it cleared the local window and flashed on
+   every deployed load. A cold load runs ~4s in both places, so a delay this
+   long costs nothing on the path the skeleton actually exists for. */
+.cc-skel { opacity: 0; animation: cc-skel-in 200ms ease-out 700ms forwards; }
 @keyframes cc-skel-in { to { opacity: 1; } }
 .cc-skel-bar {
   background: linear-gradient(90deg, #101a24 0%, #16222e 50%, #101a24 100%);
@@ -149,7 +152,7 @@ div[data-testid="stMultiSelect"] > div > div,
   /* Not `animation: none; opacity: 1` — that discards the delay and makes
      reduced-motion the one setting where a cached page DOES flash. Keep the
      delay, drop only the fade. */
-  .cc-skel { animation: cc-skel-in 1ms linear 350ms forwards; }
+  .cc-skel { animation: cc-skel-in 1ms linear 700ms forwards; }
 }
 </style>
 """, unsafe_allow_html=True)
