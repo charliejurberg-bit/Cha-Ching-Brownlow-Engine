@@ -5876,8 +5876,10 @@ if _page == 'Live Tracker':
 
     # ── fetch ────────────────────────────────────────────────
     # Skeleton first, so a frame is on screen before the up-to-7 sequential AFL
-    # API calls block the script. Cleared once, above the branch below, so the
-    # error / no-data / live paths all drop it. The CSS is in theme.py.
+    # API calls block the script. Cleared inside each of the three branches
+    # below, on the line before that branch's own iframe, so the skeleton also
+    # covers load_game and _assemble_live_tracker on the live path rather than
+    # leaving them to run against a blank page. The CSS is in theme.py.
     _lt_ph = st.empty()
     _lt_ph.markdown(
         '<div class="cc-skel">'
@@ -5938,15 +5940,15 @@ if _page == 'Live Tracker':
   <div class="comp">{_lt_sn}</div>
 </div></body></html>"""
 
-    _lt_ph.empty()
-
     if _lt_err:
+        _lt_ph.empty()
         st.iframe(_hdr_html, height=54)
         st.error(f"Could not fetch AFL tracker data: {_lt_err}")
         if st.button("Retry", key="lt_retry"):
             st.cache_data.clear()
             st.rerun()
     elif _lt_df.empty:
+        _lt_ph.empty()
         st.iframe(_hdr_html, height=54)
         st.info(
             "Count night hasn't started yet — showing AFL's own Brownlow predictor data "
@@ -6728,6 +6730,7 @@ if _page == 'Live Tracker':
         # height:100% / min-height:100vh, so the desktop frame still measures a
         # viewport-height panel and .zones{flex:1} still has something to stretch
         # against — the single-viewport look _LT_IFRAME_H used to pin.
+        _lt_ph.empty()
         st.iframe(_full_html, height='content')
 
         # ── Public account panel ────────────────────────────────────────────
