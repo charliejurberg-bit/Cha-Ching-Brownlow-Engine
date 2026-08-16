@@ -5869,6 +5869,73 @@ def _assemble_live_tracker(lt, game_df, watchlist):
     return asm
 
 
+def _lt_cache_key(lt, game_df, watchlist, season):
+    """Cheap, content-exact cache key for _assemble_live_tracker.
+
+    Why a hand-built key instead of letting st.cache_data hash the arguments:
+    lt["df"] carries a Round_Votes column of dicts, so pandas' hash_pandas_object
+    raises "unhashable type: dict" and Streamlit falls back to pickling the whole
+    frame. That fallback costs ~75ms per rerun across the two frames (41ms for lt
+    at a 188-row feed, more at count-night size, plus 34ms for the 8,694-row game
+    frame) and logs a warning every call. Building this key measured 0.14ms for an
+    anonymous visitor and 1.2ms with a watchlist, against the 226ms it saves.
+
+    Covers exactly what the assembler reads: lt's df / last_round / is_live, the
+    model frame, and the watchlist. It does NOT cover lt["feed"], because the
+    assembler never looks at it. If that changes, this key has to grow with it.
+    """
+    df = lt.get("df")
+    if df is None or getattr(df, "empty", True):
+        live = ()
+    else:
+        live = (
+            tuple(df["Player"].to_numpy().tolist()) if "Player" in df.columns else (),
+            tuple(df["Total_Votes"].to_numpy().tolist()) if "Total_Votes" in df.columns else (),
+            tuple(df["Last_Vote_Round"].to_numpy().tolist()) if "Last_Vote_Round" in df.columns else (),
+        )
+
+    if game_df is None or getattr(game_df, "empty", True):
+        gkey = None
+    else:
+        # Length plus the Exp_Votes sum fingerprints the frame without walking
+        # all 168 columns. load_game caches per season, so within its ttl the
+        # object is identical anyway; this catches the rewrite when it lands.
+        gkey = (len(game_df),
+                round(float(np.nansum(game_df["Exp_Votes"].to_numpy())), 6)
+                if "Exp_Votes" in game_df.columns else None)
+
+    if watchlist is None:
+        wkey = None
+    elif watchlist.empty:
+        wkey = ()
+    else:
+        _wc = [c for c in ("Player", "Team", "My_Rounds", "Settled") if c in watchlist.columns]
+        wkey = tuple(map(tuple, watchlist[_wc].astype(str).to_numpy().tolist()))
+
+    return (season, int(lt.get("last_round", 0) or 0), bool(lt.get("is_live", False)),
+            live, gkey, wkey)
+
+
+# max_entries bounds memory: the return value pickles to ~492KB, so 64 entries is
+# ~31MB worst case. Sized for the multi-user axis, not the vote axis: every other
+# slot in the key is shared, so on count night each signed-in user with a distinct
+# watchlist costs one entry PER vote state, and anonymous visitors all share a
+# single entry (watchlist None). 16 would have thrashed on a busy count night with
+# every entry evicting the next; 64 leaves room for ~63 concurrent watchlists.
+# ttl is a backstop only — the key is content-exact, so a vote change invalidates
+# it without waiting for expiry.
+@st.cache_data(ttl=300, show_spinner=False, max_entries=64)
+def _assemble_live_tracker_cached(_lt, _game_df, _wl, cache_key):
+    """Cached front end for _assemble_live_tracker (226ms, run on every rerun).
+
+    The leading underscores on _lt / _game_df / _wl are load-bearing: that is how
+    Streamlit is told NOT to hash a parameter. cache_key deliberately has no
+    underscore — it is the only thing hashed, and renaming it to _cache_key would
+    silently make every call a cache hit on stale data.
+    """
+    return _assemble_live_tracker(_lt, _game_df, _wl)
+
+
 if _page == 'Live Tracker':
     import time as _time
     from datetime import datetime as _dt
@@ -5978,7 +6045,8 @@ if _page == 'Live Tracker':
         _wl_visible = _wl is not None
 
         _lt_game = load_game(_LT_SEASON)
-        _asm     = _assemble_live_tracker(_lt, _lt_game, _wl)
+        _asm     = _assemble_live_tracker_cached(
+            _lt, _lt_game, _wl, _lt_cache_key(_lt, _lt_game, _wl, _LT_SEASON))
 
         # ── Public account watchlist ────────────────────────────────────────
         # The ★ set below and the poll picks feeding Zone 1/3 above are separate
