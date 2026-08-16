@@ -2,9 +2,11 @@
 
 > Do not paste full source files. Locate code by function name, never by line number.
 > Last full-file recon pass over the live repo: 29 July 2026. Last edited:
-> 12 August 2026, listing every file in `data_history/` and registering
-> `team_h2h_spec.md` and `player_history_spec.md` under Other docs. Nothing
-> outside the lines those edits touched has been re-verified since 29 July.
+> 16 August 2026, adding the skeleton-loader law under UI theme, the Cloud
+> versus local timing entry under Environment gotchas, and the Caching section.
+> That edit was additive only: three insertions, no existing line changed.
+> Nothing outside the lines those edits touched has been re-verified since
+> 29 July.
 >
 > **This file and the Project Knowledge copy must be kept in sync.** On 29 July they
 > had diverged badly: the repo copy was several sessions stale and asserted three
@@ -539,12 +541,25 @@ book's line. `BETFAIR_MIN_BACK = 1.5` filters lay prices.
 - Animated/JS content lives in `st.iframe` (5 call sites in `dashboard.py`).
   `components.html()` is gone; the only surviving reference is a test mock in
   `test_espn.py`.
+- **Blocking loads show a skeleton, not a spinner.** `.cc-skel` / `.cc-skel-bar`
+  live in `inject_global_theme()`'s stylesheet, not a page-local block. Reveal is
+  delayed 700ms so a cache hit never paints. That number is tuned against
+  deployed timings, never local: the same warm Live Tracker path ran 262ms local
+  and 407 to 602ms on Cloud. The reduced-motion rule keeps the delay and drops
+  only the fade; `animation: none; opacity: 1` discards the delay and makes
+  reduced motion the one setting where a cached page flashes. Sole call site is
+  the `if _page == 'Live Tracker':` block, cleared once per branch immediately
+  above each `st.iframe`.
 
 ## Environment gotchas
 
 - Streamlit Cloud hot-update only re-executes `dashboard.py`; the import cache
   retains old module objects. **Changes to imported modules need a manual app
   reboot.**
+- **Cloud runs the same Python path roughly 1.6x to 2.3x slower than localhost**,
+  because the websocket round trip and shared CPU sit on the critical path. Any
+  threshold tuned on local numbers will be wrong in production. Measure on the
+  deployed app.
 - `st.context.cookies` is blind under Cloud's iframe embedding (SameSite=Strict).
   Cookie reads must go client-side via the component's `getAll`.
 - Screenshot verification is unreliable for this app. `get_page_text` and log
@@ -559,6 +574,18 @@ book's line. `BETFAIR_MIN_BACK = 1.5` filters lay prices.
   `[System.IO.File]::WriteAllText` instead.
 - `scripts/build_history.R` uses repo-root-relative paths. Run it as
   `Rscript scripts/build_history.R` from the root, never from inside `scripts/`.
+
+## Caching the Live Tracker load path
+
+`_assemble_live_tracker` is ~218ms and was uncached, paid on every rerun. It is
+now wrapped by `_assemble_live_tracker_cached`, keyed on a hand-built 6-slot
+content key from `_lt_cache_key()`. Naive `st.cache_data` does not work here:
+`hash_pandas_object` raises on the `Round_Votes` dict column, Streamlit falls
+back to pickling both frames, and that costs 75ms per call with a logged warning.
+The three data args carry leading underscores so Streamlit skips hashing them.
+`max_entries=64` sizes the multi-user axis, since each signed-in user with a
+distinct watchlist costs one entry per vote state while anonymous visitors share
+one.
 
 ## Conventions
 
