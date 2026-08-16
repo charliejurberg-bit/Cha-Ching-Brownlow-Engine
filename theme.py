@@ -125,5 +125,26 @@ div[data-testid="stMultiSelect"] > div > div,
     font-weight: 700 !important;
     padding: 10px 18px !important;
 }
+/* ── Skeleton loader ──
+   Markup is st.markdown'd into an st.empty() by the page that is loading, so
+   the rules live here rather than in a page-local <style>: this is the one
+   stylesheet every page already has. Deliberately no new exported name.
+   The 120ms delay on cc-skel is load-bearing — a cached page renders inside
+   that window and never flashes a skeleton it didn't need. */
+.cc-skel { opacity: 0; animation: cc-skel-in 200ms ease-out 120ms forwards; }
+@keyframes cc-skel-in { to { opacity: 1; } }
+.cc-skel-bar {
+  background: linear-gradient(90deg, #101a24 0%, #16222e 50%, #101a24 100%);
+  background-size: 200% 100%;
+  animation: cc-skel-shimmer 1.4s ease-in-out infinite;
+  border: 1px solid #1a2632; border-radius: 6px; margin-bottom: 10px;
+}
+@keyframes cc-skel-shimmer {
+  0% { background-position: 200% 0; } 100% { background-position: -200% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cc-skel-bar { animation: none; }
+  .cc-skel { animation: none; opacity: 1; }
+}
 </style>
 """, unsafe_allow_html=True)

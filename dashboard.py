@@ -1787,7 +1787,7 @@ def form_guide_dots(season, n_rounds=3):
     return result
 
 # count night: temporarily drop to ~60 and match the sleep.
-@st.cache_data(ttl=300, show_spinner="Fetching live votes…")
+@st.cache_data(ttl=300, show_spinner=False)
 def fetch_live_brownlow_data():
     """Fetch Brownlow vote data from AFL public API. Returns a result dict."""
     import requests as _req
@@ -5875,6 +5875,19 @@ if _page == 'Live Tracker':
     _count_night = _dt.now() >= _dt(2026, 9, 21)
 
     # ── fetch ────────────────────────────────────────────────
+    # Skeleton first, so a frame is on screen before the up-to-7 sequential AFL
+    # API calls block the script. Cleared once, above the branch below, so the
+    # error / no-data / live paths all drop it. The CSS is in theme.py.
+    _lt_ph = st.empty()
+    _lt_ph.markdown(
+        '<div class="cc-skel">'
+        '<div class="cc-skel-bar" style="height:54px"></div>'
+        '<div class="cc-skel-bar" style="height:92px"></div>'
+        + '<div class="cc-skel-bar" style="height:44px"></div>' * 8 +
+        '</div>',
+        unsafe_allow_html=True,
+    )
+
     _lt = fetch_live_brownlow_data()
     _lt_err  = _lt.get("error")
     _lt_df   = _lt.get("df", pd.DataFrame())
@@ -5924,6 +5937,8 @@ if _page == 'Live Tracker':
     <span class="pill {'live' if _lt_live else ''}"><span class="dot"></span>{_pill_txt}</span></div>
   <div class="comp">{_lt_sn}</div>
 </div></body></html>"""
+
+    _lt_ph.empty()
 
     if _lt_err:
         st.iframe(_hdr_html, height=54)
