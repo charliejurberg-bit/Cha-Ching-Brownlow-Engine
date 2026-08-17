@@ -3,9 +3,18 @@
     python team_h2h.py --teams "Richmond" "St Kilda"
     python team_h2h.py --teams "Richmond" "St Kilda" --date 2026-08-15
     python team_h2h.py --teams "Richmond" "St Kilda" --scope ha --without "Tim Taranto"
+    python team_h2h.py --teams "Richmond" "St Kilda" --extended
 
 The first team named is the subject. Every record is oriented to it, never to
 the home side.
+
+`--extended` adds section 12, the 1897-1964 tier, for the cuts that can cross
+the join. Timeslot, quarter records, the Q1-Q4 streak bases and with/without
+cannot cross it and keep their 1965 floor, and section 12 says so rather than
+printing them blank. Without the flag sections 1 to 11 are unchanged from
+before the tier existed, and the only addition is a section 12 heading carrying
+the same "Not run, opt-in via" stub sections 10 and 11 already print. See
+team_h2h_spec.md section 14.
 
 Output is a **markdown facts file** to drafts/, which is gitignored. No tweet
 copy and no draft: draft_gate.py has no team-mode coverage, so nothing here is
@@ -25,6 +34,11 @@ Three things the writer is built to prevent, each from the spec:
   - **An empty arm read as a contrast.** If a with/without arm has no matches
     there is no comparator, so the numbers print and the framing is withheld
     with the reason given.
+  - **Two floors read as one.** Under `--extended` the file carries a 1965
+    floor for sections 1 to 11 and an 1897 floor for section 12. Every extended
+    table names its own floor, and the two cells-tested counts are reported
+    separately, so a figure cannot be lifted from one and paired with a figure
+    from the other.
 """
 
 import argparse
@@ -34,10 +48,13 @@ import sys
 import pandas as pd
 
 from team_h2h_crossopp import LIVE_STREAK_TRIGGER, cross_opponent_streaks
+from team_h2h_pre1965 import (EXTENDED_CAVEAT, EXTENDED_FLOOR,
+                              MIXED_FLOOR_WARNING, extended_series)
 from team_h2h_records import H2HError, h2h_records
 from team_h2h_streaks import FLOOR_CAVEAT, FLOOR_SEASON, h2h_streaks
 from team_h2h_without import h2h_without
 from team_match_table import load_match_table
+from team_match_table_pre1965 import UNAVAILABLE
 
 OUT_DIR = 'drafts'
 
@@ -46,6 +63,14 @@ OUT_DIR = 'drafts'
 # finding, so it is computed from the frames rather than declared.
 CUT_SECTIONS = ('by_venue', 'by_timeslot', 'by_day', 'by_venue_timeslot',
                 'same_calendar_date', 'by_quarter')
+
+# Section 12's own cuts. Counted and printed SEPARATELY from CUT_SECTIONS
+# rather than added to it: they are the same pre-declared cuts run on a
+# different population, so folding them into one number would understate how
+# many cells an extended run has actually looked at while implying the 1965+
+# sections got bigger.
+EXTENDED_CUT_SECTIONS = ('pre_by_venue', 'all_by_venue', 'all_by_day',
+                         'all_same_calendar_date')
 
 
 def _slug(text):
@@ -63,11 +88,19 @@ DROP_ALWAYS = ('source_file', 'includes_extra_time', 'extra_time_n')
 SEASON_COLS = ('season_first', 'season_last', 'start_season', 'end_season',
                'first_season', 'last_season', 'season')
 
+# Same defect, different column. `ties` is attached only to a longest row, so
+# the live row beside it is NaN and promotes the whole column to float, which
+# prints a tie count of 1 as "1.0".
+COUNT_COLS = ('ties',)
+
 
 def _ints(df):
-    """Cast season columns to nullable Int64 so a year is not printed as 1972.0."""
+    """Cast season and count columns to nullable Int64.
+
+    So a year is not printed as 1972.0 and a tie count is not printed as 1.0.
+    """
     d = df.copy()
-    for c in SEASON_COLS:
+    for c in SEASON_COLS + COUNT_COLS:
         if c in d.columns:
             d[c] = pd.to_numeric(d[c], errors='coerce').astype('Int64')
     return d
@@ -119,6 +152,26 @@ def _et_note(df, meetings):
             f'match record are not the same quantity on those matches.\n')
 
 
+def _et_note_once(frames, meetings):
+    """The extra-time note for a whole section, emitted at most once.
+
+    Sections 1 to 9 attach the note per table, which is right there: each of
+    those tables is a differently scoped population and a reader may lift any
+    one of them alone. Section 12's tables all draw from the SAME combined
+    population, so the per-table form printed one identical paragraph five
+    times in a file that already carried it. This collapses them, and fires if
+    any frame in the section holds an extra-time match, so nothing is lost.
+    """
+    n = sum(int(f.extra_time_n.sum()) for f in frames
+            if f is not None and not f.empty and 'extra_time_n' in f.columns)
+    if not n:
+        return ''
+    # A one-row stand-in carrying only the flag. `_et_note` names the matches
+    # from `meetings`, not from this frame, so the count here only has to be
+    # non-zero to fire it.
+    return _et_note(pd.DataFrame([{'extra_time_n': 1}]), meetings)
+
+
 def _venue_home_split(meetings):
     """Venue crossed with whether the subject was at home.
 
@@ -163,8 +216,115 @@ def _live_summary(f):
     return reasons.pop() if len(reasons) == 1 else None
 
 
+def _extended_lines(subject, opponent, scope, fixture_date, table):
+    """Section 12. The pre-1965 tier and the all-time figures it unlocks.
+
+    Returns (lines, extended_cuts, meta). Every table here carries its own
+    `floor` column, and the mixed-floor warning is printed before any of them:
+    with two floors in one file, the live risk is a reader pairing an all-time
+    number from here with a 1965-floored number from section 8.
+    """
+    ext = extended_series(subject, opponent, scope=scope,
+                          fixture_date=fixture_date, main=table)
+    em = ext['meta'].iloc[0]
+    # Zero when the tier adds no meetings. The all-time frames still compute in
+    # that case, but they are row-for-row the sections above, so counting their
+    # cells would claim this section looked at cells it never printed.
+    cuts = 0 if ext['pre_meetings'] is None else sum(
+        len(ext[s]) for s in EXTENDED_CUT_SECTIONS if ext.get(s) is not None)
+
+    L = [f'\n## 12. Extended tier, {EXTENDED_FLOOR} to {FLOOR_SEASON - 1}\n']
+    a = L.append
+    a(f'> **{MIXED_FLOOR_WARNING}**\n')
+    a(f'> {EXTENDED_CAVEAT}\n')
+    a(f'- Pre-{FLOOR_SEASON} meetings: **{int(em.pre_meetings)}** '
+      f'across {int(em.seasons_added)} season(s)')
+    a(f'- {FLOOR_SEASON}+ meetings: **{int(em.main_meetings)}** '
+      f'(sections 1 to 11 above)')
+    a(f'- All-time meetings: **{int(em.all_meetings)}**')
+    a(f'- First meeting all-time: **{em.first_meeting_all}**, against '
+      f'{em.first_meeting_main} in the {FLOOR_SEASON}+ tier alone')
+    a(f'- Extended cells tested in this section: **{cuts}**. Counted '
+      f'separately from the {FLOOR_SEASON}+ count above, because these are the '
+      f'same cuts on a different population rather than extra cuts on the '
+      f'same one.\n')
+    a(f'**What does not extend, and why.** These sections keep their '
+      f'{FLOOR_SEASON} floor. The fields are absent from a match-level feed, '
+      f'so they are reported as unavailable rather than left blank: a blank '
+      f'reads as "no matches" and the truth is "never recorded".\n')
+    for k, v in UNAVAILABLE.items():
+        a(f'- {k}: {v}')
+    a('')
+
+    if ext['pre_meetings'] is None:
+        a(f'\n### 12.1 No pre-{FLOOR_SEASON} meetings\n')
+        a(f'_{subject} and {opponent} did not meet before {FLOOR_SEASON}: at '
+          f'least one of them was not in the competition. The extended tier '
+          f'adds nothing to this pairing, so every all-time figure equals its '
+          f'section 1 to 11 counterpart. This is a real zero, not a failed '
+          f'lookup: the tier searched holds {int(em.tier_matches):,} matches '
+          f'across {em.tier_range}._\n')
+        return L, cuts, em
+
+    # Extra time can only enter through the 1965+ half of a combined
+    # population, since the pre-1965 tier has none. The note still has to fire
+    # on the all-time tables: an all-time quarter claim does not exist here,
+    # but the match record on those rows is the extra-time one and the reader
+    # is owed the same flag section 1 gives them.
+    all_m = ext['all_meetings']
+    a(_et_note_once([ext['all_overview'], ext['all_scope_split'],
+                     ext['all_by_venue'], ext['all_by_day'],
+                     ext['all_win_streaks'], ext['all_non_loss_streaks']],
+                    all_m))
+
+    a(f'\n### 12.1 Series overview\n')
+    a(f'_Pre-{FLOOR_SEASON} tier alone, then all-time. The two are printed '
+      f'separately so the added history is visible as its own population '
+      f'rather than folded invisibly into a bigger number._\n')
+    a(_table(ext['pre_overview']))
+    a(_table(ext['all_overview']))
+
+    a(f'\n### 12.2 Scope split, home and away against finals\n')
+    a(_table(ext['pre_scope_split']))
+    a(_table(ext['all_scope_split']))
+
+    a(f'\n### 12.3 Venue\n')
+    a('_Venue strings are the era\'s own. A ground that changed name across '
+      'the join appears under both, and no two rows are merged on a guess._\n')
+    a(_table(ext['pre_by_venue']))
+    a(_table(ext['all_by_venue']))
+
+    a(f'\n### 12.4 Day of week, all-time\n')
+    a(_table(ext['all_by_day']))
+
+    a(f'\n### 12.5 Same calendar date, all-time\n')
+    if fixture_date is None:
+        a('_Not computed. Needs `--date`, as section 7 does._\n')
+    a(_table(ext['all_same_calendar_date']))
+
+    a(f'\n### 12.6 Streaks, all-time, match basis only\n')
+    a(f'_The match basis is the ONLY one that crosses the join, because the '
+      f'pre-{FLOOR_SEASON} tier has no quarter scores. The Q1 to Q4 streaks in '
+      f'section 9 keep their {FLOOR_SEASON} floor and are not restated here._\n')
+    a(f'_Computed on all {int(em.all_meetings)} meetings whatever the scope, '
+      f'the same inversion section 9 applies: a final between two home-and-away '
+      f'results breaks continuity._\n')
+    # `ties` is printed here and not in section 9. Widening the archive is
+    # exactly what creates ties at the longest: two runs of equal length that
+    # sat in different eras now sit in one population. A tied longest presented
+    # as "the" longest is a superlative the data does not support, so the count
+    # travels with the row.
+    a(f'_A `ties` above 1 means the longest is SHARED. It is not a '
+      f'superlative and must not be written as one._\n')
+    for label, key in (('Win streaks', 'all_win_streaks'),
+                       ('Non-loss streaks', 'all_non_loss_streaks')):
+        a(f'\n**{label}**\n')
+        a(_table(ext[key], cols=_streak_cols() + ['ties', 'floor']))
+    return L, cuts, em
+
+
 def build_facts(subject, opponent, scope='all', fixture_date=None,
-                without=(), matches=None):
+                without=(), matches=None, extended=False):
     """Return the facts file as markdown text, and the run's own metadata."""
     table = load_match_table() if matches is None else matches
 
@@ -202,6 +362,11 @@ def build_facts(subject, opponent, scope='all', fixture_date=None,
     # FLOOR_CAVEAT already opens with "Archive floor 1965.", so it is quoted
     # rather than prefixed.
     a(f'> {FLOOR_CAVEAT}\n')
+    if extended:
+        a(f'> **Two floors in this file.** `--extended` was passed, so section '
+          f'12 adds the {EXTENDED_FLOOR} to {FLOOR_SEASON - 1} tier. The '
+          f'caveat above governs sections 1 to 11 and nothing else. Section 12 '
+          f'names its own floor on every table.\n')
     a('> **Reading the cuts.** A series this long will contain a striking '
       'pattern somewhere in {quarters x result x venue x timeslot x day}. '
       f'{cuts_tested} cells were tested to produce the sections below, so any '
@@ -371,15 +536,32 @@ def build_facts(subject, opponent, scope='all', fixture_date=None,
         a(f'\n_{meta.availability_note}_\n')
         a(f'\n_No quarter-by-quarter breakdown on this cut._\n')
 
+    extended_cuts, extended_meta = 0, None
+    if not extended:
+        a(f'\n## 12. Extended tier, pre-{FLOOR_SEASON}\n')
+        a(f'_Not run. Opt-in via `--extended`, which adds the {EXTENDED_FLOOR} '
+          f'to {FLOOR_SEASON - 1} tier for the cuts that can cross the join._\n')
+    else:
+        lines, extended_cuts, extended_meta = _extended_lines(
+            subject, opponent, scope, fixture_date, table)
+        L.extend(lines)
+
     a('\n---\n')
     a(f'_Facts only. No forward-looking claim appears above: this tool is '
       f'retrospective and touches no model output. Archive floor '
-      f'{FLOOR_SEASON}._\n')
+      f'{FLOOR_SEASON}'
+      + (f' for sections 1 to 11, {EXTENDED_FLOOR} for section 12.'
+         if extended else '.') + '_\n')
 
     run = {'subject': subject, 'opponent': opponent, 'scope': scope,
            'fixture_date': fixture_date, 'meetings': int(ov.denominator),
            'cuts_tested': cuts_tested, 'live_match_streak': live_match,
-           'without': [p for p, _ in resolved]}
+           'without': [p for p, _ in resolved], 'extended': extended,
+           'extended_cuts': extended_cuts,
+           'all_meetings': (int(extended_meta.all_meetings)
+                            if extended_meta is not None else None),
+           'pre_meetings': (int(extended_meta.pre_meetings)
+                            if extended_meta is not None else None)}
     return '\n'.join(L), run
 
 
@@ -394,13 +576,19 @@ def main(argv=None):
                         'only; without it that section reports as not computed')
     p.add_argument('--without', action='append', default=[], metavar='PLAYER',
                    help='player name or afltables url, repeatable, opt-in')
+    p.add_argument('--extended', action='store_true',
+                   help=f'add section 12, the {EXTENDED_FLOOR} to '
+                        f'{FLOOR_SEASON - 1} tier, for the cuts that can cross '
+                        f'the join. Timeslot, quarters and with/without cannot '
+                        f'and keep their {FLOOR_SEASON} floor')
     p.add_argument('--out-dir', default=OUT_DIR)
     args = p.parse_args(argv)
 
     subject, opponent = args.teams
     try:
         text, run = build_facts(subject, opponent, scope=args.scope,
-                                fixture_date=args.date, without=args.without)
+                                fixture_date=args.date, without=args.without,
+                                extended=args.extended)
     except H2HError as exc:
         print(f'FAILED: {exc}', file=sys.stderr)
         return 1
@@ -426,6 +614,10 @@ def main(argv=None):
           f'{run["live_match_streak"]}')
     if run['without']:
         print(f'  with/without: {", ".join(run["without"])}')
+    if run['extended']:
+        print(f'  extended: {run["all_meetings"]} all-time meetings '
+              f'({run["pre_meetings"]} pre-{FLOOR_SEASON}), '
+              f'{run["extended_cuts"]} extended cells tested')
     return 0
 
 

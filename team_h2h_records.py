@@ -89,15 +89,26 @@ def _orient(matches, subject, opponent):
     m['subject_is_home'] = home
     m['subject_score'] = m.home_score.where(home, m.away_score)
     m['opp_score'] = m.away_score.where(home, m.home_score)
-    for q in QUARTERS:
-        m[f'subject_q{q}P'] = m[f'HQ{q}P'].where(home, m[f'AQ{q}P'])
-        m[f'opp_q{q}P'] = m[f'AQ{q}P'].where(home, m[f'HQ{q}P'])
+
+    # The quarter and timeslot columns are conditional because this function
+    # serves two tiers. The 1965+ table has both; the pre-1965 table
+    # (team_match_table_pre1965) has neither, because a match-level feed
+    # records no quarter scores and no start time. Orientation itself is
+    # identical either way, so it lives here once rather than being re-derived
+    # per tier: a change to what "subject" means has to move both at once.
+    # Nothing is null-filled. An absent column stays absent, so a consumer that
+    # asks a pre-1965 frame for a quarter fails at the point of the mistake.
+    if all(f'HQ{q}P' in m.columns for q in QUARTERS):
+        for q in QUARTERS:
+            m[f'subject_q{q}P'] = m[f'HQ{q}P'].where(home, m[f'AQ{q}P'])
+            m[f'opp_q{q}P'] = m[f'AQ{q}P'].where(home, m[f'HQ{q}P'])
 
     # Match result, extra-time inclusive. home_score/away_score already carry
     # the extra-time total where one exists; the loader asserts that on every
     # match, so this does not re-derive it.
     m['result'] = _result(m.subject_score, m.opp_score)
-    m['timeslot'] = m.local_start_time.map(_timeslot)
+    if 'local_start_time' in m.columns:
+        m['timeslot'] = m.local_start_time.map(_timeslot)
     m['day_month'] = m.date.dt.strftime('%m-%d')
     return m.sort_values('date').reset_index(drop=True)
 

@@ -402,3 +402,116 @@ A check that returns empty is a failed check, not a passed one.
 6. RESOLVED. `data_history/` documented in full at 285709c: 19 files, not one.
    The two that mattered were `fitzroy_stats_1965_2006.csv.gz` and the 17
    `game_level_YYYY.csv` files. Project Knowledge re-upload required.
+
+---
+
+## 14. Extended tier, 1897–1964
+
+Added after the original build. **Opt-in via `--extended`; without the flag
+nothing in sections 1–11 changes.** The one difference an unflagged run does
+make is a section 12 heading carrying the same "Not run, opt-in via" stub that
+sections 10 and 11 already print, so the file states that the tier exists and
+was declined rather than staying silent about it. Verified by diffing an
+unflagged run against the same run built from the commit before the tier: five
+added lines, all of them that stub, with sections 1–11 and the closing floor
+line untouched.
+
+### Why the 1965 floor was never a results floor
+
+Section 2 derives the match table from three **player-level** files, so the
+floor is the floor of AFLTables player statistics, 1965. Nothing about the
+*results* stops there. `fetch_results_afltables()` reaches 1897, the VFL's
+first season, and carries date, venue, round, both clubs and full scores.
+
+### The condition section 2 set, and how this meets it
+
+Section 2 rules out `_tmp/match_results_all.csv` on three grounds: untracked,
+gitignored directory, and **produced by a script that no longer exists**. It
+adds: "do not adopt it later without a tracked regeneration path."
+
+`scripts/fetch_results_pre1965.R` **is** that path. It writes
+`data_history/match_results_1897_1965.csv` (tracked, 6,670 rows) and asserts
+the points identity before writing.
+
+The fourth ground stands and is not fixable: the feed carries **no start time
+and no quarter scores**. That is why this is a separate tier rather than a
+fourth entry in `SOURCES`.
+
+| Tier | Source | Matches | Loader |
+|---|---|---|---|
+| 1897–1964 | `match_results_1897_1965.csv` | 6,558 | `team_match_table_pre1965.py` |
+| 1965–2026 | the three player files | per section 2 | `team_match_table.py` |
+
+The tiers **must not be concatenated blindly.** The pre-1965 table is
+deliberately narrower and does not null-fill the columns it lacks, so a
+consumer reaching for `local_start_time` fails at the point of the mistake
+rather than binning 6,558 matches as "Unknown".
+
+### What crosses the join and what does not
+
+| Section | Extends | Why not |
+|---|---|---|
+| 1 overview, 2 scope split, 3 venue, 5 day, 7 same date | yes | |
+| 9 streaks, **match basis only** | yes | |
+| 4 timeslot, 6 venue × timeslot | no | no `Local.start.time` |
+| 8 quarter by quarter, 9 streaks Q1–Q4 | no | no quarter scores |
+| 11 with/without | no | no player rows |
+
+Unavailability is **printed, never left blank.** A blank section reads as "no
+matches"; the truth is "the field was never recorded". `UNAVAILABLE` in
+`team_match_table_pre1965.py` is the machine-readable form.
+
+### The overlap season
+
+The fetch reaches 1965 even though the tier stops at 1964. That season is the
+**join validation**: `validate_join()` checks the two feeds agree before any
+combined figure is trusted. Verified at build: 112 matches both feeds, 112
+scores agreeing, 112 venue strings agreeing. Without an overlap the join would
+be unverifiable. The tier itself drops 1965, and assertion 8 enforces the
+1897–1964 range so nothing is double-counted.
+
+### Extra time pre-1965
+
+`went_to_extra_time` is False on every pre-1965 row, and that is a fact about
+the era rather than a missing field: extra time did not enter VFL finals until
+1991, and a drawn final was replayed the following week as its own match.
+Assertion 7 checks every drawn final has a replay, so the False is verified.
+
+### Mixed floors — the new failure mode
+
+An extended file carries **two floors**. The risk is a reader pairing an
+all-time figure from section 12 with a 1965-floored figure from section 8 in
+one sentence. Three guards:
+
+1. Every section 12 frame carries a `floor` column, so a table copied out of
+   context still names its floor.
+2. `MIXED_FLOOR_WARNING` prints before any section 12 table, and a banner
+   prints in the header.
+3. Section 12's cells-tested count is reported **separately** from the 1965+
+   count. They are the same cuts on a different population, so one number
+   would misstate both.
+
+### Claim strength, and the limit of it
+
+1897 is the VFL's first season, so for two clubs in the competition from 1897
+the extended tier IS complete VFL/AFL history: "since 1897" and "in VFL/AFL
+history" are both true of it. It is still **not club history** — clubs played
+in the VFA before 1897 and no tier here holds those meetings.
+
+`ties` is printed on section 12 streaks and not on section 9's. Widening the
+archive is exactly what creates ties at the longest, two equal runs from
+different eras landing in one population. A tied longest written as a
+superlative is the specific defect that column prevents.
+
+### Clubs
+
+University (1908–1914) appears and is deliberately NOT added to
+`CLUB_ALIASES`. It maps to itself, which is already what `canonical_club()`
+does with an unrecognised string, and it terminates rather than folding, like
+Fitzroy. It is in `KNOWN_CLUBS` so the guard cannot pass it through unnoticed.
+This supersedes section 5's "add only if the floor ever moves earlier": the
+floor moved, and the answer was the known-club set rather than an alias.
+
+Note the results feed already emits South Melbourne as "Sydney" where the
+player feed emits "South Melbourne". `canonical_club()` runs on both sides in
+both loaders, so the tiers land on the same string either way.
