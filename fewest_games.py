@@ -36,13 +36,54 @@ and would bias any "fewest games" ranking. With Date in the key every season's
 fixture count matches data_history/match_counts_baseline.csv exactly, and no
 season 1965-2025 is missing a home-and-away fixture.
 
-Per-stat floors
----------------
+Eligibility is a per-player coverage test
+-----------------------------------------
+A player is eligible only if **every game of their career in this data carries a
+non-null value for the stat**. That is the rule's actual purpose, no invisible
+games, tested directly rather than approximated by debut season.
+
+This replaced a blanket debut-floor rule, which was measurably too strict. Garry
+Wilson has all 268 of his games recorded with a disposals value, 1971-1984, yet
+the old rule dropped him for debuting before the 1976 floor; under the coverage
+test he ranks at 190 games, matching the published figure exactly. Across the ten
+stats the change recovers players only where a floor was set by *partial* rather
+than absent coverage: Disposals (1,468 excluded before, 240 now), Frees.For and
+Frees.Against (436 each) and Hit.Outs (1,052). For the six stats whose column is
+strictly all-null before its floor, every pre-floor game is a gap, so the two
+rules select identically.
+
+The debut-floor rule was also structurally loose, since it passed any post-floor
+debutant without checking for a mid-career gap. That loophole currently costs
+nothing: the count of players who debuted after a stat's floor and still carry a
+gap is **zero for all ten stats**, which each header reports. It is checked
+rather than assumed because a future source revision could open it.
+
+The coverage test runs on the raw frame, before features.add_row_stats() is
+called, because that function coerces its inputs with `.fillna(0)`. Test the
+finished value and a missing input has already become a legitimate-looking zero.
+For a derived stat the test covers its inputs, not its output: Score_Involvements
+needs all four terms, Wins needs both scores and Home.Away.
+
+Left-censoring
+--------------
+Separately, a player whose first game falls in the earliest season any source
+covers may have debuted earlier and played games no source records. They are
+excluded too, and counted separately, because the cause is the archive's start
+date rather than a gap in the stat.
+
+Per-stat floors, now a diagnostic
+---------------------------------
 A stat's column exists long before it is populated, and a present-but-empty
 column is not coverage. Each floor below is the first season from which the
 column is non-null on every row with no later gap, measured per season across
 all three sources. The floors are not all the first season the column polls a
 value: four stats poll earlier and then break.
+
+**The floors no longer filter anything.** They are reported in each header as a
+diagnostic, and used to split the coverage exclusions into those a debut-floor
+rule would have predicted and those it would have missed. A floor is the season
+from which a column is complete for every player at once, which is strictly
+stronger than what any individual player needs.
 
 Player identity is keyed on `ID`, never name, and every output row prints the ID
 beside the name.
@@ -127,12 +168,31 @@ ENGINEERED = {'Score_Involvements'}
 DERIVED_WIN = 'Wins'
 
 ELIGIBILITY_RULE = (
-    "A player is included only if their first game anywhere in the data falls "
-    "on or after this stat's floor season. Anyone who debuted earlier is "
-    "excluded outright, because their pre-floor games are invisible to the "
-    "stat and they would rank as having reached the threshold faster than they "
-    "actually did."
+    "A player is eligible only if every game of their career in this data "
+    "carries a non-null value for this stat. That tests the rule's actual "
+    "purpose, which is that no game is invisible, rather than approximating it "
+    "by debut season. A player who debuted before the stat's floor but happens "
+    "to have a complete record is ranked; a player who debuted after it but has "
+    "a gap is not."
 )
+
+# Required verbatim in every header. One constant so all four tables carry
+# byte-identical wording.
+CENSORING_NOTE = (
+    "**Career totals are censored at both ends.** The 1965 data floor truncates "
+    "earlier debutants and any player still active has an unfinished count."
+)
+
+
+def _left_censor_rule(data_floor):
+    return (
+        f"**Left-censoring.** A player whose first game in the data falls in "
+        f"{data_floor}, the earliest season any source covers, may have debuted "
+        f"earlier and played games no source records. Their count cannot be "
+        f"trusted and they are excluded, reported separately from the coverage "
+        f"exclusions because the cause is the archive's start date rather than "
+        f"a gap in the stat."
+    )
 
 # Columns read from every source. The engineered path needs more than the stat
 # itself, because features.add_row_stats() computes the whole row-stat block.
@@ -235,6 +295,38 @@ def load_frame(archive=ARCHIVE, modern=MODERN, current=CURRENT):
     return df, prov
 
 
+# The columns a row needs for the stat to be computable. The coverage test runs
+# on these, not on the finished value: add_row_stats() coerces its inputs with
+# .fillna(0), so by the time a derived value exists a missing input has already
+# become a legitimate-looking zero.
+_COVERAGE_INPUTS = {
+    'Score_Involvements': ('Goals', 'Goal.Assists', 'Marks.Inside.50',
+                           'Inside.50s'),
+    'Wins': ('Home.score', 'Away.score', 'Home.Away'),
+}
+
+
+def _coverage_mask(df, stat):
+    """Per-row: does this row carry everything `stat` needs to be computed?
+
+    Must be called on the raw frame, before add_row_stats() turns a missing
+    input into a zero.
+    """
+    cols = _COVERAGE_INPUTS.get(stat, (stat,))
+    missing = [c for c in cols if c not in df.columns]
+    if missing:
+        raise ValueError(
+            f"cannot test coverage for {stat!r}: column(s) {missing} absent "
+            f"from the frame")
+    mask = pd.Series(True, index=df.index)
+    for c in cols:
+        if c == 'Home.Away':
+            mask &= df[c].notna()
+        else:
+            mask &= pd.to_numeric(df[c], errors='coerce').notna()
+    return mask
+
+
 def _stat_series(work, stat):
     """The per-game contribution of `stat` on the working frame.
 
@@ -317,22 +409,46 @@ def build_fewest_games(stat, threshold, top_n=10, out_dir=DRAFTS_DIR, **kw):
 
     floor, why = STAT_FLOORS[stat]
     df, prov = load_frame(**kw)
+    data_floor = prov['season_min']
 
-    # Debut is measured on the FULL frame, never on the floor-restricted one.
-    # Measuring it after the restriction would read a 1974 debutant's first
-    # post-floor game as their debut and let them in.
+    # Debut is measured on the FULL frame, so a player's first game is their
+    # first game anywhere in the data and not merely their first surviving row.
     debut = df.groupby('ID')['Season'].min()
-    eligible = set(debut[debut >= floor].index)
-    excluded = set(debut.index) - eligible
+
+    # Per-player coverage, on the raw frame. A player is eligible only if every
+    # one of their games carries a value; the stat's floor is no longer a filter.
+    per = (df.assign(_cov=_coverage_mask(df, stat))
+             .groupby('ID')['_cov'].agg(games='size', covered='sum'))
+    incomplete = set(per.index[per['covered'] < per['games']])
+    # Left-censoring is its own cause: a debut in the first season the archive
+    # covers may not be a real debut.
+    left_censored = set(debut.index[debut == data_floor])
+    both = incomplete & left_censored
+    excluded = incomplete | left_censored
+    eligible = set(per.index) - excluded
+
+    # Diagnostic only. Reports how much of the coverage exclusion the old
+    # blanket debut-floor rule would have predicted.
+    pre_floor = {p for p in incomplete if debut.loc[p] < floor}
+    late_gap = incomplete - pre_floor
+
+    prov['exc_coverage'] = len(incomplete)
+    prov['exc_coverage_pre_floor'] = len(pre_floor)
+    prov['exc_coverage_post_floor'] = len(late_gap)
+    prov['exc_left_censored'] = len(left_censored)
+    prov['exc_both'] = len(both)
+    prov['eligible'] = len(eligible)
 
     work = df[df['ID'].isin(eligible)].copy()
-    # Eligible players cannot have a pre-floor game by construction. Asserted
-    # rather than assumed, because it is also what guarantees no engineered
-    # value is computed before its floor.
-    if len(work) and int(work['Season'].min()) < floor:
+    # For an engineered stat the coverage test should already have removed every
+    # player with a pre-floor game, because at least one input is all-null back
+    # there. Asserted because a silently zero-filled input is the worst failure
+    # mode available here.
+    if stat in ENGINEERED and len(work) and int(work['Season'].min()) < floor:
         raise ValueError(
-            f"eligible rows reach back to {int(work['Season'].min())}, before "
-            f"the {stat} floor of {floor}; debut filtering is broken")
+            f"eligible rows for engineered stat {stat} reach back to "
+            f"{int(work['Season'].min())}, before its {floor} floor; an input "
+            f"is being zero-filled rather than caught by the coverage test")
 
     values, work = _stat_series(work, stat)
     # No leading underscore on these: itertuples renames underscore-prefixed
@@ -392,14 +508,33 @@ def build_fewest_games(stat, threshold, top_n=10, out_dir=DRAFTS_DIR, **kw):
              f"prediction pipeline drops finals, so a 2026 debutant's tally is "
              f"complete for the home-and-away season and nothing else.")
     L.append("")
-    L.append(f"**Floor season for {stat}: {floor}.** {why[0].upper()}{why[1:]}.")
-    L.append("")
     L.append(f"**Eligibility.** {ELIGIBILITY_RULE}")
     L.append("")
-    L.append(f"**{len(excluded):,} players excluded as pre-{floor} debutants**, "
-             f"leaving {len(eligible):,} of the frame's {prov['players']:,} "
-             f"players eligible. Of those, {len(rows):,} reached "
+    L.append(f"**{prov['exc_coverage']:,} players excluded for incomplete "
+             f"coverage**, meaning at least one career game with no {stat} "
+             f"value. Of those, {prov['exc_coverage_pre_floor']:,} debuted "
+             f"before this stat's floor season and "
+             f"{prov['exc_coverage_post_floor']:,} debuted after it and still "
+             f"carry a gap, which a blanket debut-floor rule would have missed.")
+    L.append("")
+    L.append(_left_censor_rule(data_floor))
+    L.append("")
+    L.append(f"**{prov['exc_left_censored']:,} players excluded by "
+             f"left-censoring**, their first game falling in {data_floor}. "
+             f"{prov['exc_both']:,} of them also fail the coverage test, so the "
+             f"two exclusions overlap by that many rather than summing.")
+    L.append("")
+    L.append(f"**{prov['eligible']:,} of the frame's {prov['players']:,} "
+             f"players are eligible**, of whom {len(rows):,} reached "
              f"{threshold:g} {stat} and rank below.")
+    L.append("")
+    L.append(f"**Floor season for {stat}: {floor}. Reported as a diagnostic "
+             f"only, not used as a filter.** {why[0].upper()}{why[1:]}. The "
+             f"per-player coverage test supersedes it: the floor is the season "
+             f"from which the column is complete for every player at once, "
+             f"which is stricter than what any individual player needs.")
+    L.append("")
+    L.append(CENSORING_NOTE)
     L.append("")
     L.append("The game key includes `Date`, so the four replayed drawn finals "
              "(1972 SF, 1977 GF, 1990 QF, 2010 GF) count as two games each "
@@ -428,8 +563,12 @@ def build_fewest_games(stat, threshold, top_n=10, out_dir=DRAFTS_DIR, **kw):
     out_path = _write(L, name, out_dir=out_dir)
     print(f"OK wrote {out_path} ({len(rows):,} players reached "
           f"{threshold:g} {stat}, top {len(shown)} shown)")
-    print(f"   floor {floor} | {len(excluded):,} pre-floor debutants excluded "
-          f"| {len(eligible):,} eligible")
+    print(f"   excluded: coverage {prov['exc_coverage']:,} "
+          f"(pre-floor {prov['exc_coverage_pre_floor']:,}, "
+          f"post-floor gap {prov['exc_coverage_post_floor']:,}) | "
+          f"left-censored {prov['exc_left_censored']:,} "
+          f"(overlap {prov['exc_both']:,}) | eligible {prov['eligible']:,} "
+          f"| floor {floor} diagnostic only")
     print("   " + _gap_line(shown, 'games', unit).replace("**", ""))
     return out_path
 
