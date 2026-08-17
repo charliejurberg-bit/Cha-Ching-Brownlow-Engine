@@ -2,9 +2,10 @@
 
 Three builders, each writing one markdown table under drafts/:
 
-    build_pair_season_totals   teammate pairs by combined votes in a club-season
-    build_club_season_totals   total votes by club-season
-    build_three_vote_games     count of 3-vote games per player-season
+    build_pair_season_totals       teammate pairs by combined votes, club-season
+    build_club_season_totals       total votes by club-season
+    build_three_vote_games         count of 3-vote games per player-season
+    build_career_three_vote_games  count of 3-vote games per player, career
 
 RECON / DRAFT OUTPUT ONLY. Like club_aliases, this module must not be imported
 by features.py, brownlow_model.py or predict_2026.py: it canonicalises club
@@ -153,15 +154,20 @@ def _season_length_note(prov):
 
     1984-1986 ran 132 games, later seasons more, and 2020 was cut short. Naming
     every exception dates the file; the measured range does not.
+
+    Deliberately names no table's own metric. All four builders share this
+    string, so wording that mentions club-season totals or a pair's combined
+    total reads as an error on the two 3-vote tables.
     """
     return (
         f"**Season length varies across this window.** Home-and-away games per "
         f"season range from {prov['games_per_season_min']} to "
         f"{prov['games_per_season_max']} across "
         f"{prov['season_min']}-{prov['season_max']} "
-        f"({prov['games']:,} games in total), so a club-season total from a "
-        f"short season is not directly comparable with one from a long season, "
-        f"and neither is a pair's combined total."
+        f"({prov['games']:,} games in total). Totals from different eras are "
+        f"therefore not directly comparable: a shorter season puts fewer votes "
+        f"in play to be accumulated at all, and no figure below is normalised "
+        f"for that difference."
     )
 
 
@@ -608,6 +614,107 @@ def build_three_vote_games(top_n=10, out_dir=DRAFTS_DIR, **kw):
     return out_path
 
 
+def _career_clubs(df):
+    """ID to its clubs in season order, comma separated and canonicalised.
+
+    Ordered by the first season the player appeared for each club, so the string
+    reads as a career path rather than alphabetically. Club name breaks a tie so
+    a player who turned out for two clubs in one season still renders the same
+    way on every run.
+    """
+    first_season = (df.groupby(['ID', 'Club'], dropna=False)['Season']
+                      .min().reset_index()
+                      .sort_values(['ID', 'Season', 'Club']))
+    return (first_season.groupby('ID')['Club']
+                        .apply(lambda s: ", ".join(x for x in s
+                                                   if isinstance(x, str))))
+
+
+def build_career_three_vote_games(top_n=10, out_dir=DRAFTS_DIR, **kw):
+    """Career count of 3-vote games per player across the whole frame.
+
+    Needs no medallist data: this counts best-on-ground games, which the vote
+    frame carries directly. Ranked on the raw count rather than a per-game rate,
+    so a long career is an advantage by design.
+    """
+    df, prov = load_frame(**kw)
+
+    # Precomputed rather than a lambda inside agg: one vectorised pass over
+    # 320k rows instead of one Python call per player.
+    d = df.assign(_is3=(df['Votes'] == 3).astype(int))
+    career = (d.groupby('ID')
+                .agg(three_vote_games=('_is3', 'sum'),
+                     career_votes=('Votes', 'sum'),
+                     games=('Votes', 'size'),
+                     first_season=('Season', 'min'),
+                     last_season=('Season', 'max'),
+                     Player_Name=('Player_Name', 'first'))
+                .reset_index())
+    career['career_votes'] = career['career_votes'].astype(int)
+    career = career.join(_career_clubs(df).rename('clubs'), on='ID')
+
+    players_total = len(career)
+    eligible = career[career['three_vote_games'] >= 1].copy()
+
+    rows = [{
+        'who': _who(r['Player_Name'], r['ID']),
+        'clubs': r['clubs'],
+        'three_vote_games': int(r['three_vote_games']),
+        'career_votes': int(r['career_votes']),
+        'games': int(r['games']),
+        'span': f"{int(r['first_season'])}-{int(r['last_season'])}",
+    } for r in eligible.to_dict('records')]
+    rows.sort(key=lambda r: (-r['three_vote_games'], -r['career_votes'],
+                             r['who']))
+    shown = rows[:top_n]
+
+    computed_from = (
+        f"From it, {players_total:,} players by `ID`, of whom {len(rows):,} "
+        f"recorded at least one 3-vote game.")
+
+    L = ["# All-time career 3-vote games", ""]
+    L.append("Count of best-on-ground games (`Brownlow.Votes` == 3) per player "
+             "across their whole career inside this window, ranked by that "
+             "count.")
+    L.append("")
+    L.extend(_provenance_block(prov, computed_from))
+    L.append("**Raw count, not a rate.** Ranked on total 3-vote games with no "
+             "per-game or per-season normalisation, so a long career counts in "
+             "a player's favour and this is a longevity table as much as a peak "
+             "table. The games column is there to read the count against.")
+    L.append("")
+    L.append("**Career totals here are censored at both ends.** The 1984 "
+             "caveat above truncates anyone who debuted earlier, and a player "
+             "still active after 2025 has an unfinished count, so no row should "
+             "be read as a closed career total.")
+    L.append("")
+    L.append("Ties on the count are broken by career total votes, then name, so "
+             "a re-run is byte-identical.")
+    L.append("")
+    L.append(_gap_line(shown, 'three_vote_games', "3-vote games"))
+    L.append("")
+    L.append(f"Full ranked table to {top_n}, of {len(rows):,} players holding "
+             f"at least one 3-vote game.")
+    L.append("")
+    _table(
+        L,
+        "| # | player | clubs | seasons | career 3-vote games | career votes "
+        "| H&A games played |",
+        "|---|---|---|---|---|---|---|",
+        ["| " + " | ".join([
+            str(i), r['who'], str(r['clubs']), r['span'],
+            str(r['three_vote_games']), str(r['career_votes']),
+            str(r['games'])]) + " |"
+         for i, r in enumerate(shown, 1)])
+
+    out_path = _write(L, "career_three_vote", out_dir=out_dir)
+    print(f"OK wrote {out_path} ({len(rows):,} players with a 3-vote game, "
+          f"top {len(shown)} shown)")
+    print("   " + _gap_line(shown, 'three_vote_games', "3-vote games").replace("**", ""))
+    print(_assertion_summary(prov))
+    return out_path
+
+
 # ─────────────────────────────────────────────────────────────
 # CLI
 # ─────────────────────────────────────────────────────────────
@@ -616,9 +723,11 @@ _BUILDERS = {
     "pairs": build_pair_season_totals,
     "clubs": build_club_season_totals,
     "three-vote": build_three_vote_games,
+    "career-three-vote": build_career_three_vote_games,
 }
 
-_USAGE = ("usage: python all_time_tables.py <pairs|clubs|three-vote> [top_n]")
+_USAGE = ("usage: python all_time_tables.py "
+          "<pairs|clubs|three-vote|career-three-vote> [top_n]")
 
 
 def main(argv):
