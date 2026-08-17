@@ -389,5 +389,163 @@ def main():
     return 0
 
 
+# ─────────────────────────────────────────────────────────────
+# Closest calls
+# ─────────────────────────────────────────────────────────────
+
+# Its own column tuple rather than _GAME_COLS, which carries neither
+# model_source nor the fixture teams this needs and does carry stat columns it
+# does not. Kept separate so a change to one reader cannot quietly alter the
+# other.
+_CLOSEST_COLS = (
+    'Season', 'Round_num', 'Game_ID', 'Player_Name', 'Playing.for',
+    'Home.team', 'Away.team', 'Exp_Votes', 'model_source',
+)
+
+
+def _fmt_votes(x):
+    """Exp_Votes to two decimals, where a nonzero value never prints as 0.00.
+
+    Plain `:.2f` renders 0.004 as "0.00", which asserts a player earned nothing
+    when the model gave them something. The magnitude is genuinely below the
+    printed precision, so this says so rather than inventing a 0.01 the model
+    did not produce.
+    """
+    if pd.isna(x):
+        return "n/a"
+    s = f"{float(x):.2f}"
+    if s in ("0.00", "-0.00") and float(x) != 0.0:
+        return "<0.01" if float(x) > 0 else ">-0.01"
+    return "0.00" if s == "-0.00" else s
+
+
+def build_closest_calls(season, round_num, path=GAME_LEVEL, out_dir=DRAFTS_DIR):
+    """Every game of one round, ranked by how close its top two Exp_Votes are.
+
+    Reads predictions/game_level_2026.csv and nothing else. No actual Brownlow
+    votes are read: they do not exist for 2026 until count night, and the file's
+    Brownlow.Votes column is all zeroes, which is absence rather than a result.
+
+    The sort is on the top-two gap alone. Third place is printed because a tight
+    three-way is worth seeing, but it never moves a game up or down: a game
+    whose top two are level is the closest call in the round whatever sits
+    third.
+
+    Every game is listed. This is deliberately not a top N, so the round's
+    clear-cut games are visible as the comparison that makes the close ones
+    close.
+    """
+    df = pd.read_csv(path, usecols=lambda c: c in _CLOSEST_COLS)
+    rnd = df[(df['Season'] == int(season)) &
+             (df['Round_num'] == int(round_num))].copy()
+    if rnd.empty:
+        raise ValueError(
+            f"no rows for season {season}, raw Round_num {round_num} in {path}. "
+            f"Seasons present: {sorted(df['Season'].dropna().unique().astype(int))}; "
+            f"rounds present for that season: "
+            f"{sorted(df.loc[df['Season'] == int(season), 'Round_num'].dropna().unique().astype(int))}")
+
+    disp_round = _display_round(round_num, season)
+    sources = sorted(rnd['model_source'].dropna().unique().tolist())
+    mixed = len(sources) > 1
+
+    # 'Playing.for' holds a dot, which itertuples renames positionally, so the
+    # club is read by label off the sorted frame instead. Same trap as
+    # 'Coaches.Votes' elsewhere in this repo.
+    rows = []
+    for game_id, g in rnd.groupby('Game_ID'):
+        if len(g) < 2:
+            # Cannot form a gap from one player. Never silently skipped.
+            raise ValueError(f"game {game_id} holds {len(g)} row(s), "
+                             f"a top-two gap needs at least 2")
+        top = g.sort_values('Exp_Votes', ascending=False).head(3).reset_index(drop=True)
+
+        def _slot(i):
+            """(label, Exp_Votes) for the i-th ranked player, or a no-data pair."""
+            if i >= len(top):
+                return "n/a", float('nan')
+            return (_label_with_team(top.at[i, 'Player_Name'],
+                                     top.at[i, 'Playing.for']),
+                    float(top.at[i, 'Exp_Votes']))
+
+        first, first_v = _slot(0)
+        second, second_v = _slot(1)
+        third, third_v = _slot(2)
+        rows.append({
+            'fixture': f"{g['Home.team'].iloc[0]} v {g['Away.team'].iloc[0]}",
+            'gap': first_v - second_v,
+            'first': first, 'first_v': first_v,
+            'second': second, 'second_v': second_v,
+            'third': third, 'third_v': third_v,
+            'source': g['model_source'].iloc[0],
+        })
+
+    # Smallest gap first. Fixture breaks a tie so a re-run is byte-identical.
+    rows.sort(key=lambda r: (r['gap'], r['fixture']))
+
+    L = [f"# Round {disp_round} closest calls", ""]
+    L.append(f"Source: `{path}`. Season {int(season)}, AFLTables Round_num "
+             f"{int(round_num)}, shown throughout as Round {disp_round}.")
+    L.append("")
+    L.append(f"All {len(rows)} games of the round, ranked by the gap between the "
+             f"top two Exp_Votes, smallest gap first. Every game is listed, this "
+             f"is not a top N.")
+    L.append("")
+    L.append("Exp_Votes is a **model expectation, retrospective**. It scores a "
+             "game that has already been played and is not a forecast.")
+    L.append("")
+    L.append("Actual Brownlow votes are not read here. They are not known until "
+             "count night.")
+    L.append("")
+    if mixed:
+        L.append(f"This round mixes model variants, so `model_source` is shown "
+                 f"per game: {', '.join(sources)}.")
+    else:
+        L.append(f"Every game in this round ran on one model variant, "
+                 f"`model_source` = `{sources[0] if sources else 'unknown'}`.")
+    L.append("")
+
+    head = "| # | fixture | gap | 1st | Exp | 2nd | Exp | 3rd | Exp |"
+    rule = "|---|---|---|---|---|---|---|---|---|"
+    if mixed:
+        # Both already end in a pipe, so the extra cell appends. Trimming that
+        # pipe first leaves the header a cell short of the data rows and the
+        # table stops rendering as a table.
+        head = head + " model_source |"
+        rule = rule + "---|"
+    L.append(head)
+    L.append(rule)
+    for i, r in enumerate(rows, 1):
+        cells = [str(i), r['fixture'], _fmt_votes(r['gap']),
+                 r['first'], _fmt_votes(r['first_v']),
+                 r['second'], _fmt_votes(r['second_v']),
+                 r['third'], _fmt_votes(r['third_v'])]
+        if mixed:
+            cells.append(str(r['source']))
+        L.append("| " + " | ".join(cells) + " |")
+    L.append("")
+
+    os.makedirs(out_dir, exist_ok=True)
+    out_path = os.path.join(out_dir, f"closest_calls_r{disp_round}.md")
+    with open(out_path, "w", encoding="utf-8") as f:
+        f.write("\n".join(L).rstrip() + "\n")
+    print(f"OK wrote {out_path} ({len(rows)} games, "
+          f"tightest gap {_fmt_votes(rows[0]['gap'])})")
+    return out_path
+
+
+def main_closest_calls(argv):
+    if len(argv) != 2:
+        print("usage: python draft_posts.py closest-calls <season> <raw_round_num>",
+              file=sys.stderr)
+        return 2
+    build_closest_calls(int(argv[0]), int(argv[1]))
+    return 0
+
+
 if __name__ == "__main__":
+    # No arguments runs the round card, which is what update.py invokes. The
+    # subcommand is additive and leaves that path untouched.
+    if len(sys.argv) > 1 and sys.argv[1] == "closest-calls":
+        sys.exit(main_closest_calls(sys.argv[2:]))
     sys.exit(main())
