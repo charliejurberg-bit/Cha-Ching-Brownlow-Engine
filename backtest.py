@@ -12,6 +12,7 @@ from sklearn.preprocessing import LabelEncoder
 import xgboost as xgb
 import os, warnings
 import features as feat
+import coaches_guard as cvguard
 from brownlow_medallists import get_medallists
 warnings.filterwarnings('ignore')
 
@@ -103,6 +104,11 @@ if wheelo is not None:
 print("Building relative game features...")
 df['Game_ID'] = (df['Season'].astype(str) + '_' + df['Round_num'].astype(str) + '_' +
                  df['Home.team'].astype(str) + '_' + df['Away.team'].astype(str))
+
+# Identical call to brownlow_model.py's, at the identical point. If these two
+# ever diverge, backtest stops measuring the model that ships, so the logic is
+# shared rather than copied. See coaches_guard.py.
+df = cvguard.drop_contaminated_games(df, coaches, label='backtest')
 
 RANK_STATS = feat.rank_stats_for(df)
 df = feat.build_game_rank_features(df, RANK_STATS)

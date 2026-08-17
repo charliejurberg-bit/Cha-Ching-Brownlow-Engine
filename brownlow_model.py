@@ -20,6 +20,7 @@ import xgboost as xgb
 import pickle
 import os, warnings
 import features as feat
+import coaches_guard as cvguard
 warnings.filterwarnings('ignore')
 
 os.makedirs("predictions", exist_ok=True)
@@ -156,6 +157,15 @@ if wheelo is not None:
 # ── Build relative game features ─────────────────────────────
 print("Building relative game features...")
 df['Game_ID'] = df['Season'].astype(str)+'_'+df['Round_num'].astype(str)+'_'+df['Home.team'].astype(str)+'_'+df['Away.team'].astype(str)
+
+# Drop games holding a contaminated coaches row, BEFORE the rank features are
+# built, since those are all groupby('Game_ID') and would otherwise be computed
+# against the bad population. Applied unconditionally, including under
+# NO_COACHES: the variant exists to be the same model minus coaches votes, so
+# training it on a different row population would break the comparison, and
+# momentum_cv is coaches-derived and survives into that variant anyway.
+# backtest.py calls this identically. See coaches_guard.py.
+df = cvguard.drop_contaminated_games(df, coaches, label='train')
 
 RANK_STATS = feat.rank_stats_for(df)
 if NO_COACHES:
