@@ -1,154 +1,103 @@
 {
-  "round": 22,
+  "round": 23,
   "brownlowNight": "2026-09-21",
   "leader": {
     "name": "Nick Daicos",
-    "votes": 37.5,
-    "clear": 12.0,
-    "bestOdds": "$1.20"
+    "votes": 39.3,
+    "clear": 11.9,
+    "bestOdds": "$1.02"
   },
   "chips": [
     {
       "rank": 1,
-      "name": "I. Rankine",
-      "team": "ADE",
-      "votes": 2.9
-    },
-    {
-      "rank": 2,
-      "name": "M. Rowell",
-      "team": "GCS",
+      "name": "I. Heeney",
+      "team": "SYD",
       "votes": 2.8
     },
     {
+      "rank": 2,
+      "name": "M. Hall",
+      "team": "STK",
+      "votes": 2.4
+    },
+    {
       "rank": 3,
-      "name": "L. Davies-Uniacke",
-      "team": "NTH",
-      "votes": 2.6
+      "name": "E. Gulden",
+      "team": "SYD",
+      "votes": 2.4
     }
   ],
   "ticker": [
     {
-      "match": "ADE V RIC",
+      "match": "BRI V GCS",
       "votes": [
         [
           3,
-          "RANKINE"
-        ],
-        [
-          2,
-          "DAWSON"
-        ],
-        [
-          1,
-          "BERRY"
-        ]
-      ]
-    },
-    {
-      "match": "BRI V HAW",
-      "votes": [
-        [
-          3,
-          "LOHMANN"
-        ],
-        [
-          2,
           "W.ASHCROFT"
         ],
         [
+          2,
+          "MORRIS"
+        ],
+        [
           1,
-          "NEALE"
+          "ZORKO"
         ]
       ]
     },
     {
-      "match": "GEE V ESS",
+      "match": "ESS V SYD",
       "votes": [
         [
           3,
-          "SMITH"
+          "HEENEY"
         ],
         [
           2,
-          "DEMPSEY"
-        ],
-        [
-          1,
-          "O.HENRY"
-        ]
-      ]
-    },
-    {
-      "match": "GWS V GCS",
-      "votes": [
-        [
-          3,
-          "ROWELL"
-        ],
-        [
-          2,
-          "MILLER"
-        ],
-        [
-          1,
-          "ANDERSON"
-        ]
-      ]
-    },
-    {
-      "match": "MEL V FRE",
-      "votes": [
-        [
-          3,
-          "PICKETT"
-        ],
-        [
-          2,
-          "SPARROW"
-        ],
-        [
-          1,
-          "BOWEY"
-        ]
-      ]
-    },
-    {
-      "match": "STK V CAR",
-      "votes": [
-        [
-          3,
-          "HALL"
-        ],
-        [
-          2,
-          "WALSH"
-        ],
-        [
-          1,
-          "EVANS"
-        ]
-      ]
-    },
-    {
-      "match": "SYD V PTA",
-      "votes": [
-        [
-          3,
           "GULDEN"
         ],
         [
-          2,
-          "WARNER"
-        ],
-        [
           1,
-          "CURNOW"
+          "WARNER"
         ]
       ]
     },
     {
-      "match": "WCE V COL",
+      "match": "FRE V ADE",
+      "votes": [
+        [
+          3,
+          "SERONG"
+        ],
+        [
+          2,
+          "RANKINE"
+        ],
+        [
+          1,
+          "BOLTON"
+        ]
+      ]
+    },
+    {
+      "match": "GWS V WCE",
+      "votes": [
+        [
+          3,
+          "ASH"
+        ],
+        [
+          2,
+          "WHITFIELD"
+        ],
+        [
+          1,
+          "OLIVER"
+        ]
+      ]
+    },
+    {
+      "match": "HAW V COL",
       "votes": [
         [
           3,
@@ -156,28 +105,79 @@
         ],
         [
           2,
-          "J.DAICOS"
+          "MCCREERY"
         ],
         [
           1,
-          "MCSTAY"
+          "J.DAICOS"
         ]
       ]
     },
     {
-      "match": "WB V NTH",
+      "match": "NTH V GEE",
       "votes": [
         [
           3,
-          "DAVIES-UNIACKE"
+          "SMITH"
         ],
         [
           2,
-          "CURTIS"
+          "MANNAGH"
         ],
         [
           1,
-          "DANIEL"
+          "SIMPKIN"
+        ]
+      ]
+    },
+    {
+      "match": "PTA V MEL",
+      "votes": [
+        [
+          3,
+          "GAWN"
+        ],
+        [
+          2,
+          "CHANDLER"
+        ],
+        [
+          1,
+          "STEELE"
+        ]
+      ]
+    },
+    {
+      "match": "RIC V STK",
+      "votes": [
+        [
+          3,
+          "HALL"
+        ],
+        [
+          2,
+          "HILL"
+        ],
+        [
+          1,
+          "OWENS"
+        ]
+      ]
+    },
+    {
+      "match": "WB V CAR",
+      "votes": [
+        [
+          3,
+          "RICHARDS"
+        ],
+        [
+          2,
+          "CRIPPS"
+        ],
+        [
+          1,
+          "LIBERATORE"
         ]
       ]
     }
