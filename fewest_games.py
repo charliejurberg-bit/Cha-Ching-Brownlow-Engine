@@ -196,9 +196,14 @@ def _left_censor_rule(data_floor):
 
 # Columns read from every source. The engineered path needs more than the stat
 # itself, because features.add_row_stats() computes the whole row-stat block.
+# 'Career.Games' is not read by anything in this module. It is projected here
+# so milestones.py can share this loader rather than opening the same three
+# files again: it is AFLTables' own inclusive career-games counter and, unlike a
+# cumulative count over these rows, it carries games played before 1965. See
+# milestones.py for the zero-as-missing rule that column needs.
 _BASE_COLS = ('Season', 'Round', 'Date', 'ID', 'Player', 'Player_Name',
               'Playing.for', 'Home.team', 'Away.team', 'Home.score',
-              'Away.score', 'Home.Away')
+              'Away.score', 'Home.Away', 'Career.Games')
 _STAT_COLS = ('Disposals', 'Frees.For', 'Frees.Against', 'Hit.Outs', 'Tackles',
               'Clearances', 'One.Percenters', 'Goal.Assists')
 # Taken from features.NUMERIC_STATS rather than restated, because
