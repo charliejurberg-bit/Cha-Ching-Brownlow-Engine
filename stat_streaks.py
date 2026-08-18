@@ -422,18 +422,41 @@ def build_stat_streaks(stat, threshold, season, top_n=10, out_dir=DRAFTS_DIR,
 # Builder: the board
 # ─────────────────────────────────────────────────────────────
 
-def build_streak_board(season, pairs=None, top_n=3, out_dir=DRAFTS_DIR, **kw):
-    """The longest active run for each default pair, in one table."""
+def _clubs_now(df, season):
+    """ID to the club they last played for in `season`."""
+    s = df[df['Season'] == season]
+    if s.empty:
+        return {}
+    last = s.sort_values(['ID', 'Date']).groupby('ID').tail(1)
+    return {int(r['ID']): canonical_club(r['Playing.for'])
+            for r in last.to_dict('records')}
+
+
+def build_streak_board(season, pairs=None, top_n=3, clubs=None,
+                       out_dir=DRAFTS_DIR, **kw):
+    """The longest active run for each default pair, in one table.
+
+    `clubs` filters the ACTIVE side to an iterable of canonical club names,
+    which is how a single fixture's preview block is cut. The longest-on-record
+    column is deliberately left unfiltered: it is there for scale, and scaling a
+    club's run against that club's own history rather than against the record
+    would make a modest run look like a landmark.
+    """
     pairs = DEFAULT_PAIRS if pairs is None else list(pairs)
     df, prov = fg.load_frame(**kw)
     names = df.drop_duplicates('ID').set_index('ID')['Player'].to_dict()
     last_round = _last_round_map(df, season)
     scope = df[df['Season'] <= season]
+    wanted = None if clubs is None else {canonical_club(c) for c in clubs}
+    club_now = _clubs_now(df, season) if wanted is not None else {}
 
     blocks = []
     for stat, threshold in pairs:
         floor, active, best, comparable = _streaks_for(df, stat, threshold,
                                                        season)
+        if wanted is not None and len(active):
+            active = active[active['ID'].map(
+                lambda i: club_now.get(int(i)) in wanted)]
         act_rows = _decorate(scope, active.nlargest(top_n, 'n'), names,
                              last_round) if len(active) else []
         all_rows = _decorate(scope, best.nlargest(1, 'n'), names,
@@ -451,6 +474,15 @@ def build_streak_board(season, pairs=None, top_n=3, out_dir=DRAFTS_DIR, **kw):
              f"round by definition, since it either extends or breaks.")
     L.append("")
     _header(L, prov, season)
+
+    if wanted is not None:
+        L.append(f"**Active runs filtered to {', '.join(sorted(wanted))}**, on "
+                 f"the club the player last turned out for in {season}. The "
+                 f"longest-on-record column is NOT filtered: it is there for "
+                 f"scale, and scaling a club's run against that club's own "
+                 f"history rather than against the record would make a modest "
+                 f"run look like a landmark.")
+        L.append("")
 
     L.append("## Summary")
     L.append("")
@@ -500,7 +532,12 @@ def build_streak_board(season, pairs=None, top_n=3, out_dir=DRAFTS_DIR, **kw):
                      f" missed inside the run.")
             L.append("")
 
+    # The club filter goes in the filename, so a fixture cut cannot overwrite
+    # the full board. Same trap milestones.py records.
     name = f"streak_board_{season}"
+    if wanted is not None:
+        name += "_" + "_".join(fg._slug(c).replace('_', '')
+                               for c in sorted(wanted))
     out_path = _write(L, name, out_dir=out_dir)
     print(f"OK wrote {out_path} ({len(pairs)} thresholds)")
     for b in blocks:
