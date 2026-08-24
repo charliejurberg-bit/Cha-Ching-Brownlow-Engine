@@ -3526,6 +3526,18 @@ def _lb_subtitle(is_2026, rounded):
 
 
 if _page == 'Leaderboard':
+    # The global block-container caps every page at 1200px, which left the wide
+    # table boxed in with dead space either side. Widened here rather than in the
+    # main CSS block so only this page changes: the rule is emitted as part of
+    # the Leaderboard body, so it simply is not on the document on any other
+    # page. !important because the global rule is a bare max-width and this has
+    # to beat it whichever order they land in. min() keeps it from overflowing a
+    # narrow window, where 96vw wins instead.
+    st.markdown(
+        '<style>[data-testid="block-container"],[data-testid="stMainBlockContainer"]'
+        '{max-width:min(1440px,96vw) !important;}</style>',
+        unsafe_allow_html=True,
+    )
     _lb_live_html = ' <span class="lb-live-pill">LIVE</span>' if is_2026 else ""
     _lbh_main, _lbh_mode, _lbh_season = st.columns([3, 1.5, 1], vertical_alignment="bottom")
     # Both controls are read BEFORE the title is written, because the subtitle
@@ -3600,13 +3612,11 @@ if _page == 'Leaderboard':
             _proj_ceiling = dict(zip(_proj['Player'], _proj['Ceiling_Projection']))
             has_fc = len(_proj_ceiling) > 0
 
-    _odds_best, _odds_impl, has_odds = {}, {}, False
-    if is_2026:
-        _odds = load_best_odds()
-        if _odds is not None and len(_odds) > 0:
-            _odds_best = dict(zip(_odds['player'], _odds['best_odds']))
-            _odds_impl = dict(zip(_odds['player'], _odds['implied_prob']))
-            has_odds = True
+    # Best Odds and Mkt % were dropped from this table: the board is a model
+    # ranking and the two price columns crowded it without changing the read.
+    # Prices still live on Predictions and the Live Tracker, which load
+    # best_odds themselves, so nothing else is affected and this page no longer
+    # pays for load_best_odds() at all.
 
     _fg = form_guide_dots(selected_season, n_rounds=3) if is_2026 else {}
 
@@ -3854,25 +3864,25 @@ SCOPE .lb-bar-lo{text-align:right;}
     _LB_TBL_CSS = ("""
 .lb-table .lb-tbl-wrap{overflow-x:auto;}
 .lb-table .lb-tbl{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;}
-.lb-table .lb-tbl th{font-size:10px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:9px 12px;border-bottom:1px solid var(--hairline-strong);text-align:right;white-space:nowrap;}
+.lb-table .lb-tbl th{font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--hairline-strong);text-align:right;white-space:nowrap;}
 .lb-table .lb-tbl th.lft{text-align:left;}
-.lb-table .lb-tbl td{font-size:13px;padding:8px 12px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;color:var(--steel);}
+.lb-table .lb-tbl td{font-size:15px;padding:12px 14px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;color:var(--steel);}
 .lb-table .lb-tbl td.lft{text-align:left;}
 .lb-table .lb-tbl th.grp-start,.lb-table .lb-tbl td.grp-start{border-left:1px solid var(--hairline-strong);}
 .lb-table .lb-tbl tr.lb-leader{background:rgba(52,211,153,.04);}
 .lb-table .lb-rank{color:var(--text);font-weight:600;}
 .lb-table .lb-clubrank{color:var(--muted);font-weight:600;}
-.lb-table .lb-up{color:var(--emerald);font-size:10px;margin-left:4px;}
-.lb-table .lb-down{color:#f87171;font-size:10px;margin-left:4px;}
+.lb-table .lb-up{color:var(--emerald);font-size:11px;margin-left:5px;}
+.lb-table .lb-down{color:#f87171;font-size:11px;margin-left:5px;}
 .lb-table .lb-exp{font-weight:700;color:var(--text);}
-.lb-table .lb-pname{font-family:'Archivo',sans-serif;font-size:14px;font-weight:600;color:var(--text);}
-.lb-table .lb-ttag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);margin-left:7px;}
-.lb-table .lb-form{display:inline-flex;gap:3px;align-items:center;}
-.lb-table .lb-dot{width:7px;height:7px;border-radius:50%;display:inline-block;}
+.lb-table .lb-pname{font-family:'Archivo',sans-serif;font-size:16px;font-weight:600;color:var(--text);}
+.lb-table .lb-ttag{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-left:8px;}
+.lb-table .lb-form{display:inline-flex;gap:4px;align-items:center;}
+.lb-table .lb-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
 .lb-table .lb-dot-on{background:var(--emerald);}
 .lb-table .lb-dot-mid{background:rgba(52,211,153,.45);}
 .lb-table .lb-dot-off{background:var(--muted);opacity:.4;}
-.lb-table .lb-tbl td.fc-cell{min-width:160px;}
+.lb-table .lb-tbl td.fc-cell{min-width:190px;}
 .lb-table .lb-fc{width:100%;}
 .lb-table .lb-fc-track{position:relative;height:6px;background:var(--surface-2);border:1px solid var(--hairline-strong);border-radius:999px;box-sizing:border-box;}
 .lb-table .lb-fc-seg{position:absolute;top:0;height:100%;background:var(--emerald-track);border-radius:999px;}
@@ -3894,8 +3904,6 @@ SCOPE .lb-bar-lo{text-align:right;}
         if has_fc:
             _heads.append(('Floor–Ceiling', 'lft'))
         _heads += [('Poll %', ''), (_lb_3v_head, '')]
-        if has_odds:
-            _heads += [('Best Odds', 'grp-start'), ('Mkt %', '')]
     else:
         _heads = _rank_heads + [('Player', 'lft'), ('GP', ''), (_lb_votes_head, ''),
                                 ('Actual', ''), ('Diff', ''), ('Poll %', ''), (_lb_3v_head, '')]
@@ -3942,12 +3950,6 @@ SCOPE .lb-bar-lo{text-align:right;}
             _cells.append(f'<td>{_lb_v(_exp - _act, signed=True)}</td>')
         _cells.append(f'<td>{_poll:.1f}%</td>')
         _cells.append(f'<td>{_lb_v(_tvg)}</td>')
-        if is_2026 and has_odds:
-            _bo = _odds_best.get(_name); _mk = _odds_impl.get(_name)
-            _bo_s = f'${float(_bo):.1f}' if _bo is not None and pd.notna(_bo) else '—'
-            _mk_s = f'{float(_mk):.0f}%' if _mk is not None and pd.notna(_mk) else '—'
-            _cells.append(f'<td class="grp-start">{_bo_s}</td>')
-            _cells.append(f'<td>{_mk_s}</td>')
         _tr_cls = ' class="lb-leader"' if _rank == 1 else ''
         _rows.append(f'<tr{_tr_cls}>{"".join(_cells)}</tr>')
 
