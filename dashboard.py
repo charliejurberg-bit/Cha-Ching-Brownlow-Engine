@@ -3868,6 +3868,7 @@ SCOPE .lb-bar-lo{text-align:right;}
 .lb-table .lb-tbl th.lft{text-align:left;}
 .lb-table .lb-tbl td{font-size:15px;padding:12px 14px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;color:var(--steel);}
 .lb-table .lb-tbl td.lft{text-align:left;}
+.lb-table .lb-tbl th.pcell,.lb-table .lb-tbl td.pcell{width:26%;}
 .lb-table .lb-tbl th.grp-start,.lb-table .lb-tbl td.grp-start{border-left:1px solid var(--hairline-strong);}
 .lb-table .lb-tbl tr.lb-leader{background:rgba(52,211,153,.04);}
 .lb-table .lb-rank{color:var(--text);font-weight:600;}
@@ -3900,12 +3901,12 @@ SCOPE .lb-bar-lo{text-align:right;}
     _show_club_rank = team_pick != 'All'
     _rank_heads = [('Rank', 'lft')] + ([('#', 'lft')] if _show_club_rank else [])
     if is_2026:
-        _heads = _rank_heads + [('Player', 'lft'), ('GP', ''), ('Form', 'lft'), (_lb_votes_head, '')]
+        _heads = _rank_heads + [('Player', 'lft pcell'), ('GP', ''), ('Form', 'lft'), (_lb_votes_head, '')]
         if has_fc:
             _heads.append(('Floor–Ceiling', 'lft'))
         _heads += [('Poll %', ''), (_lb_3v_head, '')]
     else:
-        _heads = _rank_heads + [('Player', 'lft'), ('GP', ''), (_lb_votes_head, ''),
+        _heads = _rank_heads + [('Player', 'lft pcell'), ('GP', ''), (_lb_votes_head, ''),
                                 ('Actual', ''), ('Diff', ''), ('Poll %', ''), (_lb_3v_head, '')]
 
     def _th(lbl, cls):
@@ -3935,7 +3936,7 @@ SCOPE .lb-bar-lo{text-align:right;}
             _cells.append(
                 f'<td class="lft"><span class="lb-clubrank">{int(_row["ClubRank"])}</span></td>')
         _cells += [
-            f'<td class="lft"><span class="lb-pname">{_name}</span><span class="lb-ttag">{_lb_abbr(_team)}</span></td>',
+            f'<td class="lft pcell"><span class="lb-pname">{_name}</span><span class="lb-ttag">{_lb_abbr(_team)}</span></td>',
             f'<td>{_gp}</td>',
         ]
         if is_2026:
