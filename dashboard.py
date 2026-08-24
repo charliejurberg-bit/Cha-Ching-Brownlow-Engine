@@ -1427,6 +1427,80 @@ def load_game(season):
         return None
     return _disambiguate_players(_fix_team_names(pd.read_csv(path)))
 
+# ── Rounded 3-2-1 board ───────────────────────────────────────
+# A second way to READ the same predictions, not a second model. Each game's
+# three highest Exp_Votes are awarded 3, 2 and 1 and everyone else scores 0.
+# Exp_Votes is only ever read here: predict_2026.py, the model artifacts and
+# every CSV under predictions/ are untouched, so switching the Leaderboard
+# toggle can never change what the engine produced.
+_HARD_VOTE_BY_RANK = {1: 3, 2: 2, 3: 1}
+
+
+def _game_key(g):
+    """One value per match. Game_ID exists in the 2026 game-level file but not
+    in the historical ones (2015's has no such column), so fall back to the
+    round plus the two clubs, which every season from 2007 carries."""
+    if 'Game_ID' in g.columns:
+        return g['Game_ID'].astype(str)
+    return (g['Round_num'].astype(str) + '|' +
+            g['Home.team'].astype(str) + '|' + g['Away.team'].astype(str))
+
+
+@st.cache_data(ttl=3600)
+def load_game_rounded(season):
+    """Game-level frame with a Hard_Votes column holding the 3/2/1 award."""
+    g = load_game(season)
+    if g is None or 'Exp_Votes' not in g.columns:
+        return None
+    g = g.copy()
+    g['_gkey'] = _game_key(g)
+    # Exp_Votes is the criterion. The columns after it only break exact ties, so
+    # the award never depends on the order rows happen to sit in the file. On
+    # 2026 no tie reaches a top-three slot, but a historical season may.
+    _sort = ['_gkey', 'Exp_Votes'] + [c for c in ('Poll_Prob', 'P_3') if c in g.columns] + ['Player_Name']
+    _asc = [True, False] + [False] * (len(_sort) - 3) + [True]
+    g = g.sort_values(_sort, ascending=_asc)
+    g['Hard_Votes'] = (g.groupby('_gkey').cumcount() + 1).map(_HARD_VOTE_BY_RANK).fillna(0).astype(int)
+    return g
+
+
+@st.cache_data(ttl=3600)
+def load_season_rounded(season):
+    """Season totals under the rounded board, in load_season's schema so the
+    Leaderboard renders it without needing to know which board it is holding.
+
+    Every column keeps a meaning on this board rather than carrying a decimal
+    figure across: a 3-vote game is one that was counted, not one that was
+    expected, and the poll rate is the share of games that actually drew a vote.
+    """
+    g = load_game_rounded(season)
+    if g is None or g.empty:
+        return None
+    team_col = 'Team' if 'Team' in g.columns else 'Playing.for'
+    out = g.groupby('Player_Name').agg(
+        Team=(team_col, 'last'),
+        Games=('Hard_Votes', 'size'),
+        Exp_Total_Votes=('Hard_Votes', 'sum'),
+        _Decimal_Total=('Exp_Votes', 'sum'),
+    ).reset_index()
+    _counts = g.groupby('Player_Name')['Hard_Votes'].value_counts().unstack(fill_value=0)
+    for _v, _c in ((3, 'Exp_3vote_games'), (2, 'Exp_2vote_games'), (1, 'Exp_1vote_games')):
+        _src = _counts[_v] if _v in _counts.columns else None
+        out[_c] = (out['Player_Name'].map(_src).fillna(0) if _src is not None else 0)
+        out[_c] = out[_c].astype(int)
+    _polled = out['Exp_3vote_games'] + out['Exp_2vote_games'] + out['Exp_1vote_games']
+    out['Avg_Poll_Prob'] = _polled / out['Games'].where(out['Games'] > 0)
+    if 'Brownlow.Votes' in g.columns:
+        out['Actual_Votes'] = out['Player_Name'].map(
+            g.groupby('Player_Name')['Brownlow.Votes'].sum()).fillna(0)
+    else:
+        out['Actual_Votes'] = 0
+    # Hard totals tie far more often than decimal ones (whole numbers, small
+    # range), so the decimal total breaks ties. Without it the order inside a
+    # tied block would be arbitrary and would shuffle between reruns.
+    out = out.sort_values(['Exp_Total_Votes', '_Decimal_Total'], ascending=False)
+    return out.drop(columns=['_Decimal_Total']).reset_index(drop=True)
+
 @st.cache_data(ttl=3600)
 def load_importance():
     path = f"{PRED_DIR}/feature_importance.csv"
@@ -3443,21 +3517,32 @@ if _page == 'Predictions':
 # ════════════════════════════════════════════════════════════
 # LEADERBOARD
 # ════════════════════════════════════════════════════════════
+def _lb_subtitle(is_2026, rounded):
+    if rounded:
+        return ("Rounded 3-2-1 votes through current round" if is_2026
+                else "Rounded 3-2-1 votes vs actual results")
+    return ("Projected votes through current round" if is_2026
+            else "Model predicted vs actual results")
+
+
 if _page == 'Leaderboard':
     _lb_live_html = ' <span class="lb-live-pill">LIVE</span>' if is_2026 else ""
-    _lbh_main, _lbh_season = st.columns([4, 1], vertical_alignment="bottom")
-    with _lbh_main:
-        st.markdown(
-            f'<div class="lb-header">'
-            f'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
-            f'<h2 class="lb-title">{selected_season} Brownlow Leaderboard</h2>'
-            f'{_lb_live_html}'
-            f'</div>'
-            f'<p class="lb-subtitle">'
-            f'{"Projected votes through current round" if is_2026 else "Model predicted vs actual results"}'
-            f'</p></div>',
-            unsafe_allow_html=True,
+    _lbh_main, _lbh_mode, _lbh_season = st.columns([3, 1.5, 1], vertical_alignment="bottom")
+    # Both controls are read BEFORE the title is written, because the subtitle
+    # and every figure below depend on which board is selected. st.columns places
+    # by column, not by call order, so the header still renders left to right.
+    with _lbh_mode:
+        _lb_mode = st.segmented_control(
+            "Vote scale", ["Decimal", "3-2-1"],
+            default="Decimal", key="lb_vote_mode",
+            help=("Decimal: the model's expected votes. "
+                  "3-2-1: the same predictions with each game's top three "
+                  "awarded 3, 2 and 1. The model itself is identical either way."),
+            label_visibility="collapsed",
         )
+        # segmented_control returns None when the active pill is clicked off.
+        if _lb_mode is None:
+            _lb_mode = "Decimal"
     with _lbh_season:
         # Season picker sits inline with the title (per-page key mirrors the
         # choice into season_by_page via _season_changed, like the other pages).
@@ -3470,9 +3555,45 @@ if _page == 'Leaderboard':
             label_visibility="collapsed",
         )
 
+    # Rebinding `predictions` keeps every downstream cell on this page reading
+    # Exp_Total_Votes, so the two boards share one rendering path. Scoped to the
+    # Leaderboard block: no other page runs in this rerun, and nothing here is
+    # written back to disk.
+    _lb_rounded = (_lb_mode == "3-2-1")
+    if _lb_rounded:
+        _rounded = load_season_rounded(selected_season)
+        if _rounded is None or _rounded.empty:
+            st.warning(f"No game-level data for {selected_season}, showing the decimal board.")
+            _lb_rounded = False
+        else:
+            predictions = _rounded
+
+    # One formatter for both boards: 3-2-1 totals are whole numbers and a
+    # trailing .0 on every row reads as false precision.
+    def _lb_v(x, signed=False):
+        _f = '.0f' if _lb_rounded else '.1f'
+        return format(float(x), ('+' if signed else '') + _f)
+
+    with _lbh_main:
+        st.markdown(
+            f'<div class="lb-header">'
+            f'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
+            f'<h2 class="lb-title">{selected_season} Brownlow Leaderboard</h2>'
+            f'{_lb_live_html}'
+            f'</div>'
+            f'<p class="lb-subtitle">'
+            f'{_lb_subtitle(is_2026, _lb_rounded)}'
+            f'</p></div>',
+            unsafe_allow_html=True,
+        )
+
     # ── Shared data: projection, odds, form, bar domain, helpers ──
     _proj_floor, _proj_ceiling, has_fc = {}, {}, False
-    if is_2026:
+    # Floor-Ceiling is skipped on the rounded board. The Monte Carlo band is a
+    # decimal-space quantity, and drawing it against a whole-number 3-2-1 total
+    # would invite reading one as the other's confidence interval, which it is
+    # not. The column and both bars simply drop out when has_fc stays False.
+    if is_2026 and not _lb_rounded:
         _proj = load_season_projection()
         if _proj is not None and 'Floor_Projection' in _proj.columns:
             _proj_floor   = dict(zip(_proj['Player'], _proj['Floor_Projection']))
@@ -3595,7 +3716,10 @@ SCOPE .lb-bar-lo{text-align:right;}
     _e1 = float(_r1['Exp_Total_Votes'])
     _hero_bar = (_lb_bar(_proj_floor.get(_n1, 0), _proj_ceiling.get(_n1, _e1), _e1)
                  if has_fc else _lb_bar(0, _e1, _e1))
-    _proj_lbl = "PROJECTED VOTES" if is_2026 else "EXPECTED VOTES"
+    if _lb_rounded:
+        _proj_lbl = "3-2-1 VOTES"
+    else:
+        _proj_lbl = "PROJECTED VOTES" if is_2026 else "EXPECTED VOTES"
 
     _chasers = ''
     for _i in (1, 2):
@@ -3608,7 +3732,8 @@ SCOPE .lb-bar-lo{text-align:right;}
                 f'<div class="lb-chaser">'
                 f'<div class="lb-chaser-top"><span class="lb-badge">{_i + 1}</span>'
                 f'<span class="lb-chaser-name">{_nm}</span></div>'
-                f'<div class="lb-chaser-meta">{_tm} · {_ex:.1f} exp</div>'
+                f'<div class="lb-chaser-meta">{_tm} · {_lb_v(_ex)} '
+                f'{"votes" if _lb_rounded else "exp"}</div>'
                 f'{_bar}</div>'
             )
 
@@ -3616,13 +3741,13 @@ SCOPE .lb-bar-lo{text-align:right;}
         f'<div class="lb-spotlight"><style>{_LB_SPOT_CSS}</style>'
         f'<div class="lb-hero">'
         f'<div class="lb-hero-main">'
-        f'<div class="lb-hero-overline">★ #1 PREDICTED</div>'
+        f'<div class="lb-hero-overline">★ #1 {"ON 3-2-1" if _lb_rounded else "PREDICTED"}</div>'
         f'<div class="lb-hero-name">{_n1}</div>'
         f'<div class="lb-hero-meta">{_t1} · {_g1} games · {_p1:.0f}% poll rate</div>'
         f'</div>'
         f'<div class="lb-hero-proj">'
         f'<div class="lb-proj-label">{_proj_lbl}</div>'
-        f'<div class="lb-proj-value">{_e1:.1f}</div>'
+        f'<div class="lb-proj-value">{_lb_v(_e1)}</div>'
         f'{_hero_bar}'
         f'</div></div>'
         f'<div class="lb-hero-rule"></div>'
@@ -3656,11 +3781,17 @@ SCOPE .lb-bar-lo{text-align:right;}
 
     # ── Round-on-round movement (2026 only) ──────────────────
     _move_map = {}
-    if is_2026 and game_df is not None:
-        _max_rnd = int(game_df['Round_num'].max())
+    # Movement is last round's rank against this one, so it has to be measured
+    # in the units on screen: subtracting decimal Exp_Votes from a 3-2-1 total
+    # would produce a previous total that is on neither board.
+    _mv_src, _mv_col = game_df, 'Exp_Votes'
+    if _lb_rounded:
+        _mv_src, _mv_col = load_game_rounded(selected_season), 'Hard_Votes'
+    if is_2026 and _mv_src is not None:
+        _max_rnd = int(_mv_src['Round_num'].max())
         _cur_rnd_votes = (
-            game_df[game_df['Round_num'] == _max_rnd]
-            .groupby('Player_Name')['Exp_Votes'].sum()
+            _mv_src[_mv_src['Round_num'] == _max_rnd]
+            .groupby('Player_Name')[_mv_col].sum()
         )
         _all = predictions[['Player_Name', 'Exp_Total_Votes']].copy()
         _all['Prev_Total'] = _all['Exp_Total_Votes'] - _all['Player_Name'].map(_cur_rnd_votes).fillna(0)
@@ -3752,18 +3883,22 @@ SCOPE .lb-bar-lo{text-align:right;}
 
     # The club-position column exists only while a club is selected. On "All" it
     # would be identical to Rank, so it is dropped rather than duplicated.
+    # On the rounded board these two columns hold counted games rather than
+    # expected ones, so the headings say so instead of reading as decimals.
+    _lb_votes_head = '3-2-1' if _lb_rounded else 'Exp Votes'
+    _lb_3v_head = '3V' if _lb_rounded else '3V Games'
     _show_club_rank = team_pick != 'All'
     _rank_heads = [('Rank', 'lft')] + ([('#', 'lft')] if _show_club_rank else [])
     if is_2026:
-        _heads = _rank_heads + [('Player', 'lft'), ('GP', ''), ('Form', 'lft'), ('Exp Votes', '')]
+        _heads = _rank_heads + [('Player', 'lft'), ('GP', ''), ('Form', 'lft'), (_lb_votes_head, '')]
         if has_fc:
             _heads.append(('Floor–Ceiling', 'lft'))
-        _heads += [('Poll %', ''), ('3V Games', '')]
+        _heads += [('Poll %', ''), (_lb_3v_head, '')]
         if has_odds:
             _heads += [('Best Odds', 'grp-start'), ('Mkt %', '')]
     else:
-        _heads = _rank_heads + [('Player', 'lft'), ('GP', ''), ('Exp Votes', ''),
-                                ('Actual', ''), ('Diff', ''), ('Poll %', ''), ('3V Games', '')]
+        _heads = _rank_heads + [('Player', 'lft'), ('GP', ''), (_lb_votes_head, ''),
+                                ('Actual', ''), ('Diff', ''), ('Poll %', ''), (_lb_3v_head, '')]
 
     def _th(lbl, cls):
         return f'<th class="{cls}">{lbl}</th>' if cls else f'<th>{lbl}</th>'
@@ -3797,16 +3932,16 @@ SCOPE .lb-bar-lo{text-align:right;}
         ]
         if is_2026:
             _cells.append(f'<td class="lft">{_form_html(_fg.get(_name, "▫▫▫"))}</td>')
-        _cells.append(f'<td class="lb-exp" style="background:rgba(52,211,153,{_a:.3f})">{_exp:.1f}</td>')
+        _cells.append(f'<td class="lb-exp" style="background:rgba(52,211,153,{_a:.3f})">{_lb_v(_exp)}</td>')
         if is_2026 and has_fc:
             _fl = _proj_floor.get(_name, float("nan")); _ce = _proj_ceiling.get(_name, float("nan"))
             _cells.append(f'<td class="lft fc-cell">{_lb_fc_bar(_fl, _ce, _exp, _tbl_maxceil)}</td>')
         if not is_2026:
             _act = int(_row['Actual_Votes']) if pd.notna(_row['Actual_Votes']) else 0
             _cells.append(f'<td>{_act}</td>')
-            _cells.append(f'<td>{(_exp - _act):+.1f}</td>')
+            _cells.append(f'<td>{_lb_v(_exp - _act, signed=True)}</td>')
         _cells.append(f'<td>{_poll:.1f}%</td>')
-        _cells.append(f'<td>{_tvg:.1f}</td>')
+        _cells.append(f'<td>{_lb_v(_tvg)}</td>')
         if is_2026 and has_odds:
             _bo = _odds_best.get(_name); _mk = _odds_impl.get(_name)
             _bo_s = f'${float(_bo):.1f}' if _bo is not None and pd.notna(_bo) else '—'
