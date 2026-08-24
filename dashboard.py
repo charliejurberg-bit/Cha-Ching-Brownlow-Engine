@@ -5163,7 +5163,7 @@ if _page == 'Player Profile':
 if _page == 'Game Analysis':
     st.markdown(
         f'<div class="lb-header"><h2 class="lb-title">Game Analysis — {selected_season}</h2>'
-        f'<p class="lb-subtitle">Round-by-round match predictions</p></div>',
+        f'<p class="lb-subtitle">Match predictions, by round or by club</p></div>',
         unsafe_allow_html=True,
     )
     _ga_rbr_tab = st.container()
@@ -5181,24 +5181,62 @@ if _page == 'Game Analysis':
         else:
             rr = rr.copy()
             rr['Match'] = rr['Home.team'] + ' vs ' + rr['Away.team']
+            # Round + match is the game key for every lookup below. Game_ID is
+            # only in the 2026 file (the historical game_level CSVs predate it)
+            # and Match alone is not unique across a season, because two clubs
+            # can meet twice — so neither works on its own in Team view.
+            rr['_ga_key'] = rr['Round_num'].astype(str) + '|' + rr['Match']
             available_rounds = sorted(rr['Round_num'].dropna().unique().astype(int).tolist())
+            available_teams = sorted(
+                set(rr['Home.team'].dropna().astype(str))
+                | set(rr['Away.team'].dropna().astype(str))
+            )
 
-            sel_col, info_col = st.columns([2, 5])
-            with sel_col:
-                selected_round = st.selectbox(
-                    "Select Round", available_rounds,
-                    format_func=lambda r: f"Round {_display_round(r, selected_season)}",
-                    index=max(0, len(available_rounds) - 1),
-                    # Season-scoped: an unscoped key made Streamlit carry the old
-                    # round across a season switch, so picking 2020 (18 rounds)
-                    # after 2015 (23) kept a round the new season does not have.
-                    key=f"rbr_round::{selected_season}",
+            mode_col, sel_col, info_col = st.columns([1.4, 2, 3.6])
+            with mode_col:
+                _ga_view = st.segmented_control(
+                    "View by", ["Round", "Team"],
+                    default="Round", key=f"ga_view::{selected_season}",
+                    help=("Round: every match of one round. "
+                          "Team: every match one club has played this season, "
+                          "oldest round first."),
                 )
-            rnd = rr[rr['Round_num'] == selected_round].copy()
+                # segmented_control returns None when the active pill is clicked off.
+                if _ga_view is None:
+                    _ga_view = "Round"
+
+            if _ga_view == "Team":
+                with sel_col:
+                    selected_team = st.selectbox(
+                        "Select Team", available_teams,
+                        # Season-scoped for the same reason as the round key: a
+                        # club can be absent from an earlier season's file.
+                        key=f"rbr_team::{selected_season}",
+                    )
+                rnd = rr[(rr['Home.team'] == selected_team)
+                         | (rr['Away.team'] == selected_team)].copy()
+                rnd = rnd.sort_values(['Round_num', 'Match'], kind='stable')
+                _ga_scope = f"team_{selected_team}"
+                _ga_caption = selected_team
+            else:
+                with sel_col:
+                    selected_round = st.selectbox(
+                        "Select Round", available_rounds,
+                        format_func=lambda r: f"Round {_display_round(r, selected_season)}",
+                        index=max(0, len(available_rounds) - 1),
+                        # Season-scoped: an unscoped key made Streamlit carry the old
+                        # round across a season switch, so picking 2020 (18 rounds)
+                        # after 2015 (23) kept a round the new season does not have.
+                        key=f"rbr_round::{selected_season}",
+                    )
+                rnd = rr[rr['Round_num'] == selected_round].copy()
+                _ga_scope = f"round_{selected_round}"
+                _ga_caption = f"Round {_display_round(selected_round, selected_season)}"
+
             with info_col:
                 st.markdown(
                     f'<div style="line-height:38px;color:var(--muted);font-size:14px;">'
-                    f'Round {_display_round(selected_round, selected_season)} &nbsp;·&nbsp; {rnd["Match"].nunique()} matches &nbsp;·&nbsp; {len(rnd)} players'
+                    f'{_ga_caption} &nbsp;·&nbsp; {rnd["_ga_key"].nunique()} matches &nbsp;·&nbsp; {len(rnd)} players'
                     f'</div>',
                     unsafe_allow_html=True,
                 )
@@ -5299,12 +5337,22 @@ if _page == 'Game Analysis':
                     return '<span class="ga-tbadge ga-tbadge-empty"></span>'
                 return f'<span class="ga-tbadge ga-tbadge-{alloc}">{alloc}</span>'
 
-            game_order = rnd.drop_duplicates('Match')[['Match', 'Home.team', 'Away.team', 'Home.score', 'Away.score']].reset_index(drop=True)
+            game_order = rnd.drop_duplicates('_ga_key')[
+                ['_ga_key', 'Match', 'Round_num', 'Home.team', 'Away.team',
+                 'Home.score', 'Away.score']
+            ].reset_index(drop=True)
 
             for game_idx, game_row in game_order.iterrows():
+                game_key = game_row['_ga_key']
                 match = game_row['Match']
                 home  = game_row['Home.team']
                 away  = game_row['Away.team']
+                # Per-game round: in Team view the games span the season, so the
+                # overline cannot reuse a single selected_round.
+                try:
+                    game_round = _display_round(int(float(game_row['Round_num'])), selected_season)
+                except (TypeError, ValueError):
+                    game_round = '-'
 
                 # ── PART 1: result header — winner ordered by score, not stored home/away
                 try:
@@ -5335,7 +5383,7 @@ if _page == 'Game Analysis':
                     result_html = f'<span class="ga-win-name">{match}</span>'
 
                 # ── per-game data (sorted by expected votes, descending)
-                gp = rnd[rnd['Match'] == match].copy().sort_values('Exp_Votes', ascending=False).reset_index(drop=True)
+                gp = rnd[rnd['_ga_key'] == game_key].copy().sort_values('Exp_Votes', ascending=False).reset_index(drop=True)
                 _cont = pd.to_numeric(
                     gp.get('Contested.Possessions', gp.get('ContPoss', pd.Series([0] * len(gp)))),
                     errors='coerce').fillna(0).astype(int).tolist()
@@ -5353,7 +5401,7 @@ if _page == 'Game Analysis':
                 # Season-scoped too: game_idx is positional within a round, so
                 # without the season the expanded state leaked onto whatever
                 # game happened to sit at the same index in the new season.
-                expand_key = f"rr_expand::{selected_season}_{selected_round}_{game_idx}"
+                expand_key = f"rr_expand::{selected_season}_{_ga_scope}_{game_idx}"
                 if expand_key not in st.session_state:
                     st.session_state[expand_key] = False
                 show_all = st.session_state[expand_key]
@@ -5397,7 +5445,7 @@ if _page == 'Game Analysis':
 
                 st.markdown(
                     f'<div class="ga-game"><style>{_GA_CSS}</style>'
-                    f'<div class="ga-overline">GAME {game_idx + 1} · ROUND {_display_round(selected_round, selected_season)}</div>'
+                    f'<div class="ga-overline">GAME {game_idx + 1} · ROUND {game_round}</div>'
                     f'<div class="ga-result">{result_html}</div>'
                     f'<div class="ga-rule"></div>'
                     f'<div class="ga-section-label">PREDICTED VOTES'
@@ -5420,7 +5468,7 @@ if _page == 'Game Analysis':
 
                 if n_total > 10:
                     _exp_lbl = "↑ Show less" if show_all else f"↓ Show all {n_total} players  (+{n_total - 10} more)"
-                    if st.button(_exp_lbl, key=f"rr_btn::{selected_season}_{selected_round}_{game_idx}"):
+                    if st.button(_exp_lbl, key=f"rr_btn::{selected_season}_{_ga_scope}_{game_idx}"):
                         st.session_state[expand_key] = not show_all
                         st.rerun()
 
