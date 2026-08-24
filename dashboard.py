@@ -83,7 +83,7 @@ html, body, [data-testid="stAppViewContainer"] {
 [data-testid="block-container"],
 [data-testid="stMainBlockContainer"] {
     padding-top: 0 !important;
-    max-width: 1200px;
+    max-width: min(1440px, 96vw);
 }
 [data-testid="stSidebar"] {
     background-color: #0d1720 !important;
@@ -3526,18 +3526,6 @@ def _lb_subtitle(is_2026, rounded):
 
 
 if _page == 'Leaderboard':
-    # The global block-container caps every page at 1200px, which left the wide
-    # table boxed in with dead space either side. Widened here rather than in the
-    # main CSS block so only this page changes: the rule is emitted as part of
-    # the Leaderboard body, so it simply is not on the document on any other
-    # page. !important because the global rule is a bare max-width and this has
-    # to beat it whichever order they land in. min() keeps it from overflowing a
-    # narrow window, where 96vw wins instead.
-    st.markdown(
-        '<style>[data-testid="block-container"],[data-testid="stMainBlockContainer"]'
-        '{max-width:min(1440px,96vw) !important;}</style>',
-        unsafe_allow_html=True,
-    )
     _lb_live_html = ' <span class="lb-live-pill">LIVE</span>' if is_2026 else ""
     _lbh_main, _lbh_mode, _lbh_season = st.columns([3, 1.5, 1], vertical_alignment="bottom")
     # Both controls are read BEFORE the title is written, because the subtitle
