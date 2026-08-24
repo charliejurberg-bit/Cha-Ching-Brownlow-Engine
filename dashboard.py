@@ -5149,15 +5149,6 @@ if _page == 'Player Profile':
 # GAME ANALYSIS
 # ════════════════════════════════════════════════════════════
 if _page == 'Game Analysis':
-    # Same widening as the Leaderboard, and for the same reason: the global
-    # 1200px cap boxed the cards in with dead space either side. That matters
-    # more here now two games share a row. Page-scoped — the rule is emitted as
-    # part of this page's body, so it is not on the document anywhere else.
-    st.markdown(
-        '<style>[data-testid="block-container"],[data-testid="stMainBlockContainer"]'
-        '{max-width:min(1600px,96vw) !important;}</style>',
-        unsafe_allow_html=True,
-    )
     st.markdown(
         f'<div class="lb-header"><h2 class="lb-title">Game Analysis — {selected_season}</h2>'
         f'<p class="lb-subtitle">Match predictions, by round or by club</p></div>',
