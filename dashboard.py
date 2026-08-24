@@ -5149,6 +5149,15 @@ if _page == 'Player Profile':
 # GAME ANALYSIS
 # ════════════════════════════════════════════════════════════
 if _page == 'Game Analysis':
+    # Same widening as the Leaderboard, and for the same reason: the global
+    # 1200px cap boxed the cards in with dead space either side. That matters
+    # more here now two games share a row. Page-scoped — the rule is emitted as
+    # part of this page's body, so it is not on the document anywhere else.
+    st.markdown(
+        '<style>[data-testid="block-container"],[data-testid="stMainBlockContainer"]'
+        '{max-width:min(1600px,96vw) !important;}</style>',
+        unsafe_allow_html=True,
+    )
     st.markdown(
         f'<div class="lb-header"><h2 class="lb-title">Game Analysis — {selected_season}</h2>'
         f'<p class="lb-subtitle">Match predictions, by round or by club</p></div>',
@@ -5244,15 +5253,15 @@ if _page == 'Game Analysis':
 
             # Scoped style block — emitted inside each .ga-game wrapper so it can't leak.
             _GA_CSS = """
-.ga-game{font-family:'Archivo',sans-serif;margin:0 0 40px 0;padding:0 24px;}
+.ga-game{font-family:'Archivo',sans-serif;margin:0 0 34px 0;padding:0 2px;}
 .ga-game .ga-overline{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.22em;
   text-transform:uppercase;color:var(--muted);margin-bottom:9px;}
 .ga-game .ga-result{display:flex;align-items:baseline;flex-wrap:wrap;gap:10px;}
-.ga-game .ga-win-name{font-size:30px;font-weight:800;color:var(--emerald);line-height:1;}
-.ga-game .ga-win-score{font-family:'IBM Plex Mono',monospace;font-size:30px;color:var(--text);line-height:1;}
+.ga-game .ga-win-name{font-size:23px;font-weight:800;color:var(--emerald);line-height:1;}
+.ga-game .ga-win-score{font-family:'IBM Plex Mono',monospace;font-size:23px;color:var(--text);line-height:1;}
 .ga-game .ga-def{font-size:13px;color:var(--muted);}
-.ga-game .ga-lose-name{font-size:20px;font-weight:600;color:var(--muted);line-height:1;}
-.ga-game .ga-lose-score{font-family:'IBM Plex Mono',monospace;font-size:20px;color:var(--muted);line-height:1;}
+.ga-game .ga-lose-name{font-size:16px;font-weight:600;color:var(--muted);line-height:1;}
+.ga-game .ga-lose-score{font-family:'IBM Plex Mono',monospace;font-size:16px;color:var(--muted);line-height:1;}
 .ga-game .ga-margin{font-family:'IBM Plex Mono',monospace;font-size:13px;font-weight:600;color:var(--emerald);
   background:var(--emerald-dim);padding:3px 11px;border-radius:999px;align-self:center;}
 .ga-game .ga-rule{height:1px;background:var(--line);margin:16px 0 22px 0;}
@@ -5261,24 +5270,24 @@ if _page == 'Game Analysis':
 .ga-game .ga-hint{color:var(--muted);opacity:.55;letter-spacing:.12em;margin-left:9px;}
 .ga-game .ga-podium{display:grid;grid-template-columns:1fr 1fr 1fr;border:1px solid var(--line);
   border-radius:14px;overflow:hidden;}
-.ga-game .ga-seat{padding:16px 18px;border-left:1px solid var(--line);
+.ga-game .ga-seat{padding:14px 14px;border-left:1px solid var(--line);
   transition:background-color .25s var(--ease-out);}
 .ga-game .ga-seat:first-child{border-left:none;}
 .ga-game .ga-seat:hover{background-color:rgba(159,176,191,.05);}
 .ga-game .ga-seat-3{background:linear-gradient(180deg,var(--gold-dim),transparent);}
-.ga-game .ga-badge{width:38px;height:38px;border-radius:9px;display:flex;align-items:center;
-  justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:18px;font-weight:600;margin-bottom:11px;}
+.ga-game .ga-badge{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;
+  justify-content:center;font-family:'IBM Plex Mono',monospace;font-size:16px;font-weight:600;margin-bottom:9px;}
 .ga-game .ga-badge-3{background:var(--gold);color:var(--bg);}
 .ga-game .ga-badge-2{background:var(--emerald);color:var(--bg);}
 .ga-game .ga-badge-1{background:rgba(159,176,191,.16);color:var(--steel);border:1px solid var(--hairline-strong);}
-.ga-game .ga-seat-name{font-size:16px;font-weight:700;color:var(--text);margin-bottom:4px;}
-.ga-game .ga-seat-meta{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
+.ga-game .ga-seat-name{font-size:15px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.ga-game .ga-seat-meta{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--muted);}
 .ga-game .ga-table{width:100%;border-collapse:collapse;margin-top:24px;}
 .ga-game .ga-table th{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:500;letter-spacing:.16em;
-  text-transform:uppercase;color:var(--muted);text-align:right;padding:8px 10px;border-bottom:1px solid var(--hairline-strong);}
+  text-transform:uppercase;color:var(--muted);text-align:right;padding:7px 7px;border-bottom:1px solid var(--hairline-strong);}
 .ga-game .ga-table th.ga-l{text-align:left;}
-.ga-game .ga-table td{font-family:'IBM Plex Mono',monospace;font-size:13px;text-align:right;color:var(--steel);
-  padding:7px 10px;border-bottom:1px solid var(--line);}
+.ga-game .ga-table td{font-family:'IBM Plex Mono',monospace;font-size:12px;text-align:right;color:var(--steel);
+  padding:6px 7px;border-bottom:1px solid var(--line);}
 .ga-game .ga-table td.ga-player{text-align:left;}
 .ga-game .ga-row-pred{background:rgba(52,211,153,.035);}
 .ga-game .ga-row-pred td{color:var(--text);}
@@ -5291,7 +5300,7 @@ if _page == 'Game Analysis':
 .ga-game .ga-tbadge-2{background:var(--emerald);color:var(--bg);}
 .ga-game .ga-tbadge-1{background:rgba(159,176,191,.16);color:var(--steel);border:1px solid var(--hairline-strong);}
 .ga-game .ga-tbadge-empty{background:transparent;}
-.ga-game .ga-pname{font-family:'Archivo',sans-serif;font-size:14px;font-weight:600;color:var(--text);}
+.ga-game .ga-pname{font-family:'Archivo',sans-serif;font-size:13px;font-weight:600;color:var(--text);}
 .ga-game .ga-ttag{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);}
 .ga-game .ga-legend{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.08em;
   color:var(--muted);opacity:.7;margin-top:13px;}
@@ -5331,134 +5340,141 @@ if _page == 'Game Analysis':
             ].reset_index(drop=True)
 
             for game_idx, game_row in game_order.iterrows():
-                game_key = game_row['_ga_key']
-                match = game_row['Match']
-                home  = game_row['Home.team']
-                away  = game_row['Away.team']
-                # Per-game round: in Team view the games span the season, so the
-                # overline cannot reuse a single selected_round.
-                try:
-                    game_round = _display_round(int(float(game_row['Round_num'])), selected_season)
-                except (TypeError, ValueError):
-                    game_round = '-'
+                # Two games per row. The cards were a single 1200px-capped
+                # column with dead space either side, and a 23-game Team
+                # view made that a very long scroll. st.columns stacks on a
+                # narrow viewport, so this stays one-up on a phone.
+                if game_idx % 2 == 0:
+                    _ga_row = st.columns(2, gap="large")
+                with _ga_row[game_idx % 2]:
+                    game_key = game_row['_ga_key']
+                    match = game_row['Match']
+                    home  = game_row['Home.team']
+                    away  = game_row['Away.team']
+                    # Per-game round: in Team view the games span the season, so the
+                    # overline cannot reuse a single selected_round.
+                    try:
+                        game_round = _display_round(int(float(game_row['Round_num'])), selected_season)
+                    except (TypeError, ValueError):
+                        game_round = '-'
 
-                # ── PART 1: result header — winner ordered by score, not stored home/away
-                try:
-                    home_score = int(float(game_row['Home.score']))
-                    away_score = int(float(game_row['Away.score']))
-                    if home_score == away_score:
-                        result_html = (
-                            f'<span class="ga-lose-name" style="color:var(--text)">{home}</span>'
-                            f'<span class="ga-lose-score" style="color:var(--text)">{home_score}</span>'
-                            f'<span class="ga-def">drew</span>'
-                            f'<span class="ga-lose-name" style="color:var(--text)">{away}</span>'
-                            f'<span class="ga-lose-score" style="color:var(--text)">{away_score}</span>'
-                        )
-                    else:
-                        if home_score > away_score:
-                            win_n, win_s, lose_n, lose_s = home, home_score, away, away_score
+                    # ── PART 1: result header — winner ordered by score, not stored home/away
+                    try:
+                        home_score = int(float(game_row['Home.score']))
+                        away_score = int(float(game_row['Away.score']))
+                        if home_score == away_score:
+                            result_html = (
+                                f'<span class="ga-lose-name" style="color:var(--text)">{home}</span>'
+                                f'<span class="ga-lose-score" style="color:var(--text)">{home_score}</span>'
+                                f'<span class="ga-def">drew</span>'
+                                f'<span class="ga-lose-name" style="color:var(--text)">{away}</span>'
+                                f'<span class="ga-lose-score" style="color:var(--text)">{away_score}</span>'
+                            )
                         else:
-                            win_n, win_s, lose_n, lose_s = away, away_score, home, home_score
-                        result_html = (
-                            f'<span class="ga-win-name">{win_n}</span>'
-                            f'<span class="ga-win-score">{win_s}</span>'
-                            f'<span class="ga-def">def.</span>'
-                            f'<span class="ga-lose-name">{lose_n}</span>'
-                            f'<span class="ga-lose-score">{lose_s}</span>'
-                            f'<span class="ga-margin">+{abs(home_score - away_score)}</span>'
+                            if home_score > away_score:
+                                win_n, win_s, lose_n, lose_s = home, home_score, away, away_score
+                            else:
+                                win_n, win_s, lose_n, lose_s = away, away_score, home, home_score
+                            result_html = (
+                                f'<span class="ga-win-name">{win_n}</span>'
+                                f'<span class="ga-win-score">{win_s}</span>'
+                                f'<span class="ga-def">def.</span>'
+                                f'<span class="ga-lose-name">{lose_n}</span>'
+                                f'<span class="ga-lose-score">{lose_s}</span>'
+                                f'<span class="ga-margin">+{abs(home_score - away_score)}</span>'
+                            )
+                    except (ValueError, TypeError):
+                        result_html = f'<span class="ga-win-name">{match}</span>'
+
+                    # ── per-game data (sorted by expected votes, descending)
+                    gp = rnd[rnd['_ga_key'] == game_key].copy().sort_values('Exp_Votes', ascending=False).reset_index(drop=True)
+                    _cont = pd.to_numeric(
+                        gp.get('Contested.Possessions', gp.get('ContPoss', pd.Series([0] * len(gp)))),
+                        errors='coerce').fillna(0).astype(int).tolist()
+                    names = gp['Player_Name'].astype(str).tolist()
+                    teams = gp['Team'].astype(str).tolist()
+                    exps  = pd.to_numeric(gp['Exp_Votes'], errors='coerce').fillna(0.0).tolist()
+                    p3s   = (pd.to_numeric(gp['P_3'], errors='coerce').fillna(0.0) * 100).tolist()
+                    dsps  = pd.to_numeric(gp['Disposals'], errors='coerce').fillna(0).astype(int).tolist()
+                    clrs  = pd.to_numeric(gp['Clearances'], errors='coerce').fillna(0).astype(int).tolist()
+                    gls   = pd.to_numeric(gp['Goals'], errors='coerce').fillna(0).astype(int).tolist()
+                    cvs   = pd.to_numeric(gp['Coaches_Votes'], errors='coerce').fillna(0).round().astype(int).tolist()
+                    max_exp = max(exps) if exps else 0.0
+
+                    n_total    = len(gp)
+                    # Season-scoped too: game_idx is positional within a round, so
+                    # without the season the expanded state leaked onto whatever
+                    # game happened to sit at the same index in the new season.
+                    expand_key = f"rr_expand::{selected_season}_{_ga_scope}_{game_idx}"
+                    if expand_key not in st.session_state:
+                        st.session_state[expand_key] = False
+                    show_all = st.session_state[expand_key]
+                    n_view   = n_total if show_all else min(10, n_total)
+
+                    # ── PART 2: predicted-votes podium (top 3 by expected votes)
+                    seats = []
+                    for i in range(min(3, n_total)):
+                        alloc = {0: 3, 1: 2, 2: 1}[i]
+                        seat_cls = "ga-seat ga-seat-3" if i == 0 else "ga-seat"
+                        seats.append(
+                            f'<div class="{seat_cls}">'
+                            f'<div class="ga-badge ga-badge-{alloc}">{alloc}</div>'
+                            f'<div class="ga-seat-name">{names[i]}</div>'
+                            f'<div class="ga-seat-meta">{exps[i]:.2f} exp · {int(round(p3s[i]))}% for 3 · {dsps[i]} disp</div>'
+                            f'</div>'
                         )
-                except (ValueError, TypeError):
-                    result_html = f'<span class="ga-win-name">{match}</span>'
+                    podium_html = '<div class="ga-podium">' + ''.join(seats) + '</div>'
 
-                # ── per-game data (sorted by expected votes, descending)
-                gp = rnd[rnd['_ga_key'] == game_key].copy().sort_values('Exp_Votes', ascending=False).reset_index(drop=True)
-                _cont = pd.to_numeric(
-                    gp.get('Contested.Possessions', gp.get('ContPoss', pd.Series([0] * len(gp)))),
-                    errors='coerce').fillna(0).astype(int).tolist()
-                names = gp['Player_Name'].astype(str).tolist()
-                teams = gp['Team'].astype(str).tolist()
-                exps  = pd.to_numeric(gp['Exp_Votes'], errors='coerce').fillna(0.0).tolist()
-                p3s   = (pd.to_numeric(gp['P_3'], errors='coerce').fillna(0.0) * 100).tolist()
-                dsps  = pd.to_numeric(gp['Disposals'], errors='coerce').fillna(0).astype(int).tolist()
-                clrs  = pd.to_numeric(gp['Clearances'], errors='coerce').fillna(0).astype(int).tolist()
-                gls   = pd.to_numeric(gp['Goals'], errors='coerce').fillna(0).astype(int).tolist()
-                cvs   = pd.to_numeric(gp['Coaches_Votes'], errors='coerce').fillna(0).round().astype(int).tolist()
-                max_exp = max(exps) if exps else 0.0
+                    # ── PART 3: full breakdown table (heatmap on Exp Votes only)
+                    rows_html = []
+                    for i in range(n_view):
+                        a = 0.22 * (exps[i] / max_exp) if max_exp > 0 else 0.0
+                        exp_cls = ' class="ga-zero"' if round(exps[i], 2) == 0.0 else ''
+                        tr_cls  = ' class="ga-row-pred"' if i < 3 else ''
+                        player_td = (
+                            f'<td class="ga-player"><span class="ga-player-wrap">{_ga_vote_badge(i)}'
+                            f'<span class="ga-pname">{names[i]}</span>'
+                            f'<span class="ga-ttag">{_ga_abbr(teams[i])}</span></span></td>'
+                        )
+                        rows_html.append(
+                            f'<tr{tr_cls}>{player_td}'
+                            f'<td style="background:rgba(52,211,153,{a:.3f})"><span{exp_cls}>{exps[i]:.2f}</span></td>'
+                            f'<td>{_ga_num(p3s[i], pct=True)}</td>'
+                            f'<td>{_ga_num(dsps[i])}</td>'
+                            f'<td>{_ga_num(_cont[i])}</td>'
+                            f'<td>{_ga_num(clrs[i])}</td>'
+                            f'<td>{_ga_num(gls[i])}</td>'
+                            f'<td>{_ga_num(cvs[i], coach=True)}</td></tr>'
+                        )
 
-                n_total    = len(gp)
-                # Season-scoped too: game_idx is positional within a round, so
-                # without the season the expanded state leaked onto whatever
-                # game happened to sit at the same index in the new season.
-                expand_key = f"rr_expand::{selected_season}_{_ga_scope}_{game_idx}"
-                if expand_key not in st.session_state:
-                    st.session_state[expand_key] = False
-                show_all = st.session_state[expand_key]
-                n_view   = n_total if show_all else min(10, n_total)
-
-                # ── PART 2: predicted-votes podium (top 3 by expected votes)
-                seats = []
-                for i in range(min(3, n_total)):
-                    alloc = {0: 3, 1: 2, 2: 1}[i]
-                    seat_cls = "ga-seat ga-seat-3" if i == 0 else "ga-seat"
-                    seats.append(
-                        f'<div class="{seat_cls}">'
-                        f'<div class="ga-badge ga-badge-{alloc}">{alloc}</div>'
-                        f'<div class="ga-seat-name">{names[i]}</div>'
-                        f'<div class="ga-seat-meta">{exps[i]:.2f} exp · {int(round(p3s[i]))}% for 3 · {dsps[i]} disp</div>'
-                        f'</div>'
-                    )
-                podium_html = '<div class="ga-podium">' + ''.join(seats) + '</div>'
-
-                # ── PART 3: full breakdown table (heatmap on Exp Votes only)
-                rows_html = []
-                for i in range(n_view):
-                    a = 0.22 * (exps[i] / max_exp) if max_exp > 0 else 0.0
-                    exp_cls = ' class="ga-zero"' if round(exps[i], 2) == 0.0 else ''
-                    tr_cls  = ' class="ga-row-pred"' if i < 3 else ''
-                    player_td = (
-                        f'<td class="ga-player"><span class="ga-player-wrap">{_ga_vote_badge(i)}'
-                        f'<span class="ga-pname">{names[i]}</span>'
-                        f'<span class="ga-ttag">{_ga_abbr(teams[i])}</span></span></td>'
-                    )
-                    rows_html.append(
-                        f'<tr{tr_cls}>{player_td}'
-                        f'<td style="background:rgba(52,211,153,{a:.3f})"><span{exp_cls}>{exps[i]:.2f}</span></td>'
-                        f'<td>{_ga_num(p3s[i], pct=True)}</td>'
-                        f'<td>{_ga_num(dsps[i])}</td>'
-                        f'<td>{_ga_num(_cont[i])}</td>'
-                        f'<td>{_ga_num(clrs[i])}</td>'
-                        f'<td>{_ga_num(gls[i])}</td>'
-                        f'<td>{_ga_num(cvs[i], coach=True)}</td></tr>'
+                    st.markdown(
+                        f'<div class="ga-game"><style>{_GA_CSS}</style>'
+                        f'<div class="ga-overline">GAME {game_idx + 1} · ROUND {game_round}</div>'
+                        f'<div class="ga-result">{result_html}</div>'
+                        f'<div class="ga-rule"></div>'
+                        f'<div class="ga-section-label">PREDICTED VOTES'
+                        f'<span class="ga-hint">model expectation · 3-2-1</span></div>'
+                        f'{podium_html}'
+                        # Eight mono columns come to ~440px of min-content, so on a
+                        # phone the table used to widen the page instead of itself.
+                        # Contained scroll, the Polls a Vote matrix pattern — never
+                        # overflow-x:hidden at page level (project law).
+                        f'<div style="overflow-x:auto">'
+                        f'<table class="ga-table"><thead><tr>'
+                        f'<th class="ga-l">Player</th><th>Exp Votes</th><th>P(3)</th><th>Disp</th>'
+                        f'<th>Cont.</th><th>Clr</th><th>Goals</th><th>Coaches</th>'
+                        f'</tr></thead><tbody>{"".join(rows_html)}</tbody></table></div>'
+                        f'<div class="ga-legend">heat = expected votes &nbsp;·&nbsp; gold = coaches votes '
+                        f'&nbsp;·&nbsp; shaded rows = predicted 3-2-1</div>'
+                        f'</div>',
+                        unsafe_allow_html=True,
                     )
 
-                st.markdown(
-                    f'<div class="ga-game"><style>{_GA_CSS}</style>'
-                    f'<div class="ga-overline">GAME {game_idx + 1} · ROUND {game_round}</div>'
-                    f'<div class="ga-result">{result_html}</div>'
-                    f'<div class="ga-rule"></div>'
-                    f'<div class="ga-section-label">PREDICTED VOTES'
-                    f'<span class="ga-hint">model expectation · 3-2-1</span></div>'
-                    f'{podium_html}'
-                    # Eight mono columns come to ~440px of min-content, so on a
-                    # phone the table used to widen the page instead of itself.
-                    # Contained scroll, the Polls a Vote matrix pattern — never
-                    # overflow-x:hidden at page level (project law).
-                    f'<div style="overflow-x:auto">'
-                    f'<table class="ga-table"><thead><tr>'
-                    f'<th class="ga-l">Player</th><th>Exp Votes</th><th>P(3)</th><th>Disp</th>'
-                    f'<th>Cont.</th><th>Clr</th><th>Goals</th><th>Coaches</th>'
-                    f'</tr></thead><tbody>{"".join(rows_html)}</tbody></table></div>'
-                    f'<div class="ga-legend">heat = expected votes &nbsp;·&nbsp; gold = coaches votes '
-                    f'&nbsp;·&nbsp; shaded rows = predicted 3-2-1</div>'
-                    f'</div>',
-                    unsafe_allow_html=True,
-                )
-
-                if n_total > 10:
-                    _exp_lbl = "↑ Show less" if show_all else f"↓ Show all {n_total} players  (+{n_total - 10} more)"
-                    if st.button(_exp_lbl, key=f"rr_btn::{selected_season}_{_ga_scope}_{game_idx}"):
-                        st.session_state[expand_key] = not show_all
-                        st.rerun()
+                    if n_total > 10:
+                        _exp_lbl = "↑ Show less" if show_all else f"↓ Show all {n_total} players  (+{n_total - 10} more)"
+                        if st.button(_exp_lbl, key=f"rr_btn::{selected_season}_{_ga_scope}_{game_idx}"):
+                            st.session_state[expand_key] = not show_all
+                            st.rerun()
 
 
 # ════════════════════════════════════════════════════════════
