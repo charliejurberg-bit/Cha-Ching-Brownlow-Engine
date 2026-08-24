@@ -1810,6 +1810,11 @@ def load_best_odds():
 
 # Model Comparison source files. Paths are module-level because the page also
 # renders them as the per-model source label.
+# Placeholder for a model that does not rank a player. One constant, used by
+# the emitter and by both comparisons that read it back, so a change to the
+# glyph cannot leave a comparison testing for the old one.
+_MC_NA = '\u00b7'
+
 _MC_CC_PATH = "predictions/season_2026.csv"
 _MC_WH_PUB  = "data_2026/wheelo_brownlow_predictions.csv"
 _MC_WH_PATH = "data_wheelo/wheelo_2026.csv"   # legacy fallback
@@ -7038,13 +7043,20 @@ if _page == 'Live Tracker':
 # MODEL COMPARISON
 # ════════════════════════════════════════════════════════════
 if _page == 'Model Comparison':
-    # ── 1. Header — no box ────────────────────────────────────
+    # ── 1. Header: eyebrow + H1, no box ───────────────────────
+    # The eyebrow's Round segment is deliberately absent. Model Comparison is not
+    # in _SEASON_PAGES, so selected_season is not this page's source of truth and
+    # the tab carries no round of its own. max_season_rounds does exist, but it
+    # tracks the season picker this page ignores, so quoting it here would be a
+    # new claim rather than a reused one.
     st.markdown(
-        '<div style="margin:2px 0 16px">'
-        '<div style="font-size:10px;font-weight:700;letter-spacing:2px;'
-        'text-transform:uppercase;color:#7e8c99">Model Comparison · 2026</div>'
-        '<h1 style="font-family:\'Archivo\',sans-serif;font-size:34px;font-weight:800;'
-        'color:#e9eef3;margin:4px 0 0;line-height:1.05">Five models, one view</h1>'
+        '<div style="margin:2px 0 18px">'
+        '<div style="font-family:\'DM Mono\',monospace;font-size:10.5px;font-weight:500;'
+        'letter-spacing:.14em;text-transform:uppercase;color:#7e8c99">'
+        'Model comparison · 2026</div>'
+        '<h1 style="font-family:\'Archivo\',sans-serif;font-size:38px;font-weight:700;'
+        'letter-spacing:-.022em;color:#e9eef3;margin:6px 0 0;line-height:1.05">'
+        'Where we differ from the field</h1>'
         '</div>',
         unsafe_allow_html=True,
     )
@@ -7067,15 +7079,36 @@ if _page == 'Model Comparison':
 
         _mc_cc_raw, _mc_wh_raw, _mc_wh_src = _load_model_comparison()
 
-        # Which Cha Ching board feeds the comparison. The control itself is drawn
-        # beside the consensus table, far below this point, so its value is read
-        # from session_state instead of from the widget: Streamlit writes a keyed
-        # widget's selection into session_state before the rerun that follows a
-        # click, so by the time this line runs the key already holds the choice
-        # this render needs. Nothing else changes — the other four models, the
-        # matching and the edge maths are untouched, and only the board Cha Ching
-        # is ranked on moves.
-        _mc_rounded = st.session_state.get('mc_vote_mode') == '3-2-1'
+        # ── 3. Toolbar ────────────────────────────────────────────
+        # The three columns are created here, at the row's visual position, but
+        # only two are filled now. The chips need counts that do not exist until
+        # _pc_df is built a couple of hundred lines below, so their column is
+        # written into later; a Streamlit column stays writable after creation.
+        # Scale and order have to be read here, because scale decides which board
+        # the Cha Ching ranks are computed from.
+        with st.container(key="mc_toolbar"):
+            _tb_chips, _tb_order, _tb_scale = st.columns(
+                [5, 2.4, 1.6], gap="small", vertical_alignment="center")
+        with _tb_order:
+            _mc_order = st.segmented_control(
+                "Order", ["Consensus", "Spread"], default="Consensus",
+                key="mc_order", label_visibility="collapsed",
+                help=("Row order only. The number in the first column is the "
+                      "consensus rank either way, and travels with its row."),
+            )
+        with _tb_scale:
+            _mc_scale = st.segmented_control(
+                "Scale", ["Decimal", "3-2-1"], default="Decimal",
+                key="mc_vote_mode", label_visibility="collapsed",
+                help=("Switches the Cha Ching column between expected votes and "
+                      "rounded 3-2-1. Consensus order shifts with it."),
+            )
+
+        # Read from the widget's return value, not from session_state. The
+        # fail-safe below stays a plain local: once the widget above exists,
+        # assigning to st.session_state['mc_vote_mode'] raises, so the override
+        # must not be written back to the key.
+        _mc_rounded = (_mc_scale == '3-2-1')
         if _mc_rounded:
             _mc_r = load_season_rounded(2026)
             if _mc_r is not None and not _mc_r.empty:
@@ -7262,7 +7295,7 @@ if _page == 'Model Comparison':
 
         def _rk(v):
             if v is None or (isinstance(v, float) and pd.isna(v)):
-                return '—'
+                return _MC_NA
             return str(int(v))
 
         def _rk_valid(v):
@@ -7288,271 +7321,248 @@ if _page == 'Model Comparison':
         def _in_top10(df, match_key, rc):
             r = _mc_lookup(df, match_key, rc)
             return r is not None and r <= 10
-        _all_agree_count = sum(
-            1 for _, row in _pc_df[_pc_df['Consensus'] <= 10].iterrows()
-            if all(_in_top10(df, row['_mk'], rc) for df, rc in _avail_models)
-        )
         _agree_thr = max(3, _n_models - 1)
-        _3of_agree_count = sum(
-            1 for _, row in _pc_df[_pc_df['Consensus'] <= 10].iterrows()
-            if sum(_in_top10(df, row['_mk'], rc) for df, rc in _avail_models) >= _agree_thr
-        )
-        # Cha Ching outliers = players whose edge magnitude is >= 5.
-        _cc_outlier_count = int((_pc_df['_edge'].dropna().abs() >= 5).sum())
+        # The same three predicates, now materialised as boolean columns. The chip
+        # count is the column's sum and the chip filter is the column itself, so
+        # the number on a chip and the rows it produces cannot disagree.
+        _pc_df['_f_full'] = _pc_df.apply(
+            lambda row: bool(row['Consensus'] <= 10) and all(
+                _in_top10(df, row['_mk'], rc) for df, rc in _avail_models), axis=1)
+        _pc_df['_f_strong'] = _pc_df.apply(
+            lambda row: bool(row['Consensus'] <= 10) and sum(
+                _in_top10(df, row['_mk'], rc) for df, rc in _avail_models) >= _agree_thr,
+            axis=1)
+        # Not top-10 scoped, unlike the two above: an outlier anywhere in the 25
+        # is an outlier. to_numeric rather than dropna so the result is a mask
+        # aligned to every row; a missing edge compares False, which is the same
+        # count the dropna form produced.
+        _pc_df['_f_out'] = pd.to_numeric(_pc_df['_edge'], errors='coerce').abs() >= 5
 
-        # ── 2. Consensus headline (replaces the five model cards) ──
-        _top = _pc_df.iloc[0]
-        _top_ranks = [('Cha Ching', _top['_cc']), ('AFL', _top['_afl']),
-                      ('Betfair', _top['_bf']), ('Wheelo', _top['_wh']), ('ESPN', _top['_espn'])]
-        _n_top1 = sum(1 for _, r in _top_ranks if _rk_valid(r) and int(r) == 1)
-        _agree_tag = ('unanimous across all five models' if _n_top1 == 5
-                      else f'tops {_n_top1} of 5 models')
+        _all_agree_count = int(_pc_df['_f_full'].sum())
+        _3of_agree_count = int(_pc_df['_f_strong'].sum())
+        _cc_outlier_count = int(_pc_df['_f_out'].sum())
+
+        # Per-row shape of the field, from the same definition of "available"
+        # that _cons averages over. Both feed the table: _n_avail drives the
+        # thin-baseline guard, _spread is the last column.
+        def _avail_ranks(row):
+            return [row[c] for c in ('_cc', '_afl', '_bf', '_wh', '_espn')
+                    if _rk_valid(row[c])]
+        _pc_df['_n_avail'] = _pc_df.apply(lambda r: len(_avail_ranks(r)), axis=1)
+        _pc_df['_spread'] = _pc_df.apply(
+            lambda r: (max(_avail_ranks(r)) - min(_avail_ranks(r)))
+            if _avail_ranks(r) else None, axis=1)
+
+        # ── 3b. Filter chips, written into the toolbar row created above ──
+        # Option values are stable keys and the counts live in format_func, so a
+        # count changing with the scale toggle does not change the option list
+        # and Streamlit therefore does not reset the selection.
+        _MC_CHIPS = ['All', 'full', 'strong', 'out']
+        _mc_chip_labels = {
+            'All': f'All ({len(_pc_df)})',
+            'full': f'Top 10 everywhere ({_all_agree_count})',
+            'strong': f'Top 10 in {_agree_thr} ({_3of_agree_count})',
+            'out': f'Outliers ({_cc_outlier_count})',
+        }
+        with _tb_chips:
+            _mc_filter = st.pills(
+                "Filter", _MC_CHIPS, default='All', key='mc_filter',
+                format_func=lambda _k: _mc_chip_labels[_k],
+                label_visibility="collapsed",
+            )
+        # st.pills returns None when the pressed chip is clicked again, which is
+        # exactly the "reset to All" behaviour, so it needs no separate handling.
+        if _mc_filter is None:
+            _mc_filter = 'All'
+
+        # ── 4. Metadata row: tint scale left, source stamps right ──
+        _MC_SWATCHES = [
+            'background:transparent;box-shadow:inset 0 0 0 1px #1a2632',
+            'background:rgba(52,211,153,.06)',
+            'background:rgba(52,211,153,.12)',
+            'background:rgba(52,211,153,.19)',
+            'background:rgba(52,211,153,.26)',
+        ]
+        _mc_meta_txt = ("font-family:'DM Mono',monospace;font-size:10.5px;"
+                        "letter-spacing:.06em;color:#5c6b79")
+        _mc_sw_html = ''.join(
+            f'<span style="width:22px;height:10px;border-radius:1px;'
+            f'display:inline-block;{_sw}"></span>' for _sw in _MC_SWATCHES)
+
+        # One stamp per source, each keeping _file_ts's own "never fetched". No
+        # single summary timestamp: three files go stale independently and one
+        # date standing for all three would be a claim none of them supports.
+        _afl_ts = _file_ts(_AFL_CSV) or 'never fetched'
+        _espn_ts = _file_ts(_ESPN_CSV) or 'never fetched'
+        _bf_ts = _file_ts(_BF_CSV) or 'never fetched'
+
         st.markdown(
-            f'<div style="margin:2px 0 12px;font-size:15px;color:#7e8c99">Consensus #1: '
-            f'<span style="color:#34d399;font-weight:700;font-size:19px">{_top["Player"]}</span>'
-            f'<span style="font-size:12px;color:#7e8c99"> · {_agree_tag}</span></div>',
+            f'<div style="display:flex;justify-content:space-between;'
+            f'align-items:center;gap:16px;margin:14px 0 6px;{_mc_meta_txt}">'
+            f'<span style="display:flex;align-items:center;gap:8px">'
+            f'<span>Off consensus</span>'
+            f'<span style="display:flex;gap:2px">{_mc_sw_html}</span>'
+            f'<span>0 to 8+</span>'
+            f'</span>'
+            f'<span>'
+            f'<span title="stored pulls, not live">Field columns stored</span>'
+            f' &nbsp;AFL {_afl_ts} · ESPN {_espn_ts} · Betfair {_bf_ts}'
+            f'</span></div>',
             unsafe_allow_html=True,
         )
 
-        def _agree_cell(label, rank, first=False):
-            _v = _rk(rank)
-            _c = '#34d399' if (_rk_valid(rank) and int(rank) == 1) else ('#7e8c99' if _v == '—' else '#e9eef3')
-            _bd = '' if first else 'border-left:1px solid rgba(140,165,185,.14)'
-            return (f'<div style="{_bd};padding:8px 16px">'
-                    f'<div style="font-size:9px;font-weight:700;letter-spacing:1.2px;'
-                    f'text-transform:uppercase;color:#7e8c99">{label}</div>'
-                    f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:18px;font-weight:600;'
-                    f'color:{_c};text-align:left;font-variant-numeric:tabular-nums">{_v}</div></div>')
-        st.markdown(
-            '<div style="display:grid;grid-template-columns:repeat(5,1fr);margin:0 0 22px;'
-            'border-top:1px solid rgba(140,165,185,.14);border-bottom:1px solid rgba(140,165,185,.14)">' +
-            ''.join(_agree_cell(_l, _r, _i == 0) for _i, (_l, _r) in enumerate(_top_ranks)) +
-            '</div>',
-            unsafe_allow_html=True,
-        )
-
-        # ── 4. Metadata strip (replaces the three summary cards) ──
-        def _meta_cell(label, value, value_colour, sub, first=False):
-            _pad = 'padding:0 22px 0 0' if first else 'padding:0 22px'
-            _bd = '' if first else 'border-left:1px solid rgba(140,165,185,.14)'
-            return (f'<div style="{_pad};{_bd}">'
-                    f'<div style="font-size:10px;font-weight:700;letter-spacing:1.2px;'
-                    f'text-transform:uppercase;color:#7e8c99">{label}</div>'
-                    f'<div style="font-family:\'IBM Plex Mono\',monospace;font-size:25px;font-weight:600;'
-                    f'color:{value_colour};text-align:right;line-height:1.2;'
-                    f'font-variant-numeric:tabular-nums">{value}</div>'
-                    f'<div style="font-size:11px;color:#7e8c99;text-align:right;margin-top:3px">{sub}</div></div>')
-        st.markdown(
-            '<div style="display:grid;grid-template-columns:repeat(3,1fr);margin:0 0 8px">' +
-            _meta_cell('Full consensus', _all_agree_count, '#e9eef3',
-                       'top 10 in every available model', first=True) +
-            _meta_cell('Strong consensus', _3of_agree_count, '#e9eef3',
-                       f'top 10 in at least {_agree_thr} models') +
-            _meta_cell('Cha Ching outliers', _cc_outlier_count, '#34d399',
-                       'edge of 5+ vs the field') +
-            '</div>',
-            unsafe_allow_html=True,
-        )
-
-        # ── 4a. AFL Predictor source freshness ──
-        # No refresh button by design: the cadence is Run Update (scraper_afl.py),
-        # and the live award-API read stays on the Live Tracker. This is a stamp
-        # only, so the column can't go silently old without saying so.
-        _afl_ts = _file_ts(_AFL_CSV)
-        st.markdown(
-            '<div style="font-size:11px;color:#7e8c99;margin:2px 0 10px">'
-            f'AFL Predictor column · {"as of " + _afl_ts if _afl_ts else "never fetched"}'
-            ' — a stored pull, not live (the Live Tracker reads the API direct).</div>',
-            unsafe_allow_html=True,
-        )
-
-        # ── 4b. ESPN source freshness + opt-in refresh ──
-        # Every column here is stored rather than live-read, so any of them can
-        # be silently old — hence the stamps. ESPN's is a browser render, which
-        # is why it also gets a refresh button (Betfair's is at 4c). The refresh
-        # itself is ~20-30s of headless Chromium and is signed-in only: an
-        # anonymous visitor must never be able to spawn a browser on the server.
+        # ── 4a. Refresh buttons, signed in only ────────────────────
+        # Unchanged behaviour: clear the loader's cache, then rerun so the frame
+        # is rebuilt from the new CSV. An anonymous visitor must never be able to
+        # spawn a browser or wake a remote API from this page.
         if _mc_espn_msg := st.session_state.pop("mc_espn_msg", None):
             st.success(_mc_espn_msg)
-        _espn_ts = _file_ts(_ESPN_CSV)
-        _espn_cap = (
-            '<div style="font-size:11px;color:#7e8c99;margin:2px 0 10px">'
-            f'ESPN column · {"as of " + _espn_ts if _espn_ts else "never fetched"}'
-            ' — a stored render, not a live pull (ESPN publishes no feed).</div>'
-        )
+        if _mc_bf_msg := st.session_state.pop("mc_bf_msg", None):
+            st.success(_mc_bf_msg)
         if _is_admin:
-            _es1, _es2 = st.columns([4, 1])
-            _es1.markdown(_espn_cap, unsafe_allow_html=True)
-            if _es2.button("Refresh ESPN", key="mc_espn_refresh",
+            _rf1, _rf2, _rf3 = st.columns([1, 1, 6], gap="small")
+            if _rf1.button("Refresh ESPN", key="mc_espn_refresh",
                            help="Renders espn.com in a headless browser. Takes ~30s."):
-                with st.spinner("Rendering ESPN — this takes ~30s…"):
+                with st.spinner("Rendering ESPN, this takes ~30s."):
                     _espn_ok, _espn_msg = _refresh_espn_live_to_csv()
                 if _espn_ok:
-                    # The frame above was already built from the old csv, so the
-                    # rerun is what actually redraws the table.
                     fetch_espn_brownlow.clear()
                     st.session_state["mc_espn_msg"] = _espn_msg
                     st.rerun()
                 else:
                     st.error(_espn_msg)
-        else:
-            st.markdown(_espn_cap, unsafe_allow_html=True)
-
-        # ── 4c. Betfair source freshness + opt-in refresh ──
-        # Same treatment as ESPN: Betfair's widget API is a Heroku backend whose
-        # dyno sleeps off-season (~10s cold-wake), so it's a stored CSV read on
-        # render now, with the live pull behind this signed-in button.
-        if _mc_bf_msg := st.session_state.pop("mc_bf_msg", None):
-            st.success(_mc_bf_msg)
-        _bf_ts = _file_ts(_BF_CSV)
-        _bf_cap = (
-            '<div style="font-size:11px;color:#7e8c99;margin:2px 0 10px">'
-            f'Betfair column · {"as of " + _bf_ts if _bf_ts else "never fetched"}'
-            ' — a stored pull, not live (their API sleeps off-season).</div>'
-        )
-        if _is_admin:
-            _bf1, _bf2 = st.columns([4, 1])
-            _bf1.markdown(_bf_cap, unsafe_allow_html=True)
-            if _bf2.button("Refresh Betfair", key="mc_bf_refresh",
+            if _rf2.button("Refresh Betfair", key="mc_bf_refresh",
                            help="Pulls Betfair's live JSON feed. Takes ~10s if their API is cold."):
-                with st.spinner("Pulling Betfair — this can take ~10s…"):
+                with st.spinner("Pulling Betfair, this can take ~10s."):
                     _bf_ok, _bf_msg = _refresh_betfair_live_to_csv()
                 if _bf_ok:
-                    # The frame above was built from the old csv, so the rerun is
-                    # what redraws the table.
                     fetch_betfair_brownlow.clear()
                     st.session_state["mc_bf_msg"] = _bf_msg
                     st.rerun()
                 else:
                     st.error(_bf_msg)
-        else:
-            st.markdown(_bf_cap, unsafe_allow_html=True)
 
-        # ── 5. Consensus ranking table (replaces table + heatmap + scatter) ──
-        st.markdown(
-            '<div style="margin:18px 0 4px;font-size:10px;font-weight:700;letter-spacing:1.5px;'
-            'text-transform:uppercase;color:#7e8c99">Consensus ranking — top 25</div>',
-            unsafe_allow_html=True,
-        )
-
-        def _mc_cell(v, colour):
-            _t = _rk(v)
-            _c = '#7e8c99' if _t == '—' else colour
-            return (f'<td style="text-align:right;padding:7px 12px;color:{_c};'
-                    f'border-bottom:1px solid rgba(140,165,185,.14)">{_t}</td>')
-
-        # The header is Streamlit columns rather than a <thead>, because the scale
-        # control has to live in the Cha Ching cell and a widget cannot go inside
-        # an HTML table. The body stays an HTML table (25 rows of st.columns
-        # would be slow), so the two are tied together by _MC_W: the same
-        # percentages drive these column weights and the table's colgroup, and
-        # the table is table-layout:fixed so it honours them exactly rather than
-        # resizing to content. Change one, change the other.
-        _MC_W = [5, 27, 20, 12, 12, 12, 12]        # sums to 100
-        _mc_hs = ("font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;"
-                  "letter-spacing:.1em;text-transform:uppercase;padding:0 12px 8px;"
-                  "white-space:nowrap")
-        st.markdown(
-            # Zeroing the gap is not enough on its own: Streamlit sizes a column
-            # as calc(% - gap) inline, so the computed widths stay a few pixels
-            # off and every label drifts against the body cell beneath it.
-            # Pinning flex-basis to the same percentages the colgroup uses takes
-            # Streamlit's arithmetic out of the loop, and generating both from
-            # _MC_W means they cannot fall out of step later.
-            '<style>.st-key-mc_thead [data-testid="stHorizontalBlock"]{gap:0 !important;}'
-            '.st-key-mc_thead [data-testid="stColumn"]{padding:0 !important;}'
-            + ''.join(
-                f'.st-key-mc_thead [data-testid="stColumn"]:nth-child({_i + 1})'
-                f'{{flex:0 0 {_w}% !important;width:{_w}% !important;'
-                f'min-width:0 !important;}}'
-                for _i, _w in enumerate(_MC_W))
-            + '</style>',
-            unsafe_allow_html=True,
-        )
-        with st.container(key="mc_thead"):
-            _hc = st.columns(_MC_W, gap="small", vertical_alignment="top")
-            _mc_labels = ['#', 'Player', None, 'AFL', 'Betfair', 'Wheelo', 'ESPN']
-            for _i, _lbl in enumerate(_mc_labels):
-                with _hc[_i]:
-                    if _lbl is None:
-                        st.markdown(
-                            f'<div style="{_mc_hs};color:#34d399;text-align:right">'
-                            f'Cha Ching</div>',
-                            unsafe_allow_html=True,
-                        )
-                        # Keyed, and read at the top of this block on the rerun
-                        # that follows a click.
-                        st.segmented_control(
-                            "Cha Ching scale", ["Decimal", "3-2-1"],
-                            default="Decimal", key="mc_vote_mode",
-                            help=("Which Cha Ching leaderboard the comparison ranks "
-                                  "against. Decimal is the model's expected votes; "
-                                  "3-2-1 awards each game's top three 3, 2 and 1. The "
-                                  "model is the same either way, and the other four "
-                                  "columns never move."),
-                            label_visibility="collapsed",
-                        )
-                    else:
-                        _al = 'left' if _lbl == 'Player' else 'right'
-                        st.markdown(
-                            f'<div style="{_mc_hs};color:#7e8c99;text-align:{_al}">{_lbl}</div>',
-                            unsafe_allow_html=True,
-                        )
+        # ── 5. Consensus ranking table ─────────────────────────────
+        # Eight columns. _MC_W drives the colgroup and nothing else now: the
+        # header is a real <thead> inside this same table, so one element and one
+        # set of column rules govern both halves.
+        _MC_W = [5, 25, 13, 12, 12, 12, 12, 9]        # sums to 100
         _mc_colgroup = '<colgroup>' + ''.join(
             f'<col style="width:{_w}%">' for _w in _MC_W) + '</colgroup>'
 
+        _MC_TBL_CSS = (
+            ".st-key-mc_table .mc-tbl{width:100%;table-layout:fixed;"
+            "border-collapse:collapse;font-family:'DM Mono',monospace;font-size:13px;"
+            "font-weight:400;font-variant-numeric:tabular-nums;}"
+            ".st-key-mc_table .mc-tbl th{font-family:'DM Mono',monospace;font-size:10.5px;"
+            "font-weight:500;letter-spacing:.14em;text-transform:uppercase;color:#7e8c99;"
+            "padding:0 12px 10px;text-align:right;white-space:nowrap;"
+            "border-bottom:1px solid rgba(140,165,185,.22);}"
+            ".st-key-mc_table .mc-tbl th.mc-l{text-align:left;}"
+            ".st-key-mc_table .mc-tbl th.mc-cc,.st-key-mc_table .mc-tbl td.mc-cc{"
+            "border-left:1px solid rgba(52,211,153,.16);"
+            "border-right:1px solid rgba(52,211,153,.16);}"
+            # display:inline-block so the inset shadow has a box to paint into;
+            # on a bare inline span it collapses and the underline never shows.
+            ".st-key-mc_table .mc-tbl th.mc-cc .mc-cc-lbl{color:#34d399;"
+            "display:inline-block;box-shadow:inset 0 -2px 0 #34d399;}"
+            ".st-key-mc_table .mc-tbl tbody tr{height:40px;}"
+            ".st-key-mc_table .mc-tbl tbody tr:hover{background:rgba(233,238,243,.028);}"
+            ".st-key-mc_table .mc-tbl td{position:relative;text-align:right;padding:0 12px;"
+            "color:#c6d2dc;border-bottom:1px solid rgba(26,38,50,.55);}"
+            ".st-key-mc_table .mc-tbl td.mc-l{text-align:left;}"
+            ".st-key-mc_table .mc-caret{position:absolute;left:12px;font-size:9px;opacity:.5;}"
+        )
+
+        def _mc_cell(v, d, is_cc, model, cons, thin):
+            """One rank cell.
+
+            d is the deviation from the row's consensus, or None when there is
+            no rank to deviate. thin carries the guard: a row whose consensus
+            rests on fewer than four models gets no tint and no caret, because a
+            strong signal computed off two models is a false signal.
+            """
+            _t = _rk(v)
+            _title = f'{model}: {_t}, consensus {cons:.1f}'
+            _cls = ' class="mc-cc"' if is_cc else ''
+            if thin or d is None:
+                return f'<td{_cls} title="{_title}">{_t}</td>'
+            _a = min(abs(d) / 8.0, 1.0)
+            _bg = '' if _a < 0.12 else f' style="background:rgba(52,211,153,{_a * 0.26:.3f})"'
+            _caret = ''
+            if abs(d) >= 1.5:
+                _caret = f'<span class="mc-caret">{"▴" if d < 0 else "▾"}</span>'
+            return f'<td{_cls}{_bg} title="{_title}">{_caret}{_t}</td>'
+
+        _MC_COLS = [('_cc', 'Cha Ching'), ('_afl', 'AFL'), ('_bf', 'Betfair'),
+                    ('_wh', 'Wheelo'), ('_espn', 'ESPN')]
+
+        # Filter, then order. Consensus was assigned once, in consensus order,
+        # and travels with its row: ordering by spread must never re-index it or
+        # the first column becomes a spread rank wearing a consensus label.
+        _mc_view = _pc_df
+        if _mc_filter == 'full':
+            _mc_view = _mc_view[_mc_view['_f_full']]
+        elif _mc_filter == 'strong':
+            _mc_view = _mc_view[_mc_view['_f_strong']]
+        elif _mc_filter == 'out':
+            _mc_view = _mc_view[_mc_view['_f_out']]
+        if _mc_order == 'Spread':
+            _mc_view = _mc_view.sort_values(
+                ['_spread', 'Consensus'], ascending=[False, True], na_position='last')
+
+        _mc_head = (
+            '<thead><tr>'
+            '<th>#</th><th class="mc-l">Player</th>'
+            '<th class="mc-cc"><span class="mc-cc-lbl">Cha Ching</span></th>'
+            + ''.join(f'<th>{_h}</th>' for _h in ('AFL', 'Betfair', 'Wheelo', 'ESPN'))
+            + '<th>Spread</th></tr></thead>'
+        )
+
         _mc_body = ''
-        for _, _r in _pc_df.iterrows():
-            _e = _r['_edge']
-            if _e is None or (isinstance(_e, float) and pd.isna(_e)):
-                _row_bg = ''
-            else:
-                _ev = int(_e)
-                if _ev >= 5:
-                    _row_bg = 'background:rgba(52,211,153,0.07)'
-                elif _ev <= -5:
-                    _row_bg = 'background:rgba(240,180,41,0.07)'
-                else:
-                    _row_bg = ''
+        for _, _r in _mc_view.iterrows():
+            _cons_v = float(_r['_cons'])
+            _thin = int(_r['_n_avail']) < 4
             _tc = _TEAM_COLOURS.get(_mc_cc_team.get(_r['_mk'], ''), '#7e8c99')
-            _dot = (f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;'
-                    f'background:{_tc};margin-right:9px;vertical-align:middle"></span>')
-            _mc_body += (
-                f'<tr style="{_row_bg}">'
-                f'<td style="text-align:right;padding:7px 12px;color:#7e8c99;'
-                f'border-bottom:1px solid rgba(140,165,185,.14)">{_r["Consensus"]}</td>'
-                f'<td style="text-align:left;padding:7px 12px;color:#e9eef3;'
-                f'font-family:\'Archivo\',sans-serif;border-bottom:1px solid rgba(140,165,185,.14)">'
-                f'{_dot}{_r["Player"]}</td>'
-                + _mc_cell(_r['_cc'], '#34d399')
-                + _mc_cell(_r['_afl'], '#e9eef3')
-                + _mc_cell(_r['_bf'], '#e9eef3')
-                + _mc_cell(_r['_wh'], '#e9eef3')
-                + _mc_cell(_r['_espn'], '#e9eef3')
-                + '</tr>'
+            _dot = (f'<span style="display:inline-block;width:8px;height:8px;'
+                    f'border-radius:50%;background:{_tc};margin-right:9px;'
+                    f'vertical-align:middle"></span>')
+            _cells = [
+                f'<td>{_r["Consensus"]}</td>',
+                f'<td class="mc-l" style="font-family:\'Archivo\',sans-serif;'
+                f'color:#e9eef3">{_dot}{_r["Player"]}</td>',
+            ]
+            for _key, _label in _MC_COLS:
+                _v = _r[_key]
+                _d = (float(_v) - _cons_v) if _rk_valid(_v) else None
+                _cells.append(_mc_cell(_v, _d, _key == '_cc', _label, _cons_v, _thin))
+            _sp = _r['_spread']
+            if _sp is None or (isinstance(_sp, float) and pd.isna(_sp)):
+                _sp_txt, _sp_col = _MC_NA, '#5c6b79'
+            else:
+                _sp_txt = str(int(_sp))
+                _sp_col = '#f0b429' if (not _thin and int(_sp) >= 5) else '#5c6b79'
+            _cells.append(
+                f'<td title="Spread: {_sp_txt}, consensus {_cons_v:.1f}" '
+                f'style="color:{_sp_col}">{_sp_txt}</td>')
+            _mc_body += '<tr>' + ''.join(_cells) + '</tr>'
+
+        with st.container(key="mc_table"):
+            st.markdown(
+                # table-layout:fixed makes the colgroup binding rather than
+                # advisory. Contained scroll, the Polls a Vote matrix pattern,
+                # because eight columns of min-content would otherwise widen the
+                # page rather than the table on a phone.
+                f'<style>{_MC_TBL_CSS}</style>'
+                '<div style="overflow-x:auto">'
+                '<table class="mc-tbl">'
+                + _mc_colgroup + _mc_head + '<tbody>' + _mc_body + '</tbody></table></div>',
+                unsafe_allow_html=True,
             )
 
-        st.markdown(
-            # Seven columns (# / Player / Cha Ching / AFL / Betfair / Wheelo /
-            # ESPN). table-layout:fixed makes the colgroup binding rather than
-            # advisory, which is what holds the body under the st.columns
-            # header above. It also settles the old failure where width:100%
-            # was only a PREFERRED width, min-content won, and on a phone the
-            # table widened the page instead of itself. Contained scroll
-            # either way, the Polls a Vote matrix pattern.
-            '<div style="overflow-x:auto">'
-            "<table style=\"width:100%;table-layout:fixed;border-collapse:collapse;"
-            "font-size:13px;border-top:1px solid rgba(140,165,185,.22);"
-            "font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums\">"
-            + _mc_colgroup + _mc_body + '</table></div>',
-            unsafe_allow_html=True,
-        )
-        st.caption('Row tint = Cha Ching disagrees with the field by 5 places or more. '
-                   'Emerald = Cha Ching ranks the player higher than the other four '
-                   'models average; gold = lower.')
-
-        # (Summary cards, rank heatmap and CC-vs-AFL scatter removed — folded
-        #  into the consensus headline, metadata strip and table above.)
+        # (Summary cards, rank heatmap, CC-vs-AFL scatter, the Consensus #1
+        #  strip and the three-metric band have all gone. What they carried now
+        #  lives in the filter chips and in the table's own cell encoding.)
 
     with _mc_tab3:
         # ── Header: one muted context line (boxed title + stacked banners removed) ──
