@@ -7067,6 +7067,24 @@ if _page == 'Model Comparison':
 
         _mc_cc_raw, _mc_wh_raw, _mc_wh_src = _load_model_comparison()
 
+        # Which Cha Ching board feeds the comparison. The control itself is drawn
+        # beside the consensus table, far below this point, so its value is read
+        # from session_state instead of from the widget: Streamlit writes a keyed
+        # widget's selection into session_state before the rerun that follows a
+        # click, so by the time this line runs the key already holds the choice
+        # this render needs. Nothing else changes — the other four models, the
+        # matching and the edge maths are untouched, and only the board Cha Ching
+        # is ranked on moves.
+        _mc_rounded = st.session_state.get('mc_vote_mode') == '3-2-1'
+        if _mc_rounded:
+            _mc_r = load_season_rounded(2026)
+            if _mc_r is not None and not _mc_r.empty:
+                # Same three columns _load_model_comparison() yields, so every
+                # line below this is indifferent to which board it is holding.
+                _mc_cc_raw = _mc_r[['Player_Name', 'Team', 'Exp_Total_Votes']].copy()
+            else:
+                _mc_rounded = False
+
         # 1. Cha Ching
         _mc_cc_df = pd.DataFrame()
         if _mc_cc_raw is not None:
@@ -7423,36 +7441,79 @@ if _page == 'Model Comparison':
             return (f'<td style="text-align:right;padding:7px 12px;color:{_c};'
                     f'border-bottom:1px solid rgba(140,165,185,.14)">{_t}</td>')
 
-        _mc_th = ('text-align:right;padding:8px 12px;font-size:10px;letter-spacing:.12em;'
-                  'text-transform:uppercase;border-bottom:1px solid rgba(140,165,185,.22)')
-        _mc_head = (
-            '<tr>'
-            f'<th style="{_mc_th};color:#7e8c99">#</th>'
-            f'<th style="{_mc_th};color:#7e8c99;text-align:left">Player</th>'
-            f'<th style="{_mc_th};color:#34d399">Cha Ching</th>'
-            + ''.join(f'<th style="{_mc_th};color:#7e8c99">{_h}</th>'
-                      for _h in ('AFL', 'Betfair', 'Wheelo', 'ESPN'))
-            + f'<th style="{_mc_th};color:#7e8c99">Edge</th>'
-            '</tr>'
+        # The header is Streamlit columns rather than a <thead>, because the scale
+        # control has to live in the Cha Ching cell and a widget cannot go inside
+        # an HTML table. The body stays an HTML table (25 rows of st.columns
+        # would be slow), so the two are tied together by _MC_W: the same
+        # percentages drive these column weights and the table's colgroup, and
+        # the table is table-layout:fixed so it honours them exactly rather than
+        # resizing to content. Change one, change the other.
+        _MC_W = [5, 27, 20, 12, 12, 12, 12]        # sums to 100
+        _mc_hs = ("font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:700;"
+                  "letter-spacing:.1em;text-transform:uppercase;padding:0 12px 8px;"
+                  "white-space:nowrap")
+        st.markdown(
+            # Zeroing the gap is not enough on its own: Streamlit sizes a column
+            # as calc(% - gap) inline, so the computed widths stay a few pixels
+            # off and every label drifts against the body cell beneath it.
+            # Pinning flex-basis to the same percentages the colgroup uses takes
+            # Streamlit's arithmetic out of the loop, and generating both from
+            # _MC_W means they cannot fall out of step later.
+            '<style>.st-key-mc_thead [data-testid="stHorizontalBlock"]{gap:0 !important;}'
+            '.st-key-mc_thead [data-testid="stColumn"]{padding:0 !important;}'
+            + ''.join(
+                f'.st-key-mc_thead [data-testid="stColumn"]:nth-child({_i + 1})'
+                f'{{flex:0 0 {_w}% !important;width:{_w}% !important;'
+                f'min-width:0 !important;}}'
+                for _i, _w in enumerate(_MC_W))
+            + '</style>',
+            unsafe_allow_html=True,
         )
+        with st.container(key="mc_thead"):
+            _hc = st.columns(_MC_W, gap="small", vertical_alignment="top")
+            _mc_labels = ['#', 'Player', None, 'AFL', 'Betfair', 'Wheelo', 'ESPN']
+            for _i, _lbl in enumerate(_mc_labels):
+                with _hc[_i]:
+                    if _lbl is None:
+                        st.markdown(
+                            f'<div style="{_mc_hs};color:#34d399;text-align:right">'
+                            f'Cha Ching</div>',
+                            unsafe_allow_html=True,
+                        )
+                        # Keyed, and read at the top of this block on the rerun
+                        # that follows a click.
+                        st.segmented_control(
+                            "Cha Ching scale", ["Decimal", "3-2-1"],
+                            default="Decimal", key="mc_vote_mode",
+                            help=("Which Cha Ching leaderboard the comparison ranks "
+                                  "against. Decimal is the model's expected votes; "
+                                  "3-2-1 awards each game's top three 3, 2 and 1. The "
+                                  "model is the same either way, and the other four "
+                                  "columns never move."),
+                            label_visibility="collapsed",
+                        )
+                    else:
+                        _al = 'left' if _lbl == 'Player' else 'right'
+                        st.markdown(
+                            f'<div style="{_mc_hs};color:#7e8c99;text-align:{_al}">{_lbl}</div>',
+                            unsafe_allow_html=True,
+                        )
+        _mc_colgroup = '<colgroup>' + ''.join(
+            f'<col style="width:{_w}%">' for _w in _MC_W) + '</colgroup>'
 
         _mc_body = ''
         for _, _r in _pc_df.iterrows():
             _e = _r['_edge']
             if _e is None or (isinstance(_e, float) and pd.isna(_e)):
                 _row_bg = ''
-                _edge_html = '<span style="color:#7e8c99">—</span>'
             else:
                 _ev = int(_e)
                 if _ev >= 5:
                     _row_bg = 'background:rgba(52,211,153,0.07)'
-                    _edge_html = f'<span style="color:#34d399;font-weight:600">value +{_ev}</span>'
                 elif _ev <= -5:
                     _row_bg = 'background:rgba(240,180,41,0.07)'
-                    _edge_html = f'<span style="color:#f0b429;font-weight:600">fade −{abs(_ev)}</span>'
                 else:
                     _row_bg = ''
-                    _edge_html = f'<span style="color:#7e8c99">±{abs(_ev)}</span>'
             _tc = _TEAM_COLOURS.get(_mc_cc_team.get(_r['_mk'], ''), '#7e8c99')
             _dot = (f'<span style="display:inline-block;width:8px;height:8px;border-radius:50%;'
                     f'background:{_tc};margin-right:9px;vertical-align:middle"></span>')
@@ -7468,24 +7529,27 @@ if _page == 'Model Comparison':
                 + _mc_cell(_r['_bf'], '#e9eef3')
                 + _mc_cell(_r['_wh'], '#e9eef3')
                 + _mc_cell(_r['_espn'], '#e9eef3')
-                + f'<td style="text-align:right;padding:7px 12px;'
-                  f'border-bottom:1px solid rgba(140,165,185,.14)">{_edge_html}</td>'
                 + '</tr>'
             )
 
         st.markdown(
-            # Eight columns (# / Player / Cha Ching / AFL / Betfair / Wheelo /
-            # ESPN / Edge). width:100% is only a PREFERRED width — min-content
-            # wins, so on a phone this widened the page rather than itself.
-            # Contained scroll, the Polls a Vote matrix pattern.
+            # Seven columns (# / Player / Cha Ching / AFL / Betfair / Wheelo /
+            # ESPN). table-layout:fixed makes the colgroup binding rather than
+            # advisory, which is what holds the body under the st.columns
+            # header above. It also settles the old failure where width:100%
+            # was only a PREFERRED width, min-content won, and on a phone the
+            # table widened the page instead of itself. Contained scroll
+            # either way, the Polls a Vote matrix pattern.
             '<div style="overflow-x:auto">'
-            "<table style=\"width:100%;border-collapse:collapse;font-size:13px;margin-top:4px;"
+            "<table style=\"width:100%;table-layout:fixed;border-collapse:collapse;"
+            "font-size:13px;border-top:1px solid rgba(140,165,185,.22);"
             "font-family:'IBM Plex Mono',monospace;font-variant-numeric:tabular-nums\">"
-            + _mc_head + _mc_body + '</table></div>',
+            + _mc_colgroup + _mc_body + '</table></div>',
             unsafe_allow_html=True,
         )
-        st.caption('Edge = mean of the other four models’ ranks minus Cha Ching’s rank. '
-                   'Positive (emerald) = Cha Ching higher than the field; negative (gold) = lower.')
+        st.caption('Row tint = Cha Ching disagrees with the field by 5 places or more. '
+                   'Emerald = Cha Ching ranks the player higher than the other four '
+                   'models average; gold = lower.')
 
         # (Summary cards, rank heatmap and CC-vs-AFL scatter removed — folded
         #  into the consensus headline, metadata strip and table above.)
