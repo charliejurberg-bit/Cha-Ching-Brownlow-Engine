@@ -1,120 +1,103 @@
 {
-  "round": 23,
+  "round": 24,
   "brownlowNight": "2026-09-21",
   "leader": {
     "name": "Nick Daicos",
     "votes": 39.3,
-    "clear": 11.9,
-    "bestOdds": "$1.02"
+    "clear": 9.2,
+    "bestOdds": "$1.01"
   },
   "chips": [
     {
       "rank": 1,
-      "name": "I. Heeney",
-      "team": "SYD",
-      "votes": 2.8
+      "name": "L. Morris",
+      "team": "BRI",
+      "votes": 2.9
     },
     {
       "rank": 2,
-      "name": "M. Hall",
-      "team": "STK",
-      "votes": 2.4
+      "name": "I. Rankine",
+      "team": "ADE",
+      "votes": 2.8
     },
     {
       "rank": 3,
-      "name": "E. Gulden",
-      "team": "SYD",
-      "votes": 2.4
+      "name": "B. Smith",
+      "team": "GEE",
+      "votes": 2.7
     }
   ],
   "ticker": [
     {
-      "match": "BRI V GCS",
+      "match": "ADE V GWS",
       "votes": [
         [
           3,
-          "W.ASHCROFT"
-        ],
-        [
-          2,
-          "MORRIS"
-        ],
-        [
-          1,
-          "ZORKO"
-        ]
-      ]
-    },
-    {
-      "match": "ESS V SYD",
-      "votes": [
-        [
-          3,
-          "HEENEY"
-        ],
-        [
-          2,
-          "GULDEN"
-        ],
-        [
-          1,
-          "WARNER"
-        ]
-      ]
-    },
-    {
-      "match": "FRE V ADE",
-      "votes": [
-        [
-          3,
-          "SERONG"
-        ],
-        [
-          2,
           "RANKINE"
         ],
         [
+          2,
+          "WALKER"
+        ],
+        [
           1,
-          "BOLTON"
+          "THILTHORPE"
         ]
       ]
     },
     {
-      "match": "GWS V WCE",
+      "match": "CAR V FRE",
       "votes": [
         [
           3,
-          "ASH"
+          "WALSH"
         ],
         [
           2,
-          "WHITFIELD"
+          "SMITH"
         ],
         [
           1,
-          "OLIVER"
+          "EVANS"
         ]
       ]
     },
     {
-      "match": "HAW V COL",
+      "match": "COL V BRI",
       "votes": [
         [
           3,
-          "N.DAICOS"
+          "MORRIS"
         ],
         [
           2,
-          "MCCREERY"
+          "NEALE"
         ],
         [
           1,
-          "J.DAICOS"
+          "DUNKLEY"
         ]
       ]
     },
     {
-      "match": "NTH V GEE",
+      "match": "ESS V PTA",
+      "votes": [
+        [
+          3,
+          "BURGOYNE"
+        ],
+        [
+          2,
+          "GEORGIADES"
+        ],
+        [
+          1,
+          "CADDY"
+        ]
+      ]
+    },
+    {
+      "match": "GEE V RIC",
       "votes": [
         [
           3,
@@ -126,46 +109,12 @@
         ],
         [
           1,
-          "SIMPKIN"
+          "DANGERFIELD"
         ]
       ]
     },
     {
-      "match": "PTA V MEL",
-      "votes": [
-        [
-          3,
-          "GAWN"
-        ],
-        [
-          2,
-          "CHANDLER"
-        ],
-        [
-          1,
-          "STEELE"
-        ]
-      ]
-    },
-    {
-      "match": "RIC V STK",
-      "votes": [
-        [
-          3,
-          "HALL"
-        ],
-        [
-          2,
-          "HILL"
-        ],
-        [
-          1,
-          "OWENS"
-        ]
-      ]
-    },
-    {
-      "match": "WB V CAR",
+      "match": "MEL V WB",
       "votes": [
         [
           3,
@@ -173,11 +122,62 @@
         ],
         [
           2,
-          "CRIPPS"
+          "BONTEMPELLI"
         ],
         [
           1,
-          "LIBERATORE"
+          "M.KENNEDY"
+        ]
+      ]
+    },
+    {
+      "match": "STK V GCS",
+      "votes": [
+        [
+          3,
+          "MILLER"
+        ],
+        [
+          2,
+          "ANDERSON"
+        ],
+        [
+          1,
+          "NOBLE"
+        ]
+      ]
+    },
+    {
+      "match": "SYD V NTH",
+      "votes": [
+        [
+          3,
+          "GULDEN"
+        ],
+        [
+          2,
+          "GRUNDY"
+        ],
+        [
+          1,
+          "CURNOW"
+        ]
+      ]
+    },
+    {
+      "match": "WCE V HAW",
+      "votes": [
+        [
+          3,
+          "GUNSTON"
+        ],
+        [
+          2,
+          "DAY"
+        ],
+        [
+          1,
+          "WARD"
         ]
       ]
     }

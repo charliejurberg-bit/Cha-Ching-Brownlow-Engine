@@ -14,6 +14,7 @@ Andrew Brayshaw,15,2.0
 Andrew Brayshaw,16,3.0
 Andrew Brayshaw,18,1.5
 Andrew Brayshaw,19,1.5
+Andrew Brayshaw,23,0.5
 Archie Roberts,4,1.0
 Archie Roberts,5,3.0
 Archie Roberts,9,1.5
@@ -34,12 +35,15 @@ Bailey Smith,18,0.5
 Bailey Smith,19,2.0
 Bailey Smith,21,0.5
 Bailey Smith,22,3.0
+Bailey Smith,23,2.5
 Bailey Williams,2,0.5
 Bailey Williams,10,1.0
 Bailey Williams,11,1.0
 Bailey Williams,19,0.5
 Bayley Fritsch,17,0.5
 Bayley Fritsch,20,1.0
+Bayley Fritsch,23,1.0
+Beau Mccreery,23,1.0
 Ben Ainsworth,16,2.0
 Ben King,2,3.0
 Ben Long,15,0.5
@@ -49,6 +53,7 @@ Bodhi Uwland,9,1.0
 Brad Hill,17,1.5
 Brad Hill,18,2.5
 Brad Hill,20,1.0
+Brad Hill,23,2.0
 Brayden Campbell,22,1.0
 Brent Daniels,11,1.5
 Brent Daniels,14,1.0
@@ -70,6 +75,7 @@ Caleb Serong,9,1.0
 Caleb Serong,18,0.5
 Caleb Serong,19,1.5
 Caleb Serong,20,1.0
+Caleb Serong,23,2.0
 Callum Mills,14,1.5
 Callum Wilkie,6,1.5
 Callum Wilkie,18,1.0
@@ -86,6 +92,7 @@ Chad Warner,19,1.5
 Chad Warner,20,0.5
 Chad Warner,21,2.0
 Chad Warner,22,1.5
+Chad Warner,23,1.0
 Charlie Cameron,0,0.5
 Charlie Curnow,7,3.0
 Charlie Curnow,12,1.5
@@ -108,6 +115,7 @@ Clayton Oliver,10,2.0
 Clayton Oliver,11,1.0
 Clayton Oliver,17,1.0
 Clayton Oliver,18,3.0
+Clayton Oliver,23,1.0
 Colby Mckercher,3,1.0
 Connor Macdonald,1,1.5
 Connor Macdonald,4,1.5
@@ -132,6 +140,7 @@ Darcy Wilmot,6,1.0
 Darcy Wilmot,8,1.0
 Darcy Wilson,20,1.0
 Dayne Zorko,18,0.5
+Dayne Zorko,23,2.0
 Dylan Moore,2,1.0
 Dylan Moore,10,1.0
 Dylan Moore,18,0.5
@@ -148,12 +157,14 @@ Ed Richards,18,2.0
 Ed Richards,20,3.0
 Ed Richards,21,1.0
 Ed Richards,22,0.5
+Ed Richards,23,3.0
 Elliot Yeo,22,1.0
 Errol Gulden,0,2.0
 Errol Gulden,1,1.0
 Errol Gulden,20,3.0
 Errol Gulden,21,3.0
 Errol Gulden,22,2.0
+Errol Gulden,23,2.5
 Finn Callaghan,0,1.5
 Finn Callaghan,5,3.0
 Finn Callaghan,8,1.0
@@ -212,6 +223,7 @@ Isaac Heeney,12,3.0
 Isaac Heeney,13,2.0
 Isaac Heeney,14,2.0
 Isaac Heeney,17,0.5
+Isaac Heeney,23,2.5
 Izak Rankine,5,2.0
 Izak Rankine,9,3.0
 Izak Rankine,10,2.0
@@ -220,6 +232,7 @@ Izak Rankine,18,2.0
 Izak Rankine,19,2.0
 Izak Rankine,21,1.5
 Izak Rankine,22,3.0
+Izak Rankine,23,3.0
 Jack Darling,14,0.5
 Jack Ginnivan,4,1.0
 Jack Ginnivan,5,1.5
@@ -243,6 +256,7 @@ Jack Steele,7,1.0
 Jack Steele,10,1.5
 Jack Steele,18,0.5
 Jack Steele,20,1.0
+Jack Steele,23,0.5
 Jagga Smith,1,2.0
 Jagga Smith,17,1.5
 Jagga Smith,19,1.5
@@ -317,6 +331,7 @@ Josh Daicos,0,1.5
 Josh Daicos,7,1.0
 Josh Daicos,15,0.5
 Josh Daicos,18,2.0
+Josh Daicos,23,2.0
 Josh Dunkley,13,0.5
 Josh Dunkley,16,1.0
 Josh Dunkley,19,1.5
@@ -336,13 +351,16 @@ Josh Ward,20,0.5
 Justin Mcinerney,0,3.0
 Jy Simpkin,18,1.0
 Jy Simpkin,21,1.0
+Jy Simpkin,23,1.0
 Jye Amiss,4,1.0
 Jye Amiss,6,2.5
 Jye Amiss,12,1.0
 Jye Amiss,19,2.0
 Jye Amiss,20,1.5
 Jye Amiss,22,1.0
+Jye Amiss,23,0.5
 Kade Chandler,6,1.0
+Kade Chandler,23,2.5
 Kai Lohmann,17,1.0
 Kai Lohmann,19,1.0
 Kai Lohmann,22,2.5
@@ -363,6 +381,7 @@ Lachie Ash,2,2.0
 Lachie Ash,5,1.5
 Lachie Ash,7,1.0
 Lachie Ash,12,1.0
+Lachie Ash,23,2.0
 Lachie Neale,0,2.0
 Lachie Neale,4,2.0
 Lachie Neale,5,3.0
@@ -376,8 +395,10 @@ Lachie Neale,19,2.0
 Lachie Neale,22,1.5
 Lachie Whitfield,9,2.0
 Lachie Whitfield,21,3.0
+Lachie Whitfield,23,2.0
 Lachlan Bramble,20,1.0
 Lawson Humphries,11,2.5
+Levi Ashcroft,23,1.0
 Liam Ryan,14,2.0
 Logan Morris,4,0.5
 Logan Morris,13,3.0
@@ -445,11 +466,13 @@ Max Gawn,17,2.0
 Max Gawn,18,0.5
 Max Gawn,19,1.0
 Max Gawn,21,3.0
+Max Gawn,23,2.0
 Max Hall,1,2.0
 Max Hall,10,2.0
 Max Hall,11,1.5
 Max Hall,17,1.5
 Max Hall,22,1.5
+Max Hall,23,2.0
 Max Holmes,1,2.0
 Max Holmes,3,1.5
 Max Holmes,6,1.0
@@ -463,6 +486,7 @@ Milan Murdock,12,1.0
 Mitch Georgiades,7,2.0
 Mitch Lewis,5,1.5
 Mitch Lewis,19,1.5
+Mitch Owens,23,2.0
 Murphy Reid,6,1.0
 Murphy Reid,10,2.0
 Murphy Reid,11,2.5
@@ -503,6 +527,7 @@ Nick Daicos,19,2.0
 Nick Daicos,20,3.0
 Nick Daicos,21,0.5
 Nick Daicos,22,2.5
+Nick Daicos,23,3.0
 Nick Larkey,14,1.5
 Nick Watson,1,2.0
 Nick Watson,6,3.0
@@ -540,6 +565,7 @@ Patrick Cripps,16,2.0
 Patrick Cripps,17,1.0
 Patrick Cripps,19,2.5
 Patrick Cripps,20,3.0
+Patrick Cripps,23,1.5
 Patrick Dangerfield,13,1.5
 Patrick Dangerfield,17,2.5
 Patrick Lipinski,6,1.5
@@ -576,6 +602,7 @@ Sam Walsh,12,1.5
 Sam Walsh,15,2.0
 Sam Walsh,16,1.0
 Sam Walsh,22,1.5
+Sam Walsh,23,1.5
 Scott Pendlebury,0,1.5
 Scott Pendlebury,7,3.0
 Scott Pendlebury,20,0.5
@@ -590,9 +617,11 @@ Shannon Neale,20,1.5
 Shaun Mannagh,8,0.5
 Shaun Mannagh,10,3.0
 Shaun Mannagh,18,2.0
+Shaun Mannagh,23,0.5
 Steele Sidebottom,3,2.0
 Stephen Coniglio,21,1.5
 Tanner Bruhn,5,1.5
+Tanner Bruhn,23,1.5
 Taylor Byrne,20,1.0
 Taylor Walker,6,2.5
 Taylor Walker,18,1.5
@@ -611,6 +640,7 @@ Toby Greene,11,1.5
 Toby Greene,12,1.0
 Toby Greene,17,2.0
 Toby Greene,18,0.5
+Toby Greene,23,1.0
 Tom Atkins,5,1.5
 Tom Atkins,20,2.0
 Tom Mccartin,1,2.0
@@ -645,6 +675,7 @@ Will Ashcroft,18,3.0
 Will Ashcroft,19,1.5
 Will Ashcroft,20,3.0
 Will Ashcroft,22,2.0
+Will Ashcroft,23,3.0
 Will Day,13,0.5
 Will Day,15,0.5
 Will Setterfield,14,1.0
