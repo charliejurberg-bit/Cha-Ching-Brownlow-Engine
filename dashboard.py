@@ -2898,28 +2898,6 @@ __ICON_CSS__
     letter-spacing: -0.01em;
 }
 .lb-subtitle { color: var(--muted); font-size: 14px; margin: 6px 0 0 0; }
-.lb-live-pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 7px;
-    font-family: 'IBM Plex Mono', monospace;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    padding: 5px 11px;
-    border-radius: 99px;
-    background: var(--emerald-dim);
-    color: var(--emerald);
-}
-.lb-live-pill::before {
-    content: "";
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: currentColor;
-    animation: tagDotPulse 2.2s ease-in-out infinite;
-}
 .lb-odds-ts {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 10px;
@@ -3526,9 +3504,16 @@ def _lb_subtitle(is_2026, rounded):
 
 
 if _page == 'Leaderboard':
-    _lb_live_html = ' <span class="lb-live-pill">LIVE</span>' if is_2026 else ""
-    _lbh_main, _lbh_mode, _lbh_season = st.columns([3, 1.5, 1], vertical_alignment="bottom")
-    # Both controls are read BEFORE the title is written, because the subtitle
+    # Title, vote scale and season share one row, centred on each other, and the
+    # subtitle drops below it. The scale toggle sits immediately after the title
+    # where the LIVE pill used to, so the control that decides which board is on
+    # screen reads as part of the heading rather than as a stray widget adrift in
+    # the middle of the row. The spacer column is what keeps the season picker
+    # pinned right without stretching the toggle to meet it.
+    _lbh_title, _lbh_mode, _lbh_gap, _lbh_season = st.columns(
+        [2.17, 1.45, 4.78, 1.6], vertical_alignment="center"
+    )
+    # Both controls are read BEFORE the subtitle is written, because the subtitle
     # and every figure below depend on which board is selected. st.columns places
     # by column, not by call order, so the header still renders left to right.
     with _lbh_mode:
@@ -3574,18 +3559,19 @@ if _page == 'Leaderboard':
         _f = '.0f' if _lb_rounded else '.1f'
         return format(float(x), ('+' if signed else '') + _f)
 
-    with _lbh_main:
+    with _lbh_title:
         st.markdown(
-            f'<div class="lb-header">'
-            f'<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">'
-            f'<h2 class="lb-title">{selected_season} Brownlow Leaderboard</h2>'
-            f'{_lb_live_html}'
-            f'</div>'
-            f'<p class="lb-subtitle">'
-            f'{_lb_subtitle(is_2026, _lb_rounded)}'
-            f'</p></div>',
+            f'<h2 class="lb-title">{selected_season} Brownlow Leaderboard</h2>',
             unsafe_allow_html=True,
         )
+    # Subtitle sits under the whole row rather than inside the title column, so
+    # it can run the full width and is not held to the title column's share.
+    st.markdown(
+        f'<div class="lb-header"><p class="lb-subtitle" style="margin-top:0">'
+        f'{_lb_subtitle(is_2026, _lb_rounded)}'
+        f'</p></div>',
+        unsafe_allow_html=True,
+    )
 
     # ── Shared data: projection, odds, form, bar domain, helpers ──
     _proj_floor, _proj_ceiling, has_fc = {}, {}, False
