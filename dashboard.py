@@ -1464,6 +1464,33 @@ def load_game_rounded(season):
     return g
 
 
+@st.cache_data(ttl=3600, show_spinner=False)
+def round_vote_matrix(season, rounded):
+    """Per-player, per-round votes for the Leaderboard's round grid.
+
+    Returns (rounds, {player: {round_num: value}}). A round the player did not
+    play is simply ABSENT from their dict rather than present as 0, because the
+    grid draws the two differently: a bye or an injury is a blank cell, a game
+    that drew nothing is a dot. Collapsing them would tell a reader that a
+    player was quiet in a round they were never named for.
+
+    `rounded` picks the units, Hard_Votes on the 3-2-1 board and Exp_Votes on
+    the decimal one, so the grid always matches the total sitting beside it.
+
+    Cached because the Leaderboard's search box reruns the page on every
+    keystroke and this is a groupby over the whole game frame.
+    """
+    g = load_game_rounded(season) if rounded else load_game(season)
+    col = 'Hard_Votes' if rounded else 'Exp_Votes'
+    if g is None or g.empty or col not in g.columns or 'Round_num' not in g.columns:
+        return [], {}
+    _w = g.groupby(['Player_Name', 'Round_num'])[col].sum().unstack()
+    _rounds = [int(c) for c in _w.columns]
+    _map = {p: {int(r): float(v) for r, v in row.items() if pd.notna(v)}
+            for p, row in _w.to_dict('index').items()}
+    return _rounds, _map
+
+
 @st.cache_data(ttl=3600)
 def load_season_rounded(season):
     """Season totals under the rounded board, in load_season's schema so the
@@ -1838,32 +1865,6 @@ def _load_model_comparison():
                          usecols=lambda c: c in {'Player', 'ExpVotes', 'RatingPoints'})
         wh_src = 'legacy'
     return cc, wh, wh_src
-
-@st.cache_data
-def form_guide_dots(season, n_rounds=3):
-    """Returns dict: Player_Name -> emoji dot string for last n_rounds (🟢=polled,⚫=no vote,▫=DNP)."""
-    df = load_game(season)
-    if df is None:
-        return {}
-    pname_col = 'Player_Name' if 'Player_Name' in df.columns else 'Player'
-    poll_col  = 'Poll_Prob'   if 'Poll_Prob'   in df.columns else None
-    if poll_col is None:
-        return {}
-    rounds_avail = sorted(df['Round_num'].unique())
-    last_n = rounds_avail[-n_rounds:] if len(rounds_avail) >= n_rounds else rounds_avail
-    result = {}
-    for player, grp in df.groupby(pname_col):
-        dots = []
-        for r in last_n:
-            rg = grp[grp['Round_num'] == r]
-            if rg.empty:
-                dots.append('▫')
-            elif float(rg[poll_col].iloc[0]) >= 0.30:
-                dots.append('🟢')
-            else:
-                dots.append('⚫')
-        result[player] = ''.join(dots)
-    return result
 
 # count night: temporarily drop to ~60 and match the sleep.
 @st.cache_data(ttl=300, show_spinner=False)
@@ -3596,8 +3597,14 @@ if _page == 'Leaderboard':
     # Prices still live on Predictions and the Live Tracker, which load
     # best_odds themselves, so nothing else is affected and this page no longer
     # pays for load_best_odds() at all.
-
-    _fg = form_guide_dots(selected_season, n_rounds=3) if is_2026 else {}
+    #
+    # Form and Poll % left the same way when the round grid landed, and for a
+    # stronger reason than crowding: the grid carries every round, so a
+    # three-dot summary of the last three and a season-average poll rate are
+    # both strictly contained in it. form_guide_dots() went with the column, it
+    # being the only caller, which also stops a groupby over the whole game
+    # frame running on every keystroke in the search box. Poll % still reads on
+    # the hero spotlight above, so it has not left the page.
 
     if has_fc:
         _ceil_vals = [float(v) for v in _proj_ceiling.values() if pd.notna(v)]
@@ -3618,11 +3625,6 @@ if _page == 'Leaderboard':
     }
     def _lb_abbr(t):
         return _LB_ABBR.get(str(t), str(t)[:4].upper())
-
-    def _form_html(s):
-        _m = {'🟢': 'lb-dot-on', '⚫': 'lb-dot-mid', '▫': 'lb-dot-off'}
-        _d = ''.join(f'<span class="lb-dot {_m.get(ch, "lb-dot-off")}"></span>' for ch in str(s))
-        return f'<span class="lb-form">{_d}</span>'
 
     def _lb_bar(floor, ceiling, exp, mini=False, labels=False):
         mc = _max_ceil if _max_ceil > 0 else 1.0
@@ -3791,6 +3793,39 @@ SCOPE .lb-bar-lo{text-align:right;}
         _merged['Move'] = _merged['Prev_Rank'] - _merged['Curr_Rank']
         _move_map = dict(zip(_merged['Player_Name'], _merged['Move']))
 
+    # ── Round-by-round grid ──────────────────────────────────
+    # Units follow the board on screen for the same reason the movement arrows
+    # do: a decimal Exp_Votes cell sitting under a 3-2-1 season total would be
+    # read as a component of it, and it is not one.
+    #
+    # Not gated on is_2026. Every season has a game-level file, and the grid is
+    # arguably more useful on a finished season than a live one.
+    _rd_rounds, _rd_map = round_vote_matrix(selected_season, _lb_rounded)
+
+    def _rd_cell(v, first=False):
+        """One round cell. `v` of None means no game that round.
+
+        Three states, deliberately distinct: a blank cell is a round the player
+        was not named for, a dot is a game that drew nothing, and a number is a
+        game that did. Rendering the middle case as "0.0" would spend the
+        widest character count in the row on the least information and flatten
+        the tint pattern, which is the thing the grid is actually read by.
+        """
+        _g = ' grp-start' if first else ''
+        if v is None:
+            return f'<td class="rd{_g}"></td>'
+        _v = float(v)
+        if _v < 0.05:
+            return f'<td class="rd rd-nil{_g}">·</td>'
+        # Tint runs against 3.0, the most a single game can be worth, so a cell
+        # means the same thing on every row and on both boards. Scaling to the
+        # observed max instead would make a quiet season look like a loud one.
+        _a = 0.34 * min(1.0, _v / 3.0)
+        _txt = f'{_v:.0f}' if _lb_rounded else f'{_v:.1f}'
+        _hot = ' rd-hot' if _v >= 1.0 else ''
+        return (f'<td class="rd{_hot}{_g}" '
+                f'style="background:rgba(52,211,153,{_a:.3f})">{_txt}</td>')
+
     # Rank is positional over the FULL leaderboard and is assigned BEFORE the
     # search filter and Show N, so a searched player carries their real standing
     # through instead of being renumbered from 1. No sort here: predictions
@@ -3842,12 +3877,12 @@ SCOPE .lb-bar-lo{text-align:right;}
     # ── PART 3: full leaderboard table ──
     _LB_TBL_CSS = ("""
 .lb-table .lb-tbl-wrap{overflow-x:auto;}
-.lb-table .lb-tbl{width:100%;border-collapse:collapse;font-family:'IBM Plex Mono',monospace;}
+.lb-table .lb-tbl{width:100%;border-collapse:separate;border-spacing:0;font-family:'IBM Plex Mono',monospace;}
 .lb-table .lb-tbl th{font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--hairline-strong);text-align:right;white-space:nowrap;}
 .lb-table .lb-tbl th.lft{text-align:left;}
 .lb-table .lb-tbl td{font-size:15px;padding:12px 14px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;color:var(--steel);}
 .lb-table .lb-tbl td.lft{text-align:left;}
-.lb-table .lb-tbl th.pcell,.lb-table .lb-tbl td.pcell{width:26%;}
+.lb-table .lb-tbl th.pcell,.lb-table .lb-tbl td.pcell{width:215px;max-width:215px;overflow:hidden;text-overflow:ellipsis;}
 .lb-table .lb-tbl th.grp-start,.lb-table .lb-tbl td.grp-start{border-left:1px solid var(--hairline-strong);}
 .lb-table .lb-tbl tr.lb-leader{background:rgba(52,211,153,.04);}
 .lb-table .lb-rank{color:var(--text);font-weight:600;}
@@ -3857,12 +3892,18 @@ SCOPE .lb-bar-lo{text-align:right;}
 .lb-table .lb-exp{font-weight:700;color:var(--text);}
 .lb-table .lb-pname{font-family:'Archivo',sans-serif;font-size:16px;font-weight:600;color:var(--text);}
 .lb-table .lb-ttag{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-left:8px;}
-.lb-table .lb-form{display:inline-flex;gap:4px;align-items:center;}
-.lb-table .lb-dot{width:8px;height:8px;border-radius:50%;display:inline-block;}
-.lb-table .lb-dot-on{background:var(--emerald);}
-.lb-table .lb-dot-mid{background:rgba(52,211,153,.45);}
-.lb-table .lb-dot-off{background:var(--muted);opacity:.4;}
-.lb-table .lb-tbl td.fc-cell{min-width:190px;}
+.lb-table .lb-tbl th.rd,.lb-table .lb-tbl td.rd{padding:12px 3px;text-align:center;width:26px;}
+.lb-table .lb-tbl th.rd{font-size:9px;letter-spacing:0;}
+.lb-table .lb-tbl td.rd{font-size:10px;color:var(--muted);}
+.lb-table .lb-tbl td.rd-hot{color:var(--text);font-weight:600;}
+.lb-table .lb-tbl td.rd-nil{opacity:.45;}
+.lb-table .lb-tbl th.stick1,.lb-table .lb-tbl td.stick1{position:sticky;left:0;z-index:2;background:var(--bg);width:62px;}
+.lb-table .lb-tbl th.stick2,.lb-table .lb-tbl td.stick2{position:sticky;left:62px;z-index:2;background:var(--bg);}
+.lb-table .lb-tbl th.stick3,.lb-table .lb-tbl td.stick3{position:sticky;left:102px;z-index:2;background:var(--bg);}
+.lb-table .lb-tbl th.stick2:not(.pcell),.lb-table .lb-tbl td.stick2:not(.pcell){width:40px;}
+.lb-table .lb-tbl th.pcell,.lb-table .lb-tbl td.pcell{box-shadow:inset -1px 0 0 var(--hairline-strong);}
+.lb-table .lb-tbl tr.lb-leader td.stick1,.lb-table .lb-tbl tr.lb-leader td.stick2,.lb-table .lb-tbl tr.lb-leader td.stick3{background:#0c181c;}
+.lb-table .lb-tbl td.fc-cell{width:110px;min-width:110px;}
 .lb-table .lb-fc{width:100%;}
 .lb-table .lb-fc-track{position:relative;height:6px;background:var(--surface-2);border:1px solid var(--hairline-strong);border-radius:999px;box-sizing:border-box;}
 .lb-table .lb-fc-seg{position:absolute;top:0;height:100%;background:var(--emerald-track);border-radius:999px;}
@@ -3873,20 +3914,29 @@ SCOPE .lb-bar-lo{text-align:right;}
 
     # The club-position column exists only while a club is selected. On "All" it
     # would be identical to Rank, so it is dropped rather than duplicated.
-    # On the rounded board these two columns hold counted games rather than
-    # expected ones, so the headings say so instead of reading as decimals.
+    # On the rounded board the totals column holds counted votes rather than
+    # expected ones, so the heading says so instead of reading as a decimal.
     _lb_votes_head = '3-2-1' if _lb_rounded else 'Exp Votes'
-    _lb_3v_head = '3V' if _lb_rounded else '3V Games'
     _show_club_rank = team_pick != 'All'
-    _rank_heads = [('Rank', 'lft')] + ([('#', 'lft')] if _show_club_rank else [])
+    # Rank, club position and Player freeze at the left edge, so a name stays
+    # readable once the grid scrolls. The sticky offsets are fixed pixel values
+    # (0 / 62 / 102), which is why the class a column gets depends on whether
+    # the club position column is present in the row at all.
+    _rank_heads = [('Rank', 'lft stick1')] + ([('#', 'lft stick2')] if _show_club_rank else [])
+    _pcell = 'lft pcell ' + ('stick3' if _show_club_rank else 'stick2')
     if is_2026:
-        _heads = _rank_heads + [('Player', 'lft pcell'), ('GP', ''), ('Form', 'lft'), (_lb_votes_head, '')]
+        _heads = _rank_heads + [('Player', _pcell), ('GP', ''), (_lb_votes_head, '')]
         if has_fc:
             _heads.append(('Floor–Ceiling', 'lft'))
-        _heads += [('Poll %', ''), (_lb_3v_head, '')]
     else:
-        _heads = _rank_heads + [('Player', 'lft pcell'), ('GP', ''), (_lb_votes_head, ''),
-                                ('Actual', ''), ('Diff', ''), ('Poll %', ''), (_lb_3v_head, '')]
+        _heads = _rank_heads + [('Player', _pcell), ('GP', ''), (_lb_votes_head, ''),
+                                ('Actual', ''), ('Diff', '')]
+    # Rounds close the row rather than sitting mid-table. Put them before the
+    # totals and a narrow window scrolls Exp Votes out of sight; put them last
+    # and the only thing that moves is the grid itself.
+    _heads += [(str(_display_round(_r, selected_season)),
+                'rd' + (' grp-start' if _i == 0 else ''))
+               for _i, _r in enumerate(_rd_rounds)]
 
     def _th(lbl, cls):
         return f'<th class="{cls}">{lbl}</th>' if cls else f'<th>{lbl}</th>'
@@ -3897,9 +3947,7 @@ SCOPE .lb-bar-lo{text-align:right;}
         _name = str(_row['Player_Name']); _team = str(_row['Team'])
         _rank = int(_row['Rank'])
         _exp  = float(_row['Exp_Total_Votes'])
-        _poll = float(_row['Avg_Poll_Prob']) * 100 if pd.notna(_row['Avg_Poll_Prob']) else 0.0
         _gp   = int(_row['Games']) if pd.notna(_row['Games']) else 0
-        _tvg  = float(_row['Exp_3vote_games']) if pd.notna(_row['Exp_3vote_games']) else 0.0
         _mv = _move_map.get(_name, 0) if _move_map else 0
         if _mv and _mv > 0:
             _arrow = f'<span class="lb-up">▲{int(_mv)}</span>'
@@ -3909,17 +3957,15 @@ SCOPE .lb-bar-lo{text-align:right;}
             _arrow = ''
         _a = 0.22 * (_exp / _max_exp)
         _cells = [
-            f'<td class="lft"><span class="lb-rank">{_rank}</span>{_arrow}</td>',
+            f'<td class="lft stick1"><span class="lb-rank">{_rank}</span>{_arrow}</td>',
         ]
         if _show_club_rank:
             _cells.append(
-                f'<td class="lft"><span class="lb-clubrank">{int(_row["ClubRank"])}</span></td>')
+                f'<td class="lft stick2"><span class="lb-clubrank">{int(_row["ClubRank"])}</span></td>')
         _cells += [
-            f'<td class="lft pcell"><span class="lb-pname">{_name}</span><span class="lb-ttag">{_lb_abbr(_team)}</span></td>',
+            f'<td class="{_pcell}"><span class="lb-pname">{_name}</span><span class="lb-ttag">{_lb_abbr(_team)}</span></td>',
             f'<td>{_gp}</td>',
         ]
-        if is_2026:
-            _cells.append(f'<td class="lft">{_form_html(_fg.get(_name, "▫▫▫"))}</td>')
         _cells.append(f'<td class="lb-exp" style="background:rgba(52,211,153,{_a:.3f})">{_lb_v(_exp)}</td>')
         if is_2026 and has_fc:
             _fl = _proj_floor.get(_name, float("nan")); _ce = _proj_ceiling.get(_name, float("nan"))
@@ -3928,8 +3974,10 @@ SCOPE .lb-bar-lo{text-align:right;}
             _act = int(_row['Actual_Votes']) if pd.notna(_row['Actual_Votes']) else 0
             _cells.append(f'<td>{_act}</td>')
             _cells.append(f'<td>{_lb_v(_exp - _act, signed=True)}</td>')
-        _cells.append(f'<td>{_poll:.1f}%</td>')
-        _cells.append(f'<td>{_lb_v(_tvg)}</td>')
+        if _rd_rounds:
+            _pr = _rd_map.get(_name, {})
+            _cells += [_rd_cell(_pr.get(_r), _i == 0)
+                       for _i, _r in enumerate(_rd_rounds)]
         _tr_cls = ' class="lb-leader"' if _rank == 1 else ''
         _rows.append(f'<tr{_tr_cls}>{"".join(_cells)}</tr>')
 
@@ -3941,8 +3989,13 @@ SCOPE .lb-bar-lo{text-align:right;}
             f'</table></div></div>',
             unsafe_allow_html=True,
         )
-    if is_2026 and _fg and _lb_rows_exist:
-        st.caption("Form (last 3 rounds): emerald = predicted to poll (≥30%) · grey = quiet · faint = did not play")
+    if _rd_rounds and _lb_rows_exist:
+        st.caption(
+            ("Round columns: votes awarded that round" if _lb_rounded
+             else "Round columns: expected votes that round")
+            + " · deeper emerald = more · a dot is a game that drew nothing"
+              " · blank is no game · scroll sideways for later rounds"
+        )
 
 # ── H2H votes (Compare tab) ──────────────────────────────────
 # Poll_Prob at or above which a player counts as "likely to poll" in a round.
