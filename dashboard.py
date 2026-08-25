@@ -3877,12 +3877,12 @@ SCOPE .lb-bar-lo{text-align:right;}
     # ── PART 3: full leaderboard table ──
     _LB_TBL_CSS = ("""
 .lb-table .lb-tbl-wrap{overflow-x:auto;}
-.lb-table .lb-tbl{width:100%;border-collapse:separate;border-spacing:0;font-family:'IBM Plex Mono',monospace;}
+.lb-table .lb-tbl{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;font-family:'IBM Plex Mono',monospace;}
 .lb-table .lb-tbl th{font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--hairline-strong);text-align:right;white-space:nowrap;}
 .lb-table .lb-tbl th.lft{text-align:left;}
 .lb-table .lb-tbl td{font-size:15px;padding:12px 14px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;color:var(--steel);}
 .lb-table .lb-tbl td.lft{text-align:left;}
-.lb-table .lb-tbl th.pcell,.lb-table .lb-tbl td.pcell{width:215px;max-width:215px;overflow:hidden;text-overflow:ellipsis;}
+.lb-table .lb-tbl th.pcell,.lb-table .lb-tbl td.pcell{overflow:hidden;text-overflow:ellipsis;}
 .lb-table .lb-tbl th.grp-start,.lb-table .lb-tbl td.grp-start{border-left:1px solid var(--hairline-strong);}
 .lb-table .lb-tbl tr.lb-leader{background:rgba(52,211,153,.04);}
 .lb-table .lb-rank{color:var(--text);font-weight:600;}
@@ -3892,18 +3892,16 @@ SCOPE .lb-bar-lo{text-align:right;}
 .lb-table .lb-exp{font-weight:700;color:var(--text);}
 .lb-table .lb-pname{font-family:'Archivo',sans-serif;font-size:16px;font-weight:600;color:var(--text);}
 .lb-table .lb-ttag{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--muted);margin-left:8px;}
-.lb-table .lb-tbl th.rd,.lb-table .lb-tbl td.rd{padding:12px 3px;text-align:center;width:26px;}
+.lb-table .lb-tbl th.rd,.lb-table .lb-tbl td.rd{padding:12px 3px;text-align:center;}
 .lb-table .lb-tbl th.rd{font-size:9px;letter-spacing:0;}
 .lb-table .lb-tbl td.rd{font-size:10px;color:var(--muted);}
 .lb-table .lb-tbl td.rd-hot{color:var(--text);font-weight:600;}
 .lb-table .lb-tbl td.rd-nil{opacity:.45;}
-.lb-table .lb-tbl th.stick1,.lb-table .lb-tbl td.stick1{position:sticky;left:0;z-index:2;background:var(--bg);width:62px;}
-.lb-table .lb-tbl th.stick2,.lb-table .lb-tbl td.stick2{position:sticky;left:62px;z-index:2;background:var(--bg);}
-.lb-table .lb-tbl th.stick3,.lb-table .lb-tbl td.stick3{position:sticky;left:102px;z-index:2;background:var(--bg);}
-.lb-table .lb-tbl th.stick2:not(.pcell),.lb-table .lb-tbl td.stick2:not(.pcell){width:40px;}
+.lb-table .lb-tbl th.stick1,.lb-table .lb-tbl td.stick1{position:sticky;left:0;z-index:2;background:var(--bg);}
+.lb-table .lb-tbl th.stick2,.lb-table .lb-tbl td.stick2{position:sticky;left:70px;z-index:2;background:var(--bg);}
+.lb-table .lb-tbl th.stick3,.lb-table .lb-tbl td.stick3{position:sticky;left:110px;z-index:2;background:var(--bg);}
 .lb-table .lb-tbl th.pcell,.lb-table .lb-tbl td.pcell{box-shadow:inset -1px 0 0 var(--hairline-strong);}
 .lb-table .lb-tbl tr.lb-leader td.stick1,.lb-table .lb-tbl tr.lb-leader td.stick2,.lb-table .lb-tbl tr.lb-leader td.stick3{background:#0c181c;}
-.lb-table .lb-tbl td.fc-cell{width:110px;min-width:110px;}
 .lb-table .lb-fc{width:100%;}
 .lb-table .lb-fc-track{position:relative;height:6px;background:var(--surface-2);border:1px solid var(--hairline-strong);border-radius:999px;box-sizing:border-box;}
 .lb-table .lb-fc-seg{position:absolute;top:0;height:100%;background:var(--emerald-track);border-radius:999px;}
@@ -3937,6 +3935,27 @@ SCOPE .lb-bar-lo{text-align:right;}
     _heads += [(str(_display_round(_r, selected_season)),
                 'rd' + (' grp-start' if _i == 0 else ''))
                for _i, _r in enumerate(_rd_rounds)]
+
+    # Column widths, as a colgroup against table-layout:fixed. Under the auto
+    # layout this replaced, surplus page width went to whichever unconstrained
+    # column had the widest content, which was Exp Votes: a four-character
+    # number sitting in ~200px. Fixed layout gives each named column exactly
+    # its px (border-box, the global * rule), and the round columns carry no
+    # width at all, so they divide every remaining pixel equally between them.
+    # That is the redistribution: Exp Votes is pinned at 70px, Floor-Ceiling
+    # takes a flat 175px, and the rounds absorb the rest.
+    #
+    # Order here MUST track _heads exactly, hence the same three conditionals.
+    _cols = [70] + ([40] if _show_club_rank else []) + [225, 48, 70]
+    if is_2026 and has_fc:
+        _cols.append(175)
+    if not is_2026:
+        _cols += [56, 68]
+    _colgroup = (''.join(f'<col style="width:{_w}px">' for _w in _cols)
+                 + '<col>' * len(_rd_rounds))
+    # Floor under which the round columns stop shrinking and the wrap scrolls
+    # sideways instead. 26px holds "2.1" at 10px with its 3px padding.
+    _tbl_min = sum(_cols) + 26 * len(_rd_rounds)
 
     def _th(lbl, cls):
         return f'<th class="{cls}">{lbl}</th>' if cls else f'<th>{lbl}</th>'
@@ -3984,7 +4003,9 @@ SCOPE .lb-bar-lo{text-align:right;}
     if _lb_rows_exist:
         st.markdown(
             f'<div class="lb-table"><style>{_LB_TBL_CSS}</style>'
-            f'<div class="lb-tbl-wrap"><table class="lb-tbl">'
+            f'<div class="lb-tbl-wrap">'
+            f'<table class="lb-tbl" style="min-width:{_tbl_min}px">'
+            f'<colgroup>{_colgroup}</colgroup>'
             f'<thead><tr>{_ths}</tr></thead><tbody>{"".join(_rows)}</tbody>'
             f'</table></div></div>',
             unsafe_allow_html=True,
