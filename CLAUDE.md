@@ -28,35 +28,72 @@ python predict_2026.py
 drafts, landing artifact). One-off checks tied to a particular round are
 recorded here.
 
-**Routing check, every remaining round of 2026.** `fetch_coaches.R` is commented
-out of `update.py`'s `r_scripts` because the 2026 coaches feed has gone private,
-so `data_2026/coaches_votes_2026.csv` is frozen complete through raw Round_num
-22. The full-model count is therefore pinned at 180 for the rest of the season,
-and every game after that routes to the no-coaches variant. Read the routing
-line `predict_2026.py` prints against this table:
+**Routing check. The expected line is now `207 full / 0 no_cv`.** The 2026 home
+and away season is complete at raw Round_num 25, 207 games, and
+`data_2026/coaches_votes_2026.csv` holds every one of them: 1,346 rows, rounds 1
+to 25. The no-coaches variant no longer engages anywhere in 2026. Anything other
+than 207 / 0 means the coaches file has been damaged, and the first three
+sections below say how.
 
-| Round | Games in file | Expected routing |
+**Where each round came from, because the two halves are not equally safe.**
+
+| Raw rounds | Source | Safe to refetch |
 |---|---|---|
-| raw 23 (landed) | 189 | 180 full / 9 no_cv |
-| raw 24 | 198 | 180 full / 18 no_cv |
-| raw 25 | 207 | 180 full / 27 no_cv |
+| 1 to 23 | fitzRoy `fetch_coaches_votes()` | Yes |
+| 24 and 25 | Hand-transcribed from afl.com.au | **No. A refetch deletes them** |
 
-Raw 23 is verified: 0 of its 414 rows carried a coaches vote and all 9 games
-routed `no_cv`. The predicate fixed in commit `800acc7` (`(s != 0).any()` to
-`(s > 0).any()`, NaN safe) is therefore proven against a real unpublished round
-rather than by reproduction alone.
+fitzRoy's feed stops at raw round 23 and has not moved since. The AFL publishes
+the same votes in its "Coaches' votes, R<n>" articles, and **the AFL's official
+round number is one behind AFLTables' raw `Round_num` in 2026**: the AFL's R23
+is raw 24, its R24 is raw 25. Those two rounds were transcribed into the feed's
+own schema by `scripts/append_coaches_2026_r24_r25.py`, which carries both
+source URLs, refuses to append twice, and refuses to write unless the checks
+below pass.
 
-Any of the following stops the round. Do not publish its numbers.
+**The hazard this creates, stated plainly.** Running the fitzRoy coaches fetch
+again overwrites the file with rounds 1 to 23 only and **silently deletes rounds
+24 and 25**, dropping routing back to 189 / 18. `data_2026/fetch_coaches.R`'s
+`write.csv` is unconditional and unguarded, which is why it stays commented out
+of `update.py`'s `r_scripts`. `coaches_votes_2026_prev.csv` does **not** protect
+against this: it predates the transcription. Re-run the append script to
+recover, or restore the committed file.
 
-- **Full-model count above 180.** `fetch_coaches.R` has been re-enabled after the
-  feed returned, or something outside `update.py` has written the coaches file.
-- **`no_cv` count of 0 on raw 24 or 25.** The predicate is broken again: an
-  unpublished game is reaching it as NaN and being read as published.
-- **Full-model count of 0.** `fetch_coaches.R` has been re-enabled while the feed
-  is still private, and its unguarded `write.csv` has overwritten the coaches
-  file with an empty frame, which routes every game rather than the unpublished
-  ones. Restore from `data_2026/coaches_votes_2026_prev.csv`, the byte copy kept
-  as insurance.
+**Two checks that make coaches-vote data verifiable, and should be used again.**
+
+- **Every AFLCA game totals exactly 30.** Five-four-three-two-one from each of
+  two coaches. A game summing to anything else is a transcription error.
+- **The AFL's published season leaderboard is a free acceptance test.** Sum the
+  file per player and compare. All 21 published figures across the two 2026
+  articles reconciled exactly, which is what proved both the transcription and
+  the pre-existing rounds at the same time.
+
+**The feed mislabels rounds, and the fixture guard is load-bearing.** For a
+period the feed published raw round 22's fixtures under the label "Round 23".
+`predict_2026.py`'s per-round fixture guard catches this by checking each
+coaches round's fixture set is a **subset** of the AFLTables fixtures for the
+same round number, and drops the round if not. Subset rather than equality, so a
+genuinely partial round survives. Do not weaken it to an equality or
+byte-identity test: a copy with one vote edited walks straight through those
+while still carrying the wrong round's fixtures, and the per-game routing then
+reads a stale round as published and never engages the variant.
+
+**Name reconciliation is already handled; do not pre-correct feed spellings.**
+`features.resolve_feed_names()` maps the feed's spelling onto AFLTables'
+(Harrison Petty to Harry Petty, De Goey to de Goey, O'Sullivan to OSullivan) and
+prints an unmatched count. Transcribe names as published and let it report; the
+2026 append resolved 1,319 exactly, 25 by surname plus team plus round, 2 by
+override, 0 unmatched.
+
+Background, still true and still relevant to 2027: the zero-source guard in
+`features.py` (`ZERO_SOURCE_GUARD_STATS`, applied inside
+`build_game_rank_features`) sets the **raw `Coaches_Votes` column** to NaN for a
+game whose votes are all zero, not just the derived rank/pct/z triplet, and it
+runs before the routing test. An unpublished game therefore reaches the
+predicate holding NaN rather than 0, and any NaN-unsafe comparison reads that as
+"votes published" and sends the game to the full model, so `model_nocv.pkl`
+never engages. The predicate fixed in commit `800acc7` (`(s != 0).any()` to
+`(s > 0).any()`) is NaN safe and was proven against raw round 23 while that
+round was genuinely unpublished. Keep it NaN safe in any rewrite.
 
 Background: the root cause does not live in `predict_2026.py`. The zero-source
 guard in `features.py` (`ZERO_SOURCE_GUARD_STATS`, applied inside
@@ -82,6 +119,11 @@ brownlow_engine/
 │
 ├── scraper_stats.py      # Pulls player stats from Squiggle API → data_2026/
 ├── scraper_odds.py       # Scrapes multi-bookie odds from Oddschecker (undetected-chromedriver)
+├── scraper_advanced.py   # footywire advanced match stats → data_advanced/. The
+│                         #   ONLY source of real Score Involvements. See
+│                         #   "Score involvements" below before touching it
+├── build_score_involvements.py  # Joins the above onto fitzRoy IDs. Refuses to
+│                         #   write below a 98% match rate
 ├── data_pull.py          # EMPTY, 0 bytes. Not a fetcher. The R paths that do
 │                         #   work are fetch_extended_data.R and scripts/build_history.R
 ├── fetch_extended_data.R # R script for fitzRoy data (coaches votes etc.)
@@ -98,9 +140,17 @@ brownlow_engine/
 │   ├── season_2026.csv       # Season totals by player
 │   └── season_projection_2026.csv  # Floor/ceiling projections (Monte Carlo)
 │
+├── data_advanced/        # footywire advanced stats, 2015 onward. Real Score
+│   │                     #   Involvements plus metres gained, intercepts,
+│   │                     #   centre clearances, effective disposals, TOG%
+│   ├── advanced_<season>.csv        # One per season, as scraped
+│   └── score_involvements.csv       # Joined to Season + Round_num + ID
+│
 ├── data_2026/            # Current season raw data
 │   ├── afltables_2026.csv    # Player stats (from R/fitzRoy)
-│   ├── coaches_votes_2026.csv
+│   ├── coaches_votes_2026.csv    # Rounds 1-23 fitzRoy, 24-25 hand-transcribed.
+│   │                             #   Do NOT refetch, see "Update chain"
+│   ├── fetch_coaches.R           # Unguarded write.csv. Stays out of update.py
 │   ├── bookmaker_odds.csv    # Wide: Player | Bookie1 | Bookie2 | …
 │   └── best_odds.csv         # Long: player, best_odds, implied_prob, best_bookie
 │
@@ -134,7 +184,8 @@ brownlow_engine/
 | Data — historical | fitzRoy (R package) via `fetch_extended_data.R` |
 | Data — live stats | Squiggle API (`api.squiggle.com.au`) |
 | Data — odds | Oddschecker scrape via `undetected-chromedriver` + BeautifulSoup |
-| Data — coaches votes | fitzRoy `fetch_coaches_votes()` |
+| Data — coaches votes | fitzRoy `fetch_coaches_votes()` to raw round 23; afl.com.au round articles beyond it |
+| Data — advanced stats | footywire match pages (`ft_match_statistics?mid=…&advv=Y`), 2015 onward |
 | Serialisation | `pickle` for model artifacts |
 
 ## Model architecture (v4.0)
@@ -169,6 +220,59 @@ artifact defines either group, so treat both as approximate. Count from
 **Prediction outputs** (per game): `P_1`, `P_2`, `P_3`, `Poll_Prob` (P_1+P_2+P_3), `Exp_Votes` (weighted expected value).
 
 **Season projection**: Monte Carlo (10,000 simulations) over completed rounds → 10th/90th percentile floor/ceiling.
+
+## Score involvements: two different quantities, one name
+
+**`Score_Involvements` in `features.py` is NOT the AFL's Score Involvements
+stat.** `add_row_stats()` defines it as `Goals + Goal.Assists + Marks.Inside.50 +
+Inside.50s`. That double counts (a mark inside 50 converted to a goal scores
+twice for one act) and it omits the largest real component, any possession in a
+scoring chain. For a midfielder both land in the same 6 to 9 per game range,
+which is why the collision survived unnoticed: the wrong number looks right.
+Ed Richards' 2026 "8.95 score involvements" was 149 inside 50s out of 197.
+
+Two rules follow, and they pull in opposite directions on purpose.
+
+- **The engineered column keeps its name and its definition.** It is one of the
+  93 entries in `predictions/features.pkl`, along with its `_game_rank`,
+  `_game_pct` and `_game_z` derivatives, and it feeds `Impact_Score`. Renaming
+  or redefining it breaks `predict_2026.py` against the trained model. Changing
+  it is a retrain, not an edit.
+- **It must never be shown to a reader as a score involvement.** The real stat
+  is `Score_Involvements_Actual`, sourced by `scraper_advanced.py` and joined by
+  `build_score_involvements.py`. `round_bests.py` already refuses to rank the
+  engineered column, and says why in a comment worth reading: a record only
+  works as a record when it is the same quantity the rest of the world counts.
+
+**Coverage starts in 2015**, measured rather than assumed: footywire's advanced
+table carries no SI column for 2003 or 2010 through 2014, and does from 2015.
+Nothing special-cases that in the dashboard. `_load_stat_filter_frame` measures
+each column's floor from the first season it is non-null, so the Stat Filter's
+existing season clamp picks it up like any other stat. Pre-2015 loses the filter
+rather than falling back to the substitute.
+
+**Three traps in the footywire scrape, each of which produced silently wrong
+data before it was caught by a count rather than by reading code:**
+
+1. **The stats table is nested two layers deep.** `find_all('tr')` on a wrapper
+   returns the inner rows too, so every player is counted once per level. The
+   first run wrote exactly 3x the expected rows. Parse only the innermost table,
+   the one containing no table of its own.
+2. **The player link names the player's CURRENT club, not the club he played
+   that match for.** Reading the team from `pp-<club>--<name>` put Dangerfield,
+   Jeremy Cameron and Isaac Smith in Geelong's 2015 round 1 table. Take the team
+   from the table's own "<club> Match Statistics" heading.
+3. **An unmapped club name drops a whole club silently.** GWS title-cased to a
+   name the archive has never used and 529 rows joined to nothing with no error.
+   `_heading_to_club` now raises on any club outside `KNOWN_CLUBS`, on the first
+   match rather than after 206 requests.
+
+Consequences worth knowing before this replaces anything: any career-total
+format built on the engineered column is measuring a quantity nobody recognises
+and cannot be rebuilt honestly from the real stat, because a career total needs
+the whole career and the real one starts in 2015.
+`drafts/fewest_games_score_involvements_1000.md` and the matching ladder in
+`fewest_games.py` are both in that position.
 
 ## Dashboard pages
 
