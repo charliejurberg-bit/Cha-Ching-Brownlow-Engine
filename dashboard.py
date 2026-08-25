@@ -3878,7 +3878,7 @@ SCOPE .lb-bar-lo{text-align:right;}
     _LB_TBL_CSS = ("""
 .lb-table .lb-tbl-wrap{overflow-x:auto;}
 .lb-table .lb-tbl{width:100%;table-layout:fixed;border-collapse:separate;border-spacing:0;font-family:'IBM Plex Mono',monospace;}
-.lb-table .lb-tbl th{font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--hairline-strong);text-align:right;white-space:nowrap;}
+.lb-table .lb-tbl th{font-size:11px;font-weight:500;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);padding:12px 14px;border-bottom:1px solid var(--hairline-strong);text-align:right;white-space:normal;line-height:1.25;overflow:hidden;vertical-align:bottom;}
 .lb-table .lb-tbl th.lft{text-align:left;}
 .lb-table .lb-tbl td{font-size:15px;padding:12px 14px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap;color:var(--steel);}
 .lb-table .lb-tbl td.lft{text-align:left;}
@@ -3946,11 +3946,11 @@ SCOPE .lb-bar-lo{text-align:right;}
     # takes a flat 175px, and the rounds absorb the rest.
     #
     # Order here MUST track _heads exactly, hence the same three conditionals.
-    _cols = [70] + ([40] if _show_club_rank else []) + [225, 48, 70]
+    _cols = [70] + ([40] if _show_club_rank else []) + [225, 48, 78]
     if is_2026 and has_fc:
         _cols.append(175)
     if not is_2026:
-        _cols += [56, 68]
+        _cols += [80, 68]
     _colgroup = (''.join(f'<col style="width:{_w}px">' for _w in _cols)
                  + '<col>' * len(_rd_rounds))
     # Floor under which the round columns stop shrinking and the wrap scrolls
