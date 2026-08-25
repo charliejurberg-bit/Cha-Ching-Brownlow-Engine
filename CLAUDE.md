@@ -267,12 +267,14 @@ data before it was caught by a count rather than by reading code:**
    `_heading_to_club` now raises on any club outside `KNOWN_CLUBS`, on the first
    match rather than after 206 requests.
 
-Consequences worth knowing before this replaces anything: any career-total
-format built on the engineered column is measuring a quantity nobody recognises
-and cannot be rebuilt honestly from the real stat, because a career total needs
-the whole career and the real one starts in 2015.
-`drafts/fewest_games_score_involvements_1000.md` and the matching ladder in
-`fewest_games.py` are both in that position.
+**No career total of this stat is possible, in either version.** The engineered
+column measures a quantity nobody recognises; the real one starts in 2015, and a
+career total needs the whole career. There is no honest version, so
+`fewest_games.py` now **refuses** `Score_Involvements` via `NOT_FOR_PUBLICATION`
+rather than redirecting it, and the stale
+`drafts/fewest_games_score_involvements_1000.md` carries a DO NOT POST banner.
+Per-game and per-season figures are fine from 2015 on; it is the career ladder
+that cannot be built.
 
 ## Dashboard pages
 

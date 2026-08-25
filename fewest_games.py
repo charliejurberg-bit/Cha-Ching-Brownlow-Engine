@@ -163,6 +163,28 @@ STAT_FLOORS = {
 
 # Reconstructed by features.add_row_stats(), never re-typed here.
 ENGINEERED = {'Score_Involvements'}
+
+# A stat the loader can compute but this tool refuses to rank, because the
+# output would be a leaderboard of a quantity no reader recognises. Same call
+# round_bests.py already made, and for the same reason: a record only works as
+# a record when it is the same thing the rest of the world counts.
+#
+# The floor above is honest about what Score_Involvements is made of, but the
+# name is not: features.add_row_stats() defines it as Goals + Goal.Assists +
+# Marks.Inside.50 + Inside.50s, which is NOT the AFL's Score Involvements. It
+# double counts a marked goal and omits every possession in a scoring chain.
+# The real stat lives in data_advanced/score_involvements.csv and starts in
+# 2015, so a CAREER total of it cannot be built at all: a career total needs
+# the whole career. There is no honest version of this ladder, which is why
+# this refuses rather than redirects.
+NOT_FOR_PUBLICATION = {
+    'Score_Involvements':
+        "features.Score_Involvements is Goals + Goal.Assists + Marks.Inside.50 "
+        "+ Inside.50s, not the AFL stat of that name, so a career ladder of it "
+        "ranks a quantity no reader recognises. The real stat starts in 2015 "
+        "and so cannot carry a career total. See CLAUDE.md, 'Score "
+        "involvements: two different quantities, one name'.",
+}
 # Derived from Home.Away / Home.score / Away.score. A draw is neither a win nor
 # a loss and contributes nothing toward the threshold.
 DERIVED_WIN = 'Wins'
@@ -595,6 +617,10 @@ def main(argv):
         print(f"unknown stat {stat!r}, expected one of "
               f"{', '.join(sorted(STAT_FLOORS))}", file=sys.stderr)
         print(_USAGE, file=sys.stderr)
+        return 2
+    if stat in NOT_FOR_PUBLICATION:
+        print(f"{stat} is not built here. {NOT_FOR_PUBLICATION[stat]}",
+              file=sys.stderr)
         return 2
     try:
         threshold = float(argv[1])
