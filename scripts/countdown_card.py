@@ -48,6 +48,8 @@ OUT_DIR = "drafts"
 # timeline. 1200 wide scales to 0.292, and portrait buys the vertical room to
 # set the type at the sizes that survive it. Check any change with --preview,
 # which writes the 350px version Twitter actually shows.
+# S is the output multiplier, not a supersample: the card is drawn and SAVED at
+# W*S by H*S (2400x3000). X accepts up to 4096 a side.
 W, H, S = 1200, 1500, 2
 
 # Midnight Turf, from CLAUDE.md. Never change these.
@@ -272,10 +274,20 @@ def draw(player, place, tagline, d):
     os.makedirs(OUT_DIR, exist_ok=True)
     slug = re.sub(r"[^a-z0-9]+", "_", player.lower()).strip("_")
     path = os.path.join(OUT_DIR, f"countdown_{place:02d}_{slug}.png")
-    full = img.resize((W, H), Image.LANCZOS)
-    full.save(path, "PNG")
+    # Save the FULL canvas, W*S by H*S. This used to downsample to W by H first,
+    # which threw the resolution away for nothing: the card was drawn at 2400x3000
+    # and saved at 1200x1500, so it went soft the moment anyone tapped it to
+    # full-screen (an iPad needs ~1668px across, a desktop ~1800). PIL renders the
+    # type antialiased at the real size, so there is no quality argument for the
+    # downsample either.
+    #
+    # It stays a PNG on X at this size: 2400x3000 comes to ~260KB, under the
+    # ~900KB above which X re-encodes to JPEG, and JPEG on small text over a dark
+    # ground is exactly where ringing artefacts show. Do not add a quantise step
+    # to shrink it further; there is no need and it would chew the type edges.
+    img.save(path, "PNG", optimize=True)
     prev = os.path.join(OUT_DIR, f"countdown_{place:02d}_{slug}_timeline.png")
-    full.resize((350, int(350 * H / W)), Image.LANCZOS).save(prev, "PNG")
+    img.resize((350, int(350 * H / W)), Image.LANCZOS).save(prev, "PNG")
     return path, prev
 
 
