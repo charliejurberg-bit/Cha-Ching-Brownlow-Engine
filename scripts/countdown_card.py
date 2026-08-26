@@ -344,6 +344,15 @@ ABBR = {"Greater Western Sydney": "GWS", "Western Bulldogs": "WESTERN BULLDOGS",
         "Gold Coast": "GOLD COAST", "St Kilda": "ST KILDA"}
 
 
+# A game earns a block by having produced at least one figure inside the
+# league's top NOTABLE for the season. Below that it is just a game he played:
+# Wanganeen-Milera's third-rated game was 20 kicks and 28 disposals, nothing
+# flagged, and it made a card whose rows visibly tailed off. Trailing games are
+# dropped rather than the middle ones, and never below MIN_BLOCKS.
+NOTABLE = 25
+MIN_BLOCKS = 2
+
+
 def top_games(player, picked, season=2026, n=3, per_game=3):
     """The player's biggest games, each described by ITS OWN best stats.
 
@@ -374,16 +383,40 @@ def top_games(player, picked, season=2026, n=3, per_game=3):
     if me.empty:
         raise SystemExit(f"{player} has no {season} games.")
 
-    out = []
-    for _, r in me.nlargest(n, "Exp_Votes").iterrows():
-        ranked = []
+    chosen = me.nlargest(n, "Exp_Votes")
+    ranks = {}                       # (round, col) -> league rank of that figure
+    for _, r in chosen.iterrows():
         for c in cols:
             v = r.get(c)
-            if pd.isna(v) or v <= 0:
+            if pd.isna(v):
                 continue
-            # Rank against every player-game in the season, not against his own.
-            ranked.append((int((g[c] > v).sum()) + 1, c, float(v)))
-        ranked.sort()
+            ranks[(int(r.Round_num), c)] = int((g[c] > v).sum()) + 1
+
+    # ONE set of columns for all three games, so a reader can compare down the
+    # card instead of re-reading the labels on every row. The columns are still
+    # chosen from these games rather than from the season: take each stat's BEST
+    # rank across the three and keep the strongest few. For Wanganeen-Milera
+    # that is kicks, metres gained and disposals, which is what his round 20 was
+    # made of; tackles reached the old per-game list only because round 5 had
+    # nothing better, and it told a reader nothing.
+    best_rank = {}
+    for (rn, c), rk in ranks.items():
+        v = chosen.loc[chosen.Round_num == rn, c].iloc[0]
+        if pd.notna(v) and v > 0:
+            best_rank[c] = min(best_rank.get(c, 10 ** 9), rk)
+    order = [c for c, _ in sorted(best_rank.items(), key=lambda x: x[1])][:per_game]
+
+    # Trim from the end while the last block has nothing worth flagging.
+    keep = list(chosen.Round_num.astype(int))
+    while len(keep) > MIN_BLOCKS:
+        rn = keep[-1]
+        if min((ranks.get((rn, c), 10 ** 9) for c in order), default=10 ** 9) <= NOTABLE:
+            break
+        keep.pop()
+    chosen = chosen[chosen.Round_num.astype(int).isin(keep)]
+
+    out = []
+    for _, r in chosen.iterrows():
         opp = r["Away.team"] if r["Playing.for"] == r["Home.team"] else r["Home.team"]
         won = (r["Playing.for"] == r["Home.team"]) == (r["Home.score"] > r["Away.score"])
         rn = int(r.Round_num)
@@ -394,7 +427,9 @@ def top_games(player, picked, season=2026, n=3, per_game=3):
             "exp": float(r.Exp_Votes),
             # Game-level figures are whole numbers; the catalogue's formats are
             # for per-game averages and would print "39.0 kicks".
-            "stats": [(label[c], f"{v:,.0f}", rk) for rk, c, v in ranked[:per_game]],
+            "stats": [(label[c],
+                       "-" if pd.isna(r.get(c)) else f"{float(r[c]):,.0f}",
+                       ranks.get((rn, c))) for c in order],
         })
     return out
 
@@ -565,6 +600,8 @@ def main():
     ap.add_argument("--font", default="twcen", help=", ".join(FONT_SETS))
     ap.add_argument("--mode", choices=("compare", "games"), default="compare",
                     help="compare = season v season; games = the biggest games")
+    ap.add_argument("--games", type=int, default=3,
+                    help="games mode: how many to consider (weak ones are trimmed)")
     ap.add_argument("--seasons", type=int, default=2, choices=(2, 3),
                     help="2 = 2025 v 2026 (default), 3 = adds 2024")
     a = ap.parse_args()
@@ -573,7 +610,7 @@ def main():
     d = gather(a.player, seasons)
     picked = pick_stats(d, seasons)
     if a.mode == "games":
-        games = top_games(a.player, picked)
+        games = top_games(a.player, picked, n=a.games)
         p, prev = draw_games(a.player, a.place, games, d)
     else:
         p, prev = draw(a.player, a.place, a.tagline, d, seasons, picked)
