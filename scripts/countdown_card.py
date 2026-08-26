@@ -69,6 +69,7 @@ BG = "#0a1017"
 INK, MUTED = "#e9eef3", "#7e8c99"
 RANK_INK = "#93a3b1"            # light enough to survive Twitter's downscale
 EMERALD = "#34d399"
+GOLD = "#f0b429"                 # results, and the tail of the CHING gradient
 LINE = "#1a2632"
 PANEL = "#0c141c"               # barely-there lift, not a green block
 
@@ -152,6 +153,59 @@ CATALOGUE = [
 ALWAYS = [(["COACHES", "VOTES"], "cv", "{:.0f}"),
           (["BROWNLOW", "VOTES"], "bv", "{:.0f}")]
 N_PICK = 4
+
+
+# ── the CHA CHING mark ────────────────────────────────────────
+# Lifted from dashboard.py's .ccb-mark: CHA is a vertical silver gradient and
+# CHING runs emerald to lime to gold on a diagonal. Flat emerald text was not
+# the logo, it was just the accent colour spelling the name.
+CHA_STOPS = [(0.0, (233, 238, 243)), (1.0, (138, 154, 169))]
+CHING_STOPS = [(0.0, (52, 211, 153)), (0.52, (142, 201, 74)), (1.0, (240, 180, 41))]
+
+
+def _lerp(stops, t):
+    t = min(max(t, 0.0), 1.0)
+    for i in range(len(stops) - 1):
+        p0, c0 = stops[i]
+        p1, c1 = stops[i + 1]
+        if p0 <= t <= p1:
+            f = 0.0 if p1 == p0 else (t - p0) / (p1 - p0)
+            return tuple(int(round(c0[j] + (c1[j] - c0[j]) * f)) for j in range(3))
+    return stops[-1][1]
+
+
+def gradient_text(img, xy, txt, fnt, stops, angle):
+    """Draw txt filled with a linear gradient. angle 180 = top to bottom."""
+    xy = (int(xy[0]), int(xy[1]))
+    box = tuple(int(v) for v in ImageDraw.Draw(img).textbbox(xy, txt, font=fnt))
+    w, h = max(1, box[2] - box[0]), max(1, box[3] - box[1])
+    pad = 4
+    w, h = w + pad * 2, h + pad * 2
+    import math
+    rad = math.radians(angle - 90)
+    dx, dy = math.cos(rad), math.sin(rad)
+    denom = abs(dx) * w + abs(dy) * h or 1
+    px = []
+    for y in range(h):
+        for x in range(w):
+            t = ((x if dx >= 0 else w - x) * abs(dx)
+                 + (y if dy >= 0 else h - y) * abs(dy)) / denom
+            px.append(_lerp(stops, t))
+    grad = Image.new("RGB", (w, h))
+    grad.putdata(px)
+    mask = Image.new("L", (w, h), 0)
+    ImageDraw.Draw(mask).text((pad - (box[0] - xy[0]), pad - (box[1] - xy[1])),
+                              txt, font=fnt, fill=255)
+    img.paste(grad, (box[0] - pad, box[1] - pad), mask)
+    return box[2] - box[0]
+
+
+def draw_mark(img, x, y, size):
+    """CHA CHING, in the site's own gradients."""
+    f = font("display", size)
+    w = gradient_text(img, (x, y), "CHA", f, CHA_STOPS, 180)
+    sp = int(ImageDraw.Draw(img).textlength(" ", font=f))
+    gradient_text(img, (x + w + sp, y), "CHING", f, CHING_STOPS, 120)
 
 
 def ordinal(n):
@@ -290,6 +344,130 @@ ABBR = {"Greater Western Sydney": "GWS", "Western Bulldogs": "WESTERN BULLDOGS",
         "Gold Coast": "GOLD COAST", "St Kilda": "ST KILDA"}
 
 
+def top_games(player, picked, season=2026, n=3, per_game=3):
+    """The player's biggest games, each described by ITS OWN best stats.
+
+    Games are ranked by Exp_Votes rather than by any single stat, because this
+    is a Brownlow countdown: the question is which games the model thought were
+    vote-winning, not which produced the largest number. For Nasiah
+    Wanganeen-Milera that puts a 28-disposal win over Port Adelaide third, ahead
+    of a 44-disposal loss, which is the point.
+
+    WITHIN a game the stats are chosen per game, not carried across from the
+    season card. Showing the same three every time buries what actually happened:
+    his round 20 was the highest-kicking AND furthest-gaining single game any
+    player managed all season, and he also kicked four goals from defence, none
+    of which a fixed set would have surfaced. Each stat is ranked against every
+    player-game in the season, so "league best" means best of ~9,500 and a
+    figure that is merely large for him does not get a row.
+    """
+    g = pd.read_csv(f"predictions/game_level_{season}.csv").drop_duplicates(
+        ["Round_num", "ID"], keep="first")
+    adv = pd.read_csv(SI_PATH, usecols=["Season", "Round_num", "ID"] + ADV_COLS)
+    adv = adv[adv.Season == season].drop(columns="Season").drop_duplicates(
+        ["Round_num", "ID"])
+    g = g.merge(adv, on=["Round_num", "ID"], how="left")
+
+    label = {c: l for l, c, _ in CATALOGUE}
+    cols = [c for _, c, _ in CATALOGUE if c in g.columns]
+    me = g[g.Player_Name == player]
+    if me.empty:
+        raise SystemExit(f"{player} has no {season} games.")
+
+    out = []
+    for _, r in me.nlargest(n, "Exp_Votes").iterrows():
+        ranked = []
+        for c in cols:
+            v = r.get(c)
+            if pd.isna(v) or v <= 0:
+                continue
+            # Rank against every player-game in the season, not against his own.
+            ranked.append((int((g[c] > v).sum()) + 1, c, float(v)))
+        ranked.sort()
+        opp = r["Away.team"] if r["Playing.for"] == r["Home.team"] else r["Home.team"]
+        won = (r["Playing.for"] == r["Home.team"]) == (r["Home.score"] > r["Away.score"])
+        rn = int(r.Round_num)
+        out.append({
+            "round": "OR" if (rn - 1 == 0 and season >= 2024) else str(
+                rn - 1 if season >= 2024 else rn),
+            "opp": ABBR.get(opp, opp.upper()), "won": bool(won),
+            "exp": float(r.Exp_Votes),
+            # Game-level figures are whole numbers; the catalogue's formats are
+            # for per-game averages and would print "39.0 kicks".
+            "stats": [(label[c], f"{v:,.0f}", rk) for rk, c, v in ranked[:per_game]],
+        })
+    return out
+
+
+# A game block is header + values + labels + the rank note, ~252px of content.
+# The height follows the block count rather than being pinned to the compare
+# card's 1500, which left a third of the canvas empty and meant X scaled the
+# image down to fit dead space.
+GAME_BH = 312
+GAME_FOOT = 128
+
+
+def draw_games(player, place, games, d, season=2026):
+    H2 = 322 + len(games) * GAME_BH + GAME_FOOT
+    img = Image.new("RGB", (W * S, H2 * S), BG)
+    k = ImageDraw.Draw(img)
+    m, right = 56 * S, (W - 56) * S
+
+    def text(xy, t, f, fill, anchor="la"):
+        k.text(xy, t, font=f, fill=fill, anchor=anchor)
+
+    draw_mark(img, m, 44 * S, 29)
+    text((right, 44 * S), f"BROWNLOW COUNTDOWN   {ordinal(place).upper()}",
+         font("display", 29), MUTED, anchor="ra")
+    k.rectangle([m, 100 * S, right, 101 * S], fill=LINE)
+    text((m, 132 * S), player.upper(), font("name", 80), INK)
+    text((m, 236 * S), f"BIGGEST GAMES OF {season}", font("display", 32), MUTED)
+
+    top, bh = 322 * S, GAME_BH * S
+    for i, gm in enumerate(games):
+        y = top + i * bh
+        if i:
+            k.rectangle([m, y - 26 * S, right, y - 25 * S], fill=LINE)
+        head = f"ROUND {gm['round']}   v {gm['opp']}"
+        text((m, y), head, font("display", 34), INK)
+        text((right, y), "WON" if gm["won"] else "LOST", font("display", 30),
+             GOLD if gm["won"] else MUTED, anchor="ra")
+        cells = gm["stats"] + [(["EXPECTED", "VOTES"], f"{gm['exp']:.2f}", None)]
+        cw = (right - m) // len(cells)
+        for j, (lines, val, rk) in enumerate(cells):
+            cx = m + cw * j + cw // 2
+            last = j == len(cells) - 1
+            text((cx, y + 62 * S), val, font("fig", 72),
+                 EMERALD if last else INK, anchor="ma")
+            for li, ln in enumerate(lines):
+                text((cx, y + 158 * S + li * 32 * S), ln, font("display", 24),
+                     MUTED, anchor="ma")
+            # Only a genuinely rare figure earns the note. Everything else would
+            # be a rank nobody is impressed by, printed in the accent colour.
+            if rk == 1:
+                text((cx, y + 228 * S), "LEAGUE BEST", font("display", 24),
+                     EMERALD, anchor="ma")
+            elif rk and rk <= 10:
+                text((cx, y + 228 * S), f"{ordinal(rk).upper()} IN THE AFL",
+                     font("display", 24), EMERALD, anchor="ma")
+
+    fy = (H2 - GAME_FOOT + 18) * S
+    k.rectangle([m, fy - 30 * S, right, fy - 29 * S], fill=LINE)
+    text((m, fy), f"The {len(games)} games the model rated highest, of "
+                  f"{d[season]['games']} played in {season}.",
+         font("body", 25), MUTED)
+    text((m, fy + 36 * S), "Each figure is ranked against every player-game in "
+                           "the season, about 9,500 of them.", font("body", 25), MUTED)
+
+    os.makedirs(OUT_DIR, exist_ok=True)
+    slug = re.sub(r"[^a-z0-9]+", "_", player.lower()).strip("_")
+    path = os.path.join(OUT_DIR, f"countdown_{place:02d}_{slug}_games.png")
+    img.save(path, "PNG", optimize=True)
+    prev = os.path.join(OUT_DIR, f"countdown_{place:02d}_{slug}_games_timeline.png")
+    img.resize((350, int(350 * H2 / W)), Image.LANCZOS).save(prev, "PNG")
+    return path, prev
+
+
 def draw(player, place, tagline, d, seasons, picked):
     img = Image.new("RGB", (W * S, H * S), BG)
     k = ImageDraw.Draw(img)
@@ -310,7 +488,7 @@ def draw(player, place, tagline, d, seasons, picked):
     k.rectangle([cx0, PANEL_TOP, cx0 + col_w, PANEL_BOT], fill=PANEL)
     k.rectangle([cx0, PANEL_TOP, cx0 + col_w, PANEL_TOP + 3 * S], fill=EMERALD)
 
-    text((m, 44 * S), "CHA CHING", font("display", 29), EMERALD)
+    draw_mark(img, m, 44 * S, 29)
     text((right, 44 * S), f"BROWNLOW COUNTDOWN   {ordinal(place).upper()}",
          font("display", 29), MUTED, anchor="ra")
     k.rectangle([m, 100 * S, right, 101 * S], fill=LINE)
@@ -385,6 +563,8 @@ def main():
     ap.add_argument("place", type=int)
     ap.add_argument("--tagline", default="")
     ap.add_argument("--font", default="twcen", help=", ".join(FONT_SETS))
+    ap.add_argument("--mode", choices=("compare", "games"), default="compare",
+                    help="compare = season v season; games = the biggest games")
     ap.add_argument("--seasons", type=int, default=2, choices=(2, 3),
                     help="2 = 2025 v 2026 (default), 3 = adds 2024")
     a = ap.parse_args()
@@ -392,7 +572,11 @@ def main():
     seasons = [2024, 2025, 2026][-a.seasons:]
     d = gather(a.player, seasons)
     picked = pick_stats(d, seasons)
-    p, prev = draw(a.player, a.place, a.tagline, d, seasons, picked)
+    if a.mode == "games":
+        games = top_games(a.player, picked)
+        p, prev = draw_games(a.player, a.place, games, d)
+    else:
+        p, prev = draw(a.player, a.place, a.tagline, d, seasons, picked)
     print(f"OK  wrote {p}")
     print(f"    timeline preview (what Twitter shows on a phone): {prev}")
     print("    chosen: " + ", ".join(" ".join(l) for l, _, _ in picked))
