@@ -231,7 +231,29 @@ artifact defines either group, so treat both as approximate. Count from
 
 **Prediction outputs** (per game): `P_1`, `P_2`, `P_3`, `Poll_Prob` (P_1+P_2+P_3), `Exp_Votes` (weighted expected value).
 
-**Season projection**: Monte Carlo (10,000 simulations) over completed rounds → 10th/90th percentile floor/ceiling.
+**Season projection**: Monte Carlo (10,000 simulations) over completed rounds →
+10th/90th percentile floor/ceiling. Two things about it are easy to get wrong.
+
+- **Each game is sampled with its OWN probabilities.** Averaging a player's
+  p1/p2/p3 across his season and drawing `multinomial(games_played, p_avg)` is
+  mean-preserving, so totals and rankings stay right and nothing looks broken,
+  but it inflates the variance and made every band on the board too wide in the
+  same direction (2026 top 15: 14.5 votes where the model implies 9.2, a 36%
+  overstatement). A player's games are independent draws from DIFFERENT
+  categorical distributions; there is no averaging step to be had. Do not
+  reintroduce one for speed.
+- **The displayed ceiling is `max(p90, the 3-2-1 total)`, and the lift lives in
+  `dashboard.py`, not in the CSV.** The two boards describe one season, so a
+  reader who toggles must never see a total on one that breaks the stated
+  maximum on the other — Daicos read 34-45 on the decimal board and 48 on the
+  rounded one. p90 answers "what does he reach one year in ten"; the 3-2-1 total
+  answers "what does he collect if every game the model gives him lands"; the
+  ceiling bounds both. It must be `max()` and never a swap: the 3-2-1 total sits
+  BELOW p90 for 293 of the 465 players with ten or more games, and for 198 of
+  those it is at or below the player's own expected total. Only 2 players lift.
+  Done in the dashboard so the 3-2-1 rule stays solely in `load_game_rounded`,
+  which means `season_projection_2026.csv` carries the raw p90 and the board
+  shows the lifted figure. That file has exactly one consumer, the Leaderboard.
 
 ## Score involvements: two different quantities, one name
 

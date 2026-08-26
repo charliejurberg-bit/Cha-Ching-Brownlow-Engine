@@ -3656,6 +3656,35 @@ if _page == 'Leaderboard':
             _proj_ceiling = dict(zip(_proj['Player'], _proj['Ceiling_Projection']))
             has_fc = len(_proj_ceiling) > 0
 
+            # A ceiling must cover the 3-2-1 total for the same player. Both
+            # boards describe one season, so a reader who toggles must never see
+            # a total on one board that breaks the stated maximum on the other.
+            # Nick Daicos read 39.6 with a 34-45 band on the decimal board and 48
+            # on the rounded one, with nothing on screen reconciling them.
+            #
+            # The two answer different questions. The band's p90 is "what does he
+            # reach one year in ten"; the 3-2-1 total is "what does he collect if
+            # every game the model gives him lands". The ceiling is the higher of
+            # the two, so it bounds both readings rather than one.
+            #
+            # max(), never a swap, and the margin is not close. The 3-2-1 total
+            # sits BELOW p90 for 293 of the 465 players with ten or more games,
+            # and for 198 of those it is at or below the player's own expected
+            # total, so assigning it unconditionally would print ceilings under
+            # the central estimate sitting beside them. Two players lift.
+            #
+            # Done here rather than in predict_2026.py so the 3-2-1 rule stays in
+            # one place, load_game_rounded. The lift happens before every
+            # downstream read (bar domain, hero, chasers, table), so all four
+            # agree. load_season_rounded is cached and load_game is already warm
+            # on this path, so the cost is one sort per hour.
+            _rounded_tot = load_season_rounded(selected_season)
+            if _rounded_tot is not None:
+                for _pn, _hv in zip(_rounded_tot['Player_Name'],
+                                    _rounded_tot['Exp_Total_Votes']):
+                    if _pn in _proj_ceiling and float(_hv) > float(_proj_ceiling[_pn]):
+                        _proj_ceiling[_pn] = float(_hv)
+
     # Best Odds and Mkt % were dropped from this table: the board is a model
     # ranking and the two price columns crowded it without changing the read.
     # Prices still live on Predictions and the Live Tracker, which load
