@@ -1425,7 +1425,37 @@ def load_game(season):
     path = f"{PRED_DIR}/game_level_{season}.csv"
     if not os.path.exists(path):
         return None
-    return _disambiguate_players(_fix_team_names(pd.read_csv(path)))
+    return _attach_real_si(
+        _disambiguate_players(_fix_team_names(pd.read_csv(path))), season)
+
+
+def _attach_real_si(df, season):
+    """Add the real Score Involvements column, or leave it off.
+
+    Left off rather than zero-filled when the file or the keys are missing, so
+    a consumer's `if col in df.columns` guard drops the row instead of showing
+    a column of zeros. See _SI_PATH for why the engineered `Score_Involvements`
+    is not the same quantity and must not stand in for this one.
+    """
+    if df is None or not os.path.exists(_SI_PATH):
+        return df
+    if 'ID' not in df.columns or 'Round_num' not in df.columns:
+        return df
+    si = pd.read_csv(_SI_PATH, usecols=['Season', 'Round_num', 'ID', _SI_COL])
+    si = si[si['Season'] == season].drop(columns='Season')
+    # The right side of a left merge must be unique on the key or it multiplies
+    # the left row instead of annotating it. build_score_involvements.py already
+    # guarantees this; the second line of defence is here because a stale file
+    # written before that guarantee row-multiplies silently rather than erring.
+    si = si.drop_duplicates(['Round_num', 'ID'])
+    if si.empty:
+        return df
+    out = df.copy()
+    out['_si_id'] = pd.to_numeric(out['ID'], errors='coerce')
+    si['ID'] = si['ID'].astype('int64')
+    out = out.merge(si.rename(columns={'ID': '_si_id'}),
+                    on=['_si_id', 'Round_num'], how='left')
+    return out.drop(columns='_si_id')
 
 # ── Rounded 3-2-1 board ───────────────────────────────────────
 # A second way to READ the same predictions, not a second model. Each game's
@@ -1550,9 +1580,28 @@ def load_season_projection():
 _STAT_FILTER_COLS = (
     'Player_Name', 'Season', 'Round_num', 'Playing.for', 'Team', 'Brownlow.Votes',
     'Is_Win', 'Is_Loss', 'Disposals', 'Goals', 'Kicks', 'Clearances',
-    'Contested.Possessions', 'Coaches_Votes', 'Tackles', 'Score_Involvements',
+    'Contested.Possessions', 'Coaches_Votes', 'Tackles',
     'RatingPoints', 'Exp_Votes', 'ID',
 )
+
+# Real Score Involvements, joined on Season + Round_num + ID, built by
+# build_score_involvements.py from footywire's advanced match tables.
+#
+# This page used to filter on `Score_Involvements`, which is NOT the AFL stat
+# of that name: features.add_row_stats() defines it as Goals + Goal.Assists +
+# Marks.Inside.50 + Inside.50s, which double counts a marked goal and omits
+# every possession in a scoring chain. It lands in the same 6-to-9 per game
+# range as the real thing for a midfielder, so the label read as correct for as
+# long as it was there. The engineered column keeps its name and its definition
+# because it is one of the 93 features in predictions/features.pkl; it is just
+# no longer shown to anyone as a score involvement.
+#
+# Coverage starts in 2015, measured: footywire's advanced table carries no SI
+# column before it. Nothing special-cases that season here. `floors` below is
+# computed from the first season each column is non-null, so the page's own
+# season clamp picks it up the same way it picks up every other stat's floor.
+_SI_PATH = "data_advanced/score_involvements.csv"
+_SI_COL = 'Score_Involvements_Actual'
 
 # Where the 1990-2006 game_level files live. Deliberately not predictions/:
 # AVAILABLE_SEASONS is built by scanning that directory for season_*.csv and it
@@ -1567,7 +1616,7 @@ _GAME_LEVEL_RE = re.compile(r"^game_level_(\d{4})\.csv$")
 # The nine Stat Filter sliders, by column. Anything not listed carries no floor.
 _SF_SLIDER_COLS = (
     'Disposals', 'Goals', 'Kicks', 'Clearances', 'Contested.Possessions',
-    'Coaches_Votes', 'Tackles', 'Score_Involvements', 'RatingPoints',
+    'Coaches_Votes', 'Tackles', _SI_COL, 'RatingPoints',
 )
 
 # Columns the career Player Profile path reads — the union of what the profile
@@ -1691,6 +1740,20 @@ def _load_stat_filter_frame():
     g = g[g['ID'].notna()].copy()
     g['ID'] = g['ID'].astype('int64')
 
+    # Real Score Involvements. Merged before floors are measured, so the column
+    # declares its own 2015 start the same way every other stat does. A missing
+    # file leaves the column absent rather than zero-filled: the slider block
+    # and the floors loop both skip a column that is not there, so the page
+    # loses the filter instead of quietly offering one that answers nothing.
+    si_rows = 0
+    if os.path.exists(_SI_PATH):
+        _si = pd.read_csv(_SI_PATH, usecols=['Season', 'Round_num', 'ID', _SI_COL])
+        _si['ID'] = _si['ID'].astype('int64')
+        # Unique on the merge key, or the merge inflates. See _attach_real_si.
+        _si = _si.drop_duplicates(['Season', 'Round_num', 'ID'])
+        g = g.merge(_si, on=['Season', 'Round_num', 'ID'], how='left')
+        si_rows = int(g[_SI_COL].notna().sum())
+
     # Measured, not declared. A hardcoded floor table drifts the moment the
     # converter's column set changes, and the season clamp is only honest if
     # the floor it enforces is the one the data actually has.
@@ -1746,6 +1809,7 @@ def _load_stat_filter_frame():
 
     meta = {
         'null_ids_dropped': null_ids,
+        'si_rows': si_rows,
         'floors': floors,
         'labels': labels,
         'per_dir': per_dir,
@@ -4757,7 +4821,7 @@ if _page == 'Player Profile':
                         ('Clearances / game', 'Clearances'),
                         ('Tackles / game', 'Tackles'),
                         ('Goals / game', 'Goals'),
-                        ('Score involvements / game', 'Score_Involvements'),
+                        ('Score involvements / game', _SI_COL),
                     ]:
                         if _col in game_df.columns:
                             _so += _mirror_row(_lbl, _cmp_mean(_cg1, _col), _cmp_mean(_cg2, _col), _fmt_mean)
@@ -5616,7 +5680,13 @@ def _render_stat_filter():
             min_coaches = st.slider("Min coaches votes", 0, 10, 0, 1, key="sf_cv")
             min_tackles = st.slider("Min tackles", 0, 12, 0, 1, key="sf_tack")
         with col3:
-            min_score_inv = st.slider("Min score involvements", 0, 15, 0, 1, key="sf_si")
+            # Ceiling 20, not the 15 the engineered column used. Real score
+            # involvements top out at 21 per game and 15 is only the 99.9th
+            # percentile, so the old range could not reach the best games of
+            # the stat that now sits behind this slider.
+            min_score_inv = (
+                st.slider("Min score involvements", 0, 20, 0, 1, key="sf_si")
+                if _SI_COL in hist.columns else 0)
             has_rating = 'RatingPoints' in hist.columns
             min_rating = st.slider("Min Wheelo rating pts", 0, 100, 0, 1, key="sf_rating") if has_rating else 0
 
@@ -5633,7 +5703,7 @@ def _render_stat_filter():
                 ('Contested possessions', 'Contested.Possessions', min_contested, 0, 25),
                 ('Coaches votes', 'Coaches_Votes', min_coaches, 0, 10),
                 ('Tackles', 'Tackles', min_tackles, 0, 12),
-                ('Score involvements', 'Score_Involvements', min_score_inv, 0, 15),
+                ('Score involvements', _SI_COL, min_score_inv, 0, 20),
             ]
             if has_rating:
                 _stat_sliders.append(('Wheelo rating pts', 'RatingPoints', min_rating, 0, 100))
