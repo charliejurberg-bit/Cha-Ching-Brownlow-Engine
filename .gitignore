@@ -57,3 +57,10 @@ _tmp/
 # Selenium download scratch for the Wheelo match-stats fetch. Cleared at the
 # start of every round fetch; the parsed result lands in wheelo_2026.csv.
 data_wheelo/downloads/
+
+# Root-level pickles are interactive-session scratch, never source. Eight of
+# them (car, d, g, gaps, gd, m, tq, wh) were cached recon DataFrames that got
+# staged by a bare `git add`: 215 MB, no .py file in the repo referencing any of
+# them, and permanent once committed. The model artifacts live in predictions/
+# and are deliberately not covered by this rule.
+/*.pkl
