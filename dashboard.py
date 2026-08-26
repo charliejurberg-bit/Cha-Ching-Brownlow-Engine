@@ -4001,6 +4001,50 @@ SCOPE .lb-bar-lo{text-align:right;}
 .lb-table .lb-fc-dot{position:absolute;top:50%;width:8px;height:8px;border-radius:50%;background:var(--emerald);transform:translate(-50%,-50%);box-shadow:0 0 0 2px var(--bg);}
 .lb-table .lb-fc-labels{position:relative;height:12px;margin-top:4px;}
 .lb-table .lb-fc-lo,.lb-table .lb-fc-hi{position:absolute;top:0;font-family:'IBM Plex Mono',monospace;font-size:9px;color:var(--muted);transform:translateX(-50%);white-space:nowrap;}
+/* Narrow viewports. The desktop widths freeze 295px of sticky Rank + Player,
+   which on a 390px phone leaves a 65px scroll window: NARROWER THAN THE 78px
+   Exp Votes column, so that column could not be brought fully on screen at any
+   scroll position, and the 25-round grid showed 2.5 columns at a time. Shrinking
+   the frozen pair to 154px opens the window to ~206px. Nothing here applies
+   above the breakpoint. */
+@media (max-width:700px){
+  .lb-table .lb-tbl{min-width:var(--tbl-min-sm,760px)!important;}
+  .lb-table .lb-tbl col.c-rank{width:34px!important;}
+  .lb-table .lb-tbl col.c-clubrank{width:30px!important;}
+  .lb-table .lb-tbl col.c-player{width:120px!important;}
+  .lb-table .lb-tbl col.c-gp{width:30px!important;}
+  .lb-table .lb-tbl col.c-votes{width:58px!important;}
+  .lb-table .lb-tbl col.c-actual{width:58px!important;}
+  .lb-table .lb-tbl col.c-diff{width:52px!important;}
+  /* Sticky offsets are absolute px and must track the widths above, or the
+     frozen columns overlap each other. 34 = Rank; 64 = Rank + club rank. */
+  .lb-table .lb-tbl th.stick2,.lb-table .lb-tbl td.stick2{left:34px;}
+  .lb-table .lb-tbl th.stick3,.lb-table .lb-tbl td.stick3{left:64px;}
+  /* Floor-Ceiling collapses to nothing rather than display:none. Hiding a cell
+     REMOVES it from the row, and every later cell then inherits the previous
+     column's width from the colgroup, so the whole round grid would shift one
+     slot left. Zero width keeps the cell, and the alignment with it. */
+  .lb-table .lb-tbl col.c-fc{width:0!important;}
+  /* nowrap matters as much as the zero width. th carries white-space:normal,
+     so "FLOOR-CEILING" inside a 0px cell wraps to one character per line and
+     drags the header row to ~166px, taller than it is on desktop. One line,
+     clipped by overflow, keeps the row its proper height. */
+  .lb-table .lb-tbl th.fc-cell,.lb-table .lb-tbl td.fc-cell{width:0!important;padding-left:0!important;padding-right:0!important;overflow:hidden!important;border-left:0!important;white-space:nowrap!important;}
+  .lb-table .lb-tbl .lb-fc{display:none!important;}
+  .lb-table .lb-tbl th{font-size:9px;letter-spacing:.08em;padding:9px 6px;}
+  /* The frozen headings must not wrap. "RANK" at 9px does not fit 34px minus
+     padding, and a wrapped heading drags the whole header row taller on the
+     one screen with the least height to spare. Tighter padding and nowrap; the
+     column is narrow enough that ellipsis never triggers on these three. */
+  .lb-table .lb-tbl th.stick1,.lb-table .lb-tbl th.stick2,.lb-table .lb-tbl th.stick3{white-space:nowrap;padding-left:4px;padding-right:4px;}
+  .lb-table .lb-tbl td.stick1,.lb-table .lb-tbl td.stick2,.lb-table .lb-tbl td.stick3{padding-left:4px;padding-right:4px;}
+  .lb-table .lb-tbl td{font-size:13px;padding:9px 6px;}
+  .lb-table .lb-tbl th.rd,.lb-table .lb-tbl td.rd{padding:9px 2px;}
+  .lb-table .lb-tbl th.rd{font-size:8px;}
+  .lb-table .lb-tbl td.rd{font-size:11px;}
+  .lb-table .lb-pname{font-size:13px;}
+  .lb-table .lb-ttag{font-size:10px;margin-left:4px;}
+}
 """).replace('\n', '')
 
     # The club-position column exists only while a club is selected. On "All" it
@@ -4018,7 +4062,7 @@ SCOPE .lb-bar-lo{text-align:right;}
     if is_2026:
         _heads = _rank_heads + [('Player', _pcell), ('GP', ''), (_lb_votes_head, '')]
         if has_fc:
-            _heads.append(('Floor–Ceiling', 'lft'))
+            _heads.append(('Floor–Ceiling', 'lft fc-cell'))
     else:
         _heads = _rank_heads + [('Player', _pcell), ('GP', ''), (_lb_votes_head, ''),
                                 ('Actual', ''), ('Diff', '')]
@@ -4039,16 +4083,23 @@ SCOPE .lb-bar-lo{text-align:right;}
     # takes a flat 175px, and the rounds absorb the rest.
     #
     # Order here MUST track _heads exactly, hence the same three conditionals.
-    _cols = [70] + ([40] if _show_club_rank else []) + [225, 48, 78]
+    #
+    # Each entry is (desktop px, narrow px, class). The class is what the
+    # narrow-viewport media query overrides; the inline width stays as the
+    # desktop default, so nothing changes above the breakpoint.
+    _cols = [(70, 34, 'c-rank')] + ([(40, 30, 'c-clubrank')] if _show_club_rank else [])             + [(225, 120, 'c-player'), (48, 30, 'c-gp'), (78, 58, 'c-votes')]
     if is_2026 and has_fc:
-        _cols.append(175)
+        _cols.append((175, 0, 'c-fc'))       # collapses on a phone, see the CSS
     if not is_2026:
-        _cols += [80, 68]
-    _colgroup = (''.join(f'<col style="width:{_w}px">' for _w in _cols)
-                 + '<col>' * len(_rd_rounds))
+        _cols += [(80, 58, 'c-actual'), (68, 52, 'c-diff')]
+    _colgroup = (''.join(f'<col class="{_c}" style="width:{_w}px">'
+                         for _w, _m, _c in _cols)
+                 + '<col class="c-rd">' * len(_rd_rounds))
     # Floor under which the round columns stop shrinking and the wrap scrolls
-    # sideways instead. 26px holds "2.1" at 10px with its 3px padding.
-    _tbl_min = sum(_cols) + 26 * len(_rd_rounds)
+    # sideways instead. 26px holds "2.1" at 10px with its 3px padding; 22px is
+    # the same figure at the narrow viewport's smaller round font.
+    _tbl_min = sum(_w for _w, _m, _c in _cols) + 26 * len(_rd_rounds)
+    _tbl_min_sm = sum(_m for _w, _m, _c in _cols) + 22 * len(_rd_rounds)
 
     def _th(lbl, cls):
         return f'<th class="{cls}">{lbl}</th>' if cls else f'<th>{lbl}</th>'
@@ -4097,7 +4148,8 @@ SCOPE .lb-bar-lo{text-align:right;}
         st.markdown(
             f'<div class="lb-table"><style>{_LB_TBL_CSS}</style>'
             f'<div class="lb-tbl-wrap">'
-            f'<table class="lb-tbl" style="min-width:{_tbl_min}px">'
+            f'<table class="lb-tbl" style="min-width:{_tbl_min}px;'
+            f'--tbl-min-sm:{_tbl_min_sm}px">'
             f'<colgroup>{_colgroup}</colgroup>'
             f'<thead><tr>{_ths}</tr></thead><tbody>{"".join(_rows)}</tbody>'
             f'</table></div></div>',
