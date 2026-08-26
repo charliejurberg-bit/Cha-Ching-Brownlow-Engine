@@ -39,6 +39,8 @@ import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
 
 MIN_GAMES = 12
+SI_PATH = "data_advanced/score_involvements.csv"
+SI_COL = "Score_Involvements_Actual"
 OUT_DIR = "drafts"
 # 4:5 portrait, not 16:9. Twitter renders an in-timeline image at roughly 350px
 # wide on a phone WHATEVER its aspect, so horizontal resolution is fixed and the
@@ -106,14 +108,42 @@ def set_fonts(name):
         raise SystemExit(f"--font must be one of {', '.join(FONT_SETS)}")
     FONTS = dict(FONT_SETS[name])
 
-# Labels are lines, not strings: at a legible size "CONTESTED POSSESSIONS" does
-# not fit one line beside three number columns, and shortening it to "CONTESTED"
-# loses what the stat is.
-ROWS = [(["DISPOSALS"], "disp", "{:.1f}"),
-        (["CONTESTED", "POSSESSIONS"], "cp", "{:.1f}"),
-        (["CLEARANCES"], "clr", "{:.1f}"),
-        (["COACHES", "VOTES"], "cv", "{:.0f}"),
-        (["BROWNLOW", "VOTES"], "bv", "{:.0f}")]
+# Every candidate stat, with the label split into lines because at a legible
+# size "CONTESTED POSSESSIONS" will not fit one line beside the number columns.
+# Which of these a card shows is CHOSEN PER PLAYER, see pick_stats: a fixed five
+# rows says the same thing about a tagger, a ruck and a small forward, and
+# usually says the wrong thing about two of them.
+CATALOGUE = [
+    (["DISPOSALS"],              "Disposals",               "{:.1f}"),
+    (["CONTESTED", "POSSESSIONS"], "Contested.Possessions", "{:.1f}"),
+    (["CLEARANCES"],             "Clearances",              "{:.1f}"),
+    (["TACKLES"],                "Tackles",                 "{:.1f}"),
+    (["GOALS"],                  "Goals",                   "{:.1f}"),
+    (["MARKS"],                  "Marks",                   "{:.1f}"),
+    (["INSIDE 50s"],             "Inside.50s",              "{:.1f}"),
+    (["KICKS"],                  "Kicks",                   "{:.1f}"),
+    (["HANDBALLS"],              "Handballs",               "{:.1f}"),
+    (["MARKS", "INSIDE 50"],     "Marks.Inside.50",         "{:.1f}"),
+    (["CONTESTED", "MARKS"],     "Contested.Marks",         "{:.1f}"),
+    (["GOAL", "ASSISTS"],        "Goal.Assists",            "{:.1f}"),
+    (["REBOUND 50s"],            "Rebounds",                "{:.1f}"),
+    (["ONE", "PERCENTERS"],      "One.Percenters",          "{:.1f}"),
+    (["HIT-OUTS"],               "Hit.Outs",                "{:.1f}"),
+    # The REAL AFL stat, joined from data_advanced/score_involvements.csv.
+    # NOT features.py's `Score_Involvements`, which is a model feature defined as
+    # Goals + Goal.Assists + Marks.Inside.50 + Inside.50s: it double counts a
+    # marked goal, omits every possession in a scoring chain, and lands in the
+    # same 6-to-9 range for a midfielder, so the wrong number looks right. Never
+    # show that one to a reader as a score involvement. Coverage starts 2015,
+    # which covers every season a countdown card compares.
+    (["SCORE", "INVOLVEMENTS"],  "Score_Involvements_Actual", "{:.1f}"),
+]
+# Always shown, in this order, after the chosen stats. Coaches votes are an
+# independent read on the same season and Brownlow votes are the whole point of
+# the countdown, so neither competes for a slot.
+ALWAYS = [(["COACHES", "VOTES"], "cv", "{:.0f}"),
+          (["BROWNLOW", "VOTES"], "bv", "{:.0f}")]
+N_PICK = 4
 
 
 def ordinal(n):
@@ -129,9 +159,10 @@ def _strip_club(s):
     return re.sub(r"\s*\([^)]*\)\s*$", "", str(s)).strip()
 
 
-def gather(player):
-    """Three seasons of figures and league ranks for one player."""
+def gather(player, seasons):
+    """Per-game averages and league ranks for every catalogue stat, per season."""
     first, sur = player.split(" ", 1)
+    cols = [c for _, c, _ in CATALOGUE]
 
     hist = pd.read_csv("fitzroy_stats_all.csv", low_memory=False)
     hist["Season"] = pd.to_numeric(hist["Season"], errors="coerce")
@@ -141,6 +172,16 @@ def gather(player):
     cur = pd.read_csv("data_2026/afltables_2026.csv", low_memory=False)
     cur["Round_num"] = pd.to_numeric(cur["Round"], errors="coerce")
     cur = cur[cur["Round_num"].notna()]
+    cur["Season"] = 2026
+
+    # Real score involvements ride in on Season + Round_num + ID. Deduped before
+    # the merge: a repeated key on the RIGHT of a left join multiplies the left
+    # row instead of annotating it. Absent seasons simply lose the stat, and
+    # pick_stats skips a column it cannot rank.
+    _si = pd.read_csv(SI_PATH, usecols=["Season", "Round_num", "ID", SI_COL])
+    _si = _si.drop_duplicates(["Season", "Round_num", "ID"])
+    hist = hist.merge(_si, on=["Season", "Round_num", "ID"], how="left")
+    cur = cur.merge(_si, on=["Season", "Round_num", "ID"], how="left")
 
     cvh = pd.read_csv("coaches_votes_all.csv", low_memory=False)
     cv26 = pd.read_csv("data_2026/coaches_votes_2026.csv")
@@ -150,13 +191,11 @@ def gather(player):
                     cv26[["Season", "p", "Coaches.Votes"]]])
 
     out = {}
-    for yr, src in ((2024, hist[hist.Season == 2024]),
-                    (2025, hist[hist.Season == 2025]),
-                    (2026, cur)):
+    for yr in seasons:
+        src = cur if yr == 2026 else hist[hist.Season == yr]
         agg = {"sur": ("Surname", "first"), "fn": ("First.name", "first"),
-               "team": ("Playing.for", "last"), "games": ("Round_num", "size"),
-               "disp": ("Disposals", "mean"), "cp": ("Contested.Possessions", "mean"),
-               "clr": ("Clearances", "mean")}
+               "team": ("Playing.for", "last"), "games": ("Round_num", "size")}
+        agg.update({c: (c, "mean") for c in cols if c in src.columns})
         if "Brownlow.Votes" in src.columns:
             agg["bv"] = ("Brownlow.Votes", "sum")
         g = src.groupby("ID").agg(**agg)
@@ -165,17 +204,17 @@ def gather(player):
             raise SystemExit(f"{player} has no {yr} home-and-away games in the archive.")
         pid = hit.index[0]
         q = g[g.games >= MIN_GAMES]
-        r = {c: int(q[c].rank(ascending=False, method="min")[pid]) for c in
-             ("disp", "cp", "clr")}
         row = g.loc[pid]
 
         cy = CV[CV.Season == yr].groupby("p")["Coaches.Votes"].sum()
         cvt = float(cy.get(player, 0))
         rec = {"team": str(row.team), "games": int(row.games), "qualified": len(q),
-               "disp": float(row.disp), "disp_r": r["disp"],
-               "cp": float(row.cp), "cp_r": r["cp"],
-               "clr": float(row.clr), "clr_r": r["clr"],
+               "val": {}, "rank": {},
                "cv": cvt, "cv_r": int((cy > cvt).sum()) + 1}
+        for c in cols:
+            if c in g.columns:
+                rec["val"][c] = float(row[c])
+                rec["rank"][c] = int(q[c].rank(ascending=False, method="min")[pid])
         if yr < 2026:
             rec["bv"] = float(row.bv)
             rec["bv_r"] = None
@@ -184,9 +223,56 @@ def gather(player):
             m = proj[proj.Player_Name == player]
             rec["bv"] = float(m.Exp_Total_Votes.iloc[0]) if len(m) else 0.0
             rec["bv_r"] = None
-            rec["bv_exp"] = True
         out[yr] = rec
     return out
+
+
+# A stat earns its slot by being one this player is actually GOOD at, then by
+# how far he moved. Strength gates and improvement ranks, in that order: a stat
+# he improved at while staying ordinary says nothing worth a row, and a stat he
+# is elite at says plenty even if it did not move (Clayton Oliver leading the
+# league for contested ball is the case). ELIGIBLE is the gate in percentile
+# terms, so it means the same thing in a 408-player field as a 433-player one.
+#
+# STRENGTH IS CUBED, and that is the whole fix. Linear strength barely separates
+# 10th from 79th in a 408-man field (0.98 against 0.81), so a big climb through
+# the pack outscored genuine quality: Shai Bolton's tackles went 193rd to 79th
+# and beat his being 10th in the AFL for score involvements onto the card.
+# Cubing spreads the top end (0.94 against 0.53) so improvement decides between
+# strong stats rather than dragging a mediocre one in.
+# The gate is top 12%, roughly top 50 in a 408-man field, because a row has to
+# earn its space. Bolton's handballs at 53rd cleared an 18% gate and said
+# nothing: his real story is 3rd, 5th and 10th in the AFL, and a fourth row of
+# "53rd" only diluted it. Cards therefore show 3 or 4 stats, not always 4.
+ELIGIBLE = 0.12
+MIN_PICK = 3                     # relax the gate rather than ship a sparse card
+W_STRENGTH, W_IMPROVE = 0.55, 0.45
+
+
+def pick_stats(d, seasons):
+    prev, cur = seasons[-2], seasons[-1]
+    n = d[cur]["qualified"]
+    scored = []
+    for lines, col, fmt in CATALOGUE:
+        rc = d[cur]["rank"].get(col)
+        if rc is None or rc > n * ELIGIBLE:
+            continue
+        rp = d[prev]["rank"].get(col)
+        strength = (1 - (rc - 1) / n) ** 3
+        improve = max((rp - rc) / d[prev]["qualified"], 0) if rp else 0.0
+        scored.append((W_STRENGTH * strength + W_IMPROVE * improve,
+                       lines, col, fmt))
+    scored.sort(key=lambda x: -x[0])
+    picked = [(l, c, f) for _, l, c, f in scored[:N_PICK]]
+    if len(picked) < MIN_PICK:
+        # Too few cleared the gate. Fall back to the best available by rank
+        # alone, so a card never renders with one row, but keep the order.
+        have = {c for _, c, _ in picked}
+        rest = sorted(((d[cur]["rank"].get(c, 10 ** 6), l, c, f)
+                       for l, c, f in CATALOGUE if c not in have
+                       and c in d[cur]["rank"]))
+        picked += [(l, c, f) for _, l, c, f in rest[:MIN_PICK - len(picked)]]
+    return picked
 
 
 ABBR = {"Greater Western Sydney": "GWS", "Western Bulldogs": "WESTERN BULLDOGS",
@@ -195,75 +281,79 @@ ABBR = {"Greater Western Sydney": "GWS", "Western Bulldogs": "WESTERN BULLDOGS",
         "Gold Coast": "GOLD COAST", "St Kilda": "ST KILDA"}
 
 
-def draw(player, place, tagline, d):
+def draw(player, place, tagline, d, seasons, picked):
     img = Image.new("RGB", (W * S, H * S), BG)
     k = ImageDraw.Draw(img)
-    m = 56 * S
-    right = (W - 56) * S
-    years = [2024, 2025, 2026]
-
+    m, right = 56 * S, (W - 56) * S
+    rows = picked + ALWAYS
     lab_w = 320 * S
     col_x0 = m + lab_w
-    col_w = (right - col_x0) // 3
-    centre = [col_x0 + col_w * i + col_w // 2 for i in range(3)]
+    ncol = len(seasons)
+    col_w = (right - col_x0) // ncol
+    centre = [col_x0 + col_w * i + col_w // 2 for i in range(ncol)]
 
     def text(xy, t, f, fill, anchor="la"):
         k.text(xy, t, font=f, fill=fill, anchor=anchor)
 
-    # The current season is a faint lift and a hairline above it. No fill, no
-    # border, no pill anywhere on the card: at timeline size the emerald figures
-    # already carry the eye, and boxing them as well is what made it shout.
-    cx0 = col_x0 + col_w * 2
+    cur_i = len(seasons) - 1
+    cx0 = col_x0 + col_w * cur_i
     PANEL_TOP, PANEL_BOT = 282 * S, 1372 * S
-    k.rectangle([cx0, PANEL_TOP, right, PANEL_BOT], fill=PANEL)
-    k.rectangle([cx0, PANEL_TOP, right, PANEL_TOP + 3 * S], fill=EMERALD)
+    k.rectangle([cx0, PANEL_TOP, cx0 + col_w, PANEL_BOT], fill=PANEL)
+    k.rectangle([cx0, PANEL_TOP, cx0 + col_w, PANEL_TOP + 3 * S], fill=EMERALD)
 
     text((m, 44 * S), "CHA CHING", font("display", 29), EMERALD)
     text((right, 44 * S), f"BROWNLOW COUNTDOWN   {ordinal(place).upper()}",
          font("display", 29), MUTED, anchor="ra")
     k.rectangle([m, 100 * S, right, 101 * S], fill=LINE)
-
     text((m, 132 * S), player.upper(), font("name", 80), INK)
-    text((m, 234 * S), tagline, font("body", 33), MUTED)
+    if tagline:
+        text((m, 234 * S), tagline, font("body", 33), MUTED)
 
-    for i, yr in enumerate(years):
-        cur = yr == 2026
+    for i, yr in enumerate(seasons):
+        cur = i == cur_i
         text((centre[i], 302 * S), str(yr), font("display", 45),
              EMERALD if cur else INK, anchor="ma")
         club = ABBR.get(d[yr]["team"], d[yr]["team"].upper())
         text((centre[i], 360 * S), club, font("display", 25), MUTED, anchor="ma")
-        text((centre[i], 392 * S), f"{d[yr]['games']} GAMES", font("display", 23),
+        text((centre[i], 394 * S), f"{d[yr]['games']} GAMES", font("display", 23),
              MUTED, anchor="ma")
     k.rectangle([m, 430 * S, right, 431 * S], fill=LINE)
 
-    top, rh = 450 * S, 184 * S
-    for ri, (lines, key, fmt) in enumerate(ROWS):
+    top = 452 * S
+    rh = int((1372 * S - top) / len(rows))
+    for ri, (lines, key, fmt) in enumerate(rows):
         y = top + ri * rh
         if ri:
             k.rectangle([m, y - 12 * S, right, y - 11 * S], fill=LINE)
-        ly = y + (46 if len(lines) == 1 else 24) * S
+        ly = y + (int(rh / S * 0.24) if len(lines) == 1 else int(rh / S * 0.11)) * S
         for li, ln in enumerate(lines):
             text((m, ly + li * 44 * S), ln, font("display", 37), INK)
-        for i, yr in enumerate(years):
-            cur = yr == 2026
-            rec = d[yr]
-            val = f"{rec['bv']:.1f}" if (key == "bv" and cur) else fmt.format(rec[key])
-            text((centre[i], y + 16 * S), val, font("fig", 78),
-                 EMERALD if cur else INK, anchor="ma")
-            # Rank rides under the figure as plain text. Legibility comes from
-            # size and a light enough ink, not from a box: 38px is 11px once
-            # Twitter has scaled the card, and RANK_INK holds ~6:1 on this
-            # ground. The pills these replaced were the tacky part.
-            rk = rec.get(key + "_r")
-            if rk:
-                text((centre[i], y + 112 * S), ordinal(rk), font("display", 38),
-                     EMERALD if cur else RANK_INK, anchor="ma")
-            elif key == "bv" and cur:
-                text((centre[i], y + 112 * S), "EXPECTED", font("display", 30),
-                     EMERALD, anchor="ma")
-    k.rectangle([m, PANEL_BOT + 14 * S, right, PANEL_BOT + 15 * S], fill=LINE)
 
-    pool = " / ".join(str(d[y]["qualified"]) for y in years)
+        def value_of(yr):
+            r = d[yr]
+            if key in ("cv", "bv"):
+                return r[key]
+            return r["val"].get(key)
+
+        for i, yr in enumerate(seasons):
+            cur = i == cur_i
+            v = value_of(yr)
+            if v is None:
+                continue
+            txt = f"{v:.1f}" if (key == "bv" and yr == 2026) else fmt.format(v)
+            text((centre[i], y + int(rh / S * 0.10) * S), txt, font("fig", 74),
+                 EMERALD if cur else INK, anchor="ma")
+            rk = (d[yr]["rank"].get(key) if key not in ("cv", "bv")
+                  else (d[yr]["cv_r"] if key == "cv" else None))
+            if rk:
+                text((centre[i], y + int(rh / S * 0.56) * S), ordinal(rk),
+                     font("display", 36), EMERALD if cur else RANK_INK, anchor="ma")
+            elif key == "bv" and yr == 2026:
+                text((centre[i], y + int(rh / S * 0.56) * S), "EXPECTED",
+                     font("display", 29), EMERALD, anchor="ma")
+
+    k.rectangle([m, PANEL_BOT + 14 * S, right, PANEL_BOT + 15 * S], fill=LINE)
+    pool = " / ".join(str(d[y]["qualified"]) for y in seasons)
     text((m, 1404 * S),
          f"Ranks among players with {MIN_GAMES}+ home-and-away games that season",
          font("body", 25), MUTED)
@@ -274,17 +364,6 @@ def draw(player, place, tagline, d):
     os.makedirs(OUT_DIR, exist_ok=True)
     slug = re.sub(r"[^a-z0-9]+", "_", player.lower()).strip("_")
     path = os.path.join(OUT_DIR, f"countdown_{place:02d}_{slug}.png")
-    # Save the FULL canvas, W*S by H*S. This used to downsample to W by H first,
-    # which threw the resolution away for nothing: the card was drawn at 2400x3000
-    # and saved at 1200x1500, so it went soft the moment anyone tapped it to
-    # full-screen (an iPad needs ~1668px across, a desktop ~1800). PIL renders the
-    # type antialiased at the real size, so there is no quality argument for the
-    # downsample either.
-    #
-    # It stays a PNG on X at this size: 2400x3000 comes to ~260KB, under the
-    # ~900KB above which X re-encodes to JPEG, and JPEG on small text over a dark
-    # ground is exactly where ringing artefacts show. Do not add a quantise step
-    # to shrink it further; there is no need and it would chew the type edges.
     img.save(path, "PNG", optimize=True)
     prev = os.path.join(OUT_DIR, f"countdown_{place:02d}_{slug}_timeline.png")
     img.resize((350, int(350 * H / W)), Image.LANCZOS).save(prev, "PNG")
@@ -296,21 +375,24 @@ def main():
     ap.add_argument("player")
     ap.add_argument("place", type=int)
     ap.add_argument("--tagline", default="")
-    ap.add_argument("--font", default="twcen",
-                    help=", ".join(FONT_SETS))
+    ap.add_argument("--font", default="twcen", help=", ".join(FONT_SETS))
+    ap.add_argument("--seasons", type=int, default=2, choices=(2, 3),
+                    help="2 = 2025 v 2026 (default), 3 = adds 2024")
     a = ap.parse_args()
     set_fonts(a.font)
-    d = gather(a.player)
-    p, prev = draw(a.player, a.place, a.tagline, d)
+    seasons = [2024, 2025, 2026][-a.seasons:]
+    d = gather(a.player, seasons)
+    picked = pick_stats(d, seasons)
+    p, prev = draw(a.player, a.place, a.tagline, d, seasons, picked)
     print(f"OK  wrote {p}")
     print(f"    timeline preview (what Twitter shows on a phone): {prev}")
-    for yr in (2024, 2025, 2026):
+    print("    chosen: " + ", ".join(" ".join(l) for l, _, _ in picked))
+    for yr in seasons:
         r = d[yr]
-        print(f"    {yr} {r['team'][:22]:<23} {r['games']:>2}g  "
-              f"disp {r['disp']:>5.1f} ({ordinal(r['disp_r']):>5})  "
-              f"cp {r['cp']:>5.1f} ({ordinal(r['cp_r']):>5})  "
-              f"clr {r['clr']:>4.1f} ({ordinal(r['clr_r']):>5})  "
-              f"cv {r['cv']:>3.0f} ({ordinal(r['cv_r']):>5})  bv {r['bv']:.1f}")
+        bits = [f"{c.split('.')[0][:9]} {r['val'][c]:.1f}({ordinal(r['rank'][c])})"
+                for _, c, _ in picked if c in r["val"]]
+        print(f"    {yr} {r['team'][:20]:<21}{r['games']:>2}g  " + "  ".join(bits)
+              + f"  cv {r['cv']:.0f}({ordinal(r['cv_r'])})  bv {r['bv']:.1f}")
     return 0
 
 
