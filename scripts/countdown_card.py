@@ -41,6 +41,10 @@ from PIL import Image, ImageDraw, ImageFont
 MIN_GAMES = 12
 SI_PATH = "data_advanced/score_involvements.csv"
 SI_COL = "Score_Involvements_Actual"
+# Everything data_advanced carries that is a performance stat. Time_On_Ground_Pct
+# is deliberately NOT here: a high TOG is a role, not an achievement, and ranking
+# by it would put players who never leave the ground above players who are good.
+ADV_COLS = [SI_COL, "Metres_Gained", "Intercepts"]
 OUT_DIR = "drafts"
 # 4:5 portrait, not 16:9. Twitter renders an in-timeline image at roughly 350px
 # wide on a phone WHATEVER its aspect, so horizontal resolution is fixed and the
@@ -137,6 +141,10 @@ CATALOGUE = [
     # show that one to a reader as a score involvement. Coverage starts 2015,
     # which covers every season a countdown card compares.
     (["SCORE", "INVOLVEMENTS"],  "Score_Involvements_Actual", "{:.1f}"),
+    # Also from data_advanced, 2015 onward. Metres gained runs in the hundreds
+    # so it formats without a decimal.
+    (["METRES", "GAINED"],       "Metres_Gained",           "{:.0f}"),
+    (["INTERCEPTS"],             "Intercepts",              "{:.1f}"),
 ]
 # Always shown, in this order, after the chosen stats. Coaches votes are an
 # independent read on the same season and Brownlow votes are the whole point of
@@ -178,7 +186,8 @@ def gather(player, seasons):
     # the merge: a repeated key on the RIGHT of a left join multiplies the left
     # row instead of annotating it. Absent seasons simply lose the stat, and
     # pick_stats skips a column it cannot rank.
-    _si = pd.read_csv(SI_PATH, usecols=["Season", "Round_num", "ID", SI_COL])
+    _si = pd.read_csv(SI_PATH,
+                      usecols=["Season", "Round_num", "ID"] + ADV_COLS)
     _si = _si.drop_duplicates(["Season", "Round_num", "ID"])
     hist = hist.merge(_si, on=["Season", "Round_num", "ID"], how="left")
     cur = cur.merge(_si, on=["Season", "Round_num", "ID"], how="left")
