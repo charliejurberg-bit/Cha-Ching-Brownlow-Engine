@@ -108,7 +108,7 @@ never engages. Keep that predicate NaN safe in any rewrite.
 
 ```
 brownlow_engine/
-├── dashboard.py          # Main Streamlit app — 7,838 lines. Brownlow pages + hub
+├── dashboard.py          # Main Streamlit app — 8,674 lines. Brownlow pages + hub
 │                         #   router + global CSS. NOT all pages: the Betting Hub
 │                         #   pages render from betting_hub.py (except Predictions)
 ├── betting_hub.py        # Betting Hub module, imported by dashboard.py
@@ -123,7 +123,12 @@ brownlow_engine/
 │                         #   ONLY source of real Score Involvements. See
 │                         #   "Score involvements" below before touching it
 ├── build_score_involvements.py  # Joins the above onto fitzRoy IDs. Refuses to
-│                         #   write below a 98% match rate
+│                         #   write below a 98% match rate; all twelve seasons
+│                         #   currently join at 100.00%
+├── fixture_recon.py      # Per-fixture PLAYER-level recon (blocks 1-8 of
+│                         #   fixture_recon_spec.md) → gitignored drafts/. Review
+│                         #   material, never post-ready. Team-level records are
+│                         #   team_h2h.py's, not duplicated here
 ├── data_pull.py          # EMPTY, 0 bytes. Not a fetcher. The R paths that do
 │                         #   work are fetch_extended_data.R and scripts/build_history.R
 ├── fetch_extended_data.R # R script for fitzRoy data (coaches votes etc.)
@@ -145,6 +150,13 @@ brownlow_engine/
 │   │                     #   centre clearances, effective disposals, TOG%
 │   ├── advanced_<season>.csv        # One per season, as scraped
 │   └── score_involvements.csv       # Joined to Season + Round_num + ID
+│
+├── data_history/         # Pre-2007 archives. game_level_1990..2006.csv live here
+│   │                     #   and NOT in predictions/, because AVAILABLE_SEASONS
+│   │                     #   scans that directory and would offer the season
+│   ├── brownlow_seasons_1924_1983.csv  # SEASON TOTALS only, no game attribution.
+│   │                     #   See "Brownlow votes before 1984" below
+│   └── fitzroy_stats_1965_2006.csv.gz  # Brownlow.Votes all-null before 1984
 │
 ├── data_2026/            # Current season raw data
 │   ├── afltables_2026.csv    # Player stats (from R/fitzRoy)
@@ -240,9 +252,15 @@ Two rules follow, and they pull in opposite directions on purpose.
   it is a retrain, not an edit.
 - **It must never be shown to a reader as a score involvement.** The real stat
   is `Score_Involvements_Actual`, sourced by `scraper_advanced.py` and joined by
-  `build_score_involvements.py`. `round_bests.py` already refuses to rank the
-  engineered column, and says why in a comment worth reading: a record only
-  works as a record when it is the same quantity the rest of the world counts.
+  `build_score_involvements.py`. `round_bests.py` refuses to rank the engineered
+  column, and says why in a comment worth reading: a record only works as a
+  record when it is the same quantity the rest of the world counts. Every
+  reader-facing surface now reads the real column, via `_SI_COL` in
+  `dashboard.py` — the Stat Filter slider and its results table, and the Player
+  Profile Compare tab's "Score involvements / game" row. Both go through
+  `_SI_PATH`; grep `_SI_COL` rather than the literal string. The Stat Filter
+  slider ceiling is 20, not the 15 the engineered column used: the real stat
+  reaches 21 in a game and 15 is only its 99.9th percentile.
 
 **Coverage starts in 2015**, measured rather than assumed: footywire's advanced
 table carries no SI column for 2003 or 2010 through 2014, and does from 2015.
@@ -267,6 +285,39 @@ data before it was caught by a count rather than by reading code:**
    `_heading_to_club` now raises on any club outside `KNOWN_CLUBS`, on the first
    match rather than after 206 requests.
 
+**Two rules the JOIN must keep, both learned from a row count rather than from
+reading code, and both enforced in `build_score_involvements.py`:**
+
+1. **A candidate round is claimed at most once, and a match with no unclaimed
+   candidate is DROPPED rather than placed over one.** Matches are positioned by
+   the club pair they actually were, not by footywire's round label, because the
+   label disagrees in rescheduled cases. But two matches of the same pair are two
+   different games: putting both on one `Round_num` does not merge them, it makes
+   them indistinguishable, and `drop_duplicates('kf')` then hands the round
+   whichever sorted first. footywire files an Essendon v Gold Coast game under
+   its Round 24 that the archive holds no fixture for at that date; nearest
+   candidate placement dropped it onto `Round_num` 18 where the genuine meeting
+   already sat, and 30 of the 32 players in both carried different figures. Half
+   that round was wrong with the build still reporting a pass. Do not relax the
+   claim back to nearest-candidate.
+2. **The archive is the authority on which games happened.** A footywire match
+   the fixture list has no room for cannot be placed, and guessing is worse than
+   the gap. The 2025 case resolves to `Round_num` 1 by elimination, which its own
+   player list confirms: 46 a side, 43 exact, the 3 misses pure name forms
+   (Lachlan/Lachie Weller, Samuel/Sam Collins, Zachary/Zach Merrett).
+
+**`predictions/game_level_*.csv` can carry exactly-duplicated rows, and this is
+NOT fixed at the source.** 2025 has 78 of them (every Essendon and Gold Coast
+player in round 24, listed twice) and 2026 has 89. A duplicate does two kinds of
+damage. On the right side of a left merge it multiplies the left row rather than
+annotating it — the 2025 Stat Filter frame grew 9,561 rows to 9,639 before this
+was caught. And it defeats name matching, which accepts only a key unique on
+BOTH sides, so a player named twice in one round for one club reads as ambiguous
+and is refused. `build_score_involvements.py` dedupes `gl` at load and
+`dashboard.py` dedupes at both merge sites, so the SI path defends itself; every
+other consumer of those files does not. Whatever writes them still emits the
+duplicates.
+
 **No career total of this stat is possible, in either version.** The engineered
 column measures a quantity nobody recognises; the real one starts in 2015, and a
 career total needs the whole career. There is no honest version, so
@@ -275,6 +326,28 @@ rather than redirecting it, and the stale
 `drafts/fewest_games_score_involvements_1000.md` carries a DO NOT POST banner.
 Per-game and per-season figures are fine from 2015 on; it is the career ladder
 that cannot be built.
+
+## Brownlow votes before 1984
+
+**Every per-game vote source in this repo starts in 1984**, and that is a
+boundary in the source rather than a fetch-range choice.
+`data_history/fitzroy_stats_1965_2006.csv.gz` carries `Brownlow.Votes` as
+all-null for 1965 to 1983 and fully populated from 1984 — the earlier rows were
+pulled and came back with kicks and marks present and votes empty. AFLTables'
+own detailed records are titled "Brownlow Records 1984-2025" with no earlier
+equivalent.
+
+`scripts/build_brownlow_seasons.py` (run from the repo root, not from inside
+`scripts/`) fetches AFLTables season totals for 1924 to 1983 into
+`data_history/brownlow_seasons_1924_1983.csv`. **It carries season totals per
+player and never game attribution**, which fixes what it can and cannot support:
+
+- It CAN extend a career-total or season-leader claim back to 1924.
+- It CANNOT extend any opponent-scoped or fixture-scoped claim ("votes against
+  Melbourne", "votes in Carlton v Fremantle"). A season total does not record
+  which game a vote came from, so those claims stay capped at 1984 permanently.
+
+Recon only. Nothing in the model pipeline reads this file.
 
 ## Dashboard pages
 
@@ -426,3 +499,4 @@ Market types: Disposals O/U, Goals O/U, Kicks O/U, Handballs O/U, Marks O/U, Mat
 - **Wheelo merge key**: Player + Team + Season + Round (team required to disambiguate e.g. two players named "Bailey Williams").
 - **Model retrain**: Only needed at start of season or when feature set changes. Predictions (`predict_2026.py`) run weekly after each round.
 - **Odds scraper**: Uses `undetected-chromedriver` (headless Chrome) to bypass Cloudflare on Oddschecker. Fragile — may need `--headless=new` flag updates if site changes.
+- **Root-level `.pkl` files are session scratch and are gitignored** (`/*.pkl`). Eight of them, 215 MB of cached recon DataFrames referenced by no `.py` file in the repo, were once staged by a bare `git add` and came within a commit of being permanent. The rule is root-scoped on purpose: the model artifacts in `predictions/` are tracked and must stay that way. Prefer the scratchpad directory over the repo root for interactive caches.
