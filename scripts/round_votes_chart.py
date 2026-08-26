@@ -35,6 +35,12 @@ import sys
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
 
+# The CHA CHING mark comes from countdown_card so the two scripts cannot drift
+# apart on the logo. Importing is safe: that module guards its CLI behind
+# __name__ and does no file IO at import time.
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from countdown_card import gradient_text, CHA_STOPS, CHING_STOPS  # noqa: E402
+
 W, H, S = 1200, 1500, 2          # bars style; the grid style sets its own
 OUT_DIR = "drafts"
 MAX_VOTES = 3.0
@@ -55,6 +61,14 @@ FONTS = dict(display="TCB_____.TTF", name="TCB_____.TTF",
 def font(role, size):
     return ImageFont.truetype(os.path.join(F, FONTS[role]),
                               int(size * S * FONTS["scale"]))
+
+
+def draw_mark(img, x, y, size):
+    """CHA CHING in the site's gradients, using THIS script's font set."""
+    f = font("display", size)
+    w = gradient_text(img, (x, y), "CHA", f, CHA_STOPS, 180)
+    sp = int(ImageDraw.Draw(img).textlength(" ", font=f))
+    gradient_text(img, (x + w + sp, y), "CHING", f, CHING_STOPS, 120)
 
 
 def rounds_for(player, season=2026):
@@ -81,7 +95,7 @@ def draw(player, rows, total, show_total):
     def text(xy, t, f, fill, anchor="la"):
         k.text(xy, t, font=f, fill=fill, anchor=anchor)
 
-    text((m, 44 * S), "CHA CHING", font("display", 29), EMERALD)
+    draw_mark(img, m, 44 * S, 29)
     if show_total:
         text((right, 44 * S), f"{total:.1f} EXPECTED VOTES",
              font("display", 29), MUTED, anchor="ra")
@@ -186,7 +200,7 @@ def draw_grid(player, rows, total, show_total):
     def text(xy, t, f, fill, anchor="la"):
         k.text(xy, t, font=f, fill=fill, anchor=anchor)
 
-    text((m, 44 * S), "CHA CHING", font("display", 29), EMERALD)
+    draw_mark(img, m, 44 * S, 29)
     if show_total:
         text((right, 44 * S), f"{total:.1f} EXPECTED VOTES",
              font("display", 29), MUTED, anchor="ra")

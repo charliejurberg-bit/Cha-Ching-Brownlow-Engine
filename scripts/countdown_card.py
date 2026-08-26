@@ -38,6 +38,9 @@ import sys
 import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import features as feat  # noqa: E402  the repo's own feed-name resolver
+
 MIN_GAMES = 12
 SI_PATH = "data_advanced/score_involvements.csv"
 SI_COL = "Score_Involvements_Actual"
@@ -45,6 +48,34 @@ SI_COL = "Score_Involvements_Actual"
 # is deliberately NOT here: a high TOG is a role, not an achievement, and ranking
 # by it would put players who never leave the ground above players who are good.
 ADV_COLS = [SI_COL, "Metres_Gained", "Intercepts"]
+
+# Wheelo, 2015 onward. Only columns the other two sources do NOT already carry:
+# Intercepts, MetresGained and ScoreInvolvements are all in data_advanced and
+# agree with Wheelo exactly (154 / 7.00 for Ed Richards from both), so taking
+# them twice would only create a chance for the two to drift.
+#
+# Score involvement PERCENTAGE is derived here rather than read: it is the
+# player's score involvements over his TEAM's score launches, which is how
+# Wheelo publishes it. Against team scoring shots instead it reads 33.8% for
+# Richards where Wheelo says 31.0, and the rank is the same either way, so the
+# denominator is the whole difference.
+WHEELO_2026 = "data_wheelo/wheelo_2026.csv"
+WHEELO_ALL = "data_wheelo/wheelo_all_seasons.csv"
+WHEELO_COLS = ["PressureActs", "InterceptMarks", "GroundBallGets",
+               "ScoreLaunches", "FirstPossessions", "xScore",
+               "DisposalEfficiency", "ScoreInvolvements"]
+SI_PCT = "ScoreInvolvementPct"
+
+# A PERCENTAGE CANNOT BE AVERAGED PER GAME. Every other stat here is a per-game
+# mean, which is right for a count; for a ratio it is not. Ed Richards' score
+# involvement percentage is 30.5 as the mean of his per-game figures and 31.2 as
+# season involvements over season team launches, and Wheelo publishes 31.0. Each
+# entry is (numerator, denominator) and the season figure is the ratio of the
+# two sums, weighting every game by how much of the denominator it carried.
+RATIO_STATS = {
+    SI_PCT: ("ScoreInvolvements", "_team_sl"),
+    "DisposalEfficiency": ("_eff_disposals", "Disposals"),
+}
 OUT_DIR = "drafts"
 # 4:5 portrait, not 16:9. Twitter renders an in-timeline image at roughly 350px
 # wide on a phone WHATEVER its aspect, so horizontal resolution is fixed and the
@@ -146,6 +177,15 @@ CATALOGUE = [
     # so it formats without a decimal.
     (["METRES", "GAINED"],       "Metres_Gained",           "{:.0f}"),
     (["INTERCEPTS"],             "Intercepts",              "{:.1f}"),
+    # Wheelo. Percentages format without a decimal place, counts with one.
+    (["PRESSURE", "ACTS"],       "PressureActs",            "{:.1f}"),
+    (["INTERCEPT", "MARKS"],     "InterceptMarks",          "{:.1f}"),
+    (["GROUND BALL", "GETS"],    "GroundBallGets",          "{:.1f}"),
+    (["SCORE", "LAUNCHES"],      "ScoreLaunches",           "{:.1f}"),
+    (["FIRST", "POSSESSIONS"],   "FirstPossessions",        "{:.1f}"),
+    (["EXPECTED", "SCORE"],      "xScore",                  "{:.1f}"),
+    (["DISPOSAL", "EFFICIENCY"], "DisposalEfficiency",      "{:.0f}"),
+    (["SCORE", "INVOLVEMENT %"], SI_PCT,                   "{:.0f}"),
 ]
 # Always shown, in this order, after the chosen stats. Coaches votes are an
 # independent read on the same season and Brownlow votes are the whole point of
@@ -221,6 +261,55 @@ def _strip_club(s):
     return re.sub(r"\s*\([^)]*\)\s*$", "", str(s)).strip()
 
 
+def _wheelo(seasons, targets):
+    """Wheelo stats keyed to the AFLTables spelling, one frame per season.
+
+    Names are resolved with features.resolve_feed_names, the repo's own three
+    layer matcher, rather than a join on the raw strings. A raw join reaches
+    91%: Wheelo writes O'Sullivan, D'Ambrosio, Bailey J. Williams and Thomas
+    Edwards where AFLTables writes OSullivan, DAmbrosio, Bailey Williams and Tom
+    Edwards. The resolver reaches 99.98% with nothing unmatched, and it keeps
+    team in the key at every layer so the two Bailey Williamses cannot swap.
+    """
+    out = []
+    allw = None
+    for yr in seasons:
+        if yr == 2026:
+            w = pd.read_csv(WHEELO_2026, low_memory=False)
+        else:
+            if allw is None:
+                allw = pd.read_csv(WHEELO_ALL, low_memory=False)
+            w = allw[allw.Season == yr].copy()
+        if w.empty:
+            continue
+        w["Team"] = w["Team"].replace(feat.WHEELO_TEAM_FIXES)
+        # Team score launches, for the percentage. Computed BEFORE the name
+        # resolution, which does not touch team or round.
+        tl = w.groupby(["Round", "Team"])["ScoreLaunches"].sum().rename("_team_sl")
+        w = w.merge(tl, on=["Round", "Team"], how="left")
+        # Effective disposals, reconstructed so efficiency can be re-weighted.
+        w["_eff_disposals"] = w["DisposalEfficiency"] / 100.0 * w["Disposals"]
+        res, _ = feat.resolve_feed_names(w, targets[yr], "Player", "Team", "Round",
+                                         label=f"wheelo {yr}", verbose=False)
+        res = res.rename(columns={"Player": "Player_Name", "Team": "Playing.for",
+                                  "Round": "Round_num"})
+        keep = (["Player_Name", "Playing.for", "Round_num"] + WHEELO_COLS
+                + ["_team_sl", "_eff_disposals"])
+        r = res[[c for c in keep if c in res.columns]].copy()
+        r["Season"] = yr
+        # Unique on the merge key or the merge multiplies the left row instead
+        # of annotating it. Wheelo's 2025 carries 41 duplicate keys, every one a
+        # Gold Coast round 25 row, which inflated the qualified pool from 420 to
+        # 421 and would have shifted every 2025 rank by a place. It is the same
+        # 2025 round 24/25 duplication already found in game_level_2025.csv (78
+        # rows) and backtest_game_level.csv (41), so this is a defect in the
+        # season rather than in any one feed, and every consumer has to defend
+        # itself.
+        r = r.drop_duplicates(["Season", "Round_num", "Player_Name", "Playing.for"])
+        out.append(r)
+    return pd.concat(out, ignore_index=True) if out else None
+
+
 def gather(player, seasons):
     """Per-game averages and league ranks for every catalogue stat, per season."""
     first, sur = player.split(" ", 1)
@@ -253,15 +342,37 @@ def gather(player, seasons):
     CV = pd.concat([cvh[["Season", "p", "Coaches.Votes"]],
                     cv26[["Season", "p", "Coaches.Votes"]]])
 
+    # Wheelo needs a per-season target frame carrying the AFLTables spelling.
+    hist["Player_Name"] = (hist["First.name"].str.strip() + " "
+                           + hist["Surname"].str.strip())
+    cur["Player_Name"] = (cur["First.name"].str.strip() + " "
+                          + cur["Surname"].str.strip())
+    targets = {yr: (cur if yr == 2026 else hist[hist.Season == yr])
+               for yr in seasons}
+    wh = _wheelo(seasons, targets)
+    if wh is not None:
+        key = ["Season", "Round_num", "Player_Name", "Playing.for"]
+        hist = hist.merge(wh, on=key, how="left")
+        cur = cur.merge(wh[wh.Season == 2026], on=key, how="left")
+
     out = {}
     for yr in seasons:
         src = cur if yr == 2026 else hist[hist.Season == yr]
         agg = {"sur": ("Surname", "first"), "fn": ("First.name", "first"),
                "team": ("Playing.for", "last"), "games": ("Round_num", "size")}
-        agg.update({c: (c, "mean") for c in cols if c in src.columns})
+        agg.update({c: (c, "mean") for c in cols
+                    if c in src.columns and c not in RATIO_STATS})
+        for _stat, (_num, _den) in RATIO_STATS.items():
+            if _num in src.columns and _den in src.columns:
+                agg[f"_n_{_stat}"] = (_num, "sum")
+                agg[f"_d_{_stat}"] = (_den, "sum")
         if "Brownlow.Votes" in src.columns:
             agg["bv"] = ("Brownlow.Votes", "sum")
         g = src.groupby("ID").agg(**agg)
+        for _stat in RATIO_STATS:
+            if f"_n_{_stat}" in g.columns:
+                g[_stat] = (g[f"_n_{_stat}"] / g[f"_d_{_stat}"]).replace(
+                    [float("inf"), -float("inf")], pd.NA) * 100
         hit = g[(g.sur == sur) & (g.fn == first)]
         if hit.empty:
             raise SystemExit(f"{player} has no {yr} home-and-away games in the archive.")
