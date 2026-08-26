@@ -3,8 +3,8 @@
   "brownlowNight": "2026-09-21",
   "leader": {
     "name": "Nick Daicos",
-    "votes": 39.3,
-    "clear": 9.2,
+    "votes": 39.6,
+    "clear": 10.2,
     "bestOdds": "$1.01"
   },
   "chips": [
@@ -16,15 +16,15 @@
     },
     {
       "rank": 2,
-      "name": "I. Rankine",
-      "team": "ADE",
+      "name": "B. Smith",
+      "team": "GEE",
       "votes": 2.8
     },
     {
       "rank": 3,
-      "name": "B. Smith",
-      "team": "GEE",
-      "votes": 2.7
+      "name": "I. Rankine",
+      "team": "ADE",
+      "votes": 2.8
     }
   ],
   "ticker": [
@@ -37,11 +37,11 @@
         ],
         [
           2,
-          "WALKER"
+          "DAWSON"
         ],
         [
           1,
-          "THILTHORPE"
+          "WALKER"
         ]
       ]
     },
@@ -88,11 +88,11 @@
         ],
         [
           2,
-          "GEORGIADES"
+          "CADDY"
         ],
         [
           1,
-          "CADDY"
+          "GEORGIADES"
         ]
       ]
     },
@@ -122,11 +122,11 @@
         ],
         [
           2,
-          "BONTEMPELLI"
+          "GAWN"
         ],
         [
           1,
-          "M.KENNEDY"
+          "PETTY"
         ]
       ]
     },
@@ -135,15 +135,15 @@
       "votes": [
         [
           3,
-          "MILLER"
-        ],
-        [
-          2,
           "ANDERSON"
         ],
         [
+          2,
+          "ROWELL"
+        ],
+        [
           1,
-          "NOBLE"
+          "MILLER"
         ]
       ]
     },
@@ -160,7 +160,7 @@
         ],
         [
           1,
-          "CURNOW"
+          "CAMPBELL"
         ]
       ]
     },
@@ -169,15 +169,15 @@
       "votes": [
         [
           3,
-          "GUNSTON"
-        ],
-        [
-          2,
           "DAY"
         ],
         [
+          2,
+          "C.MACDONALD"
+        ],
+        [
           1,
-          "WARD"
+          "GUNSTON"
         ]
       ]
     }
