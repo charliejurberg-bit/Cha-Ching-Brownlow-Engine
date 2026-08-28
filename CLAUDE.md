@@ -132,6 +132,9 @@ brownlow_engine/
 ├── data_pull.py          # EMPTY, 0 bytes. Not a fetcher. The R paths that do
 │                         #   work are fetch_extended_data.R and scripts/build_history.R
 ├── fetch_extended_data.R # R script for fitzRoy data (coaches votes etc.)
+│                         # scripts/fetch_match_chains.py → data_chains/, and
+│                         #   scripts/period_records.py reads it back as
+│                         #   youngest-player ladders. Recon only
 ├── backtest.py           # Backtesting harness
 │
 ├── predictions/          # Model artifacts + CSV outputs
@@ -150,6 +153,13 @@ brownlow_engine/
 │   │                     #   centre clearances, effective disposals, TOG%
 │   ├── advanced_<season>.csv        # One per season, as scraped
 │   └── score_involvements.csv       # Joined to Season + Round_num + ID
+│
+├── data_chains/          # Per-player, per-QUARTER kicks/handballs/disposals from
+│   │                     #   the AFL's play-by-play feed. The ONLY intra-game
+│   │                     #   source anywhere near this repo. 2021 on. See
+│   │                     #   "Player stats by quarter" below
+│   ├── period_stats.csv  # One row per player per quarter. Tracked
+│   └── raw/              # Fetch cache, 31 MB, gitignored. Refetched on demand
 │
 ├── data_history/         # Pre-2007 archives. game_level_1990..2006.csv live here
 │   │                     #   and NOT in predictions/, because AVAILABLE_SEASONS
@@ -348,6 +358,57 @@ rather than redirecting it, and the stale
 `drafts/fewest_games_score_involvements_1000.md` carries a DO NOT POST banner.
 Per-game and per-season figures are fine from 2015 on; it is the career ladder
 that cannot be built.
+
+## Player stats by quarter
+
+**Nothing in this repo except `data_chains/` can answer an intra-game
+question.** AFLTables, Wheelo, footywire and Squiggle all carry full-match
+player totals only, and the `HQ1P`/`AQ1P` style quarter columns in
+`fitzroy_stats_all.csv` are **team scores, not player stats**. Wheelo's
+`Rating_Q1`-`Q4` are ratings, not counts. Before building any "at half time",
+"in the last quarter" or "by quarter time" claim, the source is
+`scripts/fetch_match_chains.py` and nothing else.
+
+The feed is the AFL's own play-by-play:
+`https://api.afl.com.au/cfs/afl/matchChains/{providerId}`, one row per match
+event with `period`, `periodSeconds`, `playerId`, `teamId` and a `description`.
+It needs an `x-media-mis-token`, minted free and unauthenticated from `POST
+/cfs/afl/WMCTok`. **That POST needs `Origin`, `Referer` and an explicit
+`Content-Length: 0`** or Akamai returns a bare HTML "Bad Request" rather than a
+JSON error. The fixture walk on `aflapi.afl.com.au/afl/v2` needs no token.
+
+**A disposal is an event whose `disposal` field is non-null, and there is no
+description list to maintain.** That field is populated on exactly three
+descriptions (Kick, Ground Kick, Handball) and null on the other 36. Counting by
+description instead scored 37/46 players with `{Kick}` and 44/46 with `{Kick,
+Ground Kick}` against the AFL's own live figures; the `disposal` field scored
+45/46 and is the source's own definition.
+
+**Two boundaries, both in the source rather than chosen:**
+
+- **Coverage starts in 2021.** `matchChains` returns HTTP **200 with an empty
+  list** for every season 2012-2020, checked across rounds 1, 5, 15 and 23-27 in
+  2017-2020. It is not an error and not a missing-match case, so an unguarded
+  run writes nothing and reports success. `FIRST_SEASON` refuses the range
+  instead. Every record off this data is "youngest since 2021", never "ever".
+- **The feed lags badly during a live match.** Mid-final-quarter of the 2026
+  wildcard final the chains had Swadling on 20 disposals while the official
+  `playerStats/match` feed had him on 30; both read 32 after the siren. Only
+  matches whose fixture status is `CONCLUDED` or `POSTGAME` are fetched, and the
+  raw cache from a live fetch is poison. The 98% reconciliation guard catches
+  it, but clear the cached match rather than lowering the floor.
+
+**The guard is a cross-endpoint check, not a self-check.** Per-period disposals
+are summed per player and compared against `playerStats/match`, which Champion
+Data computes independently. Currently 2,106 of 2,116 reconcile (99.53%) across
+46 finals. Below `MIN_MATCH_RATE` the run refuses to write.
+
+**Bounding the pre-2021 gap without the data.** A player cannot have N
+disposals by half time without having N for the full match, so every possible
+pre-2021 challenger to a half-time record sits in the full-game archive, which
+does reach 1965. That converts an open-ended "but what about before 2021" into a
+finite named candidate list. `scripts/period_records.py` prints the note under
+every ladder.
 
 ## Brownlow votes before 1984
 
