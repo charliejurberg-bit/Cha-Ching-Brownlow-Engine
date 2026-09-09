@@ -39,6 +39,7 @@ import pandas as pd
 from PIL import Image, ImageDraw, ImageFont
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import coaches_guard as cvguard  # noqa: E402  the coaches archive's repair
 import features as feat  # noqa: E402  the repo's own feed-name resolver
 
 MIN_GAMES = 12
@@ -335,8 +336,20 @@ def gather(player, seasons):
     hist = hist.merge(_si, on=["Season", "Round_num", "ID"], how="left")
     cur = cur.merge(_si, on=["Season", "Round_num", "ID"], how="left")
 
-    cvh = pd.read_csv("coaches_votes_all.csv", low_memory=False)
-    cv26 = pd.read_csv("data_2026/coaches_votes_2026.csv")
+    # THE COACHES ARCHIVE IS NOT SAFE TO SUM RAW, and this card sums it.
+    # coaches_votes_all.csv carries an upstream broadcast defect that repeats
+    # one fixture across every round from 19 to the end of the season, so a
+    # player caught in it collects the same game's votes eight times: Will
+    # Ashcroft's 2025 reads 166 raw against a true 58, and the raw archive names
+    # the wrong AFL leader in four of the five seasons 2021-2025. It reaches the
+    # card because the season total here is a plain groupby with no fixture
+    # join. coaches_guard owns the repair; clean_source is its display-side
+    # entry point, as against drop_contaminated_games for the trainer.
+    # data_2026/coaches_votes_2026.csv is clean, all 207 games summing to 30,
+    # and is passed through the same call so one path serves both.
+    cvh = cvguard.clean_source(pd.read_csv("coaches_votes_all.csv",
+                                           low_memory=False))
+    cv26 = cvguard.clean_source(pd.read_csv("data_2026/coaches_votes_2026.csv"))
     cvh["p"] = cvh["Player.Name"].map(_strip_club)
     cv26["p"] = cv26["Player.Name"].map(_strip_club)
     CV = pd.concat([cvh[["Season", "p", "Coaches.Votes"]],

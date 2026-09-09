@@ -65,7 +65,8 @@ silently changed one cannot pass unnoticed.
 import numpy as np
 import pandas as pd
 
-__all__ = ['drop_contaminated_games', 'contaminated_keys', 'GuardError']
+__all__ = ['drop_contaminated_games', 'contaminated_keys', 'clean_source',
+           'GuardError']
 
 # Both coaches award 5-4-3-2-1, so one player's two-coach sum cannot exceed
 # 2 * 5 and a game cannot carry other than 2 * (5+4+3+2+1).
@@ -140,6 +141,94 @@ def contaminated_keys(coaches):
     a['test_ceiling'] = a['_src_over'] | (a['sum'] > VOTE_CEILING)
     a['contaminated'] = a.test_duplicate | a.test_fractional | a.test_ceiling
     return a[a.contaminated].copy()
+
+
+def clean_source(coaches, verbose=False):
+    """Source rows safe to SUM per player per season. For DISPLAY, not training.
+
+    drop_contaminated_games is the training answer and stays the training
+    answer. This is the answer for a reader-facing season total, and the two
+    differ because they are protecting different things.
+
+    WHY A DISPLAY TOTAL NEEDS ITS OWN RULE
+    A card shows "coaches votes, 2025" as a season sum. There is no
+    within-game ranking in that number, so the collateral argument that makes
+    the trainer drop whole games does not apply, and dropping a whole game
+    would delete real votes from a player's season for no gain. What a display
+    total needs is the opposite: keep every vote that is real, drop every vote
+    that is not.
+
+    Left unguarded the damage is not subtle. The broadcast defect repeats one
+    fixture across every round from 19 to the end of the season, so a player
+    caught in it collects that game's votes eight times over: Will Ashcroft's
+    2025 reads 166 in the raw archive against a true 58, which made him the
+    league's leading coaches-vote getter by 40 from a figure that is 108 votes
+    of one repeated game. The stored archive names the wrong leader in four of
+    the five seasons 2021-2025.
+
+    TWO STEPS, AND THE ORDER IS LOAD BEARING
+
+      1 Drop every row belonging to a fixture whose votes do not sum to
+        VOTES_PER_GAME. This removes the phantom fixture outright. A display
+        pass can do this where the trainer cannot, because Home.Team and
+        Away.Team identify the phantom directly and the trainer's merge key
+        never carries them.
+      2 Apply contaminated_keys to what survives and drop what it still
+        condemns. Step 1 alone is not enough: 51 groups across 2018-2021 sit
+        in fixtures that DO sum to 30, and are duplicates or over the ceiling
+        inside a legitimate game.
+
+    Running the two the other way round is worse than either. contaminated_keys
+    condemns a player-round group when two source rows share its key, and the
+    phantom shares the key of whatever real game that player played that round,
+    so a group-first pass throws away the real row with the fake one. Ashcroft
+    loses a genuine 9-vote round 20 and a genuine 3-vote round 23 that way, and
+    reads 46 rather than 58. Removing the phantom first leaves one legal row
+    and the group is no longer a duplicate.
+
+    Returns a new frame carrying the caller's columns plus CV_Player and
+    CV_Team. coaches is not modified. The fixture columns are required; a frame
+    without them cannot be cleaned this way and raises rather than silently
+    falling back to the weaker rule.
+    """
+    for col in ('Home.Team', 'Away.Team'):
+        if col not in coaches.columns:
+            raise GuardError(
+                f'clean_source needs {col} to identify the repeated fixture, '
+                f'and the frame does not carry it. Use contaminated_keys '
+                f'directly if the source has no fixture columns.')
+
+    c = _prepare(coaches)
+    n0 = len(c)
+    game = ['Season', 'Round', 'Home.Team', 'Away.Team']
+    ok = np.isclose(c.groupby(game, dropna=False)['_v'].transform('sum'),
+                    VOTES_PER_GAME)
+    c = c[ok]
+    n1 = len(c)
+
+    bad = contaminated_keys(c)
+    if len(bad):
+        keys = bad[GROUP_KEY].assign(_bad=True)
+        marked = c.merge(keys, on=GROUP_KEY, how='left')
+        if len(marked) != len(c):
+            raise GuardError(f'clean_source merge changed row count, {len(c):,} '
+                             f'to {len(marked):,}. Refusing to guess.')
+        c = marked[marked['_bad'].isna()].drop(columns='_bad')
+    n2 = len(c)
+
+    # Cheap post-conditions. Neither can hold if the two steps ran in the wrong
+    # order or if a step silently matched nothing.
+    v = c['_v']
+    if (v.mod(1) != 0).any() or (v > VOTE_CEILING).any():
+        raise GuardError('clean_source left a fractional or above-ceiling value '
+                         'behind, so it did not do what it claims.')
+
+    if verbose:
+        print(f'Coaches source cleaned for display: {n0:,} rows in, {n2:,} out')
+        print(f'  fixtures not summing to {VOTES_PER_GAME}: {n0 - n1:,} rows')
+        print(f'  groups still condemned after that:       {n1 - n2:,} rows '
+              f'({len(bad):,} groups)')
+    return c.drop(columns='_v')
 
 
 def drop_contaminated_games(df, coaches, enforce=True, label=''):
