@@ -18,6 +18,14 @@ column per game, in order, with the line drawn across, makes the shape the
 graphic: the last nine columns all clear it and the reader counts them without
 being told.
 
+HOME AND AWAY ONLY, AND THE SUBTITLE SAYS SO RATHER THAN SAYING "EVERY GAME"
+It first read EVERY GAME HE PLAYED, which was wrong the moment finals started:
+afl.com.au had Ashcroft on 24 games while this file holds 23, because
+data_2026/afltables_2026.csv carries no finals rows. The two reconcile exactly
+(174 score involvements here against the AFL's 180, over 24 games rather than
+23), so neither is broken, but a card claiming EVERY GAME while showing 23 of 24
+is a card a reader can catch.
+
 THE X AXIS IS GAMES PLAYED, NOT ROUNDS, AND THE SUBTITLE SAYS SO
 Ashcroft's run covers AFL rounds 14 and 16 to 23; he did not play round 15. A
 streak is conventionally consecutive games, so plotting rounds would open a gap
@@ -182,7 +190,7 @@ def draw(player, place, b, preview=False):
     lab = stat.replace(".", " ").upper()
     head2 = f"{player.upper()}, {ltxt}+ {lab}, {season}"
     text((m, 232 * S), head2, fit(head2, "display", 30, right - m), MUTED)
-    sub = "EVERY GAME HE PLAYED, IN ORDER"
+    sub = "EVERY HOME AND AWAY GAME, IN ORDER"
     text((m, 274 * S), sub, font("display", 30), RANK_INK)
     k.rectangle([m, 328 * S, right, 329 * S], fill=LINE)
 
