@@ -423,6 +423,35 @@ MIN_PICK = 3                     # relax the gate rather than ship a sparse card
 W_STRENGTH, W_IMPROVE = 0.55, 0.45
 
 
+def force_stats(spec):
+    """Resolve --stats into CATALOGUE rows, in the order given.
+
+    pick_stats scores a player's stats against the field and takes the best
+    four, which is right by default and is why the automatic path stays the
+    default. It optimises for "which numbers flatter him", though, and that is
+    not always the same question as "which numbers show what happened". On the
+    2024-2026 Pickett card it chose TACKLES, 3.6 / 3.6 / 4.6, flat across the
+    first step of a three-season arc, over CLEARANCES, 1.6 / 3.3 / 4.5, which
+    rises at both steps and nearly triples. Both are true; only one is the
+    story. This exists for that case and should stay the exception.
+    """
+    by_col = {col.lower(): (lines, col, fmt) for lines, col, fmt in CATALOGUE}
+    out = []
+    for raw in [s.strip() for s in spec.split(",") if s.strip()]:
+        hit = by_col.get(raw.lower())
+        if hit is None:
+            raise SystemExit(
+                f"--stats: no catalogue column {raw!r}.\nValid columns:\n  "
+                + "\n  ".join(sorted(c for _, c, _ in CATALOGUE)))
+        if hit in out:
+            raise SystemExit(f"--stats: {raw!r} given twice")
+        out.append(hit)
+    if not 2 <= len(out) <= 5:
+        raise SystemExit("--stats takes between 2 and 5 columns "
+                         "(the two always-shown vote rows are added after)")
+    return out
+
+
 def pick_stats(d, seasons):
     prev, cur = seasons[-2], seasons[-1]
     n = d[cur]["qualified"]
@@ -464,7 +493,7 @@ NOTABLE = 25
 MIN_BLOCKS = 2
 
 
-def top_games(player, picked, season=2026, n=3, per_game=3):
+def top_games(player, picked, season=2026, n=3, per_game=3, force=None):
     """The player's biggest games, each described by ITS OWN best stats.
 
     Games are ranked by Exp_Votes rather than by any single stat, because this
@@ -510,12 +539,27 @@ def top_games(player, picked, season=2026, n=3, per_game=3):
     # that is kicks, metres gained and disposals, which is what his round 20 was
     # made of; tackles reached the old per-game list only because round 5 had
     # nothing better, and it told a reader nothing.
-    best_rank = {}
-    for (rn, c), rk in ranks.items():
-        v = chosen.loc[chosen.Round_num == rn, c].iloc[0]
-        if pd.notna(v) and v > 0:
-            best_rank[c] = min(best_rank.get(c, 10 ** 9), rk)
-    order = [c for c, _ in sorted(best_rank.items(), key=lambda x: x[1])][:per_game]
+    #
+    # `force` overrides the pick, because best-rank alone can seat a column that
+    # is strong in one game and empty in the others. Rankine's two biggest games
+    # of 2026 drew goal assists on a best rank of 21st, which put "1" in a cell
+    # of his round 22; metres gained missed the cut at 26th and was 795 and 845
+    # in the two games, 42nd and 26th of ~9,500. Read the printed per-game ranks
+    # before overriding, and only override to a column that is strong in EVERY
+    # block, never to one that flatters a single game.
+    if force:
+        bad = [c for c in force if c not in cols]
+        if bad:
+            raise SystemExit(f"--game-stats: not in this season's data: "
+                             f"{', '.join(bad)}")
+        order = list(force)
+    else:
+        best_rank = {}
+        for (rn, c), rk in ranks.items():
+            v = chosen.loc[chosen.Round_num == rn, c].iloc[0]
+            if pd.notna(v) and v > 0:
+                best_rank[c] = min(best_rank.get(c, 10 ** 9), rk)
+        order = [c for c, _ in sorted(best_rank.items(), key=lambda x: x[1])][:per_game]
 
     # Trim from the end while the last block has nothing worth flagging.
     keep = list(chosen.Round_num.astype(int))
@@ -550,7 +594,7 @@ def top_games(player, picked, season=2026, n=3, per_game=3):
 # card's 1500, which left a third of the canvas empty and meant X scaled the
 # image down to fit dead space.
 GAME_BH = 312
-GAME_FOOT = 128
+GAME_FOOT = 40        # bottom margin only; no footer text, by standing rule
 
 
 def draw_games(player, place, games, d, season=2026):
@@ -597,13 +641,8 @@ def draw_games(player, place, games, d, season=2026):
                 text((cx, y + 228 * S), f"{ordinal(rk).upper()} IN THE AFL",
                      font("display", 24), EMERALD, anchor="ma")
 
-    fy = (H2 - GAME_FOOT + 18) * S
-    k.rectangle([m, fy - 30 * S, right, fy - 29 * S], fill=LINE)
-    text((m, fy), f"The {len(games)} games the model rated highest, of "
-                  f"{d[season]['games']} played in {season}.",
-         font("body", 25), MUTED)
-    text((m, fy + 36 * S), "Each figure is ranked against every player-game in "
-                           "the season, about 9,500 of them.", font("body", 25), MUTED)
+    # No footer text on a card, by standing rule. Every threshold and
+    # window qualifier this used to carry now lives in the draft copy.
 
     os.makedirs(OUT_DIR, exist_ok=True)
     slug = re.sub(r"[^a-z0-9]+", "_", player.lower()).strip("_")
@@ -630,7 +669,7 @@ def draw(player, place, tagline, d, seasons, picked):
 
     cur_i = len(seasons) - 1
     cx0 = col_x0 + col_w * cur_i
-    PANEL_TOP, PANEL_BOT = 282 * S, 1372 * S
+    PANEL_TOP, PANEL_BOT = 282 * S, 1444 * S
     k.rectangle([cx0, PANEL_TOP, cx0 + col_w, PANEL_BOT], fill=PANEL)
     k.rectangle([cx0, PANEL_TOP, cx0 + col_w, PANEL_TOP + 3 * S], fill=EMERALD)
 
@@ -653,7 +692,7 @@ def draw(player, place, tagline, d, seasons, picked):
     k.rectangle([m, 430 * S, right, 431 * S], fill=LINE)
 
     top = 452 * S
-    rh = int((1372 * S - top) / len(rows))
+    rh = int((PANEL_BOT - top) / len(rows))
     for ri, (lines, key, fmt) in enumerate(rows):
         y = top + ri * rh
         if ri:
@@ -685,14 +724,8 @@ def draw(player, place, tagline, d, seasons, picked):
                 text((centre[i], y + int(rh / S * 0.56) * S), "EXPECTED",
                      font("display", 29), EMERALD, anchor="ma")
 
-    k.rectangle([m, PANEL_BOT + 14 * S, right, PANEL_BOT + 15 * S], fill=LINE)
-    pool = " / ".join(str(d[y]["qualified"]) for y in seasons)
-    text((m, 1404 * S),
-         f"Ranks among players with {MIN_GAMES}+ home-and-away games that season",
-         font("body", 25), MUTED)
-    text((m, 1440 * S),
-         f"({pool} qualified).  Brownlow votes unranked.  2026 = expected votes.",
-         font("body", 25), MUTED)
+    # No footer text on a card, by standing rule. Every threshold and
+    # window qualifier this used to carry now lives in the draft copy.
 
     os.makedirs(OUT_DIR, exist_ok=True)
     slug = re.sub(r"[^a-z0-9]+", "_", player.lower()).strip("_")
@@ -703,25 +736,421 @@ def draw(player, place, tagline, d, seasons, picked):
     return path, prev
 
 
+# --------------------------------------------------------------- split mode
+
+# The with/without card. Rows are FIXED rather than picked from the data, and
+# that is the whole design. pick_stats() exists to find a player's best angles,
+# which is right for a season card and wrong here: choosing the rows after
+# seeing which ones moved turns a breakdown into an argument, and a reader has
+# no way to tell the two apart. These seven are declared before any split is
+# computed and they do not change per subject.
+#
+# Time on ground is on this card, unlike everywhere else in this file, because
+# a claim about workload that hides the minutes is not a claim about workload.
+# It is also the row most likely to fall, which is the point of fixing the set.
+SPLIT_ROWS = [
+    (["CENTRE BOUNCE", "ATTENDANCE %"], "CentreBounceAttendancePercentage", "{:.0f}"),
+    (["DISPOSALS"], "Disposals", "{:.1f}"),
+    (["CLEARANCES"], "TotalClearances", "{:.1f}"),
+    (["GROUND BALL GETS"], "GroundBallGets", "{:.1f}"),
+    (["CONTESTED", "POSSESSIONS"], "ContestedPossessions", "{:.1f}"),
+    (["TACKLES"], "Tackles", "{:.1f}"),
+    (["TIME ON GROUND %"], "TimeOnGround", "{:.0f}"),
+]
+
+# A club-mate needs enough of a split for his average to be a rank rather than a
+# cameo. 60% of that split's games, which at four games means three.
+SPLIT_MIN_SHARE = 0.6
+
+
+def display_round(rn, season):
+    """AFLTables numbers Opening Round as Round 1 from 2024, one ahead of the
+    AFL's own count. The games card already does this conversion inline; the
+    footer here must match it or one card contradicts another. Conditional on
+    season, never unconditional. See CLAUDE.md, "Round numbering".
+    """
+    rn = int(rn)
+    if season < 2024:
+        return str(rn)
+    return "OR" if rn - 1 == 0 else str(rn - 1)
+
+
+def gather_split(player, without, season=2026):
+    """Split the player's season on whether a named club-mate played.
+
+    Wheelo is the only source here. Its Round aligns with the raw AFLTables
+    Round_num, and taking both sides of the split from ONE file is what makes
+    the two columns comparable: a stat that exists in Wheelo and not in the
+    archive would otherwise be present on one side of the card only.
+    """
+    w = pd.read_csv(WHEELO_2026 if season == 2026 else WHEELO_ALL, low_memory=False)
+    w = w[w.Season == season]
+    me = w[w.Player == player]
+    if me.empty:
+        raise SystemExit(f"{player} has no {season} Wheelo rows.")
+    team = me.Team.iloc[-1]
+    club = w[w.Team == team]
+    if not (club.Player == without).any():
+        raise SystemExit(f"{without} has no {season} rows for {team}.")
+
+    out_rounds = set(club.loc[club.Player == without, "Round"])
+    mine = set(me.Round)
+    idx = {"with": sorted(mine & out_rounds), "without": sorted(mine - out_rounds)}
+    if not idx["without"]:
+        raise SystemExit(f"{player} played no {season} game without {without}.")
+
+    d = {"team": team, "player": player, "without": without, "season": season,
+         "without_surname": without.split()[-1].upper(), "rounds": idx}
+    for side, rounds in idx.items():
+        sub = club[club.Round.isin(rounds)]
+        mrows = me[me.Round.isin(rounds)]
+        val, rank, pool = {}, {}, None
+        for _, col, _ in SPLIT_ROWS:
+            val[col] = float(mrows[col].mean())
+            g = sub.groupby("Player")[col].agg(["size", "mean"])
+            g = g[g["size"] >= max(1, round(len(rounds) * SPLIT_MIN_SHARE))]
+            rank[col] = int((g["mean"] > val[col]).sum()) + 1
+            pool = len(g)
+        d[side] = {"games": len(rounds), "val": val, "rank": rank, "pool": pool}
+    return d
+
+
+def draw_split(player, place, tagline, sp):
+    img = Image.new("RGB", (W * S, H * S), BG)
+    k = ImageDraw.Draw(img)
+    m, right = 56 * S, (W - 56) * S
+    lab_w = 330 * S
+    col_x0 = m + lab_w
+    col_w = (right - col_x0) // 2
+    centre = [col_x0 + col_w // 2, col_x0 + col_w + col_w // 2]
+    sides = ["with", "without"]
+
+    def text(xy, t, f, fill, anchor="la"):
+        k.text(xy, t, font=f, fill=fill, anchor=anchor)
+
+    PANEL_TOP, PANEL_BOT = 282 * S, 1444 * S
+    cx0 = col_x0 + col_w
+    k.rectangle([cx0, PANEL_TOP, cx0 + col_w, PANEL_BOT], fill=PANEL)
+    k.rectangle([cx0, PANEL_TOP, cx0 + col_w, PANEL_TOP + 3 * S], fill=EMERALD)
+
+    draw_mark(img, m, 44 * S, 29)
+    text((right, 44 * S), f"BROWNLOW COUNTDOWN   {ordinal(place).upper()}",
+         font("display", 29), MUTED, anchor="ra")
+    k.rectangle([m, 100 * S, right, 101 * S], fill=LINE)
+    text((m, 132 * S), player.upper(), font("name", 80), INK)
+    if tagline:
+        text((m, 234 * S), tagline, font("body", 33), MUTED)
+
+    surname = sp["without_surname"]
+    for i, side in enumerate(sides):
+        cur = side == "without"
+        head = f"WITH {surname}" if not cur else f"WITHOUT {surname}"
+        text((centre[i], 302 * S), head, font("display", 38),
+             EMERALD if cur else INK, anchor="ma")
+        text((centre[i], 360 * S), ABBR.get(sp["team"], sp["team"].upper()),
+             font("display", 25), MUTED, anchor="ma")
+        text((centre[i], 394 * S), f"{sp[side]['games']} GAMES", font("display", 23),
+             MUTED, anchor="ma")
+    k.rectangle([m, 430 * S, right, 431 * S], fill=LINE)
+
+    top = 452 * S
+    rows = SPLIT_ROWS
+    rh = int((PANEL_BOT - top) / len(rows))
+    for ri, (lines, col, fmt) in enumerate(rows):
+        y = top + ri * rh
+        if ri:
+            k.rectangle([m, y - 12 * S, right, y - 11 * S], fill=LINE)
+        ly = y + (int(rh / S * 0.24) if len(lines) == 1 else int(rh / S * 0.11)) * S
+        for li, ln in enumerate(lines):
+            text((m, ly + li * 44 * S), ln, font("display", 34), INK)
+        for i, side in enumerate(sides):
+            cur = side == "without"
+            v = sp[side]["val"][col]
+            text((centre[i], y + int(rh / S * 0.10) * S), fmt.format(v),
+                 font("fig", 70), EMERALD if cur else INK, anchor="ma")
+            text((centre[i], y + int(rh / S * 0.56) * S),
+                 ordinal(sp[side]["rank"][col]) + " AT CLUB", font("display", 30),
+                 EMERALD if cur else RANK_INK, anchor="ma")
+
+    # No footer text on a card, by standing rule. Every threshold and
+    # window qualifier this used to carry now lives in the draft copy.
+
+    os.makedirs(OUT_DIR, exist_ok=True)
+    slug = re.sub(r"[^a-z0-9]+", "_", player.lower()).strip("_")
+    wslug = re.sub(r"[^a-z0-9]+", "_", surname.lower()).strip("_")
+    path = os.path.join(OUT_DIR, f"countdown_{place:02d}_{slug}_without_{wslug}.png")
+    img.save(path, "PNG", optimize=True)
+    prev = os.path.join(OUT_DIR,
+                        f"countdown_{place:02d}_{slug}_without_{wslug}_timeline.png")
+    img.resize((350, int(350 * H / W)), Image.LANCZOS).save(prev, "PNG")
+    return path, prev
+
+
+# --------------------------------------------------------------- form mode
+
+# The before/after card. A season split at a round, which answers a different
+# question from split mode: not "who was missing" but "when did he change".
+#
+# ROWS ARE FIXED, for the same reason SPLIT_ROWS are. Picking the rows after
+# seeing which ones moved turns a breakdown into an argument and a reader cannot
+# tell the two apart. Expected votes leads because this is a Brownlow card and
+# it is the only row that answers the question directly; the four ball-winning
+# rows underneath are there to say what the votes were made of.
+#
+# COACHES VOTES ARE PER GAME HERE, not a season total as on the season card.
+# The two windows are different lengths (12 games against 8 for Rankine), so a
+# total would read as a fall while the rate more than quadrupled.
+# Fourth field is the population the rank is taken against: None for every
+# qualifying player, "mid" for midfielders only. A goal tally means nothing
+# against a league that includes key forwards, and everything against the
+# players doing the same job: 47th of everyone, 2nd of midfielders.
+FORM_ROWS = [
+    (["EXPECTED", "VOTES / GAME"], "Exp_Votes", "{:.2f}", None),
+    (["COACHES", "VOTES / GAME"], "Coaches_Votes", "{:.1f}", None),
+    (["DISPOSALS"], "Disposals", "{:.1f}", None),
+    (["CONTESTED", "POSSESSIONS"], "Contested.Possessions", "{:.1f}", None),
+    (["CLEARANCES"], "Clearances", "{:.1f}", None),
+    (["GOALS"], "Goals", "{:.1f}", "mid"),
+    (["METRES", "GAINED"], "Metres_Gained", "{:.0f}", None),
+]
+
+# A league rank inside a short window needs a games floor or it is a list of
+# players who had one good week. 60% of the window's rounds, the same share
+# split mode uses at the club, and the card states both the share and the
+# qualifying pool.
+FORM_MIN_SHARE = 0.6
+
+# "Midfielder" is not a column anywhere in this repo, so it is defined here and
+# stated on the card: a player whose mean centre bounce attendance in THAT
+# window is at least MID_CBA per cent, from Wheelo.
+#
+# 40 rather than 50, and the reason is the comparison rather than the definition.
+# Rankine attended 45.3% of Adelaide's centre bounces before round 17 and 80.2%
+# after. At a 50% line he is not a midfielder in the first window at all, so the
+# left column would have no rank and the row would compare a number to nothing.
+# 40 is the highest line he clears in both. His rank is 2nd at 40, 50 and 60, so
+# the threshold moves the pool and not the answer, but the card must still say
+# which line it drew.
+MID_CBA = 40
+MID_SUFFIX = " OF MIDS"
+
+
+def _midfielders(lo, hi, season):
+    """Player names whose mean centre bounce attendance across raw rounds
+    lo..hi is at least MID_CBA per cent. Wheelo is the only source in the repo
+    that carries centre bounce attendance at all, and its Round aligns with the
+    raw AFLTables Round_num.
+    """
+    path = WHEELO_2026 if season == 2026 else WHEELO_ALL
+    w = pd.read_csv(path, low_memory=False)
+    w = w[(w.Season == season) & (w.Round >= lo) & (w.Round <= hi)]
+    cba = w.groupby("Player")["CentreBounceAttendancePercentage"].mean()
+    return set(cba[cba >= MID_CBA].index)
+
+
+def gather_form(player, afl_round, season=2026):
+    """Split a season at a round and rank each half against the league.
+
+    `afl_round` is the AFL's own round number, because that is what the card
+    prints and what anyone asking for this split has in mind. AFLTables numbers
+    Opening Round as round 1 from 2024, so the raw cut is one higher. Getting
+    this backwards silently moves the split by a week, which is exactly the kind
+    of error a finished card cannot show you.
+
+    Expected votes come from predictions/game_level_<season>.csv and are model
+    output; every other row is a counted stat from the same file, with metres
+    gained joined from data_advanced. One source for both halves, so a column
+    present on one side and missing on the other cannot happen.
+    """
+    raw_split = afl_round + 1 if season >= 2024 else afl_round
+    g = pd.read_csv(f"predictions/game_level_{season}.csv", low_memory=False)
+    g = g.drop_duplicates(["Round_num", "ID"], keep="first")
+    adv = pd.read_csv(SI_PATH, usecols=["Season", "Round_num", "ID"] + ADV_COLS)
+    adv = adv[adv.Season == season].drop(columns="Season").drop_duplicates(
+        ["Round_num", "ID"])
+    g = g.merge(adv, on=["Round_num", "ID"], how="left")
+    if player not in set(g.Player_Name):
+        raise SystemExit(f"{player} has no {season} games.")
+
+    d = {"player": player, "season": season, "afl_round": afl_round,
+         "raw_split": raw_split}
+    for side, w in (("before", g[g.Round_num < raw_split]),
+                    ("after", g[g.Round_num >= raw_split])):
+        mine = w[w.Player_Name == player]
+        if mine.empty:
+            raise SystemExit(f"{player} played no game {side} round {afl_round}.")
+        nrounds = w.Round_num.nunique()
+        floor = max(1, round(nrounds * FORM_MIN_SHARE))
+        lo, hi = w.Round_num.min(), w.Round_num.max()
+        mids = _midfielders(lo, hi, season)
+        if player not in mids:
+            raise SystemExit(
+                f"{player} averaged under {MID_CBA}% centre bounce attendance "
+                f"{side} round {afl_round}, so the goals row has no rank on one "
+                f"side. Lower MID_CBA or drop the row.")
+        val, rank, pool = {}, {}, {}
+        for _, col, _, group in FORM_ROWS:
+            val[col] = float(mine[col].mean())
+            q = w.groupby("Player_Name")[col].agg(["size", "mean"])
+            q = q[q["size"] >= floor]
+            if group == "mid":
+                q = q[q.index.isin(mids)]
+            rank[col] = int((q["mean"] > val[col]).sum()) + 1
+            pool[group] = len(q)
+        d[side] = {"games": len(mine), "val": val, "rank": rank,
+                   "pool": pool[None], "mid_pool": pool.get("mid"),
+                   "rounds": nrounds, "floor": floor,
+                   "won": int((mine.Outcome == "W").sum()),
+                   "lost": int((mine.Outcome == "L").sum()),
+                   "ev_total": float(mine.Exp_Votes.sum()),
+                   "cv_total": float(mine.Coaches_Votes.sum())}
+    return d
+
+
+def draw_form(player, place, tagline, fm):
+    img = Image.new("RGB", (W * S, H * S), BG)
+    k = ImageDraw.Draw(img)
+    m, right = 56 * S, (W - 56) * S
+    lab_w = 330 * S
+    col_x0 = m + lab_w
+    col_w = (right - col_x0) // 2
+    centre = [col_x0 + col_w // 2, col_x0 + col_w + col_w // 2]
+    sides = ["before", "after"]
+
+    def text(xy, t, f, fill, anchor="la"):
+        k.text(xy, t, font=f, fill=fill, anchor=anchor)
+
+    PANEL_TOP, PANEL_BOT = 282 * S, 1444 * S
+    cx0 = col_x0 + col_w
+    k.rectangle([cx0, PANEL_TOP, cx0 + col_w, PANEL_BOT], fill=PANEL)
+    k.rectangle([cx0, PANEL_TOP, cx0 + col_w, PANEL_TOP + 3 * S], fill=EMERALD)
+
+    draw_mark(img, m, 44 * S, 29)
+    text((right, 44 * S), f"BROWNLOW COUNTDOWN   {ordinal(place).upper()}",
+         font("display", 29), MUTED, anchor="ra")
+    k.rectangle([m, 100 * S, right, 101 * S], fill=LINE)
+    text((m, 132 * S), player.upper(), font("name", 80), INK)
+    if tagline:
+        text((m, 234 * S), tagline, font("body", 33), MUTED)
+
+    rd = fm["afl_round"]
+    heads = [f"BEFORE ROUND {rd}", f"ROUND {rd} ONWARDS"]
+    for i, side in enumerate(sides):
+        cur = side == "after"
+        text((centre[i], 302 * S), heads[i], font("display", 36),
+             EMERALD if cur else INK, anchor="ma")
+        text((centre[i], 360 * S), f"{fm[side]['games']} GAMES",
+             font("display", 25), MUTED, anchor="ma")
+        text((centre[i], 394 * S),
+             f"{fm[side]['won']} WINS, {fm[side]['lost']} LOSSES",
+             font("display", 23), MUTED, anchor="ma")
+    k.rectangle([m, 430 * S, right, 431 * S], fill=LINE)
+
+    top = 452 * S
+    rh = int((PANEL_BOT - top) / len(FORM_ROWS))
+    for ri, (lines, col, fmt, group) in enumerate(FORM_ROWS):
+        y = top + ri * rh
+        if ri:
+            k.rectangle([m, y - 12 * S, right, y - 11 * S], fill=LINE)
+        ly = y + (int(rh / S * 0.24) if len(lines) == 1 else int(rh / S * 0.11)) * S
+        for li, ln in enumerate(lines):
+            text((m, ly + li * 44 * S), ln, font("display", 34), INK)
+        for i, side in enumerate(sides):
+            cur = side == "after"
+            text((centre[i], y + int(rh / S * 0.10) * S),
+                 fmt.format(fm[side]["val"][col]), font("fig", 70),
+                 EMERALD if cur else INK, anchor="ma")
+            # A bare ordinal everywhere except the one row ranked against a
+            # different population. That row says so, because "2nd" beside six
+            # league ranks would read as 2nd in the league.
+            note = ordinal(fm[side]["rank"][col])
+            if group == "mid":
+                note += MID_SUFFIX
+            text((centre[i], y + int(rh / S * 0.56) * S), note,
+                 font("display", 28), EMERALD if cur else RANK_INK, anchor="ma")
+
+    # No footer text on a card, by standing rule. Every threshold and
+    # window qualifier this used to carry now lives in the draft copy.
+
+    os.makedirs(OUT_DIR, exist_ok=True)
+    slug = re.sub(r"[^a-z0-9]+", "_", player.lower()).strip("_")
+    path = os.path.join(OUT_DIR, f"countdown_{place:02d}_{slug}_form_r{rd}.png")
+    img.save(path, "PNG", optimize=True)
+    prev = path.replace(".png", "_timeline.png")
+    img.resize((350, int(350 * H / W)), Image.LANCZOS).save(prev, "PNG")
+    return path, prev
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("player")
     ap.add_argument("place", type=int)
     ap.add_argument("--tagline", default="")
     ap.add_argument("--font", default="twcen", help=", ".join(FONT_SETS))
-    ap.add_argument("--mode", choices=("compare", "games"), default="compare",
-                    help="compare = season v season; games = the biggest games")
+    ap.add_argument("--mode", choices=("compare", "games", "split", "form"),
+                    default="compare",
+                    help="compare = season v season; games = the biggest games; "
+                         "split = with/without a named club-mate; "
+                         "form = the season either side of a round")
+    ap.add_argument("--split-round", dest="split_round", type=int, default=0,
+                    help="form mode: the AFL round the second window starts at "
+                         "(the AFL's own number, not the raw AFLTables one)")
+    ap.add_argument("--without", default="",
+                    help="split mode: the club-mate whose absence defines the split")
     ap.add_argument("--games", type=int, default=3,
                     help="games mode: how many to consider (weak ones are trimmed)")
+    ap.add_argument("--game-stats", dest="game_stats", default="",
+                    help="games mode: comma-separated catalogue columns to show "
+                         "in every block instead of the automatic pick (e.g. "
+                         "\"Clearances,Contested.Possessions,Metres_Gained\")")
     ap.add_argument("--seasons", type=int, default=2, choices=(2, 3),
                     help="2 = 2025 v 2026 (default), 3 = adds 2024")
+    ap.add_argument("--stats", default="",
+                    help="comma-separated catalogue columns to show instead of "
+                         "the automatic pick, in row order (e.g. "
+                         "\"Clearances,Metres_Gained,Inside.50s\")")
     a = ap.parse_args()
     set_fonts(a.font)
     seasons = [2024, 2025, 2026][-a.seasons:]
+    if a.mode == "form":
+        if not a.split_round:
+            raise SystemExit("form mode needs --split-round <AFL round>")
+        fm = gather_form(a.player, a.split_round)
+        p, prev = draw_form(a.player, a.place, a.tagline, fm)
+        print(f"OK  wrote {p}")
+        print(f"    timeline preview: {prev}")
+        print(f"    split at AFL round {a.split_round} = raw Round_num "
+              f"{fm['raw_split']}")
+        for side in ("before", "after"):
+            r = fm[side]
+            bits = [f"{c.split('.')[0][:9]} {r['val'][c]:.2f}"
+                    f"({ordinal(r['rank'][c])}{'m' if grp else ''})"
+                    for _, c, _, grp in FORM_ROWS]
+            print(f"    {side:<7}{r['games']:>2}g {r['won']}-{r['lost']}  "
+                  + "  ".join(bits))
+            print(f"           expected votes total {r['ev_total']:.2f}, "
+                  f"coaches votes total {r['cv_total']:.0f}, "
+                  f"pool {r['pool']} at {r['floor']}+ of {r['rounds']} rounds")
+        return 0
+    if a.mode == "split":
+        if not a.without:
+            raise SystemExit("split mode needs --without \"<club-mate>\"")
+        sp = gather_split(a.player, a.without)
+        p, prev = draw_split(a.player, a.place, a.tagline, sp)
+        print(f"OK  wrote {p}")
+        print(f"    timeline preview: {prev}")
+        for side in ("with", "without"):
+            r = sp[side]
+            bits = [f"{c[:14]} {r['val'][c]:.1f}({ordinal(r['rank'][c])})"
+                    for _, c, _ in SPLIT_ROWS]
+            print(f"    {side:<8}{r['games']:>2}g  " + "  ".join(bits))
+        print(f"    without rounds: {sp['rounds']['without']}")
+        return 0
     d = gather(a.player, seasons)
-    picked = pick_stats(d, seasons)
+    picked = force_stats(a.stats) if a.stats else pick_stats(d, seasons)
     if a.mode == "games":
-        games = top_games(a.player, picked, n=a.games)
+        force = [c.strip() for c in a.game_stats.split(",") if c.strip()]
+        games = top_games(a.player, picked, n=a.games, force=force or None)
         p, prev = draw_games(a.player, a.place, games, d)
     else:
         p, prev = draw(a.player, a.place, a.tagline, d, seasons, picked)
