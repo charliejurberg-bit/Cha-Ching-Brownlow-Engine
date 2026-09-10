@@ -655,7 +655,7 @@ def coaches_frame(d):
 
     g = d["games"]
     j = cv.merge(g[["Season", "Round_num", "Player_Name", "Club", "ID",
-                    "Votes"]],
+                    "Votes", "Home.team", "Away.team"]],
                  left_on=["Season", "Round", "A", "club"],
                  right_on=["Season", "Round_num", "Player_Name", "Club"],
                  how="left")
@@ -674,6 +674,40 @@ def coaches_frame(d):
     d["_cv"] = (j, cover, {"dup_games": n_dup, "bad_30": n_bad,
                            "leaked_finals": leaked, "unresolved": n_unres})
     return d["_cv"]
+
+
+def reverse_frame(d):
+    """Every Brownlow row in a coaches-covered game, with cv filled to 0.
+
+    THE COACHES FILE HOLDS ONLY PLAYERS WHO POLLED, WHICH INVERTS THE WHOLE JOIN.
+    "Most coaches votes for no Brownlow vote" can be read off the coaches rows
+    directly, because the player is in the file by definition. Its mirror, three
+    Brownlow votes for NO coaches votes, cannot: that player has no coaches row
+    at all, so he is invisible to a join that starts from the coaches side. He
+    has to be found from the Brownlow side instead, with a missing coaches row
+    read as a real zero.
+
+    That reading is only safe inside a game the coaches file actually covers. In
+    a game it does not cover, every player looks like a zero and the whole
+    fixture would arrive as 44 false findings. So the frame is restricted to
+    fixtures with at least one matched coaches row, identified in the ARCHIVE's
+    own club names rather than the feed's.
+    """
+    if "_rev" in d:
+        return d["_rev"]
+    j, cover, _ = coaches_frame(d)
+    m = j[j.ID.notna() & j["Home.team"].notna()]
+    covered = set(zip(m.Season, m.Round_num, m["Home.team"], m["Away.team"]))
+
+    g = d["games"]
+    key = list(zip(g.Season, g.Round_num, g["Home.team"], g["Away.team"]))
+    sub = g[[k in covered for k in key]].copy()
+
+    cvmap = m.set_index(["Season", "Round_num", "ID"]).cv
+    idx = pd.MultiIndex.from_arrays([sub.Season, sub.Round_num, sub.ID])
+    sub["cv"] = cvmap.reindex(idx).fillna(0.0).values
+    d["_rev"] = (sub, len(covered))
+    return d["_rev"]
 
 
 def build_coaches(d):
@@ -794,6 +828,68 @@ def build_coaches(d):
         above the coaches' read of it.""",
         table(_rank(lo.head(30)), ["rank", "player", "club", "cv", "bv",
                                    "cv_per_bv", "zero_bv_cv", "games"],
+              floatfmt=2)))
+
+    # ---- the mirror: Brownlow votes the coaches did not see ---------------
+    rev, n_cov = reverse_frame(d)
+    threes = rev[rev.Votes == 3]
+    t0 = threes[threes.cv == 0].sort_values(["Season", "Round_num"])
+    dist = threes.cv.value_counts().sort_index()
+    blocks.append((
+        "Best on ground to the umpires, NOTHING from the coaches",
+        f"""The mirror of the two tables above, and it needs a different join to
+        find at all. The coaches file lists only players who polled, so a player
+        with no coaches votes has no row in it and is invisible to any lookup
+        that starts from the coaches side. These are found from the Brownlow
+        side, inside the {n_cov:,} fixtures the coaches file actually covers, so
+        that an absent row can be read as a real zero rather than as a missing
+        game.
+
+        {len(threes):,} three-vote games sit inside a covered fixture.
+        {len(t0):,} of them ({len(t0) / max(len(threes), 1) * 100:.1f}%) drew no
+        coaches votes at all: the umpires' best on ground did not make either
+        coach's top five.
+
+        What a three-vote Brownlow game draws from the coaches:
+
+        {' | '.join(f"{int(k)} cv: {v:,}" for k, v in dist.items())}""",
+        table(_rank(t0), ["rank", "Player_Name", "Club", "Season",
+                          "Round_num", "Home.team", "Away.team"],
+              floatfmt=0)))
+
+    low = threes[threes.cv <= 2].groupby(["ID"]).agg(
+        name=("Player_Name", "first"), club=("Club", "first"),
+        n=("Votes", "size")).reset_index()
+    zero_by = threes[threes.cv == 0].groupby("ID").size().rename("with_zero")
+    low = low.join(zero_by, on="ID").fillna({"with_zero": 0})
+    low = low.sort_values(["with_zero", "n"], ascending=False)
+    blocks.append((
+        "Who collects the most three-vote games the coaches ignored",
+        """Grouped by player. n counts his three-vote games drawing two coaches
+        votes or fewer; with_zero counts the subset that drew none.
+
+        Same caution as its mirror: a player cannot appear here without first
+        having a lot of three-vote games, so this is partly a ladder of
+        best-on-ground counts. Read it against career.md's three-vote table.""",
+        table(_rank(low.head(30)), ["rank", "name", "club", "with_zero", "n"],
+              floatfmt=0)))
+
+    per_g = rev.groupby(["ID"]).agg(
+        name=("Player_Name", "first"), club=("Club", "first"),
+        bv=("Votes", "sum"), cv=("cv", "sum"), games=("Votes", "size"))
+    per_g = per_g[(per_g.games >= 60) & (per_g.bv >= 20)].copy()
+    per_g["cv_per_bv"] = per_g.cv / per_g.bv
+    blocks.append((
+        "Career: fewest coaches votes per Brownlow vote, both sides counted",
+        f"""The ratio again, but computed off the reverse frame so a game with
+        no coaches votes counts as a zero rather than as an absence. Minimum 60
+        games inside covered fixtures and 20 career Brownlow votes in them.
+
+        This is the honest version of the "umpires rate him, coaches do not"
+        claim, and it is a different table from the one above, which could only
+        see games where he polled with the coaches.""",
+        table(_rank(per_g.reset_index().sort_values("cv_per_bv").head(30)),
+              ["rank", "name", "club", "bv", "cv", "cv_per_bv", "games"],
               floatfmt=2)))
 
     # ---- season level ------------------------------------------------------
@@ -1524,6 +1620,7 @@ QUESTION_MAP = [
     ("Youngest to 100 career votes?", "age.md"),
     ("Most coaches votes for fewest Brownlow votes?", "coaches.md"),
     ("Ten coaches votes and no Brownlow vote?", "coaches.md"),
+    ("Three Brownlow votes and no coaches votes?", "coaches.md"),
     ("Who do the coaches rate that the umpires do not?", "coaches.md"),
     ("What records could fall tonight?", "projections_2026.md"),
     ("What milestones are in reach?", "projections_2026.md"),
