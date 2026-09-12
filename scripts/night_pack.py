@@ -143,7 +143,13 @@ def load(refresh=False):
     d["proj_2026"] = pd.read_csv("predictions/season_projection_2026.csv")
     gl = pd.read_csv("predictions/game_level_2026.csv", low_memory=False)
     # game_level carries exactly-duplicated rows (89 in 2026); see CLAUDE.md.
-    d["game_2026"] = gl.drop_duplicates(["Round_num", "ID"], keep="first")
+    # Deduped on name and club, NOT on ID. fitzRoy returns no ID for twelve 2026
+    # players (Charlie Cameron, Jack Ross and Jack Graham among them) and
+    # drop_duplicates counts every NaN as equal, so an ID key collapsed each
+    # round's null-ID players into one row and silently dropped the other 67.
+    # Player_Name already carries a club suffix where two players share a name.
+    d["game_2026"] = gl.drop_duplicates(
+        ["Round_num", "Player_Name", "Playing.for"], keep="first")
 
     with open(CACHE, "wb") as fh:
         pickle.dump(d, fh)
