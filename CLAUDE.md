@@ -496,6 +496,51 @@ behind it sleeps, and the sleep screen is itself a 200.
 `fetch_live_brownlow_data()` itself and computes bolters, landed and the
 leaderboard inline. Fixing one does not fix the other.
 
+**The feed's player names must be bridged onto the model frame, and a missing
+model value reads as ZERO rather than as absent.** That asymmetry is what makes
+this a correctness bug and not a blank cell: the leaderboard shows an
+unbridged player's whole total as outperformance, and Zone 1's bolter test
+(`_e < BOLTER_MODEL_MAX`) puts him under "polled, nobody called it". Measured on
+the 2026 feed, three vote-getters were in that state, the worst being Matt
+Carroll — 2 votes in display round 10, with the model on 0.86 Exp_Votes and a
+47% poll probability.
+
+Two structural causes, neither a typo. `load_game` runs
+`_disambiguate_players`, which appends `(Team)` to any name carried by more than
+one fitzRoy ID, and no feed will ever produce that suffix; and the feed uses the
+full given name ("Matthew Carroll") where the archive uses the short one.
+
+`_lt_feed_to_model_names` handles both, above the cache key so every downstream
+lookup shares one namespace. **Do not write a second resolver**: step 1 is
+`features.resolve_feed_names`, whose own docstring names the two Bailey
+Williamses as the case it exists for, and whose uniqueness guard refuses rather
+than guesses. Step 2 is the `(base name, club)` hop onto the disambiguated name,
+which only this page needs.
+
+`AFL_AWARD_TEAM_FIXES` is separate from `COACHES_TEAM_FIXES` on purpose and the
+two must not be merged. The same six clubs differ from AFLTables in both feeds,
+but this one shouts two of them — `Gold Coast SUNS`, `GWS GIANTS` — where the
+coaches feed title-cases them, and `.replace()` is exact-match. Sharing the dict
+leaves both clubs unfixed and every one of their players unresolvable by the
+team-scoped layer, which is exactly where the two Bailey Williamses are told
+apart.
+
+**`asm["recon"]` is written and never read.** Its three buckets are named `hit`,
+`blanked` and `bolter`, which mirror Zone 1's three panels exactly, so it reads
+as the thing that fills them. It is not: the page builds `_bolters` / `_landed`
+/ `_missed` inline. It also differs from the render in two ways, so it is not
+even a stale copy — it skips `last_round == 0` (the whole Opening Round
+segment) and it calls any 2+ vote player off the card a bolter without the
+model test. Change the render, not this.
+
+**A signed-in account renders four panels an anonymous visitor never sees**, so
+verifying the page signed out verifies about half of it. `_wl_visible` is
+`_wl is not None`, and `_wl` is `None` without a user — which drops Zone 3
+(upcoming targets), the H2H panel, the ★ set and the "My watchlist only"
+filter before they render. To exercise them, patch the four `user_auth`
+loaders (`current_user`, `load_poll_picks`, `load_h2h_pair`, `load_watchlist`);
+they are the page's whole interface to an account.
+
 ## Dashboard pages
 
 Navigation is a **tab bar of at most two rows** (the hub row is admin-only, see
