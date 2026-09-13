@@ -102,9 +102,14 @@ TWEET_MAX = 600
 # minutes, matching the Live Tracker's own ttl. A pass costs one feed read and
 # one pack load off a warm cache, so the loop is idle most of the interval.
 WATCH_INTERVAL = 60
+# One definition, so --watch and --last cannot end up reading different files.
+DEFAULT_WATCH_LOG = os.path.join("drafts", "count_night_tweets.txt")
 # How often --watch says it is still alive while nothing is changing, so a quiet
 # terminal is distinguishable from a dead one without burying the drafts.
 HEARTBEAT_EVERY = 600
+# A --watch heartbeat line, so --last can strip them back out. They are the
+# watcher reporting on itself and are noise in an answer to "what do I post".
+_HEARTBEAT = re.compile(r"^\[\d{2}:\d{2}:\d{2}\] ")
 BOARD_ROWS = 4            # names under the medallist on the final board
 LEADER_ROWS = 5
 LEADER_ROWS_MAX = 7       # a tie straddling the cut is shown whole up to this
@@ -1799,6 +1804,59 @@ class _Tee:
             pass
 
 
+def read_last(log, n=1):
+    """Print the last n drafted sections from a --watch log. Returns an int code.
+
+    FOR CHECKING IN FROM A PHONE. --watch writes the whole night to one file,
+    which by the end is several hundred lines, and the answer to "what just
+    landed" is the last section of it. Reading the file is all this does: no
+    feed request, no pack load, no model, so it answers instantly and costs
+    nothing whether it is read over Remote Control or in a terminal.
+
+    Cheapness is the point rather than a bonus. Checking in after each of 25
+    rounds by having an assistant read the entire growing log is 25 reads of a
+    file that ends up 450 lines long; this hands back only the rounds asked for.
+
+    Sections are delimited by emit()'s 72-character banner, written as
+    banner / TITLE / banner, so a heartbeat line between sections cannot be
+    mistaken for one.
+    """
+    if not os.path.exists(log):
+        print(f"no log yet at {log}. Has --watch been started?")
+        return 1
+    with open(log, encoding="utf-8") as fh:
+        lines = fh.read().split("\n")
+
+    bar = "=" * 72
+    starts = [i for i in range(len(lines) - 2)
+              if lines[i] == bar and lines[i + 2] == bar]
+    if not starts:
+        print(f"{log} has no drafted rounds yet. "
+              f"{sum(1 for ln in lines if ln.strip())} lines so far, "
+              f"most recently:")
+        for ln in [x for x in lines if x.strip()][-3:]:
+            print(f"  {ln}")
+        return 0
+
+    n = max(1, int(n))
+    picked = starts[-n:]
+    for j, s in enumerate(picked):
+        end = starts[starts.index(s) + 1] if starts.index(s) + 1 < len(starts) \
+            else len(lines)
+        body = "\n".join(lines[s:end]).rstrip()
+        # Heartbeats are the watcher talking to itself; they are noise in an
+        # answer to "what do I post".
+        body = "\n".join(ln for ln in body.split("\n")
+                         if not _HEARTBEAT.match(ln))
+        print(body.rstrip())
+        if j < len(picked) - 1:
+            print()
+    if len(starts) > n:
+        print(f"\n({len(starts)} sections drafted so far; showing the last "
+              f"{n}. Pass --last {len(starts)} for all of them.)")
+    return 0
+
+
 def watch(args):
     """Poll the count until it finishes, drafting each round as it lands.
 
@@ -1825,7 +1883,7 @@ def watch(args):
     """
     import time as _t
     os.makedirs("drafts", exist_ok=True)
-    log = args.log or os.path.join("drafts", "count_night_tweets.txt")
+    log = args.log or DEFAULT_WATCH_LOG
     os.makedirs(os.path.dirname(log) or ".", exist_ok=True)
     tee = _Tee(sys.stdout, log)
     real_stdout, sys.stdout = sys.stdout, tee
@@ -1878,14 +1936,24 @@ def main(argv=None):
                     help=f"watch: seconds between polls (default "
                          f"{WATCH_INTERVAL})")
     ap.add_argument("--log", default=None,
-                    help="watch: file to append the night to "
-                         "(default drafts/count_night_tweets.txt)")
+                    help=f"watch/--last: the night's log "
+                         f"(default {DEFAULT_WATCH_LOG})")
     ap.add_argument("--round", default="all",
                     help="a round number, 'all', or 'final' for the "
                          "end-of-count posts alone")
     ap.add_argument("--replay", action="store_true",
                     help="live: redraft rounds already emitted")
+    ap.add_argument("--last", nargs="?", const=1, type=int, default=None,
+                    metavar="N",
+                    help="print the last N drafted sections from the watch "
+                         "log and exit (default 1). Reads the file only")
     args = ap.parse_args(argv)
+
+    # --last answers from the log alone, so it takes neither --dry-run nor
+    # --live and is checked before the mode test below. It is what a check-in
+    # from a phone runs.
+    if args.last is not None:
+        return read_last(args.log or DEFAULT_WATCH_LOG, args.last)
     if args.watch:
         # --watch is a live-only mode by definition: it exists to sit through a
         # count. Implying --live rather than demanding both keeps the command
