@@ -162,19 +162,38 @@ def _disperse(rem, sigma, rng):
 
 
 def win_probabilities(current, games, n_players, n_sims=DEFAULT_SIMS,
-                      sigma=SIGMA, seed=0):
+                      sigma=SIGMA, seed=0, split_ties=False):
     """P(finishes on top) per player, given votes already read.
 
-    current is an (n_players,) array of votes counted so far. A shared lead
-    counts as a win for each player tied on it, because a tied count shares the
-    medal. Returns (win probability array, simulated final totals).
+    current is an (n_players,) array of votes counted so far.
+
+    TWO DEFENSIBLE READINGS OF A TIE, and the caller picks.
+
+    split_ties=False credits a shared lead to EVERY player tied on it, because
+    a tied count shares the medal and each of them wins one. That is the right
+    question for the backtest, which scores against a winners set built the
+    same way, and it is the default so that scoring is never changed by
+    accident.
+
+    split_ties=True divides a tied simulation between the players tied on it,
+    which makes the result a proper distribution summing to one. That is the
+    right question for a published leaderboard: under the first reading the
+    percentages sum past 100 and a reader adding up the column finds 103.
+
+    The gap between them is the chance of a tie, 3.7% at round 8 of the 2026
+    count, and it is real rather than noise.
+
+    Returns (win probability array, simulated final totals).
     """
     rng = np.random.default_rng(seed)
     rem = simulate_remaining(games, n_players, n_sims, rng)
     rem = _disperse(rem, sigma, rng)
     totals = rem.astype(np.int32) + current.astype(np.int32)
     best = totals.max(axis=1, keepdims=True)
-    return (totals == best).mean(axis=0), totals
+    hit = (totals == best)
+    if split_ties:
+        return (hit / hit.sum(axis=1, keepdims=True)).mean(axis=0), totals
+    return hit.mean(axis=0), totals
 
 
 # ---------------------------------------------------------------------------
@@ -193,7 +212,7 @@ def _season_frame(df, season):
 
 
 def chances_from_frame(remaining, current_by_name, n_sims=DEFAULT_SIMS,
-                       sigma=SIGMA, seed=0):
+                       sigma=SIGMA, seed=0, split_ties=True):
     """{player: chance of finishing on top} for a count in progress.
 
     `remaining` is the game-level frame for the rounds still to be read, with
@@ -211,8 +230,12 @@ def chances_from_frame(remaining, current_by_name, n_sims=DEFAULT_SIMS,
     current = np.array([current_by_name.get(n, 0) for n in names],
                        dtype=np.float64)
     games = _game_arrays(remaining)
+    # split_ties defaults True here and False in win_probabilities: everything
+    # that reads this function publishes the number, and a published column has
+    # to add up. The backtest calls win_probabilities directly and keeps the
+    # tie-inclusive reading its scoring is built on.
     p, totals = win_probabilities(current, games, len(names), n_sims,
-                                  sigma=sigma, seed=seed)
+                                  sigma=sigma, seed=seed, split_ties=split_ties)
     mean_total = totals.mean(axis=0)
     return ({n: float(p[i]) for i, n in enumerate(names)},
             {n: float(mean_total[i]) for i, n in enumerate(names)})

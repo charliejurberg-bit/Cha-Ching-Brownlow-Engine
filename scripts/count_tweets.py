@@ -217,6 +217,41 @@ def _pick_stats(ranked, limit=None):
     return window[:limit]
 
 
+def _chance_dp(c):
+    """Fewest decimals that state this probability without degrading it to 0 or
+    100, or None when no number of them will (it is exactly one or exactly
+    zero across every simulation)."""
+    pct = float(c) * 100
+    for dp in (0, 1, 2):
+        if 0 < float(f"{pct:.{dp}f}") < 100:
+            return dp
+    return None
+
+
+def _chance_txt(c, dp=None):
+    """A probability that never reads as certain, or as impossible, when it is
+    neither.
+
+    "100% chance of winning" with eight rounds unread is a claim the simulation
+    never made: at round 16 of the 2026 count it says 99.8, and a zero-decimal
+    format rounds the doubt away. A count is not over until it is over, and a
+    post claiming certainty is the one that cannot be walked back if it lands
+    wrong. Only a probability that is exactly one or exactly zero across every
+    simulation falls back to a bound, and a bound is still not a certainty.
+
+    `dp` is passed by a caller showing several of these together, so one column
+    does not mix precisions. Left to itself, round 12 rendered Bailey Smith's
+    0.856 as "1%" beside Marcus Bontempelli's 0.372 as "0.4%", which reads as
+    carelessness rather than as the two different magnitudes it is.
+    """
+    pct = float(c) * 100
+    if dp is None:
+        dp = _chance_dp(c)
+    if dp is not None and 0 < float(f"{pct:.{dp}f}") < 100:
+        return f"{pct:.{dp}f}%"
+    return ">99.99%" if pct >= 100 else "<0.01%"
+
+
 def _stat_txt(lab, v):
     """One stat, agreeing in number."""
     if float(v) == 1:
@@ -927,11 +962,16 @@ def block_leader_watch(rs, ctx, where):
         return rs["totals"].get(pid, 0) if pid is not None else 0
 
     lines.append("")
+    # One precision for the whole column, the coarsest that leaves every row
+    # honest. Rows that need a bound do not constrain it.
+    _dps = [d for d in (_chance_dp(c) for _, c in ranked) if d is not None]
+    _dp = max(_dps) if _dps else 0
     for game, c in sorted(ranked, key=lambda e: (-_votes(e), -e[1])):
         now = _votes((game, c))
         lines.append(f"{_disp(ctx, game)} {now} "
                      f"vote{'' if now == 1 else 's'}, exp final tally "
-                     f"{projected.get(game, 0):.0f}, {c:.0%} chance of winning")
+                     f"{projected.get(game, 0):.0f}, {_chance_txt(c, _dp)} "
+                     f"chance of winning")
 
     # The 3-2-1 read belongs to whoever actually leads the count, not to
     # whoever the simulation likes best: the two are different players early,
