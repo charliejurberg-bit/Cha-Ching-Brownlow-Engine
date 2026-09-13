@@ -496,6 +496,25 @@ behind it sleeps, and the sleep screen is itself a 200.
 `fetch_live_brownlow_data()` itself and computes bolters, landed and the
 leaderboard inline. Fixing one does not fix the other.
 
+**Driving the night: `python scripts/count_tweets.py --watch`.** One command
+for the whole count. It polls every 60s, drafts each round once it is finished,
+teas the night to `drafts/count_night_tweets.txt`, and stops itself after the
+end-of-count posts. It never posts.
+
+**It must stay a plain Python loop, not a `/loop`.** Every post in
+`count_tweets.py` is templated, which the module states as a deliberate choice
+in its own header: a templated post cannot invent an accuracy claim under time
+pressure. So nothing on the night needs a model, and a `/loop` would spend a
+full model call per tick, roughly 25 of them, for deterministic output. Token
+cost of `--watch` is zero.
+
+**`drafts/count_night_drafted_<season>.txt` is what stops a round drafting
+twice**, and it is the file to be careful with. If it already lists every round,
+`--watch` correctly draws the conclusion that there is nothing new and drafts
+NOTHING, with no error. Any test of the live path must redirect `_seen_path`
+elsewhere rather than write it. Deleting it mid-count is the opposite failure:
+the next poll redrafts the whole night and buries the round that just landed.
+
 **The feed's player names must be bridged onto the model frame, and a missing
 model value reads as ZERO rather than as absent.** That asymmetry is what makes
 this a correctness bug and not a blank cell: the leaderboard shows an
