@@ -6453,6 +6453,24 @@ if _page == 'Live Tracker':
     _pill_state, _mode_state = _LT_STATE_TXT.get(
         _lt_state, _LT_STATE_TXT["UNKNOWN"])
 
+    # The banner under the board is drawn from the same state as the pill, for
+    # the same reason the pill and the mode line are. It used to be one hardcoded
+    # sentence on the `not _lt_live` branch, and UNKNOWN falls into that branch
+    # too — so a missing or unreadable snapshot mid-count produced a page whose
+    # pill read UNVERIFIED over a banner asserting the count had not started,
+    # with live votes on the board underneath. Contradicting itself is worse
+    # than either message alone. COUNTING and COUNTED carry no banner; the board
+    # is the message there.
+    _LT_STATE_NOTE = {
+        "PREDICTOR": ("Count night hasn't started yet. This is the AFL's own Brownlow "
+                      "predictor for the current season, not live votes. The page "
+                      "updates automatically once the count begins."),
+        "UNKNOWN":   ("Showing the AFL's Brownlow feed, but this page could not verify "
+                      "whether it is serving predictions or live count votes. Treat the "
+                      "numbers below as unconfirmed."),
+    }
+    _lt_note = _LT_STATE_NOTE.get(_lt_state)
+
     _lt_auto = False  # set in the utility line below; init so refresh guard is safe
 
     # ── named constants (single source for the reconciliation thresholds) ──
@@ -6505,16 +6523,10 @@ if _page == 'Live Tracker':
     elif _lt_df.empty:
         _lt_ph.empty()
         st.iframe(_hdr_html, height=54)
-        st.info(
-            "Count night hasn't started yet — showing AFL's own Brownlow predictor data "
-            "for the current season. This page will update automatically on count night."
-        )
+        st.info(_lt_note or _LT_STATE_NOTE["PREDICTOR"])
     else:
-        if not _lt_live:
-            st.info(
-                "Count night hasn't started yet — showing AFL's own Brownlow predictor data "
-                "for the current season. This page will update automatically on count night."
-            )
+        if _lt_note:
+            st.info(_lt_note)
 
         # ── shared assembly: live votes + model per-round signal + watchlist ──
         # A signed-in user's own poll picks are the watchlist, and the only
@@ -6840,7 +6852,22 @@ if _page == 'Live Tracker':
         _live_pill = (f'<span class="live">{_pill_state}</span>' if _lt_live else
                       f'<span class="live" style="color:var(--muted);'
                       f'border-color:var(--hair2)">{_pill_state}</span>')
-        _pct = max(0.0, min(100.0, _disp_round / 24 * 100))
+        # Progress is "how many rounds have been read out", not the round
+        # index. There are 25 of them — Opening Round plus 1..24 — and the
+        # feed numbers Opening Round 0, so the count after it is _disp_round+1.
+        # Reading the index straight put the bar on 0% with Opening Round
+        # already on the board, and printed "Round 0 of 24 counted" under it.
+        # _any_votes separates the two states the index cannot: nothing counted
+        # yet, which is what the first minutes of the night look like, from
+        # Opening Round counted. Both arrive here as _disp_round == 0.
+        _any_votes = any(_rv for _rv in _asm["round_votes"].values())
+        if not _any_votes:
+            _prog_txt, _pct = "No rounds counted yet", 0.0
+        elif _disp_round == 0:
+            _prog_txt, _pct = "Opening Round counted", 100.0 / 25
+        else:
+            _prog_txt = f"Round {_disp_round} of 24 counted"
+            _pct = max(0.0, min(100.0, (_disp_round + 1) / 25 * 100))
 
         # ── CSS: mockup tokens + structure verbatim (standalone votes-feed
         #    rules dropped per the redesign; .mexp retained — used by .rrow). ──
@@ -7242,7 +7269,7 @@ if _page == 'Live Tracker':
   <div class="prog">
     <span class="lbl">Count progress</span>
     <div class="track"><div class="fill" style="width:{_pct:.1f}%"></div></div>
-    <span class="rd">Round {_disp_round} of 24 counted</span>
+    <span class="rd">{_prog_txt}</span>
   </div>
 
   <div class="race">
