@@ -139,6 +139,9 @@ SNUB_MIN_COACHES = 8      # measured: see the module docstring
 SNUB_GOALS_SHOWN = 2      # show goals only when one of the two kicked this many
 FIRST_VOTE_MIN_GAMES = 65    # the 90th percentile of every first vote since 1985
 FIRST_VOTE_RANK_MENTION = 25  # name the wait only this near the top of that list
+VOTE_GAP_MIN = 75         # games between two votes before it is worth saying
+VOTE_GAP_RANK_MENTION = 10   # name the position only this near the top
+VOTE_GAP_FROM = 1984      # the per-game vote archive starts here
 FIRST_VOTE_FROM = 1985    # careers that start inside the per-game archive
 NUMBER_WORD = {2: "two", 3: "three"}
 ACTIVE_FROM = 2020        # vote_milestones' own test for "the active one"
@@ -1195,12 +1198,138 @@ def block_snub(rs, ctx, where):
 
 
 # Single-line items, bundled into the round's own reply in this order.
+def _last_archived_vote():
+    """{fitzRoy ID: (season, round order)} of the last vote in the archive.
+
+    The archive ends at 2025, so this is "before tonight" by construction and
+    needs no filtering against the current season.
+    """
+    if "last_vote" in _GAMES_CACHE:
+        return _GAMES_CACHE["last_vote"]
+    d = npk.load()
+    v = d["games"]
+    vv = v[v.Votes > 0][["ID", "Season", "Round_num"]].dropna(subset=["ID"]).copy()
+    vv["ID"] = vv.ID.astype(int)
+    vv["_ord"] = vv.Round_num.map(_round_order)
+    vv = vv.sort_values(["Season", "_ord"]).groupby("ID").last()
+    out = {int(i): (int(r.Season), int(r._ord)) for i, r in vv.iterrows()}
+    _GAMES_CACHE["last_vote"] = out
+    return out
+
+
+def vote_gap_ladder():
+    """(name, from_season, to_season, games) for every gap between two
+    consecutive Brownlow votes since 1984, longest first.
+
+    The gap is games PLAYED between the two votes, finals included, on exactly
+    the basis career_game_number uses. bisect over the same sorted per-career
+    game list is the same arithmetic as that function's count, and the +1 each
+    end would add cancels in a subtraction.
+
+    Measured before it was used, like every other threshold in this file. Over
+    the 20,189 vote-to-vote intervals since 1984:
+
+        0-49 games   19,900     498 a season, so worth nothing
+        50-99           269     6.7 a season
+        100-149          19     0.5 a season
+        150+              1     Heath Grundy, 2010 to 2017, 162 games
+
+    VOTE_GAP_MIN is 75, which fires about twice a season. At 60 it is four a
+    season and stops being a rarity; at 100 whole seasons pass with nothing.
+    """
+    if "vote_gaps" in _GAMES_CACHE:
+        return _GAMES_CACHE["vote_gaps"]
+    import bisect
+    d = npk.load()
+    v = d["games"]
+    vv = v[v.Votes > 0][["ID", "Season", "Round_num", "Player_Name"]].dropna(
+        subset=["ID"]).copy()
+    vv["ID"] = vv.ID.astype(int)
+    vv["_ord"] = vv.Round_num.map(_round_order)
+    vv = vv.sort_values(["ID", "Season", "_ord"])
+    games = all_games_played()
+    rows = []
+    for cid, grp in vv.groupby("ID"):
+        seq = games.get(int(cid))
+        if not seq:
+            continue
+        pts = list(zip(grp.Season, grp._ord, grp.Player_Name))
+        for (s0, o0, _), (s1, o1, nm) in zip(pts, pts[1:]):
+            rows.append((nm, int(s0), int(s1),
+                         bisect.bisect_left(seq, (s1, o1))
+                         - bisect.bisect_left(seq, (s0, o0))))
+    rows.sort(key=lambda r: -r[3])
+    _GAMES_CACHE["vote_gaps"] = rows
+    return rows
+
+
+def block_vote_gap(rs, ctx):
+    """A player polling again after a long time without.
+
+    THE OTHER SIDE OF A FIRST VOTE. block_first_vote catches a career's first;
+    this catches the ones who polled early, disappeared from the umpires'
+    cards for years, and came back. Ryan Lester last polled in 2017 and polls
+    again 137 games later, which is the fourth longest gap since 1984.
+
+    The previous vote is taken from TONIGHT first and the archive second. A
+    player who polled in round 2 and again in round 20 has a gap of eighteen
+    rounds, not of the years since 2022, and reading the archive alone would
+    announce the same stale gap every time he polled all night.
+
+    Both ends are career game numbers on one basis, so the difference is games
+    he actually played and not rounds the competition played without him.
+    """
+    out = []
+    ladder = vote_gap_ladder()
+    for pid, pts in sorted(rs["votes"].items(),
+                           key=lambda kv: ctx["roster"][kv[0]]["name"]):
+        r = ctx["roster"][pid]
+        cid, game = r.get("cid"), r.get("game")
+        if not cid or not game:
+            continue
+        rd = rs["rd"]
+        played = ctx["rounds_2026"].get(game, ())
+        here = career_game_number(cid, npk.CUR_SEASON, rd + 1, played)
+
+        # Tonight's earlier votes win over the archive.
+        prev_rd = max((r0 for r0, votes in ctx["by_round"].items()
+                       if r0 < rd and votes.get(pid)), default=None)
+        if prev_rd is not None:
+            prev_n = career_game_number(cid, npk.CUR_SEASON, prev_rd + 1, played)
+            from_season = npk.CUR_SEASON
+        else:
+            hist = _last_archived_vote().get(int(cid))
+            if not hist:
+                continue                 # no earlier vote: block_first_vote's
+            s0, o0 = hist
+            prev_n = career_game_number(cid, s0, o0)
+            from_season = s0
+        gap = here - prev_n
+        if gap < VOTE_GAP_MIN:
+            continue
+        n = int(pts)
+        line = (f"{r['name']} polls his first Brownlow "
+                f"vote{'' if n == 1 else 's'} since {from_season}, "
+                f"{gap} games ago.")
+        longer = sum(1 for _, _, _, w in ladder if w > gap)
+        if longer == 0:
+            top = ladder[0]
+            line += (f" The longest any player has gone between votes since "
+                     f"{VOTE_GAP_FROM}, past {top[0]}'s {top[3]}.")
+        elif longer < VOTE_GAP_RANK_MENTION:
+            line += (f" That is the {_ordinal(longer + 1)} longest gap between "
+                     f"votes since {VOTE_GAP_FROM}.")
+        out.append(line)
+    return out
+
+
 LINE_BLOCKS = [
     ("league record", block_league_record),
     ("club season record", block_club_season_record),
     ("club career record", block_club_career_record),
     ("milestones", block_milestones),
     ("first career vote", block_first_vote),
+    ("long gap between votes", block_vote_gap),
 ]
 
 # Multi-line units, each its own post. The middle word is where it goes, and
