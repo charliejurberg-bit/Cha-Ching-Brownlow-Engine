@@ -99,8 +99,26 @@ def _name(d):
             + d["Surname"].astype(str).str.strip())
 
 
+# THE ARCHIVES AND THE PREDICTIONS DISAGREE ON TWO CLUB NAMES, and the failure
+# is silent enough to look like a missing player. The club is read from
+# predictions/season_2026.csv, which uses the AFL's current names, while both
+# stats archives carry Team as the club's older or shorter form. Sixteen of the
+# eighteen match on the nose; these two do not, and a Bontempelli card died on
+# "no rows for club 'Western Bulldogs'" rather than on anything about him.
+# Checked by differencing the two name sets rather than by listing what looked
+# wrong: Fitzroy is the only other archive-side name with no 2026 equivalent and
+# it is a defunct club, correctly absent.
+CLUB_ALIAS = {"Western Bulldogs": "Footscray",
+              "Greater Western Sydney": "GWS"}
+
+
+def _archive_club(club):
+    return CLUB_ALIAS.get(club, club)
+
+
 def club_ladder(club):
     """Every player's Brownlow votes polled for `club`, biggest first."""
+    club = _archive_club(club)
     frames = []
     for path in (STATS_HIST, STATS_ALL):
         d = pd.read_csv(path, low_memory=False)
@@ -132,6 +150,7 @@ def rate_ladder(club, floor):
     Games are games FOR THIS CLUB, matching the numerator. A traded player's
     games at his other clubs belong to neither side of this fraction.
     """
+    club = _archive_club(club)
     frames = []
     for path in (STATS_HIST, STATS_ALL):
         d = pd.read_csv(path, low_memory=False)
@@ -201,9 +220,27 @@ def build(player, n_above=3):
                      span=(int(me["first"]), int(me["last"])), me=True,
                      proj=proj, exp=exp, games=games))
 
+    # A PLAYER ALREADY 1st HAS NO RUNGS ABOVE HIM, and without this the card
+    # draws a single row on an otherwise empty page with the settled figure and
+    # the projected figure overprinting each other. Bontempelli holds the
+    # Bulldogs record by 38 votes and is the case. Show the men BEHIND him
+    # instead: the claim is then the size of the lead rather than a move, which
+    # is the only claim a record holder's ladder can make. The projection is
+    # still drawn because he is still adding to the record.
+    if len(rows) == 1:
+        below = (lad[lad["votes"] < career]
+                 .nlargest(n_above + 2, "votes")
+                 .sort_values("votes", ascending=False))
+        rows += [dict(rank=int(r["rank"]), name=r["name"], votes=int(r["votes"]),
+                      span=(int(r["first"]), int(r["last"])), me=False)
+                 for _, r in below.iterrows()]
+
     # The bar he is chasing: the lowest player still ahead of him. Passing means
     # strictly more, so the gap to a player on V is V - career + 1.
-    ahead = [r for r in rows if not r["me"]]
+    # Only players genuinely ABOVE him can be chased. Once the fallback above
+    # puts men behind him into `rows`, a plain "everyone but me" filter picks
+    # the lowest of THOSE and the footer reads "Needs -106 to pass Macrae".
+    ahead = [r for r in rows if not r["me"] and r["votes"] > career]
     target = min(ahead, key=lambda r: r["votes"]) if ahead else None
     new_rank = int((lad["votes"] > proj).sum()) + 1
     return dict(club=club, rows=rows, career=career, exp=exp, proj=proj,
@@ -281,11 +318,25 @@ def draw(player, place, b, preview=False):
             text((right, by - 6 * S), f"{r['votes']}", font("fig", 52),
                  EMERALD, anchor="ra")
             # The projected figure sits at the END of the ghost, so the eye runs
-            # bar-then-number the same way it does on every settled row.
-            text((ghost + 18 * S, by - 2 * S), f"{b['proj']:.0f}",
-                 font("fig", 40), EMERALD)
-            text((bx0, by + bh + 14 * S), f"PROJECTED AFTER {PROJ_SEASON}",
-                 font("display", 27), GHOST_INK)
+            # bar-then-number the same way it does on every settled row. That
+            # only works while the ghost stops short of the figure column: a
+            # LEADER sets the bar scale himself, so his ghost runs to the right
+            # edge and the projection overprints his settled total. Bontempelli
+            # read "2139.1". When there is no room, the projection moves under
+            # the bar and shares the label line instead.
+            # There is only room for the projection when the ghost stops short
+            # of the figure column, and a LEADER sets the bar scale himself, so
+            # his ghost runs to the right edge: Bontempelli's read "2139.1"
+            # overprinted. Moving it under the bar does not help either, because
+            # the row pitch puts that line on top of the next player's name.
+            # Both labels are therefore dropped for a leader. Nothing is lost:
+            # the ghost still draws the extension and the footer still states
+            # the expected votes in words.
+            proj_t = f"{b['proj']:.0f}"
+            if ghost + 18 * S + k.textlength(proj_t, font=font("fig", 40)) < right - 90 * S:
+                text((ghost + 18 * S, by - 2 * S), proj_t, font("fig", 40), EMERALD)
+                text((bx0, by + bh + 14 * S), f"PROJECTED AFTER {PROJ_SEASON}",
+                     font("display", 27), GHOST_INK)
         else:
             k.rectangle([bx0, by, bar_end(r["votes"]), by + bh], fill=BAR)
             text((right, by - 6 * S), f"{r['votes']}", font("fig", 52),

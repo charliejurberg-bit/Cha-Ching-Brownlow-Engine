@@ -21,10 +21,23 @@ the 93 entries in `predictions/features.pkl` and renaming it breaks
 under `Score_Involvements_Actual` and the user-facing label belongs to the real
 one.
 
-Coverage floor is 2015, measured rather than assumed: footywire's advanced
-table carries no SI column for 2003, 2010, 2011, 2012, 2013 or 2014, and does
-carry it for 2015 onward. A season before the floor is refused rather than
-written empty, because a file of nulls is indistinguishable from a failed run.
+Two coverage floors, not one, both measured rather than assumed by reading the
+advanced table's own header row across seasons.
+
+  2010  the advanced table itself begins. CP, UP, ED, DE%, CM, GA, MI5, 1%, BO
+        and TOG% are all present from Round 1 of 2010 through that year's Grand
+        Final. For 2009 and earlier `advv=Y` serves the basic table instead
+        (K, HB, D, M, G, B, T, HO, and from 2007 GA, I50, AF, SC), with no
+        efficiency column anywhere in it.
+  2015  SI, MG, ITC, CCL, SCL, TO and T5 arrive, all seven together.
+
+An earlier version of this module carried the 2015 date alone and called it the
+coverage floor. It is the SI floor. Disposal efficiency and effective disposals
+were collateral, and five seasons of them (2010-2014) sat unread behind a limit
+that was never about them. A season below ADV_FLOOR is still refused, because a
+file of nulls is indistinguishable from a failed run; a season between the two
+floors is written with the SI-era columns simply absent, and the printed summary
+says which era it was.
 
 Round numbering. footywire calls Opening Round "Round 0", so its round number
 runs one BEHIND the AFLTables raw Round_num that the rest of this repo uses
@@ -46,7 +59,12 @@ from club_aliases import canonical_club
 
 BASE = "https://www.footywire.com/afl/footy"
 OUT_DIR = "data_advanced"
-SI_FLOOR = 2015
+ADV_FLOOR = 2010   # advanced table exists at all
+SI_FLOOR = 2015    # SI, MG, ITC, CCL, SCL, TO, T5 arrive
+# Present in every season from ADV_FLOOR on, so this is what identifies the
+# stats table and what a written file is checked against. Keyed on DE% rather
+# than SI for exactly that reason: SI is era-specific, DE% is not.
+ERA_COLS = ('Effective_Disposals', 'Disposal_Efficiency_Pct')
 DELAY = 0.4
 TIMEOUT = 30
 HEADERS = {"User-Agent": "Mozilla/5.0 (compatible; brownlow-engine/1.0)"}
@@ -207,7 +225,10 @@ def match_rows(mid):
         head = None
         for tr in trs:
             txts = [td.get_text(strip=True) for td in tr.find_all('td')]
-            if txts[:1] == ['Player'] and 'SI' in txts:
+            # Keyed on DE%, present in every season from 2010. Keying on SI
+            # here is what made 2010-2014 parse to nothing even with the floor
+            # lifted: no pre-2015 header has it, so no table was ever found.
+            if txts[:1] == ['Player'] and 'DE%' in txts:
                 head = txts
                 break
         if head is None:
@@ -239,11 +260,12 @@ def match_rows(mid):
 
 
 def build(season, out_dir=OUT_DIR):
-    if season < SI_FLOOR:
+    if season < ADV_FLOOR:
         raise ValueError(
-            f"{season} is before the measured Score Involvements floor of "
-            f"{SI_FLOOR}; footywire's advanced table carries no SI column for "
-            f"it, and writing a file of nulls would look like a failed run")
+            f"{season} is before the measured advanced-table floor of "
+            f"{ADV_FLOOR}; footywire serves the basic table for it, with no "
+            f"efficiency column at all, and writing a file of nulls would "
+            f"look like a failed run")
     fx = fixture(season)
     print(f"{season}: {len(fx)} matches in the fixture", flush=True)
     frames = []
@@ -284,9 +306,23 @@ def build(season, out_dir=OUT_DIR):
     os.makedirs(out_dir, exist_ok=True)
     path = os.path.join(out_dir, f"advanced_{season}.csv")
     out.to_csv(path, index=False)
-    miss = int(out['Score_Involvements_Actual'].isna().sum())
+    # SI's absence below SI_FLOOR is expected; DE%'s absence never is.
+    for col in ERA_COLS:
+        if col not in out.columns:
+            raise RuntimeError(
+                f"{season}: {col} missing from every match. It is present in "
+                f"every season from {ADV_FLOOR}, so this is a parse failure, "
+                f"not a coverage gap")
+        null_rate = out[col].isna().mean()
+        if null_rate > 0.02:
+            raise RuntimeError(
+                f"{season}: {col} is {null_rate:.1%} null, above the 2% floor")
+
+    era = 'full' if season >= SI_FLOOR else f'pre-SI (no SI/MG/ITC/CCL/SCL/TO/T5)'
+    miss = (int(out['Score_Involvements_Actual'].isna().sum())
+            if 'Score_Involvements_Actual' in out.columns else 'n/a')
     print(f"{season}: wrote {path}, {len(out):,} player-games, "
-          f"{out['mid'].nunique()} matches, {miss} null SI", flush=True)
+          f"{out['mid'].nunique()} matches, {era}, null SI: {miss}", flush=True)
     return path
 
 
