@@ -98,6 +98,13 @@ DOMAIN_COST = 23          # Twitter counts any link as 23 characters
 # post is collapsed behind "Show more" in the timeline, which in a thread costs
 # more than splitting would. Blocks still trim themselves against it.
 TWEET_MAX = 600
+# --watch poll cadence. 60s against a count that reads a round every five or six
+# minutes, matching the Live Tracker's own ttl. A pass costs one feed read and
+# one pack load off a warm cache, so the loop is idle most of the interval.
+WATCH_INTERVAL = 60
+# How often --watch says it is still alive while nothing is changing, so a quiet
+# terminal is distinguishable from a dead one without burying the drafts.
+HEARTBEAT_EVERY = 600
 BOARD_ROWS = 4            # names under the medallist on the final board
 LEADER_ROWS = 5
 LEADER_ROWS_MAX = 7       # a tie straddling the cut is shown whole up to this
@@ -1667,36 +1674,41 @@ def build_context(players, d):
     return ctx, warnings
 
 
-def main(argv=None):
-    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    ap.add_argument("--dry-run", action="store_true",
-                    help="use the AFL predictor as stand-in votes")
-    ap.add_argument("--live", action="store_true",
-                    help="use the real count, refusing unless it is running")
-    ap.add_argument("--round", default="all",
-                    help="a round number, 'all', or 'final' for the "
-                         "end-of-count posts alone")
-    ap.add_argument("--replay", action="store_true",
-                    help="live: redraft rounds already emitted")
-    args = ap.parse_args(argv)
-    if args.dry_run == args.live:
-        raise SystemExit("pass exactly one of --dry-run or --live")
-
+def _read_feed():
+    """One read of the AFL feed. Returns (season_id, season_name, players)."""
     import count_night as cn
-    # A poll that cannot reach the AFL is an ordinary event on the night, not a
-    # crash: the next tick of the loop tries again. Say so in one line rather
-    # than printing a traceback over the drafts.
-    try:
-        sid, sname = cn.season_id()
-        players = cn.fetch(sid)
-    except Exception as exc:
-        raise SystemExit(f"could not read the AFL feed ({type(exc).__name__}: "
-                         f"{exc}). Nothing drafted; try the next poll.")
+    sid, sname = cn.season_id()
+    return sid, sname, cn.fetch(sid)
+
+
+def run_once(args, feed=None):
+    """One drafting pass. Returns (status, message).
+
+    NEVER exits the process, so --watch can keep polling through the two things
+    that are ordinary on the night rather than fatal: a feed that cannot be
+    reached, and a count that has not started yet. main() turns those back into
+    the SystemExit the single-shot modes have always raised, so --dry-run and
+    --live behave exactly as before.
+
+    Statuses: FEED_ERROR, REFUSED, NOTHING_NEW, DRAFTED, COMPLETE.
+    """
+    import count_night as cn
+    if feed is None:
+        # A poll that cannot reach the AFL is an ordinary event on the night,
+        # not a crash: the next tick of the loop tries again. Say so in one line
+        # rather than printing a traceback over the drafts.
+        try:
+            feed = _read_feed()
+        except Exception as exc:
+            return "FEED_ERROR", (f"could not read the AFL feed "
+                                  f"({type(exc).__name__}: {exc}). Nothing "
+                                  f"drafted; try the next poll.")
+    sid, sname, players = feed
 
     if args.live:
         state, why = cn.classify(cn.digest(players), cn.load_snapshot())
         if state not in ("COUNTING", "COUNTED"):
-            raise SystemExit(f"refusing: {state}. {why}")
+            return "REFUSED", f"refusing: {state}. {why}"
         print(f"{sname}: {state}. {why}")
 
     d = npk.load()
@@ -1716,9 +1728,11 @@ def main(argv=None):
     else:
         rounds, want_final = [int(args.round)], False
 
-    # A round still being read is reported and left for the next poll.
+    # A round still being read is reported and left for the next poll. Silent
+    # under --watch: the same "3 of 9 games in" line every 60 seconds buries the
+    # round that actually landed, and the status line already carries progress.
     for rd in rounds:
-        if rd not in done:
+        if rd not in done and not getattr(args, "watch", False):
             got = len(ctx["by_match"].get(rd, ()))
             print(f"  {_round_label(rd)} is still being read: {got} of "
                   f"{gpr.get(rd, 0)} games in. Not drafted yet.")
@@ -1735,9 +1749,9 @@ def main(argv=None):
         if args.round == "all" and "final" in seen:
             want_final = False
         if not rounds and not want_final:
-            print(f"no new rounds since the last run "
-                  f"({len(seen)} already drafted). Nothing to post.")
-            return 0
+            return "NOTHING_NEW", (f"no new rounds since the last run "
+                                   f"({len(seen)} already drafted). "
+                                   f"Nothing to post.")
 
     for rd in rounds:
         emit(_round_label(rd), tweets_for_round(ctx, rd), args.dry_run)
@@ -1754,6 +1768,145 @@ def main(argv=None):
     if args.live and not args.replay:
         final_done = {"final"} if want_final and complete else set()
         _save_seen(seen | {str(r) for r in rounds} | final_done)
+
+    if complete and want_final:
+        return "COMPLETE", None
+    return "DRAFTED", None
+
+
+class _Tee:
+    """stdout to the terminal AND to a file, so checking in after a round shows
+    what scrolled past. Line-buffered: the file is readable from another window
+    while the night is still running, which is the whole point of it."""
+
+    def __init__(self, stream, path):
+        self.stream = stream
+        self.fh = open(path, "a", encoding="utf-8", buffering=1)
+
+    def write(self, s):
+        self.stream.write(s)
+        self.fh.write(s)
+        return len(s)
+
+    def flush(self):
+        self.stream.flush()
+        self.fh.flush()
+
+    def close(self):
+        try:
+            self.fh.close()
+        except Exception:
+            pass
+
+
+def watch(args):
+    """Poll the count until it finishes, drafting each round as it lands.
+
+    THIS IS THE WHOLE NIGHT IN ONE COMMAND. It replaces running --live by hand
+    once per round, which is 25 invocations over about two hours while also
+    watching the broadcast.
+
+    IT NEVER POSTS AND NEVER CALLS A MODEL. Every post here is templated, so
+    there is nothing for a language model to decide per round and no token is
+    spent by this loop; it is an ordinary Python process reading a public feed.
+    Drafting is all it does. What goes out is still your call, from the
+    scrollback or from the log.
+
+    Quiet on purpose. A status line prints only when the status CHANGES, plus a
+    heartbeat every HEARTBEAT_EVERY seconds so a silent terminal is
+    distinguishable from a dead one. Everything else on screen is a draft. A
+    poll that fails is counted and retried rather than fatal: the feed dropping
+    one request is the expected case, not the end of the night.
+
+    Stops when the count is complete and the end-of-count posts have been
+    drafted. Ctrl+C stops it cleanly at any time, and because the rounds it has
+    already drafted are recorded in drafts/, restarting picks up where it left
+    off instead of replaying the night.
+    """
+    import time as _t
+    os.makedirs("drafts", exist_ok=True)
+    log = args.log or os.path.join("drafts", "count_night_tweets.txt")
+    os.makedirs(os.path.dirname(log) or ".", exist_ok=True)
+    tee = _Tee(sys.stdout, log)
+    real_stdout, sys.stdout = sys.stdout, tee
+
+    def say(msg):
+        print(f"[{_t.strftime('%H:%M:%S')}] {msg}", flush=True)
+
+    say(f"watching the count every {args.interval}s. Drafts also appended to "
+        f"{log}")
+    say("nothing is posted and no model is called. Ctrl+C to stop.")
+    last, fails, last_beat = None, 0, _t.time()
+    try:
+        while True:
+            status, msg = run_once(args)
+            if status == "FEED_ERROR":
+                fails += 1
+                # Only the first failure of a run speaks. A flapping feed would
+                # otherwise fill the screen with the same line.
+                if status != last:
+                    say(f"{msg} (failure {fails})")
+            elif status in ("REFUSED", "NOTHING_NEW"):
+                if status != last or _t.time() - last_beat > HEARTBEAT_EVERY:
+                    say(msg)
+                    last_beat = _t.time()
+            elif status == "COMPLETE":
+                say("the count is complete and the end-of-count posts are "
+                    "drafted above. Stopping.")
+                return 0
+            last = status
+            _t.sleep(args.interval)
+    except KeyboardInterrupt:
+        say("stopped. Rounds already drafted are recorded, so restarting "
+            "resumes rather than replaying.")
+        return 0
+    finally:
+        sys.stdout = real_stdout
+        tee.close()
+
+
+def main(argv=None):
+    ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
+    ap.add_argument("--dry-run", action="store_true",
+                    help="use the AFL predictor as stand-in votes")
+    ap.add_argument("--live", action="store_true",
+                    help="use the real count, refusing unless it is running")
+    ap.add_argument("--watch", action="store_true",
+                    help="live: poll all night, drafting each round as it "
+                         "lands. Never posts, never calls a model")
+    ap.add_argument("--interval", type=int, default=WATCH_INTERVAL,
+                    help=f"watch: seconds between polls (default "
+                         f"{WATCH_INTERVAL})")
+    ap.add_argument("--log", default=None,
+                    help="watch: file to append the night to "
+                         "(default drafts/count_night_tweets.txt)")
+    ap.add_argument("--round", default="all",
+                    help="a round number, 'all', or 'final' for the "
+                         "end-of-count posts alone")
+    ap.add_argument("--replay", action="store_true",
+                    help="live: redraft rounds already emitted")
+    args = ap.parse_args(argv)
+    if args.watch:
+        # --watch is a live-only mode by definition: it exists to sit through a
+        # count. Implying --live rather than demanding both keeps the command
+        # short on the one night it is typed under pressure.
+        args.live = True
+        if args.round != "all":
+            raise SystemExit("--watch drafts every round as it lands; "
+                             "do not pass --round with it")
+    if args.dry_run == args.live:
+        raise SystemExit("pass exactly one of --dry-run or --live")
+    if args.watch:
+        return watch(args)
+
+    status, msg = run_once(args)
+    # The single-shot modes exit the way they always have: a feed that cannot be
+    # read and a count that has not started are both failures to a caller that
+    # asked for one pass, and both are ordinary to the watcher.
+    if status in ("FEED_ERROR", "REFUSED"):
+        raise SystemExit(msg)
+    if msg:
+        print(msg)
     return 0
 
 
