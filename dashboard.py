@@ -6861,7 +6861,15 @@ if _page == 'Live Tracker':
         # yet, which is what the first minutes of the night look like, from
         # Opening Round counted. Both arrive here as _disp_round == 0.
         _any_votes = any(_rv for _rv in _asm["round_votes"].values())
-        if not _any_votes:
+        if _lt_state == "PREDICTOR":
+            # The predictor payload carries all 25 rounds, so the round-based
+            # meter reads "Round 24 of 24 counted" on a full green bar while the
+            # banner directly above says the count has not started. Both describe
+            # the same payload and they cannot both be true to a reader. Nothing
+            # has been counted in this state, so the meter says so; it starts
+            # moving when the feed does.
+            _prog_txt, _pct = "Count not started", 0.0
+        elif not _any_votes:
             _prog_txt, _pct = "No rounds counted yet", 0.0
         elif _disp_round == 0:
             _prog_txt, _pct = "Opening Round counted", 100.0 / 25
