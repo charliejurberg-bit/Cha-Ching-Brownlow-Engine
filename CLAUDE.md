@@ -432,6 +432,70 @@ player and never game attribution**, which fixes what it can and cannot support:
 
 Recon only. Nothing in the model pipeline reads this file.
 
+## Count night and the Live Tracker
+
+**The AFL award endpoint serves the AFL's own PREDICTOR between counts and the
+live votes on the night, at the same URL, in the same shape, with no field
+saying which.** `aflapi.afl.com.au/afl/v2/compseasons/{id}/award/brownlow`.
+Measured against two completed seasons rather than assumed: it says 2025 Dawson
+32 where the count was Rowell 39, and 2024 Cripps 33 where the count was Cripps
+45. So `any(totalVotes > 0)` is true all year and gates nothing. It was the
+deployed test until 13 September 2026, and the live page spent the season
+showing a pulsing LIVE badge over predicted totals.
+
+**The only way to tell the two apart is a before-picture.**
+`data_2026/brownlow_predictor_snapshot.json` is the pre-count payload, taken 10
+September 2026: 630 players, 1,242 votes, Daicos 47. `scripts/count_night.py
+snapshot` refuses to overwrite it without `--force`, and it cannot be retaken —
+once the count starts the pre-count payload is gone from everywhere.
+
+`_feed_state()` in `dashboard.py` compares against it and returns one of four
+states. `scripts/count_night.py status` prints the same verdict from the CLI.
+
+| State | Test | Pill / mode |
+|---|---|---|
+| PREDICTOR | totals match the snapshot | PREDICTION · Count not started |
+| COUNTING | total < `207 * 6` = 1,242 | LIVE COUNT · progress by rounds read |
+| COUNTED | full pool again, but changed | FINAL |
+| UNKNOWN | snapshot missing or unreadable | UNVERIFIED · treat as unconfirmed |
+
+**Three rules that are load-bearing, each learned from a way it went wrong:**
+
+- **It must fail to UNKNOWN, never to "live".** Labelling predictions as the
+  count is the one error that cannot be walked back.
+- **The comparison runs over the SNAPSHOT's keys, not by dict equality.** The
+  page's fetch early-stops on the first page whose tail is all zeros, so its
+  payload is truncated (210 players) while the snapshot never is (630). A plain
+  equality reads "different" on every poll and calls the predictor a live
+  count. An absent player is a zero.
+- **The pill, the mode line, the banner and the progress meter all derive from
+  that one state.** They are `_LT_STATE_TXT`, `_LT_STATE_NOTE` and `_prog_txt`
+  in `dashboard.py`. Each one that was ever written independently ended up
+  contradicting the others on the same payload: UNVERIFIED over a banner saying
+  the count had not started, and a full green "Round 24 of 24 counted" over a
+  banner saying the same. Add a new surface to the map, never beside it.
+
+**Round numbering here is the AFL feed's, not AFLTables'.** Opening Round is 0
+and the rest are 1 to 24, 25 in all, so the progress meter is
+`(_disp_round + 1) / 25` and round 0 is "Opening Round", not "Round 0". Do NOT
+apply the `Round_num - 1` law in this page; `last_round` and `_disp_round`
+arrive already offset, and `_rounds_of()` says so at its definition.
+
+**`ttl=60` on `fetch_live_brownlow_data` and the auto-refresh `sleep(60)` must
+move together**, or each refresh lands on a warm cache and pulls nothing. At
+the old 300 the board could sit five minutes stale with the votes already
+public. A round is read out every five or six minutes; unknown until the night
+is how fast the AFL feed updates against the broadcast.
+
+**The app is kept awake by `.github/workflows/keepalive.yml`**, every 15
+minutes, driving a real browser via `scripts/keepalive.py`. A curl ping cannot
+do this job: Streamlit Cloud serves the host page with a 200 while the app
+behind it sleeps, and the sleep screen is itself a 200.
+
+**`scripts/` does not feed the page.** The Live Tracker calls
+`fetch_live_brownlow_data()` itself and computes bolters, landed and the
+leaderboard inline. Fixing one does not fix the other.
+
 ## Dashboard pages
 
 Navigation is a **tab bar of at most two rows** (the hub row is admin-only, see
