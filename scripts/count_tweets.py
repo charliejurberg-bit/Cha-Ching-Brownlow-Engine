@@ -173,6 +173,47 @@ _SINGULAR = {"score involvements": "score involvement",
              "contested possessions": "contested possession"}
 
 
+def _pick_stats(ranked, limit=None):
+    """The stats to show beside a game, from the full percentile-ranked list.
+
+    Three rules, and they are in tension, so the order they resolve in is the
+    whole of this function.
+
+      HARD CAP at FIRST_VOTE_STATS. A stat line is a clause in a sentence, not
+        a box score. Appending a fourth for goals read as padding.
+      GOALS ARE ALWAYS IN when he kicked one. Percentile judges a goal against
+        the other twenty-one in the match, so in a game where three forwards
+        kicked three, the man who kicked one ranks below marks and loses the
+        only stat a reader wants said out loud.
+      DISPOSALS LEAD when they are shown. The headline stat of the game reads
+        first or the line reads like it is burying it.
+
+    Goals displace the weakest OTHER stat rather than disposals, which is what
+    keeps "28 disposals, 8 tackles, 1 goal" instead of dropping the 28 to make
+    room. Everything after disposals stays in percentile order, so goals land
+    where they were earned: first for a five-goal game, last for one.
+    """
+    limit = FIRST_VOTE_STATS if limit is None else limit
+    goal = next(((lab, v) for lab, v in ranked if lab == "goals"), None)
+    window = list(ranked[:limit])
+    if goal and goal not in window:
+        # Drop the weakest that is not disposals, then re-sort below.
+        others = [x for x in window if x[0] != "disposals"]
+        if others:
+            window.remove(others[-1])
+        else:
+            window = window[:limit - 1]
+        window.append(goal)
+    # Percentile order is the order they came in; restore it, then lead with
+    # disposals if they survived the cut.
+    order = {lab: i for i, (lab, _) in enumerate(ranked)}
+    window.sort(key=lambda x: order.get(x[0], 99))
+    disp = next((x for x in window if x[0] == "disposals"), None)
+    if disp:
+        window = [disp] + [x for x in window if x[0] != "disposals"]
+    return window[:limit]
+
+
 def _stat_txt(lab, v):
     """One stat, agreeing in number."""
     if float(v) == 1:
@@ -1057,18 +1098,7 @@ def block_first_vote(rs, ctx):
         n = int(pts)
         what = ("his first Brownlow vote" if n == 1 else
                 f"his first Brownlow votes, {NUMBER_WORD[n]} of them,")
-        # Goals are worth saying whatever else he did, so a player who kicked
-        # one is never described without it. APPENDED rather than promoted into
-        # the window: percentile ranks a single goal below almost everything in
-        # a game where three forwards kicked three, so substituting it dropped
-        # "28 disposals" off Tom Sparrow's first vote to make room for "1 goal".
-        # The strongest stats keep their places and the goal follows them.
-        _all = ctx["stat_line"].get((rn, r["game"]), [])
-        stats = _all[:FIRST_VOTE_STATS]
-        if not any(lab == "goals" for lab, _ in stats):
-            _g = next(((lab, v) for lab, v in _all if lab == "goals"), None)
-            if _g:
-                stats = stats + [_g]
+        stats = _pick_stats(ctx["stat_line"].get((rn, r["game"]), []))
         tail = (": " + ", ".join(_stat_txt(lab, v) for lab, v in stats)
                 if stats else "")
         line = f"{r['name']} polls {what} in career game {gnum}{tail}."
