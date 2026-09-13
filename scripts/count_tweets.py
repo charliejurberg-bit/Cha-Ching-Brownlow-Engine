@@ -110,6 +110,26 @@ HEARTBEAT_EVERY = 600
 # A --watch heartbeat line, so --last can strip them back out. They are the
 # watcher reporting on itself and are noise in an answer to "what do I post".
 _HEARTBEAT = re.compile(r"^\[\d{2}:\d{2}:\d{2}\] ")
+
+# Set by watch() to its timestamped say(). Everything that is not a draft goes
+# through _note, so under --watch it lands as a heartbeat line and --last strips
+# it; under the single-shot modes it prints exactly as it always has.
+#
+# THE REASON IS A REHEARSAL, NOT TIDINESS. These lines are written between one
+# round's last tweet and the next round's banner, so in the log they sit INSIDE
+# the draft they follow. No parser separates them from tweet text by position,
+# and what --last handed back was a post with
+# "2026 Toyota AFL Premiership: COUNTING. partial: 216 of 1,242 votes" on the
+# end of it. On a phone that is one careless copy away from being posted.
+_WATCH_SAY = None
+
+
+def _note(msg):
+    """A diagnostic, never a draft."""
+    if _WATCH_SAY is not None:
+        _WATCH_SAY(msg.strip())
+    else:
+        print(msg)
 BOARD_ROWS = 4            # names under the medallist on the final board
 LEADER_ROWS = 5
 LEADER_ROWS_MAX = 7       # a tie straddling the cut is shown whole up to this
@@ -496,7 +516,11 @@ def build_roster(players, polled, d):
              FEED_CLUBS.get(p.get("teamId")), bool(p.get("eligible", True)))
             for p in players]
     feed = pd.concat(
-        [resolve([r for r in rows if r[0] in polled], True, "award feed"),
+        # verbose off under --watch: the same summary every 60 seconds, written
+        # into the draft stream. A name that cannot be placed is reported
+        # separately and still reaches the log.
+        [resolve([r for r in rows if r[0] in polled],
+                 _WATCH_SAY is None, "award feed"),
          resolve([r for r in rows if r[0] not in polled], False, "unpolled")],
         ignore_index=True)
 
@@ -1714,13 +1738,13 @@ def run_once(args, feed=None):
         state, why = cn.classify(cn.digest(players), cn.load_snapshot())
         if state not in ("COUNTING", "COUNTED"):
             return "REFUSED", f"refusing: {state}. {why}"
-        print(f"{sname}: {state}. {why}")
+        _note(f"{sname}: {state}. {why}")
 
     d = npk.load()
     ctx, warnings = build_context(players, d)
     for w in [stale_cache()] + warnings:
         if w:
-            print(f"  !! {w}")
+            _note(f"  !! {w}")
     by_round = ctx["by_round"]
     gpr = games_per_round(d)
     done = finished_rounds(ctx["by_match"], gpr)
@@ -1763,11 +1787,11 @@ def run_once(args, feed=None):
 
     if want_final:
         if not complete:
-            print(f"  !! drafting the end-of-count posts on request, but only "
-                  f"{len(done)} of {len(gpr)} rounds are finished")
+            _note(f"  !! drafting the end-of-count posts on request, but "
+                  f"only {len(done)} of {len(gpr)} rounds are finished")
         drafts, notes = final_tweets(ctx)
         for n in notes:
-            print(f"  !! {n}")
+            _note(f"  !! {n}")
         emit("End of count", drafts, args.dry_run)
 
     if args.live and not args.replay:
@@ -1891,6 +1915,8 @@ def watch(args):
     def say(msg):
         print(f"[{_t.strftime('%H:%M:%S')}] {msg}", flush=True)
 
+    global _WATCH_SAY
+    _WATCH_SAY = say
     say(f"watching the count every {args.interval}s. Drafts also appended to "
         f"{log}")
     say("nothing is posted and no model is called. Ctrl+C to stop.")
@@ -1919,6 +1945,7 @@ def watch(args):
             "resumes rather than replaying.")
         return 0
     finally:
+        _WATCH_SAY = None
         sys.stdout = real_stdout
         tee.close()
 
