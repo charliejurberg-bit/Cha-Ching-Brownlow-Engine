@@ -165,6 +165,19 @@ PERF_MIN_GAMES = 10       # games before a season over/underperformance counts
 PERF_ROWS = 5
 DIVERGENCE_MIN_VOTES = 8  # Brownlow votes before a rank gap means anything
 FIRST_VOTE_STATS = 3      # stats shown beside a first career vote
+
+# STAT_LABELS are plural because a stat line almost always carries more than
+# one of a thing. "1 goals" is the exception that shows up the moment goals are
+# guaranteed a place in the line, and it reads like a bug to anyone who sees it.
+_SINGULAR = {"score involvements": "score involvement",
+             "contested possessions": "contested possession"}
+
+
+def _stat_txt(lab, v):
+    """One stat, agreeing in number."""
+    if float(v) == 1:
+        lab = _SINGULAR.get(lab, lab[:-1] if lab.endswith("s") else lab)
+    return f"{v:g} {lab}"
 WATCH_ROWS = 4            # players shown in the leader watch
 WATCH_MIN_CHANCE = 0.01   # and the chance below which one is not worth a row
 WATCH_MIN_ROWS = 3        # but never fewer than this many
@@ -873,7 +886,7 @@ def block_leader_watch(rs, ctx, where):
     for game, c in sorted(ranked, key=lambda e: (-_votes(e), -e[1])):
         now = _votes((game, c))
         lines.append(f"{_disp(ctx, game)} {now} "
-                     f"vote{'' if now == 1 else 's'}, final tally "
+                     f"vote{'' if now == 1 else 's'}, exp final tally "
                      f"{projected.get(game, 0):.0f}, {c:.0%} chance of winning")
 
     # The 3-2-1 read belongs to whoever actually leads the count, not to
@@ -1044,8 +1057,19 @@ def block_first_vote(rs, ctx):
         n = int(pts)
         what = ("his first Brownlow vote" if n == 1 else
                 f"his first Brownlow votes, {NUMBER_WORD[n]} of them,")
-        stats = ctx["stat_line"].get((rn, r["game"]), [])[:FIRST_VOTE_STATS]
-        tail = (": " + ", ".join(f"{v:g} {lab}" for lab, v in stats)
+        # Goals are worth saying whatever else he did, so a player who kicked
+        # one is never described without it. APPENDED rather than promoted into
+        # the window: percentile ranks a single goal below almost everything in
+        # a game where three forwards kicked three, so substituting it dropped
+        # "28 disposals" off Tom Sparrow's first vote to make room for "1 goal".
+        # The strongest stats keep their places and the goal follows them.
+        _all = ctx["stat_line"].get((rn, r["game"]), [])
+        stats = _all[:FIRST_VOTE_STATS]
+        if not any(lab == "goals" for lab, _ in stats):
+            _g = next(((lab, v) for lab, v in _all if lab == "goals"), None)
+            if _g:
+                stats = stats + [_g]
+        tail = (": " + ", ".join(_stat_txt(lab, v) for lab, v in stats)
                 if stats else "")
         line = f"{r['name']} polls {what} in career game {gnum}{tail}."
         waits = wait_ladder()
