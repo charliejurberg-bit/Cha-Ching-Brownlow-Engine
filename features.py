@@ -76,6 +76,23 @@ COACHES_TEAM_FIXES = {
     'West Coast Eagles': 'West Coast',
 }
 
+# The AFL award endpoint's own club spelling, for the Live Tracker's feed. Six
+# differ from AFLTables, the same six as the coaches feed — but NOT with the
+# same strings, so this cannot reuse COACHES_TEAM_FIXES. That feed writes 'Gold
+# Coast Suns' and 'GWS Giants' in title case; this one shouts them, 'Gold Coast
+# SUNS' and 'GWS GIANTS', and .replace() is exact-match. Sharing the dict would
+# leave those two clubs unfixed and every one of their players unresolvable by
+# the team-scoped layer, which is precisely where the two Bailey Williamses are
+# told apart.
+AFL_AWARD_TEAM_FIXES = {
+    'Adelaide Crows': 'Adelaide',
+    'Geelong Cats': 'Geelong',
+    'Gold Coast SUNS': 'Gold Coast',
+    'GWS GIANTS': 'Greater Western Sydney',
+    'Sydney Swans': 'Sydney',
+    'West Coast Eagles': 'West Coast',
+}
+
 # ── Player name normalisation ────────────────────────────────
 # Five feeds spell the same player five ways, and AFLTables is not consistently
 # on either side of any of them:

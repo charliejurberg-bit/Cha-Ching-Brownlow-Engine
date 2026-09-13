@@ -6192,6 +6192,145 @@ def _rounds_of(s):
     return out
 
 
+def _lt_norm_club(team):
+    """One club spelling across the award feed and the model frame.
+
+    The feed's six marketing names go through the same fixes
+    features.resolve_feed_names is given; every other string passes through, so
+    two identical spellings still match and no club is silently folded. The
+    model side needs no fixes of its own because load_game has already run
+    _fix_team_names over it (Footscray -> Western Bulldogs, GWS -> Greater
+    Western Sydney).
+    """
+    t = str(team or "").strip()
+    return feat.AFL_AWARD_TEAM_FIXES.get(t, t)
+
+
+def _lt_feed_to_model_names(df, game_df):
+    """Rewrite the award feed's player names into the model frame's spelling.
+
+    Returns (frame, n_rewritten). The frame is a copy when anything changed and
+    the original otherwise, so the common case allocates nothing.
+
+    WHY THIS EXISTS. Every model lookup on this page is keyed by
+    normalise_name, and a miss reads as a model value of ZERO rather than as
+    absent. So an unresolved vote-getter does not render blank, he renders
+    wrong: the leaderboard shows his whole total as outperformance against a
+    model that supposedly said nothing, and Zone 1 tests `_e < BOLTER_MODEL_MAX`
+    and announces him as a bolter nobody saw coming. Measured on the 2026 feed,
+    three vote-getters were in that state, and the worst was Matt Carroll, who
+    polled 2 in display round 10 with the model on 0.86 and a 47% poll
+    probability — a player the model rated, published under a banner saying it
+    had not.
+
+    TWO STEPS, because two different things are wrong with the names.
+
+    Step 1 is the repo's existing reconciliation, not a new one.
+    _resolve_feed_names maps the feed onto AFLTables spelling through
+    features.resolve_feed_names, team-scoped, which is what turns 'Matthew
+    Carroll' into 'Matt Carroll' and 'Jordan De Goey' into 'Jordan de Goey' and
+    what keeps the two Bailey Williamses apart while doing it. Its uniqueness
+    guard refuses rather than guesses, which is the behaviour we want: on the
+    2026 feed it left three names unresolved and all three carried no votes.
+
+    Step 2 is the part only this page needs. load_game runs
+    _disambiguate_players, which appends '(Team)' to any name carried by more
+    than one fitzRoy ID, so the model frame spells one of those two players
+    'Bailey Williams (West Coast)' where AFLTables spells both plain 'Bailey
+    Williams'. That suffix is a dashboard construct and no feed will ever
+    produce it, so the last hop is a (base name, club) lookup against the
+    frame's own _base_name column, which _disambiguate_players preserves for
+    exactly this kind of re-join. Skipped entirely when the frame carries no
+    _base_name, which is the no-ID-source case where no suffix was added either.
+
+    Called BEFORE the assembler and before the cache key, so the assembler's
+    dicts and the page's own normalise_name lookups land in one namespace and
+    no individual lookup site has to know any of this happened.
+    """
+    if df is None or getattr(df, "empty", True) or "Player" not in df.columns:
+        return df, 0
+    if game_df is None or getattr(game_df, "empty", True):
+        return df, 0
+
+    before = df["Player"].tolist()
+
+    # ── Step 1: feed spelling -> AFLTables spelling ──
+    try:
+        out = _resolve_feed_names(df, player_col="Player", team_col="Team",
+                                  team_fixes=feat.AFL_AWARD_TEAM_FIXES,
+                                  label="afl-award")
+    except Exception:
+        # A render, not a pipeline: the unreconciled board is a better answer
+        # than a traceback, and the states this feeds all degrade to "no model
+        # row", which is what happens today anyway.
+        return df, 0
+    if out is None or "Player" not in getattr(out, "columns", []):
+        return df, 0
+
+    # ── Step 2: AFLTables spelling -> the model frame's disambiguated name ──
+    if "_base_name" in game_df.columns and "Player_Name" in game_df.columns:
+        tcol = next((c for c in ("Team", "Playing.for") if c in game_df.columns), None)
+        if tcol is not None:
+            sub = game_df[["_base_name", "Player_Name", tcol]].dropna(
+                subset=["_base_name", "Player_Name"]).drop_duplicates()
+            # Only names the suffix actually changed need a hop; everything else
+            # already matches and a blanket map would be a no-op with a cost.
+            sub = sub[sub["_base_name"] != sub["Player_Name"]]
+            if not sub.empty:
+                # Keyed on club as well as name: the whole point of the suffix is
+                # that the base name alone names two different people.
+                lut = {}
+                for b, p, t in zip(sub["_base_name"], sub["Player_Name"], sub[tcol]):
+                    lut[(normalise_name(b), _lt_norm_club(t))] = p
+                if "Team" in out.columns:
+                    out = out.copy()
+                    out["Player"] = [
+                        lut.get((normalise_name(n), _lt_norm_club(t)), n)
+                        for n, t in zip(out["Player"], out["Team"])
+                    ]
+
+    after = out["Player"].tolist()
+    n = sum(1 for a, b in zip(before, after) if a != b)
+    return (out, n) if n else (df, 0)
+
+def _lt_names_cache_key(df, season):
+    """Content-exact key for _lt_feed_to_model_names_cached.
+
+    The (name, club) pairs are the entire input: the resolution depends on
+    nothing else about the feed, not the votes and not the round. So the key is
+    stable across a whole count night for the anonymous and signed-in paths
+    alike — the names do not change as votes are read out, which is what makes
+    caching this worth doing at all. Season stands in for the model frame,
+    which load_game already caches per season.
+    """
+    if df is None or getattr(df, "empty", True) or "Player" not in df.columns:
+        return (season, ())
+    teams = df["Team"].astype(str).tolist() if "Team" in df.columns else [""] * len(df)
+    return (season, tuple(zip(df["Player"].astype(str).tolist(), teams)))
+
+
+# 203ms measured locally, and project_brief records Cloud running 1.6-2.3x
+# slower than local, so this is a ~300-460ms step on every rerun of a page that
+# auto-refreshes every 60 seconds. That is more than _assemble_live_tracker
+# costs, and that one is cached for exactly this reason.
+#
+# max_entries is small because the key is small: the feed's name list is the
+# same for every viewer, so all of them share ONE entry, and it only changes
+# when the AFL adds a player to the payload. It does not multiply per watchlist
+# the way the assembler's key does.
+@st.cache_data(ttl=3600, show_spinner=False, max_entries=4)
+def _lt_feed_to_model_names_cached(_df, _game_df, cache_key):
+    """Cached front end for _lt_feed_to_model_names.
+
+    The leading underscores on _df / _game_df are load-bearing: that is how
+    Streamlit is told not to hash a parameter. cache_key carries the real
+    identity; renaming it to _cache_key would silently make every call a hit on
+    stale data, which here would mean serving one season's name mapping into
+    the next.
+    """
+    return _lt_feed_to_model_names(_df, _game_df)
+
+
 def _assemble_live_tracker(lt, game_df, watchlist):
     """Assemble every value the Live Tracker renders from, off (a) live AFL vote
     data, (b) the model's per-round Exp_Votes / Poll_Prob, and (c) the persisted
@@ -6201,7 +6340,7 @@ def _assemble_live_tracker(lt, game_df, watchlist):
     Dicts are keyed by normalise_name(player) throughout. Returns:
       totals, prev_totals, round_votes, model_to_date, model_remaining,
       projection, delta, team, name, model_pollers (display_round -> {norm names}),
-      recon (hit / blanked / bolter),
+      recon (hit / blanked / bolter)  -- WRITTEN BUT NEVER READ, see below,
       round_exp / round_pp (display_round -> {norm name -> value}),
       game_name / game_team (norm name -> model-frame name / team).
 
@@ -6307,6 +6446,22 @@ def _assemble_live_tracker(lt, game_df, watchlist):
         asm["delta"][nn] = tot - asm["model_to_date"].get(nn, 0.0)
 
     # ── watchlist: last-round reconciliation ──────────────────────────────────
+    # NOTHING READS asm["recon"]. Checked rather than assumed: the only
+    # occurrences of the key in this file are the three writes below and its
+    # initialiser. The page builds its own _bolters / _landed / _missed inline
+    # from _your_card, _model_topn and round_votes, and that is what Zone 1
+    # renders.
+    #
+    # Left in place deliberately, and this comment is the reason. The three
+    # bucket names — hit, blanked, bolter — mirror Zone 1's three panels
+    # exactly, so the block reads as the thing that populates them. It is not.
+    # Editing it to change what the count shows will change nothing; edit the
+    # render instead. Two behaviours differ from the render besides, so it is
+    # not even a stale copy of it: this skips last_round == 0 entirely, which
+    # is the whole Opening Round segment, and it counts a bolter as any player
+    # on 2+ votes not on the card, where the render also requires the model to
+    # have missed him (BOLTER_MODEL_MAX).
+    #
     # `watchlist` is the caller's poll picks (Player / Team / My_Rounds /
     # Settled), or None when nobody is signed in.
     #
@@ -6545,6 +6700,19 @@ if _page == 'Live Tracker':
         _wl_visible = _wl is not None
 
         _lt_game = load_game(_LT_SEASON)
+
+        # The feed and the model frame spell players differently, and a name
+        # that fails to bridge does not read as missing downstream, it reads as
+        # a model value of zero. Rebound here, above the cache key, so the
+        # assembler's dicts and every normalise_name lookup further down this
+        # page share one namespace. _lt is rebuilt rather than mutated: it is a
+        # cache_data return, and writing through it would poison the entry for
+        # every other viewer on a count night.
+        _lt_df, _lt_named = _lt_feed_to_model_names_cached(
+            _lt_df, _lt_game, _lt_names_cache_key(_lt_df, _LT_SEASON))
+        if _lt_named:
+            _lt = {**_lt, "df": _lt_df}
+
         _asm     = _assemble_live_tracker_cached(
             _lt, _lt_game, _wl, _lt_cache_key(_lt, _lt_game, _wl, _LT_SEASON))
 
