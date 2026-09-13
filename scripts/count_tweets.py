@@ -1079,8 +1079,20 @@ def block_first_vote(rs, ctx):
             line += (f" The longest wait since {FIRST_VOTE_FROM}, past "
                      f"{top[0]}'s {top[2]} in {top[1]}.")
         elif longer < FIRST_VOTE_RANK_MENTION:
-            line += (f" Only {longer} player{'s' if longer > 1 else ''} since "
-                     f"{FIRST_VOTE_FROM} waited longer.")
+            # HIS POSITION, NOT THE COUNT ABOVE HIM. "Only 18 waited longer"
+            # and "the 18th most games" are different claims and the second is
+            # off by one: 18 ahead of him makes him 19th. Easy to carry the
+            # wrong number straight across when rewording, and it would be
+            # wrong in public with the right number sitting next to it.
+            #
+            # Ties are real at this end of the ladder and are named rather than
+            # rounded away. Tom Sparrow's 124 is also Robert Copeland's 124 in
+            # 2007, so Sparrow is equal 19th, not 19th outright.
+            rank = longer + 1
+            tied = sum(1 for _, _, w in waits if w == gnum)
+            line += (f" That is {'equal ' if tied else 'the '}"
+                     f"{_ordinal(rank)} most games played before a first vote "
+                     f"since {FIRST_VOTE_FROM}.")
         out.append(line)
     return out
 
