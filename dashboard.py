@@ -8,6 +8,7 @@ import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import json
 import os
 import re
 import subprocess
@@ -1930,8 +1931,61 @@ def _load_model_comparison():
         wh_src = 'legacy'
     return cc, wh, wh_src
 
-# count night: temporarily drop to ~60 and match the sleep.
-@st.cache_data(ttl=300, show_spinner=False)
+_PREDICTOR_SNAPSHOT = "data_2026/brownlow_predictor_snapshot.json"
+_FULL_VOTE_POOL = 207 * 6      # 18 clubs x 23 / 2 games, 3-2-1 each
+
+
+def _feed_state(players):
+    """PREDICTOR / COUNTING / COUNTED / UNKNOWN for an award-API payload.
+
+    The endpoint serves the AFL's predictor between counts and the live votes on
+    count night, identically shaped and unlabelled, so the only way to tell is a
+    before-picture. scripts/count_night.py snapshots the predictor and commits
+    it; this compares against that file.
+
+    Three states, each decidable from the payload alone:
+      PREDICTOR  totals identical to the snapshot, so the count has not started
+      COUNTING   partial, fewer than 6 x 207 votes, so the count is running
+      COUNTED    complete again but no longer matching the snapshot
+
+    The partial state carries the weight. A count is read out round by round, so
+    mid-count the feed must hold less than a full season while the predictor
+    always holds exactly 1,242.
+
+    Returns UNKNOWN on any failure, including a missing snapshot. UNKNOWN is a
+    real answer that the page renders honestly; guessing "live" is not.
+    """
+    try:
+        def _key(p):
+            nm = f"{p.get('firstName', '')} {p.get('surname', '')}".strip()
+            return f"{nm}|{p.get('teamId')}"
+
+        cur = {_key(p): p.get("totalVotes", 0) for p in players}
+        total = sum(cur.values())
+        if not os.path.exists(_PREDICTOR_SNAPSHOT):
+            return "UNKNOWN"
+        with open(_PREDICTOR_SNAPSHOT, encoding="utf-8") as fh:
+            snap = json.load(fh).get("players") or {}
+        if not snap:
+            return "UNKNOWN"
+        # Compared over the snapshot's own keys: this payload may be truncated by
+        # the early stop above while the snapshot never is, so a plain dict
+        # equality would read "different" on every poll and call the predictor a
+        # live count. A player absent from a truncated tail is a zero here.
+        if all(cur.get(k, 0) == v for k, v in snap.items()):
+            return "PREDICTOR"
+        if total < _FULL_VOTE_POOL:
+            return "COUNTING"
+        return "COUNTED"
+    except Exception:
+        return "UNKNOWN"
+
+
+# ttl=60 for count night: a round is read out every few minutes, and at 300 the
+# board could sit five minutes stale while the votes are already public. The
+# auto-refresh sleep below matches it, and the two must move together or each
+# refresh lands on a warm cache and pulls nothing.
+@st.cache_data(ttl=60, show_spinner=False)
 def fetch_live_brownlow_data():
     """Fetch Brownlow vote data from AFL public API. Returns a result dict."""
     import requests as _req
@@ -1964,8 +2018,14 @@ def fetch_live_brownlow_data():
                 team_map[t["id"]] = t.get("name", str(t["id"]))
 
         # Paginate player data (sorted by totalVotes desc from API)
+        # 12 pages, not 5. The early stop below is what actually bounds this in
+        # practice, and it fires on the first page whose tail is all zeros; the
+        # range is only the ceiling for the case where it doesn't. Five pages
+        # capped at 500 players and the 2026 feed carries 630, so a truncated
+        # read silently dropped the tail — and mid-count a player on one vote can
+        # still be the row that moves a record.
         all_players = []
-        for page in range(5):
+        for page in range(12):
             pr = _req.get(
                 f"{BASE}/compseasons/{season_id}/award/brownlow?page={page}&pageSize=100",
                 headers=HDRS, timeout=TMO,
@@ -1983,7 +2043,18 @@ def fetch_live_brownlow_data():
         if not all_players:
             return {**_empty, "error": "AFL API returned no player data."}
 
-        is_live = any(p.get("totalVotes", 0) > 0 for p in all_players)
+        # WHAT THE FEED IS SERVING, MEASURED RATHER THAN ASSUMED.
+        # This endpoint carries the AFL's Brownlow PREDICTOR between counts and
+        # the real votes as they are read out on the night, at the same URL, in
+        # the same shape, with no field saying which. So the old test here,
+        # `any(totalVotes > 0)`, is true all year and gates nothing: it reads
+        # LIVE today with a full set of predicted votes in the payload.
+        # _feed_state compares against a snapshot of the predictor taken before
+        # the count and returns PREDICTOR / COUNTING / COUNTED / UNKNOWN. It
+        # fails to UNKNOWN, never to "live", because labelling predictions as
+        # the count is the one error that cannot be walked back.
+        feed_state = _feed_state(all_players)
+        is_live = feed_state in ("COUNTING", "COUNTED")
 
         # Build per-round feed dict and player rows
         round_feed: dict[int, list] = {}
@@ -2028,7 +2099,8 @@ def fetch_live_brownlow_data():
 
         return {
             "df": df, "feed": feed_items, "last_round": last_round,
-            "season_name": season_name, "is_live": is_live, "error": None,
+            "season_name": season_name, "is_live": is_live,
+            "feed_state": feed_state, "error": None,
         }
     except Exception as exc:
         return {**_empty, "error": str(exc)}
@@ -6335,8 +6407,12 @@ def _assemble_live_tracker_cached(_lt, _game_df, _wl, cache_key):
 
 if _page == 'Live Tracker':
     import time as _time
-    from datetime import datetime as _dt
-    _count_night = _dt.now() >= _dt(2026, 9, 21)
+    # _count_night was `datetime.now() >= datetime(2026, 9, 21)`, a calendar guess
+    # and not a fact about the data. It flipped the board's label to "Live count"
+    # at midnight on the 21st while the feed still served the predictor for the
+    # nineteen hours before the count actually began. The state now comes from
+    # _feed_state, measured against the pre-count snapshot, so the label is right
+    # whenever the feed flips, early or late. See _LT_STATE_TXT below.
 
     # ── fetch ────────────────────────────────────────────────
     # Skeleton first, so a frame is on screen before the up-to-7 sequential AFL
@@ -6361,6 +6437,39 @@ if _page == 'Live Tracker':
     _lt_last = _lt.get("last_round", 0)
     _lt_sn   = _lt.get("season_name", "")
     _lt_live = _lt.get("is_live", False)
+    _lt_state = _lt.get("feed_state", "UNKNOWN")
+
+    # One place the four feed states become words, so the pill, the mode line and
+    # any copy drawn off them cannot describe the same payload differently.
+    # UNKNOWN reads as unverified rather than as either of the two confident
+    # states: it means the snapshot is missing or unreadable, not that the count
+    # is running.
+    _LT_STATE_TXT = {
+        "PREDICTOR": ("PREDICTION", "AFL predictor"),
+        "COUNTING":  ("LIVE COUNT", "Live count"),
+        "COUNTED":   ("FINAL", "Final votes"),
+        "UNKNOWN":   ("UNVERIFIED", "Unverified feed"),
+    }
+    _pill_state, _mode_state = _LT_STATE_TXT.get(
+        _lt_state, _LT_STATE_TXT["UNKNOWN"])
+
+    # The banner under the board is drawn from the same state as the pill, for
+    # the same reason the pill and the mode line are. It used to be one hardcoded
+    # sentence on the `not _lt_live` branch, and UNKNOWN falls into that branch
+    # too — so a missing or unreadable snapshot mid-count produced a page whose
+    # pill read UNVERIFIED over a banner asserting the count had not started,
+    # with live votes on the board underneath. Contradicting itself is worse
+    # than either message alone. COUNTING and COUNTED carry no banner; the board
+    # is the message there.
+    _LT_STATE_NOTE = {
+        "PREDICTOR": ("Count night hasn't started yet. This is the AFL's own Brownlow "
+                      "predictor for the current season, not live votes. The page "
+                      "updates automatically once the count begins."),
+        "UNKNOWN":   ("Showing the AFL's Brownlow feed, but this page could not verify "
+                      "whether it is serving predictions or live count votes. Treat the "
+                      "numbers below as unconfirmed."),
+    }
+    _lt_note = _LT_STATE_NOTE.get(_lt_state)
 
     _lt_auto = False  # set in the utility line below; init so refresh guard is safe
 
@@ -6381,7 +6490,7 @@ if _page == 'Live Tracker':
 
     # Small fallback header for the error / no-data states only. The live panel
     # folds its own topbar (title + LIVE pill) into the single redesign iframe.
-    _pill_txt = "LIVE" if _lt_live else "OFF-SEASON"
+    _pill_txt = _pill_state
     _pill_col = "#34d399" if _lt_live else "#7e8c99"
     _hdr_html = f"""<!doctype html><html><head><meta charset="utf-8">
 {_FONTS_LINKS}
@@ -6414,16 +6523,10 @@ if _page == 'Live Tracker':
     elif _lt_df.empty:
         _lt_ph.empty()
         st.iframe(_hdr_html, height=54)
-        st.info(
-            "Count night hasn't started yet — showing AFL's own Brownlow predictor data "
-            "for the current season. This page will update automatically on count night."
-        )
+        st.info(_lt_note or _LT_STATE_NOTE["PREDICTOR"])
     else:
-        if not _lt_live:
-            st.info(
-                "Count night hasn't started yet — showing AFL's own Brownlow predictor data "
-                "for the current season. This page will update automatically on count night."
-            )
+        if _lt_note:
+            st.info(_lt_note)
 
         # ── shared assembly: live votes + model per-round signal + watchlist ──
         # A signed-in user's own poll picks are the watchlist, and the only
@@ -6744,11 +6847,27 @@ if _page == 'Live Tracker':
                 '<span><span class="dot you"></span>you</span></div>')
 
         # ── topbar display values ──
-        _mode_txt = "Live count" if _count_night else "Prediction"
+        _mode_txt = _mode_state
         _fetched  = _time.strftime("%H:%M:%S")
-        _live_pill = ('<span class="live">LIVE</span>' if _lt_live else
-                      '<span class="live" style="color:var(--muted);border-color:var(--hair2)">OFF-SEASON</span>')
-        _pct = max(0.0, min(100.0, _disp_round / 24 * 100))
+        _live_pill = (f'<span class="live">{_pill_state}</span>' if _lt_live else
+                      f'<span class="live" style="color:var(--muted);'
+                      f'border-color:var(--hair2)">{_pill_state}</span>')
+        # Progress is "how many rounds have been read out", not the round
+        # index. There are 25 of them — Opening Round plus 1..24 — and the
+        # feed numbers Opening Round 0, so the count after it is _disp_round+1.
+        # Reading the index straight put the bar on 0% with Opening Round
+        # already on the board, and printed "Round 0 of 24 counted" under it.
+        # _any_votes separates the two states the index cannot: nothing counted
+        # yet, which is what the first minutes of the night look like, from
+        # Opening Round counted. Both arrive here as _disp_round == 0.
+        _any_votes = any(_rv for _rv in _asm["round_votes"].values())
+        if not _any_votes:
+            _prog_txt, _pct = "No rounds counted yet", 0.0
+        elif _disp_round == 0:
+            _prog_txt, _pct = "Opening Round counted", 100.0 / 25
+        else:
+            _prog_txt = f"Round {_disp_round} of 24 counted"
+            _pct = max(0.0, min(100.0, (_disp_round + 1) / 25 * 100))
 
         # ── CSS: mockup tokens + structure verbatim (standalone votes-feed
         #    rules dropped per the redesign; .mexp retained — used by .rrow). ──
@@ -7150,7 +7269,7 @@ if _page == 'Live Tracker':
   <div class="prog">
     <span class="lbl">Count progress</span>
     <div class="track"><div class="fill" style="width:{_pct:.1f}%"></div></div>
-    <span class="rd">Round {_disp_round} of 24 counted</span>
+    <span class="rd">{_prog_txt}</span>
   </div>
 
   <div class="race">
@@ -7249,7 +7368,7 @@ if _page == 'Live Tracker':
         # filter state to remember.
         _lt_c1, _lt_c2 = st.columns([1, 3])
         with _lt_c1:
-            _lt_auto = st.checkbox("Auto-refresh 5 min", value=False,
+            _lt_auto = st.checkbox("Auto-refresh 1 min", value=False,
                                    key="lt_auto_refresh")
         with _lt_c2:
             if _cc_user and _cc_watch_nn:
@@ -7261,7 +7380,7 @@ if _page == 'Live Tracker':
     # Matches the fetch_live_brownlow_data ttl, so each refresh lands on an
     # expired cache and actually pulls new votes. Move both together.
     if _lt_auto:
-        _time.sleep(300)
+        _time.sleep(60)
         st.rerun()
 
 # ════════════════════════════════════════════════════════════

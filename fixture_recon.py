@@ -272,12 +272,36 @@ def block2_fixture_votes(fx, min_polls=2):
 
 
 def block3_2026_meeting(cur, home, away):
+    """Every meeting between the clubs this season, one entry each.
+
+    A LIST, not a single meeting. Two clubs can meet twice in a home and away
+    season and four of them did in 2026. The single-meeting version took the
+    round number from the first row of the unsorted frame and the host and
+    venue from `nlargest(5, 'Exp_Votes')`, which is a different row whenever
+    the better individual game was the other meeting. Adelaide v Western
+    Bulldogs then rendered as "raw Round_num 3, Western Bulldogs hosting at
+    Docklands": round 3 was at Adelaide Oval with Adelaide hosting, and
+    Docklands was round 15. Both halves were true of a real game and the
+    sentence was true of neither.
+
+    The top five are taken per meeting rather than across the pair, because a
+    table headed by one round number and filled from two is the same defect
+    one level down.
+    """
     pair = {home, away}
     m = cur[(cur['Home.team'].isin(pair)) & (cur['Away.team'].isin(pair))
             & (cur['Home.team'] != cur['Away.team'])]
     if not len(m):
-        return None, m
-    return int(m['Round_num'].iloc[0]), m.nlargest(5, 'Exp_Votes')
+        return [], m
+    meetings = []
+    for rn, grp in m.groupby('Round_num', sort=True):
+        meetings.append({
+            'round': int(rn),
+            'host': grp['Home.team'].iloc[0],
+            'venue': grp['Venue'].iloc[0],
+            'top': grp.nlargest(5, 'Exp_Votes'),
+        })
+    return meetings, m
 
 
 def block4_coaches(home, away, votes):
@@ -726,16 +750,20 @@ def render(home, away, venue_strings, venue_label):
             v, int(at['Season'].min()), int(at['Season'].max()), len(at)))
     a("")
 
-    rnd, meet = block3_2026_meeting(cur, home, away)
+    season_meetings, meet = block3_2026_meeting(cur, home, away)
     a("## Check C, {} meeting".format(CURRENT_SEASON))
     a("")
-    if rnd is None:
+    if not season_meetings:
         a("The two clubs have **not met in {}**. Block 3 is empty and this is "
           "their first meeting of the season.".format(CURRENT_SEASON))
     else:
-        host = meet['Home.team'].iloc[0]
-        a("Met once, raw Round_num {}, {} hosting at {}.".format(
-            rnd, host, meet['Venue'].iloc[0]))
+        a("Met {}:".format(
+            "once" if len(season_meetings) == 1
+            else "{} times".format(len(season_meetings))))
+        a("")
+        for mt in season_meetings:
+            a("- raw Round_num {}, {} hosting at {}.".format(
+                mt['round'], mt['host'], mt['venue']))
     a("")
 
     a("## Block 1, active streaks in {}".format(CURRENT_SEASON))
@@ -762,14 +790,20 @@ def render(home, away, venue_strings, venue_label):
     L += _tbl(b2, ['who', 'club', 'meetings', 'polls', 'zeros', 'votes',
                    'contiguous', 'detail'], limit=15)
 
-    a("## Block 3, expected votes in the {} meeting".format(CURRENT_SEASON))
+    a("## Block 3, expected votes in the {} meeting{}".format(
+        CURRENT_SEASON, "" if len(season_meetings) < 2 else "s"))
     a("")
-    if rnd is None:
+    if not season_meetings:
         a("_No meeting this season, so there is nothing to report._")
         a("")
     else:
-        L += _tbl(meet[['Player_Name', 'Playing.for', 'Disposals', 'Goals',
-                        'Coaches_Votes', 'Exp_Votes']])
+        for mt in season_meetings:
+            if len(season_meetings) > 1:
+                a("**Raw Round_num {}, {} hosting at {}.**".format(
+                    mt['round'], mt['host'], mt['venue']))
+                a("")
+            L += _tbl(mt['top'][['Player_Name', 'Playing.for', 'Disposals',
+                                 'Goals', 'Coaches_Votes', 'Exp_Votes']])
 
     a("## Block 4, coaches votes in this fixture")
     a("")
