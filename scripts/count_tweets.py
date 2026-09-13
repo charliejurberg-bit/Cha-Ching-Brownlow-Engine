@@ -983,21 +983,34 @@ def block_milestones(rs, ctx):
             if before < mk <= now:
                 crossed.append((pid, mk, now))
     crossed.sort(key=lambda x: -x[1])
+    # Ranked including tonight's votes, so a position quoted here cannot
+    # contradict block_club_career, which has always read live totals.
+    live_by_gid = {}
+    for _p, _v in rs["totals"].items():
+        _g = ctx["player_id"].get(_p)
+        if _g:
+            live_by_gid[int(_g)] = live_by_gid.get(int(_g), 0.0) + float(_v)
+    career_rank_live, club_rank_live = ctx["rankings"](live_by_gid)
     for pid, mk, now in crossed:
         name = roster[pid]["name"]
         # "passes 100 ... now on 100" is a contradiction a reader will catch.
         line = (f"{name} reaches {mk:.0f} career votes" if now == mk
                 else f"{name} passes {mk:.0f} career votes, now on {now:.0f}")
-        rank = ctx["career_rank"].get(ctx["player_id"].get(pid))
-        club = ctx["club_rank"].get(ctx["player_id"].get(pid))
+        rank = career_rank_live.get(ctx["player_id"].get(pid))
+        club = club_rank_live.get(ctx["player_id"].get(pid))
         if club and club[2]:
-            line += f", {_ordinal(club[0])} most at {club[1]}"
+            # "1st most" is not English, and before the ladders were ranked
+            # live nobody ever reached the top of one mid-count, so the case
+            # never came up. Now it is the case the night is built to catch.
+            line += (f", the most at {club[1]}" if club[0] == 1
+                     else f", {_ordinal(club[0])} most at {club[1]}")
         elif rank and rank <= CAREER_RANK_MAX:
             # A position only says something while it is a short number.
             # "489th most all time" is a true fact and a wasted clause, and it
             # is what a player who has changed clubs falls back to, since a
             # club position cannot be quoted beside a career total for him.
-            line += f", {_ordinal(rank)} most all time"
+            line += (", the most all time" if rank == 1
+                     else f", {_ordinal(rank)} most all time")
         out.append(line + ".")
     return out
 
@@ -1617,21 +1630,39 @@ def _game_detail(g):
     return stat_line, hard
 
 
-def _rankings(d, career_base):
-    """(career_rank, club_rank) by fitzRoy ID.
+def _rankings(d, career_base, live=None):
+    """(career_rank, club_rank) by fitzRoy ID, AS AT THIS POINT IN THE COUNT.
 
     club_rank is (position, club, whole career at that club). The last flag is
     what decides whether a club position may be quoted beside a CAREER
     milestone: for a one-club player the two numbers are the same votes, and
     for anyone who has moved they are not.
+
+    `live` maps fitzRoy ID to votes polled SO FAR TONIGHT and is added to both
+    ladders before they are sorted. Without it these were computed once, off
+    the pre-season base, and then quoted beside milestones reached during the
+    count — so every position was stale by exactly the votes being read out,
+    and it drifted further every round.
+
+    Caught in rehearsal, and it contradicted another block in the same thread
+    two rounds apart. Toby Greene started 2026 on 96 with Josh Kelly on 97.
+    Round 7: "Toby Greene passes Josh Kelly as Greater Western Sydney's leading
+    vote-getter, 99 to 97", which reads live totals and was right. Round 9:
+    "Toby Greene reaches 100 career votes, 2nd most at Greater Western Sydney",
+    off this function, still ranking him behind a player he had passed two
+    rounds earlier. Both posts in one thread, both about the same player.
     """
+    live = live or {}
     car = d["career"]
-    car = car[car.ID > 0].sort_values("votes", ascending=False)
+    car = car[car.ID > 0].copy()
+    car["_live"] = (car.votes.astype(float)
+                    + car.ID.astype(int).map(lambda i: live.get(int(i), 0.0)))
+    car = car.sort_values("_live", ascending=False)
     career_rank = {int(i): n for n, i in enumerate(car.ID, 1)}
-    total = dict(zip(car.ID.astype(int), car.votes.astype(float)))
+    total = dict(zip(car.ID.astype(int), car["_live"].astype(float)))
     by_club = {}
     for (club, cid), v in career_base.items():
-        by_club.setdefault(club, []).append((v, cid))
+        by_club.setdefault(club, []).append((v + live.get(int(cid), 0.0), cid))
     club_rank = {}
     for club, rows in by_club.items():
         for pos, (v, cid) in enumerate(sorted(rows, reverse=True), 1):
@@ -1699,7 +1730,12 @@ def build_context(players, d):
            "club_season_rec": season_rec, "club_career_rec": career_rec,
            "club_career_base": career_base, "complete_clubs": complete,
            "stat_line": stat_line, "hard_votes": hard, "chances": chances,
-           "career_rank": career_rank, "club_rank": club_rank}
+           "career_rank": career_rank, "club_rank": club_rank,
+           # Ranked as at a point in the count. block_milestones quotes a
+           # position beside a milestone reached tonight, so it must rank on
+           # tonight's totals; the two frozen dicts above are the pre-count
+           # standing and are kept only for anything that wants that.
+           "rankings": lambda live: _rankings(d, career_base, live)}
     return ctx, warnings
 
 
