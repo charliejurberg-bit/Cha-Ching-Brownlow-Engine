@@ -432,6 +432,67 @@ player and never game attribution**, which fixes what it can and cannot support:
 
 Recon only. Nothing in the model pipeline reads this file.
 
+## Count night runbook, 21 September 2026
+
+**Read this before doing anything on the night.** Charlie runs the count from
+his PHONE, over Remote Control, so the session answering him has none of the
+context this file was written in. Everything needed is here.
+
+**The watcher runs on the PC and must be detached from the Claude session.**
+Started in the foreground it blocks that session for two hours; started as an
+ordinary background task it can die with the session. Start it hidden and
+independent, from PowerShell, and it survives Claude entirely:
+
+```powershell
+Start-Process -FilePath "python" `
+  -ArgumentList "scripts/count_tweets.py","--watch" `
+  -WorkingDirectory "C:\Users\charl\Python\brownlow_engine" `
+  -WindowStyle Hidden -PassThru
+```
+
+Note the PID it prints; `Stop-Process -Id <pid>` is how the night ends early.
+Sleep is not a risk: both `STANDBYIDLE` and `HIBERNATEIDLE` on AC read 0
+(never), measured 13 September 2026.
+
+**Checking in after a round is one command.**
+
+```bash
+python scripts/count_tweets.py --last        # the round that just landed
+python scripts/count_tweets.py --last 3      # if a few went by
+```
+
+It reads `drafts/count_night_tweets.txt` and nothing else: no feed request, no
+model, instant. **Relay its output verbatim** so the posts can be copied
+straight into X. Do not summarise them, and do not rewrite the copy — every
+post is templated on purpose, and the wording is signed off.
+
+**What to expect, so nothing looks broken.** Before the count starts the log
+says `refusing: PREDICTOR` once and then goes quiet; that is correct, not a
+hang. Most rounds produce one post or none. A heartbeat prints every 10
+minutes. The loop stops itself after the end-of-count posts.
+
+**Do not run `--live` or `--watch` a second time to "check" it.** The drafted
+rounds file is what stops a round drafting twice, and the failure modes are
+silent in both directions. See the bullet below.
+
+**If the watcher dies**, restart it with the same command. Rounds already
+drafted are recorded, so it resumes rather than replaying the night. Nothing is
+lost from the log, which is appended to.
+
+**Never delete `drafts/count_night_drafted_2026.txt` mid-count** (the next poll
+redrafts all 25 rounds and buries the one that just landed), and never write
+rounds into it (`--watch` then concludes there is nothing new and drafts
+NOTHING, with no error).
+
+**Nothing here posts.** `--watch` and `--last` only draft. Posting is Charlie's,
+from his phone.
+
+**The site needs no action.** The Live Tracker flips itself from PREDICTION to
+LIVE COUNT off the feed, and `.github/workflows/keepalive.yml` keeps the app
+awake every 15 minutes. If asked whether it is live,
+`python scripts/count_night.py status` answers in one line without touching the
+site.
+
 ## Count night and the Live Tracker
 
 **The AFL award endpoint serves the AFL's own PREDICTOR between counts and the
