@@ -506,6 +506,13 @@ book's line. `BETFAIR_MIN_BACK = 1.5` filters lay prices.
   Neither of the older two has Brisbane Bears. Not consolidated.
 - Fitzroy stays Fitzroy. Deliberate. Folding it into Brisbane Lions corrupts
   opponent counts for every club that played both.
+- **A missing date of birth arrives as `Age == 0`, not as null.** 888 player-games
+  across 1984-2022 (631 players; 482 in `fitzroy_stats_1965_2006.csv.gz`, 406
+  in `fitzroy_stats_all.csv`) carry it. `notna()` passes every one, so an
+  unguarded youngest-ever list is a list of newborns with the real record
+  nowhere on it. No row sits between 0 and 15, so the zero is the whole defect.
+  `night_sections._aged` coerces anything under 15 to NaN and
+  `period_records.py` filters `Age > 0`; any new age query needs the same guard.
 
 ## UI theme — Midnight Turf
 
@@ -670,9 +677,6 @@ listed twice in `.gitignore`. The `Matt Rowell`/`Matthew Rowell` duplicate in
 `best_odds.csv` — inert while the top-10 all price shorter than 501, but it
 shifts `_market_rank` and would surface if a long-priced player reached the
 Predictions top 10.
-
-Pre-count-night: drop `fetch_live_brownlow_data` TTL and auto-refresh sleep
-together, 300 → ~60.
 
 Modelling backlog: 16 non-rank Wheelo features, composite-vs-raw Impact_Score,
 round-index interaction, Kangaroos alias.

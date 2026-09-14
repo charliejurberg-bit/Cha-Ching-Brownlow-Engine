@@ -430,6 +430,18 @@ player and never game attribution**, which fixes what it can and cannot support:
   Melbourne", "votes in Carlton v Fremantle"). A season total does not record
   which game a vote came from, so those claims stay capped at 1984 permanently.
 
+**1976 and 1977 doubled the vote pool, and the file does not say so.** Two
+field umpires each awarded 3-2-1, so both seasons total exactly 1,512 votes
+against 756 in 1975 and 792 in 1978. The `Vote_system` column labels them
+"3-2-1" like every season from 1931, so nothing in the data flags them. A naive
+all-time season ladder therefore opens with Graham Teasdale's 59 (1977) and
+Graham Moss' 48 (1976), neither comparable to a modern total, and against a
+single allocation Cripps' 45 in 2024 is the record. Measure the pool per season
+rather than trusting the label. `night_pack.COMPARABLE` drops both seasons (and
+the 1924-1930 one-vote era) and `count_tweets.py` filters through it;
+`leaderboard_card.py` names Cripps rather than claiming a record for the same
+reason. Any new season-total record must go through `COMPARABLE`.
+
 Recon only. Nothing in the model pipeline reads this file.
 
 ## Count night runbook, 21 September 2026
