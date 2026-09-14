@@ -1426,8 +1426,8 @@ def load_game(season):
     path = f"{PRED_DIR}/game_level_{season}.csv"
     if not os.path.exists(path):
         return None
-    return _attach_real_si(
-        _disambiguate_players(_fix_team_names(pd.read_csv(path))), season)
+    return _fit_game_probs(_attach_real_si(
+        _disambiguate_players(_fix_team_names(pd.read_csv(path))), season))
 
 
 def _attach_real_si(df, season):
@@ -1475,6 +1475,82 @@ def _game_key(g):
         return g['Game_ID'].astype(str)
     return (g['Round_num'].astype(str) + '|' +
             g['Home.team'].astype(str) + '|' + g['Away.team'].astype(str))
+
+
+# ── Probabilities that add up within a game ──────────────────
+# The model scores every player on his own row, so nothing ties one player's
+# P_3 to his teammates'. A game's raw P_3 sums anywhere from 38% to 199% in
+# 2026, and 112 of the 207 games go over 100%: a page that lists a game's
+# players side by side then shows, say, 88% and 47% for the same single 3.
+#
+# _fit_game_probs rescales P_1/P_2/P_3 so each game hands out exactly one 3,
+# one 2 and one 1 (iterative proportional fitting over players x {0,1,2,3}:
+# every row sums to 1, the 1, 2 and 3 columns each sum to 1, 0 takes the rest).
+# The three are fitted jointly rather than dividing P_3 by its game total,
+# because a player the model makes a likely 2 cannot also be a likely 3.
+# Measured on the 18 walk-forward seasons in backtest_game_level.csv, 3,467
+# games: P(3) Brier x1000 13.54 raw, 13.14 divided, 13.01 fitted, and a raw
+# P(3) of 70-80% landed only 67% of the time where the fitted one lands 78%.
+#
+# Display only, in P_1_game/P_2_game/P_3_game beside the raw columns.
+# Exp_Votes, Poll_Prob and P_1/P_2/P_3 are untouched, so no total, sim or
+# leaderboard on the site moves.
+_GAME_PROB_COLS = ('P_1', 'P_2', 'P_3')
+_GAME_PROB_KEY_COLS = ('Game_ID', 'Home.team', 'Away.team', 'ID')
+
+
+def _fit_game_probs(df):
+    if df is None or not set(_GAME_PROB_COLS) <= set(df.columns):
+        return df
+    if 'Game_ID' not in df.columns and not {'Home.team', 'Away.team'} <= set(df.columns):
+        return df
+    def _txt(s):
+        # Under pandas 3 a missing value survives astype(str) as missing, and
+        # concatenating it blanks the whole key, so fill before joining.
+        return s.astype(object).where(s.notna(), '').astype(str)
+
+    key = _game_key(df)
+    if 'Season' in df.columns:
+        key = df['Season'].astype(str) + '|' + key
+    # A row with no game key cannot be fitted and keeps its raw figures.
+    ok = key.notna().to_numpy()
+    # One player can sit in a game twice (78 rows in 2025, the copies differing
+    # in their Wheelo columns and so in P_3). Fitted with both copies he would
+    # take two shares of the game's votes, so only the first copy is fitted and
+    # both display it. The name rides along with the ID because ID can be
+    # blank: 92 rows in 2026, three of them in West Coast v Collingwood alone
+    # (raw round 23), which ID-only keying fuses into one player.
+    who = _txt(df['Player_Name'])
+    if 'ID' in df.columns:
+        who = who + '|' + _txt(df['ID'])
+    pair = (_txt(key) + '#' + who).to_numpy()
+    first = ok & ~pd.Series(pair).duplicated().to_numpy()
+    if not first.any():
+        return df
+    raw = (df[list(_GAME_PROB_COLS)].apply(pd.to_numeric, errors='coerce')
+           .fillna(0.0).to_numpy(dtype=float))
+    P = raw[first]
+    M = np.clip(np.column_stack([1.0 - P.sum(1), P]), 1e-12, None)
+    codes, uniq = pd.factorize(key.to_numpy()[first])
+    k = len(uniq)
+    size = np.bincount(codes, minlength=k).astype(float)
+    target = np.column_stack([np.maximum(size - 3, 1e-9), np.ones((k, 3))])
+    # ~110 sweeps to 1e-9 on a full season, about 30ms.
+    for _ in range(1000):
+        M /= M.sum(1, keepdims=True)
+        col = np.column_stack([np.bincount(codes, weights=M[:, j], minlength=k)
+                               for j in range(4)])
+        if np.abs(col - target).max() < 1e-9:
+            break
+        M *= (target / col)[codes]
+    M /= M.sum(1, keepdims=True)
+    back = pd.Index(pair[first]).get_indexer(pair)
+    out = df.copy()
+    for j, c in enumerate(_GAME_PROB_COLS, start=1):
+        vals = raw[:, j - 1].copy()
+        vals[ok] = M[back[ok], j]
+        out[f'{c}_game'] = vals
+    return out
 
 
 @st.cache_data(ttl=3600)
@@ -1658,9 +1734,17 @@ def load_all_historical(columns=None, categorize=('Player_Name', 'Playing.for', 
         if os.path.exists(path):
             if want is None:
                 df = _fix_team_names(pd.read_csv(path))
+                df = _fit_game_probs(df)
             else:
                 avail = set(pd.read_csv(path, nrows=0).columns)
-                df = _fix_team_names(pd.read_csv(path, usecols=list(want & avail)))
+                # The within-game fit needs the whole game, so it runs per
+                # season file with the match-key columns read in and then
+                # dropped, leaving the frame as narrow as the caller asked.
+                fit = set(_GAME_PROB_COLS) <= want
+                extra = (set(_GAME_PROB_KEY_COLS) - want) if fit else set()
+                df = _fix_team_names(pd.read_csv(path, usecols=list((want | extra) & avail)))
+                if fit:
+                    df = _fit_game_probs(df).drop(columns=list(extra & avail))
             df['Season'] = season
             frames.append(df)
     if not frames:
@@ -4588,11 +4672,17 @@ if _page == 'Player Profile':
                 st.markdown('<div class="section-header">Game Log</div>', unsafe_allow_html=True)
                 log = player_games.copy()
                 log['Result'] = log['Is_Win'].map({1: 'W', 0: 'L'})
-                log['Poll%'] = (log['Poll_Prob'] * 100).round(1).astype(str) + '%'
                 log['ExpV'] = log['Exp_Votes'].round(2)
-                log['P(3)'] = (log['P_3'] * 100).round(1).astype(str) + '%'
-                log['P(2)'] = (log['P_2'] * 100).round(1).astype(str) + '%'
-                log['P(1)'] = (log['P_1'] * 100).round(1).astype(str) + '%'
+                # The within-game fits, so a game reads the same here as on Game
+                # Analysis and Poll% is still the sum of the three beside it.
+                # ExpV stays raw: it is the unit every season total is summed in.
+                _fitted = all(f'P_{_n}_game' in log.columns for _n in (1, 2, 3))
+                _sfx = '_game' if _fitted else ''
+                for _n in (3, 2, 1):
+                    log[f'P({_n})'] = (log[f'P_{_n}{_sfx}'] * 100).round(1).astype(str) + '%'
+                _poll = (log[[f'P_{_n}{_sfx}' for _n in (1, 2, 3)]].sum(axis=1)
+                         if _fitted else log['Poll_Prob'])
+                log['Poll%'] = (_poll * 100).round(1).astype(str) + '%'
                 display_cols = (['Season'] if is_career else []) + [
                     'Round_num', 'Result', 'Disposals', 'Goals',
                     'Contested.Possessions', 'Clearances', 'Coaches_Votes']
@@ -5667,7 +5757,9 @@ if _page == 'Game Analysis':
                     names = gp['Player_Name'].astype(str).tolist()
                     teams = gp['Team'].astype(str).tolist()
                     exps  = pd.to_numeric(gp['Exp_Votes'], errors='coerce').fillna(0.0).tolist()
-                    p3s   = (pd.to_numeric(gp['P_3'], errors='coerce').fillna(0.0) * 100).tolist()
+                    # Fitted so the game's P(3) column adds to 100%. See _fit_game_probs.
+                    p3s   = (pd.to_numeric(gp['P_3_game' if 'P_3_game' in gp.columns else 'P_3'],
+                                           errors='coerce').fillna(0.0) * 100).tolist()
                     dsps  = pd.to_numeric(gp['Disposals'], errors='coerce').fillna(0).astype(int).tolist()
                     clrs  = pd.to_numeric(gp['Clearances'], errors='coerce').fillna(0).astype(int).tolist()
                     gls   = pd.to_numeric(gp['Goals'], errors='coerce').fillna(0).astype(int).tolist()
