@@ -1,12 +1,14 @@
 # Cha Ching — Project Brief
 
 > Do not paste full source files. Locate code by function name, never by line number.
-> Last full-file recon pass over the live repo: 29 July 2026. Last edited:
-> 16 August 2026, adding the skeleton-loader law under UI theme, the Cloud
-> versus local timing entry under Environment gotchas, and the Caching section.
-> That edit was additive only: three insertions, no existing line changed.
-> Nothing outside the lines those edits touched has been re-verified since
-> 29 July.
+> Last full-file recon pass over the live repo: 29 July 2026. **Status pass: 14
+> September 2026**, one week before count night. Re-measured that day and
+> corrected where stale: tech stack and R scripts, file structure and tracked
+> counts, the win-probability claim, null-versus-zero counts, the odds section
+> (against the 24 August scrape), fonts, `st.iframe` count, current priorities,
+> deferred items and the keep-alive cadence. The Model section, calibration
+> table, Page structure, Access model and the Averages figures (0.66 / 0.60 /
+> 0.56) were **not** re-run and stand as of their own dates.
 >
 > **This file and the Project Knowledge copy must be kept in sync.** On 29 July they
 > had diverged badly: the repo copy was several sessions stale and asserted three
@@ -17,7 +19,8 @@
 
 AFL Brownlow predictor + betting research tool. Streamlit dashboard deployed on
 Streamlit Cloud from GitHub (`charliejurberg-bit/Cha-Ching-Brownlow-Engine`).
-Persistence via Supabase. Live since Round 10 2026.
+Persistence via Supabase. Live since Round 10 2026. The 2026 home and away
+season is complete and fully predicted; the count is 21 September 2026.
 Location: `C:\Users\charl\Python\brownlow_engine\`
 
 Separate Vercel landing page repo: `C:\Users\charl\web\cha-ching-brownlow\`
@@ -35,22 +38,31 @@ Twitter/X: `@ChaChingBrwnlow` (no "o" in Brwnlow).
 
 - **Python 3.13 local / 3.10 on Cloud**, Streamlit 1.57 local / 1.59 Cloud.
   This version gap has caused multiple production failures. Verify on the
-  deployed app, never on local alone.
+  deployed app, never on local alone. (Local measured 14 September 2026: Python
+  3.13.14, Streamlit 1.57.0, pandas 3.0.3, numpy 2.4.4, xgboost 3.2.0. The Cloud
+  Python version was not re-checked.)
 - `requirements.txt` pins `streamlit==1.59.2` **exact, not `>=1.57`**. Also pins
-  `supabase==2.30.0` and carries `extra-streamlit-components==0.1.81`.
+  `supabase==2.30.0` and carries `extra-streamlit-components==0.1.81`. pandas
+  is **unpinned**, so Cloud takes whatever resolves; local is on pandas 3.
 - XGBoost, pandas, numpy, scikit-learn, plotly, requests
 - **Supabase** — cloud persistence for bets, Cha Ching tips, Polls-a-Vote
   watchlist, player props. Source of truth; local CSV fallback. RLS deny-all
   baseline on all four private tables.
 - **Playwright** — live Betfair + ESPN fetch inside `dashboard.py`
 - **undetected_chromedriver** — Oddschecker scraper (`scraper_odds.py`, local only)
-- **R** — two scripts, both fitzRoy: `fetch_extended_data.R` (2007–2014 player
-  stats, 2006–2014 coaches votes) and `scripts/build_history.R` (the 1990–2006
-  archive, run from repo root). **`data_pull.py` does no work: it is 0 bytes**,
-  and has been empty since the initial commit. Earlier briefs listed it here as
-  the historical fetcher.
+- **R** — seven tracked scripts, all fitzRoy: `fetch_extended_data.R`
+  (2007–2014 player stats, 2006–2014 coaches votes), `scripts/build_history.R`
+  (the 1990–2006 archive, run from repo root), `data_2026/fetch_stats_2026.R`
+  (step 1 of `update.py`), `data_2026/fetch_coaches.R` (commented out of
+  `update.py`; see CLAUDE.md "Update chain" before running it), and
+  `scripts/fetch_coaches_2003_2005.R`, `fetch_coaches_2015_2025.R`,
+  `fetch_results_pre1965.R`. **`data_pull.py` does no work: it is 0 bytes**,
+  and has been empty since the initial commit.
 - Data sources: fitzRoy, Wheelo ratings, Oddschecker, Betfair, ESPN,
-  AFL Predictor API, Squiggle API, AFL public API
+  AFL Predictor API, Squiggle API, AFL public API (award endpoint, and
+  `matchChains` play-by-play for per-quarter stats from 2021), footywire
+  advanced stats (real Score Involvements from 2015), AFLTables Brownlow season
+  totals 1924–1983, afl.com.au coaches-vote articles (2026 raw rounds 24–25)
 
 ## Model
 
@@ -177,7 +189,24 @@ brownlow_engine/
 ├── backfill_game_level.py    # Historical game-level backfill
 ├── merge_wheelo.py           # Wheelo merge
 ├── streaks.py                # Streak computation for post drafts
-├── draft_posts.py            # Templated post generator — step 7 of update.py, no LLM pass
+├── draft_posts.py            # Templated post generator — step 8 of update.py, no LLM pass
+├── draft_gate.py             # Refuses an unsourced draft: 8 checks (superlative,
+│                             #   denominator, attribution...), regression suite
+├── landing_summary.py        # Step 9 of update.py → site/landing.json (front door)
+├── coaches_guard.py          # Contaminated-game guard for the coaches archive
+├── coaches_validate.py       # Completeness check for the coaches vote feed
+│
+├── scraper_advanced.py       # footywire advanced stats → data_advanced/
+├── build_score_involvements.py  # Joins the above onto fitzRoy IDs (98% floor)
+├── fetch_wheelo_historical.py
+├── espn_page_dump.py         # Diagnostic: saves the ESPN page's full HTML
+│
+├── fixture_recon.py          # Per-fixture PLAYER recon (fixture_recon_spec.md)
+├── team_h2h.py               # Team head-to-head preview (team_h2h_spec.md), with
+│                             #   team_h2h_crossopp / _pre1965 / _records / _streaks /
+│                             #   _without and team_match_table(_pre1965).py
+├── all_time_tables.py, milestones.py, round_bests.py, fewest_games.py,
+│   stat_streaks.py           # Record builders for posts, 1965 or 1984 onward
 │
 ├── scraper_odds.py           # Oddschecker (undetected_chromedriver) — sole writer of implied_prob
 ├── scraper_betfair.py        # Betfair consensus (JSON API)
@@ -192,13 +221,29 @@ brownlow_engine/
 ├── fetch_extended_data.R     # fitzRoy: 2007–2014 player stats, 2006–2014
 │                             #   coaches votes. Run via source() in R.
 │
-├── scripts/
+├── scripts/                  # 36 tracked files. Nothing here feeds a page of the site.
+│   ├── count_night.py        # Feed state (PREDICTOR/COUNTING/COUNTED/UNKNOWN), snapshot
+│   ├── count_tweets.py       # --watch: drafts count-night posts per round, never posts
+│   ├── count_sim.py          # Who wins from here: conditional 3-2-1 simulator, backtested
+│   ├── night_pack.py         # Research pack → drafts/brownlow_night/ (with night_sections.py)
+│   ├── vote_milestones.py    # Milestones a player could pass on the night
+│   ├── keepalive.py          # Real-browser wake for the deployed app (Actions job)
+│   ├── *_card.py, round_votes_chart.py   # Tweet-size post images: 16 cards + 1 chart
+│   ├── fetch_match_chains.py # AFL play-by-play → data_chains/; period_records.py reads it
+│   ├── build_brownlow_seasons.py         # AFLTables 1924–1983 season totals
+│   ├── append_coaches_2026_r24_r25.py    # Hand-transcribed coaches votes, guarded
+│   ├── convert_history.py, rebuild_coaches_all.py, validate_coaches.py,
+│   │   reproject_2026.py     # Archive and projection maintenance
 │   └── build_history.R       # Producer for the 1990–2006 archive. Run from repo root.
 │
-├── data_2026/                # Live season data (22 files)
-├── data_wheelo/              # Wheelo 2015–2026 + wheelo_all_seasons.csv (16 files)
+├── site/landing.json         # Front-door artifact, tracked; see update.py docstring
+│
+├── data_2026/                # Live season data (24 tracked files)
+├── data_wheelo/              # Wheelo 2015–2026 + wheelo_all_seasons.csv (15 tracked)
 ├── data_betting/             # Betting Hub local fallback CSVs (4 files)
-├── data_history/             # Pre-2007 archive (19 files, all git-tracked, 43 MB)
+├── data_advanced/            # footywire advanced stats, 2015+, and score_involvements.csv (18 tracked)
+├── data_chains/              # period_stats.csv tracked; raw/ fetch cache gitignored
+├── data_history/             # Pre-2007 archive (24 tracked files)
 │   ├── brownlow_votes_1990_2006.csv       # 124,171 rows, 10 cols. Votes ledger,
 │   │                                      #   H&A only, no stat columns. Recon-only
 │   ├── fitzroy_stats_1965_2006.csv.gz     # 266,687 rows, 81 cols, 1965–2006. Same
@@ -215,7 +260,8 @@ brownlow_engine/
 │                                          #   dashboard._load_stat_filter_frame()
 │                                          #   for Stat Filter only. Regenerate with
 │                                          #   scripts/convert_history.py
-├── predictions/              # Model artifacts + output CSVs — git-tracked (75 files)
+├── predictions/              # Model artifacts + output CSVs — git-tracked (79 files,
+│                             #   incl. snapshots/ of season totals for rounds 20–25)
 ├── page_modules_wip/         # DEAD half-refactor, 13 .py files, nothing imports it
 ├── supabase/                 # SQL / config
 ├── assets/
@@ -246,6 +292,12 @@ Other docs: `CLAUDE.md`, `CLAUDE_CODE_BRIEF.md`, `fixture_recon_spec.md`,
 governs the team-level head-to-head fixture preview and is distinct from
 `fixture_recon_spec.md`, which is player-level. `landing_spec.md` is **not** in
 this repo and should not be added to it. It belongs to the front-end repo, below.
+
+Handovers: `handover_2026-08-02b.md`, `handover_2026-08-02c.md` and
+`handover_2026-08-18_weekly_formats.md` are tracked; the count-night handover
+`handover_2026-09-11_count_night.md` is untracked, holds nothing durable any
+more (its findings are in `CLAUDE.md` and here) and is to be deleted after count
+night.
 
 ### Two repos and one second clone
 
@@ -349,10 +401,17 @@ Anonymous reach is exactly the Brownlow `_snav_pages` list.
 ## Model-vs-market surfaces
 
 Every site that puts a model number against a market number normalises
-`Exp_Total_Votes` into a share. **No win probability exists anywhere in the
-repo.** `season_projection_2026.csv` holds independent per-player Monte Carlo
+`Exp_Total_Votes` into a share. **No win probability exists anywhere on the
+site.** `season_projection_2026.csv` holds independent per-player Monte Carlo
 floor/ceiling bands only; because players are simulated independently, no winner
 distribution is derivable from it.
+
+The repo does now hold one, offline: `scripts/count_sim.py` (12 September 2026)
+is a conditional 3-2-1 simulator that answers "who wins from here" part way
+through a count, backtested over 2008–2025 before any figure is used.
+`scripts/count_tweets.py` reads it on count night and caps its wording so it
+never claims certainty. Nothing on the site calls it, so the table below is
+unchanged.
 
 | Site | Page | Anonymous | What it actually is |
 |---|---|---|---|
@@ -390,13 +449,18 @@ The same player can show 0.66, 0.60 and 0.56. All five live paths are in
 Labels were fixed by relabel only, no arithmetic touched: Profile tab is
 "Avg exp votes", DNA tab is "Avg votes polled".
 
-**Null versus zero.** Same 7,866 games, opposite encoding:
+**Null versus zero.** Same 9,522 player-games (the full 2026 season, re-counted
+14 September 2026), opposite encoding:
 
 ```
-data_2026/afltables_2026.csv      7,866 null, 0 zero, .mean() → NaN
-predictions/game_level_2026.csv   0 null, 7,866 zero, .mean() → 0.0
+data_2026/afltables_2026.csv      9,522 null, 0 zero, .mean() → NaN
+predictions/game_level_2026.csv   0 null, 9,522 zero, .mean() → 0.0
 fitzroy_stats_all.csv finals      7,658 null, dropped by .mean()
 ```
+
+Both 2026 files switch from "no votes yet" to real votes only once the count's
+results are loaded after 21 September; until then every 2026 vote figure in
+either file is a placeholder.
 
 Recon reads the first, the app reads the third. Finals get dropped; 2026 rows get
 counted and drag career averages down. **Any votes-per-game figure must state
@@ -414,38 +478,33 @@ for a retrospective quantity. Rename while it is free.
 bookmakers, so stored `implied_prob` is a best-of-eight composite, not any single
 book's line. `BETFAIR_MIN_BACK = 1.5` filters lay prices.
 
-- 116 quoted players. **60 of them sit at 980 or 1001**, every one stored as
-  `implied_prob` 0.1. That is a board floor, not an opinion. Over half the field
-  carries no market view.
-- Book sums to 127.89% across all quoted; 121.89% excluding the 980/1001 tail.
-- Six exact-join failures against `season_2026.csv`: Jordan De Goey, Lachlan Ash,
-  Matthew Rowell, Nic Martin, Samuel Lalor, Tom Green. The earlier "Jack/Josh
-  Rachele" bookmaker typo is resolved — the scrape now returns "Josh Rachele",
-  which matches exactly. "Nic Martin" and "Tom Green" have no counterpart in the
-  model universe at all.
-- **Five of the six survive `normalise_name()`, not all six.** It does no
-  nickname mapping, so Matthew/Matt Rowell, Samuel/Sam Lalor and Lachlan/Lachie
-  Ash stay split, and Nic Martin and Tom Green have nothing to match. But
-  `Jordan De Goey` vs the model's `Jordan de Goey` is a capitalisation
-  difference, and `normalise_name()` opens with `.title()`, so it *does* resolve
-  that one. Consumers joining exactly see six failures; consumers going through
-  `normalise_name()` see five.
-- **`best_odds.csv` carries `Matt Rowell` and `Matthew Rowell` as separate
-  rows**, present since the first commit containing the file (`6c328f6`,
-  21 May 2026). `scrape_oddschecker()` dedupes on the exact `data-bname` string
-  while Oddschecker renders the player under two spellings, so both clear the
-  guard and both propagate into `bookmaker_odds.csv`, the long-form history and
-  `best_odds.csv`.
-  The consequence is **not a wrong best price**. `max()` runs per row, so the
-  two never meet, but the union's longest price is bet365's 1001 either way —
-  merging the rows would return the same `best_odds`, `implied_prob` and
-  `best_bookie`. What it does create is a **phantom row at market rank 26**,
-  inflating `_market_rank` by one for every player priced longer than 501. Both
-  sites are in `dashboard.py`, inside the `if _page == 'Predictions':` block:
-  the rank is built at `_market_rank[_pl] = int(_mr) + 1`, and consumed one
-  screen down at `_edge = _market_rank[_pname] - _rank`. Currently inert: the
-  top-10 model players who reach that loop all price shorter than 501.
-- Jason Horne-Francis is genuinely unquoted, rank 11 by expected votes.
+**The figures below are from the last scrape, 24 August 2026 17:45**
+(`scraped_at` in `best_odds.csv`, re-measured 14 September). No odds have been
+scraped since; the in-season chain is finished. The July figures they replace
+are in git history.
+
+- 111 quoted players. **19 of them sit at 980 or 1001**, every one stored as
+  `implied_prob` 0.1. That is a board floor, not an opinion. (It was 60 of 116
+  in July.)
+- Book sums to 119.18% across all quoted; 117.28% excluding the 980/1001 tail.
+- Four exact-join failures against `season_2026.csv`: Jordan De Goey, Lachlan
+  Ash, Nic Martin, Samuel Lalor. "Nic Martin" has no counterpart in the model
+  universe at all. Matthew Rowell and Tom Green, two of July's six, are gone
+  from this scrape.
+- **Three of the four survive `normalise_name()`.** It does no nickname
+  mapping, so Samuel/Sam Lalor and Lachlan/Lachie Ash stay split and Nic Martin
+  has nothing to match. `Jordan De Goey` against the model's `Jordan de Goey`
+  is only capitalisation, and `normalise_name()` opens with `.title()`, so it
+  resolves that one.
+- **The `Matt Rowell` / `Matthew Rowell` duplicate is absent from this scrape**
+  (one row, `Matt Rowell`). The cause is not fixed: `scrape_oddschecker()` still
+  dedupes on the exact `data-bname` string, so it recurs whenever Oddschecker
+  renders a player under two spellings. When present it never yields a wrong
+  best price (`max()` runs per row) but adds a phantom row to `_market_rank`,
+  built at `_market_rank[_pl] = int(_mr) + 1` and consumed at
+  `_edge = _market_rank[_pname] - _rank` in the `if _page == 'Predictions':`
+  block, shifting every player priced longer than the phantom.
+- Jason Horne-Francis is still unquoted.
 - **Price history is appended in-repo, not overwritten away.** The two working
   files are still rewritten whole each run, and there is no `_prev` and no
   timestamped filename for them. But `_append_history()` writes `mode="a"` to
@@ -454,11 +513,12 @@ book's line. `BETFAIR_MIN_BACK = 1.5` filters lay prices.
   per run), both git-tracked. It dedupes on `scraped_at`, so a re-run against an
   unchanged scrape is a no-op. Earlier briefs said git history was the only price
   record that would ever exist for this season. It is not: the history files are.
-- **The eight books behind `implied_prob` are UK books**, not the Australian
-  ones: bet365, Unibet, BetMGM UK, Virgin Bet, Betway, Skybet, Paddy Power,
-  Betfair. They are what survives into columns out of 26 bookmaker names detected
-  on the page. Note the scraper prints "Bookmakers found" twice with different
-  meanings, 26 on the page and 8 in the final frame.
+- **The books behind `implied_prob` are UK books**, not the Australian ones.
+  The 24 August scrape carries seven: bet365, Unibet, Virgin Bet, Betway,
+  Skybet, Paddy Power, Betfair (July's eight also had BetMGM UK). They are what
+  survives into columns out of the bookmaker names detected on the page. The
+  scraper labels both counts, the names detected on the page and the books left
+  in the final frame (26 and 8 in July).
   This is a **different set from the Australian books in CLAUDE.md's Betting Hub
   section** (Sportsbet, TAB, Betfair, Ladbrokes, Neds, PointsBet, Unibet), and
   the two are not meant to match: this list is what the Oddschecker scrape
@@ -518,8 +578,12 @@ book's line. `BETFAIR_MIN_BACK = 1.5` filters lay prices.
 
 - `bg #0a1017`, `surface #101a24`, `text #e9eef3`, `emerald #34d399`,
   `gold #f0b429`, `muted red #ef7a6d`, `border #1a2632`, `muted #7e8c99`
-- **Archivo** display headings, **Sora** UI text, **DM Mono** numerics
-  (weights 400/500 only; faux bold clamped to 500). Not IBM Plex Mono.
+- **Archivo** display headings, **Sora** UI text, **IBM Plex Mono** numerics.
+  Corrected 14 September 2026: this line used to say DM Mono and "not IBM Plex
+  Mono", but `theme.py` loads IBM Plex Mono (400/500/600) and forces it on
+  dataframe headers and metric values, and it has 96 uses in `dashboard.py`
+  and 36 in `betting_hub.py`. DM Mono is still loaded by `dashboard.py` and
+  survives in 22 older rules there, a leftover rather than the standard.
 - `config.toml`: `base=dark`, `primaryColor=#34d399`, `backgroundColor=#0a1017`,
   `secondaryBackgroundColor=#101a24`, `textColor=#e9eef3`
 
@@ -545,7 +609,7 @@ book's line. `BETFAIR_MIN_BACK = 1.5` filters lay prices.
   .react-aria-ComboBox > div` (closed), `[data-testid="stSelectboxVirtualDropdown"]`
   (portal, mounts as bare body child), `[role="option"]` rows.
 - Nav CSS changes require live verification on a BH-routed page.
-- Animated/JS content lives in `st.iframe` (5 call sites in `dashboard.py`).
+- Animated/JS content lives in `st.iframe` (4 call sites in `dashboard.py`).
   `components.html()` is gone; the only surviving reference is a test mock in
   `test_espn.py`.
 - **Blocking loads show a skeleton, not a spinner.** `.cc-skel` / `.cc-skel-bar`
@@ -572,6 +636,16 @@ book's line. `BETFAIR_MIN_BACK = 1.5` filters lay prices.
 - Screenshot verification is unreliable for this app. `get_page_text` and log
   inspection are more trustworthy.
 - `st.iframe` rejects `height=0` — use `height=1`.
+- **pandas 3 (local) keeps a missing value missing through `astype(str)`.** A
+  NaN ID concatenated into a key blanks the whole key instead of yielding
+  `"nan"`, so every blank-ID player in a game fuses into one. Fill before
+  joining (`s.astype(object).where(s.notna(), '')`). Caught in
+  `_fit_game_probs`, where 92 blank IDs in 2026 hit it.
+- **`gh` is not installed.** Read Actions runs from the public API instead:
+  `api.github.com/repos/charliejurberg-bit/Cha-Ching-Brownlow-Engine/actions/workflows/<file>/runs`.
+- **Rendering pages headless:** `streamlit.testing.v1.AppTest` needs the repo
+  on `PYTHONPATH` (`PYTHONPATH=.`) or `import betting_hub` fails before the page
+  runs.
 - **PowerShell 5.1 only, no `pwsh` 7.x.** `-Encoding utf8` writes a BOM, which
   breaks pandas merges on column 0 by silently producing `\ufeffPlayer_Name`.
   `>` and `Out-File` write UTF-16LE. Commit messages with quoted strings require
@@ -619,7 +693,9 @@ default and is read-only.
 ## Content pipeline
 
 `draft_posts.py` is a **templated** generator with no LLM pass, wired in as step
-7 of `update.py`. This was deliberate: templated output cannot invent an accuracy
+8 of `update.py`. `scripts/count_tweets.py` follows the same rule for count
+night, and `draft_gate.py` checks a draft against its facts file before it
+ships. This was deliberate: templated output cannot invent an accuracy
 claim. Keep it that way unless the decision is revisited explicitly.
 
 `fixture_recon_spec.md` governs per-fixture recon: eight blocks, existence checks
@@ -652,18 +728,52 @@ Copy rules, permanent:
 
 ## Current priorities
 
-1. Superlative and denominator gates: a script that fails the build when a draft
-   makes a superlative claim without a ranked table, or states a per-game rate
-   without a denominator and source file.
-2. Remove the Streamlit landing page — Vercel is the front door.
-3. Script the deterministic post-round chain (`update.py`, `draft_posts.py`,
-   `streaks.py`) with exit-code checks, stopping on failure.
-4. Forum post and first weekly scorecard, built on the calibration table.
-5. Resolve the MAE question above.
-6. Result posts for the Mullin and Bontempelli previews. Three handovers
-   outstanding. Previews without results are the half of the record that does not
-   count.
-7. Resend SMTP wiring, once the custom domain is live.
+Rewritten 14 September 2026. The season's work has converged on one date.
+
+**Before count night (21 September 2026).** The engine is built, verified on the
+deployed app in all six feed states (signed in and out) and pushed; the tweet
+copy is signed off. What is left is operational:
+
+1. **Rehearse the phone check-in once.** Start the watcher detached with the
+   command in CLAUDE.md's "Count night runbook", connect from the phone over
+   Remote Control, confirm the log reads `refusing: PREDICTOR` plus a heartbeat,
+   run `--last`, stop it by PID. Safe now because the feed is serving the
+   predictor. Afterwards confirm `drafts/count_night_drafted_2026.txt` was not
+   created. Not yet done: no `drafts/count_night_tweets.txt` exists.
+2. **The PC on the night:** on AC, and no Windows Update restart pending. Sleep
+   is already off (measured 13 September).
+3. **Open the site before the count starts.** The keep-alive job lands every 1.6
+   to 5.6 hours, not every 15 minutes, so a cold start is still possible.
+4. Betting strategy and markets for the night (private, Charlie's).
+
+One thing cannot be tested in advance: how far the AFL feed lags the broadcast.
+
+**After the count.**
+
+5. Load the real 2026 votes. AFLTables' `brownlow2026rbr.html` already lists
+   all 207 fixtures and fills after the count, in the archive's own format.
+   Resolve 2026 inclusion across the four actual-votes paths at the same time.
+6. Scorecard and results posts. Still no accuracy percentage unless Charlie
+   supplies it, and no MAE until item 7.
+7. Resolve the MAE question above.
+8. Fit `Exp_Votes` within each game at the source (parked 14 September; see
+   CLAUDE.md, "Prediction outputs").
+9. Delete `handover_2026-09-11_count_night.md`.
+10. The off-season list below.
+
+**Carried from the July list, status by repo evidence:**
+
+- ~~Superlative and denominator gates.~~ **Built** as `draft_gate.py` (30 July),
+  eight checks and `tests/run_gate_tests.py`. Run by hand per draft; nothing
+  calls it automatically, and it has no team-mode coverage (`team_h2h.py` says
+  so).
+- ~~Remove the Streamlit landing page.~~ **Done** 21 July (`ecb15c5`).
+- Script the post-round chain to stop on failure. **Not done, and moot until
+  2027:** `update.py` now reports each step's exit code but deliberately runs
+  every step regardless, and `streaks.py` is still a separate command.
+- Forum post and first weekly scorecard; result posts for the Mullin and
+  Bontempelli previews; Resend SMTP wiring once the domain is live. **Status
+  not recorded in the repo** and not checked here.
 
 ## Known deferred, non-blocking
 
@@ -672,11 +782,16 @@ CSV re-import duplication; `_load_bets` CSV shadowing; dead
 traceback-in-UI; `uuid[:8]` on import paths; `ADMIN_UID` silent-lockout
 mitigation. Consolidate the three club-alias copies. Rename
 `Avg_Predicted_Per_Game`. Resolve 2026 inclusion across the four actual-votes
-paths. Prune the allow list in `.claude/settings.local.json`. `.claude/` is
-listed twice in `.gitignore`. The `Matt Rowell`/`Matthew Rowell` duplicate in
-`best_odds.csv` — inert while the top-10 all price shorter than 501, but it
-shifts `_market_rank` and would surface if a long-priced player reached the
-Predictions top 10.
+paths. Prune the allow list in `.claude/settings.local.json`. The Oddschecker
+same-player-two-spellings dedupe (absent from the 24 August scrape, cause
+unfixed; see "Odds data"). `predictions/game_level_*.csv` can carry one player
+twice in a game with differing Wheelo columns (78 rows in 2025; see CLAUDE.md).
+The `scripts/night_pack.py` docstring says the 1976-77 pool compares with "792
+in every neighbouring season"; 1975 was 756. Game Analysis' Exp Votes column
+still sums 3.8 to 8.3 per game while its P(3) column is fitted.
+
+(`.claude/` listed twice in `.gitignore`, carried here until 14 September, is
+fixed: it appears once.)
 
 Modelling backlog: 16 non-rank Wheelo features, composite-vs-raw Impact_Score,
 round-index interaction, Kangaroos alias.
@@ -701,9 +816,10 @@ for rounds 1–19 from weekly data-update commits.
 - **Keep-alive GitHub Actions cron.** Firing, and not a launch blocker. It never
   was one. Runs 82 to 104 are all labelled Scheduled, confirming delivery since
   at least 1 August 2026, mostly green with scattered failures. Two things to
-  know before re-raising it. GitHub delivers the cron roughly hourly rather than
-  the requested 15 minutes, because short intervals get dropped under load, so
-  the interval is a target and not a promise. The intermittent 400s are endpoint
+  know before re-raising it. GitHub delivers the cron far less often than the
+  requested 15 minutes, because short intervals get dropped under load, so the interval is
+  a target and not a promise: roughly hourly in early August, and every 1.6 to 5.6
+  hours across the ten runs of 12 to 14 September 2026, all of them green. The intermittent 400s are endpoint
   flake, not a broken workflow. The ping moved off the `/~/+/` suffix to the bare
   app URL with a cookie jar in 648c6a7, which was hardening plus header dumps on
   failure, not a repair of a dead cron.

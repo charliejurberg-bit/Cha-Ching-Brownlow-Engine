@@ -1,6 +1,12 @@
 # Cha Ching — Brownlow Medal Predictor & Betting Hub
 
-AFL Brownlow Medal predictor plus a betting tracker. XGBoost model (v4.0) trained on 2007–2025 data. Dashboard runs live during the 2026 season.
+AFL Brownlow Medal predictor plus a betting tracker. XGBoost model (v4.0) trained on 2007–2025 data. Dashboard live on Streamlit Cloud.
+
+**Where things stand (14 September 2026):** the 2026 home and away season is
+complete and fully predicted (207 games, coaches votes for all of them). The
+count is **21 September 2026**; its engine is built, verified and pushed, and
+the "Count night runbook" below is the whole procedure. What remains before it
+is operational, listed under "Current priorities" in `project_brief.md`.
 
 **Only the Betting Hub is personal.** The Brownlow section is the free public product, launched to AFL betting forums with no paywall and no paid tips; the Betting Hub is private and admin-gated. Treat any copy decision as public-facing unless it lives behind the gate.
 
@@ -24,8 +30,12 @@ python predict_2026.py
 
 ## Update chain
 
-`python update.py` runs the ten step weekly chain (stats, odds, predictions,
-drafts, landing artifact). One-off checks tied to a particular round are
+`python update.py` runs the nine step weekly chain: one R step (2026 stats) then
+eight Python steps (odds, Betfair, ESPN, AFL predictor, Wheelo, predictions,
+drafts, `site/landing.json`). The 2026 coaches fetch is commented out of it, see
+below. Nothing in the chain stops on a failed step; read each step's exit code.
+The 2026 home and away season is over, so the chain has nothing left to fetch
+this year. One-off checks tied to a particular round are
 recorded here.
 
 **Routing check. The expected line is now `207 full / 0 no_cv`.** The 2026 home
@@ -95,27 +105,18 @@ never engages. The predicate fixed in commit `800acc7` (`(s != 0).any()` to
 `(s > 0).any()`) is NaN safe and was proven against raw round 23 while that
 round was genuinely unpublished. Keep it NaN safe in any rewrite.
 
-Background: the root cause does not live in `predict_2026.py`. The zero-source
-guard in `features.py` (`ZERO_SOURCE_GUARD_STATS`, applied inside
-`build_game_rank_features`) sets the **raw `Coaches_Votes` column** to NaN for a
-game whose votes are all zero, not just the derived rank/pct/z triplet, and it
-runs before the routing test. An unpublished game therefore reaches the
-predicate holding NaN rather than 0, and any NaN-unsafe comparison reads that as
-"votes published" and sends the game to the full model, so `model_nocv.pkl`
-never engages. Keep that predicate NaN safe in any rewrite.
-
 ## Project structure
 
 ```
 brownlow_engine/
-├── dashboard.py          # Main Streamlit app — 8,674 lines. Brownlow pages + hub
+├── dashboard.py          # Main Streamlit app — 9,130 lines. Brownlow pages + hub
 │                         #   router + global CSS. NOT all pages: the Betting Hub
 │                         #   pages render from betting_hub.py (except Predictions)
 ├── betting_hub.py        # Betting Hub module, imported by dashboard.py
 │
 ├── brownlow_model.py     # Model training (v4.0) — runs once per season
 ├── predict_2026.py       # In-season predictor — run after each round
-├── update.py             # One-click: stats → odds → predict
+├── update.py             # Nine step weekly chain, ends with site/landing.json
 │
 ├── scraper_stats.py      # Pulls player stats from Squiggle API → data_2026/
 ├── scraper_odds.py       # Scrapes multi-bookie odds from Oddschecker (undetected-chromedriver)
@@ -132,13 +133,27 @@ brownlow_engine/
 ├── data_pull.py          # EMPTY, 0 bytes. Not a fetcher. The R paths that do
 │                         #   work are fetch_extended_data.R and scripts/build_history.R
 ├── fetch_extended_data.R # R script for fitzRoy data (coaches votes etc.)
-│                         # scripts/fetch_match_chains.py → data_chains/, and
-│                         #   scripts/period_records.py reads it back as
-│                         #   youngest-player ladders. Recon only
-├── backtest.py           # Backtesting harness
+├── backtest.py           # Walk-forward backtest → predictions/backtest_game_level.csv
+│
+├── scripts/              # 36 tracked files. Three groups:
+│   │                     #   count night: count_night.py (feed state + snapshot),
+│   │                     #   count_tweets.py (the --watch drafter), count_sim.py
+│   │                     #   (who wins from here), night_pack.py + night_sections.py
+│   │                     #   (research pack), vote_milestones.py, keepalive.py
+│   │                     #   post cards: *_card.py, round_votes_chart.py
+│   │                     #   data builders: fetch_match_chains.py → data_chains/
+│   │                     #   (read back by period_records.py), build_brownlow_seasons.py,
+│   │                     #   append_coaches_2026_r24_r25.py, convert_history.py,
+│   │                     #   reproject_2026.py, the coaches R fetches
+│   │                     #   Nothing here feeds a page of the site. See "Count
+│   │                     #   night and the Live Tracker" below
 │
 ├── predictions/          # Model artifacts + CSV outputs
 │   ├── model.pkl         # Trained XGBClassifier
+│   ├── model_nocv.pkl    # No-coaches variant, for games whose coaches votes are
+│   │                     #   unpublished. Idle in 2026 now: see "Update chain"
+│   ├── backtest_game_level.csv  # Walk-forward per-game predictions, 2008-2025.
+│   │                     #   The only out-of-sample set; every calibration uses it
 │   ├── features.pkl      # Feature list (93 features)
 │   ├── label_encoder.pkl # LabelEncoder for Margin_Bucket
 │   ├── rank_stats.pkl    # Stats used for relative game features
@@ -241,6 +256,27 @@ artifact defines either group, so treat both as approximate. Count from
 
 **Prediction outputs** (per game): `P_1`, `P_2`, `P_3`, `Poll_Prob` (P_1+P_2+P_3), `Exp_Votes` (weighted expected value).
 
+**None of these add up within a game.** The model scores each player's row on
+its own, so a 2026 game's `P_3` sums anywhere from 38% to 199% (112 of 207 over
+100%) and its `Exp_Votes` from 3.8 to 8.3 rather than 6. Two consequences:
+
+- **Displayed probabilities are fitted, totals are not.** `_fit_game_probs` in
+  `dashboard.py` (commit `a39fe1b`) runs iterative proportional fitting over
+  players x {0,1,2,3} so each game hands out one 3, one 2 and one 1, and writes
+  `P_1_game`/`P_2_game`/`P_3_game` beside the raw columns inside `load_game` and
+  the career loader. Game Analysis P(3) and the Player Profile game log read
+  them. The joint fit beat dividing by the game total on the 3,467 backtest
+  games (P(3) Brier x1000 13.54 raw, 13.14 divided, 13.01 fitted). Keying is on
+  name plus ID, because ID is blank on 92 rows of 2026 and pandas 3 turns a
+  blank into a missing key rather than the string "nan".
+- **Fitting `Exp_Votes` itself is parked until after count night.** It would
+  move public totals a week before the count (Heeney 22.9 to 21.1, Gawn 17th to
+  14th, Daicos 48 to 46 on the 3-2-1 board). A source fix belongs in
+  `predict_2026.py`, `brownlow_model.py` and `backtest.py`, which all compute
+  `Exp_Votes` from the raw columns. Any sampler of a game's 3-2-1 must condition
+  within the game (see `scripts/count_sim.py`), never draw the three columns
+  independently.
+
 **Season projection**: Monte Carlo (10,000 simulations) over completed rounds →
 10th/90th percentile floor/ceiling. Two things about it are easy to get wrong.
 
@@ -338,9 +374,15 @@ reading code, and both enforced in `build_score_involvements.py`:**
    player list confirms: 46 a side, 43 exact, the 3 misses pure name forms
    (Lachlan/Lachie Weller, Samuel/Sam Collins, Zachary/Zach Merrett).
 
-**`predictions/game_level_*.csv` can carry exactly-duplicated rows, and this is
-NOT fixed at the source.** 2025 has 78 of them (every Essendon and Gold Coast
-player in round 24, listed twice) and 2026 has 89. A duplicate does two kinds of
+**`predictions/game_level_*.csv` can carry the same player twice in one game,
+and this is NOT fixed at the source.** 2025 has 78 such rows: every Essendon
+player in Essendon v St Kilda and every Gold Coast player in Gold Coast v GWS,
+both round 24. The copies are **not exact duplicates**: they differ in their
+Wheelo columns and so in `P_1`-`P_3` and `Exp_Votes`, which means
+`drop_duplicates()` with no subset removes none of them. Dedupe on game plus
+player. 2026 currently has none (9,522 rows, exactly 207 games x 46, checked 14
+September 2026). The 89 this line used to state no longer reproduces, and
+nothing upstream stops it recurring. A duplicate does two kinds of
 damage. On the right side of a left merge it multiplies the left row rather than
 annotating it — the 2025 Stat Filter frame grew 9,561 rows to 9,639 before this
 was caught. And it defeats name matching, which accepts only a key unique on
@@ -501,7 +543,9 @@ from his phone.
 
 **The site needs no action.** The Live Tracker flips itself from PREDICTION to
 LIVE COUNT off the feed, and `.github/workflows/keepalive.yml` keeps the app
-awake every 15 minutes. If asked whether it is live,
+awake. Open the site yourself before the count anyway: the job fires every 1.6 to
+5.6 hours in practice, so the first visitor after a quiet spell can still meet a
+cold start. If asked whether it is live,
 `python scripts/count_night.py status` answers in one line without touching the
 site.
 
@@ -560,10 +604,15 @@ the old 300 the board could sit five minutes stale with the votes already
 public. A round is read out every five or six minutes; unknown until the night
 is how fast the AFL feed updates against the broadcast.
 
-**The app is kept awake by `.github/workflows/keepalive.yml`**, every 15
-minutes, driving a real browser via `scripts/keepalive.py`. A curl ping cannot
-do this job: Streamlit Cloud serves the host page with a 200 while the app
-behind it sleeps, and the sleep screen is itself a 200.
+**The app is kept awake by `.github/workflows/keepalive.yml`**, driving a real
+browser via `scripts/keepalive.py`. A curl ping cannot do this job: Streamlit
+Cloud serves the host page with a 200 while the app behind it sleeps, and the
+sleep screen is itself a 200. **The cron asks for every 15 minutes and GitHub
+does not deliver it:** the ten runs from 12 to 14 September 2026 all succeeded,
+spaced 1.6 to 5.6 hours apart. Enough to stop the app sleeping, not enough to
+promise a warm start. `gh` is not installed on this PC; the public Actions API
+(`api.github.com/repos/charliejurberg-bit/Cha-Ching-Brownlow-Engine/actions/workflows/keepalive.yml/runs`)
+answers without it.
 
 **`scripts/` does not feed the page.** The Live Tracker calls
 `fetch_live_brownlow_data()` itself and computes bolters, landed and the
@@ -721,7 +770,12 @@ Predictions → Home / Value Finder.
 
 ## CSS design system
 
-CSS lives in **one large `st.markdown()` block** at the top of `dashboard.py` (lines ~20–390) and a `BH_CSS` string constant in `betting_hub.py`. All Streamlit widget overrides use `!important`.
+CSS lives in three places: `inject_global_theme()` in `theme.py` (the tokens and
+the app-wide resets, called once from `dashboard.py`), the `<style>` blocks in
+`dashboard.py` (20 in all: the global page CSS near the top, the nav rules
+further down, and many page-scoped blocks such as Game Analysis' `_GA_CSS`),
+and the `BH_CSS` string constant in `betting_hub.py`. Widget overrides use
+`!important`. Find a rule by grepping its selector, not by position.
 
 **Midnight Turf colour palette — never change these:**
 ```
@@ -747,13 +801,24 @@ inviolable; all nine of those values return **zero matches repo-wide**. Red
 `#ef7a6d` is for losses and negative P&L only, never model errors, validation
 nudges, or status indicators.
 
-**Key CSS patterns:**
-- Cards use layered box-shadow: `0 1px 3px rgba(0,0,0,0.04), 0 4px 12px rgba(0,0,0,0.04)`
-- Hover lifts: `transform: translateY(-2px)` + heavier shadow
-- Section headers (`.section-header`, `.trend-header`): 10px / 800 weight / 2px letter-spacing / `::before` full-height green or gold vertical bar
-- Metric labels: 10px / 700 / 1px letter-spacing
+Beyond the seven named tokens, `theme.py` also defines `--surface-2`,
+`--steel`, `--emerald-dim`/`-track`/`-pack`, `--gold-dim`, `--hairline-strong`
+and `--ease-out`; page CSS uses them, so check there before hard-coding a tint.
+
+**Fonts:** Archivo for headings, Sora for UI text, and **IBM Plex Mono for
+numerics**, which `theme.py` loads and forces on dataframe headers and metric
+values (96 uses in `dashboard.py`, 36 in `betting_hub.py`). DM Mono is still
+loaded by `dashboard.py` and survives in 22 older rules there; it is a leftover,
+not the standard.
+
+**Key CSS patterns** (verified 14 September 2026; an earlier list here described
+card shadows, hover lifts and a `::before` header bar that no longer exist):
+- `.section-header` (`dashboard.py`): Sora 11px / 500 / 0.1em uppercase, muted,
+  a hairline `border-bottom`. `.trend-header` (`betting_hub.py`): emerald 10px /
+  800 / 2px uppercase, same border.
+- Metric labels: muted, 11px / 500 / 0.07em uppercase.
 - Anti-aliasing: `* { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }`
-- Custom scrollbar: 6px, `#cfc4b0` thumb, `#8b6f47` on hover
+- Custom scrollbar: 6px, `var(--line)` thumb, emerald on hover.
 - Streamlit toolbar hidden: `[data-testid="stToolbar"] { display: none !important; }`
 
 ## Betting Hub data model
