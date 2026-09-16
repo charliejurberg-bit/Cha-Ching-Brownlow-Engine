@@ -8559,6 +8559,19 @@ def render_polls_a_vote(season: int):
     # calls would be three copies of an 11 MB frame.
     _pav_game = load_game(season) if _pav_load else None
 
+    # Every read below keys on 'Player', but that column is NULL wherever fitzRoy
+    # returned no ID — 77 rows and 11 players in 2026, Charlie Cameron (23 games),
+    # Jack Ross (19) and Jack Graham (13) among them. dropna(subset=['Player'])
+    # then removed them from the Add form's dropdown entirely, so they could not
+    # be watched at all. 'Player_Name' is populated on every row, so it is the
+    # fallback. Filled only where 'Player' is missing, never over it: the two
+    # differ on 36 rows where _disambiguate_players appended a '(Team)' suffix,
+    # and rewriting those would change the name this page SAVES against picks
+    # already stored under the plain spelling.
+    if _pav_game is not None and 'Player' in _pav_game.columns             and 'Player_Name' in _pav_game.columns:
+        _pav_game = _pav_game.copy()
+        _pav_game['Player'] = _pav_game['Player'].fillna(_pav_game['Player_Name'])
+
     _gdf = None  # per-round Poll_Prob source for the grid (the gold numbers)
     if _pav_game is not None:
         try:
