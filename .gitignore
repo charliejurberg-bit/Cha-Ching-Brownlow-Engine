@@ -69,3 +69,9 @@ data_wheelo/downloads/
 # A pure fetch cache: scripts/fetch_match_chains.py refetches anything missing,
 # and the parsed result lands in the tracked data_chains/period_stats.csv.
 data_chains/raw/
+
+# Player press photography for social cards. Third-party images, licensed to
+# nobody here, and this is a public repo: a bare `git add` would make them
+# permanent. The card scripts read this folder and regenerate from it, so
+# nothing tracked depends on a file in it existing.
+ChaChingContent/
