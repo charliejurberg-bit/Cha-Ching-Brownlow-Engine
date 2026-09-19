@@ -75,3 +75,8 @@ data_chains/raw/
 # permanent. The card scripts read this folder and regenerate from it, so
 # nothing tracked depends on a file in it existing.
 ChaChingContent/
+
+# Raw AFL "Medical room" injury-list HTML, ~450 KB per round. A pure fetch
+# cache: scripts/fetch_injury_lists.py refetches anything missing, and the
+# parsed result lands in the tracked data_injury/injury_list_<season>.csv.
+data_injury/raw/

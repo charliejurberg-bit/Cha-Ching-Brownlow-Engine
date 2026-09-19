@@ -135,7 +135,7 @@ brownlow_engine/
 ├── fetch_extended_data.R # R script for fitzRoy data (coaches votes etc.)
 ├── backtest.py           # Walk-forward backtest → predictions/backtest_game_level.csv
 │
-├── scripts/              # 36 tracked files. Three groups:
+├── scripts/              # 48 tracked files. Three groups:
 │   │                     #   count night: count_night.py (feed state + snapshot),
 │   │                     #   count_tweets.py (the --watch drafter), count_sim.py
 │   │                     #   (who wins from here), night_pack.py + night_sections.py
@@ -144,7 +144,10 @@ brownlow_engine/
 │   │                     #   data builders: fetch_match_chains.py → data_chains/
 │   │                     #   (read back by period_records.py), build_brownlow_seasons.py,
 │   │                     #   append_coaches_2026_r24_r25.py, convert_history.py,
-│   │                     #   reproject_2026.py, the coaches R fetches
+│   │                     #   reproject_2026.py, the coaches R fetches, and
+│   │                     #   fetch_injury_lists.py → build_injury_ladder.py
+│   │                     #   → data_injury/ (the ONLY source here that says WHY
+│   │                     #   a player did not play; see "Injury data" below)
 │   │                     #   Nothing here feeds a page of the site. See "Count
 │   │                     #   night and the Live Tracker" below
 │
@@ -175,6 +178,14 @@ brownlow_engine/
 │   │                     #   "Player stats by quarter" below
 │   ├── period_stats.csv  # One row per player per quarter. Tracked
 │   └── raw/              # Fetch cache, 31 MB, gitignored. Refetched on demand
+│
+├── data_injury/          # The AFL's weekly published injury list, 2026 on. The
+│   │                     #   ONLY source in the repo that separates injury from
+│   │                     #   omission. See "Injury data" below
+│   ├── injury_list_<season>.csv    # As published: club, player, injury, return
+│   ├── injury_detail_<season>.csv  # Per player per round, with career games
+│   ├── injury_ladder_<season>.csv  # Per club. The postable table
+│   └── raw/              # HTML fetch cache, gitignored. Refetched on demand
 │
 ├── data_history/         # Pre-2007 archives. game_level_1990..2006.csv live here
 │   │                     #   and NOT in predictions/, because AVAILABLE_SEASONS
@@ -451,6 +462,67 @@ pre-2021 challenger to a half-time record sits in the full-game archive, which
 does reach 1965. That converts an open-ended "but what about before 2021" into a
 finite named candidate list. `scripts/period_records.py` prints the note under
 every ladder.
+
+## Injury data
+
+**Nothing else in this repo records WHY a player did not play.** Every other
+file records who took the field, so a count of players used, or of changes week
+to week, cannot tell a hamstring from a form drop. `data_injury/` is the only
+source that can, built from the AFL's weekly "Medical room: The full AFL injury
+list" articles by `scripts/fetch_injury_lists.py` then
+`scripts/build_injury_ladder.py`. 2026 on; there is no back catalogue here.
+
+**The two measures disagree, and it is not a rounding difference.** Hawthorn
+used 40 players in 2026, equal third most in the league, and lost 126 games to
+injury, third fewest: that gap is rotation. Sydney used 36, equal fifth fewest,
+and lost 231 games, fifth most. Do not use a selection count as an injury proxy
+in either direction.
+
+**A game counts as missed only if the player was listed AND did not play.** 686
+of 2026's 3,760 entries read "Test" as the estimated return and 265 of those
+players played. The published list is not a list of absentees, and counting it
+alone rewards clubs that report their doubtfuls diligently.
+
+**`Experience_missed` is confounded by list age, and must be published as an
+experience figure rather than as a hardest-hit figure.** Games missed runs
+r = -0.602 against 2026 wins (p = 0.008); weighting each missed game by the
+player's career games takes that to r = -0.039 (p = 0.88). North Melbourne top
+the experience ladder, having lost Jackson Archer (26 career games), Toby Pink
+(37) and George Wardlaw (52), and finished 14th. Brisbane and Sydney sit near
+the bottom of it and finished 3rd and 2nd. It is the measure the newspaper
+injury ladders use and it answers "how much experience was missing", nothing
+more.
+
+**Article IDs are per season and cannot be derived.** `afl.com.au` resolves
+`/news/<id>/<slug>` by ID and **ignores the slug**: a wrong ID serves the home
+page with HTTP **200**, and a real ID under a wrong slug serves that ID's
+article. So the round in the URL proves nothing, every page is verified against
+its own `<title>`, and the 25 IDs for 2026 were each found by searching the
+exact headline. A new season means a new `ARTICLE_IDS` block, found the same
+way; there is no working news search API on the site.
+
+**Club comes from the strap image before each table, never from table order**,
+and the naming changed three times across 2026: `carlton.jpeg`, then
+`..._Straps-Badge-Refresh_CARL_FA-1x.jpg`, then the clubs' Indigenous names in
+Sir Doug Nicholls Round (`kuwarna`, `walyalup`, `narrm`, `yartapuulti`,
+`euro-yroke`, `waalitj`). An unresolved filename **raises** rather than falling
+through to the previous club, and the resolved 18-club sequence is asserted
+against alphabetical order on every page. Both guards were earned: matching only
+`.jpg|.png` missed Carlton's `.jpeg` and handed Carlton's and Collingwood's
+tables to Brisbane, and Round 10's `kuwarna_2026.jpg` would have filed
+Adelaide's list under Brisbane.
+
+**An unmatched name is the EXPECTED case here, which inverts the usual rule.**
+The stats archive only holds players who played, so a season-ending injury makes
+a player invisible to it: Tom Green reads "Knee / Season" every week of 2026 and
+appears in no row of `afltables_2026.csv`. `features.resolve_feed_names` runs
+first and whatever it leaves is checked against the club's own season roster by
+surname, accepted only when exactly one roster player has that surname and the
+first names pass `first_names_compatible` or `first_names_aliased`. In 2026 that
+separated 22 real variants from 99 genuine never-played cases and correctly
+refused West Coast's "Tylah Williams" against a roster holding Bailey and Jack
+Williams. Dropping that roster hop is not cosmetic: it counts "Dan Curtin" as
+missing the rounds Daniel Curtin played, and gives him no career.
 
 ## Brownlow votes before 1984
 

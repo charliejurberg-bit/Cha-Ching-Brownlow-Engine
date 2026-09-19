@@ -1,0 +1,3761 @@
+AFL_round,Round_num,Club,Player_as_published,Injury,Estimated_return
+OR,1,Adelaide,Dan Curtin,Knee,TBC
+OR,1,Adelaide,Mitch Hinge,Back,Test
+OR,1,Adelaide,Mark Keane,Leg,TBC
+OR,1,Adelaide,James Peatling,Hamstring,1 week
+OR,1,Adelaide,Izak Rankine,Suspension,Round 2
+OR,1,Brisbane Lions,Cody Curtin,Chest,TBC
+OR,1,Brisbane Lions,Tom Doedee,Wrist,2 weeks
+OR,1,Brisbane Lions,Sam Draper,Foot,1-2 weeks
+OR,1,Brisbane Lions,Koby Evans,Ankle,3-4 weeks
+OR,1,Brisbane Lions,Eric Hipwood,Knee,Mid-season
+OR,1,Brisbane Lions,Luke Lloyd,Ankle,3-4 weeks
+OR,1,Brisbane Lions,Ben Murphy,Chest,TBC
+OR,1,Brisbane Lions,Jack Payne,Knee,TBC
+OR,1,Brisbane Lions,Cam Rayner,Groin,Test
+OR,1,Brisbane Lions,Henry Smith,Foot,4 weeks
+OR,1,Carlton,Adam Cerra,Hamstring,3-4 weeks
+OR,1,Carlton,Matt Cottrell,Knee,3-4 weeks
+OR,1,Carlton,Francis Evans,Knee,1-3 weeks
+OR,1,Carlton,Nick Haynes,Ankle,1-3 weeks
+OR,1,Carlton,Jesse Motlop,Knee,Season
+OR,1,Carlton,Nic Newman,Suspension,Round 3
+OR,1,Carlton,Harry O'Farrell,Knee,TBC
+OR,1,Carlton,Billy Wilson,Foot,TBC
+OR,1,Collingwood,Bobby Hill,Unavailable,TBC
+OR,1,Collingwood,Jeremy Howe,Calf,1-2 weeks
+OR,1,Collingwood,Reef McInnes,Knee,4-6 weeks
+OR,1,Collingwood,Darcy Moore,Calf,1 week
+OR,1,Essendon,Cillian Bourke,Hamstring,TBC
+OR,1,Essendon,Nick Bryan,Knee,TBC
+OR,1,Essendon,Tom Edwards,Knee,TBC
+OR,1,Essendon,Lewis Hayes,Knee,TBC
+OR,1,Essendon,Isaac Kako,Hamstring,1-3 weeks
+OR,1,Essendon,Nic Martin,Knee,Season
+OR,1,Essendon,Jordan Ridley,Calf,4-5 weeks
+OR,1,Essendon,Sullivan Robey,Back,1 week
+OR,1,Essendon,Will Setterfield,Foot,TBC
+OR,1,Essendon,Rhys Unwin,Calf,3 weeks
+OR,1,Fremantle,Brennan Cox,Calf,Test
+OR,1,Fremantle,Alex Pearce,Calf,Test
+OR,1,Fremantle,Sam Switkowski,Concussion,Test
+OR,1,Fremantle,Sam Sturt,Knee,TBC
+OR,1,Fremantle,Karl Worner,Knee soreness,Test
+OR,1,Geelong,Harley Barker,Knee,Indefinite
+OR,1,Geelong,Jeremy Cameron,Quad,Test
+OR,1,Geelong,Toby Conway,Foot/Knee,TBC
+OR,1,Geelong,Patrick Dangerfield,Calf,Test
+OR,1,Geelong,Keighton Matofai-Forbes,Foot,TBC
+OR,1,Geelong,Gryan Miers,Thumb,Test
+OR,1,Geelong,Jacob Molier,Foot,8-10 weeks
+OR,1,Geelong,Bailey Smith,Calf,Test
+OR,1,Gold Coast,Beau Addinsall,Hamstring,4-6 weeks
+OR,1,Gold Coast,Charlie Ballard,Knee,Test
+OR,1,Gold Coast,Elliott Himmelberg,Knee,6-plus weeks
+OR,1,Gold Coast,Max Knobel,Ankle,1-3 weeks
+OR,1,Gold Coast,Jai Murray,Leg,6-plus weeks
+OR,1,Gold Coast,Jake Rogers,Hamstring,Test
+OR,1,Gold Coast,Matt Rowell,Finger,TBC
+OR,1,Gold Coast,Jed Walter,Suspension,Round 1
+OR,1,Greater Western Sydney,Leek Aleer,Groin,1 week
+OR,1,Greater Western Sydney,Cody Angove,Hamstring,TBC
+OR,1,Greater Western Sydney,Toby Bedford,Hamstring,1 week
+OR,1,Greater Western Sydney,Aaron Cadman,Pelvis,2 weeks
+OR,1,Greater Western Sydney,Finn Callaghan,Hip,Test
+OR,1,Greater Western Sydney,Brent Daniels,Hamstring,3-4 weeks
+OR,1,Greater Western Sydney,Tom Green,Knee,Season
+OR,1,Greater Western Sydney,Darcy Jones,Knee,TBC
+OR,1,Greater Western Sydney,Josh Kelly,Hip,TBC
+OR,1,Greater Western Sydney,Toby McMullin,Hamstring,1 week
+OR,1,Greater Western Sydney,Sam Taylor,Hamstring,4-6 weeks
+OR,1,Hawthorn,Tom Barrass,Back,Test
+OR,1,Hawthorn,James Blanck,Groin,TBC
+OR,1,Hawthorn,Will Day,Shoulder,3 months
+OR,1,Hawthorn,Cam Mackenzie,Concussion,1 week
+OR,1,Hawthorn,Cam Nairn,Back,1 week
+OR,1,Melbourne,Jake Bowey,Foot,TBC
+OR,1,Melbourne,Tom Campbell,Neck,TBC
+OR,1,Melbourne,Jai Culley,Arm,1-2 weeks
+OR,1,Melbourne,Bayley Fritsch,Hand,1-2 weeks
+OR,1,Melbourne,Jack Henderson,Sacrum,TBC
+OR,1,Melbourne,Matt Jefferson,Foot,TBC
+OR,1,Melbourne,Luker Kentfield,Knee,6 weeks
+OR,1,Melbourne,Shane McAdam,Achilles,TBC
+OR,1,Melbourne,Brody Mihocek,Concussion,Test
+OR,1,Melbourne,Andy Moniz-Wakefield,Knee,TBC
+OR,1,Melbourne,Jack Viney,Achilles,8 weeks
+OR,1,Melbourne,Kalani White,Glandular fever,TBC
+OR,1,North Melbourne,Jackson Archer,Knee,Season
+OR,1,North Melbourne,Aidan Corr,Calf,Test
+OR,1,North Melbourne,Taylor Goad,Ankle,2-4 weeks
+OR,1,North Melbourne,Riley Hardeman,Ankle,1-2 weeks
+OR,1,North Melbourne,Luke McDonald,Wrist,Test
+OR,1,North Melbourne,Colby McKercher,Finger,Test
+OR,1,North Melbourne,Blake Thredgold,Foot,TBC
+OR,1,North Melbourne,George Wardlaw,Hamstring,2-3 weeks
+OR,1,Port Adelaide,Tom Cochrane,Hamstring,3-4 weeks
+OR,1,Port Adelaide,Jack Lukosius,Groin,Test
+OR,1,Port Adelaide,Sam Powell-Pepper,Knee,12-14 weeks
+OR,1,Port Adelaide,Ivan Soldo,Knee,Season
+OR,1,Port Adelaide,Ollie Wines,Suspension,Round 3
+OR,1,Richmond,Judson Clarke,ACL,TBC
+OR,1,Richmond,Sam Cumming,Shoulder,4 weeks
+OR,1,Richmond,Ollie Hayes-Brown,Patella tendon,Test
+OR,1,Richmond,Taj Hotton,Hip,TBC
+OR,1,Richmond,Mykelti Lefau,Suspension,Round 2
+OR,1,Richmond,Dion Prestia,Hamstring,Test
+OR,1,Richmond,Samson Ryan,Foot,3-4 weeks
+OR,1,Richmond,Tom Sims,Elbow/Foot,TBC
+OR,1,Richmond,Josh Smillie,Quad,6-10 weeks
+OR,1,Richmond,Nick Vlastuin,Management,Test
+OR,1,St Kilda,Ryan Byrnes,Foot,TBC
+OR,1,St Kilda,Liam Henry,Hamstring,6-7 weeks
+OR,1,St Kilda,Max King,Calf/knee,TBC
+OR,1,St Kilda,Liam O'Connell,Facial fractures,TBC
+OR,1,St Kilda,Jack Silvagni,Concussion,Test
+OR,1,Sydney,Riak Andrew,Quad,TBC
+OR,1,Sydney,Ned Bowman,Hamstring,6 weeks
+OR,1,Sydney,Braeden Campbell,Shin,TBC
+OR,1,Sydney,Billy Cootee,Thigh,3-4 weeks
+OR,1,Sydney,Harry Cunningham,Quad,1 week
+OR,1,Sydney,Jesse Dattoli,Foot,1-2 weeks
+OR,1,Sydney,Tom Hanily,Shin,2-3 weeks
+OR,1,Sydney,Max King,Back,5 months
+OR,1,Sydney,Jevan Phillipou,Quad,1-2 weeks
+OR,1,West Coast,Liam Baker,Suspension,Round 2
+OR,1,West Coast,Tyler Brockman,ITB,5 weeks
+OR,1,West Coast,Liam Duggan,Concussion,Test
+OR,1,West Coast,Harry Edwards,Concussion,TBC
+OR,1,West Coast,Reuben Ginbey,Foot,Test
+OR,1,West Coast,Jack Graham,Hamstring,Test
+OR,1,West Coast,Tom Gross,Hamstring,5-7 weeks
+OR,1,West Coast,Jack Hutchinson,Ankle,7-9 weeks
+OR,1,West Coast,Tim Kelly,Hamstring,Test
+OR,1,West Coast,Noah Long,Knee,Season
+OR,1,West Coast,Fred Rodriguez,Foot,TBC
+OR,1,West Coast,Harry Schoenberg,Suspension,Round 2
+OR,1,West Coast,Brandon Starcevich,Calf,1-2 weeks
+OR,1,West Coast,Bailey Williams,Groin,2-3 weeks
+OR,1,Western Bulldogs,Bailey Dale,Knee,Test
+OR,1,Western Bulldogs,Sam Darcy,Soreness,Test
+OR,1,Western Bulldogs,Riley Garcia,Hamstring,TBC
+OR,1,Western Bulldogs,Ryan Gardner,Groin,1-2 weeks
+OR,1,Western Bulldogs,Adam Treloar,Calf,Test
+OR,1,Western Bulldogs,Ryley Sanders,Concussion,1-2 weeks
+OR,1,Western Bulldogs,Zac Walker,Ankle,5-7 weeks
+OR,1,Western Bulldogs,Cody Weightman,Knee,TBC
+R1,2,Adelaide,Dan Curtin,Knee,8-12 weeks
+R1,2,Adelaide,Mitch Hinge,Back,4-6 weeks
+R1,2,Adelaide,Mark Keane,Leg,10-14 weeks
+R1,2,Adelaide,Izak Rankine,Suspension,Round 2
+R1,2,Adelaide,Riley Thilthorpe,Back,Test
+R1,2,Brisbane Lions,Harris Andrews,Suspension,Round 5
+R1,2,Brisbane Lions,Zac Bailey,Suspension,Round 3
+R1,2,Brisbane Lions,Cody Curtin,Chest,TBC
+R1,2,Brisbane Lions,Tom Doedee,Wrist,1 week
+R1,2,Brisbane Lions,Koby Evans,Ankle,2-3 weeks
+R1,2,Brisbane Lions,Darcy Gardiner,Suspension,Round 3
+R1,2,Brisbane Lions,Eric Hipwood,Knee,Mid-season
+R1,2,Brisbane Lions,Luke Lloyd,Ankle,1-2 weeks
+R1,2,Brisbane Lions,Hugh McCluggage,Calf,1-2 weeks
+R1,2,Brisbane Lions,Conor McKenna,Hamstring,4-6 weeks
+R1,2,Brisbane Lions,Ben Murphy,Chest,TBC
+R1,2,Brisbane Lions,Jack Payne,Knee,TBC
+R1,2,Brisbane Lions,Henry Smith,Foot,4 weeks
+R1,2,Carlton,Adam Cerra,Hamstring,2-3 weeks
+R1,2,Carlton,Matt Cottrell,Knee,2-3 weeks
+R1,2,Carlton,Francis Evans,Knee,2-3 weeks
+R1,2,Carlton,Jesse Motlop,Knee,Season
+R1,2,Carlton,Nic Newman,Suspension,Round 3
+R1,2,Carlton,Harry O'Farrell,Knee,TBC
+R1,2,Carlton,Adam Saad,Hamstring,2-3 weeks
+R1,2,Carlton,Billy Wilson,Foot,TBC
+R1,2,Collingwood,Jeremy Howe,Calf,1 week
+R1,2,Collingwood,Reef McInnes,Knee,3-5 weeks
+R1,2,Collingwood,Darcy Moore,Calf,Test
+R1,2,Essendon,Cillian Bourke,Hamstring,6-7 weeks
+R1,2,Essendon,Nick Bryan,Knee,4-5 weeks
+R1,2,Essendon,Angus Clarke,Syndesmosis,6-8 weeks
+R1,2,Essendon,Tom Edwards,Knee,2 weeks
+R1,2,Essendon,Lewis Hayes,Knee,TBC
+R1,2,Essendon,Isaac Kako,Hamstring,Test
+R1,2,Essendon,Nic Martin,Knee,Season
+R1,2,Essendon,Jordan Ridley,Calf,2 weeks
+R1,2,Essendon,Will Setterfield,Foot,5-6 weeks
+R1,2,Essendon,Rhys Unwin,Calf,1 week
+R1,2,Fremantle,Brennan Cox,Calf,1 week
+R1,2,Fremantle,Michael Frederick,Ankle,4-6 weeks
+R1,2,Fremantle,Charlie Nicholls,Foot,Test
+R1,2,Fremantle,Alex Pearce,Calf,Test
+R1,2,Fremantle,Aiden Riddle,Ankle,1 week
+R1,2,Fremantle,Sam Sturt,Knee,TBC
+R1,2,Geelong,Harley Barker,Knee,Indefinite
+R1,2,Geelong,Jeremy Cameron,Quad,Test
+R1,2,Geelong,Toby Conway,Foot/Knee,TBC
+R1,2,Geelong,Patrick Dangerfield,Calf,Test
+R1,2,Geelong,Keighton Matofai-Forbes,Foot,TBC
+R1,2,Geelong,Jacob Molier,Foot,7-9 weeks
+R1,2,Geelong,Tyson Stengle,Conditioning,Individualised program
+R1,2,Gold Coast,Beau Addinsall,Hamstring,4-6 weeks
+R1,2,Gold Coast,Elliott Himmelberg,Knee,6-plus weeks
+R1,2,Gold Coast,Max Knobel,Ankle,1-3 weeks
+R1,2,Gold Coast,Jai Murray,Leg,6-plus weeks
+R1,2,Gold Coast,Matt Rowell,Finger,4-6 weeks
+R1,2,Greater Western Sydney,Cody Angove,Hamstring,TBC
+R1,2,Greater Western Sydney,Toby Bedford,Hamstring,2 weeks
+R1,2,Greater Western Sydney,Aaron Cadman,Pelvis,2 weeks
+R1,2,Greater Western Sydney,Brent Daniels,Hamstring,3 weeks
+R1,2,Greater Western Sydney,Tom Green,Knee,Season
+R1,2,Greater Western Sydney,Darcy Jones,Knee,TBC
+R1,2,Greater Western Sydney,Josh Kelly,Hip,TBC
+R1,2,Greater Western Sydney,Sam Taylor,Hamstring,6-8 weeks
+R1,2,Greater Western Sydney,Nathan Wardius,Knee,TBC
+R1,2,Hawthorn,James Blanck,Groin,TBC
+R1,2,Hawthorn,Will Day,Shoulder,3 months
+R1,2,Hawthorn,Henry Hustwaite,Ankle,2-4 weeks
+R1,2,Hawthorn,Matt LeRay,Ankle,Test
+R1,2,Hawthorn,Cam Mackenzie,Concussion,Test
+R1,2,Hawthorn,Cam Nairn,Back,Test
+R1,2,Melbourne,Jake Bowey,Foot,8-10 weeks
+R1,2,Melbourne,Tom Campbell,Neck,TBC
+R1,2,Melbourne,Matt Jefferson,Foot,4-6 weeks
+R1,2,Melbourne,Luker Kentfield,Knee,4-6 weeks
+R1,2,Melbourne,Shane McAdam,Achilles,2-4 weeks
+R1,2,Melbourne,Jack Viney,Achilles,TBC
+R1,2,Melbourne,Kalani White,Glandular fever,4-6 weeks
+R1,2,North Melbourne,Jackson Archer,Knee,Season
+R1,2,North Melbourne,Taylor Goad,Ankle,3-4 weeks
+R1,2,North Melbourne,Riley Hardeman,Ankle,Test
+R1,2,North Melbourne,Charlie Spargo,Concussion,1-2 weeks
+R1,2,North Melbourne,Blake Thredgold,Foot,TBC
+R1,2,North Melbourne,George Wardlaw,Hamstring,1 week
+R1,2,Port Adelaide,Tom Cochrane,Hamstring,2-3 weeks
+R1,2,Port Adelaide,Mani Liddy,Groin,Test
+R1,2,Port Adelaide,Sam Powell-Pepper,Knee,11-13 weeks
+R1,2,Port Adelaide,Josh Sinn,Shoulder,TBC
+R1,2,Port Adelaide,Ivan Soldo,Knee,Season
+R1,2,Port Adelaide,Ollie Wines,Suspension,Round 3
+R1,2,Richmond,Judson Clarke,ACL,TBC
+R1,2,Richmond,Sam Cumming,Shoulder,TBC
+R1,2,Richmond,Taj Hotton,Hip,TBC
+R1,2,Richmond,Mykelti Lefau,Suspension,Round 2
+R1,2,Richmond,Dion Prestia,Hamstring,1 week
+R1,2,Richmond,Samson Ryan,Foot,3-4 weeks
+R1,2,Richmond,Tom Sims,Elbow/Foot,TBC
+R1,2,Richmond,Josh Smillie,Quad,6-10 weeks
+R1,2,Richmond,Nick Vlastuin,Conditioning,Test
+R1,2,St Kilda,Ryan Byrnes,Foot,6-8 weeks
+R1,2,St Kilda,Hunter Clark,Adductor,2-3 weeks
+R1,2,St Kilda,Paddy Dow,Knee,3-4 weeks
+R1,2,St Kilda,Liam Henry,Hamstring,5-6 weeks
+R1,2,St Kilda,Max King,Calf/knee,TBC
+R1,2,St Kilda,Rowan Marshall,Concussion,1-2 weeks
+R1,2,St Kilda,Liam O'Connell,Facial fractures,4-5 weeks
+R1,2,Sydney,Riak Andrew,Quad,TBC
+R1,2,Sydney,Ned Bowman,Hamstring,5-6 weeks
+R1,2,Sydney,Braeden Campbell,Shin,TBC
+R1,2,Sydney,Billy Cootee,Thigh,2-3 weeks
+R1,2,Sydney,Harry Cunningham,Quad,Test
+R1,2,Sydney,Jesse Dattoli,Foot,Test
+R1,2,Sydney,Tom Hanily,Shin,1-2 weeks
+R1,2,Sydney,Max King,Back,5 months
+R1,2,Sydney,Jevan Phillipou,Quad,Test
+R1,2,West Coast,Sam Allen,Knee,TBC
+R1,2,West Coast,Liam Baker,Suspension,Round 2
+R1,2,West Coast,Tyler Brockman,Knee,5 weeks
+R1,2,West Coast,Harry Edwards,Concussion,1 week
+R1,2,West Coast,Jack Graham,Hamstring,Test
+R1,2,West Coast,Tom Gross,Hamstring,3-4 weeks
+R1,2,West Coast,Jack Hutchinson,Ankle,6-8 weeks
+R1,2,West Coast,Noah Long,Knee,Season
+R1,2,West Coast,Fred Rodriguez,Foot,6-8 weeks
+R1,2,West Coast,Harry Schoenberg,Suspension,Round 2
+R1,2,West Coast,Brandon Starcevich,Calf,3-4 weeks
+R1,2,West Coast,Bailey Williams,Groin,1-2 weeks
+R1,2,West Coast,Jack Williams,Calf,Test
+R1,2,Western Bulldogs,Riley Garcia,Hamstring,TBC
+R1,2,Western Bulldogs,Ryan Gardner,Groin,Test
+R1,2,Western Bulldogs,Arthur Jones,Concussion,1-2 weeks
+R1,2,Western Bulldogs,Adam Treloar,Calf,Test
+R1,2,Western Bulldogs,Ryley Sanders,Concussion,Test
+R1,2,Western Bulldogs,Laitham Vandermeer,Concussion,1-2 weeks
+R1,2,Western Bulldogs,Zac Walker,Ankle,5-7 weeks
+R1,2,Western Bulldogs,Cody Weightman,Knee,TBC
+R2,3,Adelaide,Dan Curtin,Knee,7-11 weeks
+R2,3,Adelaide,Sid Draper,Ankle,1-2 weeks
+R2,3,Adelaide,Mitch Hinge,Back,3-4 weeks
+R2,3,Adelaide,Mark Keane,Leg,9-13 weeks
+R2,3,Brisbane Lions,Harris Andrews,Suspension,Round 5
+R2,3,Brisbane Lions,Zac Bailey,Suspension,Round 3
+R2,3,Brisbane Lions,Cody Curtin,Chest,TBC
+R2,3,Brisbane Lions,Tom Doedee,Wrist,Test
+R2,3,Brisbane Lions,Koby Evans,Ankle,1-2 weeks
+R2,3,Brisbane Lions,Darcy Gardiner,Suspension,Round 3
+R2,3,Brisbane Lions,Eric Hipwood,Knee,Mid-season
+R2,3,Brisbane Lions,Luke Lloyd,Ankle,Test
+R2,3,Brisbane Lions,Hugh McCluggage,Calf,Test
+R2,3,Brisbane Lions,Conor McKenna,Hamstring,3-5 weeks
+R2,3,Brisbane Lions,Logan Morris,Hand,Test
+R2,3,Brisbane Lions,Ben Murphy,Chest,TBC
+R2,3,Brisbane Lions,Jack Payne,Knee,TBC
+R2,3,Brisbane Lions,Henry Smith,Foot,3 weeks
+R2,3,Carlton,Adam Cerra,Hamstring,1-2 weeks
+R2,3,Carlton,Matt Cottrell,Knee,1-2 weeks
+R2,3,Carlton,Francis Evans,Knee,1-2 weeks
+R2,3,Carlton,Jesse Motlop,Knee,Season
+R2,3,Carlton,Nic Newman,Suspension,Round 3
+R2,3,Carlton,Harry O'Farrell,Knee,TBC
+R2,3,Carlton,Adam Saad,Hamstring,1-2 weeks
+R2,3,Carlton,Billy Wilson,Foot,1-2 weeks
+R2,3,Collingwood,Bobby Hill,Personal reasons,TBC
+R2,3,Collingwood,Jeremy Howe,Calf,Test
+R2,3,Collingwood,Reef McInnes,Knee,2-4 weeks
+R2,3,Collingwood,Darcy Moore,Calf,Test
+R2,3,Essendon,Cillian Bourke,Hamstring,5-6 weeks
+R2,3,Essendon,Nick Bryan,Knee,3-4 weeks
+R2,3,Essendon,Angus Clarke,Syndesmosis,5-6 weeks
+R2,3,Essendon,Tom Edwards,Knee,1 week
+R2,3,Essendon,Lewis Hayes,Knee,10-12 weeks
+R2,3,Essendon,Nic Martin,Knee,Season
+R2,3,Essendon,Jordan Ridley,Calf,1 week
+R2,3,Essendon,Will Setterfield,Foot,3 weeks
+R2,3,Fremantle,Brennan Cox,Calf,1 week
+R2,3,Fremantle,Michael Frederick,Ankle,3-5 weeks
+R2,3,Fremantle,Jaeger O'Meara,Hamstring,1 week
+R2,3,Fremantle,Aiden Riddle,Ankle,Test
+R2,3,Fremantle,Sam Sturt,Knee,TBC
+R2,3,Geelong,Harley Barker,Knee,Indefinite
+R2,3,Geelong,Toby Conway,Foot/Knee,TBC
+R2,3,Geelong,Keighton Matofai-Forbes,Foot,TBC
+R2,3,Geelong,Jacob Molier,Foot,5-7 weeks
+R2,3,Geelong,Tyson Stengle,Conditioning,Individualised program
+R2,3,Geelong,James Worpel,Finger,Test
+R2,3,Gold Coast,Beau Addinsall,Hamstring,4-6 weeks
+R2,3,Gold Coast,Elliott Himmelberg,Knee,6-plus weeks
+R2,3,Gold Coast,Bailey Humphrey,Hamstring,Test
+R2,3,Gold Coast,Max Knobel,Ankle,1-3 weeks
+R2,3,Gold Coast,Jai Murray,Leg,6-plus weeks
+R2,3,Gold Coast,Matt Rowell,Finger,4-6 weeks
+R2,3,Greater Western Sydney,Cody Angove,Hamstring,TBC
+R2,3,Greater Western Sydney,Toby Bedford,Hamstring,1-2 weeks
+R2,3,Greater Western Sydney,Aaron Cadman,Pelvis,2-3 weeks
+R2,3,Greater Western Sydney,Brent Daniels,Hamstring,2-3 weeks
+R2,3,Greater Western Sydney,Finn Davis,Groin,3-4 weeks
+R2,3,Greater Western Sydney,Tom Green,Knee,Season
+R2,3,Greater Western Sydney,Harry Himmelberg,Chin,Test
+R2,3,Greater Western Sydney,Darcy Jones,Knee,TBC
+R2,3,Greater Western Sydney,Josh Kelly,Hip,TBC
+R2,3,Greater Western Sydney,Sam Taylor,Hamstring,5-7 weeks
+R2,3,Greater Western Sydney,Nathan Wardius,Knee,TBC
+R2,3,Hawthorn,James Blanck,Groin,TBC
+R2,3,Hawthorn,Will Day,Shoulder,2-3 months
+R2,3,Hawthorn,Henry Hustwaite,Ankle,2-3 weeks
+R2,3,Hawthorn,Matt LeRay,Ankle,Test
+R2,3,Melbourne,Jake Bowey,Foot,7-9 weeks
+R2,3,Melbourne,Tom Campbell,Neck,TBC
+R2,3,Melbourne,Matt Jefferson,Foot,3-5 weeks
+R2,3,Melbourne,Aidan Johnson,Knee,3-5 weeks
+R2,3,Melbourne,Luker Kentfield,Knee,3-5 weeks
+R2,3,Melbourne,Shane McAdam,Achilles,2-4 weeks
+R2,3,Melbourne,Jack Viney,Achilles,TBC
+R2,3,Melbourne,Kalani White,Glandular fever,3-5 weeks
+R2,3,North Melbourne,Jackson Archer,Knee,Season
+R2,3,North Melbourne,Taylor Goad,Ankle,3 weeks
+R2,3,North Melbourne,Josh Goater,Quad,Test
+R2,3,North Melbourne,Blake Thredgold,Foot,TBC
+R2,3,North Melbourne,Luke Urquhart,Knee,Test
+R2,3,Port Adelaide,Tom Cochrane,Hamstring,1-2 weeks
+R2,3,Port Adelaide,Mani Liddy,Groin,Test
+R2,3,Port Adelaide,Sam Powell-Pepper,Knee,10-12 weeks
+R2,3,Port Adelaide,Harrison Ramm,Ankle,TBC
+R2,3,Port Adelaide,Josh Sinn,Shoulder,5-6 months
+R2,3,Port Adelaide,Ivan Soldo,Knee,Season
+R2,3,Port Adelaide,Ollie Wines,Suspension,Round 3
+R2,3,Richmond,Judson Clarke,ACL,TBC
+R2,3,Richmond,Sam Cumming,Shoulder,TBC
+R2,3,Richmond,Jonty Faull,Suspension,Round 3
+R2,3,Richmond,Taj Hotton,Hip,TBC
+R2,3,Richmond,Rhyan Mansell,Wrist,3-4 weeks
+R2,3,Richmond,Samson Ryan,Foot,1 week
+R2,3,Richmond,Tom Sims,Elbow/Foot,TBC
+R2,3,Richmond,Josh Smillie,Quad,6-8 weeks
+R2,3,St Kilda,Ryan Byrnes,Foot,5-7 weeks
+R2,3,St Kilda,Hunter Clark,Adductor,1 week
+R2,3,St Kilda,Paddy Dow,Knee,3 weeks
+R2,3,St Kilda,Liam Henry,Hamstring,3-4 weeks
+R2,3,St Kilda,Max King,Calf/knee,TBC
+R2,3,St Kilda,Jack Macrae,Knee,2-3 weeks
+R2,3,St Kilda,Rowan Marshall,Concussion,Test
+R2,3,St Kilda,Liam O'Connell,Facial fractures,3-4 weeks
+R2,3,St Kilda,Mattaes Phillipou,Quad,Test
+R2,3,St Kilda,Liam Ryan,Shoulder,Test
+R2,3,Sydney,Riak Andrew,Quad,TBC
+R2,3,Sydney,Ned Bowman,Hamstring,3-4 weeks
+R2,3,Sydney,Braeden Campbell,Shin,TBC
+R2,3,Sydney,Billy Cootee,Hip,1-2 weeks
+R2,3,Sydney,Errol Gulden,Shoulder,4 months
+R2,3,Sydney,Tom Hanily,Shin,Test
+R2,3,Sydney,Isaac Heeney,Hamstring,Test
+R2,3,Sydney,Max King,Back,4-5 months
+R2,3,West Coast,Sam Allen,Knee,TBC
+R2,3,West Coast,Sandy Brock,Ankle,1 week
+R2,3,West Coast,Tyler Brockman,Knee,6 weeks
+R2,3,West Coast,Harry Edwards,Concussion,Test
+R2,3,West Coast,Tom Gross,Hamstring,1 week
+R2,3,West Coast,Elijah Hewett,Quad,1 week
+R2,3,West Coast,Jack Hutchinson,Ankle,5-7 weeks
+R2,3,West Coast,Noah Long,Knee,Season
+R2,3,West Coast,Fred Rodriguez,Foot,5-7 weeks
+R2,3,West Coast,Brandon Starcevich,Calf,3 weeks
+R2,3,West Coast,Jack Williams,Calf,1 week
+R2,3,Western Bulldogs,Jordan Croft,Back,Test
+R2,3,Western Bulldogs,Riley Garcia,Hamstring,TBC
+R2,3,Western Bulldogs,Ryan Gardner,Groin,Test
+R2,3,Western Bulldogs,Arthur Jones,Concussion,Test
+R2,3,Western Bulldogs,Adam Treloar,Calf,Test
+R2,3,Western Bulldogs,Laitham Vandermeer,Concussion,Test
+R2,3,Western Bulldogs,Zac Walker,Ankle,6-8 weeks
+R2,3,Western Bulldogs,Cody Weightman,Knee,TBC
+R3,4,Adelaide,Callum Ah Chee,Hamstring,6-8 weeks
+R3,4,Adelaide,Dan Curtin,Knee,6-8 weeks
+R3,4,Adelaide,Sid Draper,Ankle,Test
+R3,4,Adelaide,Mitch Hinge,Back,1 week
+R3,4,Adelaide,Mark Keane,Leg,8-10 weeks
+R3,4,Adelaide,Rory Laird,Calf,1-2 weeks
+R3,4,Adelaide,Toby Murray,Back,Test
+R3,4,Adelaide,Josh Worrell,Calf,Test
+R3,4,Brisbane Lions,Harris Andrews,Suspension,Round 5
+R3,4,Brisbane Lions,Dan Annable,Shoulder,10-plus weeks
+R3,4,Brisbane Lions,Eric Hipwood,Knee,Mid-season
+R3,4,Brisbane Lions,Hugh McCluggage,Calf,Test
+R3,4,Brisbane Lions,Conor McKenna,Hamstring,1 week
+R3,4,Brisbane Lions,Will McLachlan,Concussion,Test
+R3,4,Brisbane Lions,Ben Murphy,Chest,3 weeks
+R3,4,Brisbane Lions,Jack Payne,Knee,TBC
+R3,4,Brisbane Lions,Henry Smith,Foot,TBC
+R3,4,Carlton,Adam Cerra,Hamstring,Test
+R3,4,Carlton,Francis Evans,Knee,Test
+R3,4,Carlton,Jesse Motlop,Knee,Season
+R3,4,Carlton,Harry O'Farrell,Knee,TBC
+R3,4,Collingwood,Harry DeMattia,Back,TBC
+R3,4,Collingwood,Bobby Hill,Personal reasons,TBC
+R3,4,Collingwood,Jeremy Howe,Calf,Test
+R3,4,Collingwood,Darcy Moore,Calf,Test
+R3,4,Essendon,Cillian Bourke,Quad,3-4 weeks
+R3,4,Essendon,Nick Bryan,Knee,1 week
+R3,4,Essendon,Angus Clarke,Syndesmosis,2-3 weeks
+R3,4,Essendon,Lewis Hayes,Knee,9-11 weeks
+R3,4,Essendon,Nic Martin,Knee,Season
+R3,4,Essendon,Mason Redman,Knee,6-8 weeks
+R3,4,Essendon,Will Setterfield,Foot,2-3 weeks
+R3,4,Essendon,Dyson Sharp,Ankle,Test
+R3,4,Essendon,Vigo Visentini,Hamstring,6-8 weeks
+R3,4,Fremantle,Brennan Cox,Calf,Test
+R3,4,Fremantle,Michael Frederick,Ankle,3-4 weeks
+R3,4,Fremantle,Jaeger O'Meara,Hamstring,Test
+R3,4,Fremantle,Sam Sturt,Knee,TBC
+R3,4,Fremantle,Brandon Walker,Quad,Test
+R3,4,Fremantle,Hayden Young,Hamstring,2-3 weeks
+R3,4,Geelong,Harley Barker,Knee,Indefinite
+R3,4,Geelong,Toby Conway,Foot/Knee,TBC
+R3,4,Geelong,Patrick Dangerfield,Calf,1-2 weeks
+R3,4,Geelong,Keighton Matofai-Forbes,Foot,TBC
+R3,4,Geelong,Jacob Molier,Foot,4-6 weeks
+R3,4,Geelong,Jay Polkinghorne,Foot,Assess
+R3,4,Geelong,Tyson Stengle,Conditioning,Individualised program
+R3,4,Geelong,James Worpel,Finger,Test
+R3,4,Gold Coast,Beau Addinsall,Hamstring,4-6 weeks
+R3,4,Gold Coast,Elliott Himmelberg,Knee,6-plus weeks
+R3,4,Gold Coast,Bailey Humphrey,Suspension,Round 6
+R3,4,Gold Coast,Max Knobel,Ankle,1-3 weeks
+R3,4,Gold Coast,Jai Murray,Leg,6-plus weeks
+R3,4,Gold Coast,Christian Petracca,Hamstring,4-6 weeks
+R3,4,Gold Coast,Matt Rowell,Finger,1-3 weeks
+R3,4,Greater Western Sydney,Cody Angove,Hamstring,TBC
+R3,4,Greater Western Sydney,Toby Bedford,Hamstring,Test
+R3,4,Greater Western Sydney,Jack Buckley,Concussion,1-2 weeks
+R3,4,Greater Western Sydney,Aaron Cadman,Pelvis,Test
+R3,4,Greater Western Sydney,Brent Daniels,Hamstring,Test
+R3,4,Greater Western Sydney,Finn Davis,Groin,1-2 weeks
+R3,4,Greater Western Sydney,Tom Green,Knee,Season
+R3,4,Greater Western Sydney,Darcy Jones,Knee,TBC
+R3,4,Greater Western Sydney,Josh Kelly,Hip,TBC
+R3,4,Greater Western Sydney,Logan Smith,Knee,2-3 weeks
+R3,4,Greater Western Sydney,Sam Taylor,Hamstring,4-6 weeks
+R3,4,Greater Western Sydney,Nathan Wardius,Knee,TBC
+R3,4,Hawthorn,James Blanck,Groin,TBC
+R3,4,Hawthorn,Will Day,Shoulder,2 months
+R3,4,Hawthorn,Henry Hustwaite,Ankle,1-2 weeks
+R3,4,Hawthorn,Matt LeRay,Ankle,Test
+R3,4,Melbourne,Jake Bowey,Foot,6-8 weeks
+R3,4,Melbourne,Tom Campbell,Neck,TBC
+R3,4,Melbourne,Matt Jefferson,Foot,2-4 weeks
+R3,4,Melbourne,Aidan Johnson,Knee,1-2 weeks
+R3,4,Melbourne,Luker Kentfield,Knee,2-4 weeks
+R3,4,Melbourne,Shane McAdam,Achilles,2-4 weeks
+R3,4,Melbourne,Daniel Turner,Hand,2-3 weeks
+R3,4,Melbourne,Jack Viney,Achilles,TBC
+R3,4,Melbourne,Kalani White,Glandular fever,2-4 weeks
+R3,4,North Melbourne,Jackson Archer,Knee,Season
+R3,4,North Melbourne,Taylor Goad,Ankle,2 weeks
+R3,4,North Melbourne,Josh Goater,Quad,Test
+R3,4,North Melbourne,Griffin Logue,Hamstring,2-3 weeks
+R3,4,North Melbourne,Blake Thredgold,Foot,TBC
+R3,4,North Melbourne,Luke Urquhart,Knee,Test
+R3,4,Port Adelaide,Miles Bergman,Ankle,1-2 weeks
+R3,4,Port Adelaide,Tom Cochrane,Hamstring,1 week
+R3,4,Port Adelaide,Mani Liddy,Groin,TBC
+R3,4,Port Adelaide,Jacob Moss,Concussion,TBC
+R3,4,Port Adelaide,Sam Powell-Pepper,Knee,8-10 weeks
+R3,4,Port Adelaide,Harrison Ramm,Ankle,5-6 weeks
+R3,4,Port Adelaide,Connor Rozee,Hamstring,TBC
+R3,4,Port Adelaide,Josh Sinn,Shoulder,5 months
+R3,4,Port Adelaide,Ivan Soldo,Knee,Season
+R3,4,Richmond,Nathan Broad,Calf,1 week
+R3,4,Richmond,Judson Clarke,ACL,TBC
+R3,4,Richmond,Sam Cumming,Shoulder,TBC
+R3,4,Richmond,Taj Hotton,Hip,TBC
+R3,4,Richmond,Rhyan Mansell,Wrist,3-4 weeks
+R3,4,Richmond,Toby Nankervis,Hamstring,6-8 weeks
+R3,4,Richmond,Tom Sims,Elbow/Foot,TBC
+R3,4,Richmond,Josh Smillie,Quad,5-8 weeks
+R3,4,St Kilda,Charlie Banfield,Shoulder,TBC
+R3,4,St Kilda,Ryan Byrnes,Foot,4-6 weeks
+R3,4,St Kilda,Anthony Caminiti,Hamstring,4-6 weeks
+R3,4,St Kilda,Hunter Clark,Adductor,1 week
+R3,4,St Kilda,Paddy Dow,Knee,2 weeks
+R3,4,St Kilda,Liam Henry,Hamstring,2-3 weeks
+R3,4,St Kilda,Max King,Knee,TBC
+R3,4,St Kilda,Jack Macrae,Knee,2 weeks
+R3,4,St Kilda,Liam O'Connell,Facial fractures,Test
+R3,4,Sydney,Riak Andrew,Quad,TBC
+R3,4,Sydney,Ned Bowman,Hamstring,2-3 weeks
+R3,4,Sydney,Braeden Campbell,Shin,TBC
+R3,4,Sydney,Billy Cootee,Hip,Test
+R3,4,Sydney,Will Green,Foot,3 months
+R3,4,Sydney,Errol Gulden,Shoulder,3-4 months
+R3,4,Sydney,Isaac Heeney,Hamstring,Test
+R3,4,Sydney,Max King,Back,4-5 months
+R3,4,Sydney,Peter Ladhams,Suspension,Round 5
+R3,4,West Coast,Sam Allen,Knee,8 weeks
+R3,4,West Coast,Sandy Brock,Ankle,Test
+R3,4,West Coast,Tyler Brockman,Knee,4-5 weeks
+R3,4,West Coast,Harry Edwards,Concussion,TBC
+R3,4,West Coast,Tom Gross,Hamstring,1-2 weeks
+R3,4,West Coast,Jack Hutchinson,Ankle,4 weeks
+R3,4,West Coast,Noah Long,Knee,Season
+R3,4,West Coast,Milan Murdock,Hamstring,TBC
+R3,4,West Coast,Fred Rodriguez,Foot,5 weeks
+R3,4,West Coast,Brandon Starcevich,Calf,TBC
+R3,4,Western Bulldogs,Riley Garcia,Hamstring,TBC
+R3,4,Western Bulldogs,Tom Liberatore,Hamstring,2-3 weeks
+R3,4,Western Bulldogs,Laitham Vandermeer,Concussion,Test
+R3,4,Western Bulldogs,Zac Walker,Ankle,5-7 weeks
+R3,4,Western Bulldogs,Cody Weightman,Knee,TBC
+R4,5,Adelaide,Callum Ah Chee,Hamstring,5-7 weeks
+R4,5,Adelaide,Jordon Butts,Concussion,Concussion protocols
+R4,5,Adelaide,Dan Curtin,Knee,5-7 weeks
+R4,5,Adelaide,Jordan Dawson,Calf,Test
+R4,5,Adelaide,Mark Keane,Leg,7-9 weeks
+R4,5,Adelaide,Rory Laird,Calf,Test
+R4,5,Adelaide,Toby Murray,Back,1-2 weeks
+R4,5,Brisbane Lions,Harris Andrews,Suspension,Round 5
+R4,5,Brisbane Lions,Dan Annable,Shoulder,10-plus weeks
+R4,5,Brisbane Lions,Noah Answerth,Concussion,TBC
+R4,5,Brisbane Lions,Darcy Gardiner,Shoulder,8 weeks
+R4,5,Brisbane Lions,Eric Hipwood,Knee,Mid-season
+R4,5,Brisbane Lions,Hugh McCluggage,Calf,Test
+R4,5,Brisbane Lions,Ben Murphy,Chest,2 weeks
+R4,5,Brisbane Lions,Jack Payne,Knee,TBC
+R4,5,Brisbane Lions,Henry Smith,Foot,TBC
+R4,5,Carlton,Harry Dean,Concussion,2 weeks
+R4,5,Carlton,Matt Duffy,Concussion,2 weeks
+R4,5,Carlton,Cooper Lord,Illness,1 week
+R4,5,Carlton,Jesse Motlop,Knee,Season
+R4,5,Carlton,Harry O'Farrell,Knee,TBC
+R4,5,Collingwood,Harry DeMattia,Back,TBC
+R4,5,Collingwood,Bobby Hill,Personal reasons,TBC
+R4,5,Collingwood,Darcy Moore,Hamstring,3-4 weeks
+R4,5,Collingwood,Scott Pendlebury,Achilles,1 week
+R4,5,Essendon,Cillian Bourke,Quad,2-3 weeks
+R4,5,Essendon,Nate Caddy,Concussion,1 week
+R4,5,Essendon,Angus Clarke,Syndesmosis,Test
+R4,5,Essendon,Brayden Fiorini,Back,Test
+R4,5,Essendon,Lewis Hayes,Knee,7 weeks
+R4,5,Essendon,Nic Martin,Knee,Season
+R4,5,Essendon,Mason Redman,Knee,5-7 weeks
+R4,5,Essendon,Will Setterfield,Foot,1 week
+R4,5,Essendon,Vigo Visentini,Hamstring,5-7 weeks
+R4,5,Fremantle,Michael Frederick,Ankle,2-3 weeks
+R4,5,Fremantle,Oscar McDonald,Calf,1 week
+R4,5,Fremantle,Sam Sturt,Knee,TBC
+R4,5,Fremantle,Brandon Walker,Quad,Test
+R4,5,Fremantle,Hayden Young,Hamstring,1-2 weeks
+R4,5,Geelong,Harley Barker,Knee,Indefinite
+R4,5,Geelong,Toby Conway,Foot/Knee,TBC
+R4,5,Geelong,Patrick Dangerfield,Calf,1-2 weeks
+R4,5,Geelong,Keighton Matofai-Forbes,Foot,9 weeks
+R4,5,Geelong,Jacob Molier,Foot,2-3 weeks
+R4,5,Geelong,Jay Polkinghorne,Foot,TBC
+R4,5,Geelong,Tyson Stengle,Conditioning,Individualised program
+R4,5,Gold Coast,Beau Addinsall,Hamstring,4-6 weeks
+R4,5,Gold Coast,Cooper Bell,Concussion,Test
+R4,5,Gold Coast,Elliott Himmelberg,Knee,6-plus weeks
+R4,5,Gold Coast,Nick Holman,Hamstring,1-3 weeks
+R4,5,Gold Coast,Bailey Humphrey,Suspension,Round 6
+R4,5,Gold Coast,Jai Murray,Leg,1-3 weeks
+R4,5,Gold Coast,Christian Petracca,Hamstring,1-3 weeks
+R4,5,Gold Coast,Matt Rowell,Finger,Test
+R4,5,Gold Coast,Jamarra Ugle-Hagan,Knee,1-3 weeks
+R4,5,Greater Western Sydney,Cody Angove,Hamstring,TBC
+R4,5,Greater Western Sydney,Toby Bedford,Hamstring,Test
+R4,5,Greater Western Sydney,Jack Buckley,Concussion,1 week
+R4,5,Greater Western Sydney,Aaron Cadman,Pelvis,Test
+R4,5,Greater Western Sydney,Brent Daniels,Hamstring,Test
+R4,5,Greater Western Sydney,Finn Davis,Groin,1 week
+R4,5,Greater Western Sydney,Tom Green,Knee,Season
+R4,5,Greater Western Sydney,Darcy Jones,Knee,TBC
+R4,5,Greater Western Sydney,Josh Kelly,Hip,TBC
+R4,5,Greater Western Sydney,Harry Oliver,Leg,1-2 weeks
+R4,5,Greater Western Sydney,Logan Smith,Knee,2-3 weeks
+R4,5,Greater Western Sydney,Sam Taylor,Hamstring,6-9 weeks weeks
+R4,5,Greater Western Sydney,Nathan Wardius,Knee,TBC
+R4,5,Hawthorn,James Blanck,Groin,2 weeks
+R4,5,Hawthorn,Will Day,Shoulder,2 months
+R4,5,Hawthorn,Henry Hustwaite,Ankle,Test
+R4,5,Hawthorn,Noah Mraz,Quad,Test
+R4,5,Melbourne,Jake Bowey,Foot,5-7 weeks
+R4,5,Melbourne,Tom Campbell,Neck,TBC
+R4,5,Melbourne,Paddy Cross,Thumb,4-5 weeks
+R4,5,Melbourne,Changkuoth Jiath,Calf,3-4 weeks
+R4,5,Melbourne,Shane McAdam,Achilles,2-3 weeks
+R4,5,Melbourne,Daniel Turner,Hand,Test
+R4,5,Melbourne,Jack Viney,Achilles,TBC
+R4,5,Melbourne,Kalani White,Glandular fever,1 week
+R4,5,North Melbourne,Jackson Archer,Knee,Season
+R4,5,North Melbourne,Taylor Goad,Ankle,Test
+R4,5,North Melbourne,Josh Goater,Quad,2-3 weeks
+R4,5,North Melbourne,Griffin Logue,Hamstring,1-2 weeks
+R4,5,North Melbourne,Blake Thredgold,Foot,TBC
+R4,5,North Melbourne,Luke Urquhart,Knee,TBC
+R4,5,North Melbourne,Tristan Xerri,Suspension,Round 7
+R4,5,Port Adelaide,Miles Bergman,Ankle,Test
+R4,5,Port Adelaide,Mani Liddy,Groin,TBC
+R4,5,Port Adelaide,Todd Marshall,Ankle,1-2 weeks
+R4,5,Port Adelaide,Jacob Moss,Concussion,TBC
+R4,5,Port Adelaide,Sam Powell-Pepper,Knee,7-9 weeks
+R4,5,Port Adelaide,Harrison Ramm,Ankle,4-5 weeks
+R4,5,Port Adelaide,Esava Ratugolea,Knee,TBC
+R4,5,Port Adelaide,Connor Rozee,Hamstring,TBC
+R4,5,Port Adelaide,Josh Sinn,Shoulder,5 months
+R4,5,Port Adelaide,Ivan Soldo,Knee,Season
+R4,5,Richmond,Jasper Alger,Knee,8 weeks
+R4,5,Richmond,Harry Armstrong,Foot,8 weeks
+R4,5,Richmond,Nathan Broad,Calf,Test
+R4,5,Richmond,Judson Clarke,ACL,TBC
+R4,5,Richmond,Sam Cumming,Shoulder,Test
+R4,5,Richmond,Taj Hotton,Hip,TBC
+R4,5,Richmond,Tom Lynch,Hamstring,3-4 weeks
+R4,5,Richmond,Rhyan Mansell,Foot,TBC
+R4,5,Richmond,Toby Nankervis,Hamstring,5-7 weeks
+R4,5,Richmond,Tom Sims,Elbow/Foot,TBC
+R4,5,Richmond,Josh Smillie,Quad,5-7 weeks
+R4,5,St Kilda,Charlie Banfield,Shoulder,TBC
+R4,5,St Kilda,Ryan Byrnes,Foot,3-5 weeks
+R4,5,St Kilda,Anthony Caminiti,Hamstring,3-5 weeks
+R4,5,St Kilda,Hunter Clark,Adductor,Test
+R4,5,St Kilda,Lance Collard,Suspension,Round 6
+R4,5,St Kilda,Paddy Dow,Knee,1 week
+R4,5,St Kilda,Liam Henry,Hamstring,1-2 weeks
+R4,5,St Kilda,Max King,Knee,TBC
+R4,5,St Kilda,Jack Macrae,Knee,1 week
+R4,5,St Kilda,Liam O'Connell,Facial fractures,Test
+R4,5,St Kilda,Tobie Travaglia,Foot,TBC
+R4,5,Sydney,Taylor Adams,Hamstring,6-8 weeks
+R4,5,Sydney,Riak Andrew,Quad,TBC
+R4,5,Sydney,Ned Bowman,Hamstring,Test
+R4,5,Sydney,Braeden Campbell,Shin,TBC
+R4,5,Sydney,Noah Chamberlain,Concussion,1-2 weeks
+R4,5,Sydney,Billy Cootee,Hip,Test
+R4,5,Sydney,Will Green,Foot,10-12 weeks
+R4,5,Sydney,Errol Gulden,Shoulder,3-4 months
+R4,5,Sydney,Isaac Heeney,Hamstring,Test
+R4,5,Sydney,Max King,Back,4 months
+R4,5,Sydney,Peter Ladhams,Suspension,Round 5
+R4,5,West Coast,Sam Allen,Knee,7 weeks
+R4,5,West Coast,Tyler Brockman,Knee,3-4 weeks
+R4,5,West Coast,Liam Duggan,Ankle,Test
+R4,5,West Coast,Harry Edwards,Concussion,TBC
+R4,5,West Coast,Tom Gross,Hamstring,Test
+R4,5,West Coast,Jack Hutchinson,Ankle,4 weeks
+R4,5,West Coast,Noah Long,Knee,Season
+R4,5,West Coast,Milan Murdock,Hamstring,3 weeks
+R4,5,West Coast,Jacob Newton,Foot,TBC
+R4,5,West Coast,Deven Robertson,Suspended,Round 5
+R4,5,West Coast,Fred Rodriguez,Foot,5 weeks
+R4,5,West Coast,Brandon Starcevich,Calf,6-8 weeks
+R4,5,West Coast,Elliot Yeo,Adductor,1-2 weeks
+R4,5,Western Bulldogs,Riley Garcia,Hamstring,TBC
+R4,5,Western Bulldogs,Tom Liberatore,Hamstring,2-4 weeks
+R4,5,Western Bulldogs,Laitham Vandermeer,Concussion,Test
+R4,5,Western Bulldogs,Zac Walker,Ankle,3-5 weeks
+R4,5,Western Bulldogs,Cody Weightman,Knee,TBC
+R5,6,Adelaide,Callum Ah Chee,Hamstring,4-6 weeks
+R5,6,Adelaide,Jordon Butts,Concussion,Concussion protocols
+R5,6,Adelaide,Dan Curtin,Knee,4-6 weeks
+R5,6,Adelaide,Darcy Fogarty,Back,TBC
+R5,6,Adelaide,Mark Keane,Leg,6-8 weeks
+R5,6,Adelaide,Luke Pedlar,Concussion,Concussion protocols
+R5,6,Brisbane Lions,Dan Annable,Shoulder,16-18 weeks
+R5,6,Brisbane Lions,Noah Answerth,Concussion,Test
+R5,6,Brisbane Lions,Darcy Gardiner,Shoulder,5-7 weeks
+R5,6,Brisbane Lions,Eric Hipwood,Knee,Mid-season
+R5,6,Brisbane Lions,Hugh McCluggage,Calf,Test
+R5,6,Brisbane Lions,Ben Murphy,Chest,2 weeks
+R5,6,Brisbane Lions,Jack Payne,Knee,TBC
+R5,6,Brisbane Lions,Henry Smith,Foot,TBC
+R5,6,Carlton,Harry Dean,Concussion,1 week
+R5,6,Carlton,Matt Duffy,Concussion,1 week
+R5,6,Carlton,Cooper Lord,Illness,1 week
+R5,6,Carlton,Jesse Motlop,Knee,Season
+R5,6,Carlton,Harry O'Farrell,Knee,TBC
+R5,6,Carlton,Liam Reidy,Suspension,Round 6
+R5,6,Carlton,Jacob Weitering,Concussion,1 week
+R5,6,Collingwood,Nick Daicos,Calf,Test
+R5,6,Collingwood,Harry DeMattia,Back,TBC
+R5,6,Collingwood,Bobby Hill,Personal reasons,TBC
+R5,6,Collingwood,Darcy Moore,Hamstring,3-4 weeks
+R5,6,Collingwood,Scott Pendlebury,Achilles,Test
+R5,6,Essendon,Cillian Bourke,Quad,1-2 weeks
+R5,6,Essendon,Angus Clarke,Foot,TBC
+R5,6,Essendon,Brayden Fiorini,Back,TBC
+R5,6,Essendon,Kayle Gerreyn,Suspension,Round 6
+R5,6,Essendon,Lewis Hayes,Knee,6 weeks
+R5,6,Essendon,Harrison Jones,Calf,TBC
+R5,6,Essendon,Nic Martin,Knee,Season
+R5,6,Essendon,Mason Redman,Knee,4-6 weeks
+R5,6,Essendon,Vigo Visentini,Hamstring,4-6 weeks
+R5,6,Fremantle,Michael Frederick,Ankle,1 week
+R5,6,Fremantle,Oscar McDonald,Calf,Test
+R5,6,Fremantle,Sam Sturt,Knee,TBC
+R5,6,Fremantle,Hayden Young,Hamstring,1 week
+R5,6,Geelong,Harley Barker,Knee,Indefinite
+R5,6,Geelong,Jed Bews,Concussion,Concussion protocols
+R5,6,Geelong,Toby Conway,Foot/Knee,TBC
+R5,6,Geelong,Patrick Dangerfield,Calf,Test
+R5,6,Geelong,Keighton Matofai-Forbes,Foot,8 weeks
+R5,6,Geelong,Jacob Molier,Foot,1-2 weeks
+R5,6,Geelong,Jay Polkinghorne,Foot,6-8 weeks
+R5,6,Geelong,Tyson Stengle,Conditioning,Individualised program
+R5,6,Gold Coast,Beau Addinsall,Hamstring,4-6 weeks
+R5,6,Gold Coast,Cooper Bell,Concussion,Test
+R5,6,Gold Coast,Elliott Himmelberg,Knee,6-plus weeks
+R5,6,Gold Coast,Nick Holman,Hamstring,1-3 weeks
+R5,6,Gold Coast,Bailey Humphrey,Suspension,Round 6
+R5,6,Gold Coast,Jai Murray,Leg,1-3 weeks
+R5,6,Gold Coast,Christian Petracca,Hamstring,Test
+R5,6,Gold Coast,Jake Rogers,Concussion,Test
+R5,6,Gold Coast,Jamarra Ugle-Hagan,Knee,1-3 weeks
+R5,6,Greater Western Sydney,Cody Angove,Hamstring,TBC
+R5,6,Greater Western Sydney,Toby Bedford,Hamstring,Test
+R5,6,Greater Western Sydney,Aaron Cadman,Pelvis,Test
+R5,6,Greater Western Sydney,Brent Daniels,Hamstring,Test
+R5,6,Greater Western Sydney,Tom Green,Knee,Season
+R5,6,Greater Western Sydney,Darcy Jones,Knee,TBC
+R5,6,Greater Western Sydney,Josh Kelly,Hip,TBC
+R5,6,Greater Western Sydney,Logan Smith,Knee,2-3 weeks
+R5,6,Greater Western Sydney,Sam Taylor,Hamstring,TBC
+R5,6,Greater Western Sydney,Nathan Wardius,Knee,TBC
+R5,6,Hawthorn,Karl Amon,Knee,Test
+R5,6,Hawthorn,James Blanck,Groin,1 week
+R5,6,Hawthorn,Will Day,Shoulder,6-7 weeks
+R5,6,Hawthorn,Cam Mackenzie,Knee,Test
+R5,6,Hawthorn,Noah Mraz,Ankle,TBC
+R5,6,Melbourne,Jake Bowey,Foot,4-5 weeks
+R5,6,Melbourne,Tom Campbell,Neck,TBC
+R5,6,Melbourne,Paddy Cross,Thumb,3-4 weeks
+R5,6,Melbourne,Bayley Fritsch,Foot,Test
+R5,6,Melbourne,Changkuoth Jiath,Calf,2-3 weeks
+R5,6,Melbourne,Shane McAdam,Achilles,2-3 weeks
+R5,6,Melbourne,Jack Viney,Achilles,TBC
+R5,6,North Melbourne,Jackson Archer,Knee,Season
+R5,6,North Melbourne,Josh Goater,Quad,1 week
+R5,6,North Melbourne,Riley Hardeman,Ankle,1-2 weeks
+R5,6,North Melbourne,Griffin Logue,Hamstring,Test
+R5,6,North Melbourne,Finn O'Sullivan,Jaw,TBC
+R5,6,North Melbourne,Toby Pink,Knee,Test
+R5,6,North Melbourne,Blake Thredgold,Foot,TBC
+R5,6,North Melbourne,Luke Urquhart,Knee,TBC
+R5,6,North Melbourne,Tristan Xerri,Suspension,Round 7
+R5,6,Port Adelaide,Mani Liddy,Groin,6-8 weeks
+R5,6,Port Adelaide,Ollie Lord,Knee,Season
+R5,6,Port Adelaide,Todd Marshall,Ankle,Test
+R5,6,Port Adelaide,Jacob Moss,Concussion,TBC
+R5,6,Port Adelaide,Sam Powell-Pepper,Knee,6-8 weeks
+R5,6,Port Adelaide,Harrison Ramm,Ankle,3-4 weeks
+R5,6,Port Adelaide,Esava Ratugolea,Knee,6-8 weeks
+R5,6,Port Adelaide,Connor Rozee,Hamstring,12-14 weeks
+R5,6,Port Adelaide,Josh Sinn,Shoulder,5 months
+R5,6,Port Adelaide,Ivan Soldo,Knee,Season
+R5,6,Richmond,Jasper Alger,Knee,7 weeks
+R5,6,Richmond,Harry Armstrong,Foot,7 weeks
+R5,6,Richmond,Noah Balta,Hamstring tightness,Test
+R5,6,Richmond,Judson Clarke,ACL,TBC
+R5,6,Richmond,Josh Gibcus,Soreness,Test
+R5,6,Richmond,Taj Hotton,Hip,TBC
+R5,6,Richmond,Tom Lynch,Hamstring,2-3 weeks
+R5,6,Richmond,Rhyan Mansell,Foot,TBC
+R5,6,Richmond,Toby Nankervis,Hamstring,4-6 weeks
+R5,6,Richmond,Hugo Ralphsmith,Knee,Test
+R5,6,Richmond,Samson Ryan,Suspension,Round 6
+R5,6,Richmond,Tom Sims,Elbow/Foot,TBC
+R5,6,Richmond,Josh Smillie,Quad,4-6 weeks
+R5,6,St Kilda,Charlie Banfield,Shoulder,TBC
+R5,6,St Kilda,Ryan Byrnes,Foot,2-3 weeks
+R5,6,St Kilda,Anthony Caminiti,Hamstring,2-3 weeks
+R5,6,St Kilda,Hunter Clark,Adductor,Test
+R5,6,St Kilda,Paddy Dow,Knee,Test
+R5,6,St Kilda,Liam Henry,Hamstring,Test
+R5,6,St Kilda,Max King,Knee,TBC
+R5,6,St Kilda,Jack Macrae,Knee,1 week
+R5,6,St Kilda,Cooper Sharman,Concussion,Test
+R5,6,St Kilda,Liam Stocker,Concussion,Concussion protocols
+R5,6,St Kilda,Tobie Travaglia,Foot,TBC
+R5,6,Sydney,Taylor Adams,Hamstring,5-7 weeks
+R5,6,Sydney,Riak Andrew,Quad,TBC
+R5,6,Sydney,Braeden Campbell,Shin,TBC
+R5,6,Sydney,Noah Chamberlain,Concussion,Test
+R5,6,Sydney,Will Green,Foot,9-11 weeks
+R5,6,Sydney,Errol Gulden,Shoulder,3-4 months
+R5,6,Sydney,Max King,Back,4 months
+R5,6,Sydney,Malcolm Rosas Jnr,Calf,Test
+R5,6,Sydney,Angus Sheldrick,Suspension,Round 6
+R5,6,West Coast,Sam Allen,Knee,8 weeks
+R5,6,West Coast,Tyler Brockman,Knee,TBC
+R5,6,West Coast,Harry Edwards,Concussion,TBC
+R5,6,West Coast,Jack Hutchinson,Ankle,1 week
+R5,6,West Coast,Noah Long,Knee,Season
+R5,6,West Coast,Milan Murdock,Hamstring,1 week
+R5,6,West Coast,Jacob Newton,Foot,Season
+R5,6,West Coast,Fred Rodriguez,Foot,2 weeks
+R5,6,West Coast,Brandon Starcevich,Calf,5-7 weeks
+R5,6,West Coast,Elliot Yeo,Adductor,Test
+R5,6,Western Bulldogs,Tim English,Knee,TBC
+R5,6,Western Bulldogs,Riley Garcia,Hamstring,TBC
+R5,6,Western Bulldogs,Arty Jones,Hamstring,2-4 weeks
+R5,6,Western Bulldogs,Tom Liberatore,Hamstring,2-3 weeks
+R5,6,Western Bulldogs,Ed Richards,Knee,TBC
+R5,6,Western Bulldogs,Laitham Vandermeer,Concussion,Test
+R5,6,Western Bulldogs,Zac Walker,Ankle,3-5 weeks
+R5,6,Western Bulldogs,Cody Weightman,Knee,TBC
+R6,7,Adelaide,Callum Ah Chee,Hamstring,2-3 weeks
+R6,7,Adelaide,Jordon Butts,Concussion,Test
+R6,7,Adelaide,Dan Curtin,Knee,2-3 weeks
+R6,7,Adelaide,Darcy Fogarty,Back,TBC
+R6,7,Adelaide,Mitch Hinge,Hamstring,3-5 weeks
+R6,7,Adelaide,Mark Keane,Leg,5-7 weeks
+R6,7,Adelaide,Luke Pedlar,Concussion,Test
+R6,7,Adelaide,Jake Soligo,Ankle,Test
+R6,7,Brisbane Lions,Dan Annable,Shoulder,16-18 weeks
+R6,7,Brisbane Lions,Darcy Gardiner,Shoulder,5 weeks
+R6,7,Brisbane Lions,Eric Hipwood,Knee,Mid-season
+R6,7,Brisbane Lions,Jack Payne,Knee,TBC
+R6,7,Brisbane Lions,Henry Smith,Foot,TBC
+R6,7,Brisbane Lions,Dayne Zorko,Calf,2-3 weeks
+R6,7,Carlton,Jesse Motlop,Knee,Season
+R6,7,Carlton,Harry O'Farrell,Knee,TBC
+R6,7,Collingwood,Jordan De Goey,Concussion,TBC
+R6,7,Collingwood,Harry DeMattia,Back,TBC
+R6,7,Collingwood,Bobby Hill,Personal reasons,TBC
+R6,7,Collingwood,Darcy Moore,Hamstring,1-2 weeks
+R6,7,Collingwood,Steele Sidebottom,Hip,1 week
+R6,7,Essendon,Cillian Bourke,Quad,1 week
+R6,7,Essendon,Angus Clarke,Foot,7 weeks
+R6,7,Essendon,Brayden Fiorini,Back,TBC
+R6,7,Essendon,Lewis Hayes,Knee,5-6 weeks
+R6,7,Essendon,Harrison Jones,Calf,3-4 weeks
+R6,7,Essendon,Nic Martin,Knee,Season
+R6,7,Essendon,Mason Redman,Knee,3-4 weeks
+R6,7,Essendon,Vigo Visentini,Hamstring,3-4 weeks
+R6,7,Fremantle,Bailey Banfield,Concussion,1 week
+R6,7,Fremantle,Sean Darcy,Concussion,1 week
+R6,7,Fremantle,Michael Frederick,Ankle,Test
+R6,7,Fremantle,Sam Sturt,Knee,TBC
+R6,7,Fremantle,Hayden Young,Hamstring,Test
+R6,7,Geelong,Harley Barker,Knee,Indefinite
+R6,7,Geelong,Jed Bews,Concussion,Concussion protocols
+R6,7,Geelong,Toby Conway,Foot/Knee,TBC
+R6,7,Geelong,Patrick Dangerfield,Calf,Test
+R6,7,Geelong,Jack Henry,Oblique,Test
+R6,7,Geelong,Keighton Matofai-Forbes,Foot,7 weeks
+R6,7,Geelong,Jacob Molier,Foot,Test
+R6,7,Geelong,Mark O'Connor,Suspension,Round 7
+R6,7,Geelong,Jay Polkinghorne,Foot,5-7 weeks
+R6,7,Geelong,Tyson Stengle,Conditioning,Individualised program
+R6,7,Gold Coast,Beau Addinsall,Hamstring,Test
+R6,7,Gold Coast,Noah Anderson,Appendix,1-3 weeks
+R6,7,Gold Coast,Jy Farrar,Ankle,TBC
+R6,7,Gold Coast,Elliott Himmelberg,Knee,4-6 weeks
+R6,7,Gold Coast,Jai Murray,Leg,Test
+R6,7,Gold Coast,Jake Rogers,Concussion,Test
+R6,7,Gold Coast,Jamarra Ugle-Hagan,Knee,Test
+R6,7,Greater Western Sydney,Cody Angove,Hamstring,TBC
+R6,7,Greater Western Sydney,Aaron Cadman,Concussion,TBC
+R6,7,Greater Western Sydney,Stephen Coniglio,Concussion,TBC
+R6,7,Greater Western Sydney,Tom Green,Knee,Season
+R6,7,Greater Western Sydney,Darcy Jones,Knee,TBC
+R6,7,Greater Western Sydney,Josh Kelly,Hip,TBC
+R6,7,Greater Western Sydney,Logan Smith,Knee,3-4 weeks
+R6,7,Greater Western Sydney,Sam Taylor,Hamstring,4-5 weeks
+R6,7,Greater Western Sydney,Nathan Wardius,Knee,TBC
+R6,7,Hawthorn,Mabior Chol,Hamstring,4-6 weeks
+R6,7,Hawthorn,Will Day,Shoulder,5-6 weeks
+R6,7,Hawthorn,Noah Mraz,Ankle,Test
+R6,7,Melbourne,Jake Bowey,Foot,2-3 weeks
+R6,7,Melbourne,Tom Campbell,Neck,TBC
+R6,7,Melbourne,Paddy Cross,Thumb,2-3 weeks
+R6,7,Melbourne,Changkuoth Jiath,Calf,1-2 weeks
+R6,7,Melbourne,Shane McAdam,Achilles,2-3 weeks
+R6,7,Melbourne,Jake Melksham,Ankle,3-4 weeks
+R6,7,Melbourne,Trent Rivers,Knee,TBC
+R6,7,Melbourne,Christian Salem,Foot,4-6 weeks
+R6,7,Melbourne,Jack Viney,Achilles,TBC
+R6,7,North Melbourne,Jackson Archer,Knee,Season
+R6,7,North Melbourne,Josh Goater,Quad,Test
+R6,7,North Melbourne,Robert Hansen jnr,Groin,1 week
+R6,7,North Melbourne,Riley Hardeman,Ankle,Test
+R6,7,North Melbourne,Finn O'Sullivan,Jaw,TBC
+R6,7,North Melbourne,Blake Thredgold,Foot,TBC
+R6,7,North Melbourne,Luke Urquhart,Knee,Test
+R6,7,North Melbourne,Tristan Xerri,Suspension,Round 7
+R6,7,Port Adelaide,Mani Liddy,Groin,5-6 weeks
+R6,7,Port Adelaide,Ollie Lord,Knee,Season
+R6,7,Port Adelaide,Jack Lukosius,Groin,6-8 weeks
+R6,7,Port Adelaide,Jacob Moss,Concussion,TBC
+R6,7,Port Adelaide,Sam Powell-Pepper,Knee,6-8 weeks
+R6,7,Port Adelaide,Harrison Ramm,Ankle,3-4 weeks
+R6,7,Port Adelaide,Esava Ratugolea,Knee,5-7 weeks
+R6,7,Port Adelaide,Connor Rozee,Hamstring,11-13 weeks
+R6,7,Port Adelaide,Josh Sinn,Shoulder,4-5 months
+R6,7,Port Adelaide,Ivan Soldo,Knee,Season
+R6,7,Richmond,Jasper Alger,Knee,6 weeks
+R6,7,Richmond,Harry Armstrong,Foot,6 weeks
+R6,7,Richmond,Judson Clarke,ACL,TBC
+R6,7,Richmond,Taj Hotton,Hip,TBC
+R6,7,Richmond,Tom Lynch,Hamstring,1-2 weeks
+R6,7,Richmond,Rhyan Mansell,Foot,TBC
+R6,7,Richmond,Toby Nankervis,Hamstring,4-5 weeks
+R6,7,Richmond,Tom Sims,Elbow/Foot,TBC
+R6,7,Richmond,Josh Smillie,Quad,4-6 weeks
+R6,7,St Kilda,Charlie Banfield,Shoulder,2-3 weeks
+R6,7,St Kilda,Ryan Byrnes,Foot,1-2 weeks
+R6,7,St Kilda,Anthony Caminiti,Hamstring,1-2 weeks
+R6,7,St Kilda,Lance Collard,Suspension,Round 13
+R6,7,St Kilda,Isaac Keeler,Hamstring,4 weeks
+R6,7,St Kilda,Max King,Conditioning,1-2 weeks
+R6,7,St Kilda,Jack Macrae,Knee,Test
+R6,7,St Kilda,Liam Stocker,Concussion,Test
+R6,7,St Kilda,Tobie Travaglia,Foot,1-2 weeks
+R6,7,Sydney,Taylor Adams,Hamstring,4-6 weeks
+R6,7,Sydney,Riak Andrew,Quad,TBC
+R6,7,Sydney,Braeden Campbell,Shin,TBC
+R6,7,Sydney,Will Green,Foot,8-10 weeks
+R6,7,Sydney,Errol Gulden,Shoulder,3-4 months
+R6,7,Sydney,Max King,Back,4 months
+R6,7,West Coast,Sam Allen,Knee,7 weeks
+R6,7,West Coast,Tyler Brockman,Knee,TBC
+R6,7,West Coast,Harry Edwards,Concussion,TBC
+R6,7,West Coast,Jack Graham,Shoulder,Test
+R6,7,West Coast,Jack Hutchinson,Ankle,Test
+R6,7,West Coast,Noah Long,Knee,Season
+R6,7,West Coast,Milan Murdock,Hamstring,Test
+R6,7,West Coast,Jacob Newton,Foot,Season
+R6,7,West Coast,Deven Robertson,Knee,Season
+R6,7,West Coast,Fred Rodriguez,Foot,1 week
+R6,7,West Coast,Brandon Starcevich,Calf,4-6 weeks
+R6,7,West Coast,Elliot Yeo,Adductor,Test
+R6,7,Western Bulldogs,Connor Budarick,Hamstring,3-5 weeks
+R6,7,Western Bulldogs,Tim English,Knee,Test
+R6,7,Western Bulldogs,Riley Garcia,Hamstring,TBC
+R6,7,Western Bulldogs,Arty Jones,Hamstring,2-3 weeks
+R6,7,Western Bulldogs,Tom Liberatore,Hamstring,Test
+R6,7,Western Bulldogs,Ed Richards,Ankle,Test
+R6,7,Western Bulldogs,Zac Walker,Ankle,2-4 weeks
+R6,7,Western Bulldogs,Cody Weightman,Knee,TBC
+R7,8,Adelaide,Callum Ah Chee,Hamstring,1-2 weeks
+R7,8,Adelaide,Darcy Fogarty,Back,2-3 weeks
+R7,8,Adelaide,Mitch Hinge,Hamstring,2-4 weeks
+R7,8,Adelaide,Mark Keane,Leg,4-6 weeks
+R7,8,Adelaide,Jake Soligo,Ankle,Test
+R7,8,Brisbane Lions,Dan Annable,Shoulder,14-16 weeks
+R7,8,Brisbane Lions,Noah Answerth,Concussion,TBC
+R7,8,Brisbane Lions,Jarrod Berry,Calf,3-4 weeks
+R7,8,Brisbane Lions,Darcy Gardiner,Shoulder,4-5 weeks
+R7,8,Brisbane Lions,Eric Hipwood,Knee,Mid-season
+R7,8,Brisbane Lions,Jack Payne,Knee,TBC
+R7,8,Brisbane Lions,Henry Smith,Foot,TBC
+R7,8,Brisbane Lions,Dayne Zorko,Calf,1-2 weeks
+R7,8,Carlton,Ben Camporeale,Concussion,1 week
+R7,8,Carlton,Lucas Camporeale,Kidney,TBC
+R7,8,Carlton,Harry McKay,Concussion,1 week
+R7,8,Carlton,Jesse Motlop,Knee,Season
+R7,8,Carlton,Harry O'Farrell,Knee,TBC
+R7,8,Carlton,Marc Pittonet,Hand,1-2 weeks
+R7,8,Collingwood,Jordan De Goey,Concussion,Test
+R7,8,Collingwood,Harry DeMattia,Back,TBC
+R7,8,Collingwood,Bobby Hill,Personal reasons,TBC
+R7,8,Collingwood,Darcy Moore,Hamstring,Test
+R7,8,Collingwood,Steele Sidebottom,Hip,Test
+R7,8,Essendon,Angus Clarke,Foot,5-6 weeks
+R7,8,Essendon,Brayden Fiorini,Back,TBC
+R7,8,Essendon,Lewis Hayes,Knee,4-5 weeks
+R7,8,Essendon,Harrison Jones,Calf,2-3 weeks
+R7,8,Essendon,Nic Martin,Knee,Season
+R7,8,Essendon,Mason Redman,Knee,2-3 weeks
+R7,8,Essendon,Jordan Ridley,Calf,3-4 weeks
+R7,8,Essendon,Vigo Visentini,Hamstring,2-3 weeks
+R7,8,Fremantle,Bailey Banfield,Concussion,Test
+R7,8,Fremantle,Sean Darcy,Calf,TBC
+R7,8,Fremantle,Jaeger O'Meara,Face,4 weeks
+R7,8,Fremantle,Sam Sturt,Knee,8 weeks
+R7,8,Geelong,Harley Barker,Knee,Indefinite
+R7,8,Geelong,Toby Conway,Foot/Knee,TBC
+R7,8,Geelong,Jack Henry,Oblique,Test
+R7,8,Geelong,Keighton Matofai-Forbes,Foot,6 weeks
+R7,8,Geelong,Gryan Miers,Knee,TBC
+R7,8,Geelong,Jay Polkinghorne,Foot,4-6 weeks
+R7,8,Geelong,Tyson Stengle,Conditioning,Individualised program
+R7,8,Gold Coast,Noah Anderson,Appendix,Test
+R7,8,Gold Coast,Jy Farrar,Ankle,6+ weeks
+R7,8,Gold Coast,Elliott Himmelberg,Knee,4-6 weeks
+R7,8,Gold Coast,John Noble,Suspension,Round 8
+R7,8,Gold Coast,Avery Thomas,Shoulder,1-3 weeks
+R7,8,Greater Western Sydney,Cody Angove,Hamstring,4-5 weeks
+R7,8,Greater Western Sydney,Aaron Cadman,Concussion,Test
+R7,8,Greater Western Sydney,Stephen Coniglio,Concussion,Test
+R7,8,Greater Western Sydney,Joe Fonti,Suspension,Round 8
+R7,8,Greater Western Sydney,Tom Green,Knee,Season
+R7,8,Greater Western Sydney,Jesse Hogan,Quad,Test
+R7,8,Greater Western Sydney,Darcy Jones,Knee,TBC
+R7,8,Greater Western Sydney,Josh Kelly,Hip,TBC
+R7,8,Greater Western Sydney,Logan Smith,Knee,3-4 weeks
+R7,8,Greater Western Sydney,Sam Taylor,Hamstring,4-5 weeks
+R7,8,Greater Western Sydney,Nathan Wardius,Knee,TBC
+R7,8,Hawthorn,Mabior Chol,Hamstring,4-5 weeks
+R7,8,Hawthorn,Will Day,Shoulder,4-5 weeks
+R7,8,Hawthorn,Jack Gunston,Corked calf,Test
+R7,8,Hawthorn,Matt LeRay,Concussion,TBC
+R7,8,Hawthorn,Dylan Moore,Suspension,Round 8
+R7,8,Hawthorn,James Sicily,Suspension,Round 8
+R7,8,Melbourne,Jake Bowey,Foot,Test
+R7,8,Melbourne,Tom Campbell,Neck,TBC
+R7,8,Melbourne,Changkuoth Jiath,Calf,Test
+R7,8,Melbourne,Shane McAdam,Achilles,TBC
+R7,8,Melbourne,Jake Melksham,Ankle,2-3 weeks
+R7,8,Melbourne,Harrison Petty,TBC,TBC
+R7,8,Melbourne,Trent Rivers,Knee,2-3 weeks
+R7,8,Melbourne,Christian Salem,Foot,2-3 weeks
+R7,8,Melbourne,Jack Viney,Achilles,TBC
+R7,8,North Melbourne,Jackson Archer,Knee,Season
+R7,8,North Melbourne,Robert Hansen jnr,Groin,1 week
+R7,8,North Melbourne,Blake Thredgold,Foot,TBC
+R7,8,North Melbourne,Luke Urquhart,Knee,TBC
+R7,8,Port Adelaide,Tom Cochrane,Hamstring,1-2 weeks
+R7,8,Port Adelaide,Mani Liddy,Groin,4-5 weeks
+R7,8,Port Adelaide,Ollie Lord,Knee,Season
+R7,8,Port Adelaide,Jack Lukosius,Groin,5-7 weeks
+R7,8,Port Adelaide,Jacob Moss,Head/neck,1 week
+R7,8,Port Adelaide,Sam Powell-Pepper,Knee,5-7 weeks
+R7,8,Port Adelaide,Harrison Ramm,Ankle,2-3 weeks
+R7,8,Port Adelaide,Esava Ratugolea,Knee,3-4 weeks
+R7,8,Port Adelaide,Connor Rozee,Hamstring,10-12 weeks
+R7,8,Port Adelaide,Josh Sinn,Shoulder,4-5 months
+R7,8,Port Adelaide,Ivan Soldo,Knee,Season
+R7,8,Richmond,Jasper Alger,Knee,5 weeks
+R7,8,Richmond,Harry Armstrong,Foot,5 weeks
+R7,8,Richmond,Sam Banks,Collarbone,6 weeks
+R7,8,Richmond,Judson Clarke,ACL,TBC
+R7,8,Richmond,Taj Hotton,Hip,TBC
+R7,8,Richmond,Rhyan Mansell,Foot,TBC
+R7,8,Richmond,Toby Nankervis,Hamstring,3-4 weeks
+R7,8,Richmond,Zane Peucker,Ankle,5-7 weeks
+R7,8,Richmond,Maurice Rioli,Hamstring,4-5 weeks
+R7,8,Richmond,Tom Sims,Elbow/Foot,TBC
+R7,8,Richmond,Josh Smillie,Quad,4-6 weeks
+R7,8,Richmond,Tim Taranto,Concussion,1 week
+R7,8,St Kilda,Charlie Banfield,Shoulder,1-2 weeks
+R7,8,St Kilda,Ryan Byrnes,Foot,Test
+R7,8,St Kilda,Anthony Caminiti,Hamstring,Test
+R7,8,St Kilda,Lance Collard,Suspension,Round 13
+R7,8,St Kilda,Tom De Koning,Back,Test
+R7,8,St Kilda,Isaac Keeler,Hamstring,3 weeks
+R7,8,St Kilda,Max King,Conditioning,Test
+R7,8,St Kilda,Tobie Travaglia,Foot,1-2 weeks
+R7,8,Sydney,Taylor Adams,Hamstring,TBC
+R7,8,Sydney,Riak Andrew,Quad,TBC
+R7,8,Sydney,Braeden Campbell,Leg,TBC
+R7,8,Sydney,Will Green,Foot,8-10 weeks
+R7,8,Sydney,Errol Gulden,Shoulder,3 months
+R7,8,Sydney,Max King,Back,4 months
+R7,8,West Coast,Sam Allen,Knee,6 weeks
+R7,8,West Coast,Tyler Brockman,Knee,TBC
+R7,8,West Coast,Harry Edwards,Concussion,1-2 weeks
+R7,8,West Coast,Jack Graham,Shoulder,TBC
+R7,8,West Coast,Noah Long,Knee,Season
+R7,8,West Coast,Jacob Newton,Foot,Season
+R7,8,West Coast,Archer Reid,Knee,TBC
+R7,8,West Coast,Deven Robertson,Knee,Season
+R7,8,West Coast,Fred Rodriguez,Foot,Test
+R7,8,West Coast,Brandon Starcevich,Calf,4-5 weeks
+R7,8,Western Bulldogs,Marcus Bontempelli,Knee,Test
+R7,8,Western Bulldogs,Connor Budarick,Hamstring,3-5 weeks
+R7,8,Western Bulldogs,Sam Darcy,Knee,Season
+R7,8,Western Bulldogs,Tim English,Knee,1-3 weeks
+R7,8,Western Bulldogs,Riley Garcia,Hamstring,TBC
+R7,8,Western Bulldogs,Arty Jones,Hamstring,1-2 weeks
+R7,8,Western Bulldogs,Tom Liberatore,Concussion,Concussion protocols
+R7,8,Western Bulldogs,Rory Lobb,Hamstring,Test
+R7,8,Western Bulldogs,James O'Donnell,Hamstring,4-5 weeks
+R7,8,Western Bulldogs,Zac Walker,Ankle,2-4 weeks
+R7,8,Western Bulldogs,Cody Weightman,Knee,TBC
+R8,9,Adelaide,Callum Ah Chee,Hamstring,1 week
+R8,9,Adelaide,Darcy Fogarty,Back,Test
+R8,9,Adelaide,Mitch Hinge,Hamstring,2-3 weeks
+R8,9,Adelaide,Mark Keane,Leg,3-6 weeks
+R8,9,Adelaide,Alex Neal-Bullen,Knee,Test
+R8,9,Brisbane Lions,Oscar Allen,Foot,12-14 weeks
+R8,9,Brisbane Lions,Dan Annable,Shoulder,13-15 weeks
+R8,9,Brisbane Lions,Noah Answerth,Concussion,TBC
+R8,9,Brisbane Lions,Jarrod Berry,Calf,2-3 weeks
+R8,9,Brisbane Lions,Darcy Gardiner,Shoulder,3-4 weeks
+R8,9,Brisbane Lions,Eric Hipwood,Knee,Mid-season
+R8,9,Brisbane Lions,Ben Murphy,Hamstring,TBC
+R8,9,Brisbane Lions,Jack Payne,Knee,TBC
+R8,9,Brisbane Lions,Henry Smith,Foot,TBC
+R8,9,Brisbane Lions,Dayne Zorko,Calf,Test
+R8,9,Carlton,Ben Camporeale,Concussion,Test
+R8,9,Carlton,Lucas Camporeale,Kidney,TBC
+R8,9,Carlton,Harry McKay,Concussion,Test
+R8,9,Carlton,Rob Monahan,Shoulder,TBC
+R8,9,Carlton,Jesse Motlop,Knee,Season
+R8,9,Carlton,Harry O'Farrell,Knee,TBC
+R8,9,Carlton,Marc Pittonet,Hand,Test
+R8,9,Collingwood,Harry DeMattia,Back,1 week
+R8,9,Collingwood,Reef McInnes,Knee,Season
+R8,9,Collingwood,Tim Membrey,Hamstring,4 weeks
+R8,9,Essendon,Angus Clarke,Foot,5 weeks
+R8,9,Essendon,Brayden Fiorini,Back,TBC
+R8,9,Essendon,Lewis Hayes,Knee,4 weeks
+R8,9,Essendon,Harrison Jones,Calf,2 weeks
+R8,9,Essendon,Isaac Kako,Back,TBC
+R8,9,Essendon,Nic Martin,Knee,Season
+R8,9,Essendon,Archer May,MCL,Test
+R8,9,Essendon,Jordan Ridley,Calf,3 weeks
+R8,9,Essendon,Vigo Visentini,Hamstring,1 week
+R8,9,Fremantle,Sean Darcy,Calf,3-5 weeks
+R8,9,Fremantle,Jaeger O'Meara,Face,3 weeks
+R8,9,Fremantle,Sam Sturt,Knee,TBC
+R8,9,Fremantle,Brandon Walker,Concussion,1 week
+R8,9,Geelong,Harley Barker,Knee,Indefinite
+R8,9,Geelong,Mark Blicavs,Knee,TBC
+R8,9,Geelong,Toby Conway,Foot/Knee,TBC
+R8,9,Geelong,Keighton Matofai-Forbes,Foot,5 weeks
+R8,9,Geelong,Gryan Miers,Knee,1-3 weeks
+R8,9,Geelong,Jay Polkinghorne,Foot,4-6 weeks
+R8,9,Geelong,Tyson Stengle,Conditioning,Individualised program
+R8,9,Gold Coast,Jy Farrar,Ankle,6+ weeks
+R8,9,Gold Coast,Elliott Himmelberg,Knee,4-6 weeks
+R8,9,Gold Coast,Avery Thomas,Shoulder,Test
+R8,9,Greater Western Sydney,Cody Angove,Hamstring,3-4 weeks
+R8,9,Greater Western Sydney,Tom Green,Knee,Season
+R8,9,Greater Western Sydney,Darcy Jones,Knee,TBC
+R8,9,Greater Western Sydney,Josh Kelly,Hip,TBC
+R8,9,Greater Western Sydney,Logan Smith,Knee,3-4 weeks
+R8,9,Greater Western Sydney,Sam Taylor,Hamstring,3-4 weeks
+R8,9,Greater Western Sydney,Nathan Wardius,Knee,TBC
+R8,9,Hawthorn,James Blanck,Concussion,1 week
+R8,9,Hawthorn,Mabior Chol,Hamstring,2-3 weeks
+R8,9,Hawthorn,Will Day,Shoulder,3-4 weeks
+R8,9,Hawthorn,Matt LeRay,Concussion,1 week
+R8,9,Melbourne,Tom Campbell,Neck,TBC
+R8,9,Melbourne,Jai Culley,Knee,Season
+R8,9,Melbourne,Aidan Johnson,Hip/groin,Test
+R8,9,Melbourne,Xavier Lindsay,Hip/groin,1-2 weeks
+R8,9,Melbourne,Shane McAdam,Achilles,TBC
+R8,9,Melbourne,Jake Melksham,Ankle,2-3 weeks
+R8,9,Melbourne,Harrison Petty,Concussion protocols,Test
+R8,9,Melbourne,Trent Rivers,Knee,1-2 weeks
+R8,9,Melbourne,Christian Salem,Foot,2-3 weeks
+R8,9,Melbourne,Jack Viney,Achilles,TBC
+R8,9,North Melbourne,Jackson Archer,Knee,Season
+R8,9,North Melbourne,Charlie Comben,Illness,Test
+R8,9,North Melbourne,Zac Fisher,Hamstring,3-4 weeks
+R8,9,North Melbourne,Robert Hansen jnr,Groin,1 week
+R8,9,North Melbourne,River Stevens,Knee,6-8 weeks
+R8,9,North Melbourne,Blake Thredgold,Foot,TBC
+R8,9,North Melbourne,Luke Urquhart,Knee,1-2 weeks
+R8,9,Port Adelaide,Tom Anastasopoulos,Concussion,TBC
+R8,9,Port Adelaide,Tom Cochrane,Hamstring,Test
+R8,9,Port Adelaide,Mani Liddy,Groin,2-3 weeks
+R8,9,Port Adelaide,Ollie Lord,Knee,Season
+R8,9,Port Adelaide,Jack Lukosius,Groin,4-6 weeks
+R8,9,Port Adelaide,Sam Powell-Pepper,Knee,5-7 weeks
+R8,9,Port Adelaide,Harrison Ramm,Ankle,1 week
+R8,9,Port Adelaide,Esava Ratugolea,Knee,1-2 weeks
+R8,9,Port Adelaide,Connor Rozee,Hamstring,9-11 weeks
+R8,9,Port Adelaide,Josh Sinn,Shoulder,12-14 weeks
+R8,9,Richmond,Jasper Alger,Knee,4 weeks
+R8,9,Richmond,Harry Armstrong,Foot,4-5 weeks
+R8,9,Richmond,Sam Banks,Collarbone,5-6 weeks
+R8,9,Richmond,Judson Clarke,ACL,TBC
+R8,9,Richmond,Josh Gibcus,ACL strain,TBC
+R8,9,Richmond,Taj Hotton,Hip,TBC
+R8,9,Richmond,Rhyan Mansell,Foot,TBC
+R8,9,Richmond,Toby Nankervis,Hamstring,2-4 weeks
+R8,9,Richmond,Zane Peucker,Ankle,6 weeks
+R8,9,Richmond,Hugo Ralphsmith,MCL,5-7 weeks
+R8,9,Richmond,Maurice Rioli,Hamstring,3-4 weeks
+R8,9,Richmond,Tom Sims,Elbow/Foot,TBC
+R8,9,Richmond,Josh Smillie,Quad,TBC
+R8,9,Richmond,Kaleb Smith,Groin,3 weeks
+R8,9,Richmond,Tim Taranto,Concussion,Test
+R8,9,St Kilda,Eamonn Armstrong,Concussion,Concussion protocols
+R8,9,St Kilda,Charlie Banfield,Shoulder,Test
+R8,9,St Kilda,Hunter Clark,Knee,TBC
+R8,9,St Kilda,Lance Collard,Suspension,Round 13
+R8,9,St Kilda,Angus Hastie,Concussion,Concussion protocols
+R8,9,St Kilda,Isaac Keeler,Hamstring,1-2 weeks
+R8,9,St Kilda,Liam Ryan,Hip cork,TBC
+R8,9,Sydney,Taylor Adams,Hamstring,TBC
+R8,9,Sydney,Riak Andrew,Quad,TBC
+R8,9,Sydney,Braeden Campbell,Leg,TBC
+R8,9,Sydney,Will Green,Foot,8 weeks
+R8,9,Sydney,Errol Gulden,Shoulder,3 months
+R8,9,Sydney,Isaac Heeney,Calf,Test
+R8,9,Sydney,Liam Hetherton,Back,6 months
+R8,9,Sydney,Max King,Back,4 months
+R8,9,Sydney,Tom McCartin,Knee,2-3 weeks
+R8,9,West Coast,Sam Allen,Knee,5 weeks
+R8,9,West Coast,Tyler Brockman,Knee,TBC
+R8,9,West Coast,Harry Edwards,Concussion,Test
+R8,9,West Coast,Jack Graham,Shoulder,9-11 weeks
+R8,9,West Coast,Noah Long,Knee,Season
+R8,9,West Coast,Jacob Newton,Foot,Season
+R8,9,West Coast,Archer Reid,Knee,TBC
+R8,9,West Coast,Deven Robertson,Knee,Season
+R8,9,West Coast,Brandon Starcevich,Calf,3-4 weeks
+R8,9,Western Bulldogs,Connor Budarick,Hamstring,1-2 weeks
+R8,9,Western Bulldogs,Sam Darcy,Knee,Season
+R8,9,Western Bulldogs,Tim English,Knee,Test
+R8,9,Western Bulldogs,Riley Garcia,Hamstring,2-4 weeks
+R8,9,Western Bulldogs,Arty Jones,Hamstring,Test
+R8,9,Western Bulldogs,Tom Liberatore,Concussion,Concussion protocols
+R8,9,Western Bulldogs,Rory Lobb,Hamstring,2-4 weeks
+R8,9,Western Bulldogs,Aaron Naughton,Neck,Test
+R8,9,Western Bulldogs,James O'Donnell,Hamstring,3-4 weeks
+R8,9,Western Bulldogs,Cody Weightman,Knee,4-6 weeks
+R9,10,Adelaide,Jordon Butts,Adductor,2-3 weeks
+R9,10,Adelaide,Mitch Hinge,Hamstring,1-2 weeks
+R9,10,Adelaide,Mark Keane,Leg,2-4 weeks
+R9,10,Adelaide,Taylor Walker,Hamstring,2-3 weeks
+R9,10,Brisbane Lions,Oscar Allen,Foot,10-14 weeks
+R9,10,Brisbane Lions,Dan Annable,Shoulder,11-15 weeks
+R9,10,Brisbane Lions,Noah Answerth,Concussion,Concussion protocols
+R9,10,Brisbane Lions,Jarrod Berry,Calf,1 week
+R9,10,Brisbane Lions,Ty Gallop,Concussion,Concussion protocols
+R9,10,Brisbane Lions,Darcy Gardiner,Shoulder,1 week
+R9,10,Brisbane Lions,Eric Hipwood,Knee,5-6 weeks
+R9,10,Brisbane Lions,Luke Lloyd,Ankle,1 week
+R9,10,Brisbane Lions,Ben Murphy,Hamstring,1 week
+R9,10,Brisbane Lions,Jack Payne,Knee,TBC
+R9,10,Brisbane Lions,Henry Smith,Foot,8 weeks
+R9,10,Carlton,Lucas Camporeale,Kidney,TBC
+R9,10,Carlton,Rob Monahan,Shoulder,Season
+R9,10,Carlton,Jesse Motlop,Knee,Season
+R9,10,Carlton,Harry O'Farrell,Knee,TBC
+R9,10,Collingwood,Darcy Cameron,Ankle,Test
+R9,10,Collingwood,Joel Cochran,AC joint,4-6 weeks
+R9,10,Collingwood,Reef McInnes,Knee,Season
+R9,10,Collingwood,Tim Membrey,Hamstring,2-3 weeks
+R9,10,Collingwood,Harry Perryman,Hamstring,4-5 weeks
+R9,10,Collingwood,Lachie Sullivan,Concussion,Concussion protocols
+R9,10,Essendon,Jye Caldwell,Ankle,Test
+R9,10,Essendon,Angus Clarke,Foot,4 weeks
+R9,10,Essendon,Saad El-Hawli,Collarbone,4 weeks
+R9,10,Essendon,Brayden Fiorini,Back,TBC
+R9,10,Essendon,Lewis Hayes,Knee,3 weeks
+R9,10,Essendon,Isaac Kako,Back,TBC
+R9,10,Essendon,Nic Martin,Knee,Season
+R9,10,Essendon,Jordan Ridley,Calf,3 weeks
+R9,10,Essendon,Rhys Unwin,Hamstring,6-8 weeks
+R9,10,Fremantle,Sean Darcy,Calf,2-4 weeks
+R9,10,Fremantle,Jaeger O'Meara,Face,2 weeks
+R9,10,Fremantle,Sam Sturt,Knee,7-8 weeks
+R9,10,Fremantle,Brandon Walker,Concussion,Test
+R9,10,Geelong,Harley Barker,Knee,Indefinite
+R9,10,Geelong,Mark Blicavs,Knee,1-3 weeks
+R9,10,Geelong,Toby Conway,Foot/Knee,TBC
+R9,10,Geelong,Jack Henry,Foot,Test
+R9,10,Geelong,Keighton Matofai-Forbes,Foot,4 weeks
+R9,10,Geelong,Gryan Miers,Knee,Test
+R9,10,Geelong,Jacob Molier,Hamstring,1 week
+R9,10,Geelong,Jay Polkinghorne,Foot,3-5 weeks
+R9,10,Geelong,Tyson Stengle,Conditioning,Individualised program
+R9,10,Gold Coast,Sam Clohesy,Suspension,Round 11
+R9,10,Gold Coast,Jy Farrar,Ankle,6+ weeks
+R9,10,Gold Coast,Elliott Himmelberg,Knee,4-6 weeks
+R9,10,Gold Coast,Matt Rowell,Ankle,Test
+R9,10,Greater Western Sydney,Leek Aleer,Ankle,1-2 weeks
+R9,10,Greater Western Sydney,Cody Angove,Hamstring,3 weeks
+R9,10,Greater Western Sydney,Ryan Angwin,Concussion,TBC
+R9,10,Greater Western Sydney,Tom Green,Knee,Season
+R9,10,Greater Western Sydney,Jesse Hogan,Hip,Test
+R9,10,Greater Western Sydney,Darcy Jones,Knee,TBC
+R9,10,Greater Western Sydney,Josh Kelly,Hip,TBC
+R9,10,Greater Western Sydney,Nick Madden,Knee,6-8 weeks
+R9,10,Greater Western Sydney,Logan Smith,Knee,TBC
+R9,10,Greater Western Sydney,Sam Taylor,Hamstring,3 weeks
+R9,10,Greater Western Sydney,Nathan Wardius,Knee,TBC
+R9,10,Hawthorn,James Blanck,Shoulder,1 week
+R9,10,Hawthorn,Mabior Chol,Hamstring,1-2 weeks
+R9,10,Hawthorn,Will Day,Shoulder,2-3 weeks
+R9,10,Hawthorn,Calsher Dear,Adductor,1-2 weeks
+R9,10,Melbourne,Tom Campbell,Neck,TBC
+R9,10,Melbourne,Jai Culley,Knee,Season
+R9,10,Melbourne,Aidan Johnson,Hip/groin,Test
+R9,10,Melbourne,Xavier Lindsay,Hip/groin,2-4 weeks
+R9,10,Melbourne,Shane McAdam,Achilles,TBC
+R9,10,Melbourne,Jake Melksham,Ankle,1-2 weeks
+R9,10,Melbourne,Ricky Mentha jnr,Ankle,TBC
+R9,10,Melbourne,Brody Mihocek,Hamstring,3-5 weeks
+R9,10,Melbourne,Trent Rivers,Knee,Test
+R9,10,Melbourne,Christian Salem,Foot,2-3 weeks
+R9,10,Melbourne,Jack Viney,Achilles,TBC
+R9,10,North Melbourne,Jackson Archer,Knee,Season
+R9,10,North Melbourne,Luke Davies-Uniacke,Hamstring,Test
+R9,10,North Melbourne,Zac Fisher,Hamstring,2-3 weeks
+R9,10,North Melbourne,Robert Hansen jnr,Groin,TBC
+R9,10,North Melbourne,River Stevens,Knee,6 weeks
+R9,10,North Melbourne,Blake Thredgold,Foot,TBC
+R9,10,Port Adelaide,Tom Anastasopoulos,Concussion,Test
+R9,10,Port Adelaide,Mani Liddy,Groin,1-2 weeks
+R9,10,Port Adelaide,Ollie Lord,Knee,Season
+R9,10,Port Adelaide,Jack Lukosius,Groin,3-5 weeks
+R9,10,Port Adelaide,Sam Powell-Pepper,Knee,4-6 weeks
+R9,10,Port Adelaide,Connor Rozee,Hamstring,8-10 weeks
+R9,10,Port Adelaide,Josh Sinn,Shoulder,12-14 weeks
+R9,10,Richmond,Jasper Alger,Knee,3 weeks
+R9,10,Richmond,Harry Armstrong,Foot,4 weeks
+R9,10,Richmond,Sam Banks,Collarbone,4 weeks
+R9,10,Richmond,Judson Clarke,ACL,7-10 weeks
+R9,10,Richmond,Josh Gibcus,ACL strain,Season
+R9,10,Richmond,Taj Hotton,Hip,6-8 weeks
+R9,10,Richmond,Sam Lalor,Achilles,8-12 weeks
+R9,10,Richmond,Rhyan Mansell,Foot,TBC
+R9,10,Richmond,Toby Nankervis,Hamstring,3 weeks
+R9,10,Richmond,Zane Peucker,Ankle,6 weeks
+R9,10,Richmond,Dion Prestia,Calf,3-4 weeks
+R9,10,Richmond,Hugo Ralphsmith,MCL,4-6 weeks
+R9,10,Richmond,Maurice Rioli,Hamstring,4 weeks
+R9,10,Richmond,Tom Sims,Foot,3-4 weeks
+R9,10,Richmond,Josh Smillie,Quad,TBC
+R9,10,Richmond,Kaleb Smith,Groin,1 week
+R9,10,Richmond,Tim Taranto,Concussion,Test
+R9,10,St Kilda,Eamonn Armstrong,Concussion,Test
+R9,10,St Kilda,Dan Butler,Hamstring,2-4 weeks
+R9,10,St Kilda,Hunter Clark,Knee,TBC
+R9,10,St Kilda,Paddy Dow,Concussion,Concussion protocols
+R9,10,St Kilda,Angus Hastie,Concussion,Test
+R9,10,St Kilda,Jack Higgins,Concussion,Concussion protocols
+R9,10,St Kilda,Isaac Keeler,Hamstring,Test
+R9,10,St Kilda,Max King,Hamstring,6 weeks
+R9,10,St Kilda,Liam Ryan,Hip cork,TBC
+R9,10,Sydney,Taylor Adams,Hamstring,6-8 weeks
+R9,10,Sydney,Riak Andrew,Quad,TBC
+R9,10,Sydney,Braeden Campbell,Leg,3 months
+R9,10,Sydney,Will Green,Foot,7 weeks
+R9,10,Sydney,Errol Gulden,Shoulder,8-10 weeks
+R9,10,Sydney,Liam Hetherton,Back,6 months
+R9,10,Sydney,Max King,Back,3 months
+R9,10,Sydney,Tom McCartin,Knee,1-2 weeks
+R9,10,West Coast,Sam Allen,Knee,3-4 weeks
+R9,10,West Coast,Tyler Brockman,Knee,TBC
+R9,10,West Coast,Jack Graham,Shoulder,8-9 weeks
+R9,10,West Coast,Noah Long,Knee,Season
+R9,10,West Coast,Jacob Newton,Foot,Season
+R9,10,West Coast,Archer Reid,Knee,2-4 weeks
+R9,10,West Coast,Deven Robertson,Knee,Season
+R9,10,West Coast,Brandon Starcevich,Calf,2-3 weeks
+R9,10,Western Bulldogs,Connor Budarick,Hamstring,Test
+R9,10,Western Bulldogs,Sam Darcy,Knee,Season
+R9,10,Western Bulldogs,Riley Garcia,Hamstring,Test
+R9,10,Western Bulldogs,Luke Kennedy,Eye,1-2 weeks
+R9,10,Western Bulldogs,Tom Liberatore,Concussion,Concussion protocols
+R9,10,Western Bulldogs,Rory Lobb,Hamstring,2-3 weeks
+R9,10,Western Bulldogs,James O'Donnell,Hamstring,3-5 weeks
+R9,10,Western Bulldogs,Cody Weightman,Knee,3-5 weeks
+R9,10,Western Bulldogs,Laitham Vandermeer,Hamstring,6-7 weeks
+R10,11,Adelaide,Jordon Butts,Adductor,Test
+R10,11,Adelaide,Mitch Hinge,Hamstring,1 week
+R10,11,Adelaide,Mark Keane,Leg,2-3 weeks
+R10,11,Adelaide,Taylor Walker,Hamstring,Test
+R10,11,Brisbane Lions,Oscar Allen,Foot,10-12 weeks
+R10,11,Brisbane Lions,Dan Annable,Shoulder,11-14 weeks
+R10,11,Brisbane Lions,Noah Answerth,Concussion,2 weeks
+R10,11,Brisbane Lions,Jarrod Berry,Calf,Test
+R10,11,Brisbane Lions,Ty Gallop,Hamstring,TBC
+R10,11,Brisbane Lions,Darcy Gardiner,Shoulder,Test
+R10,11,Brisbane Lions,Eric Hipwood,Knee,4 weeks
+R10,11,Brisbane Lions,Luke Lloyd,Ankle,Test
+R10,11,Brisbane Lions,Lincoln McCarthy,Hamstring,1-2 weeks
+R10,11,Brisbane Lions,Ben Murphy,Hamstring,Test
+R10,11,Brisbane Lions,Jack Payne,Knee,TBC
+R10,11,Brisbane Lions,Henry Smith,Foot,6-7 weeks
+R10,11,Carlton,Lucas Camporeale,Kidney,TBC
+R10,11,Carlton,Rob Monahan,Shoulder,Season
+R10,11,Carlton,Jesse Motlop,Knee,Season
+R10,11,Carlton,Harry O'Farrell,Knee,TBC
+R10,11,Carlton,Zac Williams,Ankle,Test
+R10,11,Collingwood,Darcy Cameron,Ankle,Test
+R10,11,Collingwood,Joel Cochran,AC joint,3-5 weeks
+R10,11,Collingwood,Pat Lipinski,Concussion,TBC
+R10,11,Collingwood,Reef McInnes,Knee,Season
+R10,11,Collingwood,Tim Membrey,Hamstring,1-2 weeks
+R10,11,Collingwood,Darcy Moore,Concussion,TBC
+R10,11,Collingwood,Harry Perryman,Hamstring,2-3 weeks
+R10,11,Collingwood,Lachie Sullivan,Concussion,TBC
+R10,11,Essendon,Jye Caldwell,Ankle,Test
+R10,11,Essendon,Angus Clarke,Foot,3 weeks
+R10,11,Essendon,Saad El-Hawli,Collarbone,3 weeks
+R10,11,Essendon,Brayden Fiorini,Back,TBC
+R10,11,Essendon,Lewis Hayes,Knee,2 weeks
+R10,11,Essendon,Zak Johnson,Foot,TBC
+R10,11,Essendon,Isaac Kako,Back,6 weeks
+R10,11,Essendon,Nic Martin,Knee,Season
+R10,11,Essendon,Liam McMahon,Ankle,4-6 weeks
+R10,11,Essendon,Jordan Ridley,Calf,2 weeks
+R10,11,Essendon,Dyson Sharp,Shoulder,5-6 weeks
+R10,11,Essendon,Rhys Unwin,Hamstring,5-7 weeks
+R10,11,Fremantle,Sean Darcy,Calf,1-3 weeks
+R10,11,Fremantle,Jaeger O'Meara,Face,1 week
+R10,11,Fremantle,Alex Pearce,Knee,1-3 weeks
+R10,11,Fremantle,Sam Sturt,Knee/quad,6-7 weeks
+R10,11,Fremantle,Brandon Walker,Concussion,TBC
+R10,11,Geelong,Harley Barker,Knee,Indefinite
+R10,11,Geelong,Mark Blicavs,Knee,Test
+R10,11,Geelong,Jhye Clark,Concussion,TBC
+R10,11,Geelong,Toby Conway,Foot/Knee,TBC
+R10,11,Geelong,Jack Henry,Foot,Test
+R10,11,Geelong,Keighton Matofai-Forbes,Foot,4 weeks
+R10,11,Geelong,Jacob Molier,Hamstring,Test
+R10,11,Geelong,Jay Polkinghorne,Foot,3-5 weeks
+R10,11,Geelong,Tyson Stengle,Conditioning,Individualised program
+R10,11,Gold Coast,Sam Clohesy,Suspension,Round 11
+R10,11,Gold Coast,Jy Farrar,Ankle,6+ weeks
+R10,11,Gold Coast,Elliott Himmelberg,Knee,4-6 weeks
+R10,11,Gold Coast,Ben Long,Ankle,Test
+R10,11,Gold Coast,Ethan Read,Knee,TBC
+R10,11,Gold Coast,Matt Rowell,Ankle,Test
+R10,11,Greater Western Sydney,Leek Aleer,Ankle,1-2 weeks
+R10,11,Greater Western Sydney,Cody Angove,Hamstring,2 weeks
+R10,11,Greater Western Sydney,Ryan Angwin,Concussion,Test
+R10,11,Greater Western Sydney,Tom Green,Knee,Season
+R10,11,Greater Western Sydney,Jesse Hogan,Hip,Test
+R10,11,Greater Western Sydney,Darcy Jones,Knee,4-6 weeks
+R10,11,Greater Western Sydney,Josh Kelly,Hip,TBC
+R10,11,Greater Western Sydney,Nick Madden,Knee,5-8 weeks
+R10,11,Greater Western Sydney,Xavier O'Halloran,Ankle,TBC
+R10,11,Greater Western Sydney,Harry Rowston,Illness,2 weeks
+R10,11,Greater Western Sydney,Logan Smith,Knee,TBC
+R10,11,Greater Western Sydney,Sam Taylor,Hamstring,2 weeks
+R10,11,Greater Western Sydney,Nathan Wardius,Knee,TBC
+R10,11,Hawthorn,Tom Barrass,Hamstring,3-5 weeks
+R10,11,Hawthorn,James Blanck,Shoulder,Test
+R10,11,Hawthorn,Mabior Chol,Hamstring,1 week
+R10,11,Hawthorn,Will Day,Shoulder,1 week
+R10,11,Hawthorn,Calsher Dear,Adductor,Test
+R10,11,Hawthorn,Jack Gunston,Foot,Test
+R10,11,Hawthorn,Conor Nash,Concussion,1 week
+R10,11,Melbourne,Tom Campbell,Neck,TBC
+R10,11,Melbourne,Jai Culley,Knee,Season
+R10,11,Melbourne,Aidan Johnson,Hip/groin,Test
+R10,11,Melbourne,Xavier Lindsay,Hip/groin,2-4 weeks
+R10,11,Melbourne,Shane McAdam,Achilles,TBC
+R10,11,Melbourne,Jake Melksham,Ankle,1 week
+R10,11,Melbourne,Ricky Mentha jnr,Ankle,Test
+R10,11,Melbourne,Brody Mihocek,Hamstring,2-3 weeks
+R10,11,Melbourne,Christian Salem,Foot,2-3 weeks
+R10,11,Melbourne,Jack Viney,Achilles,TBC
+R10,11,Melbourne,Caleb Windsor,Toe,Test
+R10,11,North Melbourne,Jackson Archer,Knee,Season
+R10,11,North Melbourne,Zac Banch,Hamstring,4 weeks
+R10,11,North Melbourne,Zac Fisher,Hamstring,1 week
+R10,11,North Melbourne,Josh Goater,Calf,1 week
+R10,11,North Melbourne,Robert Hansen jnr,Groin,1 week
+R10,11,North Melbourne,Tom Powell,Groin,Test
+R10,11,North Melbourne,River Stevens,Knee,4-5 weeks
+R10,11,North Melbourne,Blake Thredgold,Foot,TBC
+R10,11,Port Adelaide,Miles Bergman,Toe,TBC
+R10,11,Port Adelaide,Josh Lai,Concussion,TBC
+R10,11,Port Adelaide,Ollie Lord,Knee,Season
+R10,11,Port Adelaide,Jack Lukosius,Groin,2-4 weeks
+R10,11,Port Adelaide,Sam Powell-Pepper,Knee,4-6 weeks
+R10,11,Port Adelaide,Harrison Ramm,Ankle,Test
+R10,11,Port Adelaide,Connor Rozee,Hamstring,8-10 weeks
+R10,11,Port Adelaide,Josh Sinn,Shoulder,11-13 weeks
+R10,11,Richmond,Jasper Alger,Knee,2 weeks
+R10,11,Richmond,Harry Armstrong,Foot,3-5 weeks
+R10,11,Richmond,Sam Banks,Collarbone,3 weeks
+R10,11,Richmond,Tom Brown,Arm,4-5 weeks
+R10,11,Richmond,Judson Clarke,ACL,5-8 weeks
+R10,11,Richmond,Josh Gibcus,ACL strain,Season
+R10,11,Richmond,Taj Hotton,Hip,4-6 weeks
+R10,11,Richmond,Sam Lalor,Achilles,6-9 weeks
+R10,11,Richmond,Rhyan Mansell,Foot,TBC
+R10,11,Richmond,Kane McAuliffe,Achilles,TBC
+R10,11,Richmond,Toby Nankervis,Hamstring,4-5 weeks
+R10,11,Richmond,Zane Peucker,Ankle,4-5 weeks
+R10,11,Richmond,Dion Prestia,Calf,2 weeks
+R10,11,Richmond,Hugo Ralphsmith,MCL,4-6 weeks
+R10,11,Richmond,Maurice Rioli,Hamstring,1-2 weeks
+R10,11,Richmond,Tom Sims,Foot,1 week
+R10,11,Richmond,Josh Smillie,Quad,TBC
+R10,11,Richmond,Kaleb Smith,Groin,Test
+R10,11,St Kilda,Eamonn Armstrong,Suspension,2 weeks
+R10,11,St Kilda,Dan Butler,Hamstring,2-3 weeks
+R10,11,St Kilda,Hunter Clark,Knee,TBC
+R10,11,St Kilda,Paddy Dow,Concussion,Test
+R10,11,St Kilda,Jack Higgins,Concussion,Test
+R10,11,St Kilda,Kye Fincher,Foot,6 weeks
+R10,11,St Kilda,Max King,Hamstring,5 weeks
+R10,11,St Kilda,Liam Ryan,Calf,3 weeks
+R10,11,St Kilda,Nasiah Wanganeen-Milera,Calf,3 weeks
+R10,11,St Kilda,Callum Wilkie,Back,Test
+R10,11,Sydney,Taylor Adams,Hamstring,6 weeks
+R10,11,Sydney,Riak Andrew,Quad,3 months
+R10,11,Sydney,Ned Bowman,Calf,1-2 weeks
+R10,11,Sydney,Braeden Campbell,Leg,2-3 months
+R10,11,Sydney,Charlie Curnow,Abdominal,Test
+R10,11,Sydney,Will Green,Foot,6 weeks
+R10,11,Sydney,Errol Gulden,Shoulder,7-9 weeks
+R10,11,Sydney,Liam Hetherton,Back,6 months
+R10,11,Sydney,Max King,Back,3 months
+R10,11,Sydney,Tom McCartin,Knee,Test
+R10,11,Sydney,Matt Roberts,Groin,2-4 weeks
+R10,11,Sydney,Jai Serong,Hamstring,Test
+R10,11,West Coast,Sam Allen,Knee/hamstring,TBC
+R10,11,West Coast,Tyler Brockman,Knee,3-4 weeks
+R10,11,West Coast,Jamie Cripps,Knee,TBC
+R10,11,West Coast,Harry Edwards,Concussion,TBC
+R10,11,West Coast,Jack Graham,Shoulder,6-7 weeks
+R10,11,West Coast,Noah Long,Knee,Season
+R10,11,West Coast,Jacob Newton,Foot,Season
+R10,11,West Coast,Matt Owies,Calf,Test
+R10,11,West Coast,Archer Reid,Knee,1-2 weeks
+R10,11,West Coast,Deven Robertson,Knee,Season
+R10,11,West Coast,Brandon Starcevich,Calf,1-2 weeks
+R10,11,Western Bulldogs,Sam Darcy,Knee,Season
+R10,11,Western Bulldogs,Tim English,Concussion,TBC
+R10,11,Western Bulldogs,Luke Kennedy,Eye,Test
+R10,11,Western Bulldogs,Tom Liberatore,Concussion,TBC
+R10,11,Western Bulldogs,Rory Lobb,Hamstring,1-2 weeks
+R10,11,Western Bulldogs,James O'Donnell,Hamstring,1-2 weeks
+R10,11,Western Bulldogs,Cody Weightman,Knee,2-4 weeks
+R10,11,Western Bulldogs,Laitham Vandermeer,Hamstring,4-6 weeks
+R11,12,Adelaide,Isaac Cumming,Hamstring,Test
+R11,12,Adelaide,Sid Draper,Jaw,TBC
+R11,12,Adelaide,Mark Keane,Leg,1-2 weeks
+R11,12,Brisbane Lions,Oscar Allen,Foot,8-10 weeks
+R11,12,Brisbane Lions,Dan Annable,Shoulder,10-12 weeks
+R11,12,Brisbane Lions,Noah Answerth,Concussion,1 week
+R11,12,Brisbane Lions,Jarrod Berry,Calf,Test
+R11,12,Brisbane Lions,Ty Gallop,Hamstring,Test
+R11,12,Brisbane Lions,Eric Hipwood,Knee,3 weeks
+R11,12,Brisbane Lions,Lincoln McCarthy,Hamstring,3 weeks
+R11,12,Brisbane Lions,Jack Payne,Knee,TBC
+R11,12,Brisbane Lions,Henry Smith,Foot,5-6 weeks
+R11,12,Brisbane Lions,Reece Torrent,Ankle,6-8 weeks
+R11,12,Brisbane Lions,Dayne Zorko,Soreness,Test
+R11,12,Carlton,Lucas Camporeale,Kidney,TBC
+R11,12,Carlton,Ollie Hollands,Ankle,3-4 weeks
+R11,12,Carlton,Cooper Lord,Concussion,1-2 weeks
+R11,12,Carlton,Rob Monahan,Shoulder,Season
+R11,12,Carlton,Jesse Motlop,Knee,Season
+R11,12,Carlton,Harry O'Farrell,Knee,TBC
+R11,12,Carlton,Adam Saad,Hamstring,Test
+R11,12,Collingwood,Joel Cochran,AC joint,2-4 weeks
+R11,12,Collingwood,Pat Lipinski,Concussion,Test
+R11,12,Collingwood,Reef McInnes,Knee,Season
+R11,12,Collingwood,Tim Membrey,Hamstring,Test
+R11,12,Collingwood,Darcy Moore,Concussion,Test
+R11,12,Collingwood,Harry Perryman,Hamstring,2-3 weeks
+R11,12,Collingwood,Oscar Steene,Knee,Season
+R11,12,Collingwood,Lachie Sullivan,Concussion,Test
+R11,12,Essendon,Angus Clarke,Foot,2 weeks
+R11,12,Essendon,Saad El-Hawli,Collarbone,1 week
+R11,12,Essendon,Brayden Fiorini,Back,TBC
+R11,12,Essendon,Lewis Hayes,Knee,1 week
+R11,12,Essendon,Zak Johnson,Foot,TBC
+R11,12,Essendon,Isaac Kako,Back,5 weeks
+R11,12,Essendon,Nic Martin,Knee,Season
+R11,12,Essendon,Liam McMahon,Ankle,3-5 weeks
+R11,12,Essendon,Jordan Ridley,Calf,1 week
+R11,12,Essendon,Dyson Sharp,Shoulder,4-5 weeks
+R11,12,Essendon,Rhys Unwin,Hamstring,4-6 weeks
+R11,12,Essendon,Peter Wright,Knee,TBC
+R11,12,Fremantle,Sean Darcy,Calf,1-2 weeks
+R11,12,Fremantle,Jaeger O'Meara,Face,Test
+R11,12,Fremantle,Alex Pearce,Knee,1-2 weeks
+R11,12,Fremantle,Sam Sturt,Knee/quad,5-6 weeks
+R11,12,Fremantle,Corey Wagner,Adductor,Test
+R11,12,Fremantle,Brandon Walker,Concussion,TBC
+R11,12,Fremantle,Hayden Young,Concussion,1 week
+R11,12,Geelong,Harley Barker,Knee,Indefinite
+R11,12,Geelong,Jhye Clark,Concussion,TBC
+R11,12,Geelong,Toby Conway,Foot/Knee,TBC
+R11,12,Geelong,Keighton Matofai-Forbes,Foot,3 weeks
+R11,12,Geelong,Jay Polkinghorne,Foot,2-3 weeks
+R11,12,Geelong,Tyson Stengle,Conditioning,Individualised program
+R11,12,Gold Coast,Alex Davies,Foot,TBC
+R11,12,Gold Coast,Jy Farrar,Ankle,6+ weeks
+R11,12,Gold Coast,Will Graham,Concussion,TBC
+R11,12,Gold Coast,Elliott Himmelberg,Knee,4-6 weeks
+R11,12,Gold Coast,Ben Long,Ankle,Test
+R11,12,Gold Coast,Ethan Read,Knee,4-6 weeks
+R11,12,Gold Coast,Jake Rogers,Hamstring,1-3 weeks
+R11,12,Gold Coast,Jamarra Ugle-Hagan,Ankle,1-3 weeks
+R11,12,Gold Coast,Lachie Weller,Hamstring,1-3 weeks
+R11,12,Greater Western Sydney,Leek Aleer,Ankle,2 weeks
+R11,12,Greater Western Sydney,Cody Angove,Hamstring,Test
+R11,12,Greater Western Sydney,Ryan Angwin,Hand,3 weeks
+R11,12,Greater Western Sydney,Jack Buckley,Hamstring,Test
+R11,12,Greater Western Sydney,Tom Green,Knee,Season
+R11,12,Greater Western Sydney,Jesse Hogan,Hip,1-3 weeks
+R11,12,Greater Western Sydney,Darcy Jones,Knee,4-5 weeks
+R11,12,Greater Western Sydney,Josh Kelly,Hip,TBC
+R11,12,Greater Western Sydney,Nick Madden,Knee,5-8 weeks
+R11,12,Greater Western Sydney,Xavier O'Halloran,Ankle,6-8 weeks
+R11,12,Greater Western Sydney,Harry Rowston,Knee,Test
+R11,12,Greater Western Sydney,Logan Smith,Knee,TBC
+R11,12,Greater Western Sydney,Sam Taylor,Hamstring,1-2 weeks
+R11,12,Greater Western Sydney,Nathan Wardius,Knee,TBC
+R11,12,Hawthorn,Tom Barrass,Hamstring,2-4 weeks
+R11,12,Hawthorn,James Blanck,Hamstring,4 weeks
+R11,12,Hawthorn,Jack Gunston,Foot,Test
+R11,12,Hawthorn,Jack Scrimshaw,Knee,TBC
+R11,12,Melbourne,Jed Adams,Knee,6-8 weeks
+R11,12,Melbourne,Jai Culley,Knee,Season
+R11,12,Melbourne,Aidan Johnson,Hip/groin,1-2 weeks
+R11,12,Melbourne,Xavier Lindsay,Hip/groin,4-6 weeks
+R11,12,Melbourne,Shane McAdam,Achilles,TBC
+R11,12,Melbourne,Jake Melksham,Ankle,Test
+R11,12,Melbourne,Brody Mihocek,Hamstring,1-2 weeks
+R11,12,Melbourne,Christian Salem,Foot,4-6 weeks
+R11,12,Melbourne,Jack Viney,Achilles,TBC
+R11,12,Melbourne,Caleb Windsor,Toe,Test
+R11,12,North Melbourne,Jackson Archer,Knee,Season
+R11,12,North Melbourne,Zac Banch,Hamstring,2 weeks
+R11,12,North Melbourne,Zac Fisher,Hamstring,Test
+R11,12,North Melbourne,Josh Goater,Calf,Test
+R11,12,North Melbourne,Robert Hansen jnr,Adductor,Test
+R11,12,North Melbourne,Tom Powell,Groin,2-4 weeks
+R11,12,North Melbourne,River Stevens,Knee,2-3 weeks
+R11,12,North Melbourne,Blake Thredgold,Foot,TBC
+R11,12,Port Adelaide,Miles Bergman,Toe,7-9 weeks
+R11,12,Port Adelaide,Lachie Jones,Concussion,TBC
+R11,12,Port Adelaide,Josh Lai,Concussion,Test
+R11,12,Port Adelaide,Ollie Lord,Knee,Season
+R11,12,Port Adelaide,Jack Lukosius,Groin,1-3 weeks
+R11,12,Port Adelaide,Sam Powell-Pepper,Knee,3-5 weeks
+R11,12,Port Adelaide,Connor Rozee,Hamstring,7-9 weeks
+R11,12,Port Adelaide,Josh Sinn,Shoulder,11-13 weeks
+R11,12,Richmond,Jasper Alger,Knee,Test
+R11,12,Richmond,Harry Armstrong,Foot,1-3 weeks
+R11,12,Richmond,Sam Banks,Collarbone,1 week
+R11,12,Richmond,Tom Brown,Arm,3-4 weeks
+R11,12,Richmond,Judson Clarke,ACL,4-7 weeks
+R11,12,Richmond,Josh Gibcus,ACL strain,Season
+R11,12,Richmond,Campbell Gray,Hamstring,TBC
+R11,12,Richmond,Taj Hotton,Hip,3-5 weeks
+R11,12,Richmond,Sam Lalor,Achilles,5-7 weeks
+R11,12,Richmond,Rhyan Mansell,Foot,TBC
+R11,12,Richmond,Kane McAuliffe,Achilles,TBC
+R11,12,Richmond,Toby Nankervis,Hamstring,3-4 weeks
+R11,12,Richmond,Zane Peucker,Ankle,3-4 weeks
+R11,12,Richmond,Dion Prestia,Calf,1 week
+R11,12,Richmond,Hugo Ralphsmith,MCL,3-4 weeks
+R11,12,Richmond,Maurice Rioli,Hamstring,1 week
+R11,12,Richmond,Tom Sims,Foot,Test
+R11,12,Richmond,Josh Smillie,Quad,TBC
+R11,12,St Kilda,Eamonn Armstrong,Suspension,1 week
+R11,12,St Kilda,Dan Butler,Hamstring,1 week
+R11,12,St Kilda,Hunter Clark,Knee,TBC
+R11,12,St Kilda,Jack Higgins,Knee,Test
+R11,12,St Kilda,Kye Fincher,Foot,5 weeks
+R11,12,St Kilda,Max King,Hamstring,4-5 weeks
+R11,12,St Kilda,Mitch Owens,Calf,2 weeks
+R11,12,St Kilda,Liam Ryan,Calf,2 weeks
+R11,12,St Kilda,Nasiah Wanganeen-Milera,Calf,2 weeks
+R11,12,Sydney,Taylor Adams,Hamstring,5 weeks
+R11,12,Sydney,Riak Andrew,Quad,10 weeks
+R11,12,Sydney,Ned Bowman,Calf,Test
+R11,12,Sydney,Braeden Campbell,Leg,8 weeks
+R11,12,Sydney,Will Green,Foot,5 weeks
+R11,12,Sydney,Errol Gulden,Shoulder,6-8 weeks
+R11,12,Sydney,Liam Hetherton,Back,6 months
+R11,12,Sydney,Max King,Back,3 months
+R11,12,Sydney,Dane Rampe,Calf,4 weeks
+R11,12,Sydney,Matt Roberts,Groin,2-4 weeks
+R11,12,West Coast,Sam Allen,Knee/hamstring,TBC
+R11,12,West Coast,Tyler Brockman,Knee,2-3 weeks
+R11,12,West Coast,Jamie Cripps,Knee,TBC
+R11,12,West Coast,Harry Edwards,Concussion,TBC
+R11,12,West Coast,Jack Graham,Shoulder,5-6 weeks
+R11,12,West Coast,Jack Hutchinson,Hamstring,3-5 weeks
+R11,12,West Coast,Noah Long,Knee,Season
+R11,12,West Coast,Jacob Newton,Foot,Season
+R11,12,West Coast,Archer Reid,Knee,Test
+R11,12,West Coast,Deven Robertson,Knee,Season
+R11,12,West Coast,Brandon Starcevich,Calf,Test
+R11,12,Western Bulldogs,Sam Darcy,Knee,Season
+R11,12,Western Bulldogs,Tim English,Concussion,TBC
+R11,12,Western Bulldogs,Riley Garcia,Knee,TBC
+R11,12,Western Bulldogs,Luke Kennedy,Concussion,TBC
+R11,12,Western Bulldogs,Tom Liberatore,Concussion/knee,TBC
+R11,12,Western Bulldogs,James O'Donnell,Hamstring,Test
+R11,12,Western Bulldogs,Zac Walker,Concussion,TBC
+R11,12,Western Bulldogs,Cody Weightman,Knee,1-3 weeks
+R11,12,Western Bulldogs,Bailey Williams,Hamstring,5-7 weeks
+R11,12,Western Bulldogs,Laitham Vandermeer,Hamstring,4-6 weeks
+R12,13,Adelaide,Callum Ah Chee,Thumb,TBC
+R12,13,Adelaide,Isaac Cumming,Hamstring,Test
+R12,13,Adelaide,Sid Draper,Jaw,TBC
+R12,13,Adelaide,Mark Keane,Leg,1 week
+R12,13,Adelaide,Izak Rankine,Calf,TBC
+R12,13,Brisbane Lions,Oscar Allen,Foot,7-9 weeks
+R12,13,Brisbane Lions,Dan Annable,Shoulder,8-10 weeks
+R12,13,Brisbane Lions,Noah Answerth,Concussion,Test
+R12,13,Brisbane Lions,Jarrod Berry,Calf,Test
+R12,13,Brisbane Lions,Eric Hipwood,Knee,2-3 weeks
+R12,13,Brisbane Lions,Ryan Lester,Calf,3-4 weeks
+R12,13,Brisbane Lions,Lincoln McCarthy,Hamstring,2 weeks
+R12,13,Brisbane Lions,Jack Payne,Knee,TBC
+R12,13,Brisbane Lions,Henry Smith,Foot,4-5 weeks
+R12,13,Brisbane Lions,Reece Torrent,Ankle,5-7 weeks
+R12,13,Brisbane Lions,Dayne Zorko,Soreness,2 weeks
+R12,13,Carlton,Lucas Camporeale,Kidney,TBC
+R12,13,Carlton,Matt Carroll,Knee,Season
+R12,13,Carlton,Ollie Hollands,Ankle,1-3 weeks
+R12,13,Carlton,Rob Monahan,Shoulder,Season
+R12,13,Carlton,Jesse Motlop,Knee,Season
+R12,13,Carlton,Harry O'Farrell,Knee,TBC
+R12,13,Carlton,Jacob Weitering,Calf,Test
+R12,13,Collingwood,Joel Cochran,AC joint,1-3 weeks
+R12,13,Collingwood,Jamie Elliott,Knee,Season
+R12,13,Collingwood,Will Hayes,Shoulder,5-6 weeks
+R12,13,Collingwood,Reef McInnes,Knee,Season
+R12,13,Collingwood,Darcy Moore,Hamstring,TBC
+R12,13,Collingwood,Harry Perryman,Hamstring,1-2 weeks
+R12,13,Collingwood,Oscar Steene,Knee,Season
+R12,13,Essendon,Jye Caldwell,Ankle,Test
+R12,13,Essendon,Angus Clarke,Foot,2 weeks
+R12,13,Essendon,Sam Durham,Concussion,1 week
+R12,13,Essendon,Brayden Fiorini,Back,Season
+R12,13,Essendon,Matt Guelfi,Hamstring,3-4 weeks
+R12,13,Essendon,Zak Johnson,Foot,7-8 weeks
+R12,13,Essendon,Isaac Kako,Back,3-4 weeks
+R12,13,Essendon,Nic Martin,Knee,Season
+R12,13,Essendon,Archie May,Abdominal,Test
+R12,13,Essendon,Andrew McGrath,Jaw,TBC
+R12,13,Essendon,Liam McMahon,Ankle,3-4 weeks
+R12,13,Essendon,Jordan Ridley,Calf,1 week
+R12,13,Essendon,Dyson Sharp,Shoulder,2-3 weeks
+R12,13,Essendon,Rhys Unwin,Hamstring,3-4 weeks
+R12,13,Essendon,Vigo Visentini,Hamstring,4 weeks
+R12,13,Essendon,Peter Wright,Knee,6-7 weeks
+R12,13,Fremantle,Sean Darcy,Calf,Test
+R12,13,Fremantle,Alex Pearce,Knee,Test
+R12,13,Fremantle,Caleb Serong,Calf,1 week
+R12,13,Fremantle,Sam Sturt,Knee/quad,4-5 weeks
+R12,13,Fremantle,Brandon Walker,Concussion,TBC
+R12,13,Fremantle,Hayden Young,Concussion,Test
+R12,13,Geelong,Harley Barker,Knee,Indefinite
+R12,13,Geelong,Jhye Clark,Concussion,TBC
+R12,13,Geelong,Toby Conway,Foot/Knee,TBC
+R12,13,Geelong,Nick Driscoll,Concussion,TBC
+R12,13,Geelong,Keighton Matofai-Forbes,Foot,2 weeks
+R12,13,Geelong,Jesse Mellor,Ankle,Test
+R12,13,Geelong,Jay Polkinghorne,Foot,1-2 weeks
+R12,13,Geelong,Tyson Stengle,Conditioning,Individualised program
+R12,13,Gold Coast,Alex Davies,Foot,4-6 weeks
+R12,13,Gold Coast,Jy Farrar,Ankle,6+ weeks
+R12,13,Gold Coast,Will Graham,Concussion,TBC
+R12,13,Gold Coast,Ethan Read,Knee,4-6 weeks
+R12,13,Gold Coast,Jake Rogers,Hamstring,1-3 weeks
+R12,13,Gold Coast,Jamarra Ugle-Hagan,Ankle,1-3 weeks
+R12,13,Gold Coast,Lachie Weller,Hamstring,1-3 weeks
+R12,13,Greater Western Sydney,Leek Aleer,Ankle,Test
+R12,13,Greater Western Sydney,Cody Angove,Hamstring,1-2 weeks
+R12,13,Greater Western Sydney,Ryan Angwin,Hand,1-2 weeks
+R12,13,Greater Western Sydney,Jack Buckley,Hamstring,4-6 weeks
+R12,13,Greater Western Sydney,Tom Green,Knee,Season
+R12,13,Greater Western Sydney,Jesse Hogan,Hip,1-2 weeks
+R12,13,Greater Western Sydney,Darcy Jones,Knee,4-5 weeks
+R12,13,Greater Western Sydney,Josh Kelly,Hip,TBC
+R12,13,Greater Western Sydney,Nick Madden,Knee,5-7 weeks
+R12,13,Greater Western Sydney,Xavier O'Halloran,Ankle,5-7 weeks
+R12,13,Greater Western Sydney,Jake Riccardi,Ankle,TBC
+R12,13,Greater Western Sydney,Logan Smith,Knee,TBC
+R12,13,Greater Western Sydney,Sam Taylor,Hamstring,Test
+R12,13,Greater Western Sydney,Nathan Wardius,Knee,TBC
+R12,13,Greater Western Sydney,Lachie Whitfield,Hamstring,Test
+R12,13,Hawthorn,Tom Barrass,Hamstring,1-2 weeks
+R12,13,Hawthorn,James Blanck,Hamstring,2 weeks
+R12,13,Hawthorn,Jack Gunston,Foot,Test
+R12,13,Hawthorn,Jack Scrimshaw,Knee,Test
+R12,13,Melbourne,Jed Adams,Knee,5-7 weeks
+R12,13,Melbourne,Jai Culley,Knee,Season
+R12,13,Melbourne,Aidan Johnson,Hip/groin,1-2 weeks
+R12,13,Melbourne,Jake Lever,Concussion,1-2 weeks
+R12,13,Melbourne,Xavier Lindsay,Hip/groin,4-6 weeks
+R12,13,Melbourne,Brody Mihocek,Hamstring,Test
+R12,13,Melbourne,Christian Salem,Foot,4-6 weeks
+R12,13,Melbourne,Jack Viney,Achilles,TBC
+R12,13,North Melbourne,Jackson Archer,Knee,Season
+R12,13,North Melbourne,Zac Banch,Hamstring,1 week
+R12,13,North Melbourne,Callum Coleman-Jones,Concussion,TBC
+R12,13,North Melbourne,Tom Powell,Groin,2-3 weeks
+R12,13,North Melbourne,River Stevens,Knee,1-2 weeks
+R12,13,North Melbourne,Blake Thredgold,Foot,Season
+R12,13,North Melbourne,Luke Urquhart,Knee,TBC
+R12,13,Port Adelaide,Miles Bergman,Toe,6-8 weeks
+R12,13,Port Adelaide,Lachie Jones,Concussion,Protocols
+R12,13,Port Adelaide,Ollie Lord,Knee,Season
+R12,13,Port Adelaide,Jack Lukosius,Groin,Test
+R12,13,Port Adelaide,Sam Powell-Pepper,Knee,2-4 weeks
+R12,13,Port Adelaide,Connor Rozee,Hamstring,6-8 weeks
+R12,13,Port Adelaide,Josh Sinn,Shoulder,Season
+R12,13,Richmond,Harry Armstrong,Foot,3-6 weeks
+R12,13,Richmond,Sam Banks,Collarbone,Test
+R12,13,Richmond,Tom Brown,Arm,2-3 weeks
+R12,13,Richmond,Judson Clarke,ACL,3-6 weeks
+R12,13,Richmond,Jonty Faull,Concussion,TBC
+R12,13,Richmond,Josh Gibcus,ACL strain,Season
+R12,13,Richmond,Campbell Gray,Hamstring,TBC
+R12,13,Richmond,Taj Hotton,Hip,2-4 weeks
+R12,13,Richmond,Sam Lalor,Achilles,4-6 weeks
+R12,13,Richmond,Tom Lynch,Larynx,TBC
+R12,13,Richmond,Rhyan Mansell,Foot,4-6 weeks
+R12,13,Richmond,Kane McAuliffe,Achilles,TBC
+R12,13,Richmond,Toby Nankervis,Hamstring,2-3 weeks
+R12,13,Richmond,Zane Peucker,Ankle,2-3 weeks
+R12,13,Richmond,Dion Prestia,Calf,Test
+R12,13,Richmond,Hugo Ralphsmith,MCL,Test
+R12,13,Richmond,Maurice Rioli,Hamstring,2 weeks
+R12,13,Richmond,Tom Sims,MCL,TBC
+R12,13,Richmond,Josh Smillie,Quad,TBC
+R12,13,St Kilda,Dan Butler,Hamstring,Test
+R12,13,St Kilda,Hunter Clark,Knee,TBC
+R12,13,St Kilda,Kye Fincher,Foot,3-4 weeks
+R12,13,St Kilda,Jack Higgins,Knee,3-4 weeks
+R12,13,St Kilda,Dougal Howard,Calf,TBC
+R12,13,St Kilda,Max King,Hamstring,3-4 weeks
+R12,13,St Kilda,Mitch Owens,Calf,1 week
+R12,13,St Kilda,Liam Ryan,Calf,1 week
+R12,13,St Kilda,Nasiah Wanganeen-Milera,Calf,1 week
+R12,13,Sydney,Taylor Adams,Hamstring,3-5 weeks
+R12,13,Sydney,Riak Andrew,Quad,8 weeks
+R12,13,Sydney,Ned Bowman,Calf,Test
+R12,13,Sydney,Braeden Campbell,Leg,7-8 weeks
+R12,13,Sydney,Will Green,Foot,4-5 weeks
+R12,13,Sydney,Errol Gulden,Shoulder,4-5 weeks
+R12,13,Sydney,Liam Hetherton,Back,5 months
+R12,13,Sydney,Max King,Back,8 weeks
+R12,13,Sydney,Tom Papley,Calf,6 weeks
+R12,13,Sydney,Dane Rampe,Calf,4-5 weeks
+R12,13,Sydney,Matt Roberts,Groin,1 week
+R12,13,Sydney,Malcolm Rosas,Ankle,1-2 weeks
+R12,13,West Coast,Sam Allen,Knee/hamstring,10-12 weeks
+R12,13,West Coast,Tyler Brockman,Knee,Test
+R12,13,West Coast,Jamie Cripps,Knee,TBC
+R12,13,West Coast,Harry Edwards,Concussion,TBC
+R12,13,West Coast,Jack Graham,Shoulder,2-3 weeks
+R12,13,West Coast,Jack Hutchinson,Hamstring,3-5 weeks
+R12,13,West Coast,Noah Long,Knee,Season
+R12,13,West Coast,Jacob Newton,Foot,Season
+R12,13,West Coast,Archer Reid,Knee,Test
+R12,13,West Coast,Deven Robertson,Knee,Season
+R12,13,Western Bulldogs,Jedd Busslinger,Shoulder,Test
+R12,13,Western Bulldogs,Luke Cleary,Concussion,Protocols
+R12,13,Western Bulldogs,Sam Darcy,Knee,Season
+R12,13,Western Bulldogs,Tim English,Concussion,Protocols
+R12,13,Western Bulldogs,Riley Garcia,Knee,6-8 weeks
+R12,13,Western Bulldogs,Luke Kennedy,Concussion,Protocols
+R12,13,Western Bulldogs,Tom Liberatore,Concussion/knee,Protocols
+R12,13,Western Bulldogs,James O'Donnell,Hamstring,Test
+R12,13,Western Bulldogs,Laith Vandermeer,Hamstring,3-5 weeks
+R12,13,Western Bulldogs,Zac Walker,Concussion,Protocols
+R12,13,Western Bulldogs,Cody Weightman,Knee,Test
+R12,13,Western Bulldogs,Bailey Williams,Hamstring,7-8 weeks
+R13,14,Adelaide,Isaac Cumming,Hamstring,TBC
+R13,14,Adelaide,Sid Draper,Jaw,1 week
+R13,14,Adelaide,Mitch Hinge,Ankle,Test
+R13,14,Adelaide,Izak Rankine,Calf,1 week
+R13,14,Adelaide,Riley Thilthorpe,Suspension,Round 14
+R13,14,Adelaide,Tyler Welsh,Hamstring,TBC
+R13,14,Brisbane Lions,Oscar Allen,Foot,7-8 weeks
+R13,14,Brisbane Lions,Dan Annable,Shoulder,8-9 weeks
+R13,14,Brisbane Lions,Keidean Coleman,Hamstring,5-6 weeks
+R13,14,Brisbane Lions,Tom Doedee,Calf,6 weeks
+R13,14,Brisbane Lions,Eric Hipwood,Knee,1 week
+R13,14,Brisbane Lions,Ryan Lester,Calf,3 weeks
+R13,14,Brisbane Lions,Lincoln McCarthy,Hamstring,1 week
+R13,14,Brisbane Lions,Will McLachlan,Quad,8-10 weeks
+R13,14,Brisbane Lions,Jack Payne,Knee,TBC
+R13,14,Brisbane Lions,Henry Smith,Foot,3 weeks
+R13,14,Brisbane Lions,Reece Torrent,Ankle,5-6 weeks
+R13,14,Brisbane Lions,Dayne Zorko,Quad,5 weeks
+R13,14,Carlton,Lucas Camporeale,Kidney,2 weeks
+R13,14,Carlton,Matt Carroll,Knee,Season
+R13,14,Carlton,Ollie Hollands,Ankle,2 weeks
+R13,14,Carlton,Rob Monahan,Shoulder,Season
+R13,14,Carlton,Jesse Motlop,Knee,Season
+R13,14,Carlton,Harry O'Farrell,Knee,TBC
+R13,14,Carlton,Liam Reidy,Ankle,2 weeks
+R13,14,Collingwood,Joel Cochran,AC joint,1-2 weeks
+R13,14,Collingwood,Jamie Elliott,Knee,Season
+R13,14,Collingwood,Will Hayes,Shoulder,3-4 weeks
+R13,14,Collingwood,Noah Howes,Shoulder,4-5 weeks
+R13,14,Collingwood,Reef McInnes,Knee,Season
+R13,14,Collingwood,Darcy Moore,Hamstring,TBC
+R13,14,Collingwood,Harry Perryman,Hamstring,Test
+R13,14,Collingwood,Oscar Steene,Knee,Season
+R13,14,Essendon,Jye Caldwell,Ankle,3 weeks
+R13,14,Essendon,Angus Clarke,Foot,1 week
+R13,14,Essendon,Brayden Fiorini,Back,Season
+R13,14,Essendon,Matt Guelfi,Hamstring,2-3 weeks
+R13,14,Essendon,Lewis Hayes,Knee,Season
+R13,14,Essendon,Zak Johnson,Foot,6-7 weeks
+R13,14,Essendon,Isaac Kako,Back,2-3 weeks
+R13,14,Essendon,Nic Martin,Knee,Season
+R13,14,Essendon,Archie May,Shoulder,TBC
+R13,14,Essendon,Andrew McGrath,Jaw,3 weeks
+R13,14,Essendon,Liam McMahon,Ankle,2-3 weeks
+R13,14,Essendon,Dyson Sharp,Shoulder,1-2 weeks
+R13,14,Essendon,Rhys Unwin,Hamstring,2-3 weeks
+R13,14,Essendon,Vigo Visentini,Hamstring,3 weeks
+R13,14,Essendon,Peter Wright,Knee,5-6 weeks
+R13,14,Fremantle,Brennan Cox,Knee,Test
+R13,14,Fremantle,Matthew Johnson,Hamstring,Test
+R13,14,Fremantle,Ollie Murphy,Knee,1-2 weeks
+R13,14,Fremantle,Caleb Serong,Calf,1 week
+R13,14,Fremantle,Sam Sturt,Knee/quad,3-4 weeks
+R13,14,Fremantle,Brandon Walker,Concussion,TBC
+R13,14,Fremantle,Hayden Young,Concussion,Test
+R13,14,Geelong,Harley Barker,Knee,Indefinite
+R13,14,Geelong,Toby Conway,Foot/Knee,TBC
+R13,14,Geelong,Nick Driscoll,Concussion,TBC
+R13,14,Geelong,Lawson Humphries,Ankle,Test
+R13,14,Geelong,Keighton Matofai-Forbes,Foot,1 week
+R13,14,Geelong,Jay Polkinghorne,Foot,Test
+R13,14,Geelong,Tyson Stengle,Conditioning,Individualised program
+R13,14,Gold Coast,Alex Davies,Foot,4-6 weeks
+R13,14,Gold Coast,Jy Farrar,Ankle,6+ weeks
+R13,14,Gold Coast,Ethan Read,Knee,1-3 weeks
+R13,14,Gold Coast,Jake Rogers,Hamstring,Test
+R13,14,Gold Coast,Jamarra Ugle-Hagan,Ankle,Test
+R13,14,Gold Coast,Lachie Weller,Hamstring,1-3 weeks
+R13,14,Greater Western Sydney,Cody Angove,Hamstring,1 week
+R13,14,Greater Western Sydney,Ryan Angwin,Hand,1 week
+R13,14,Greater Western Sydney,Jack Buckley,Hamstring,4-5 weeks
+R13,14,Greater Western Sydney,Stephen Coniglio,Hamstring,3 weeks
+R13,14,Greater Western Sydney,Tom Green,Knee,Season
+R13,14,Greater Western Sydney,Jesse Hogan,Hip,1 week
+R13,14,Greater Western Sydney,Darcy Jones,Knee,4-5 weeks
+R13,14,Greater Western Sydney,Josh Kelly,Hip,TBC
+R13,14,Greater Western Sydney,Nick Madden,Knee,4-6 weeks
+R13,14,Greater Western Sydney,Xavier O'Halloran,Ankle,5-6 weeks
+R13,14,Greater Western Sydney,Jake Riccardi,Ankle,8 weeks
+R13,14,Greater Western Sydney,Logan Smith,Knee,TBC
+R13,14,Greater Western Sydney,Nathan Wardius,Knee,TBC
+R13,14,Hawthorn,Tom Barrass,Hamstring,Test
+R13,14,Hawthorn,James Blanck,Hamstring,1 week
+R13,14,Hawthorn,Conor Nash,Neck,Test
+R13,14,Hawthorn,Jack Scrimshaw,Knee,1 week
+R13,14,Melbourne,Jed Adams,Knee,5-6 weeks
+R13,14,Melbourne,Jai Culley,Knee,Season
+R13,14,Melbourne,Changkuoth Jiath,Knee,Test
+R13,14,Melbourne,Aidan Johnson,Hip/groin,1-2 weeks
+R13,14,Melbourne,Jake Lever,Concussion,Test
+R13,14,Melbourne,Xavier Lindsay,Hip/groin,4-6 weeks
+R13,14,Melbourne,Andy Moniz-Wakefield,Knee,Season
+R13,14,Melbourne,Latrelle Pickett,Quad,Test
+R13,14,Melbourne,Christian Salem,Foot,4-6 weeks
+R13,14,Melbourne,Jack Viney,Achilles,TBC
+R13,14,North Melbourne,Jackson Archer,Knee,Season
+R13,14,North Melbourne,Callum Coleman-Jones,Concussion,1 week
+R13,14,North Melbourne,Tom Powell,Groin,2-3 weeks
+R13,14,North Melbourne,River Stevens,Knee,1 week
+R13,14,North Melbourne,Blake Thredgold,Foot,Season
+R13,14,North Melbourne,Luke Urquhart,Knee,TBC
+R13,14,Port Adelaide,Miles Bergman,Toe,4-6 weeks
+R13,14,Port Adelaide,Kane Farrell,Adductor,Test
+R13,14,Port Adelaide,Ollie Lord,Knee,Season
+R13,14,Port Adelaide,Jack Lukosius,Groin,Test
+R13,14,Port Adelaide,Sam Powell-Pepper,Knee,2-3 weeks
+R13,14,Port Adelaide,Connor Rozee,Hamstring,TBC
+R13,14,Port Adelaide,Josh Sinn,Shoulder,Season
+R13,14,Richmond,Harry Armstrong,Foot,2-5 weeks
+R13,14,Richmond,Tom Brown,Arm,Test
+R13,14,Richmond,Judson Clarke,ACL,2-5 weeks
+R13,14,Richmond,Jonty Faull,Concussion,TBC
+R13,14,Richmond,Josh Gibcus,ACL strain,Season
+R13,14,Richmond,Campbell Gray,Hamstring,6-10 weeks
+R13,14,Richmond,Taj Hotton,Hip,Test
+R13,14,Richmond,Sam Lalor,Achilles,3-5 weeks
+R13,14,Richmond,Tom Lynch,Larynx,TBC
+R13,14,Richmond,Rhyan Mansell,Foot,3-5 weeks
+R13,14,Richmond,Kane McAuliffe,Achilles,1-5 weeks
+R13,14,Richmond,Toby Nankervis,Hamstring,Test
+R13,14,Richmond,Zane Peucker,Ankle,Test
+R13,14,Richmond,Hugo Ralphsmith,Suspension,Round 16
+R13,14,Richmond,Jack Ross,Concussion,TBC
+R13,14,Richmond,Samson Ryan,Concussion,TBC
+R13,14,Richmond,Tom Sims,MCL,TBC
+R13,14,Richmond,Josh Smillie,Quad,TBC
+R13,14,St Kilda,Hunter Clark,Knee,3-4 weeks
+R13,14,St Kilda,Kye Fincher,Foot,2-3 weeks
+R13,14,St Kilda,Sam Flanders,Achilles,Season
+R13,14,St Kilda,Jack Higgins,Knee,2-3 weeks
+R13,14,St Kilda,Dougal Howard,Calf,TBC
+R13,14,St Kilda,Max King,Hamstring,2-3 weeks
+R13,14,St Kilda,Mitch Owens,Calf,Test
+R13,14,St Kilda,Liam Ryan,Calf,Test
+R13,14,St Kilda,Nasiah Wanganeen-Milera,Calf,Test
+R13,14,Sydney,Taylor Adams,Hamstring,1-2 weeks
+R13,14,Sydney,Riak Andrew,Quad,7 weeks
+R13,14,Sydney,Ned Bowman,Calf,Test
+R13,14,Sydney,Braeden Campbell,Leg,6-7 weeks
+R13,14,Sydney,Noah Chamberlain,Hamstring,2-3 weeks
+R13,14,Sydney,Will Green,Foot,3-4 weeks
+R13,14,Sydney,Errol Gulden,Shoulder,3-4 weeks
+R13,14,Sydney,Liam Hetherton,Back,5 months
+R13,14,Sydney,Max King,Back,7 weeks
+R13,14,Sydney,Justin McInerney,Ankle,Test
+R13,14,Sydney,Lewis Melican,Hamstring,2-3 weeks
+R13,14,Sydney,Callum Mills,Calf,Test
+R13,14,Sydney,Tom Papley,Calf,6 weeks
+R13,14,Sydney,Dane Rampe,Calf,4 weeks
+R13,14,Sydney,Matt Roberts,Groin,Test
+R13,14,Sydney,Malcolm Rosas,Ankle,Test
+R13,14,West Coast,Sam Allen,Knee/hamstring,9-11 weeks
+R13,14,West Coast,Jamie Cripps,Knee,TBC
+R13,14,West Coast,Harry Edwards,Concussion,TBC
+R13,14,West Coast,Jack Graham,Shoulder,1-2 weeks
+R13,14,West Coast,Jack Hutchinson,Hamstring,1-2 weeks
+R13,14,West Coast,Noah Long,Knee,Season
+R13,14,West Coast,Jacob Newton,Foot,Season
+R13,14,West Coast,Deven Robertson,Knee,Season
+R13,14,Western Bulldogs,Jedd Busslinger,Shoulder,Test
+R13,14,Western Bulldogs,Luke Cleary,Concussion,TBC
+R13,14,Western Bulldogs,Sam Darcy,Knee,Season
+R13,14,Western Bulldogs,Riley Garcia,Knee,5-7 weeks
+R13,14,Western Bulldogs,Tom Liberatore,Concussion/knee,TBC
+R13,14,Western Bulldogs,Laith Vandermeer,Hamstring,3-5 weeks
+R13,14,Western Bulldogs,Cody Weightman,Knee,Test
+R13,14,Western Bulldogs,Bailey Williams,Hamstring,5-7 weeks
+R14,15,Adelaide,Callum Ah Chee,Hamstring,3-4 weeks
+R14,15,Adelaide,Jordon Butts,Calf,2-3 weeks
+R14,15,Adelaide,Isaac Cumming,Hamstring,1-2 weeks
+R14,15,Adelaide,Mitch Hinge,Ankle,1 week
+R14,15,Adelaide,Izak Rankine,Calf,Test
+R14,15,Adelaide,Taylor Walker,Suspension,Round 15
+R14,15,Adelaide,Tyler Welsh,Hamstring,3-4 weeks
+R14,15,Brisbane Lions,Oscar Allen,Foot,5-6 weeks
+R14,15,Brisbane Lions,Dan Annable,Shoulder,4 weeks
+R14,15,Brisbane Lions,Keidean Coleman,Hamstring,4 weeks
+R14,15,Brisbane Lions,Tom Doedee,Calf,4-5 weeks
+R14,15,Brisbane Lions,Tai Hayes,Shin,3 weeks
+R14,15,Brisbane Lions,Eric Hipwood,Knee,Test
+R14,15,Brisbane Lions,Ryan Lester,Calf,2 weeks
+R14,15,Brisbane Lions,Lincoln McCarthy,Hamstring,Test
+R14,15,Brisbane Lions,Hugh McCluggage,Hamstring,4 weeks
+R14,15,Brisbane Lions,Will McLachlan,Quad,8 weeks
+R14,15,Brisbane Lions,Jack Payne,Knee,TBC
+R14,15,Brisbane Lions,Henry Smith,Foot,2 weeks
+R14,15,Brisbane Lions,Reece Torrent,Ankle,2-3 weeks
+R14,15,Brisbane Lions,Dayne Zorko,Quad,4 weeks
+R14,15,Carlton,Lucas Camporeale,Kidney,1 week
+R14,15,Carlton,Matt Carroll,Knee,Season
+R14,15,Carlton,Ollie Hollands,Ankle,1 week
+R14,15,Carlton,Rob Monahan,Shoulder,Season
+R14,15,Carlton,Jesse Motlop,Knee,Season
+R14,15,Carlton,Harry O'Farrell,Knee,TBC
+R14,15,Carlton,Liam Reidy,Ankle,1 week
+R14,15,Carlton,Jacob Weitering,Calf,1 week
+R14,15,Collingwood,Joel Cochran,AC joint,Test
+R14,15,Collingwood,Jamie Elliott,Knee,Season
+R14,15,Collingwood,Billy Frampton,Suspension,Round 18
+R14,15,Collingwood,Will Hayes,Shoulder,2-3 weeks
+R14,15,Collingwood,Noah Howes,Shoulder,2-3 weeks
+R14,15,Collingwood,Brayden Maynard,Shoulder,TBC
+R14,15,Collingwood,Reef McInnes,Knee,Season
+R14,15,Collingwood,Darcy Moore,Hamstring,TBC
+R14,15,Collingwood,Oscar Steene,Knee,Season
+R14,15,Essendon,Jye Caldwell,Ankle,2 weeks
+R14,15,Essendon,Angus Clarke,Foot,1 week
+R14,15,Essendon,Brayden Fiorini,Back,Season
+R14,15,Essendon,Matt Guelfi,Hamstring,1 week
+R14,15,Essendon,Lewis Hayes,Knee,Season
+R14,15,Essendon,Zak Johnson,Foot,5-6 weeks
+R14,15,Essendon,Isaac Kako,Back,1 week
+R14,15,Essendon,Nic Martin,Knee,Season
+R14,15,Essendon,Archie May,Shoulder,Season
+R14,15,Essendon,Andrew McGrath,Jaw,1 week
+R14,15,Essendon,Liam McMahon,Ankle,3-4 weeks
+R14,15,Essendon,Jayden Nguyen,Suspension,Round 16
+R14,15,Essendon,Darcy Parish,Knee soreness,1 week
+R14,15,Essendon,Dyson Sharp,Shoulder,Test
+R14,15,Essendon,Rhys Unwin,Hamstring,1 week
+R14,15,Essendon,Vigo Visentini,Hamstring,2 weeks
+R14,15,Essendon,Peter Wright,Knee,4-5 weeks
+R14,15,Fremantle,Brennan Cox,Knee,Test
+R14,15,Fremantle,Matthew Johnson,Hamstring,Test
+R14,15,Fremantle,Ollie Murphy,Knee,Test
+R14,15,Fremantle,Caleb Serong,Calf,Test
+R14,15,Fremantle,Sam Sturt,Knee/quad,2-3 weeks
+R14,15,Fremantle,Brandon Walker,Concussion,TBC
+R14,15,Geelong,Harley Barker,Knee,Indefinite
+R14,15,Geelong,Brad Close,Ankle,Test
+R14,15,Geelong,Toby Conway,Foot/Knee,TBC
+R14,15,Geelong,Nick Driscoll,Concussion,TBC
+R14,15,Geelong,Mitch Knevitt,Hip,Test
+R14,15,Geelong,Keighton Matofai-Forbes,Foot,1 week
+R14,15,Geelong,Jacob Molier,Quad,TBC
+R14,15,Geelong,Tyson Stengle,Conditioning,Individualised program
+R14,15,Geelong,Tom Stewart,Concussion,TBC
+R14,15,Gold Coast,Alex Davies,Foot,4-6 weeks
+R14,15,Gold Coast,Jy Farrar,Ankle,4-6 weeks
+R14,15,Gold Coast,Will Graham,Hamstring,4-6 weeks
+R14,15,Gold Coast,Wil Powell,Shoulder,1-3 weeks
+R14,15,Gold Coast,Ethan Read,Knee,1-3 weeks
+R14,15,Gold Coast,Lachie Weller,Hamstring,4-6 weeks
+R14,15,Greater Western Sydney,Cody Angove,Hamstring,Test
+R14,15,Greater Western Sydney,Ryan Angwin,Hand,Test
+R14,15,Greater Western Sydney,Jack Buckley,Hamstring,3-4 weeks
+R14,15,Greater Western Sydney,Stephen Coniglio,Hamstring,2-3 weeks
+R14,15,Greater Western Sydney,Tom Green,Knee,Season
+R14,15,Greater Western Sydney,Jesse Hogan,Hip,Test
+R14,15,Greater Western Sydney,Darcy Jones,Knee,4-5 weeks
+R14,15,Greater Western Sydney,Josh Kelly,Hip,TBC
+R14,15,Greater Western Sydney,Nick Madden,Knee,4-5 weeks
+R14,15,Greater Western Sydney,Xavier O'Halloran,Ankle,4-5 weeks
+R14,15,Greater Western Sydney,Jake Riccardi,Ankle,7-8 weeks
+R14,15,Greater Western Sydney,Logan Smith,Knee,TBC
+R14,15,Greater Western Sydney,Nathan Wardius,Knee,TBC
+R14,15,Hawthorn,Tom Barrass,Hamstring,Test
+R14,15,Hawthorn,Max Beattie,Ankle,TBC
+R14,15,Hawthorn,James Blanck,Hamstring,Test
+R14,15,Hawthorn,Jack Gunston,Foot,Test
+R14,15,Hawthorn,Conor Nash,Neck,TBC
+R14,15,Hawthorn,Jack Scrimshaw,Knee,TBC
+R14,15,Melbourne,Jed Adams,Knee,4-5 weeks
+R14,15,Melbourne,Jai Culley,Knee,Season
+R14,15,Melbourne,Aidan Johnson,Hip/groin,1 week
+R14,15,Melbourne,Xavier Lindsay,Hip/groin,4-6 weeks
+R14,15,Melbourne,Brody Mihocek,Neck,TBC
+R14,15,Melbourne,Andy Moniz-Wakefield,Knee,Season
+R14,15,Melbourne,Christian Salem,Foot,3-5 weeks
+R14,15,Melbourne,Jack Viney,Achilles,TBC
+R14,15,North Melbourne,Jackson Archer,Knee,Season
+R14,15,North Melbourne,Callum Coleman-Jones,Concussion,Test
+R14,15,North Melbourne,Riley Hardeman,Concussion,1 week
+R14,15,North Melbourne,Finn O'Sullivan,Concussion,1 week
+R14,15,North Melbourne,Tom Powell,Groin,2-3 weeks
+R14,15,North Melbourne,Blake Thredgold,Foot,Season
+R14,15,North Melbourne,Luke Urquhart,Knee,TBC
+R14,15,Port Adelaide,Miles Bergman,Toe,3-5 weeks
+R14,15,Port Adelaide,Kane Farrell,Adductor,Test
+R14,15,Port Adelaide,Josh Lai,Concussion,Protocols
+R14,15,Port Adelaide,Ollie Lord,Knee,Season
+R14,15,Port Adelaide,Jack Lukosius,Shoulder,Test
+R14,15,Port Adelaide,Sam Powell-Pepper,Knee,2-3 weeks
+R14,15,Port Adelaide,Connor Rozee,Hamstring,TBC
+R14,15,Port Adelaide,Josh Sinn,Shoulder,Season
+R14,15,Richmond,Harry Armstrong,Foot,1-4 weeks
+R14,15,Richmond,Judson Clarke,ACL,1-4 weeks
+R14,15,Richmond,Jonty Faull,Back,Season
+R14,15,Richmond,Josh Gibcus,ACL strain,Season
+R14,15,Richmond,Campbell Gray,Hamstring,5-9 weeks
+R14,15,Richmond,Sam Lalor,Achilles,2-4 weeks
+R14,15,Richmond,Tom Lynch,Larynx,TBC
+R14,15,Richmond,Rhyan Mansell,Foot,1-3 weeks
+R14,15,Richmond,Kane McAuliffe,Achilles,1-3 weeks
+R14,15,Richmond,Toby Nankervis,Hamstring,Test
+R14,15,Richmond,Hugo Ralphsmith,Suspension,Round 16
+R14,15,Richmond,Jack Ross,Concussion,TBC
+R14,15,Richmond,Samson Ryan,Concussion,Test
+R14,15,Richmond,Tom Sims,MCL,4-6 weeks
+R14,15,Richmond,Josh Smillie,Quad,TBC
+R14,15,St Kilda,Hunter Clark,Knee,2-3 weeks
+R14,15,St Kilda,Kye Fincher,Foot,1-2 weeks
+R14,15,St Kilda,Sam Flanders,Achilles,Season
+R14,15,St Kilda,Jack Higgins,Knee,1-2 weeks
+R14,15,St Kilda,Dougal Howard,Calf,3-5 weeks
+R14,15,St Kilda,Max King,Hamstring,1-2 weeks
+R14,15,Sydney,Taylor Adams,Hamstring,Test
+R14,15,Sydney,Riak Andrew,Quad,6 weeks
+R14,15,Sydney,Braeden Campbell,Leg,5-6 weeks
+R14,15,Sydney,Noah Chamberlain,Hamstring,TBC
+R14,15,Sydney,Will Green,Foot,2-3 weeks
+R14,15,Sydney,Errol Gulden,Shoulder,2-3 weeks
+R14,15,Sydney,Tom Hanily,Concussion,TBC
+R14,15,Sydney,Liam Hetherton,Back,5 months
+R14,15,Sydney,Max King,Back,7 weeks
+R14,15,Sydney,Tom McCartin,Concussion,TBC
+R14,15,Sydney,Justin McInerney,Hamstring,8-10 weeks
+R14,15,Sydney,Lewis Melican,Hamstring,1-2 weeks
+R14,15,Sydney,Tom Papley,Calf,4 weeks
+R14,15,Sydney,Dane Rampe,Calf,3 weeks
+R14,15,West Coast,Sam Allen,Knee/hamstring,9-10 weeks
+R14,15,West Coast,Jamie Cripps,Knee,TBC
+R14,15,West Coast,Harry Edwards,Concussion,TBC
+R14,15,West Coast,Reuben Ginbey,Quad,TBC
+R14,15,West Coast,Jack Graham,Shoulder,1 week
+R14,15,West Coast,Jack Hutchinson,Hamstring,1 week
+R14,15,West Coast,Noah Long,Knee,Season
+R14,15,West Coast,Jacob Newton,Foot,Season
+R14,15,West Coast,Deven Robertson,Knee,Season
+R14,15,Western Bulldogs,Sam Darcy,Knee,Season
+R14,15,Western Bulldogs,Riley Garcia,Knee,4-6 weeks
+R14,15,Western Bulldogs,Tom Liberatore,Concussion/knee,TBC
+R14,15,Western Bulldogs,Lachie McNeil,Concussion,TBC
+R14,15,Western Bulldogs,Laitham Vandermeer,Hamstring,1-2 weeks
+R14,15,Western Bulldogs,Bailey Williams,Hamstring,4-6 weeks
+R15,16,Adelaide,Callum Ah Chee,Hamstring,2-3 weeks
+R15,16,Adelaide,Jordon Butts,Calf,1-2 weeks
+R15,16,Adelaide,Isaac Cumming,Hamstring,1 week
+R15,16,Adelaide,Mitch Hinge,Ankle,1 week
+R15,16,Adelaide,Luke Pedlar,Hamstring,3-4 weeks
+R15,16,Adelaide,Izak Rankine,Calf,Test
+R15,16,Adelaide,Tyler Welsh,Hamstring,2-3 weeks
+R15,16,Brisbane Lions,Oscar Allen,Foot,4-5 weeks
+R15,16,Brisbane Lions,Dan Annable,Shoulder,1 week
+R15,16,Brisbane Lions,Keidean Coleman,Hamstring,3 weeks
+R15,16,Brisbane Lions,Tom Doedee,Calf,3-4 weeks
+R15,16,Brisbane Lions,Tai Hayes,Shin,2 weeks
+R15,16,Brisbane Lions,Ryan Lester,Calf,1 week
+R15,16,Brisbane Lions,Lincoln McCarthy,Calf,2-3 weeks
+R15,16,Brisbane Lions,Hugh McCluggage,Hamstring,3 weeks
+R15,16,Brisbane Lions,Will McLachlan,Quad,6-8 weeks
+R15,16,Brisbane Lions,Jack Payne,Knee,TBC
+R15,16,Brisbane Lions,Henry Smith,Foot,1 week
+R15,16,Brisbane Lions,Reece Torrent,Ankle,1-2 weeks
+R15,16,Brisbane Lions,Dayne Zorko,Quad,3 weeks
+R15,16,Carlton,Ben Camporeale,Hamstring,2-3 weeks
+R15,16,Carlton,Matt Carroll,Knee,Season
+R15,16,Carlton,Rob Monahan,Shoulder,Season
+R15,16,Carlton,Jesse Motlop,Knee,Season
+R15,16,Carlton,Harry O'Farrell,Knee,TBC
+R15,16,Carlton,Liam Reidy,Ankle,1-2 weeks
+R15,16,Carlton,Jacob Weitering,Calf,1 week
+R15,16,Collingwood,Jamie Elliott,Knee,Season
+R15,16,Collingwood,Will Hayes,Shoulder,1-2 weeks
+R15,16,Collingwood,Noah Howes,Shoulder,2 weeks
+R15,16,Collingwood,Brayden Maynard,Shoulder,TBC
+R15,16,Collingwood,Reef McInnes,Knee,Season
+R15,16,Collingwood,Darcy Moore,Hamstring,TBC
+R15,16,Collingwood,Oscar Steene,Knee,Season
+R15,16,Essendon,Jye Caldwell,Ankle,1 week
+R15,16,Essendon,Angus Clarke,Foot,Test
+R15,16,Essendon,Brayden Fiorini,Back,Season
+R15,16,Essendon,Matt Guelfi,Hamstring,Test
+R15,16,Essendon,Lewis Hayes,Knee,Season
+R15,16,Essendon,Zak Johnson,Foot,4-5 weeks
+R15,16,Essendon,Isaac Kako,Back,Test
+R15,16,Essendon,Kyle Langford,Quad,TBC
+R15,16,Essendon,Nic Martin,Knee,Season
+R15,16,Essendon,Archie May,Shoulder,Season
+R15,16,Essendon,Andrew McGrath,Jaw,Test
+R15,16,Essendon,Liam McMahon,Ankle,2-3 weeks
+R15,16,Essendon,Jayden Nguyen,Suspension,Round 16
+R15,16,Essendon,Darcy Parish,Knee soreness,Test
+R15,16,Essendon,Archie Roberts,Shoulder,TBC
+R15,16,Essendon,Rhys Unwin,Hamstring,Test
+R15,16,Essendon,Vigo Visentini,Hamstring,1 week
+R15,16,Essendon,Peter Wright,Knee,3-4 weeks
+R15,16,Fremantle,Brennan Cox,Knee,Test
+R15,16,Fremantle,Matthew Johnson,Hamstring,Test
+R15,16,Fremantle,Ollie Murphy,Knee,Test
+R15,16,Fremantle,Caleb Serong,Calf,Test
+R15,16,Fremantle,Sam Sturt,Knee/quad,1-2 weeks
+R15,16,Fremantle,Brandon Walker,Concussion,Test
+R15,16,Geelong,Harley Barker,Knee,Indefinite
+R15,16,Geelong,Jack Bowes,Hamstring,Test
+R15,16,Geelong,Brad Close,Ankle,Test
+R15,16,Geelong,Toby Conway,Foot/Knee,TBC
+R15,16,Geelong,Nick Driscoll,Concussion,TBC
+R15,16,Geelong,Keighton Matofai-Forbes,Foot,Test
+R15,16,Geelong,Jacob Molier,Quad,3 weeks
+R15,16,Geelong,Rhys Stanley,Knee,Test
+R15,16,Geelong,Tom Stewart,Concussion,TBC
+R15,16,Gold Coast,Alex Davies,Foot,4-6 weeks
+R15,16,Gold Coast,Jy Farrar,Ankle,4-6 weeks
+R15,16,Gold Coast,Will Graham,Hamstring,4-6 weeks
+R15,16,Gold Coast,Wil Powell,Shoulder,1-3 weeks
+R15,16,Gold Coast,Ethan Read,Knee,Test
+R15,16,Gold Coast,Jake Rogers,Hamstring,4-6 weeks
+R15,16,Gold Coast,Avery Thomas,Knee,4-6 weeks
+R15,16,Gold Coast,Lachie Weller,Hamstring,4-6 weeks
+R15,16,Greater Western Sydney,Jack Buckley,Hamstring,2-3 weeks
+R15,16,Greater Western Sydney,Stephen Coniglio,Hamstring,Test
+R15,16,Greater Western Sydney,Tom Green,Knee,Season
+R15,16,Greater Western Sydney,Max Gruzewski,Hand,2-3 weeks
+R15,16,Greater Western Sydney,Ollie Hannaford,Foot,4-6 weeks
+R15,16,Greater Western Sydney,Darcy Jones,Knee,3-4 weeks
+R15,16,Greater Western Sydney,Josh Kelly,Hip,TBC
+R15,16,Greater Western Sydney,Nick Madden,Knee,3-4 weeks
+R15,16,Greater Western Sydney,Xavier O'Halloran,Ankle,3-4 weeks
+R15,16,Greater Western Sydney,Jake Riccardi,Ankle,6-7 weeks
+R15,16,Greater Western Sydney,Logan Smith,Knee,TBC
+R15,16,Greater Western Sydney,Nathan Wardius,Knee,TBC
+R15,16,Hawthorn,Max Beattie,Ankle,4-6 weeks
+R15,16,Hawthorn,Jack Gunston,Foot,Test
+R15,16,Hawthorn,Matt LeRay,Concussion,1-2 weeks
+R15,16,Hawthorn,Conor Nash,Neck,TBC
+R15,16,Hawthorn,Jack Scrimshaw,Knee,1-2 weeks
+R15,16,Melbourne,Jed Adams,Knee,3-4 weeks
+R15,16,Melbourne,Lukas Cooke,Face,4 weeks
+R15,16,Melbourne,Jai Culley,Knee,Season
+R15,16,Melbourne,Aidan Johnson,Hip/groin,Test
+R15,16,Melbourne,Xavier Lindsay,Hip/groin,4-5 weeks
+R15,16,Melbourne,Brody Mihocek,Neck,Season
+R15,16,Melbourne,Andy Moniz-Wakefield,Knee,Season
+R15,16,Melbourne,Harrison Petty,Hamstring,2-4 weeks
+R15,16,Melbourne,Christian Salem,Foot,2-3 weeks
+R15,16,Melbourne,Jack Viney,Achilles,TBC
+R15,16,Melbourne,Caleb Windsor,Toe,Test
+R15,16,North Melbourne,Jackson Archer,Knee,Season
+R15,16,North Melbourne,Paul Curtis,Suspension,Round 18
+R15,16,North Melbourne,Riley Hardeman,Concussion,Test
+R15,16,North Melbourne,Finn O'Sullivan,Concussion,Test
+R15,16,North Melbourne,Tom Powell,Groin,2 weeks
+R15,16,North Melbourne,Blake Thredgold,Foot,Season
+R15,16,North Melbourne,Luke Urquhart,Knee,TBC
+R15,16,Port Adelaide,Miles Bergman,Toe,3-5 weeks
+R15,16,Port Adelaide,Josh Lai,Concussion,Test
+R15,16,Port Adelaide,Ollie Lord,Knee,Season
+R15,16,Port Adelaide,Sam Powell-Pepper,Knee,2-3 weeks
+R15,16,Port Adelaide,Connor Rozee,Hamstring,Season
+R15,16,Port Adelaide,Josh Sinn,Shoulder,Season
+R15,16,Richmond,Harry Armstrong,Foot,1-3 weeks
+R15,16,Richmond,Judson Clarke,ACL,1-3 weeks
+R15,16,Richmond,Jonty Faull,Back,Season
+R15,16,Richmond,Josh Gibcus,ACL strain,Season
+R15,16,Richmond,Campbell Gray,Hamstring,4-8 weeks
+R15,16,Richmond,Sam Lalor,Achilles,1-5 weeks
+R15,16,Richmond,Tom Lynch,Larynx,2 weeks
+R15,16,Richmond,Hugo Ralphsmith,Suspension,Round 16
+R15,16,Richmond,Jack Ross,Concussion,TBC
+R15,16,Richmond,Tom Sims,MCL,3-5 weeks
+R15,16,Richmond,Josh Smillie,Quad,TBC
+R15,16,Richmond,Luke Trainor,Hip,Test
+R15,16,St Kilda,Hunter Clark,Knee,1-2 weeks
+R15,16,St Kilda,Alex Dodson,Adductor,Test
+R15,16,St Kilda,Kye Fincher,Foot,Test
+R15,16,St Kilda,Sam Flanders,Achilles,Season
+R15,16,St Kilda,Jack Higgins,Knee,Test
+R15,16,St Kilda,Dougal Howard,Calf,2-4 weeks
+R15,16,St Kilda,Max King,Conditioning,TBC
+R15,16,Sydney,Taylor Adams,Hamstring,TBC
+R15,16,Sydney,Riak Andrew,Quad,4-5 weeks
+R15,16,Sydney,Braeden Campbell,Leg,3-4 weeks
+R15,16,Sydney,Noah Chamberlain,Hamstring,TBC
+R15,16,Sydney,Will Green,Foot,Test
+R15,16,Sydney,Errol Gulden,Shoulder,Test
+R15,16,Sydney,Tom Hanily,Concussion,TBC
+R15,16,Sydney,Liam Hetherton,Back,4-5 months
+R15,16,Sydney,Max King,Back,7 weeks
+R15,16,Sydney,Tom McCartin,Concussion,TBC
+R15,16,Sydney,Justin McInerney,Hamstring,7-9 weeks
+R15,16,Sydney,Lewis Melican,Hamstring,Test
+R15,16,Sydney,Tom Papley,Calf,2-3 weeks
+R15,16,Sydney,Dane Rampe,Calf,Test
+R15,16,West Coast,Sam Allen,Knee/hamstring,8-9 weeks
+R15,16,West Coast,Jamie Cripps,Knee,TBC
+R15,16,West Coast,Hamish Davis,Concussion,TBC
+R15,16,West Coast,Willem Duursma,Calf,Test
+R15,16,West Coast,Harry Edwards,Concussion,TBC
+R15,16,West Coast,Reuben Ginbey,Quad,TBC
+R15,16,West Coast,Jack Graham,Shoulder,Test
+R15,16,West Coast,Jack Hutchinson,Hamstring,Test
+R15,16,West Coast,Noah Long,Knee,Season
+R15,16,West Coast,Tom McCarthy,Hamstring,Test
+R15,16,West Coast,Jacob Newton,Foot,Season
+R15,16,West Coast,Deven Robertson,Knee,Season
+R15,16,Western Bulldogs,Sam Darcy,Knee,Season
+R15,16,Western Bulldogs,Riley Garcia,Knee,3-5 weeks
+R15,16,Western Bulldogs,Tom Liberatore,Concussion/knee,Test
+R15,16,Western Bulldogs,Lachie McNeil,Concussion,TBC
+R15,16,Western Bulldogs,Laitham Vandermeer,Hamstring,Test
+R15,16,Western Bulldogs,Bailey Williams,Hamstring,3-5 weeks
+R16,17,Adelaide,Callum Ah Chee,Hamstring,1-2 weeks
+R16,17,Adelaide,Jordon Butts,Calf,Test
+R16,17,Adelaide,Isaac Cumming,Hamstring,Test
+R16,17,Adelaide,Mitch Hinge,Ankle,Test
+R16,17,Adelaide,Luke Pedlar,Hamstring,2-3 weeks
+R16,17,Adelaide,Tyler Welsh,Hamstring,Test
+R16,17,Brisbane Lions,Oscar Allen,Foot,3-5 weeks
+R16,17,Brisbane Lions,Dan Annable,Shoulder,1 week
+R16,17,Brisbane Lions,Keidean Coleman,Hamstring,1 week
+R16,17,Brisbane Lions,Tom Doedee,Calf,1-2 weeks
+R16,17,Brisbane Lions,Tai Hayes,Shin,1 week
+R16,17,Brisbane Lions,Ryan Lester,Calf,Test
+R16,17,Brisbane Lions,Lincoln McCarthy,Calf,3-4 weeks
+R16,17,Brisbane Lions,Hugh McCluggage,Hamstring,2 weeks
+R16,17,Brisbane Lions,Will McLachlan,Quad,2-3 weeks
+R16,17,Brisbane Lions,Jack Payne,Knee,TBC
+R16,17,Brisbane Lions,Henry Smith,Foot,Test
+R16,17,Brisbane Lions,Reece Torrent,Ankle,Test
+R16,17,Brisbane Lions,Dayne Zorko,Quad,2 weeks
+R16,17,Carlton,Jordan Boyd,Shoulder,Test
+R16,17,Carlton,Ben Camporeale,Hamstring,1-2 weeks
+R16,17,Carlton,Matt Carroll,Knee,Season
+R16,17,Carlton,Rob Monahan,Shoulder,Season
+R16,17,Carlton,Jesse Motlop,Knee,Season
+R16,17,Carlton,Harry O'Farrell,Knee,TBC
+R16,17,Carlton,Liam Reidy,Ankle,1 week
+R16,17,Carlton,Jacob Weitering,Calf,Test
+R16,17,Collingwood,Jamie Elliott,Knee,Season
+R16,17,Collingwood,Will Hayes,Shoulder,1-2 weeks
+R16,17,Collingwood,Noah Howes,Shoulder,1-2 weeks
+R16,17,Collingwood,Brayden Maynard,Shoulder,1-2 weeks
+R16,17,Collingwood,Reef McInnes,Knee,Season
+R16,17,Collingwood,Darcy Moore,Hamstring,TBC
+R16,17,Collingwood,Oscar Steene,Knee,Season
+R16,17,Essendon,Brayden Fiorini,Back,Season
+R16,17,Essendon,Lewis Hayes,Knee,Season
+R16,17,Essendon,Zak Johnson,Foot,2 weeks
+R16,17,Essendon,Isaac Kako,Back,Test
+R16,17,Essendon,Kyle Langford,Quad,3 weeks
+R16,17,Essendon,Nic Martin,Knee,Season
+R16,17,Essendon,Archie May,Shoulder,Season
+R16,17,Essendon,Liam McMahon,Ankle,2 weeks
+R16,17,Essendon,Darcy Parish,Knee soreness,Test
+R16,17,Essendon,Archie Roberts,Shoulder,TBC
+R16,17,Essendon,Rhys Unwin,Hamstring,2 weeks
+R16,17,Essendon,Peter Wright,Knee,2 weeks
+R16,17,Fremantle,Sam Sturt,Knee/quad,Test
+R16,17,Geelong,Harley Barker,Knee,Indefinite
+R16,17,Geelong,Toby Conway,Foot/Knee,TBC
+R16,17,Geelong,Jacob Molier,Quad,1 week
+R16,17,Geelong,Tom Stewart,Concussion,TBC
+R16,17,Gold Coast,Sam Clohesy,Suspension,Round 18
+R16,17,Gold Coast,Koby Coulson,Quad,Test
+R16,17,Gold Coast,Alex Davies,Foot,4-6 weeks
+R16,17,Gold Coast,Jy Farrar,Ankle,4-6 weeks
+R16,17,Gold Coast,Will Graham,Hamstring,1-3 weeks
+R16,17,Gold Coast,Lachie Gulbin,Hand,4-6 weeks
+R16,17,Gold Coast,Wil Powell,Shoulder,Test
+R16,17,Gold Coast,Daniel Rioli,Jaw,4-6 weeks
+R16,17,Gold Coast,Jake Rogers,Hamstring,4-6 weeks
+R16,17,Gold Coast,Avery Thomas,Knee,1-3 weeks
+R16,17,Gold Coast,Lachie Weller,Hamstring,1-3 weeks
+R16,17,Greater Western Sydney,Jack Buckley,Hamstring,1-2 weeks
+R16,17,Greater Western Sydney,Tom Green,Knee,Season
+R16,17,Greater Western Sydney,Max Gruzewski,Hand,Test
+R16,17,Greater Western Sydney,Ollie Hannaford,Foot,4-5 weeks
+R16,17,Greater Western Sydney,Jesse Hogan,Finger,TBC
+R16,17,Greater Western Sydney,Darcy Jones,Knee,3-4 weeks
+R16,17,Greater Western Sydney,Josh Kelly,Hip,TBC
+R16,17,Greater Western Sydney,Jayden Laverde,Hamstring,3-4 weeks
+R16,17,Greater Western Sydney,Nick Madden,Knee,3 weeks
+R16,17,Greater Western Sydney,Toby McMullin,Hamstring,2-3 weeks
+R16,17,Greater Western Sydney,Xavier O'Halloran,Ankle,3 weeks
+R16,17,Greater Western Sydney,Jake Riccardi,Ankle,6 weeks
+R16,17,Greater Western Sydney,Logan Smith,Knee,Test
+R16,17,Greater Western Sydney,Nathan Wardius,Knee,Season
+R16,17,Hawthorn,Max Beattie,Ankle,3-5 weeks
+R16,17,Hawthorn,James Blanck,Hamstring,TBC
+R16,17,Hawthorn,Jack Gunston,Foot,1 week
+R16,17,Hawthorn,Jarman Impey,Hamstring,2-3 weeks
+R16,17,Hawthorn,Matt LeRay,Concussion,1 week
+R16,17,Hawthorn,Conor Nash,Neck,TBC
+R16,17,Hawthorn,Jack Scrimshaw,Knee,1 week
+R16,17,Hawthorn,Josh Weddle,Suspension,Round 19
+R16,17,Melbourne,Jed Adams,Knee,2-3 weeks
+R16,17,Melbourne,Lukas Cooke,Face,3 weeks
+R16,17,Melbourne,Jai Culley,Knee,Season
+R16,17,Melbourne,Xavier Lindsay,Hip/groin,4-5 weeks
+R16,17,Melbourne,Brody Mihocek,Neck,Season
+R16,17,Melbourne,Andy Moniz-Wakefield,Knee,Season
+R16,17,Melbourne,Harrison Petty,Hamstring,2-3 weeks
+R16,17,Melbourne,Christian Salem,Foot,2-3 weeks
+R16,17,Melbourne,Jack Viney,Achilles,TBC
+R16,17,North Melbourne,Jackson Archer,Knee,Season
+R16,17,North Melbourne,Paul Curtis,Suspension,Round 18
+R16,17,North Melbourne,Toby Pink,Shoulder,Season
+R16,17,North Melbourne,Tom Powell,Groin,Test
+R16,17,North Melbourne,Blake Thredgold,Foot,Season
+R16,17,North Melbourne,Luke Urquhart,Knee,3 weeks
+R16,17,North Melbourne,Tristan Xerri,Jaw,1-2 weeks
+R16,17,Port Adelaide,Miles Bergman,Toe,1-2 weeks
+R16,17,Port Adelaide,Kane Farrell,Groin,3-4 weeks
+R16,17,Port Adelaide,Ollie Lord,Knee,Season
+R16,17,Port Adelaide,Jack Lukosius,Knee,Test
+R16,17,Port Adelaide,Ewan Mackinlay,Knee,Season
+R16,17,Port Adelaide,Esava Ratugolea,Knee,Season
+R16,17,Port Adelaide,Connor Rozee,Hamstring,Season
+R16,17,Port Adelaide,Josh Sinn,Shoulder,Season
+R16,17,Richmond,Harry Armstrong,Foot,1-2 weeks
+R16,17,Richmond,Judson Clarke,ACL,1-2 weeks
+R16,17,Richmond,Jonty Faull,Back,Season
+R16,17,Richmond,Josh Gibcus,ACL strain,Season
+R16,17,Richmond,Campbell Gray,Hamstring,3-7 weeks
+R16,17,Richmond,Jacob Hopper,Ankle,TBC
+R16,17,Richmond,Sam Lalor,Achilles,1-4 weeks
+R16,17,Richmond,Tom Lynch,Larynx,1 week
+R16,17,Richmond,Jack Ross,Concussion,Test
+R16,17,Richmond,Tom Sims,MCL,2-4 weeks
+R16,17,Richmond,Josh Smillie,Quad,TBC
+R16,17,Richmond,Luke Trainor,Hip,Test
+R16,17,St Kilda,James Barrat,Foot,TBC
+R16,17,St Kilda,Hunter Clark,Knee,1 week
+R16,17,St Kilda,Tom De Koning,Ribs/lung,TBC
+R16,17,St Kilda,Alex Dodson,Adductor,1 week
+R16,17,St Kilda,Sam Flanders,Achilles,Season
+R16,17,St Kilda,Dougal Howard,Calf,1-2 weeks
+R16,17,St Kilda,Max King,Hamstring,TBC
+R16,17,St Kilda,Jack Sinclair,Calf,TBC
+R16,17,St Kilda,Alix Tauru,Suspension,Round 21
+R16,17,Sydney,Riak Andrew,Quad,2-3 weeks
+R16,17,Sydney,Braeden Campbell,Shin,2-3 weeks
+R16,17,Sydney,Noah Chamberlain,Hamstring,8-10 weeks
+R16,17,Sydney,Will Green,Foot,Test
+R16,17,Sydney,Errol Gulden,Shoulder,Test
+R16,17,Sydney,Tom Hanily,Concussion,Test
+R16,17,Sydney,Liam Hetherton,Back,Season
+R16,17,Sydney,Max King,Back,Season
+R16,17,Sydney,Tom McCartin,Concussion,Test
+R16,17,Sydney,Justin McInerney,Hamstring,6-8 weeks
+R16,17,Sydney,Lewis Melican,Hamstring,Test
+R16,17,Sydney,Tom Papley,Calf,1-2 weeks
+R16,17,Sydney,Dane Rampe,Calf,Test
+R16,17,West Coast,Sam Allen,Knee/hamstring,8 weeks
+R16,17,West Coast,Jamie Cripps,Knee,TBC
+R16,17,West Coast,Hamish Davis,Concussion,Test
+R16,17,West Coast,Willem Duursma,Calf,Test
+R16,17,West Coast,Harry Edwards,Concussion,TBC
+R16,17,West Coast,Reuben Ginbey,Quad,8 weeks
+R16,17,West Coast,Jack Graham,Shoulder,Test
+R16,17,West Coast,Jack Hutchinson,Hamstring,Test
+R16,17,West Coast,Noah Long,Knee,Season
+R16,17,West Coast,Tom McCarthy,Hamstring,Test
+R16,17,West Coast,Jacob Newton,Foot,Season
+R16,17,West Coast,Matt Owies,Concussion,Test
+R16,17,West Coast,Archer Reid,Knee,TBC
+R16,17,West Coast,Deven Robertson,Knee,Season
+R16,17,Western Bulldogs,Sam Darcy,Knee,Season
+R16,17,Western Bulldogs,Riley Garcia,Knee,3-5 weeks
+R16,17,Western Bulldogs,Bailey Williams,Hamstring,3-5 weeks
+R17,18,Adelaide,Callum Ah Chee,Hamstring,1 week
+R17,18,Adelaide,Mitch Hinge,Ankle,TBC
+R17,18,Adelaide,Luke Pedlar,Hamstring,1-2 weeks
+R17,18,Adelaide,Wayne Milera,Hamstring,1 week
+R17,18,Brisbane Lions,Oscar Allen,Foot,2-3 weeks
+R17,18,Brisbane Lions,Tom Doedee,Calf,1 week
+R17,18,Brisbane Lions,Lincoln McCarthy,Calf,2-3 weeks
+R17,18,Brisbane Lions,Hugh McCluggage,Hamstring,1 week
+R17,18,Brisbane Lions,Will McLachlan,Quad,1 week
+R17,18,Brisbane Lions,Jack Payne,Knee,TBC
+R17,18,Brisbane Lions,Dayne Zorko,Quad,1 week
+R17,18,Carlton,Ben Camporeale,Hamstring,Test
+R17,18,Carlton,Matt Carroll,Knee,Season
+R17,18,Carlton,Rob Monahan,Shoulder,Season
+R17,18,Carlton,Jesse Motlop,Knee,Season
+R17,18,Carlton,Harry O'Farrell,Knee,TBC
+R17,18,Carlton,Liam Reidy,Ankle,1-2 weeks
+R17,18,Carlton,Jacob Weitering,Calf,TBC
+R17,18,Collingwood,Jamie Elliott,Knee,Season
+R17,18,Collingwood,Will Hayes,Shoulder,Test
+R17,18,Collingwood,Noah Howes,Shoulder,Test
+R17,18,Collingwood,Brayden Maynard,Shoulder,Test
+R17,18,Collingwood,Reef McInnes,Knee,Season
+R17,18,Collingwood,Darcy Moore,Hamstring,TBC
+R17,18,Collingwood,Isaac Quaynor,Ankle,Test
+R17,18,Collingwood,Oscar Steene,Knee,Season
+R17,18,Essendon,Jaxon Artemis,Hamstring,Test
+R17,18,Essendon,Tom Edwards,Hamstring,3-4 weeks
+R17,18,Essendon,Brayden Fiorini,Back,Season
+R17,18,Essendon,Kayle Gerreyn,Knee,1 week
+R17,18,Essendon,Lewis Hayes,Knee,Season
+R17,18,Essendon,Zak Johnson,Foot,1 week
+R17,18,Essendon,Kyle Langford,Quad,2 weeks
+R17,18,Essendon,Nic Martin,Knee,Season
+R17,18,Essendon,Archie May,Shoulder,Season
+R17,18,Essendon,Liam McMahon,Ankle,Test
+R17,18,Essendon,Archie Roberts,Shoulder,1 week
+R17,18,Essendon,Rhys Unwin,Hamstring,2 weeks
+R17,18,Essendon,Peter Wright,Knee,Test
+R17,18,Fremantle,Tobyn Murray,Calf,Test
+R17,18,Fremantle,Sam Sturt,Knee/quad,TBA
+R17,18,Fremantle,Adam Sweid,Knee,Test
+R17,18,Geelong,Harley Barker,Knee,Indefinite
+R17,18,Geelong,Toby Conway,Foot/Knee,TBC
+R17,18,Geelong,Jacob Molier,Quad,Test
+R17,18,Geelong,Tom Stewart,Concussion,TBC
+R17,18,Gold Coast,Sam Clohesy,Suspension,Round 18
+R17,18,Gold Coast,Koby Coulson,Quad,Test
+R17,18,Gold Coast,Alex Davies,Foot,1-3 weeks
+R17,18,Gold Coast,Jy Farrar,Ankle,1-3 weeks
+R17,18,Gold Coast,Will Graham,Hamstring,1-3 weeks
+R17,18,Gold Coast,Lachie Gulbin,Hand,1-3 weeks
+R17,18,Gold Coast,Daniel Rioli,Jaw,4-6 weeks
+R17,18,Gold Coast,Jake Rogers,Hamstring,1-3 weeks
+R17,18,Gold Coast,Avery Thomas,Knee,Test
+R17,18,Gold Coast,Lachie Weller,Hamstring,1-3 weeks
+R17,18,Greater Western Sydney,Jack Buckley,Hamstring,Test
+R17,18,Greater Western Sydney,Brent Daniels,Calf,TBC
+R17,18,Greater Western Sydney,Finn Davis,Quad,2-3 weeks
+R17,18,Greater Western Sydney,Tom Green,Knee,Season
+R17,18,Greater Western Sydney,Max Gruzewski,Knee,4 weeks
+R17,18,Greater Western Sydney,Ollie Hannaford,Foot,4 weeks
+R17,18,Greater Western Sydney,Jesse Hogan,Finger,TBC
+R17,18,Greater Western Sydney,Darcy Jones,Knee,3-4 weeks
+R17,18,Greater Western Sydney,Josh Kelly,Hip,TBC
+R17,18,Greater Western Sydney,Jayden Laverde,Hamstring,1-2 weeks
+R17,18,Greater Western Sydney,Nick Madden,Knee,Test
+R17,18,Greater Western Sydney,Toby McMullin,Hamstring,Test
+R17,18,Greater Western Sydney,Xavier O'Halloran,Ankle,2-3 weeks
+R17,18,Greater Western Sydney,Jake Riccardi,Ankle,5-6 weeks
+R17,18,Greater Western Sydney,Nathan Wardius,Knee,Season
+R17,18,Hawthorn,Max Beattie,Ankle,1-2 weeks
+R17,18,Hawthorn,James Blanck,Hamstring,1-2 weeks
+R17,18,Hawthorn,Jack Gunston,Foot,Test
+R17,18,Hawthorn,Jarman Impey,Hamstring,1-2 weeks
+R17,18,Hawthorn,Matt LeRay,Concussion,Test
+R17,18,Hawthorn,Finn Maginness,Back,Test
+R17,18,Hawthorn,Conor Nash,Neck,TBC
+R17,18,Hawthorn,Jack Scrimshaw,Knee,TBC
+R17,18,Hawthorn,Nick Watson,Hamstring,1 week
+R17,18,Hawthorn,Josh Weddle,Suspension,Round 19
+R17,18,Melbourne,Jed Adams,Knee,1-2 weeks
+R17,18,Melbourne,Lukas Cooke,Face,1 week
+R17,18,Melbourne,Jai Culley,Knee,Season
+R17,18,Melbourne,Max Heath,Shoulder,Test
+R17,18,Melbourne,Xavier Lindsay,Hip/groin,3-4 weeks
+R17,18,Melbourne,Brody Mihocek,Neck,Season
+R17,18,Melbourne,Andy Moniz-Wakefield,Knee,Season
+R17,18,Melbourne,Harrison Petty,Hamstring,Test
+R17,18,Melbourne,Christian Salem,Foot,1-2 weeks
+R17,18,Melbourne,Jack Viney,Achilles,TBC
+R17,18,North Melbourne,Jackson Archer,Knee,Season
+R17,18,North Melbourne,Paul Curtis,Suspension,Round 18
+R17,18,North Melbourne,Toby Pink,Shoulder,Season
+R17,18,North Melbourne,Blake Thredgold,Foot,Season
+R17,18,North Melbourne,Luke Urquhart,Knee,1 week
+R17,18,Port Adelaide,Miles Bergman,Toe,Test
+R17,18,Port Adelaide,Kane Farrell,Groin,2-3 weeks
+R17,18,Port Adelaide,Mani Liddy,Hip,Season
+R17,18,Port Adelaide,Ollie Lord,Knee,Season
+R17,18,Port Adelaide,Ewan Mackinlay,Knee,Season
+R17,18,Port Adelaide,Esava Ratugolea,Knee,Season
+R17,18,Port Adelaide,Connor Rozee,Hamstring,Season
+R17,18,Port Adelaide,Josh Sinn,Shoulder,Season
+R17,18,Richmond,Harry Armstrong,Foot,Test
+R17,18,Richmond,Jonty Faull,Back,Season
+R17,18,Richmond,Josh Gibcus,ACL strain,Season
+R17,18,Richmond,Campbell Gray,Hamstring,2-6 weeks
+R17,18,Richmond,Jacob Hopper,Ankle,TBC
+R17,18,Richmond,Sam Lalor,Achilles,1-3 weeks
+R17,18,Richmond,Tom Lynch,Larynx,Test
+R17,18,Richmond,Dion Prestia,Managed,1 week
+R17,18,Richmond,Tom Sims,MCL,1-3 weeks
+R17,18,Richmond,Josh Smillie,Quad,3-5 weeks
+R17,18,St Kilda,James Barrat,Foot,TBC
+R17,18,St Kilda,Hunter Clark,Knee,Test
+R17,18,St Kilda,Tom De Koning,Ribs/lung,TBC
+R17,18,St Kilda,Alex Dodson,Adductor,Test
+R17,18,St Kilda,Sam Flanders,Achilles,Season
+R17,18,St Kilda,Dougal Howard,Calf,Test
+R17,18,St Kilda,Max King,Hamstring,TBC
+R17,18,St Kilda,Jack Sinclair,Calf,TBC
+R17,18,St Kilda,Alix Tauru,Suspension,Round 21
+R17,18,Sydney,Joel Amartey,Achilles,10 weeks
+R17,18,Sydney,Riak Andrew,Quad,2 weeks
+R17,18,Sydney,Braeden Campbell,Shin,1 week
+R17,18,Sydney,Noah Chamberlain,Hamstring,8-10 weeks
+R17,18,Sydney,Liam Hetherton,Back,Season
+R17,18,Sydney,Max King,Back,Season
+R17,18,Sydney,Justin McInerney,Hamstring,6-7 weeks
+R17,18,Sydney,Tom Papley,Calf,1 week
+R17,18,Sydney,Sam Wicks,Hamstring,4-6 weeks
+R17,18,West Coast,Sam Allen,Knee/hamstring,7 weeks
+R17,18,West Coast,Tyler Brockman,Hamstring,Test
+R17,18,West Coast,Cooper Duff-Tytler,Calf,TBC
+R17,18,West Coast,Harry Edwards,Concussion,Season
+R17,18,West Coast,Reuben Ginbey,Quad,7 weeks
+R17,18,West Coast,Tim Kelly,Hamstring,Test
+R17,18,West Coast,Noah Long,Knee,Season
+R17,18,West Coast,Jacob Newton,Foot,Season
+R17,18,West Coast,Archer Reid,Knee,TBC
+R17,18,West Coast,Deven Robertson,Knee,Season
+R17,18,Western Bulldogs,Sam Darcy,Knee,Season
+R17,18,Western Bulldogs,Riley Garcia,Knee,1-3 weeks
+R17,18,Western Bulldogs,Bailey Williams,Hamstring,1-3 weeks
+R18,19,Adelaide,Callum Ah Chee,Hamstring,Test
+R18,19,Adelaide,Mitch Hinge,Ankle,3-4 weeks
+R18,19,Adelaide,Luke Pedlar,Hamstring,Test
+R18,19,Adelaide,Wayne Milera,Hamstring,Test
+R18,19,Brisbane Lions,Oscar Allen,Foot,1-2 weeks
+R18,19,Brisbane Lions,Darcy Gardiner,Hamstring,4-6 weeks
+R18,19,Brisbane Lions,Lincoln McCarthy,Calf,1-2 weeks
+R18,19,Brisbane Lions,Jack Payne,Knee,Season
+R18,19,Carlton,Matt Carroll,Knee,Season
+R18,19,Carlton,Harry Dean,Hand,Test
+R18,19,Carlton,Rob Monahan,Shoulder,Season
+R18,19,Carlton,Jesse Motlop,Knee,Season
+R18,19,Carlton,Harry O'Farrell,Knee,TBC
+R18,19,Carlton,Liam Reidy,Ankle,Test
+R18,19,Carlton,Jacob Weitering,Calf,TBC
+R18,19,Carlton,Lewis Young,Concussion,1-2 weeks
+R18,19,Collingwood,Jamie Elliott,Knee,Season
+R18,19,Collingwood,Tew Jiath,Hamstring,1 week
+R18,19,Collingwood,Reef McInnes,Knee,Season
+R18,19,Collingwood,Darcy Moore,Hamstring,Season
+R18,19,Collingwood,Isaac Quaynor,Ankle,1 week
+R18,19,Collingwood,Iliro Smit,Concussion,Concussion protocols
+R18,19,Collingwood,Oscar Steene,Knee,Season
+R18,19,Essendon,Tom Edwards,Hamstring,3 weeks
+R18,19,Essendon,Brayden Fiorini,Back,Season
+R18,19,Essendon,Kayle Gerreyn,Knee,1 week
+R18,19,Essendon,Lewis Hayes,Knee,Season
+R18,19,Essendon,Zak Johnson,Foot,Test
+R18,19,Essendon,Kyle Langford,Quad,1 week
+R18,19,Essendon,Nic Martin,Knee,Season
+R18,19,Essendon,Archie May,Shoulder,Season
+R18,19,Essendon,Archie Roberts,Shoulder,Test
+R18,19,Essendon,Rhys Unwin,Hamstring,1 week
+R18,19,Fremantle,Tobyn Murray,Calf,Test
+R18,19,Fremantle,Charlie Nicholls,Finger,TBA
+R18,19,Fremantle,Sam Sturt,Quad,TBA
+R18,19,Fremantle,Hayden Young,Groin,Test
+R18,19,Geelong,Harley Barker,Knee,Indefinite
+R18,19,Geelong,Toby Conway,Foot/Knee,TBC
+R18,19,Geelong,Jacob Molier,Quad,Test
+R18,19,Gold Coast,Alex Davies,Foot,1-3 weeks
+R18,19,Gold Coast,Jy Farrar,Ankle,1-3 weeks
+R18,19,Gold Coast,Will Graham,Hamstring,Test
+R18,19,Gold Coast,Lachie Gulbin,Hand,1-3 weeks
+R18,19,Gold Coast,Elliott Himmelberg,Knee,Season
+R18,19,Gold Coast,Ben Long,Suspension,Round 19
+R18,19,Gold Coast,Daniel Rioli,Jaw,1-3 weeks
+R18,19,Gold Coast,Jake Rogers,Hamstring,Test
+R18,19,Gold Coast,Lachie Weller,Hamstring,1-3 weeks
+R18,19,Greater Western Sydney,Leek Aleer,Groin,1 week
+R18,19,Greater Western Sydney,Jack Buckley,Calf,TBC
+R18,19,Greater Western Sydney,Brent Daniels,Calf,TBC
+R18,19,Greater Western Sydney,Finn Davis,Quad,1 week
+R18,19,Greater Western Sydney,Tom Green,Knee,Season
+R18,19,Greater Western Sydney,Max Gruzewski,Knee,3-4 weeks
+R18,19,Greater Western Sydney,Ollie Hannaford,Foot,3-4 weeks
+R18,19,Greater Western Sydney,Jesse Hogan,Finger,TBC
+R18,19,Greater Western Sydney,Darcy Jones,Knee,3-4 weeks
+R18,19,Greater Western Sydney,Josh Kelly,Hip,TBC
+R18,19,Greater Western Sydney,Jayden Laverde,Hamstring,Test
+R18,19,Greater Western Sydney,Xavier O'Halloran,Ankle,Test
+R18,19,Greater Western Sydney,Jake Riccardi,Ankle,4-5 weeks
+R18,19,Greater Western Sydney,Nathan Wardius,Knee,Season
+R18,19,Greater Western Sydney,Lachie Whitfield,Concussion,TBC
+R18,19,Hawthorn,Karl Amon,Knee,Test
+R18,19,Hawthorn,Josh Battle,Appendix,1-2 weeks
+R18,19,Hawthorn,Max Beattie,Ankle,Test
+R18,19,Hawthorn,James Blanck,Hamstring,Test
+R18,19,Hawthorn,Sam Butler,Leg,1-2 weeks
+R18,19,Hawthorn,Henry Hustwaite,Face,4 weeks
+R18,19,Hawthorn,Jarman Impey,Hamstring,Test
+R18,19,Hawthorn,Conor Nash,Neck,TBC
+R18,19,Hawthorn,Ned Reeves,Knee,1-3 weeks
+R18,19,Hawthorn,Jack Scrimshaw,Knee,4-6 weeks
+R18,19,Hawthorn,Nick Watson,Hamstring,Test
+R18,19,Hawthorn,Josh Weddle,Suspension,Round 19
+R18,19,Melbourne,Jed Adams,Knee,Test
+R18,19,Melbourne,Jai Culley,Knee,Season
+R18,19,Melbourne,Bayley Fritsch,Finger,Test
+R18,19,Melbourne,Max Heath,Shoulder,Test
+R18,19,Melbourne,Xavier Lindsay,Hip/groin,3-4 weeks
+R18,19,Melbourne,Brody Mihocek,Neck,Season
+R18,19,Melbourne,Andy Moniz-Wakefield,Knee,Season
+R18,19,Melbourne,Christian Salem,Foot,Test
+R18,19,Melbourne,Jack Viney,Achilles,TBC
+R18,19,North Melbourne,Jackson Archer,Knee,Season
+R18,19,North Melbourne,Toby Pink,Shoulder,Season
+R18,19,North Melbourne,Blake Thredgold,Foot,Season
+R18,19,North Melbourne,George Wardlaw,Hamstring,3-4 weeks
+R18,19,Port Adelaide,Kane Farrell,Groin,Test
+R18,19,Port Adelaide,Mani Liddy,Hip,Season
+R18,19,Port Adelaide,Ollie Lord,Knee,Season
+R18,19,Port Adelaide,Ewan Mackinlay,Knee,Season
+R18,19,Port Adelaide,Sam Powell-Pepper,Training block,TBC
+R18,19,Port Adelaide,Esava Ratugolea,Knee,Season
+R18,19,Port Adelaide,Connor Rozee,Hamstring,Season
+R18,19,Port Adelaide,Josh Sinn,Shoulder,Season
+R18,19,Richmond,Jonty Faull,Back,Season
+R18,19,Richmond,Josh Gibcus,ACL strain,Season
+R18,19,Richmond,Campbell Gray,Hamstring,2-6 weeks
+R18,19,Richmond,Ollie Hayes-Brown,Knee,Test
+R18,19,Richmond,Jacob Hopper,Ankle,TBC
+R18,19,Richmond,Sam Lalor,Achilles,2 weeks
+R18,19,Richmond,Dion Prestia,Hamstring,Test
+R18,19,Richmond,Tom Sims,MCL,Test
+R18,19,Richmond,Josh Smillie,Quad,2-4 weeks
+R18,19,Richmond,Kaleb Smith,Concussion,TBC
+R18,19,Richmond,Luke Trainor,Concussion,TBC
+R18,19,St Kilda,James Barrat,Foot,TBC
+R18,19,St Kilda,Tom De Koning,Ribs,TBC
+R18,19,St Kilda,Sam Flanders,Achilles,Season
+R18,19,St Kilda,Max King,Conditioning,TBC
+R18,19,St Kilda,Jack Sinclair,Calf,Season
+R18,19,St Kilda,Alix Tauru,Suspension,Round 21
+R18,19,Sydney,Joel Amartey,Achilles,9 weeks
+R18,19,Sydney,Riak Andrew,Quad,Test
+R18,19,Sydney,Braeden Campbell,Shin,Test
+R18,19,Sydney,Noah Chamberlain,Hamstring,7-9 weeks
+R18,19,Sydney,Liam Hetherton,Back,Season
+R18,19,Sydney,Max King,Back,Season
+R18,19,Sydney,Peter Ladhams,Groin,2-3 weeks
+R18,19,Sydney,Justin McInerney,Hamstring,5-6 weeks
+R18,19,Sydney,Logan McDonald,Quad,1 week
+R18,19,Sydney,Tom Papley,Calf,Test
+R18,19,Sydney,Sam Wicks,Hamstring,3-5 weeks
+R18,19,West Coast,Sam Allen,Knee/hamstring,6 weeks
+R18,19,West Coast,Tyler Brockman,Hamstring,TBC
+R18,19,West Coast,Malakai Champion,Hand,TBC
+R18,19,West Coast,Cooper Duff-Tytler,Calf,2-4 weeks
+R18,19,West Coast,Harry Edwards,Concussion,Season
+R18,19,West Coast,Reuben Ginbey,Quad,6 weeks
+R18,19,West Coast,Noah Long,Knee,Season
+R18,19,West Coast,Jacob Newton,Foot,Season
+R18,19,West Coast,Archer Reid,Knee,TBC
+R18,19,West Coast,Deven Robertson,Knee,Season
+R18,19,Western Bulldogs,Connor Budarick,Ankle,TBC
+R18,19,Western Bulldogs,Nick Coffield,Concussion,Concussion protocols
+R18,19,Western Bulldogs,Sam Darcy,Knee,Season
+R18,19,Western Bulldogs,Riley Garcia,Knee,Test
+R18,19,Western Bulldogs,Bailey Williams,Hamstring,Test
+R19,20,Adelaide,Mitch Hinge,Ankle,2-3 weeks
+R19,20,Adelaide,Rory Laird,Ankle,TBC
+R19,20,Brisbane Lions,Darcy Gardiner,Hamstring,3-5 weeks
+R19,20,Brisbane Lions,Jack Payne,Knee,Season
+R19,20,Carlton,Matt Carroll,Knee,Season
+R19,20,Carlton,George Hewett,Back,Test
+R19,20,Carlton,Rob Monahan,Shoulder,Season
+R19,20,Carlton,Jesse Motlop,Knee,Season
+R19,20,Carlton,Harry O'Farrell,Knee,Season
+R19,20,Carlton,Marc Pittonet,Hamstring,1 week
+R19,20,Carlton,Jacob Weitering,Calf,4-5 weeks
+R19,20,Carlton,Lewis Young,Concussion,Test
+R19,20,Collingwood,Jamie Elliott,Knee,Season
+R19,20,Collingwood,Jeremy Howe,Calf,Test
+R19,20,Collingwood,Tew Jiath,Hamstring,Test
+R19,20,Collingwood,Reef McInnes,Knee,Season
+R19,20,Collingwood,Darcy Moore,Hamstring,Season
+R19,20,Collingwood,Isaac Quaynor,Ankle,Test
+R19,20,Collingwood,Lachie Schultz,Ankle,2-4 weeks
+R19,20,Collingwood,Iliro Smit,Concussion,Concussion protocols
+R19,20,Collingwood,Oscar Steene,Knee,Season
+R19,20,Essendon,Tom Edwards,Hamstring,2 weeks
+R19,20,Essendon,Brayden Fiorini,Back,Season
+R19,20,Essendon,Kayle Gerreyn,Knee,2 weeks
+R19,20,Essendon,Lewis Hayes,Knee,Season
+R19,20,Essendon,Nic Martin,Knee,Season
+R19,20,Essendon,Archie May,Shoulder,Season
+R19,20,Fremantle,Charlie Nicholls,Finger,3 weeks
+R19,20,Fremantle,Sam Sturt,Quad,3 weeks
+R19,20,Fremantle,Corey Wagner,Calf,Test
+R19,20,Fremantle,Hayden Young,Groin,Test
+R19,20,Geelong,Harley Barker,Knee,TBC
+R19,20,Geelong,Tanner Bruhn,Neck,Test
+R19,20,Geelong,Jeremy Cameron,Shoulder,4-6 weeks
+R19,20,Geelong,Toby Conway,Foot/Knee,TBC
+R19,20,Geelong,Jack Henry,Throat,Test
+R19,20,Geelong,Mark O’Connor,Quad,Test
+R19,20,Geelong,Rhys Stanley,Hamstring,Test
+R19,20,Gold Coast,Alex Davies,Foot,Test
+R19,20,Gold Coast,Jy Farrar,Ankle,Test
+R19,20,Gold Coast,Will Graham,Shoulder,TBC
+R19,20,Gold Coast,Lachie Gulbin,Hand,1-3 weeks
+R19,20,Gold Coast,Elliott Himmelberg,Knee,Season
+R19,20,Gold Coast,Daniel Rioli,Jaw,1-3 weeks
+R19,20,Gold Coast,Lachie Weller,Hamstring,1-3 weeks
+R19,20,Greater Western Sydney,Leek Aleer,Groin,TBC
+R19,20,Greater Western Sydney,Jack Buckley,Calf,TBC
+R19,20,Greater Western Sydney,Brent Daniels,Calf,TBC
+R19,20,Greater Western Sydney,Finn Davis,Quad,Test
+R19,20,Greater Western Sydney,Phoenix Gothard,Shoulder,TBC
+R19,20,Greater Western Sydney,Tom Green,Knee,Season
+R19,20,Greater Western Sydney,Max Gruzewski,Knee,Test
+R19,20,Greater Western Sydney,Ollie Hannaford,Foot,2-3 weeks
+R19,20,Greater Western Sydney,Jesse Hogan,Finger,TBC
+R19,20,Greater Western Sydney,Darcy Jones,Knee,3 weeks
+R19,20,Greater Western Sydney,Josh Kelly,Hip,Season
+R19,20,Greater Western Sydney,Jake Riccardi,Ankle,2-3 weeks
+R19,20,Greater Western Sydney,Nathan Wardius,Knee,Season
+R19,20,Greater Western Sydney,Lachie Whitfield,Concussion,Test
+R19,20,Hawthorn,Karl Amon,Knee,TBC
+R19,20,Hawthorn,Josh Battle,Appendix,Test
+R19,20,Hawthorn,Sam Butler,Leg,Test
+R19,20,Hawthorn,Jack Dalton,Knee,5-6 weeks
+R19,20,Hawthorn,Henry Hustwaite,Face,3-4 weeks
+R19,20,Hawthorn,Conor Nash,Neck,TBC
+R19,20,Hawthorn,Ned Reeves,Knee,1-2 weeks
+R19,20,Hawthorn,Jack Scrimshaw,Knee,3-5 weeks
+R19,20,Hawthorn,Nick Watson,Hamstring,Test
+R19,20,Melbourne,Jai Culley,Knee,Season
+R19,20,Melbourne,Bayley Fritsch,Finger,Test
+R19,20,Melbourne,Max Heath,Shoulder,Test
+R19,20,Melbourne,Xavier Lindsay,Hip/groin,2-3 weeks
+R19,20,Melbourne,Brody Mihocek,Neck,Season
+R19,20,Melbourne,Andy Moniz-Wakefield,Knee,Season
+R19,20,Melbourne,Harrison Petty,Hamstring,Test
+R19,20,Melbourne,Jack Viney,Achilles,TBC
+R19,20,North Melbourne,Jackson Archer,Knee,Season
+R19,20,North Melbourne,Tom Blamires,Concussion,1 week
+R19,20,North Melbourne,Toby Pink,Shoulder,Season
+R19,20,North Melbourne,Tom Powell,Groin,1-2 weeks
+R19,20,North Melbourne,Blake Thredgold,Foot,Season
+R19,20,North Melbourne,George Wardlaw,Hamstring,3-4 weeks
+R19,20,Port Adelaide,Zak Butters,Ankle,TBC
+R19,20,Port Adelaide,Tom Cochrane,Hamstring,Test
+R19,20,Port Adelaide,Mitch Georgiades,Concussion,Concussion protocols
+R19,20,Port Adelaide,Jason Horne-Francis,Suspension,Round 20
+R19,20,Port Adelaide,Lachie Jones,Ribs,Test
+R19,20,Port Adelaide,Mani Liddy,Hip,Season
+R19,20,Port Adelaide,Ollie Lord,Knee,Season
+R19,20,Port Adelaide,Jack Lukosius,Calf,TBC
+R19,20,Port Adelaide,Ewan Mackinlay,Knee,Season
+R19,20,Port Adelaide,Sam Powell-Pepper,Knee,Season
+R19,20,Port Adelaide,Esava Ratugolea,Knee,Season
+R19,20,Port Adelaide,Connor Rozee,Hamstring,Season
+R19,20,Port Adelaide,Josh Sinn,Shoulder,Season
+R19,20,Richmond,Jonty Faull,Back,Season
+R19,20,Richmond,Josh Gibcus,ACL strain,Season
+R19,20,Richmond,Campbell Gray,Hamstring,3 weeks
+R19,20,Richmond,Jacob Hopper,Ankle,TBC
+R19,20,Richmond,Sam Lalor,Achilles,Test
+R19,20,Richmond,Ben Miller,Heel,TBC
+R19,20,Richmond,Jack Ross,Concussion,TBC
+R19,20,Richmond,Jayden Short,Corked quad,Test
+R19,20,Richmond,Josh Smillie,Quad,1-3 weeks
+R19,20,Richmond,Kaleb Smith,Concussion,Test
+R19,20,Richmond,Luke Trainor,Concussion,Test
+R19,20,St Kilda,James Barrat,Foot,6+ weeks
+R19,20,St Kilda,Tom De Koning,Ribs,1-3 weeks
+R19,20,St Kilda,Sam Flanders,Achilles,Season
+R19,20,St Kilda,Max King,Conditioning,1-3 weeks
+R19,20,St Kilda,Jack Sinclair,Calf,Season
+R19,20,St Kilda,Alix Tauru,Suspension,Round 21
+R19,20,Sydney,Joel Amartey,Achilles,8 weeks
+R19,20,Sydney,Noah Chamberlain,Hamstring,8 weeks
+R19,20,Sydney,Liam Hetherton,Back,Season
+R19,20,Sydney,Max King,Back,Season
+R19,20,Sydney,Peter Ladhams,Groin,TBC
+R19,20,Sydney,Justin McInerney,Hamstring,4-5 weeks
+R19,20,Sydney,Logan McDonald,Quad,Test
+R19,20,Sydney,Sam Wicks,Hamstring,2-3 weeks
+R19,20,West Coast,Sam Allen,Knee/hamstring,5 weeks
+R19,20,West Coast,Harry Barnett,Abdominal/groin,1 week
+R19,20,West Coast,Tyler Brockman,Hamstring,Season
+R19,20,West Coast,Malakai Champion,Hand,1 week
+R19,20,West Coast,Cooper Duff-Tytler,Calf,1-2 weeks
+R19,20,West Coast,Harry Edwards,Concussion,Season
+R19,20,West Coast,Reuben Ginbey,Quad,5 weeks
+R19,20,West Coast,Josh Lindsay,Quad,1 week
+R19,20,West Coast,Noah Long,Knee,Season
+R19,20,West Coast,Jacob Newton,Foot,Season
+R19,20,West Coast,Archer Reid,Knee,Season
+R19,20,West Coast,Deven Robertson,Knee,Season
+R19,20,Western Bulldogs,Connor Budarick,Ankle,5-7 weeks
+R19,20,Western Bulldogs,Nick Coffield,Concussion,Concussion protocols
+R19,20,Western Bulldogs,Bailey Dale,Shoulder,5-7 weeks
+R19,20,Western Bulldogs,Sam Darcy,Knee,Season
+R19,20,Western Bulldogs,Tim English,Back,Test
+R19,20,Western Bulldogs,Ryley Sanders,Hand,Test
+R19,20,Western Bulldogs,Laith Vandermeer,Hamstring,Test
+R20,21,Adelaide,Hugh Bond,Hamstring,3-4 weeks
+R20,21,Adelaide,Darcy Fogarty,Suspension,Round 23
+R20,21,Adelaide,Mitch Hinge,Hamstring,1-2 weeks
+R20,21,Adelaide,Rory Laird,Ankle,3 weeks
+R20,21,Adelaide,Luke Pedlar,Hamstring,TBC
+R20,21,Brisbane Lions,Darcy Gardiner,Hamstring,2-3 weeks
+R20,21,Brisbane Lions,Jack Payne,Knee,Season
+R20,21,Brisbane Lions,Henry Smith,Foot,Season
+R20,21,Carlton,Matt Carroll,Knee,Season
+R20,21,Carlton,Harry McKay,Knee,Test
+R20,21,Carlton,Rob Monahan,Shoulder,Season
+R20,21,Carlton,Jesse Motlop,Knee,Season
+R20,21,Carlton,Harry O'Farrell,Knee,Season
+R20,21,Carlton,Marc Pittonet,Hamstring,Test
+R20,21,Carlton,Jacob Weitering,Calf,3-4 weeks
+R20,21,Collingwood,Josh Daicos,Ankle,Test
+R20,21,Collingwood,Jamie Elliott,Knee,Season
+R20,21,Collingwood,Reef McInnes,Knee,Season
+R20,21,Collingwood,Darcy Moore,Hamstring,Season
+R20,21,Collingwood,Lachie Schultz,Ankle,1-3 weeks
+R20,21,Collingwood,Oscar Steene,Knee,Season
+R20,21,Essendon,Xavier Duursma,Hamstring,Season
+R20,21,Essendon,Tom Edwards,Hamstring,1 week
+R20,21,Essendon,Brayden Fiorini,Back,Season
+R20,21,Essendon,Kayle Gerreyn,Knee,2 weeks
+R20,21,Essendon,Lewis Hayes,Knee,Season
+R20,21,Essendon,Kyle Langford,Suspension,Round 21
+R20,21,Essendon,Nic Martin,Knee,Season
+R20,21,Essendon,Archie May,Shoulder,Season
+R20,21,Fremantle,Charlie Nicholls,Finger,2-3 weeks
+R20,21,Fremantle,Jaeger O'Meara,Ankle,TBC
+R20,21,Fremantle,Sam Sturt,Quad,1 week
+R20,21,Geelong,Harley Barker,Knee,TBC
+R20,21,Geelong,Tanner Bruhn,Neck,Test
+R20,21,Geelong,Jeremy Cameron,Shoulder,3-5 weeks
+R20,21,Geelong,Toby Conway,Foot/Knee,TBC
+R20,21,Geelong,Max Holmes,Ankle,8-10 weeks
+R20,21,Geelong,Shaun Mannagh,Hamstring,Test
+R20,21,Geelong,Rhys Stanley,Hamstring,Test
+R20,21,Gold Coast,Koby Coulson,Hamstring,Test
+R20,21,Gold Coast,Will Graham,Shoulder,Season
+R20,21,Gold Coast,Lachie Gulbin,Hand,Test
+R20,21,Gold Coast,Elliott Himmelberg,Knee,Season
+R20,21,Gold Coast,Jake Rogers,Ankle,Test
+R20,21,Gold Coast,Lachie Weller,Hamstring,1-3 weeks
+R20,21,Greater Western Sydney,Leek Aleer,Groin,TBC
+R20,21,Greater Western Sydney,Kieren Briggs,Leg,1 week
+R20,21,Greater Western Sydney,Jack Buckley,Calf,TBC
+R20,21,Greater Western Sydney,Brent Daniels,Calf,TBC
+R20,21,Greater Western Sydney,Phoenix Gothard,Shoulder,Season
+R20,21,Greater Western Sydney,Tom Green,Knee,Season
+R20,21,Greater Western Sydney,Toby Greene,Quad,3-4 weeks
+R20,21,Greater Western Sydney,Ollie Hannaford,Foot,Test
+R20,21,Greater Western Sydney,Jesse Hogan,Finger,TBC
+R20,21,Greater Western Sydney,Darcy Jones,Knee,2 weeks
+R20,21,Greater Western Sydney,Josh Kelly,Hip,Season
+R20,21,Greater Western Sydney,Jake Riccardi,Ankle,1-2 weeks
+R20,21,Greater Western Sydney,Nathan Wardius,Knee,Season
+R20,21,Hawthorn,Karl Amon,Knee,2-3 weeks
+R20,21,Hawthorn,Jack Dalton,Knee,4-5 weeks
+R20,21,Hawthorn,Henry Hustwaite,Face,3 weeks
+R20,21,Hawthorn,Conor Nash,Neck,TBC
+R20,21,Hawthorn,Flynn Perez,Abdominal,Test
+R20,21,Hawthorn,Ned Reeves,Knee,1-2 weeks
+R20,21,Hawthorn,Jack Scrimshaw,Knee,3-4 weeks
+R20,21,Melbourne,Jai Culley,Knee,Season
+R20,21,Melbourne,Changkuoth Jiath,Leg,Test
+R20,21,Melbourne,Jack Henderson,Knee,Test
+R20,21,Melbourne,Xavier Lindsay,Hip/groin,1 week
+R20,21,Melbourne,Brody Mihocek,Neck,Season
+R20,21,Melbourne,Andy Moniz-Wakefield,Knee,Season
+R20,21,Melbourne,Daniel Turner,Ribs,2-4 weeks
+R20,21,Melbourne,Jack Viney,Achilles/back,TBC
+R20,21,North Melbourne,Jackson Archer,Knee,Season
+R20,21,North Melbourne,Zac Banch,Hamstring,Test
+R20,21,North Melbourne,Callum Coleman-Jones,Ankle,Test
+R20,21,North Melbourne,Zane Duursma,Shoulder,TBC
+R20,21,North Melbourne,Luke McDonald,Calf,Test
+R20,21,North Melbourne,Toby Pink,Shoulder,Season
+R20,21,North Melbourne,Tom Powell,Groin,Test
+R20,21,North Melbourne,Blake Thredgold,Foot,Season
+R20,21,North Melbourne,George Wardlaw,Hamstring,1-2 weeks
+R20,21,Port Adelaide,Zak Butters,Ankle,4-5 weeks
+R20,21,Port Adelaide,Kane Farrell,Groin,TBC
+R20,21,Port Adelaide,Mitch Georgiades,Concussion,Test
+R20,21,Port Adelaide,Mani Liddy,Hip,Season
+R20,21,Port Adelaide,Ollie Lord,Knee,Season
+R20,21,Port Adelaide,Jack Lukosius,Baker's cyst,1-2 weeks
+R20,21,Port Adelaide,Ewan Mackinlay,Knee,Season
+R20,21,Port Adelaide,Sam Powell-Pepper,Training block,Season
+R20,21,Port Adelaide,Esava Ratugolea,Knee,Season
+R20,21,Port Adelaide,Joe Richards,Finger,3-4 weeks
+R20,21,Port Adelaide,Connor Rozee,Hamstring,Season
+R20,21,Port Adelaide,Josh Sinn,Shoulder,Season
+R20,21,Richmond,Jasper Alger,Ankle,2 weeks
+R20,21,Richmond,Harry Armstrong,Foot soreness,1 week
+R20,21,Richmond,Noah Balta,Toe,TBC
+R20,21,Richmond,Tom Burton,Groin,2 weeks
+R20,21,Richmond,Jonty Faull,Back,Season
+R20,21,Richmond,Josh Gibcus,ACL strain,Season
+R20,21,Richmond,Campbell Gray,Hamstring,2 weeks
+R20,21,Richmond,Steely Green,Concussion,TBC
+R20,21,Richmond,Jacob Hopper,Ankle,Season
+R20,21,Richmond,Ben Miller,Heel,1 week
+R20,21,Richmond,Tom Sims,Toe,TBC
+R20,21,Richmond,Josh Smillie,Quad,Season
+R20,21,Richmond,Kaleb Smith,Quad,Season
+R20,21,St Kilda,James Barrat,Foot,6+ weeks
+R20,21,St Kilda,Tom De Koning,Ribs,Test
+R20,21,St Kilda,Sam Flanders,Achilles,Season
+R20,21,St Kilda,Max King,Conditioning,Test
+R20,21,St Kilda,Jack Sinclair,Calf,Season
+R20,21,St Kilda,Alix Tauru,Suspension,Round 21
+R20,21,Sydney,Joel Amartey,Achilles,7 weeks
+R20,21,Sydney,Noah Chamberlain,Hamstring,6-7 weeks
+R20,21,Sydney,Harry Cunningham,Concussion,TBC
+R20,21,Sydney,Liam Hetherton,Back,Season
+R20,21,Sydney,Max King,Back,Season
+R20,21,Sydney,Peter Ladhams,Groin,TBC
+R20,21,Sydney,Justin McInerney,Hamstring,3-4 weeks
+R20,21,Sydney,Lewis Melican,Adductor,Test
+R20,21,Sydney,Sam Wicks,Hamstring,1-2 weeks
+R20,21,West Coast,Sam Allen,Knee/hamstring,5 weeks
+R20,21,West Coast,Liam Baker,Suspension,Round 21
+R20,21,West Coast,Harry Barnett,Abdominal/groin,Test
+R20,21,West Coast,Tyler Brockman,Hamstring,Season
+R20,21,West Coast,Malakai Champion,Hand,Test
+R20,21,West Coast,Cooper Duff-Tytler,Calf,Test
+R20,21,West Coast,Harry Edwards,Concussion,Season
+R20,21,West Coast,Reuben Ginbey,Quad,4-5 weeks
+R20,21,West Coast,Jack Hutchinson,Hamstring,2-3 weeks
+R20,21,West Coast,Josh Lindsay,Quad,Test
+R20,21,West Coast,Noah Long,Knee,Season
+R20,21,West Coast,Jacob Newton,Foot,Season
+R20,21,West Coast,Archer Reid,Knee,Season
+R20,21,West Coast,Deven Robertson,Knee,Season
+R20,21,Western Bulldogs,Connor Budarick,Ankle,4-6 weeks
+R20,21,Western Bulldogs,Bailey Dale,Shoulder,4-6 weeks
+R20,21,Western Bulldogs,Sam Darcy,Knee,Season
+R20,21,Western Bulldogs,Riley Garcia,Hamstring,Indefinite
+R20,21,Western Bulldogs,Tom Liberatore,General soreness,Test
+R20,21,Western Bulldogs,Adam Treloar,Calf,4-6 weeks
+R20,21,Western Bulldogs,Laith Vandermeer,Hamstring,Test
+R21,22,Adelaide,Hugh Bond,Hamstring,2-3 weeks
+R21,22,Adelaide,Darcy Fogarty,Suspension,Round 23
+R21,22,Adelaide,Mitch Hinge,Hamstring,Test
+R21,22,Adelaide,Rory Laird,Ankle,1-2 weeks
+R21,22,Adelaide,James Peatling,Hip,Test
+R21,22,Adelaide,Luke Pedlar,Hamstring,6 weeks
+R21,22,Brisbane Lions,Ty Gallop,Suspension,Round 24
+R21,22,Brisbane Lions,Darcy Gardiner,Hamstring,1 week
+R21,22,Brisbane Lions,Jack Payne,Knee,Season
+R21,22,Brisbane Lions,Henry Smith,Foot,Season
+R21,22,Carlton,Lucas Camporeale,Calf,Test
+R21,22,Carlton,Matt Carroll,Knee,Season
+R21,22,Carlton,Campbell Chesser,Knee,TBC
+R21,22,Carlton,Lachie Fogarty,Ribs,Test
+R21,22,Carlton,Harry McKay,Knee,Test
+R21,22,Carlton,Ashton Moir,Calf,Test
+R21,22,Carlton,Rob Monahan,Shoulder,Season
+R21,22,Carlton,Jesse Motlop,Knee,Season
+R21,22,Carlton,Nic Newman,Hamstring,TBC
+R21,22,Carlton,Harry O'Farrell,Knee,Season
+R21,22,Carlton,Liam Reidy,Concussion,1 week
+R21,22,Carlton,Jacob Weitering,Calf,2-3 weeks
+R21,22,Collingwood,Jordan De Goey,Illness,Test
+R21,22,Collingwood,Jamie Elliott,Knee,Season
+R21,22,Collingwood,Brayden Maynard,Knee/hamstring,3-4 weeks
+R21,22,Collingwood,Reef McInnes,Knee,Season
+R21,22,Collingwood,Darcy Moore,Hamstring,Season
+R21,22,Collingwood,Lachie Schultz,Ankle,Test
+R21,22,Collingwood,Oscar Steene,Knee,Season
+R21,22,Essendon,Xavier Duursma,Hamstring,Season
+R21,22,Essendon,Brayden Fiorini,Back,Season
+R21,22,Essendon,Kayle Gerreyn,Knee,1 week
+R21,22,Essendon,Lewis Hayes,Knee,Season
+R21,22,Essendon,Nic Martin,Knee,Season
+R21,22,Essendon,Archie May,Shoulder,Season
+R21,22,Essendon,Jordan Ridley,Foot,TBC
+R21,22,Essendon,Sullivan Robey,Knee,TBC
+R21,22,Fremantle,Brennan Cox,Knee,1 week
+R21,22,Fremantle,Charlie Nicholls,Finger,1-2 weeks
+R21,22,Fremantle,Jaeger O'Meara,Ankle,3-4 weeks
+R21,22,Fremantle,Sam Sturt,Quad,Test
+R21,22,Geelong,Harley Barker,Knee,TBC
+R21,22,Geelong,Jeremy Cameron,Shoulder,2-4 weeks
+R21,22,Geelong,Toby Conway,Foot/Knee,Season
+R21,22,Geelong,Patrick Dangerfield,Hip,Test
+R21,22,Geelong,Max Holmes,Ankle,7-9 weeks
+R21,22,Geelong,Keighton Matofai-Forbes,Finger,TBC
+R21,22,Geelong,Jacob Molier,Quad,TBC
+R21,22,Geelong,Rhys Stanley,Calf,TBC
+R21,22,Gold Coast,Will Graham,Shoulder,Season
+R21,22,Gold Coast,Elliott Himmelberg,Knee,Season
+R21,22,Gold Coast,Lachie Weller,Hamstring,1-3 weeks
+R21,22,Greater Western Sydney,Leek Aleer,Groin,Season
+R21,22,Greater Western Sydney,Kieren Briggs,Leg,Test
+R21,22,Greater Western Sydney,Jack Buckley,Hamstring,TBC
+R21,22,Greater Western Sydney,Finn Callaghan,Ankle,Season
+R21,22,Greater Western Sydney,Brent Daniels,Calf,TBC
+R21,22,Greater Western Sydney,Phoenix Gothard,Shoulder,Season
+R21,22,Greater Western Sydney,Tom Green,Knee,Season
+R21,22,Greater Western Sydney,Toby Greene,Quad,2-3 weeks
+R21,22,Greater Western Sydney,Ollie Hannaford,Foot,Test
+R21,22,Greater Western Sydney,Jesse Hogan,Finger,Season
+R21,22,Greater Western Sydney,Darcy Jones,Knee,1-2 weeks
+R21,22,Greater Western Sydney,Josh Kelly,Hip,Season
+R21,22,Greater Western Sydney,James Leake,Leg,TBC
+R21,22,Greater Western Sydney,Jake Riccardi,Ankle,Test
+R21,22,Greater Western Sydney,Logan Smith,Knee,Season
+R21,22,Greater Western Sydney,Nathan Wardius,Knee,Season
+R21,22,Hawthorn,Karl Amon,Knee,1-2 weeks
+R21,22,Hawthorn,Jack Dalton,Knee,3-5 weeks
+R21,22,Hawthorn,Henry Hustwaite,Face,Test
+R21,22,Hawthorn,Mitch Lewis,Concussion,1-2 weeks
+R21,22,Hawthorn,Noah Mraz,Kidney,TBC
+R21,22,Hawthorn,Conor Nash,Neck,TBC
+R21,22,Hawthorn,Ned Reeves,Knee,1 week
+R21,22,Hawthorn,Jack Scrimshaw,Knee,2-3 weeks
+R21,22,Melbourne,Jed Adams,Knee,Season
+R21,22,Melbourne,Kade Chandler,Hand,1-2 weeks
+R21,22,Melbourne,Jai Culley,Knee,Season
+R21,22,Melbourne,Bayley Fritsch,Ribs,Test
+R21,22,Melbourne,Jack Henderson,Knee,Test
+R21,22,Melbourne,Changkuoth Jiath,Leg,Test
+R21,22,Melbourne,Brody Mihocek,Neck,Season
+R21,22,Melbourne,Andy Moniz-Wakefield,Knee,Season
+R21,22,Melbourne,Latrelle Pickett,Concussion,1-2 weeks
+R21,22,Melbourne,Daniel Turner,Ribs,1-3 weeks
+R21,22,Melbourne,Jack Viney,Achilles/back,TBC
+R21,22,Melbourne,Caleb Windsor,Groin,Test
+R21,22,North Melbourne,Jackson Archer,Knee,Season
+R21,22,North Melbourne,Callum Coleman-Jones,Ankle,Test
+R21,22,North Melbourne,Charlie Comben,Chest,Test
+R21,22,North Melbourne,Zane Duursma,Shoulder,Season
+R21,22,North Melbourne,Luke McDonald,Calf,1 week
+R21,22,North Melbourne,Toby Pink,Shoulder,Season
+R21,22,North Melbourne,Tom Powell,Groin,Test
+R21,22,North Melbourne,Blake Thredgold,Foot,Season
+R21,22,North Melbourne,George Wardlaw,Hamstring,1 week
+R21,22,Port Adelaide,Zak Butters,Ankle,3-4 weeks
+R21,22,Port Adelaide,Logan Evans,Shoulder,Season
+R21,22,Port Adelaide,Kane Farrell,Groin,Season
+R21,22,Port Adelaide,Mani Liddy,Hip,Season
+R21,22,Port Adelaide,Ollie Lord,Knee,Season
+R21,22,Port Adelaide,Jack Lukosius,Baker's cyst,TBC
+R21,22,Port Adelaide,Ewan Mackinlay,Knee,Season
+R21,22,Port Adelaide,Sam Powell-Pepper,Training block,Season
+R21,22,Port Adelaide,Esava Ratugolea,Knee,Season
+R21,22,Port Adelaide,Joe Richards,Finger,2-3 weeks
+R21,22,Port Adelaide,Connor Rozee,Hamstring,Season
+R21,22,Port Adelaide,Josh Sinn,Shoulder,Season
+R21,22,Richmond,Jasper Alger,Ankle,Test
+R21,22,Richmond,Harry Armstrong,Foot soreness,1 week
+R21,22,Richmond,Noah Balta,Toe,TBC
+R21,22,Richmond,Tom Burton,Groin,Test
+R21,22,Richmond,Jonty Faull,Back,Season
+R21,22,Richmond,Josh Gibcus,ACL strain,Season
+R21,22,Richmond,Campbell Gray,Hamstring,1 week
+R21,22,Richmond,Steely Green,Concussion,Test
+R21,22,Richmond,Jacob Hopper,Ankle,Season
+R21,22,Richmond,Ben Miller,Heel,Test
+R21,22,Richmond,Tom Sims,Toe,Season
+R21,22,Richmond,Josh Smillie,Quad,Season
+R21,22,Richmond,Kaleb Smith,Quad,Season
+R21,22,St Kilda,James Barrat,Foot,6+ weeks
+R21,22,St Kilda,Sam Flanders,Achilles,Season
+R21,22,St Kilda,Max King,Hamstring,Season
+R21,22,St Kilda,Campbell Lake,Calf,Test
+R21,22,St Kilda,Rowan Marshall,Back,Test
+R21,22,St Kilda,Cooper Sharman,Calf,Test
+R21,22,St Kilda,Jack Sinclair,Calf,Season
+R21,22,Sydney,Joel Amartey,Achilles,6 weeks
+R21,22,Sydney,Noah Chamberlain,Hamstring,6-7 weeks
+R21,22,Sydney,Harry Cunningham,Concussion,Test
+R21,22,Sydney,Liam Hetherton,Back,Season
+R21,22,Sydney,Max King,Back,Season
+R21,22,Sydney,Peter Ladhams,Groin,TBC
+R21,22,Sydney,Justin McInerney,Hamstring,2-3 weeks
+R21,22,Sydney,Patrick Snell,Knee,1 week
+R21,22,Sydney,Sam Wicks,Hamstring,Test
+R21,22,West Coast,Sam Allen,Knee/hamstring,Season
+R21,22,West Coast,Tyler Brockman,Hamstring,Season
+R21,22,West Coast,Malakai Champion,Hand,Test
+R21,22,West Coast,Harry Edwards,Concussion,Season
+R21,22,West Coast,Oliver Francou,Knee laceration,TBC
+R21,22,West Coast,Reuben Ginbey,Quad,Season
+R21,22,West Coast,Jack Hutchinson,Hamstring,1-2 weeks
+R21,22,West Coast,Noah Long,Knee,Season
+R21,22,West Coast,Jacob Newton,Foot,Season
+R21,22,West Coast,Archer Reid,Knee,Season
+R21,22,West Coast,Deven Robertson,Knee,Season
+R21,22,Western Bulldogs,Connor Budarick,Ankle,3-5 weeks
+R21,22,Western Bulldogs,Bailey Dale,Shoulder,3-5 weeks
+R21,22,Western Bulldogs,Sam Darcy,Knee,Season
+R21,22,Western Bulldogs,Riley Garcia,Hamstring,Season
+R21,22,Western Bulldogs,Will Lewis,Calf,TBC
+R21,22,Western Bulldogs,Adam Treloar,Calf,4-6 weeks
+R22,23,Adelaide,Sam Berry,Foot,Test
+R22,23,Adelaide,Hugh Bond,Hamstring,1-2 weeks
+R22,23,Adelaide,James Borlase,Hamstring,Test
+R22,23,Adelaide,Jordon Butts,Calf/Achilles,TBC
+R22,23,Adelaide,Darcy Fogarty,Suspension,Round 23
+R22,23,Adelaide,Rory Laird,Ankle,Test
+R22,23,Adelaide,Wayne Milera,Hamstring,2-3 weeks
+R22,23,Adelaide,Nick Murray,Knee,Test
+R22,23,Adelaide,Luke Nankervis,Chest,Test
+R22,23,Adelaide,James Peatling,Hip/groin,Test
+R22,23,Adelaide,Luke Pedlar,Hamstring,5 weeks
+R22,23,Brisbane Lions,Keidean Coleman,Concussion,TBC
+R22,23,Brisbane Lions,Ty Gallop,Suspension,Round 24
+R22,23,Brisbane Lions,Jack Payne,Knee,Season
+R22,23,Brisbane Lions,Henry Smith,Foot,Season
+R22,23,Carlton,Matt Carroll,Knee,Season
+R22,23,Carlton,Campbell Chesser,Knee,TBC
+R22,23,Carlton,Ashton Moir,Calf,Test
+R22,23,Carlton,Rob Monahan,Shoulder,Season
+R22,23,Carlton,Jesse Motlop,Knee,Season
+R22,23,Carlton,Nic Newman,Hamstring,6-7 weeks
+R22,23,Carlton,Harry O'Farrell,Knee,Season
+R22,23,Carlton,Liam Reidy,Concussion,Test
+R22,23,Carlton,Jacob Weitering,Calf,Test
+R22,23,Collingwood,Joel Cochran,Concussion,TBC
+R22,23,Collingwood,Jordan De Goey,Glute,Test
+R22,23,Collingwood,Jamie Elliott,Knee,Season
+R22,23,Collingwood,Jeremy Howe,Arm,TBC
+R22,23,Collingwood,Tew Jiath,Hamstring,Season
+R22,23,Collingwood,Pat Lipinski,Calf,2-3 weeks
+R22,23,Collingwood,Brayden Maynard,Knee/hamstring,2-3 weeks
+R22,23,Collingwood,Reef McInnes,Knee,Season
+R22,23,Collingwood,Darcy Moore,Hamstring,Season
+R22,23,Collingwood,Harry Perryman,Hamstring,3-4 weeks
+R22,23,Collingwood,Lachie Schultz,Ankle,Test
+R22,23,Collingwood,Oscar Steene,Knee,Season
+R22,23,Essendon,Angus Clarke,Concussion,1 week
+R22,23,Essendon,Xavier Duursma,Hamstring,Season
+R22,23,Essendon,Brayden Fiorini,Back,Season
+R22,23,Essendon,Kayle Gerreyn,Knee,Test
+R22,23,Essendon,Lewis Hayes,Knee,Season
+R22,23,Essendon,Nic Martin,Knee,Season
+R22,23,Essendon,Archie May,Shoulder,Season
+R22,23,Essendon,Darcy Parish,Calf,Test
+R22,23,Essendon,Jordan Ridley,Foot,2-3 weeks
+R22,23,Essendon,Sullivan Robey,Knee,3 weeks
+R22,23,Fremantle,Charlie Nicholls,Finger,1-2 weeks
+R22,23,Fremantle,Jaeger O'Meara,Ankle,1-2 weeks
+R22,23,Fremantle,Corey Wagner,Hip,Test
+R22,23,Fremantle,Brandon Walker,Shoulder,Test
+R22,23,Geelong,Harley Barker,Knee,TBC
+R22,23,Geelong,Jeremy Cameron,Shoulder,1-3 weeks
+R22,23,Geelong,Toby Conway,Foot/Knee,Season
+R22,23,Geelong,Max Holmes,Ankle,5-7 weeks
+R22,23,Geelong,Keighton Matofai-Forbes,Finger,3-5 weeks
+R22,23,Geelong,Jacob Molier,Quad,1 week
+R22,23,Gold Coast,Oscar Adams,Back,Test
+R22,23,Gold Coast,Sam Collins,Ribs,Test
+R22,23,Gold Coast,Will Graham,Shoulder,Season
+R22,23,Gold Coast,Elliott Himmelberg,Knee,Season
+R22,23,Gold Coast,Lachie Weller,Hamstring,1-3 weeks
+R22,23,Greater Western Sydney,Leek Aleer,Groin,Season
+R22,23,Greater Western Sydney,Jack Buckley,Hamstring,TBC
+R22,23,Greater Western Sydney,Finn Callaghan,Ankle,Season
+R22,23,Greater Western Sydney,Brent Daniels,Calf,TBC
+R22,23,Greater Western Sydney,Phoenix Gothard,Shoulder,Season
+R22,23,Greater Western Sydney,Tom Green,Knee,Season
+R22,23,Greater Western Sydney,Toby Greene,Quad,Test
+R22,23,Greater Western Sydney,Jesse Hogan,Finger,Season
+R22,23,Greater Western Sydney,Darcy Jones,Knee,Season
+R22,23,Greater Western Sydney,Josh Kelly,Hip,Season
+R22,23,Greater Western Sydney,James Leake,Leg,TBC
+R22,23,Greater Western Sydney,Harry Oliver,Adductor,2 weeks
+R22,23,Greater Western Sydney,Logan Smith,Knee,Season
+R22,23,Greater Western Sydney,Nathan Wardius,Knee,Season
+R22,23,Hawthorn,Karl Amon,Knee,Test
+R22,23,Hawthorn,Jack Dalton,Knee,1 week
+R22,23,Hawthorn,Henry Hustwaite,Face,Test
+R22,23,Hawthorn,Mitch Lewis,Concussion,Test
+R22,23,Hawthorn,Noah Mraz,Kidney,4-5 weeks
+R22,23,Hawthorn,Conor Nash,Neck,TBC
+R22,23,Hawthorn,Flynn Perez,Groin,1-2 weeks
+R22,23,Hawthorn,Ned Reeves,Knee,Test
+R22,23,Hawthorn,Jack Scrimshaw,Knee,1-2 weeks
+R22,23,Melbourne,Jed Adams,Knee,Season
+R22,23,Melbourne,Kade Chandler,Hand,Test
+R22,23,Melbourne,Jai Culley,Knee,Season
+R22,23,Melbourne,Blake Howes,Arm,TBC
+R22,23,Melbourne,Brody Mihocek,Neck,Season
+R22,23,Melbourne,Andy Moniz-Wakefield,Knee,Season
+R22,23,Melbourne,Latrelle Pickett,Concussion,Test
+R22,23,Melbourne,Daniel Turner,Ribs,Test
+R22,23,Melbourne,Jack Viney,Achilles/back,TBC
+R22,23,North Melbourne,Jackson Archer,Knee,Season
+R22,23,North Melbourne,Callum Coleman-Jones,Ankle,1 week
+R22,23,North Melbourne,Zane Duursma,Shoulder,Season
+R22,23,North Melbourne,Jacob Konstanty,Illness,TBC
+R22,23,North Melbourne,Luke McDonald,Calf,1 week
+R22,23,North Melbourne,Toby Pink,Shoulder,Season
+R22,23,North Melbourne,Blake Thredgold,Foot,Season
+R22,23,Port Adelaide,Zak Butters,Ankle,2-3 weeks
+R22,23,Port Adelaide,Logan Evans,Shoulder,Season
+R22,23,Port Adelaide,Kane Farrell,Groin,Season
+R22,23,Port Adelaide,Mani Liddy,Hip,Season
+R22,23,Port Adelaide,Ollie Lord,Knee,Season
+R22,23,Port Adelaide,Jack Lukosius,Baker's cyst,Season
+R22,23,Port Adelaide,Ewan Mackinlay,Knee,Season
+R22,23,Port Adelaide,Sam Powell-Pepper,Training block,Season
+R22,23,Port Adelaide,Esava Ratugolea,Knee,Season
+R22,23,Port Adelaide,Joe Richards,Finger,1-2 weeks
+R22,23,Port Adelaide,Connor Rozee,Hamstring,Season
+R22,23,Port Adelaide,Josh Sinn,Shoulder,Season
+R22,23,Port Adelaide,Jack Watkins,Hamstring,TBC
+R22,23,Richmond,Noah Balta,Toe,1-2 weeks
+R22,23,Richmond,Sam Cumming,Ankle/shoulder,Season
+R22,23,Richmond,Jonty Faull,Back,Season
+R22,23,Richmond,Josh Gibcus,ACL strain,Season
+R22,23,Richmond,Jacob Hopper,Ankle,Season
+R22,23,Richmond,Rhyan Mansell,Foot,Season
+R22,23,Richmond,Tom Sims,Toe,Season
+R22,23,Richmond,Josh Smillie,Quad,Season
+R22,23,Richmond,Kaleb Smith,Quad,Season
+R22,23,Richmond,Luke Trainor,Suspension,Round 23
+R22,23,St Kilda,James Barrat,Foot,Season
+R22,23,St Kilda,Sam Flanders,Achilles,Season
+R22,23,St Kilda,Max King,Hamstring,Season
+R22,23,St Kilda,Cooper Sharman,Calf,Test
+R22,23,St Kilda,Jack Silvagni,Shoulder,TBC
+R22,23,St Kilda,Jack Sinclair,Calf,Season
+R22,23,Sydney,Joel Amartey,Achilles,5 weeks
+R22,23,Sydney,Noah Chamberlain,Hamstring,5-6 weeks
+R22,23,Sydney,Harry Cunningham,Calf,Test
+R22,23,Sydney,Will Edwards,Leg,TBC
+R22,23,Sydney,Liam Hetherton,Back,Season
+R22,23,Sydney,Max King,Back,Season
+R22,23,Sydney,Peter Ladhams,Groin,TBC
+R22,23,Sydney,Justin McInerney,Hamstring,1-2 weeks
+R22,23,Sydney,James Rowbottom,Hand,4 weeks
+R22,23,Sydney,Patrick Snell,Knee,1 week
+R22,23,West Coast,Sam Allen,Knee/hamstring,Season
+R22,23,West Coast,Liam Baker,Calf,Test
+R22,23,West Coast,Tyler Brockman,Hamstring,Season
+R22,23,West Coast,Malakai Champion,Hand,Test
+R22,23,West Coast,Harry Edwards,Concussion,Season
+R22,23,West Coast,Oliver Francou,Knee laceration,2 weeks
+R22,23,West Coast,Reuben Ginbey,Quad,Season
+R22,23,West Coast,Jack Hutchinson,Hamstring,Test
+R22,23,West Coast,Noah Long,Knee,Season
+R22,23,West Coast,Jacob Newton,Foot,Season
+R22,23,West Coast,Archer Reid,Knee,Season
+R22,23,West Coast,Deven Robertson,Knee,Season
+R22,23,Western Bulldogs,Connor Budarick,Ankle,2-5 weeks
+R22,23,Western Bulldogs,Bailey Dale,Shoulder,3-5 weeks
+R22,23,Western Bulldogs,Sam Darcy,Knee,Season
+R22,23,Western Bulldogs,Riley Garcia,Hamstring,Season
+R22,23,Western Bulldogs,Will Lewis,Calf,4-6 weeks
+R22,23,Western Bulldogs,Aaron Naughton,Managed,Test
+R22,23,Western Bulldogs,Lachie Smith,Hamstring,5-7 weeks
+R22,23,Western Bulldogs,Adam Treloar,Calf,4-6 weeks
+R22,23,Western Bulldogs,Cody Weightman,Managed,Test
+R23,24,Adelaide,Hugh Bond,Hamstring,1 week
+R23,24,Adelaide,James Borlase,Hamstring,Test
+R23,24,Adelaide,Jordon Butts,Calf/Achilles,TBC
+R23,24,Adelaide,Wayne Milera,Hamstring,1 week
+R23,24,Adelaide,Nick Murray,Knee,Test
+R23,24,Adelaide,Luke Nankervis,Chest,Test
+R23,24,Adelaide,Luke Pedlar,Hamstring,4 weeks
+R23,24,Brisbane Lions,Ty Gallop,Suspension,Round 24
+R23,24,Brisbane Lions,Hugh McCluggage,Calf,1-2 weeks
+R23,24,Brisbane Lions,Jack Payne,Knee,Season
+R23,24,Brisbane Lions,Henry Smith,Foot,Season
+R23,24,Brisbane Lions,Reece Torrent,Ankle,Season
+R23,24,Carlton,Matt Carroll,Knee,Season
+R23,24,Carlton,Campbell Chesser,Knee,Season
+R23,24,Carlton,Rob Monahan,Shoulder,Season
+R23,24,Carlton,Jesse Motlop,Knee,Season
+R23,24,Carlton,Nic Newman,Hamstring,5-6 weeks
+R23,24,Carlton,Harry O'Farrell,Knee,Season
+R23,24,Carlton,Zac Williams,Larynx,TBC
+R23,24,Collingwood,Joel Cochran,Concussion,Test
+R23,24,Collingwood,Jordan De Goey,Glute,Test
+R23,24,Collingwood,Jamie Elliott,Knee,Season
+R23,24,Collingwood,Jeremy Howe,Arm,TBC
+R23,24,Collingwood,Tew Jiath,Hamstring,Season
+R23,24,Collingwood,Pat Lipinski,Calf,1-2 weeks
+R23,24,Collingwood,Brayden Maynard,Knee/hamstring,1-2 weeks
+R23,24,Collingwood,Reef McInnes,Knee,Season
+R23,24,Collingwood,Darcy Moore,Hamstring,Season
+R23,24,Collingwood,Scott Pendlebury,Calf,Test
+R23,24,Collingwood,Harry Perryman,Hamstring,2-3 weeks
+R23,24,Collingwood,Lachie Schultz,Ankle,Test
+R23,24,Collingwood,Oscar Steene,Knee,Season
+R23,24,Essendon,Xavier Duursma,Hamstring,Season
+R23,24,Essendon,Brayden Fiorini,Back,Season
+R23,24,Essendon,Kayle Gerreyn,Knee,Test
+R23,24,Essendon,Lewis Hayes,Knee,Season
+R23,24,Essendon,Nic Martin,Knee,Season
+R23,24,Essendon,Archie May,Shoulder,Season
+R23,24,Essendon,Darcy Parish,Calf,1 week
+R23,24,Essendon,Jordan Ridley,Foot,Season
+R23,24,Essendon,Sullivan Robey,Knee,Season
+R23,24,Fremantle,Charlie Nicholls,Finger,Test
+R23,24,Fremantle,Jaeger O'Meara,Ankle,1 week
+R23,24,Fremantle,Aiden Riddle,Ankle,Test
+R23,24,Fremantle,Corey Wagner,Hip,Test
+R23,24,Fremantle,Brandon Walker,Shoulder,Test
+R23,24,Geelong,Harley Barker,Knee,TBC
+R23,24,Geelong,Jeremy Cameron,AC joint,1-2 weeks
+R23,24,Geelong,Toby Conway,Foot/Knee,TBC
+R23,24,Geelong,Max Holmes,Ankle,3-6 weeks
+R23,24,Geelong,Keighton Matofai-Forbes,Finger,2-4 weeks
+R23,24,Geelong,Jacob Molier,Quad,Test
+R23,24,Gold Coast,Sam Collins,Ribs,Test
+R23,24,Gold Coast,Will Graham,Shoulder,Season
+R23,24,Gold Coast,Elliott Himmelberg,Knee,Season
+R23,24,Gold Coast,Lachie Weller,Hamstring,1-3 weeks
+R23,24,Greater Western Sydney,Leek Aleer,Groin,Season
+R23,24,Greater Western Sydney,Toby Bedford,Back,Test
+R23,24,Greater Western Sydney,Jack Buckley,Calf,TBC
+R23,24,Greater Western Sydney,Finn Callaghan,Ankle,Season
+R23,24,Greater Western Sydney,Brent Daniels,Calf,TBC
+R23,24,Greater Western Sydney,Phoenix Gothard,Shoulder,Season
+R23,24,Greater Western Sydney,Tom Green,Knee,Season
+R23,24,Greater Western Sydney,Jesse Hogan,Finger,Season
+R23,24,Greater Western Sydney,Darcy Jones,Knee,Season
+R23,24,Greater Western Sydney,Josh Kelly,Hip,Season
+R23,24,Greater Western Sydney,Jayden Laverde,Lung,TBC
+R23,24,Greater Western Sydney,James Leake,Leg,TBC
+R23,24,Greater Western Sydney,Xavier O'Halloran,Hamstring,1-2 weeks
+R23,24,Greater Western Sydney,Harry Oliver,Adductor,Test
+R23,24,Greater Western Sydney,Logan Smith,Knee,Season
+R23,24,Greater Western Sydney,Nathan Wardius,Knee,Season
+R23,24,Hawthorn,Noah Mraz,Kidney,2 weeks
+R23,24,Hawthorn,Conor Nash,Neck,Season
+R23,24,Hawthorn,Flynn Perez,Groin,2 weeks
+R23,24,Hawthorn,Jack Scrimshaw,Knee,Test
+R23,24,Melbourne,Jed Adams,Knee,Season
+R23,24,Melbourne,Jai Culley,Knee,Season
+R23,24,Melbourne,Blake Howes,Arm,3-5 weeks
+R23,24,Melbourne,Thomas Matthews,Shoulder,Season
+R23,24,Melbourne,Brody Mihocek,Neck,Season
+R23,24,Melbourne,Andy Moniz-Wakefield,Knee,Season
+R23,24,North Melbourne,Jackson Archer,Knee,Season
+R23,24,North Melbourne,Callum Coleman-Jones,Ankle,Test
+R23,24,North Melbourne,Aidan Corr,Back,Test
+R23,24,North Melbourne,Zane Duursma,Shoulder,Season
+R23,24,North Melbourne,Robert Hansen jnr,Wrist,Season
+R23,24,North Melbourne,Jacob Konstanty,Illness,Season
+R23,24,North Melbourne,Luke McDonald,Calf,Test
+R23,24,North Melbourne,Toby Pink,Shoulder,Season
+R23,24,North Melbourne,Tom Powell,Groin,TBC
+R23,24,North Melbourne,Blake Thredgold,Foot,Season
+R23,24,Port Adelaide,Zak Butters,Ankle,1-2 weeks
+R23,24,Port Adelaide,Darcy Byrne-Jones,Suspension,Round 24
+R23,24,Port Adelaide,Logan Evans,Shoulder,Season
+R23,24,Port Adelaide,Kane Farrell,Groin,Season
+R23,24,Port Adelaide,Jason Horne-Francis,Knee,Test
+R23,24,Port Adelaide,Lachie Jones,Adductor,Test
+R23,24,Port Adelaide,Mani Liddy,Hip,Season
+R23,24,Port Adelaide,Ollie Lord,Knee,Season
+R23,24,Port Adelaide,Jack Lukosius,Baker's cyst,Season
+R23,24,Port Adelaide,Ewan Mackinlay,Knee,Season
+R23,24,Port Adelaide,Sam Powell-Pepper,Training block,Season
+R23,24,Port Adelaide,Esava Ratugolea,Knee,Season
+R23,24,Port Adelaide,Connor Rozee,Hamstring,Season
+R23,24,Port Adelaide,Josh Sinn,Shoulder,Season
+R23,24,Port Adelaide,Jack Watkins,Hamstring,TBC
+R23,24,Richmond,Noah Balta,Toe,Season
+R23,24,Richmond,Sam Cumming,Ankle/shoulder,Season
+R23,24,Richmond,Jonty Faull,Back,Season
+R23,24,Richmond,Josh Gibcus,ACL strain,Season
+R23,24,Richmond,Jacob Hopper,Ankle,Season
+R23,24,Richmond,Sam Lalor,Knee,Test
+R23,24,Richmond,Rhyan Mansell,Foot,Season
+R23,24,Richmond,Tom Sims,Toe,Season
+R23,24,Richmond,Josh Smillie,Quad,Season
+R23,24,Richmond,Kaleb Smith,Quad,Season
+R23,24,St Kilda,James Barrat,Foot,Season
+R23,24,St Kilda,Tom De Koning,Shoulder,Test
+R23,24,St Kilda,Sam Flanders,Achilles,Season
+R23,24,St Kilda,Max King,Hamstring,Season
+R23,24,St Kilda,Liam Ryan,Shoulder,Test
+R23,24,St Kilda,Jack Sinclair,Calf,Season
+R23,24,St Kilda,Nasiah Wanganeen-Milera,Hamstring,4-6 weeks
+R23,24,St Kilda,Mason Wood,Calf,1-3 weeks
+R23,24,Sydney,Joel Amartey,Achilles,4 weeks
+R23,24,Sydney,Noah Chamberlain,Hamstring,4-5 weeks
+R23,24,Sydney,Will Edwards,Leg,Season
+R23,24,Sydney,Liam Hetherton,Back,Season
+R23,24,Sydney,Max King,Back,Season
+R23,24,Sydney,Peter Ladhams,Groin,TBC
+R23,24,Sydney,Justin McInerney,Hamstring,1 week
+R23,24,Sydney,James Rowbottom,Hand,3 weeks
+R23,24,Sydney,Patrick Snell,Knee,Test
+R23,24,West Coast,Sam Allen,Knee/hamstring,Season
+R23,24,West Coast,Tyler Brockman,Hamstring,Season
+R23,24,West Coast,Harry Edwards,Concussion,Season
+R23,24,West Coast,Oliver Francou,Knee laceration,3 weeks
+R23,24,West Coast,Reuben Ginbey,Quad,Season
+R23,24,West Coast,Elijah Hewett,Corked calf,Test
+R23,24,West Coast,Jack Hutchinson,Hamstring,Test
+R23,24,West Coast,Noah Long,Knee,Season
+R23,24,West Coast,Jake Miles-Wrency,Ankle/calf,1 week
+R23,24,West Coast,Jacob Newton,Foot,Season
+R23,24,West Coast,Archer Reid,Knee,Season
+R23,24,West Coast,Deven Robertson,Knee,Season
+R23,24,West Coast,Tylah Williams,Leg,Season
+R23,24,Western Bulldogs,Connor Budarick,Ankle,1-3 weeks
+R23,24,Western Bulldogs,Bailey Dale,Shoulder,1-3 weeks
+R23,24,Western Bulldogs,Sam Darcy,Knee,Season
+R23,24,Western Bulldogs,Tim English,Knee,TBC
+R23,24,Western Bulldogs,Riley Garcia,Hamstring,Season
+R23,24,Western Bulldogs,Will Lewis,Calf,3-5 weeks
+R23,24,Western Bulldogs,Lachie Smith,Hamstring,4-6 weeks
+R23,24,Western Bulldogs,Adam Treloar,Calf,3-5 weeks
+R24,25,Adelaide,Hugh Bond,Hamstring,Test
+R24,25,Adelaide,Jordon Butts,Calf/Achilles,1-2 weeks
+R24,25,Adelaide,Wayne Milera,Hamstring,Test
+R24,25,Adelaide,James Peatling,Hip/groin,TBC
+R24,25,Adelaide,Luke Pedlar,Hamstring,3 weeks
+R24,25,Brisbane Lions,Hugh McCluggage,Calf,1 week
+R24,25,Brisbane Lions,Jack Payne,Knee,Season
+R24,25,Brisbane Lions,Henry Smith,Foot,Season
+R24,25,Brisbane Lions,Reece Torrent,Ankle,Season
+R24,25,Brisbane Lions,Zane Zakostelsky,Knee,Season
+R24,25,Carlton,Matt Carroll,Knee,Season
+R24,25,Carlton,Campbell Chesser,Knee,Season
+R24,25,Carlton,Nick Haynes,Ankle,Test
+R24,25,Carlton,Will Hayward,Ankle,1 week
+R24,25,Carlton,Rob Monahan,Shoulder,Season
+R24,25,Carlton,Jesse Motlop,Knee,Season
+R24,25,Carlton,Nic Newman,Hamstring,4-5 weeks
+R24,25,Carlton,Harry O'Farrell,Knee,Season
+R24,25,Carlton,Zac Williams,Larynx,1-2 weeks
+R24,25,Collingwood,Jamie Elliott,Knee,Season
+R24,25,Collingwood,Jeremy Howe,Arm,Test
+R24,25,Collingwood,Tew Jiath,Hamstring,Season
+R24,25,Collingwood,Pat Lipinski,Calf,1 week
+R24,25,Collingwood,Brayden Maynard,Knee/hamstring,Test
+R24,25,Collingwood,Reef McInnes,Knee,Season
+R24,25,Collingwood,Darcy Moore,Hamstring,Season
+R24,25,Collingwood,Harry Perryman,Hamstring,2-3 weeks
+R24,25,Collingwood,Steele Sidebottom,Illness,Test
+R24,25,Collingwood,Oscar Steene,Knee,Season
+R24,25,Collingwood,Isaac Quaynor,Glute/hip,1 week
+R24,25,Essendon,Sam Durham,Soreness,Season
+R24,25,Essendon,Xavier Duursma,Hamstring,Season
+R24,25,Essendon,Brayden Fiorini,Back,Season
+R24,25,Essendon,Lewis Hayes,Knee,Season
+R24,25,Essendon,Nic Martin,Knee,Season
+R24,25,Essendon,Archie May,Shoulder,Season
+R24,25,Essendon,Darcy Parish,Calf,Season
+R24,25,Essendon,Jordan Ridley,Foot,Season
+R24,25,Essendon,Sullivan Robey,Knee,Season
+R24,25,Fremantle,Sean Darcy,Calf,Test
+R24,25,Fremantle,Jaeger O'Meara,Ankle,Test
+R24,25,Fremantle,Murphy Reid,Groin,Test
+R24,25,Fremantle,Aiden Riddle,Ankle,Test
+R24,25,Fremantle,Sam Sturt,Hamstring,TBC
+R24,25,Fremantle,Corey Wagner,Hip,Test
+R24,25,Fremantle,Brandon Walker,Shoulder,Test
+R24,25,Geelong,Harley Barker,Knee,TBC
+R24,25,Geelong,Jeremy Cameron,AC joint,Test
+R24,25,Geelong,Toby Conway,Foot/Knee,Season
+R24,25,Geelong,Sam De Koning,Knee,Test
+R24,25,Geelong,Max Holmes,Ankle,2-4 weeks
+R24,25,Geelong,Keighton Matofai-Forbes,Finger,1-3 weeks
+R24,25,Geelong,Oli Wiltshire,Foot,Test
+R24,25,Geelong,James Worpel,Hamstring,2-4 weeks
+R24,25,Gold Coast,Sam Collins,Ribs,Test
+R24,25,Gold Coast,Alex Davies,Foot,Season
+R24,25,Gold Coast,Will Graham,Shoulder,Season
+R24,25,Gold Coast,Elliott Himmelberg,Knee,Season
+R24,25,Gold Coast,Christian Petracca,Foot,Season
+R24,25,Gold Coast,Wil Powell,Shoulder,Season
+R24,25,Gold Coast,Lachie Weller,Hamstring,Season
+R24,25,Greater Western Sydney,Leek Aleer,Groin,Season
+R24,25,Greater Western Sydney,Toby Bedford,Back,Test
+R24,25,Greater Western Sydney,Jack Buckley,Calf,Season
+R24,25,Greater Western Sydney,Finn Callaghan,Ankle,Season
+R24,25,Greater Western Sydney,Brent Daniels,Calf,Season
+R24,25,Greater Western Sydney,Phoenix Gothard,Shoulder,Season
+R24,25,Greater Western Sydney,Tom Green,Knee,Season
+R24,25,Greater Western Sydney,Jesse Hogan,Finger,Season
+R24,25,Greater Western Sydney,Darcy Jones,Knee,Season
+R24,25,Greater Western Sydney,Josh Kelly,Hip,Season
+R24,25,Greater Western Sydney,Jayden Laverde,Lung,Season
+R24,25,Greater Western Sydney,James Leake,Leg,Season
+R24,25,Greater Western Sydney,Xavier O'Halloran,Hamstring,Test
+R24,25,Greater Western Sydney,Logan Smith,Knee,Season
+R24,25,Greater Western Sydney,Nathan Wardius,Knee,Season
+R24,25,Hawthorn,Cody Anderson,Hamstring,TBC
+R24,25,Hawthorn,Noah Mraz,Kidney,1 week
+R24,25,Hawthorn,Conor Nash,Neck,Season
+R24,25,Hawthorn,Flynn Perez,Groin,1 week
+R24,25,Melbourne,Jed Adams,Knee,Season
+R24,25,Melbourne,Jai Culley,Knee,Season
+R24,25,Melbourne,Blake Howes,Arm,2-3 weeks
+R24,25,Melbourne,Thomas Matthews,Shoulder,Season
+R24,25,Melbourne,Brody Mihocek,Neck,Season
+R24,25,Melbourne,Andy Moniz-Wakefield,Knee,Season
+R24,25,Melbourne,Jacob van Rooyen,Suspension,3 weeks
+R24,25,North Melbourne,Jackson Archer,Knee,Season
+R24,25,North Melbourne,Zane Duursma,Shoulder,Season
+R24,25,North Melbourne,Robert Hansen jnr,Wrist,Season
+R24,25,North Melbourne,Jacob Konstanty,Illness,Season
+R24,25,North Melbourne,Toby Pink,Shoulder,Season
+R24,25,North Melbourne,Harry Sheezel,Cheekbone,Season
+R24,25,North Melbourne,Blake Thredgold,Foot,Season
+R24,25,Port Adelaide,Aliir Aliir,Concussion,Season
+R24,25,Port Adelaide,Zak Butters,Ankle,Test
+R24,25,Port Adelaide,Logan Evans,Shoulder,Season
+R24,25,Port Adelaide,Kane Farrell,Groin,Season
+R24,25,Port Adelaide,Jason Horne-Francis,Knee,Season
+R24,25,Port Adelaide,Mani Liddy,Hip,Season
+R24,25,Port Adelaide,Ollie Lord,Knee,Season
+R24,25,Port Adelaide,Jack Lukosius,Baker's cyst,Season
+R24,25,Port Adelaide,Ewan Mackinlay,Knee,Season
+R24,25,Port Adelaide,Sam Powell-Pepper,Training block,Season
+R24,25,Port Adelaide,Esava Ratugolea,Knee,Season
+R24,25,Port Adelaide,Connor Rozee,Hamstring,Season
+R24,25,Port Adelaide,Josh Sinn,Shoulder,Season
+R24,25,Port Adelaide,Jack Watkins,Hamstring,Season
+R24,25,Richmond,Jasper Alger,Ankle soreness,Season
+R24,25,Richmond,Noah Balta,Toe,Season
+R24,25,Richmond,Sam Cumming,Ankle/shoulder,Season
+R24,25,Richmond,Jonty Faull,Back,Season
+R24,25,Richmond,Josh Gibcus,ACL strain,Season
+R24,25,Richmond,Jacob Hopper,Ankle,Season
+R24,25,Richmond,Sam Lalor,Knee soreness,Season
+R24,25,Richmond,Rhyan Mansell,Foot,Season
+R24,25,Richmond,Tom Sims,Toe,Season
+R24,25,Richmond,Josh Smillie,Quad,Season
+R24,25,Richmond,Kaleb Smith,Quad,Season
+R24,25,St Kilda,James Barrat,Foot,Season
+R24,25,St Kilda,Sam Flanders,Achilles,Season
+R24,25,St Kilda,Max King,Hamstring,Season
+R24,25,St Kilda,Patrick Said,Concussion,Season
+R24,25,St Kilda,Jack Sinclair,Calf,Season
+R24,25,St Kilda,Nasiah Wanganeen-Milera,Hamstring,Season
+R24,25,St Kilda,Mason Wood,Calf,Season
+R24,25,Sydney,Joel Amartey,Achilles,2 weeks
+R24,25,Sydney,Riley Bice,Suspended,Season
+R24,25,Sydney,Nick Blakey,Suspended,Season
+R24,25,Sydney,Noah Chamberlain,Hamstring,3-4 weeks
+R24,25,Sydney,Will Edwards,Leg,Season
+R24,25,Sydney,Tom Hanily,Ankle,Test
+R24,25,Sydney,Liam Hetherton,Back,Season
+R24,25,Sydney,Isaac Heeney,Suspended,Season
+R24,25,Sydney,James Jordon,Suspended,Season
+R24,25,Sydney,Max King,Back,Season
+R24,25,Sydney,Peter Ladhams,Groin,TBC
+R24,25,Sydney,Hayden McLean,Concussion,1 week
+R24,25,Sydney,Justin McInerney,Hamstring,2-3 weeks
+R24,25,Sydney,James Rowbottom,Hand,Test
+R24,25,Sydney,Chad Warner,Suspended,Season
+R24,25,West Coast,Sam Allen,Knee/hamstring,Season
+R24,25,West Coast,Tyler Brockman,Hamstring,Season
+R24,25,West Coast,Harry Edwards,Concussion,Season
+R24,25,West Coast,Oliver Francou,Knee laceration,2 weeks
+R24,25,West Coast,Reuben Ginbey,Quad,Season
+R24,25,West Coast,Elijah Hewett,Corked calf,Test
+R24,25,West Coast,Jack Hutchinson,Hamstring,Test
+R24,25,West Coast,Noah Long,Knee,Season
+R24,25,West Coast,Jake Miles-Wrency,Ankle/calf,Test
+R24,25,West Coast,Jacob Newton,Foot,Season
+R24,25,West Coast,Matt Owies,Knee,TBC
+R24,25,West Coast,Archer Reid,Knee,Season
+R24,25,West Coast,Deven Robertson,Knee,Season
+R24,25,West Coast,Tylah Williams,Leg,Season
+R24,25,Western Bulldogs,Connor Budarick,Ankle,Test
+R24,25,Western Bulldogs,Nick Coffield,Concussion,1-2 weeks
+R24,25,Western Bulldogs,Bailey Dale,Shoulder,Test
+R24,25,Western Bulldogs,Sam Darcy,Knee,Season
+R24,25,Western Bulldogs,Tim English,Knee,1-3 weeks
+R24,25,Western Bulldogs,Riley Garcia,Hamstring,Season
+R24,25,Western Bulldogs,Will Lewis,Calf,2-3 weeks
+R24,25,Western Bulldogs,Lachie Smith,Hamstring,4-5 weeks
+R24,25,Western Bulldogs,Adam Treloar,Calf,3-4 weeks
