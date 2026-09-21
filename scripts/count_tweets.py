@@ -1975,10 +1975,20 @@ def build_context(players, d):
 
 
 def _read_feed():
-    """One read of the AFL feed. Returns (season_id, season_name, players)."""
+    """One read of the AFL feed. Returns (season_id, season_name, players).
+
+    Reads the LIVE vote feed, not the award endpoint. On count night 2026 the
+    award endpoint never flipped: five rounds into the broadcast it was still
+    byte-identical to the 10 September predictor snapshot while the AFL's own
+    live tracker showed the real votes. `bfawards_feed` is the source that page
+    actually uses, and it returns rows in this same shape, so everything
+    downstream is unchanged. See that module's docstring.
+    """
     import count_night as cn
+    import bfawards_feed as bf
     sid, sname = cn.season_id()
-    return sid, sname, cn.fetch(sid)
+    _status, ps = bf.players()
+    return sid, sname, ps
 
 
 def run_once(args, feed=None):

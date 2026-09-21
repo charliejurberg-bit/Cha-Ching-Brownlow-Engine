@@ -2108,6 +2108,24 @@ def fetch_live_brownlow_data():
         # capped at 500 players and the 2026 feed carries 630, so a truncated
         # read silently dropped the tail — and mid-count a player on one vote can
         # still be the row that moves a record.
+        # THE LIVE FEED, TRIED FIRST. The award endpoint below did NOT flip on
+        # count night 2026: five rounds into the broadcast it was still
+        # byte-identical to the 10 September predictor snapshot while the AFL's
+        # own live tracker showed the real votes. scripts/bfawards_feed.py is
+        # the source that page uses, it returns rows in this endpoint's shape,
+        # and it carries an explicit status field, which is the one thing the
+        # award endpoint has never had. Imported rather than reimplemented so
+        # the page and the drafter cannot drift apart on what a vote is.
+        live_players, live_status = None, None
+        try:
+            _sd = os.path.join(os.path.dirname(os.path.abspath(__file__)), "scripts")
+            if _sd not in sys.path:
+                sys.path.insert(0, _sd)
+            import bfawards_feed as _bf
+            live_status, live_players = _bf.players(with_ids=False)
+        except Exception:
+            live_players, live_status = None, None
+
         all_players = []
         for page in range(12):
             pr = _req.get(
@@ -2124,7 +2142,7 @@ def fetch_live_brownlow_data():
             if batch[-1].get("totalVotes", 0) == 0 and page >= 1:
                 break
 
-        if not all_players:
+        if not all_players and not live_players:
             return {**_empty, "error": "AFL API returned no player data."}
 
         # WHAT THE FEED IS SERVING, MEASURED RATHER THAN ASSUMED.
@@ -2137,7 +2155,19 @@ def fetch_live_brownlow_data():
         # the count and returns PREDICTOR / COUNTING / COUNTED / UNKNOWN. It
         # fails to UNKNOWN, never to "live", because labelling predictions as
         # the count is the one error that cannot be walked back.
-        feed_state = _feed_state(all_players)
+        # The live feed wins when it says LIVE, and its own totals decide
+        # COUNTING against COUNTED. No snapshot comparison is needed or wanted
+        # here: the snapshot exists only because the award endpoint is
+        # unlabelled, and this feed labels itself. Anything else, including a
+        # live feed that is unreachable or not yet live, falls back to the
+        # snapshot test on the award payload, which still fails to UNKNOWN
+        # rather than to "live".
+        if live_players and live_status == "LIVE":
+            all_players = live_players
+            _tot = sum(p.get("totalVotes", 0) for p in live_players)
+            feed_state = "COUNTING" if _tot < _FULL_VOTE_POOL else "COUNTED"
+        else:
+            feed_state = _feed_state(all_players)
         is_live = feed_state in ("COUNTING", "COUNTED")
 
         # Build per-round feed dict and player rows
