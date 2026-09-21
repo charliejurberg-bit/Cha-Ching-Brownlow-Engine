@@ -255,8 +255,12 @@ def main(argv=None):
         blob = json.load(open(args.from_file, encoding="utf-8"))
         players = blob["players"] if isinstance(blob, dict) else blob
     else:
-        sid, _ = cn.season_id()
-        players = cn.fetch(sid)
+        # The LIVE feed, via count_tweets._read_feed. cn.fetch reads the award
+        # endpoint, which on count night 2026 never flipped: it served the
+        # 10 September predictor all night while the votes were public. Settling
+        # a slip against it would have reported every bet against predicted
+        # votes. See scripts/bfawards_feed.py.
+        sid, _, players = ct._read_feed()
 
     state, why = cn.classify(cn.digest(players), cn.load_snapshot())
     print(f"  feed state: {state} - {why}")

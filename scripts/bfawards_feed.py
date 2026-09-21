@@ -76,15 +76,22 @@ def team_ids():
     return out
 
 
-def player_ids():
-    """{player provider id -> numeric id} from the award endpoint's roster.
+def award_roster():
+    """Every eligible player from the award endpoint, votes stripped.
 
-    Downstream keys every player on the award endpoint's numeric ``id``, and
-    the live feed carries only the provider form (CD_I297373). The award
-    endpoint's VOTES are the stale predictor on count night, but its roster and
-    its ids are not, so it stays the authority on identity alone.
+    Downstream keys players on the award endpoint's numeric ``id``, and the
+    live feed carries only the provider form (CD_I297373). The award endpoint's
+    VOTES are the stale predictor on count night, but its ROSTER and its ids
+    are not, so it stays the authority on identity alone.
+
+    It is also the only source of players who polled nothing. The live feed
+    carries vote-getters and no one else, and several things downstream ask a
+    question about a player BECAUSE he has no votes: the snub test wants the
+    model's first pick in a game to have polled zero, and cannot tell "polled
+    zero" from "absent from the payload". Returning the full roster with
+    ``totalVotes`` zeroed restores the shape the award endpoint always had.
     """
-    out, page = {}, 0
+    out, page = [], 0
     while True:
         r = requests.get(f"{BASE}/compseasons/85/award/brownlow"
                          f"?page={page}&pageSize=100", headers=HDRS, timeout=TMO)
@@ -95,7 +102,16 @@ def player_ids():
             break
         for p in batch:
             if p.get("providerId") and isinstance(p.get("id"), int):
-                out[p["providerId"]] = p["id"]
+                out.append({
+                    "id": p["id"],
+                    "providerId": p["providerId"],
+                    "firstName": p.get("firstName", ""),
+                    "surname": p.get("surname", ""),
+                    "teamId": p.get("teamId"),
+                    "eligible": p.get("eligible", True),
+                    "totalVotes": 0,
+                    "rounds": {},
+                })
         page += 1
         if page > 40:
             break
@@ -116,22 +132,25 @@ def raw(season=SEASON_PID, sess=None, tok=None):
     return sj.get("status"), sj.get("matchVotes", []), l.json().get("leaderboard", [])
 
 
-def players(season=SEASON_PID, with_ids=True):
+def players(season=SEASON_PID, roster=True):
     """Live votes in the award endpoint's player shape.
 
-    Returns (status, rows). Built from ``matchVotes`` rather than from the
-    leaderboard's ``roundByRoundVotes``, because matchVotes is the per-match
-    record and carries the matchId every finished-round test keys on. The
-    leaderboard is read only for the team id and the eligible flag.
+    Returns (status, rows). Votes are built from ``matchVotes`` rather than
+    from the leaderboard's ``roundByRoundVotes``, because matchVotes is the
+    per-match record and carries the matchId every finished-round test keys
+    on. The leaderboard is read only for the team id and the eligible flag.
 
-    ``with_ids=False`` skips the numeric player id mapping, which costs a
-    21-page walk of the award endpoint. The drafter keys on that id and needs
-    it; the Live Tracker bridges on name plus club and does not, and it refetches
-    every 60 seconds all night, so it asks for the cheap version.
+    ``roster=True`` walks the award endpoint as well, for the numeric player
+    ids and for every player on zero votes. The drafter needs both, and the
+    zero-vote half is not optional for it: see `award_roster`.
+
+    ``roster=False`` returns the vote-getters alone and skips that 21-page
+    walk. The Live Tracker bridges on name plus club, computes its blanked and
+    bolter panels from the model frame rather than from feed absence, and
+    refetches every 60 seconds all night, so it takes the cheap read.
     """
     status, match_votes, board = raw(season)
     tmap = team_ids()
-    imap = player_ids() if with_ids else {}
 
     meta = {}
     for e in board:
@@ -139,6 +158,13 @@ def players(season=SEASON_PID, with_ids=True):
         meta[p.get("playerId")] = (e.get("team") or {}, e.get("eligible", True))
 
     rows = {}
+    if roster:
+        # Seeded with every eligible player on zero votes, then the live votes
+        # are laid over the top. A vote-getter the roster somehow omits still
+        # gets created by the setdefault below.
+        for p in award_roster():
+            rows[p["providerId"]] = p
+
     for m in match_votes:
         mid, rn = m.get("matchId"), m.get("roundNumber")
         for v in m.get("votes") or []:
@@ -148,7 +174,7 @@ def players(season=SEASON_PID, with_ids=True):
                 continue
             team, elig = meta.get(pid, (v.get("team") or {}, v.get("eligible", True)))
             r = rows.setdefault(pid, {
-                "id": imap.get(pid),
+                "id": None,
                 "providerId": pid,
                 "firstName": p.get("givenName", ""),
                 "surname": p.get("surname", ""),
@@ -161,7 +187,7 @@ def players(season=SEASON_PID, with_ids=True):
                 {"providerId": mid, "points": v["votes"]})
             r["totalVotes"] += v["votes"]
 
-    checks = [("teamId", "club")] + ([("id", "player id")] if with_ids else [])
+    checks = [("teamId", "club")] + ([("id", "player id")] if roster else [])
     for field, what in checks:
         bad = [r for r in rows.values() if r[field] is None]
         if bad:

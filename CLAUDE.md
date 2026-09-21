@@ -288,6 +288,42 @@ its own, so a 2026 game's `P_3` sums anywhere from 38% to 199% (112 of 207 over
   within the game (see `scripts/count_sim.py`), never draw the three columns
   independently.
 
+**Measured against the completed 2026 count, 207 games out of sample. The
+ordering is excellent and the probabilities are compressed toward the middle.**
+That one defect explains every result below, and it is a calibration problem
+rather than a model problem.
+
+What the ordering got right: the winner, the top three in order, 17 of the top
+20, and the model's first pick in a game took the three votes in **145 of 207
+games (70.0%)** against a 56.6% backtest baseline. The 3-2-1 board read Daicos
+48 against an actual 47, Cripps and Heeney exactly, MAE 1.70 votes.
+
+What the probabilities got wrong, by model `p` bucket:
+
+| Model p | n | Model says | Actually happened |
+|---|---|---|---|
+| 0.60 to 1.00 | 94 | 75.5% | **86.2%** |
+| 0.35 to 0.60 | 118 | 48.7% | **55.9%** |
+| 0.20 to 0.35 | 107 | 26.4% | 19.6% |
+| 0.10 to 0.20 | 192 | 14.0% | 10.4% |
+| 0.05 to 0.10 | 149 | 7.8% | 4.0% |
+
+It understates near-certainties and roughly doubles the tail. On the favourite
+it said 60.5% where the market said 69.5% and the truth was **69.6%**: the book
+was almost exactly right and the model nine points low.
+
+Two consequences worth stating before anyone builds on these numbers again. Any
+EV screen over them points the wrong way twice, refusing the favourites the
+model is right about and flagging the tail where it is most wrong; the 2026
+boards went 27 from 287 on 3-vote value picks, -67.9% ROI, while blindly backing
+the model's own top pick returned -5.8%. And the same compression is why
+`Exp_Votes` under-predicts every one of the actual top ten (Daicos 39.6 against
+47) where the 3-2-1 board does not, which is the first real evidence that the
+within-game fit above is the right call.
+
+Recalibrate against `backtest_game_level.csv` and validate on the 207 games of
+2026 before any probability from this model is published or staked again.
+
 **Season projection**: Monte Carlo (10,000 simulations) over completed rounds →
 10th/90th percentile floor/ceiling. Two things about it are easy to get wrong.
 
@@ -617,15 +653,73 @@ from his phone.
 LIVE COUNT off the feed, and `.github/workflows/keepalive.yml` keeps the app
 awake. Open the site yourself before the count anyway: the job fires every 1.6 to
 5.6 hours in practice, so the first visitor after a quiet spell can still meet a
-cold start. If asked whether it is live,
-`python scripts/count_night.py status` answers in one line without touching the
-site.
+cold start. If asked whether it is live, **do not use
+`python scripts/count_night.py status`**: it reads the award endpoint, which
+never flips, and it answered PREDICTOR through a count that was 80% complete.
+`python -c "import sys;sys.path.insert(0,'scripts');import bfawards_feed as
+b;print(b.players(roster=False)[0])"` prints the live feed's own status field.
 
 ## Count night and the Live Tracker
 
-**The AFL award endpoint serves the AFL's own PREDICTOR between counts and the
-live votes on the night, at the same URL, in the same shape, with no field
-saying which.** `aflapi.afl.com.au/afl/v2/compseasons/{id}/award/brownlow`.
+**READ THIS FIRST: the award endpoint NEVER carried the live count on 21
+September 2026, and everything below it in this section was written on the
+assumption that it would.** Five rounds into the broadcast it was still
+byte-identical to the predictor snapshot taken on 10 September, while the AFL's
+own live tracker page showed the real votes. It stayed that way all night. The
+snapshot comparison is therefore not a way of telling the predictor from the
+count: it is a way of telling the predictor from itself, and it answers
+PREDICTOR forever.
+
+**The live votes are on a different host, found by sniffing what the AFL's own
+live tracker page requests:**
+
+```
+https://api.afl.com.au/cfs/afl/bfawards/season/{seasonProviderId}
+https://api.afl.com.au/cfs/afl/bfawards/leaderboard/season/{seasonProviderId}
+```
+
+`CD_S2026014` is 2026's. It needs the same `x-media-mis-token` that
+`fetch_match_chains.py` mints (`POST /cfs/afl/WMCTok`, with `Origin`, `Referer`
+and an explicit `Content-Length: 0`), and it returns **401** without one.
+
+**It carries an explicit `status` field ("LIVE").** That is the thing the award
+endpoint has never had and the whole reason the snapshot design existed. Prefer
+it over any before-picture comparison.
+
+**`scripts/bfawards_feed.py` is the adapter, and it returns rows in the award
+endpoint's shape**, so `count_night.digest` and `count_tweets.build_context`
+work unchanged. Three things in it are load-bearing:
+
+- **`roster=True` merges the award endpoint's full player list underneath the
+  live votes, with `totalVotes` zeroed.** The live feed carries vote-getters and
+  nobody else. Several things downstream ask a question about a player BECAUSE
+  he polled nothing, and the snub block is one: it wants the model's first pick
+  in a game to have no votes, and it cannot tell "polled zero" from "absent from
+  the payload". Without the merge it silently drafts nothing, which is exactly
+  what happened for the first eleven rounds of the 2026 count. Two real snubs
+  (rounds 1 and 4) were lost live and only recovered by replay.
+- **The award endpoint's ROSTER and ids stay valid even when its votes are
+  stale**, so it remains the authority on identity. Club and player ids map by
+  id, never by name, and an unmapped one raises.
+- **`roster=False` skips the 21-page award walk** for the Live Tracker, which
+  refetches every 60 seconds and bridges on name plus club.
+
+**What is repointed and what is not, as of 22 September 2026:**
+
+| Reads the live feed | Still reads the stale award endpoint |
+|---|---|
+| `count_tweets._read_feed` | `count_night.py` (`status`, `fetch`, `classify`) |
+| `count_slip.py` | |
+| `dashboard.fetch_live_brownlow_data` (falls back) | |
+
+`python scripts/count_night.py status` therefore printed PREDICTOR all through
+a count that was 80% done. Fix it before 2027 or delete the command.
+
+Everything below this block is the 2026 pre-count design. Keep it for the
+fallback path, which `dashboard.py` still uses when the live feed is
+unreachable, and do not trust its central claim.
+
+`aflapi.afl.com.au/afl/v2/compseasons/{id}/award/brownlow`.
 Measured against two completed seasons rather than assumed: it says 2025 Dawson
 32 where the count was Rowell 39, and 2024 Cripps 33 where the count was Cripps
 45. So `any(totalVotes > 0)` is true all year and gates nothing. It was the
