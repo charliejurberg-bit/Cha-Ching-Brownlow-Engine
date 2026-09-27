@@ -310,6 +310,16 @@ if MODEL_NOCV is not None:
 df26_valid['Poll_Prob'] = df26_valid['P_1']+df26_valid['P_2']+df26_valid['P_3']
 df26_valid['Exp_Votes'] = df26_valid['P_1']*1+df26_valid['P_2']*2+df26_valid['P_3']*3
 
+# ── Stacked probabilities (stack.py) ─────────────────────────
+# Replaces P_1..P_3 / Poll_Prob / Exp_Votes with the classifier + ranker + regime
+# layer stack, keeping the classifier's figures as P_*_classifier. It refuses a
+# season it was trained on, so while predictions/stack.pkl is trained through
+# 2026 this leaves the 2026 numbers exactly as the classifier made them. Runs
+# BEFORE the same-name disambiguation below, because its footywire join and its
+# last-season votes are keyed on the undecorated name and on ID.
+import stack
+df26_valid = stack.apply_if_ready(df26_valid, 2026)
+
 # Disambiguate players who share a name but play for different teams
 player_teams = df26_valid.groupby('Player_Name')['Playing.for'].nunique()
 duplicate_names = player_teams[player_teams > 1].index

@@ -30,9 +30,9 @@ python predict_2026.py
 
 ## Update chain
 
-`python update.py` runs the nine step weekly chain: one R step (2026 stats) then
-eight Python steps (odds, Betfair, ESPN, AFL predictor, Wheelo, predictions,
-drafts, `site/landing.json`). The 2026 coaches fetch is commented out of it, see
+`python update.py` runs the eleven step weekly chain: one R step (2026 stats) then
+ten Python steps (odds, Betfair, ESPN, AFL predictor, Wheelo, footywire advanced
+stats and their ID join, predictions, drafts, `site/landing.json`). The 2026 coaches fetch is commented out of it, see
 below. Nothing in the chain stops on a failed step; read each step's exit code.
 The 2026 home and away season is over, so the chain has nothing left to fetch
 this year. One-off checks tied to a particular round are
@@ -116,7 +116,14 @@ brownlow_engine/
 │
 ├── brownlow_model.py     # Model training (v4.0) — runs once per season
 ├── predict_2026.py       # In-season predictor — run after each round
-├── update.py             # Nine step weekly chain, ends with site/landing.json
+├── update.py             # Eleven step weekly chain, ends with site/landing.json
+├── stack.py              # FROM 2027 the shipping vote model: classifier + within-
+│                         #   game ranker + regime layer, predictions/stack.pkl.
+│                         #   predict_2026.py applies it only to a season AFTER the
+│                         #   one it was trained through. See "From 2027: the stack"
+├── ranker_backtest.py    # The evidence for stack.py: walk-forward, 2013-2026
+├── calibration.py        # Regime layer over the classifier alone. Superseded for
+│                         #   shipping by stack.py; kept for its 2026 measurements
 │
 ├── scraper_stats.py      # Pulls player stats from Squiggle API → data_2026/
 ├── scraper_odds.py       # Scrapes multi-bookie odds from Oddschecker (undetected-chromedriver)
@@ -252,6 +259,35 @@ brownlow_engine/
   are 0.0953 full model and 0.1013 no-coaches. Re-run against the current model
   before any MAE figure is used anywhere. See `project_brief.md`, "## Model".
 - **Feature count**: 93 total
+
+### From 2027: the stack (`stack.py`)
+
+Built 27 September 2026 after the count exposed the classifier's flat
+probabilities. A Plackett-Luce layer over (a) this classifier's within-game
+fitted P(3) and poll, (b) an `XGBRanker` grouped by game on the 93 features plus
+`features.build_extra_features` (last season's actual votes, footywire metres
+gained / real score involvements / intercepts), and (c) within-game z of
+disposals, goals, marks, tackles, hitouts. It draws the 3, then the 2, then the
+1, so every game hands out exactly 3-2-1 and `Exp_Votes` sums to 6.
+
+- **Evidence** (`ranker_backtest.py`): beats the classifier in 12 of 13
+  walk-forward seasons (log loss 1.235 to 1.199); in 2026 level with Sportsbet's
+  3-vote board on log loss (0.797 vs 0.805), behind on Brier (0.0703 vs 0.0679).
+  No EV screen off it made money. Single-season differences under ~0.015 log loss
+  are noise: column order alone moves them.
+- **The layer is fitted on the latest season's OUT-OF-SAMPLE scores** (base
+  models trained without it), then the base models are refitted including it.
+  The latest season is the regime (2026: first with umpire stats access), so the
+  layer carries it and is refitted after every count.
+- **No extra weight on the latest season in the base models.** Measured: 3x or
+  6x beat equal weight in 4 of 13 seasons and made the 2026 prediction worse.
+- **In-sample guard.** `apply_if_ready` refuses any season `<= trained_through`,
+  so while `stack.pkl` is trained through 2026 the 2026 site stays the
+  classifier's, byte for byte. It first speaks for 2027.
+- **2026 votes** live in `data_2026/brownlow_votes_2026.csv`
+  (`scripts/fetch_brownlow_votes.py`); `game_level_2026.csv` still reads 0.
+- **Rollover to 2027:** move `ranker_backtest.LAST_SEASON`, write
+  `data_2027/brownlow_votes_2027.csv` after that count, rerun `python stack.py train`.
 
 **Feature groups:**
 1. **Base** (28): raw stats (Kicks, Disposals, Goals, Clearances, etc.) + engineered ratios (`Kick_to_HB_ratio`, `Contested_rate`, `Disposal_efficiency`, `Score_Involvements`, `Impact_Score`) + game context (Margin, Is_Win, Coaches_Votes)

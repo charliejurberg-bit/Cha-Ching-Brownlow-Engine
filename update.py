@@ -1,6 +1,6 @@
 """One-click weekly update.
 
-Nine steps in two loops, each run as its own subprocess. The R loop goes first
+Eleven steps in two loops, each run as its own subprocess. The R loop goes first
 because predict_2026.py depends on the CSVs it writes.
 
 R loop:
@@ -15,11 +15,15 @@ Python loop:
     4. scraper_espn.py         ESPN predictions, season totals and per-round
     5. scraper_afl.py          AFL Predictor votes
     6. update_wheelo_2026.py   Wheelo 2026 ratings
-    7. predict_2026.py         2026 predictions
-    8. draft_posts.py          drafts/round_<display>.md
-    9. landing_summary.py      site/landing.json
+    7. scraper_advanced.py     footywire advanced stats for the season
+    8. build_score_involvements.py   joins them onto fitzRoy IDs
+    9. predict_2026.py         2026 predictions (stack.py applies here once it
+                               is trained on an earlier season than the one
+                               predicted; see stack.py)
+   10. draft_posts.py          drafts/round_<display>.md
+   11. landing_summary.py      site/landing.json
 
-Step 9 writes an artifact, not a page. site/landing.json is git tracked, so
+Step 11 writes an artifact, not a page. site/landing.json is git tracked, so
 running this changes nothing the public can see: the numbers reach the live site
 only once the file is committed and pushed, and an uncommitted run leaves the
 site on last week's figures. Committing is necessary rather than sufficient. The
@@ -100,12 +104,12 @@ def run_r_script(r_script_path, description):
         print(f"! R script finished with warnings (this may be normal)")
     return result.returncode
 
-def run_script(script_name):
+def run_script(script_name, args=()):
     print(f"\n{'='*50}")
     print(f"Running {script_name}...")
     print('='*50)
     result = subprocess.run(
-        [sys.executable, script_name],
+        [sys.executable, script_name, *args],
         capture_output=False,
         text=True
     )
@@ -146,14 +150,24 @@ if __name__ == "__main__":
         ("scraper_espn.py",        "Scraping ESPN Brownlow predictions (season + per-round votes)"),
         ("scraper_afl.py",         "Scraping AFL Predictor Brownlow votes"),
         ("update_wheelo_2026.py",  "Updating Wheelo 2026 ratings"),
+        # footywire's metres gained / real score involvements / intercepts. The
+        # stack's ranker reads them (stack.py) and the rebuilt join also feeds the
+        # dashboard's Stat Filter. build_score_involvements.py joins the rounds
+        # already in game_level_2026.csv; the round being predicted is joined in
+        # memory by stack.advanced_for. So: scrape, rebuild, predict.
+        (("scraper_advanced.py", "2026"), "Scraping footywire advanced stats"),
+        ("build_score_involvements.py", "Joining footywire stats onto player IDs"),
         ("predict_2026.py",        "Generating 2026 predictions"),
         ("draft_posts.py",         "Generating draft posts"),
         ("landing_summary.py",     "Writing site/landing.json for the front door"),
     ]
     for script, description in py_scripts:
+        # An entry is a script name, or a (script, arg, ...) tuple for a step
+        # that needs arguments, like the season scraper_advanced.py scrapes.
+        script, args = (script[0], script[1:]) if isinstance(script, tuple) else (script, ())
         if os.path.exists(script):
             print(f"\n>> {description}...")
-            run_script(script)
+            run_script(script, args)
         else:
             print(f"\n! {script} not found — skipping")
 

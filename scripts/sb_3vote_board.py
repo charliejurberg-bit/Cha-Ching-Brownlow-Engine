@@ -128,7 +128,11 @@ def model_probs():
     # game_level can carry a player twice in one game with different Wheelo
     # columns, so a bare drop_duplicates removes none of them. Key on the pair.
     g = g.drop_duplicates(subset=["Game_ID", "Player_Name"])
-    g["P"] = iso.predict(g.P_3_game)
+    # The stack (stack.py) is calibrated by its own Plackett-Luce layer, fitted
+    # on the latest regime. This map was fitted on the old classifier's 2008-2025
+    # output and would pull the stack's figures back toward that regime.
+    stacked = g.get("prob_source", pd.Series("", index=g.index)).eq("stack")
+    g["P"] = np.where(stacked, g.P_3_game, iso.predict(g.P_3_game))
     g["_n"] = g.Player_Name.map(normalise_name)
     g["_sur"] = (g.Player_Name.str.replace(r"\s*\([^()]*\)$", "", regex=True)
                  .str.split().str[-1].str.lower())

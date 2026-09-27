@@ -724,3 +724,69 @@ def assemble_features(df, rank_stats, wheelo_features, form_features,
             leaked += [f for f in features if f == 'momentum_cv']
         assert not leaked, f"NO_COACHES feature set still carries: {leaked}"
     return features
+
+
+# ── Extra features for the within-game ranker (ranker_backtest.py) ────────────
+# Not part of the shipping classifier's 93: adding them to assemble_features would
+# change what model.pkl is fitted on. They are measured in ranker_backtest.py.
+#
+# prev_votes is REPUTATION: a player's actual Brownlow votes last season, and the
+# season before. It is the one feature tested so far whose fitted weight held
+# steady across both regimes (0.20 on 2008-2025, 0.21 on 2026), which is what
+# separates it from umpire identity (no stable signal at all). Keyed on fitzRoy
+# ID, never name.
+#
+# The advanced columns come from footywire via build_score_involvements.py and
+# start in 2015; earlier rows are NaN, which XGBoost treats as missing rather
+# than zero. Score_Involvements_Actual is the REAL stat, not the engineered
+# `Score_Involvements` column (see CLAUDE.md, "Score involvements").
+EXTRA_GAME_STATS = ['prev_votes', 'Metres_Gained', 'Score_Involvements_Actual', 'Intercepts']
+EXTRA_RAW = ['prev_votes', 'prev2_votes', 'Metres_Gained', 'Score_Involvements_Actual', 'Intercepts']
+
+
+def extra_feature_names():
+    return EXTRA_RAW + [f'{s}_game_{k}' for s in EXTRA_GAME_STATS for k in ('z', 'rank')]
+
+
+def build_extra_features(df, season_votes, advanced):
+    """Adds the ranker's extra features to a game-level frame.
+
+    season_votes: Season, ID, votes (a player's ACTUAL season total). Only prior
+    seasons are ever joined, so the current season's votes cannot leak in.
+    advanced: data_advanced/score_involvements.csv.
+    Needs a Game_ID-like key; the within-game z and rank group on `gid`.
+    """
+    sv = season_votes.groupby(['Season', 'ID'])['votes'].sum().reset_index()
+    for lag, col in ((1, 'prev_votes'), (2, 'prev2_votes')):
+        df = df.merge(sv.assign(Season=sv.Season + lag).rename(columns={'votes': col}),
+                      on=['Season', 'ID'], how='left')
+        df[col] = df[col].fillna(0)
+    adv = advanced.drop_duplicates(['Season', 'Round_num', 'ID'])
+    df = df.merge(adv[['Season', 'Round_num', 'ID', 'Metres_Gained',
+                       'Score_Involvements_Actual', 'Intercepts']],
+                  on=['Season', 'Round_num', 'ID'], how='left')
+    g = df.groupby('gid')
+    for s in EXTRA_GAME_STATS:
+        sd = g[s].transform('std').replace(0, np.nan)
+        df[f'{s}_game_z'] = (df[s] - g[s].transform('mean')) / sd
+        df[f'{s}_game_rank'] = g[s].rank(ascending=False, method='min')
+    return df
+
+
+def fill_missing_ids(df, reference):
+    """Fill a blank fitzRoy ID from the same Player_Name in `reference`, but only
+    where that name carries exactly one ID there.
+
+    92 rows of 2026 arrived with no ID, twelve established players among them
+    (Charlie Cameron, Jack Ross, Jack Graham, Jack Williams). Everything keyed on
+    ID then treats them as strangers: no last-season votes, no footywire join.
+    A name carrying two IDs (the two Bailey Williamses, the two Josh Kennedys)
+    is left blank, because guessing between two people is worse than a gap.
+    """
+    ref = reference.dropna(subset=['ID']).drop_duplicates(['Player_Name', 'ID'])
+    n = ref.groupby('Player_Name')['ID'].transform('size')
+    unique = ref[n == 1].set_index('Player_Name')['ID']
+    miss = df['ID'].isna()
+    df = df.copy()
+    df.loc[miss, 'ID'] = df.loc[miss, 'Player_Name'].map(unique)
+    return df

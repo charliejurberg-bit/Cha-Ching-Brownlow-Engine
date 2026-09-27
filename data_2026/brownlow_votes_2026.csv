@@ -1,0 +1,622 @@
+Season,Round_num,Home.team,Away.team,Player_Name,Playing.for,ID,Brownlow.Votes,Eligible,matchId
+2026,1,Brisbane Lions,Western Bulldogs,Ed Richards,Western Bulldogs,12605.0,3,True,CD_M20260140004
+2026,1,Brisbane Lions,Western Bulldogs,Lachie Neale,Brisbane Lions,12055.0,2,True,CD_M20260140004
+2026,1,Brisbane Lions,Western Bulldogs,Marcus Bontempelli,Western Bulldogs,12269.0,1,True,CD_M20260140004
+2026,1,Gold Coast,Geelong,Christian Petracca,Gold Coast,12430.0,3,True,CD_M20260140002
+2026,1,Gold Coast,Geelong,John Noble,Gold Coast,12743.0,2,True,CD_M20260140002
+2026,1,Gold Coast,Geelong,Bailey Humphrey,Gold Coast,13049.0,1,False,CD_M20260140002
+2026,1,Greater Western Sydney,Hawthorn,Jake Stringer,Greater Western Sydney,12167.0,3,True,CD_M20260140003
+2026,1,Greater Western Sydney,Hawthorn,Clayton Oliver,Greater Western Sydney,12410.0,2,True,CD_M20260140003
+2026,1,Greater Western Sydney,Hawthorn,Finn Callaghan,Greater Western Sydney,12969.0,1,True,CD_M20260140003
+2026,1,St Kilda,Collingwood,Nick Daicos,Collingwood,12943.0,3,True,CD_M20260140005
+2026,1,St Kilda,Collingwood,Callum Wilkie,St Kilda,12703.0,2,True,CD_M20260140005
+2026,1,St Kilda,Collingwood,Jack Crisp,Collingwood,12061.0,1,True,CD_M20260140005
+2026,1,Sydney,Carlton,Justin McInerney,Sydney,12711.0,3,True,CD_M20260140001
+2026,1,Sydney,Carlton,Errol Gulden,Sydney,12862.0,2,True,CD_M20260140001
+2026,1,Sydney,Carlton,Brodie Grundy,Sydney,12217.0,1,True,CD_M20260140001
+2026,2,Carlton,Richmond,Jagga Smith,Carlton,13274.0,3,True,CD_M20260140101
+2026,2,Carlton,Richmond,Patrick Cripps,Carlton,12261.0,2,True,CD_M20260140101
+2026,2,Carlton,Richmond,Tim Taranto,Richmond,12504.0,1,True,CD_M20260140101
+2026,2,Collingwood,Adelaide,Nick Daicos,Collingwood,12943.0,3,True,CD_M20260140106
+2026,2,Collingwood,Adelaide,Riley Thilthorpe,Adelaide,12892.0,2,False,CD_M20260140106
+2026,2,Collingwood,Adelaide,Alex Neal-Bullen,Adelaide,12367.0,1,True,CD_M20260140106
+2026,2,Essendon,Hawthorn,Connor Macdonald,Hawthorn,12954.0,3,True,CD_M20260140102
+2026,2,Essendon,Hawthorn,Nick Watson,Hawthorn,13105.0,2,True,CD_M20260140102
+2026,2,Essendon,Hawthorn,Jack Gunston,Hawthorn,11845.0,1,True,CD_M20260140102
+2026,2,Geelong,Fremantle,Luke Jackson,Fremantle,12779.0,3,True,CD_M20260140104
+2026,2,Geelong,Fremantle,Max Holmes,Geelong,12881.0,2,True,CD_M20260140104
+2026,2,Geelong,Fremantle,Caleb Serong,Fremantle,12786.0,1,True,CD_M20260140104
+2026,2,Gold Coast,West Coast,Christian Petracca,Gold Coast,12430.0,3,True,CD_M20260140109
+2026,2,Gold Coast,West Coast,Noah Anderson,Gold Coast,12767.0,2,True,CD_M20260140109
+2026,2,Gold Coast,West Coast,Ben King,Gold Coast,12728.0,1,True,CD_M20260140109
+2026,2,Melbourne,St Kilda,Max Hall,St Kilda,13193.0,3,True,CD_M20260140108
+2026,2,Melbourne,St Kilda,Jacob van Rooyen,Melbourne,13048.0,2,False,CD_M20260140108
+2026,2,Melbourne,St Kilda,Max Gawn,Melbourne,11966.0,1,True,CD_M20260140108
+2026,2,North Melbourne,Port Adelaide,Luke Davies-Uniacke,North Melbourne,12590.0,3,True,CD_M20260140107
+2026,2,North Melbourne,Port Adelaide,Dylan Stephens,North Melbourne,12796.0,2,True,CD_M20260140107
+2026,2,North Melbourne,Port Adelaide,Harry Sheezel,North Melbourne,13034.0,1,True,CD_M20260140107
+2026,2,Sydney,Brisbane Lions,Tom McCartin,Sydney,12627.0,3,True,CD_M20260140105
+2026,2,Sydney,Brisbane Lions,Riley Bice,Sydney,13195.0,2,True,CD_M20260140105
+2026,2,Sydney,Brisbane Lions,Joel Amartey,Sydney,12844.0,1,True,CD_M20260140105
+2026,2,Western Bulldogs,Greater Western Sydney,Marcus Bontempelli,Western Bulldogs,12269.0,3,True,CD_M20260140103
+2026,2,Western Bulldogs,Greater Western Sydney,Aaron Naughton,Western Bulldogs,12594.0,2,True,CD_M20260140103
+2026,2,Western Bulldogs,Greater Western Sydney,Tim English,Western Bulldogs,12537.0,1,True,CD_M20260140103
+2026,3,Adelaide,Western Bulldogs,Joel Freijah,Western Bulldogs,13140.0,3,True,CD_M20260140202
+2026,3,Adelaide,Western Bulldogs,Marcus Bontempelli,Western Bulldogs,12269.0,2,True,CD_M20260140202
+2026,3,Adelaide,Western Bulldogs,Ed Richards,Western Bulldogs,12605.0,1,True,CD_M20260140202
+2026,3,Fremantle,Melbourne,Shai Bolton,Fremantle,12535.0,3,True,CD_M20260140205
+2026,3,Fremantle,Melbourne,Andrew Brayshaw,Fremantle,12589.0,2,True,CD_M20260140205
+2026,3,Fremantle,Melbourne,Josh Treacy,Fremantle,12887.0,1,True,CD_M20260140205
+2026,3,Greater Western Sydney,St Kilda,Callum Wilkie,St Kilda,12703.0,3,True,CD_M20260140204
+2026,3,Greater Western Sydney,St Kilda,Clayton Oliver,Greater Western Sydney,12410.0,2,True,CD_M20260140204
+2026,3,Greater Western Sydney,St Kilda,Lachie Ash,Greater Western Sydney,12782.0,1,True,CD_M20260140204
+2026,3,Hawthorn,Sydney,Jai Newcombe,Hawthorn,12915.0,3,True,CD_M20260140201
+2026,3,Hawthorn,Sydney,Dylan Moore,Hawthorn,12710.0,2,False,CD_M20260140201
+2026,3,Hawthorn,Sydney,Tom Barrass,Hawthorn,12383.0,1,True,CD_M20260140201
+2026,3,Port Adelaide,Essendon,Zak Butters,Port Adelaide,12698.0,3,True,CD_M20260140206
+2026,3,Port Adelaide,Essendon,Jason Horne-Francis,Port Adelaide,12956.0,2,False,CD_M20260140206
+2026,3,Port Adelaide,Essendon,Aliir Aliir,Port Adelaide,12433.0,1,True,CD_M20260140206
+2026,3,Richmond,Gold Coast,Ben King,Gold Coast,12728.0,3,True,CD_M20260140203
+2026,3,Richmond,Gold Coast,Touk Miller,Gold Coast,12331.0,2,True,CD_M20260140203
+2026,3,Richmond,Gold Coast,Bodhi Uwland,Gold Coast,13041.0,1,True,CD_M20260140203
+2026,3,West Coast,North Melbourne,Harry Sheezel,North Melbourne,13034.0,3,True,CD_M20260140207
+2026,3,West Coast,North Melbourne,Harley Reid,West Coast,13111.0,2,False,CD_M20260140207
+2026,3,West Coast,North Melbourne,Nick Larkey,North Melbourne,12563.0,1,True,CD_M20260140207
+2026,4,Carlton,Melbourne,Kysaiah Pickett,Melbourne,12771.0,3,True,CD_M20260140307
+2026,4,Carlton,Melbourne,Max Gawn,Melbourne,11966.0,2,True,CD_M20260140307
+2026,4,Carlton,Melbourne,Sam Walsh,Carlton,12684.0,1,True,CD_M20260140307
+2026,4,Collingwood,Greater Western Sydney,Nick Daicos,Collingwood,12943.0,3,True,CD_M20260140302
+2026,4,Collingwood,Greater Western Sydney,Steele Sidebottom,Collingwood,11751.0,2,True,CD_M20260140302
+2026,4,Collingwood,Greater Western Sydney,Tim Membrey,Collingwood,12300.0,1,True,CD_M20260140302
+2026,4,Essendon,North Melbourne,Luke Parker,North Melbourne,11953.0,3,True,CD_M20260140305
+2026,4,Essendon,North Melbourne,Colby McKercher,North Melbourne,13107.0,2,True,CD_M20260140305
+2026,4,Essendon,North Melbourne,Harry Sheezel,North Melbourne,13034.0,1,True,CD_M20260140305
+2026,4,Fremantle,Richmond,Caleb Serong,Fremantle,12786.0,3,True,CD_M20260140304
+2026,4,Fremantle,Richmond,Josh Treacy,Fremantle,12887.0,2,True,CD_M20260140304
+2026,4,Fremantle,Richmond,Shai Bolton,Fremantle,12535.0,1,True,CD_M20260140304
+2026,4,Geelong,Adelaide,Bailey Smith,Geelong,12692.0,3,True,CD_M20260140301
+2026,4,Geelong,Adelaide,Josh Rachele,Adelaide,12953.0,2,True,CD_M20260140301
+2026,4,Geelong,Adelaide,Max Holmes,Geelong,12881.0,1,True,CD_M20260140301
+2026,4,Port Adelaide,West Coast,Jake Waterman,West Coast,12601.0,3,True,CD_M20260140306
+2026,4,Port Adelaide,West Coast,Zak Butters,Port Adelaide,12698.0,2,True,CD_M20260140306
+2026,4,Port Adelaide,West Coast,Harley Reid,West Coast,13111.0,1,False,CD_M20260140306
+2026,4,St Kilda,Brisbane Lions,Jarrod Berry,Brisbane Lions,12519.0,3,True,CD_M20260140303
+2026,4,St Kilda,Brisbane Lions,Will Ashcroft,Brisbane Lions,13040.0,2,True,CD_M20260140303
+2026,4,St Kilda,Brisbane Lions,Levi Ashcroft,Brisbane Lions,13197.0,1,True,CD_M20260140303
+2026,5,Adelaide,Fremantle,Caleb Serong,Fremantle,12786.0,3,True,CD_M20260140403
+2026,5,Adelaide,Fremantle,James Peatling,Adelaide,12934.0,2,True,CD_M20260140403
+2026,5,Adelaide,Fremantle,Andrew Brayshaw,Fremantle,12589.0,1,True,CD_M20260140403
+2026,5,Brisbane Lions,Collingwood,Will Ashcroft,Brisbane Lions,13040.0,3,True,CD_M20260140401
+2026,5,Brisbane Lions,Collingwood,Logan Morris,Brisbane Lions,13137.0,2,True,CD_M20260140401
+2026,5,Brisbane Lions,Collingwood,Zac Bailey,Brisbane Lions,12610.0,1,False,CD_M20260140401
+2026,5,Hawthorn,Geelong,Bailey Smith,Geelong,12692.0,3,True,CD_M20260140408
+2026,5,Hawthorn,Geelong,Josh Ward,Hawthorn,12955.0,2,True,CD_M20260140408
+2026,5,Hawthorn,Geelong,Connor Macdonald,Hawthorn,12954.0,1,True,CD_M20260140408
+2026,5,Melbourne,Gold Coast,Max Gawn,Melbourne,11966.0,3,True,CD_M20260140406
+2026,5,Melbourne,Gold Coast,Kysaiah Pickett,Melbourne,12771.0,2,True,CD_M20260140406
+2026,5,Melbourne,Gold Coast,Tom Sparrow,Melbourne,12693.0,1,True,CD_M20260140406
+2026,5,North Melbourne,Carlton,Luke Davies-Uniacke,North Melbourne,12590.0,3,True,CD_M20260140402
+2026,5,North Melbourne,Carlton,Harry Sheezel,North Melbourne,13034.0,2,True,CD_M20260140402
+2026,5,North Melbourne,Carlton,Marc Pittonet,Carlton,12417.0,1,True,CD_M20260140402
+2026,5,Richmond,Port Adelaide,Zak Butters,Port Adelaide,12698.0,3,True,CD_M20260140404
+2026,5,Richmond,Port Adelaide,Aliir Aliir,Port Adelaide,12433.0,2,True,CD_M20260140404
+2026,5,Richmond,Port Adelaide,Darcy Byrne-Jones,Port Adelaide,12422.0,1,False,CD_M20260140404
+2026,5,West Coast,Sydney,Brodie Grundy,Sydney,12217.0,3,True,CD_M20260140405
+2026,5,West Coast,Sydney,Isaac Heeney,Sydney,12326.0,2,True,CD_M20260140405
+2026,5,West Coast,Sydney,Chad Warner,Sydney,12797.0,1,True,CD_M20260140405
+2026,5,Western Bulldogs,Essendon,Marcus Bontempelli,Western Bulldogs,12269.0,3,True,CD_M20260140407
+2026,5,Western Bulldogs,Essendon,Matthew Kennedy,Western Bulldogs,12455.0,2,True,CD_M20260140407
+2026,5,Western Bulldogs,Essendon,Sam Darcy,Western Bulldogs,13021.0,1,True,CD_M20260140407
+2026,6,Adelaide,Carlton,Josh Rachele,Adelaide,12953.0,3,True,CD_M20260140501
+2026,6,Adelaide,Carlton,Izak Rankine,Adelaide,12798.0,2,True,CD_M20260140501
+2026,6,Adelaide,Carlton,Jordan Dawson,Adelaide,12516.0,1,True,CD_M20260140501
+2026,6,Collingwood,Fremantle,Luke Jackson,Fremantle,12779.0,3,True,CD_M20260140502
+2026,6,Collingwood,Fremantle,Jack Crisp,Collingwood,12061.0,2,True,CD_M20260140502
+2026,6,Collingwood,Fremantle,Nick Daicos,Collingwood,12943.0,1,True,CD_M20260140502
+2026,6,Essendon,Melbourne,Darcy Parish,Essendon,12406.0,3,True,CD_M20260140504
+2026,6,Essendon,Melbourne,Zach Merrett,Essendon,12241.0,2,True,CD_M20260140504
+2026,6,Essendon,Melbourne,Archie Roberts,Essendon,13168.0,1,True,CD_M20260140504
+2026,6,Geelong,West Coast,Bailey Smith,Geelong,12692.0,3,True,CD_M20260140507
+2026,6,Geelong,West Coast,Tanner Bruhn,Geelong,12871.0,2,True,CD_M20260140507
+2026,6,Geelong,West Coast,Tom Atkins,Geelong,12690.0,1,True,CD_M20260140507
+2026,6,Greater Western Sydney,Richmond,Finn Callaghan,Greater Western Sydney,12969.0,3,True,CD_M20260140508
+2026,6,Greater Western Sydney,Richmond,Clayton Oliver,Greater Western Sydney,12410.0,2,True,CD_M20260140508
+2026,6,Greater Western Sydney,Richmond,Toby Greene,Greater Western Sydney,12025.0,1,True,CD_M20260140508
+2026,6,Hawthorn,Western Bulldogs,Jai Newcombe,Hawthorn,12915.0,3,True,CD_M20260140506
+2026,6,Hawthorn,Western Bulldogs,Josh Battle,Hawthorn,12558.0,2,True,CD_M20260140506
+2026,6,Hawthorn,Western Bulldogs,Jack Ginnivan,Hawthorn,12927.0,1,True,CD_M20260140506
+2026,6,North Melbourne,Brisbane Lions,Lachie Neale,Brisbane Lions,12055.0,3,True,CD_M20260140503
+2026,6,North Melbourne,Brisbane Lions,Luke Parker,North Melbourne,11953.0,2,True,CD_M20260140503
+2026,6,North Melbourne,Brisbane Lions,Luke Davies-Uniacke,North Melbourne,12590.0,1,True,CD_M20260140503
+2026,6,Port Adelaide,St Kilda,Nasiah Wanganeen-Milera,St Kilda,12950.0,3,True,CD_M20260140509
+2026,6,Port Adelaide,St Kilda,Jason Horne-Francis,Port Adelaide,12956.0,2,False,CD_M20260140509
+2026,6,Port Adelaide,St Kilda,Zak Butters,Port Adelaide,12698.0,1,True,CD_M20260140509
+2026,6,Sydney,Gold Coast,Isaac Heeney,Sydney,12326.0,3,True,CD_M20260140505
+2026,6,Sydney,Gold Coast,Matt Rowell,Gold Coast,12768.0,2,True,CD_M20260140505
+2026,6,Sydney,Gold Coast,Tom Papley,Sydney,12412.0,1,True,CD_M20260140505
+2026,7,Adelaide,St Kilda,Sam Flanders,St Kilda,12824.0,3,True,CD_M20260140606
+2026,7,Adelaide,St Kilda,Taylor Walker,Adelaide,11713.0,2,False,CD_M20260140606
+2026,7,Adelaide,St Kilda,Rowan Marshall,St Kilda,12564.0,1,True,CD_M20260140606
+2026,7,Carlton,Collingwood,Nick Daicos,Collingwood,12943.0,3,True,CD_M20260140601
+2026,7,Carlton,Collingwood,Sam Walsh,Carlton,12684.0,2,True,CD_M20260140601
+2026,7,Carlton,Collingwood,Jamie Elliott,Collingwood,12083.0,1,True,CD_M20260140601
+2026,7,Geelong,Western Bulldogs,Jeremy Cameron,Geelong,12017.0,3,True,CD_M20260140602
+2026,7,Geelong,Western Bulldogs,Bailey Smith,Geelong,12692.0,2,True,CD_M20260140602
+2026,7,Geelong,Western Bulldogs,Max Holmes,Geelong,12881.0,1,True,CD_M20260140602
+2026,7,Gold Coast,Essendon,Christian Petracca,Gold Coast,12430.0,3,True,CD_M20260140604
+2026,7,Gold Coast,Essendon,Matt Rowell,Gold Coast,12768.0,2,True,CD_M20260140604
+2026,7,Gold Coast,Essendon,Zach Merrett,Essendon,12241.0,1,True,CD_M20260140604
+2026,7,Hawthorn,Port Adelaide,Nick Watson,Hawthorn,13105.0,3,True,CD_M20260140605
+2026,7,Hawthorn,Port Adelaide,Jason Horne-Francis,Port Adelaide,12956.0,2,False,CD_M20260140605
+2026,7,Hawthorn,Port Adelaide,Zak Butters,Port Adelaide,12698.0,1,True,CD_M20260140605
+2026,7,Melbourne,Brisbane Lions,Harvey Langford,Melbourne,13184.0,3,True,CD_M20260140608
+2026,7,Melbourne,Brisbane Lions,Lachie Neale,Brisbane Lions,12055.0,2,True,CD_M20260140608
+2026,7,Melbourne,Brisbane Lions,Kade Chandler,Melbourne,12756.0,1,True,CD_M20260140608
+2026,7,North Melbourne,Richmond,Harry Sheezel,North Melbourne,13034.0,3,True,CD_M20260140607
+2026,7,North Melbourne,Richmond,Luke Davies-Uniacke,North Melbourne,12590.0,2,True,CD_M20260140607
+2026,7,North Melbourne,Richmond,Paul Curtis,North Melbourne,12975.0,1,False,CD_M20260140607
+2026,7,Sydney,Greater Western Sydney,Nick Blakey,Sydney,12699.0,3,True,CD_M20260140603
+2026,7,Sydney,Greater Western Sydney,Clayton Oliver,Greater Western Sydney,12410.0,2,True,CD_M20260140603
+2026,7,Sydney,Greater Western Sydney,Brodie Grundy,Sydney,12217.0,1,True,CD_M20260140603
+2026,7,West Coast,Fremantle,Jordan Clark,Fremantle,12688.0,3,True,CD_M20260140609
+2026,7,West Coast,Fremantle,Jye Amiss,Fremantle,12983.0,2,True,CD_M20260140609
+2026,7,West Coast,Fremantle,Caleb Serong,Fremantle,12786.0,1,True,CD_M20260140609
+2026,8,Brisbane Lions,Adelaide,Zac Bailey,Brisbane Lions,12610.0,3,False,CD_M20260140708
+2026,8,Brisbane Lions,Adelaide,Will Ashcroft,Brisbane Lions,13040.0,2,True,CD_M20260140708
+2026,8,Brisbane Lions,Adelaide,Lachie Neale,Brisbane Lions,12055.0,1,True,CD_M20260140708
+2026,8,Essendon,Collingwood,Scott Pendlebury,Collingwood,4182.0,3,True,CD_M20260140704
+2026,8,Essendon,Collingwood,Nick Daicos,Collingwood,12943.0,2,True,CD_M20260140704
+2026,8,Essendon,Collingwood,Jack Crisp,Collingwood,12061.0,1,True,CD_M20260140704
+2026,8,Fremantle,Carlton,Shai Bolton,Fremantle,12535.0,3,True,CD_M20260140706
+2026,8,Fremantle,Carlton,Luke Jackson,Fremantle,12779.0,2,True,CD_M20260140706
+2026,8,Fremantle,Carlton,Sam Walsh,Carlton,12684.0,1,True,CD_M20260140706
+2026,8,Greater Western Sydney,North Melbourne,Toby Greene,Greater Western Sydney,12025.0,3,True,CD_M20260140709
+2026,8,Greater Western Sydney,North Melbourne,Harry Sheezel,North Melbourne,13034.0,2,True,CD_M20260140709
+2026,8,Greater Western Sydney,North Melbourne,Lachie Ash,Greater Western Sydney,12782.0,1,True,CD_M20260140709
+2026,8,Hawthorn,Gold Coast,Josh Battle,Hawthorn,12558.0,3,True,CD_M20260140703
+2026,8,Hawthorn,Gold Coast,Jai Newcombe,Hawthorn,12915.0,2,True,CD_M20260140703
+2026,8,Hawthorn,Gold Coast,Noah Anderson,Gold Coast,12767.0,1,True,CD_M20260140703
+2026,8,Port Adelaide,Geelong,Jason Horne-Francis,Port Adelaide,12956.0,3,False,CD_M20260140705
+2026,8,Port Adelaide,Geelong,Mitch Georgiades,Port Adelaide,12766.0,2,True,CD_M20260140705
+2026,8,Port Adelaide,Geelong,Zak Butters,Port Adelaide,12698.0,1,True,CD_M20260140705
+2026,8,Richmond,Melbourne,Kysaiah Pickett,Melbourne,12771.0,3,True,CD_M20260140702
+2026,8,Richmond,Melbourne,Max Gawn,Melbourne,11966.0,2,True,CD_M20260140702
+2026,8,Richmond,Melbourne,Tom Sparrow,Melbourne,12693.0,1,True,CD_M20260140702
+2026,8,St Kilda,West Coast,Hugo Garcia,St Kilda,13125.0,3,True,CD_M20260140707
+2026,8,St Kilda,West Coast,Nasiah Wanganeen-Milera,St Kilda,12950.0,2,True,CD_M20260140707
+2026,8,St Kilda,West Coast,Marcus Windhager,St Kilda,12967.0,1,True,CD_M20260140707
+2026,8,Western Bulldogs,Sydney,Charlie Curnow,Sydney,12421.0,3,True,CD_M20260140701
+2026,8,Western Bulldogs,Sydney,Brodie Grundy,Sydney,12217.0,2,True,CD_M20260140701
+2026,8,Western Bulldogs,Sydney,Marcus Bontempelli,Western Bulldogs,12269.0,1,True,CD_M20260140701
+2026,9,Adelaide,Port Adelaide,Sam Berry,Adelaide,12849.0,3,True,CD_M20260140803
+2026,9,Adelaide,Port Adelaide,Zak Butters,Port Adelaide,12698.0,2,True,CD_M20260140803
+2026,9,Adelaide,Port Adelaide,Aliir Aliir,Port Adelaide,12433.0,1,True,CD_M20260140803
+2026,9,Carlton,St Kilda,Rowan Marshall,St Kilda,12564.0,3,True,CD_M20260140807
+2026,9,Carlton,St Kilda,Nasiah Wanganeen-Milera,St Kilda,12950.0,2,True,CD_M20260140807
+2026,9,Carlton,St Kilda,Mitch Owens,St Kilda,12948.0,1,True,CD_M20260140807
+2026,9,Collingwood,Hawthorn,Connor Macdonald,Hawthorn,12954.0,3,True,CD_M20260140801
+2026,9,Collingwood,Hawthorn,Jai Newcombe,Hawthorn,12915.0,2,True,CD_M20260140801
+2026,9,Collingwood,Hawthorn,Nick Daicos,Collingwood,12943.0,1,True,CD_M20260140801
+2026,9,Essendon,Brisbane Lions,Darcy Wilmot,Brisbane Lions,13026.0,3,True,CD_M20260140804
+2026,9,Essendon,Brisbane Lions,Hugh McCluggage,Brisbane Lions,12518.0,2,True,CD_M20260140804
+2026,9,Essendon,Brisbane Lions,Kai Lohmann,Brisbane Lions,12968.0,1,True,CD_M20260140804
+2026,9,Geelong,North Melbourne,Max Holmes,Geelong,12881.0,3,True,CD_M20260140806
+2026,9,Geelong,North Melbourne,Tristan Xerri,North Melbourne,12788.0,2,False,CD_M20260140806
+2026,9,Geelong,North Melbourne,Shaun Mannagh,Geelong,13104.0,1,True,CD_M20260140806
+2026,9,Gold Coast,Greater Western Sydney,Christian Petracca,Gold Coast,12430.0,3,True,CD_M20260140809
+2026,9,Gold Coast,Greater Western Sydney,John Noble,Gold Coast,12743.0,2,True,CD_M20260140809
+2026,9,Gold Coast,Greater Western Sydney,Clayton Oliver,Greater Western Sydney,12410.0,1,True,CD_M20260140809
+2026,9,Sydney,Melbourne,Malcolm Rosas,Sydney,12903.0,3,True,CD_M20260140808
+2026,9,Sydney,Melbourne,Brodie Grundy,Sydney,12217.0,2,True,CD_M20260140808
+2026,9,Sydney,Melbourne,Isaac Heeney,Sydney,12326.0,1,True,CD_M20260140808
+2026,9,West Coast,Richmond,Harley Reid,West Coast,13111.0,3,False,CD_M20260140805
+2026,9,West Coast,Richmond,Jack Ross,Richmond,,2,True,CD_M20260140805
+2026,9,West Coast,Richmond,Noah Balta,Richmond,12686.0,1,True,CD_M20260140805
+2026,9,Western Bulldogs,Fremantle,Marcus Bontempelli,Western Bulldogs,12269.0,3,True,CD_M20260140802
+2026,9,Western Bulldogs,Fremantle,Shai Bolton,Fremantle,12535.0,2,True,CD_M20260140802
+2026,9,Western Bulldogs,Fremantle,Hayden Young,Fremantle,12777.0,1,True,CD_M20260140802
+2026,10,Brisbane Lions,Carlton,Lachie Neale,Brisbane Lions,12055.0,3,True,CD_M20260140902
+2026,10,Brisbane Lions,Carlton,Harry McKay,Carlton,12566.0,2,True,CD_M20260140902
+2026,10,Brisbane Lions,Carlton,Patrick Cripps,Carlton,12261.0,1,True,CD_M20260140902
+2026,10,Fremantle,Hawthorn,Luke Jackson,Fremantle,12779.0,3,True,CD_M20260140901
+2026,10,Fremantle,Hawthorn,Jack Gunston,Hawthorn,11845.0,2,True,CD_M20260140901
+2026,10,Fremantle,Hawthorn,Caleb Serong,Fremantle,12786.0,1,True,CD_M20260140901
+2026,10,Geelong,Collingwood,Bailey Smith,Geelong,12692.0,3,True,CD_M20260140907
+2026,10,Geelong,Collingwood,Shannon Neale,Geelong,12992.0,2,True,CD_M20260140907
+2026,10,Geelong,Collingwood,Oliver Henry,Geelong,12851.0,1,True,CD_M20260140907
+2026,10,Gold Coast,St Kilda,Touk Miller,Gold Coast,12331.0,3,True,CD_M20260140906
+2026,10,Gold Coast,St Kilda,Daniel Rioli,Gold Coast,12403.0,2,True,CD_M20260140906
+2026,10,Gold Coast,St Kilda,John Noble,Gold Coast,12743.0,1,True,CD_M20260140906
+2026,10,Greater Western Sydney,Essendon,Clayton Oliver,Greater Western Sydney,12410.0,3,True,CD_M20260140905
+2026,10,Greater Western Sydney,Essendon,Finn Callaghan,Greater Western Sydney,12969.0,2,True,CD_M20260140905
+2026,10,Greater Western Sydney,Essendon,Sam Durham,Essendon,12925.0,1,True,CD_M20260140905
+2026,10,Melbourne,West Coast,Ed Langdon,Melbourne,12393.0,3,True,CD_M20260140908
+2026,10,Melbourne,West Coast,Jacob van Rooyen,Melbourne,13048.0,2,False,CD_M20260140908
+2026,10,Melbourne,West Coast,Max Gawn,Melbourne,11966.0,1,True,CD_M20260140908
+2026,10,North Melbourne,Sydney,Isaac Heeney,Sydney,12326.0,3,True,CD_M20260140904
+2026,10,North Melbourne,Sydney,Luke Davies-Uniacke,North Melbourne,12590.0,2,True,CD_M20260140904
+2026,10,North Melbourne,Sydney,Nick Blakey,Sydney,12699.0,1,True,CD_M20260140904
+2026,10,Port Adelaide,Western Bulldogs,Marcus Bontempelli,Western Bulldogs,12269.0,3,True,CD_M20260140903
+2026,10,Port Adelaide,Western Bulldogs,Zak Butters,Port Adelaide,12698.0,2,True,CD_M20260140903
+2026,10,Port Adelaide,Western Bulldogs,Ed Richards,Western Bulldogs,12605.0,1,True,CD_M20260140903
+2026,10,Richmond,Adelaide,Izak Rankine,Adelaide,12798.0,3,True,CD_M20260140909
+2026,10,Richmond,Adelaide,Jordan Dawson,Adelaide,12516.0,2,True,CD_M20260140909
+2026,10,Richmond,Adelaide,Tim Taranto,Richmond,12504.0,1,True,CD_M20260140909
+2026,11,Adelaide,North Melbourne,Izak Rankine,Adelaide,12798.0,3,True,CD_M20260141004
+2026,11,Adelaide,North Melbourne,Josh Rachele,Adelaide,12953.0,2,True,CD_M20260141004
+2026,11,Adelaide,North Melbourne,Jake Soligo,Adelaide,12952.0,1,True,CD_M20260141004
+2026,11,Brisbane Lions,Geelong,Shaun Mannagh,Geelong,13104.0,3,True,CD_M20260141001
+2026,11,Brisbane Lions,Geelong,Bailey Smith,Geelong,12692.0,2,True,CD_M20260141001
+2026,11,Brisbane Lions,Geelong,Tom Stewart,Geelong,12505.0,1,True,CD_M20260141001
+2026,11,Carlton,Western Bulldogs,Patrick Cripps,Carlton,12261.0,3,True,CD_M20260141006
+2026,11,Carlton,Western Bulldogs,Oliver Florent,Carlton,12497.0,2,True,CD_M20260141006
+2026,11,Carlton,Western Bulldogs,Jagga Smith,Carlton,13274.0,1,True,CD_M20260141006
+2026,11,Essendon,Fremantle,Murphy Reid,Fremantle,13180.0,3,True,CD_M20260141007
+2026,11,Essendon,Fremantle,Shai Bolton,Fremantle,12535.0,2,True,CD_M20260141007
+2026,11,Essendon,Fremantle,Patrick Voss,Fremantle,13129.0,1,True,CD_M20260141007
+2026,11,Gold Coast,Port Adelaide,Noah Anderson,Gold Coast,12767.0,3,True,CD_M20260141003
+2026,11,Gold Coast,Port Adelaide,Zak Butters,Port Adelaide,12698.0,2,True,CD_M20260141003
+2026,11,Gold Coast,Port Adelaide,Christian Petracca,Gold Coast,12430.0,1,True,CD_M20260141003
+2026,11,Melbourne,Hawthorn,Max Gawn,Melbourne,11966.0,3,True,CD_M20260141005
+2026,11,Melbourne,Hawthorn,Jack Steele,Melbourne,12368.0,2,True,CD_M20260141005
+2026,11,Melbourne,Hawthorn,Tom Sparrow,Melbourne,12693.0,1,True,CD_M20260141005
+2026,11,St Kilda,Richmond,Hugo Garcia,St Kilda,13125.0,3,True,CD_M20260141008
+2026,11,St Kilda,Richmond,Max Hall,St Kilda,13193.0,2,True,CD_M20260141008
+2026,11,St Kilda,Richmond,Jack Sinclair,St Kilda,12325.0,1,True,CD_M20260141008
+2026,11,Sydney,Collingwood,Brodie Grundy,Sydney,12217.0,3,True,CD_M20260141002
+2026,11,Sydney,Collingwood,Isaac Heeney,Sydney,12326.0,2,True,CD_M20260141002
+2026,11,Sydney,Collingwood,Nick Blakey,Sydney,12699.0,1,True,CD_M20260141002
+2026,11,West Coast,Greater Western Sydney,Harley Reid,West Coast,13111.0,3,False,CD_M20260141009
+2026,11,West Coast,Greater Western Sydney,Clayton Oliver,Greater Western Sydney,12410.0,2,True,CD_M20260141009
+2026,11,West Coast,Greater Western Sydney,Bailey Williams (West Coast),West Coast,12836.0,1,True,CD_M20260141009
+2026,12,Collingwood,West Coast,Nick Daicos,Collingwood,12943.0,3,True,CD_M20260141106
+2026,12,Collingwood,West Coast,Elliot Yeo,West Coast,12087.0,2,True,CD_M20260141106
+2026,12,Collingwood,West Coast,Darcy Cameron,Collingwood,12660.0,1,True,CD_M20260141106
+2026,12,Fremantle,St Kilda,Murphy Reid,Fremantle,13180.0,3,True,CD_M20260141103
+2026,12,Fremantle,St Kilda,Shai Bolton,Fremantle,12535.0,2,True,CD_M20260141103
+2026,12,Fremantle,St Kilda,Luke Jackson,Fremantle,12779.0,1,True,CD_M20260141103
+2026,12,Geelong,Sydney,Max Holmes,Geelong,12881.0,3,True,CD_M20260141105
+2026,12,Geelong,Sydney,Lawson Humphries,Geelong,13160.0,2,True,CD_M20260141105
+2026,12,Geelong,Sydney,Jeremy Cameron,Geelong,12017.0,1,True,CD_M20260141105
+2026,12,Greater Western Sydney,Brisbane Lions,Phoenix Gothard,Greater Western Sydney,13279.0,3,True,CD_M20260141108
+2026,12,Greater Western Sydney,Brisbane Lions,Clayton Oliver,Greater Western Sydney,12410.0,2,True,CD_M20260141108
+2026,12,Greater Western Sydney,Brisbane Lions,Toby Greene,Greater Western Sydney,12025.0,1,True,CD_M20260141108
+2026,12,Hawthorn,Adelaide,Blake Hardwick,Hawthorn,12469.0,3,True,CD_M20260141101
+2026,12,Hawthorn,Adelaide,Jordan Dawson,Adelaide,12516.0,2,True,CD_M20260141101
+2026,12,Hawthorn,Adelaide,Sam Berry,Adelaide,12849.0,1,True,CD_M20260141101
+2026,12,North Melbourne,Gold Coast,Noah Anderson,Gold Coast,12767.0,3,True,CD_M20260141104
+2026,12,North Melbourne,Gold Coast,Luke Davies-Uniacke,North Melbourne,12590.0,2,True,CD_M20260141104
+2026,12,North Melbourne,Gold Coast,Matt Rowell,Gold Coast,12768.0,1,True,CD_M20260141104
+2026,12,Port Adelaide,Carlton,Patrick Cripps,Carlton,12261.0,3,True,CD_M20260141107
+2026,12,Port Adelaide,Carlton,Jason Horne-Francis,Port Adelaide,12956.0,2,False,CD_M20260141107
+2026,12,Port Adelaide,Carlton,Jagga Smith,Carlton,13274.0,1,True,CD_M20260141107
+2026,12,Richmond,Essendon,Darcy Parish,Essendon,12406.0,3,True,CD_M20260141102
+2026,12,Richmond,Essendon,Tim Taranto,Richmond,12504.0,2,True,CD_M20260141102
+2026,12,Richmond,Essendon,Zach Merrett,Essendon,12241.0,1,True,CD_M20260141102
+2026,12,Western Bulldogs,Melbourne,Ed Richards,Western Bulldogs,12605.0,3,True,CD_M20260141109
+2026,12,Western Bulldogs,Melbourne,Marcus Bontempelli,Western Bulldogs,12269.0,2,True,CD_M20260141109
+2026,12,Western Bulldogs,Melbourne,Kysaiah Pickett,Melbourne,12771.0,1,True,CD_M20260141109
+2026,13,Brisbane Lions,Fremantle,Patrick Voss,Fremantle,13129.0,3,True,CD_M20260141204
+2026,13,Brisbane Lions,Fremantle,Jye Amiss,Fremantle,12983.0,2,True,CD_M20260141204
+2026,13,Brisbane Lions,Fremantle,Zac Bailey,Brisbane Lions,12610.0,1,False,CD_M20260141204
+2026,13,Carlton,Geelong,Patrick Cripps,Carlton,12261.0,3,True,CD_M20260141202
+2026,13,Carlton,Geelong,Bailey Smith,Geelong,12692.0,2,True,CD_M20260141202
+2026,13,Carlton,Geelong,Sam Walsh,Carlton,12684.0,1,True,CD_M20260141202
+2026,13,Melbourne,Greater Western Sydney,Finn Callaghan,Greater Western Sydney,12969.0,3,True,CD_M20260141206
+2026,13,Melbourne,Greater Western Sydney,Clayton Oliver,Greater Western Sydney,12410.0,2,True,CD_M20260141206
+2026,13,Melbourne,Greater Western Sydney,Harvey Thomas,Greater Western Sydney,13101.0,1,True,CD_M20260141206
+2026,13,St Kilda,Hawthorn,James Sicily,Hawthorn,12332.0,3,False,CD_M20260141201
+2026,13,St Kilda,Hawthorn,Nick Watson,Hawthorn,13105.0,2,True,CD_M20260141201
+2026,13,St Kilda,Hawthorn,Jack Gunston,Hawthorn,11845.0,1,True,CD_M20260141201
+2026,13,Sydney,Richmond,Isaac Heeney,Sydney,12326.0,3,True,CD_M20260141203
+2026,13,Sydney,Richmond,Charlie Curnow,Sydney,12421.0,2,True,CD_M20260141203
+2026,13,Sydney,Richmond,Chad Warner,Sydney,12797.0,1,True,CD_M20260141203
+2026,13,West Coast,Essendon,Harley Reid,West Coast,13111.0,3,False,CD_M20260141207
+2026,13,West Coast,Essendon,Reuben Ginbey,West Coast,13038.0,2,True,CD_M20260141207
+2026,13,West Coast,Essendon,Jake Waterman,West Coast,12601.0,1,True,CD_M20260141207
+2026,13,Western Bulldogs,Collingwood,Jordan de Goey,Collingwood,12318.0,3,True,CD_M20260141205
+2026,13,Western Bulldogs,Collingwood,Nick Daicos,Collingwood,12943.0,2,True,CD_M20260141205
+2026,13,Western Bulldogs,Collingwood,Ed Richards,Western Bulldogs,12605.0,1,True,CD_M20260141205
+2026,14,Adelaide,Geelong,Jordan Dawson,Adelaide,12516.0,3,True,CD_M20260141301
+2026,14,Adelaide,Geelong,Bailey Smith,Geelong,12692.0,2,True,CD_M20260141301
+2026,14,Adelaide,Geelong,Patrick Dangerfield,Geelong,11700.0,1,True,CD_M20260141301
+2026,14,Collingwood,Melbourne,Kysaiah Pickett,Melbourne,12771.0,3,True,CD_M20260141308
+2026,14,Collingwood,Melbourne,Nick Daicos,Collingwood,12943.0,2,True,CD_M20260141308
+2026,14,Collingwood,Melbourne,Max Gawn,Melbourne,11966.0,1,True,CD_M20260141308
+2026,14,Essendon,Carlton,George Hewett,Carlton,12411.0,3,True,CD_M20260141307
+2026,14,Essendon,Carlton,Sam Durham,Essendon,12925.0,2,True,CD_M20260141307
+2026,14,Essendon,Carlton,Harry McKay,Carlton,12566.0,1,True,CD_M20260141307
+2026,14,Gold Coast,Brisbane Lions,Logan Morris,Brisbane Lions,13137.0,3,True,CD_M20260141304
+2026,14,Gold Coast,Brisbane Lions,Lachie Neale,Brisbane Lions,12055.0,2,True,CD_M20260141304
+2026,14,Gold Coast,Brisbane Lions,John Noble,Gold Coast,12743.0,1,True,CD_M20260141304
+2026,14,Hawthorn,Western Bulldogs,Jai Newcombe,Hawthorn,12915.0,3,True,CD_M20260141302
+2026,14,Hawthorn,Western Bulldogs,Marcus Bontempelli,Western Bulldogs,12269.0,2,True,CD_M20260141302
+2026,14,Hawthorn,Western Bulldogs,Ed Richards,Western Bulldogs,12605.0,1,True,CD_M20260141302
+2026,14,North Melbourne,Fremantle,Patrick Voss,Fremantle,13129.0,3,True,CD_M20260141303
+2026,14,North Melbourne,Fremantle,Luke Jackson,Fremantle,12779.0,2,True,CD_M20260141303
+2026,14,North Melbourne,Fremantle,Andrew Brayshaw,Fremantle,12589.0,1,True,CD_M20260141303
+2026,14,Sydney,St Kilda,Isaac Heeney,Sydney,12326.0,3,True,CD_M20260141306
+2026,14,Sydney,St Kilda,Nasiah Wanganeen-Milera,St Kilda,12950.0,2,True,CD_M20260141306
+2026,14,Sydney,St Kilda,Chad Warner,Sydney,12797.0,1,True,CD_M20260141306
+2026,14,West Coast,Port Adelaide,Zak Butters,Port Adelaide,12698.0,3,True,CD_M20260141305
+2026,14,West Coast,Port Adelaide,Jake Waterman,West Coast,12601.0,2,True,CD_M20260141305
+2026,14,West Coast,Port Adelaide,Jason Horne-Francis,Port Adelaide,12956.0,1,False,CD_M20260141305
+2026,15,Geelong,Gold Coast,Bailey Smith,Geelong,12692.0,3,True,CD_M20260141402
+2026,15,Geelong,Gold Coast,Noah Anderson,Gold Coast,12767.0,2,True,CD_M20260141402
+2026,15,Geelong,Gold Coast,Oliver Dempsey,Geelong,12974.0,1,True,CD_M20260141402
+2026,15,Melbourne,Essendon,Kysaiah Pickett,Melbourne,12771.0,3,True,CD_M20260141403
+2026,15,Melbourne,Essendon,Max Gawn,Melbourne,11966.0,2,True,CD_M20260141403
+2026,15,Melbourne,Essendon,Will Setterfield,Essendon,12567.0,1,True,CD_M20260141403
+2026,15,North Melbourne,West Coast,Harry Sheezel,North Melbourne,13034.0,3,True,CD_M20260141404
+2026,15,North Melbourne,West Coast,Tim Kelly,West Coast,12595.0,2,True,CD_M20260141404
+2026,15,North Melbourne,West Coast,Jack Darling,North Melbourne,11905.0,1,True,CD_M20260141404
+2026,15,Port Adelaide,Sydney,Isaac Heeney,Sydney,12326.0,3,True,CD_M20260141405
+2026,15,Port Adelaide,Sydney,Zak Butters,Port Adelaide,12698.0,2,True,CD_M20260141405
+2026,15,Port Adelaide,Sydney,Jordon Sweet,Port Adelaide,12890.0,1,True,CD_M20260141405
+2026,15,Richmond,Brisbane Lions,Will Ashcroft,Brisbane Lions,13040.0,3,True,CD_M20260141406
+2026,15,Richmond,Brisbane Lions,Zac Bailey,Brisbane Lions,12610.0,2,False,CD_M20260141406
+2026,15,Richmond,Brisbane Lions,Tim Taranto,Richmond,12504.0,1,True,CD_M20260141406
+2026,15,St Kilda,Greater Western Sydney,Nasiah Wanganeen-Milera,St Kilda,12950.0,3,True,CD_M20260141407
+2026,15,St Kilda,Greater Western Sydney,Liam Ryan,St Kilda,12600.0,2,True,CD_M20260141407
+2026,15,St Kilda,Greater Western Sydney,Brent Daniels,Greater Western Sydney,12656.0,1,True,CD_M20260141407
+2026,15,Western Bulldogs,Adelaide,Jordan Dawson,Adelaide,12516.0,3,True,CD_M20260141401
+2026,15,Western Bulldogs,Adelaide,Sam Berry,Adelaide,12849.0,2,True,CD_M20260141401
+2026,15,Western Bulldogs,Adelaide,Rory Laird,Adelaide,12165.0,1,True,CD_M20260141401
+2026,16,Adelaide,Melbourne,Max Gawn,Melbourne,11966.0,3,True,CD_M20260141503
+2026,16,Adelaide,Melbourne,Sam Berry,Adelaide,12849.0,2,True,CD_M20260141503
+2026,16,Adelaide,Melbourne,Josh Rachele,Adelaide,12953.0,1,True,CD_M20260141503
+2026,16,Collingwood,Port Adelaide,Nick Daicos,Collingwood,12943.0,3,True,CD_M20260141505
+2026,16,Collingwood,Port Adelaide,Jordan de Goey,Collingwood,12318.0,2,True,CD_M20260141505
+2026,16,Collingwood,Port Adelaide,Jason Horne-Francis,Port Adelaide,12956.0,1,False,CD_M20260141505
+2026,16,Fremantle,Geelong,Luke Jackson,Fremantle,12779.0,3,True,CD_M20260141501
+2026,16,Fremantle,Geelong,Andrew Brayshaw,Fremantle,12589.0,2,True,CD_M20260141501
+2026,16,Fremantle,Geelong,Murphy Reid,Fremantle,13180.0,1,True,CD_M20260141501
+2026,16,Gold Coast,Hawthorn,Jai Newcombe,Hawthorn,12915.0,3,True,CD_M20260141502
+2026,16,Gold Coast,Hawthorn,Noah Anderson,Gold Coast,12767.0,2,True,CD_M20260141502
+2026,16,Gold Coast,Hawthorn,Ben Long,Gold Coast,12521.0,1,False,CD_M20260141502
+2026,16,Greater Western Sydney,Carlton,Sam Walsh,Carlton,12684.0,3,True,CD_M20260141504
+2026,16,Greater Western Sydney,Carlton,Patrick Cripps,Carlton,12261.0,2,True,CD_M20260141504
+2026,16,Greater Western Sydney,Carlton,George Hewett,Carlton,12411.0,1,True,CD_M20260141504
+2026,16,Richmond,North Melbourne,Harry Sheezel,North Melbourne,13034.0,3,True,CD_M20260141506
+2026,16,Richmond,North Melbourne,Cooper Trembath,North Melbourne,13263.0,2,True,CD_M20260141506
+2026,16,Richmond,North Melbourne,Luke Parker,North Melbourne,11953.0,1,True,CD_M20260141506
+2026,16,St Kilda,Western Bulldogs,Marcus Bontempelli,Western Bulldogs,12269.0,3,True,CD_M20260141507
+2026,16,St Kilda,Western Bulldogs,Nasiah Wanganeen-Milera,St Kilda,12950.0,2,True,CD_M20260141507
+2026,16,St Kilda,Western Bulldogs,Hugo Garcia,St Kilda,13125.0,1,True,CD_M20260141507
+2026,17,Brisbane Lions,Sydney,Chad Warner,Sydney,12797.0,3,True,CD_M20260141601
+2026,17,Brisbane Lions,Sydney,Will Ashcroft,Brisbane Lions,13040.0,2,True,CD_M20260141601
+2026,17,Brisbane Lions,Sydney,Isaac Heeney,Sydney,12326.0,1,True,CD_M20260141601
+2026,17,Carlton,West Coast,Patrick Cripps,Carlton,12261.0,3,True,CD_M20260141602
+2026,17,Carlton,West Coast,George Hewett,Carlton,12411.0,2,True,CD_M20260141602
+2026,17,Carlton,West Coast,Harry Dean,Carlton,13273.0,1,True,CD_M20260141602
+2026,17,Collingwood,Richmond,Nick Daicos,Collingwood,12943.0,3,True,CD_M20260141603
+2026,17,Collingwood,Richmond,Jordan de Goey,Collingwood,12318.0,2,True,CD_M20260141603
+2026,17,Collingwood,Richmond,Tim Taranto,Richmond,12504.0,1,True,CD_M20260141603
+2026,17,Fremantle,Gold Coast,Andrew Brayshaw,Fremantle,12589.0,3,True,CD_M20260141604
+2026,17,Fremantle,Gold Coast,Murphy Reid,Fremantle,13180.0,2,True,CD_M20260141604
+2026,17,Fremantle,Gold Coast,Shai Bolton,Fremantle,12535.0,1,True,CD_M20260141604
+2026,17,Hawthorn,Greater Western Sydney,Jack Ginnivan,Hawthorn,12927.0,3,True,CD_M20260141605
+2026,17,Hawthorn,Greater Western Sydney,Will Day,Hawthorn,12794.0,2,True,CD_M20260141605
+2026,17,Hawthorn,Greater Western Sydney,Finn Callaghan,Greater Western Sydney,12969.0,1,True,CD_M20260141605
+2026,17,North Melbourne,Essendon,Harry Sheezel,North Melbourne,13034.0,3,True,CD_M20260141606
+2026,17,North Melbourne,Essendon,Luke Davies-Uniacke,North Melbourne,12590.0,2,True,CD_M20260141606
+2026,17,North Melbourne,Essendon,Sam Durham,Essendon,12925.0,1,True,CD_M20260141606
+2026,17,Port Adelaide,Adelaide,Zak Butters,Port Adelaide,12698.0,3,True,CD_M20260141607
+2026,17,Port Adelaide,Adelaide,Jason Horne-Francis,Port Adelaide,12956.0,2,False,CD_M20260141607
+2026,17,Port Adelaide,Adelaide,Darcy Fogarty,Adelaide,12584.0,1,False,CD_M20260141607
+2026,18,Essendon,St Kilda,Nasiah Wanganeen-Milera,St Kilda,12950.0,3,True,CD_M20260141701
+2026,18,Essendon,St Kilda,Max Hall,St Kilda,13193.0,2,True,CD_M20260141701
+2026,18,Essendon,St Kilda,Bradley Hill,St Kilda,12060.0,1,True,CD_M20260141701
+2026,18,Geelong,Brisbane Lions,Will Ashcroft,Brisbane Lions,13040.0,3,True,CD_M20260141702
+2026,18,Geelong,Brisbane Lions,Patrick Dangerfield,Geelong,11700.0,2,True,CD_M20260141702
+2026,18,Geelong,Brisbane Lions,Kai Lohmann,Brisbane Lions,12968.0,1,True,CD_M20260141702
+2026,18,Gold Coast,Collingwood,Nick Daicos,Collingwood,12943.0,3,True,CD_M20260141703
+2026,18,Gold Coast,Collingwood,Christian Petracca,Gold Coast,12430.0,2,True,CD_M20260141703
+2026,18,Gold Coast,Collingwood,Zeke Uwland,Gold Coast,13278.0,1,True,CD_M20260141703
+2026,18,Greater Western Sydney,Fremantle,Jake Stringer,Greater Western Sydney,12167.0,3,True,CD_M20260141704
+2026,18,Greater Western Sydney,Fremantle,Toby Greene,Greater Western Sydney,12025.0,2,True,CD_M20260141704
+2026,18,Greater Western Sydney,Fremantle,Clayton Oliver,Greater Western Sydney,12410.0,1,True,CD_M20260141704
+2026,18,Hawthorn,Melbourne,Jacob van Rooyen,Melbourne,13048.0,3,False,CD_M20260141705
+2026,18,Hawthorn,Melbourne,Max Gawn,Melbourne,11966.0,2,True,CD_M20260141705
+2026,18,Hawthorn,Melbourne,Changkuoth Jiath,Melbourne,12752.0,1,True,CD_M20260141705
+2026,18,Port Adelaide,North Melbourne,Jason Horne-Francis,Port Adelaide,12956.0,3,False,CD_M20260141706
+2026,18,Port Adelaide,North Melbourne,Harry Sheezel,North Melbourne,13034.0,2,True,CD_M20260141706
+2026,18,Port Adelaide,North Melbourne,Zak Butters,Port Adelaide,12698.0,1,True,CD_M20260141706
+2026,18,Richmond,Carlton,George Hewett,Carlton,12411.0,3,True,CD_M20260141707
+2026,18,Richmond,Carlton,Patrick Cripps,Carlton,12261.0,2,True,CD_M20260141707
+2026,18,Richmond,Carlton,Jagga Smith,Carlton,13274.0,1,True,CD_M20260141707
+2026,18,Sydney,Western Bulldogs,Charlie Curnow,Sydney,12421.0,3,True,CD_M20260141708
+2026,18,Sydney,Western Bulldogs,Brodie Grundy,Sydney,12217.0,2,True,CD_M20260141708
+2026,18,Sydney,Western Bulldogs,Isaac Heeney,Sydney,12326.0,1,True,CD_M20260141708
+2026,18,West Coast,Adelaide,Jordan Dawson,Adelaide,12516.0,3,True,CD_M20260141709
+2026,18,West Coast,Adelaide,Izak Rankine,Adelaide,12798.0,2,True,CD_M20260141709
+2026,18,West Coast,Adelaide,Lachlan McAndrew,Adelaide,13065.0,1,True,CD_M20260141709
+2026,19,Adelaide,Gold Coast,Izak Rankine,Adelaide,12798.0,3,True,CD_M20260141801
+2026,19,Adelaide,Gold Coast,Jordan Dawson,Adelaide,12516.0,2,True,CD_M20260141801
+2026,19,Adelaide,Gold Coast,Sam Berry,Adelaide,12849.0,1,True,CD_M20260141801
+2026,19,Brisbane Lions,Essendon,Will Ashcroft,Brisbane Lions,13040.0,3,True,CD_M20260141802
+2026,19,Brisbane Lions,Essendon,Lachie Neale,Brisbane Lions,12055.0,2,True,CD_M20260141802
+2026,19,Brisbane Lions,Essendon,Zac Bailey,Brisbane Lions,12610.0,1,False,CD_M20260141802
+2026,19,Carlton,Hawthorn,Jack Ginnivan,Hawthorn,12927.0,3,True,CD_M20260141803
+2026,19,Carlton,Hawthorn,Connor Macdonald,Hawthorn,12954.0,2,True,CD_M20260141803
+2026,19,Carlton,Hawthorn,Will Day,Hawthorn,12794.0,1,True,CD_M20260141803
+2026,19,Collingwood,North Melbourne,Nick Daicos,Collingwood,12943.0,3,True,CD_M20260141804
+2026,19,Collingwood,North Melbourne,Josh Daicos,Collingwood,12573.0,2,True,CD_M20260141804
+2026,19,Collingwood,North Melbourne,Tristan Xerri,North Melbourne,12788.0,1,False,CD_M20260141804
+2026,19,Fremantle,Sydney,Josh Treacy,Fremantle,12887.0,3,True,CD_M20260141805
+2026,19,Fremantle,Sydney,Charlie Curnow,Sydney,12421.0,2,True,CD_M20260141805
+2026,19,Fremantle,Sydney,Shai Bolton,Fremantle,12535.0,1,True,CD_M20260141805
+2026,19,Greater Western Sydney,Geelong,Shaun Mannagh,Geelong,13104.0,3,True,CD_M20260141806
+2026,19,Greater Western Sydney,Geelong,Toby Greene,Greater Western Sydney,12025.0,2,True,CD_M20260141806
+2026,19,Greater Western Sydney,Geelong,Clayton Oliver,Greater Western Sydney,12410.0,1,True,CD_M20260141806
+2026,19,Melbourne,Richmond,Jacob van Rooyen,Melbourne,13048.0,3,False,CD_M20260141807
+2026,19,Melbourne,Richmond,Tom Sparrow,Melbourne,12693.0,2,True,CD_M20260141807
+2026,19,Melbourne,Richmond,Jack Steele,Melbourne,12368.0,1,True,CD_M20260141807
+2026,19,St Kilda,Port Adelaide,Bradley Hill,St Kilda,12060.0,3,True,CD_M20260141808
+2026,19,St Kilda,Port Adelaide,Callum Wilkie,St Kilda,12703.0,2,True,CD_M20260141808
+2026,19,St Kilda,Port Adelaide,Nasiah Wanganeen-Milera,St Kilda,12950.0,1,True,CD_M20260141808
+2026,19,Western Bulldogs,West Coast,Marcus Bontempelli,Western Bulldogs,12269.0,3,True,CD_M20260141809
+2026,19,Western Bulldogs,West Coast,Aaron Naughton,Western Bulldogs,12594.0,2,True,CD_M20260141809
+2026,19,Western Bulldogs,West Coast,Harley Reid,West Coast,13111.0,1,False,CD_M20260141809
+2026,20,Collingwood,Carlton,Nick Daicos,Collingwood,12943.0,3,True,CD_M20260141901
+2026,20,Collingwood,Carlton,Patrick Cripps,Carlton,12261.0,2,True,CD_M20260141901
+2026,20,Collingwood,Carlton,Jordan de Goey,Collingwood,12318.0,1,True,CD_M20260141901
+2026,20,Essendon,Greater Western Sydney,Zach Merrett,Essendon,12241.0,3,True,CD_M20260141902
+2026,20,Essendon,Greater Western Sydney,Dyson Sharp,Essendon,13283.0,2,True,CD_M20260141902
+2026,20,Essendon,Greater Western Sydney,Clayton Oliver,Greater Western Sydney,12410.0,1,True,CD_M20260141902
+2026,20,Geelong,St Kilda,Bailey Smith,Geelong,12692.0,3,True,CD_M20260141903
+2026,20,Geelong,St Kilda,Gryan Miers,Geelong,12689.0,2,True,CD_M20260141903
+2026,20,Geelong,St Kilda,Rowan Marshall,St Kilda,12564.0,1,True,CD_M20260141903
+2026,20,Gold Coast,Western Bulldogs,Marcus Bontempelli,Western Bulldogs,12269.0,3,True,CD_M20260141904
+2026,20,Gold Coast,Western Bulldogs,Touk Miller,Gold Coast,12331.0,2,True,CD_M20260141904
+2026,20,Gold Coast,Western Bulldogs,John Noble,Gold Coast,12743.0,1,True,CD_M20260141904
+2026,20,North Melbourne,Melbourne,Tom Sparrow,Melbourne,12693.0,3,True,CD_M20260141905
+2026,20,North Melbourne,Melbourne,Kysaiah Pickett,Melbourne,12771.0,2,True,CD_M20260141905
+2026,20,North Melbourne,Melbourne,Harry Sheezel,North Melbourne,13034.0,1,True,CD_M20260141905
+2026,20,Port Adelaide,Fremantle,Caleb Serong,Fremantle,12786.0,3,True,CD_M20260141906
+2026,20,Port Adelaide,Fremantle,Joe Richards,Port Adelaide,13139.0,2,True,CD_M20260141906
+2026,20,Port Adelaide,Fremantle,Jye Amiss,Fremantle,12983.0,1,True,CD_M20260141906
+2026,20,Richmond,Hawthorn,Jarman Impey,Hawthorn,12237.0,3,True,CD_M20260141907
+2026,20,Richmond,Hawthorn,Connor Macdonald,Hawthorn,12954.0,2,True,CD_M20260141907
+2026,20,Richmond,Hawthorn,Mitch Lewis,Hawthorn,12636.0,1,True,CD_M20260141907
+2026,20,Sydney,Adelaide,Darcy Fogarty,Adelaide,12584.0,3,False,CD_M20260141908
+2026,20,Sydney,Adelaide,Tom Papley,Sydney,12412.0,2,True,CD_M20260141908
+2026,20,Sydney,Adelaide,Izak Rankine,Adelaide,12798.0,1,True,CD_M20260141908
+2026,20,West Coast,Brisbane Lions,Lachie Neale,Brisbane Lions,12055.0,3,True,CD_M20260141909
+2026,20,West Coast,Brisbane Lions,Will Ashcroft,Brisbane Lions,13040.0,2,True,CD_M20260141909
+2026,20,West Coast,Brisbane Lions,Josh Dunkley,Brisbane Lions,12408.0,1,True,CD_M20260141909
+2026,21,Adelaide,Collingwood,Nick Daicos,Collingwood,12943.0,3,True,CD_M20260142001
+2026,21,Adelaide,Collingwood,Scott Pendlebury,Collingwood,4182.0,2,True,CD_M20260142001
+2026,21,Adelaide,Collingwood,Sam Berry,Adelaide,12849.0,1,True,CD_M20260142001
+2026,21,Brisbane Lions,Port Adelaide,Zac Bailey,Brisbane Lions,12610.0,3,False,CD_M20260142002
+2026,21,Brisbane Lions,Port Adelaide,Will Ashcroft,Brisbane Lions,13040.0,2,True,CD_M20260142002
+2026,21,Brisbane Lions,Port Adelaide,Jason Horne-Francis,Port Adelaide,12956.0,1,False,CD_M20260142002
+2026,21,Carlton,Gold Coast,Patrick Cripps,Carlton,12261.0,3,True,CD_M20260142003
+2026,21,Carlton,Gold Coast,George Hewett,Carlton,12411.0,2,True,CD_M20260142003
+2026,21,Carlton,Gold Coast,Matt Rowell,Gold Coast,12768.0,1,True,CD_M20260142003
+2026,21,Fremantle,West Coast,Murphy Reid,Fremantle,13180.0,3,True,CD_M20260142004
+2026,21,Fremantle,West Coast,Matthew Johnson,Fremantle,13047.0,2,True,CD_M20260142004
+2026,21,Fremantle,West Coast,Jye Amiss,Fremantle,12983.0,1,True,CD_M20260142004
+2026,21,Greater Western Sydney,Sydney,Errol Gulden,Sydney,12862.0,3,True,CD_M20260142005
+2026,21,Greater Western Sydney,Sydney,Chad Warner,Sydney,12797.0,2,True,CD_M20260142005
+2026,21,Greater Western Sydney,Sydney,Isaac Heeney,Sydney,12326.0,1,True,CD_M20260142005
+2026,21,Hawthorn,Essendon,Jack Gunston,Hawthorn,11845.0,3,True,CD_M20260142006
+2026,21,Hawthorn,Essendon,Jarman Impey,Hawthorn,12237.0,2,True,CD_M20260142006
+2026,21,Hawthorn,Essendon,Josh Ward,Hawthorn,12955.0,1,True,CD_M20260142006
+2026,21,Melbourne,Geelong,Shannon Neale,Geelong,12992.0,3,True,CD_M20260142008
+2026,21,Melbourne,Geelong,Tom Stewart,Geelong,12505.0,2,True,CD_M20260142008
+2026,21,Melbourne,Geelong,Tom Atkins,Geelong,12690.0,1,True,CD_M20260142008
+2026,21,North Melbourne,St Kilda,Nasiah Wanganeen-Milera,St Kilda,12950.0,3,True,CD_M20260142007
+2026,21,North Melbourne,St Kilda,Bradley Hill,St Kilda,12060.0,2,True,CD_M20260142007
+2026,21,North Melbourne,St Kilda,Harry Sheezel,North Melbourne,13034.0,1,True,CD_M20260142007
+2026,21,Western Bulldogs,Richmond,Ed Richards,Western Bulldogs,12605.0,3,True,CD_M20260142009
+2026,21,Western Bulldogs,Richmond,Marcus Bontempelli,Western Bulldogs,12269.0,2,True,CD_M20260142009
+2026,21,Western Bulldogs,Richmond,Lachlan Bramble,Western Bulldogs,12916.0,1,True,CD_M20260142009
+2026,22,Carlton,Brisbane Lions,Jagga Smith,Carlton,13274.0,3,True,CD_M20260142101
+2026,22,Carlton,Brisbane Lions,George Hewett,Carlton,12411.0,2,True,CD_M20260142101
+2026,22,Carlton,Brisbane Lions,Harry McKay,Carlton,12566.0,1,True,CD_M20260142101
+2026,22,Collingwood,Geelong,Oliver Dempsey,Geelong,12974.0,3,True,CD_M20260142102
+2026,22,Collingwood,Geelong,Daniel McStay,Collingwood,12291.0,2,True,CD_M20260142102
+2026,22,Collingwood,Geelong,Bailey Smith,Geelong,12692.0,1,True,CD_M20260142102
+2026,22,Essendon,Adelaide,Jordan Dawson,Adelaide,12516.0,3,True,CD_M20260142103
+2026,22,Essendon,Adelaide,Izak Rankine,Adelaide,12798.0,2,True,CD_M20260142103
+2026,22,Essendon,Adelaide,Riley Thilthorpe,Adelaide,12892.0,1,False,CD_M20260142103
+2026,22,Fremantle,Western Bulldogs,Murphy Reid,Fremantle,13180.0,3,True,CD_M20260142104
+2026,22,Fremantle,Western Bulldogs,Luke Jackson,Fremantle,12779.0,2,True,CD_M20260142104
+2026,22,Fremantle,Western Bulldogs,Josh Treacy,Fremantle,12887.0,1,True,CD_M20260142104
+2026,22,Gold Coast,Melbourne,Max Gawn,Melbourne,11966.0,3,True,CD_M20260142105
+2026,22,Gold Coast,Melbourne,Tom Sparrow,Melbourne,12693.0,2,True,CD_M20260142105
+2026,22,Gold Coast,Melbourne,Joel Fitzgerald,Melbourne,13335.0,1,True,CD_M20260142105
+2026,22,Hawthorn,North Melbourne,Jai Newcombe,Hawthorn,12915.0,3,True,CD_M20260142106
+2026,22,Hawthorn,North Melbourne,Nick Watson,Hawthorn,13105.0,2,True,CD_M20260142106
+2026,22,Hawthorn,North Melbourne,Luke Davies-Uniacke,North Melbourne,12590.0,1,True,CD_M20260142106
+2026,22,Port Adelaide,Greater Western Sydney,Jason Horne-Francis,Port Adelaide,12956.0,3,False,CD_M20260142107
+2026,22,Port Adelaide,Greater Western Sydney,Stephen Coniglio,Greater Western Sydney,12028.0,2,True,CD_M20260142107
+2026,22,Port Adelaide,Greater Western Sydney,Lachie Whitfield,Greater Western Sydney,12143.0,1,True,CD_M20260142107
+2026,22,Richmond,West Coast,Tim Taranto,Richmond,12504.0,3,True,CD_M20260142108
+2026,22,Richmond,West Coast,Harley Reid,West Coast,13111.0,2,False,CD_M20260142108
+2026,22,Richmond,West Coast,Sam Lalor,Richmond,13190.0,1,True,CD_M20260142108
+2026,22,St Kilda,Sydney,Errol Gulden,Sydney,12862.0,3,True,CD_M20260142109
+2026,22,St Kilda,Sydney,Callum Wilkie,St Kilda,12703.0,2,True,CD_M20260142109
+2026,22,St Kilda,Sydney,Chad Warner,Sydney,12797.0,1,True,CD_M20260142109
+2026,23,Adelaide,Richmond,Izak Rankine,Adelaide,12798.0,3,True,CD_M20260142201
+2026,23,Adelaide,Richmond,Jordan Dawson,Adelaide,12516.0,2,True,CD_M20260142201
+2026,23,Adelaide,Richmond,Jack Ross,Richmond,,1,True,CD_M20260142201
+2026,23,Brisbane Lions,Hawthorn,Kai Lohmann,Brisbane Lions,12968.0,3,True,CD_M20260142202
+2026,23,Brisbane Lions,Hawthorn,Will Ashcroft,Brisbane Lions,13040.0,2,True,CD_M20260142202
+2026,23,Brisbane Lions,Hawthorn,Logan Morris,Brisbane Lions,13137.0,1,True,CD_M20260142202
+2026,23,Geelong,Essendon,Bailey Smith,Geelong,12692.0,3,True,CD_M20260142203
+2026,23,Geelong,Essendon,Oliver Dempsey,Geelong,12974.0,2,True,CD_M20260142203
+2026,23,Geelong,Essendon,Oliver Henry,Geelong,12851.0,1,True,CD_M20260142203
+2026,23,Greater Western Sydney,Gold Coast,Matt Rowell,Gold Coast,12768.0,3,True,CD_M20260142204
+2026,23,Greater Western Sydney,Gold Coast,Touk Miller,Gold Coast,12331.0,2,True,CD_M20260142204
+2026,23,Greater Western Sydney,Gold Coast,Toby Greene,Greater Western Sydney,12025.0,1,True,CD_M20260142204
+2026,23,Melbourne,Fremantle,Kysaiah Pickett,Melbourne,12771.0,3,True,CD_M20260142205
+2026,23,Melbourne,Fremantle,Tom Sparrow,Melbourne,12693.0,2,True,CD_M20260142205
+2026,23,Melbourne,Fremantle,Jye Amiss,Fremantle,12983.0,1,True,CD_M20260142205
+2026,23,St Kilda,Carlton,Sam Walsh,Carlton,12684.0,3,True,CD_M20260142206
+2026,23,St Kilda,Carlton,Patrick Cripps,Carlton,12261.0,2,True,CD_M20260142206
+2026,23,St Kilda,Carlton,Max Hall,St Kilda,13193.0,1,True,CD_M20260142206
+2026,23,Sydney,Port Adelaide,Errol Gulden,Sydney,12862.0,3,True,CD_M20260142207
+2026,23,Sydney,Port Adelaide,Chad Warner,Sydney,12797.0,2,True,CD_M20260142207
+2026,23,Sydney,Port Adelaide,Isaac Heeney,Sydney,12326.0,1,True,CD_M20260142207
+2026,23,West Coast,Collingwood,Nick Daicos,Collingwood,12943.0,3,True,CD_M20260142208
+2026,23,West Coast,Collingwood,Elliot Yeo,West Coast,12087.0,2,True,CD_M20260142208
+2026,23,West Coast,Collingwood,Daniel McStay,Collingwood,12291.0,1,True,CD_M20260142208
+2026,23,Western Bulldogs,North Melbourne,Luke Davies-Uniacke,North Melbourne,12590.0,3,True,CD_M20260142209
+2026,23,Western Bulldogs,North Melbourne,Harry Sheezel,North Melbourne,13034.0,2,True,CD_M20260142209
+2026,23,Western Bulldogs,North Melbourne,Paul Curtis,North Melbourne,12975.0,1,False,CD_M20260142209
+2026,24,Brisbane Lions,Gold Coast,Will Ashcroft,Brisbane Lions,13040.0,3,True,CD_M20260142301
+2026,24,Brisbane Lions,Gold Coast,Zac Bailey,Brisbane Lions,12610.0,2,False,CD_M20260142301
+2026,24,Brisbane Lions,Gold Coast,Dayne Zorko,Brisbane Lions,12076.0,1,True,CD_M20260142301
+2026,24,Essendon,Sydney,Errol Gulden,Sydney,12862.0,3,True,CD_M20260142302
+2026,24,Essendon,Sydney,Isaac Heeney,Sydney,12326.0,2,True,CD_M20260142302
+2026,24,Essendon,Sydney,Chad Warner,Sydney,12797.0,1,True,CD_M20260142302
+2026,24,Fremantle,Adelaide,Izak Rankine,Adelaide,12798.0,3,True,CD_M20260142303
+2026,24,Fremantle,Adelaide,Caleb Serong,Fremantle,12786.0,2,True,CD_M20260142303
+2026,24,Fremantle,Adelaide,Jye Amiss,Fremantle,12983.0,1,True,CD_M20260142303
+2026,24,Greater Western Sydney,West Coast,Lachie Ash,Greater Western Sydney,12782.0,3,True,CD_M20260142304
+2026,24,Greater Western Sydney,West Coast,Clayton Oliver,Greater Western Sydney,12410.0,2,True,CD_M20260142304
+2026,24,Greater Western Sydney,West Coast,Lachie Whitfield,Greater Western Sydney,12143.0,1,True,CD_M20260142304
+2026,24,Hawthorn,Collingwood,Nick Daicos,Collingwood,12943.0,3,True,CD_M20260142305
+2026,24,Hawthorn,Collingwood,Jai Newcombe,Hawthorn,12915.0,2,True,CD_M20260142305
+2026,24,Hawthorn,Collingwood,Sam Swadling,Collingwood,13340.0,1,True,CD_M20260142305
+2026,24,North Melbourne,Geelong,Bailey Smith,Geelong,12692.0,3,True,CD_M20260142306
+2026,24,North Melbourne,Geelong,Jy Simpkin,North Melbourne,12502.0,2,True,CD_M20260142306
+2026,24,North Melbourne,Geelong,Tanner Bruhn,Geelong,12871.0,1,True,CD_M20260142306
+2026,24,Port Adelaide,Melbourne,Max Gawn,Melbourne,11966.0,3,True,CD_M20260142307
+2026,24,Port Adelaide,Melbourne,Kade Chandler,Melbourne,12756.0,2,True,CD_M20260142307
+2026,24,Port Adelaide,Melbourne,Jack Steele,Melbourne,12368.0,1,True,CD_M20260142307
+2026,24,Richmond,St Kilda,Max Hall,St Kilda,13193.0,3,True,CD_M20260142308
+2026,24,Richmond,St Kilda,Mitch Owens,St Kilda,12948.0,2,True,CD_M20260142308
+2026,24,Richmond,St Kilda,Bradley Hill,St Kilda,12060.0,1,True,CD_M20260142308
+2026,24,Western Bulldogs,Carlton,Ed Richards,Western Bulldogs,12605.0,3,True,CD_M20260142309
+2026,24,Western Bulldogs,Carlton,Sam Walsh,Carlton,12684.0,2,True,CD_M20260142309
+2026,24,Western Bulldogs,Carlton,Patrick Cripps,Carlton,12261.0,1,True,CD_M20260142309
+2026,25,Adelaide,Greater Western Sydney,Izak Rankine,Adelaide,12798.0,3,True,CD_M20260142401
+2026,25,Adelaide,Greater Western Sydney,Riley Thilthorpe,Adelaide,12892.0,2,False,CD_M20260142401
+2026,25,Adelaide,Greater Western Sydney,Taylor Walker,Adelaide,11713.0,1,False,CD_M20260142401
+2026,25,Carlton,Fremantle,Jagga Smith,Carlton,13274.0,3,True,CD_M20260142403
+2026,25,Carlton,Fremantle,Ben Ainsworth,Carlton,12498.0,2,True,CD_M20260142403
+2026,25,Carlton,Fremantle,Sam Walsh,Carlton,12684.0,1,True,CD_M20260142403
+2026,25,Collingwood,Brisbane Lions,Logan Morris,Brisbane Lions,13137.0,3,True,CD_M20260142402
+2026,25,Collingwood,Brisbane Lions,Lachie Neale,Brisbane Lions,12055.0,2,True,CD_M20260142402
+2026,25,Collingwood,Brisbane Lions,Eric Hipwood,Brisbane Lions,12454.0,1,True,CD_M20260142402
+2026,25,Essendon,Port Adelaide,Jase Burgoyne,Port Adelaide,13007.0,3,True,CD_M20260142404
+2026,25,Essendon,Port Adelaide,Zach Merrett,Essendon,12241.0,2,True,CD_M20260142404
+2026,25,Essendon,Port Adelaide,Nate Caddy,Essendon,13148.0,1,True,CD_M20260142404
+2026,25,Geelong,Richmond,Bailey Smith,Geelong,12692.0,3,True,CD_M20260142405
+2026,25,Geelong,Richmond,Shaun Mannagh,Geelong,13104.0,2,True,CD_M20260142405
+2026,25,Geelong,Richmond,Tim Taranto,Richmond,12504.0,1,True,CD_M20260142405
+2026,25,Melbourne,Western Bulldogs,Marcus Bontempelli,Western Bulldogs,12269.0,3,True,CD_M20260142406
+2026,25,Melbourne,Western Bulldogs,Max Gawn,Melbourne,11966.0,2,True,CD_M20260142406
+2026,25,Melbourne,Western Bulldogs,Harry Petty,Melbourne,12653.0,1,True,CD_M20260142406
+2026,25,St Kilda,Gold Coast,Matt Rowell,Gold Coast,12768.0,3,True,CD_M20260142407
+2026,25,St Kilda,Gold Coast,Noah Anderson,Gold Coast,12767.0,2,True,CD_M20260142407
+2026,25,St Kilda,Gold Coast,Max Hall,St Kilda,13193.0,1,True,CD_M20260142407
+2026,25,Sydney,North Melbourne,Errol Gulden,Sydney,12862.0,3,True,CD_M20260142408
+2026,25,Sydney,North Melbourne,Brodie Grundy,Sydney,12217.0,2,True,CD_M20260142408
+2026,25,Sydney,North Melbourne,Braeden Campbell,Sydney,12863.0,1,True,CD_M20260142408
+2026,25,West Coast,Hawthorn,Will Day,Hawthorn,12794.0,3,True,CD_M20260142409
+2026,25,West Coast,Hawthorn,Jack Gunston,Hawthorn,11845.0,2,True,CD_M20260142409
+2026,25,West Coast,Hawthorn,Milan Murdock,West Coast,13294.0,1,True,CD_M20260142409

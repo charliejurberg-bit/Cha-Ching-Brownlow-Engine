@@ -249,17 +249,24 @@ def _round_map(adv, gl, season):
     return {f"Round {a}": b for a, b in zip(fw, gl_rounds)}
 
 
-def build_season(season, report):
+def build_season(season, report, gl=None):
+    """`gl` lets a caller join onto a frame it already holds rather than the
+    game_level file on disk. stack.py needs that: it joins the CURRENT round's
+    footywire stats inside predict_2026.py, before game_level_<season>.csv has
+    been rewritten to include that round. Same columns, same passes, same floor."""
     adv_path = os.path.join(ADV_DIR, f"advanced_{season}.csv")
-    gl_path = _game_level_path(season)
+    gl_path = _game_level_path(season) if gl is None else "the frame passed in"
     if gl_path is None:
         raise FileNotFoundError(f"{season}: no game_level file in {GAME_LEVEL_DIRS}")
 
     adv = pd.read_csv(adv_path)
     adv = adv[adv['Round_fw'].astype(str).str.match(r'^Round \d+$')].copy()
-    gl = pd.read_csv(gl_path, usecols=lambda c: c in
-                     ('ID', 'Round_num', 'Player_Name', 'Playing.for', 'Team',
-                      'Home.team', 'Away.team') or c in PLAYED_COLS)
+    _keep = lambda c: c in ('ID', 'Round_num', 'Player_Name', 'Playing.for', 'Team',
+                            'Home.team', 'Away.team') or c in PLAYED_COLS
+    if gl is None:
+        gl = pd.read_csv(gl_path, usecols=_keep)
+    else:
+        gl = gl[[c for c in gl.columns if _keep(c)]].copy()
     gl = gl[gl['ID'].notna()].copy()
     gl['ID'] = gl['ID'].astype(int)
 
@@ -406,6 +413,16 @@ def main(argv):
     if not seasons:
         print(f"FAIL  no advanced_<season>.csv in {ADV_DIR}.")
         return 1
+
+    # scraper_advanced.py writes 2010-2014 as well, because disposal efficiency
+    # starts there, but footywire has no SI column before 2015. Those files are
+    # not failures of this join, they are out of its scope, and reading them as
+    # failures stopped the whole build from writing.
+    no_si = [s for s in seasons if 'Score_Involvements_Actual' not in
+             pd.read_csv(os.path.join(ADV_DIR, f"advanced_{s}.csv"), nrows=0).columns]
+    if no_si:
+        print(f"  skipping {no_si}: no Score Involvements column (footywire starts it in 2015)")
+    seasons = [s for s in seasons if s not in no_si]
 
     report, frames, failed = [], [], []
     for season in seasons:
