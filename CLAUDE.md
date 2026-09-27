@@ -306,6 +306,9 @@ brownlow_engine/
   them under the label "Pre-2026-audit figures"; its current printed baselines
   are 0.0953 full model and 0.1013 no-coaches. Re-run against the current model
   before any MAE figure is used anywhere. See `project_brief.md`, "## Model".
+  The Predictions page's "MAE 0.095" header and tile were replaced on 27
+  September 2026 by the top-pick record, computed from files by
+  `top_pick_record()` in `dashboard.py` (2026: 145 of 207, 70%).
 - **Feature count**: 93 total
 
 ### From 2027: the stack (`stack.py`)

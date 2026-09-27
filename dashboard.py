@@ -1403,6 +1403,55 @@ def _disambiguate_players(df: pd.DataFrame) -> pd.DataFrame:
     return df.drop(columns=['_pid'])
 
 @st.cache_data(ttl=3600)
+def top_pick_record():
+    """(season, hits, games): how often the model's top pick in a game took the 3.
+
+    The accuracy figure the Predictions page quotes, measured from files rather
+    than typed in. It replaces "MAE 0.095", which CLAUDE.md retires: that number
+    was measured with a momentum leak in place and is comparable to nothing.
+
+    Uses the newest season with a real count. For the live season that is its
+    data_<s>/brownlow_votes_<s>.csv once the count is saved (the game_level file
+    itself still reads 0 votes); otherwise the season before, whose game_level
+    file season_rollover.py has backfilled. The top pick is the raw P_3 argmax,
+    the model as published at the time, so the 2026 figure is 145 of 207.
+    """
+    key = ['Round_num', 'Home.team', 'Away.team', 'Player_Name', 'Playing.for']
+    for s in (LIVE_SEASON, LIVE_SEASON - 1):
+        gp = f"{PRED_DIR}/game_level_{s}.csv"
+        if not os.path.exists(gp):
+            continue
+        g = pd.read_csv(gp, usecols=key + ['P_3', 'Brownlow.Votes'], low_memory=False)
+        vf = season_cfg.data_path("brownlow_votes_{s}.csv", s)
+        if os.path.exists(vf):
+            v = pd.read_csv(vf, usecols=key + ['Brownlow.Votes'])
+            g = g.drop(columns='Brownlow.Votes').merge(v, on=key, how='left')
+            g['Brownlow.Votes'] = g['Brownlow.Votes'].fillna(0)
+        g = g.drop_duplicates(key)
+        gid = g['Round_num'].astype(str) + '|' + g['Home.team'] + '|' + g['Away.team']
+        complete = g.groupby(gid)['Brownlow.Votes'].transform('sum') == 6
+        g, gid = g[complete], gid[complete]
+        if g.empty:
+            continue
+        top = g.loc[g.groupby(gid)['P_3'].idxmax()]
+        return s, int((top['Brownlow.Votes'] == 3).sum()), len(top)
+    return None, 0, 0
+
+
+@st.cache_data(ttl=3600)
+def model_label():
+    """Which model is producing the live season's numbers, for the page header."""
+    try:
+        import stack as _stack
+        _obj = _stack.load()
+        if _obj is not None and LIVE_SEASON > _obj['trained_through']:
+            return 'Classifier + ranker stack'
+    except Exception:
+        pass
+    return 'XGBoost v4.0'
+
+
+@st.cache_data(ttl=3600)
 def load_season(season):
     path = f"{PRED_DIR}/season_{season}.csv"
     if not os.path.exists(path):
@@ -3477,6 +3526,12 @@ if _page == 'Predictions':
         rounds_remaining = 24 - CURRENT_ROUND
         season_pct = int((CURRENT_ROUND / 24) * 100)
 
+        _tp_season, _tp_hits, _tp_games = top_pick_record()
+        _tp_pct = f"{_tp_hits / _tp_games:.0%}" if _tp_games else "n/a"
+        _tp_note = (f"The model's top pick took the 3 votes in {_tp_hits} of "
+                    f"{_tp_games} games, {_tp_season}" if _tp_games
+                    else "No counted season to measure against yet")
+
         st.markdown(f"""
 <div style="padding:20px 0 12px;animation:fadeSlideUp 500ms cubic-bezier(0.23,1,0.32,1) both;">
   <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
@@ -3493,8 +3548,8 @@ if _page == 'Predictions':
   </h1>
   <p style="font-family:'IBM Plex Mono',monospace;color:var(--muted);font-size:12px;
             margin:0;max-width:560px;line-height:1.7;letter-spacing:0.02em;">
-    Brownlow Medal predictor · {LIVE_SEASON} season · XGBoost v4.0 &nbsp;·&nbsp;
-    <span style="color:var(--text);font-weight:600;">MAE 0.095</span>
+    Brownlow Medal predictor · {LIVE_SEASON} season · {model_label()} &nbsp;·&nbsp;
+    <span style="color:var(--text);font-weight:600;" title="{_tp_note}">Top pick {_tp_pct} ({_tp_season})</span>
   </p>
 </div>
 """, unsafe_allow_html=True)
@@ -3560,7 +3615,7 @@ if _page == 'Predictions':
             f'<div class="hh-meta">{leader_team} · <b>{leader_votes:.1f}</b> projected votes · <b>{leader_odds}</b> to win</div>'
             '</div>'
             '<div class="hh-strip">'
-            '<div class="hh-stat"><div class="hh-stat-val">0.095</div><div class="hh-stat-lab" title="Mean absolute error — average votes the model misses by per player-game">MAE</div></div>'
+            f'<div class="hh-stat"><div class="hh-stat-val">{_tp_pct}</div><div class="hh-stat-lab" title="{_tp_note}">Top pick hit</div></div>'
             f'<div class="hh-stat"><div class="hh-stat-val">{rounds_remaining}</div><div class="hh-stat-lab">Rounds left</div></div>'
             '</div>'
             '</div><div class="hh-rule"></div></div>',
