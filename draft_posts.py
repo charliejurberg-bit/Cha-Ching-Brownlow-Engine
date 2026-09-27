@@ -41,9 +41,10 @@ import sys
 from datetime import datetime
 
 import pandas as pd
+import season as season_cfg
 
-GAME_LEVEL = "predictions/game_level_2026.csv"
-SEASON = "predictions/season_2026.csv"
+GAME_LEVEL = season_cfg.pred_path("game_level_{s}.csv")
+SEASON = season_cfg.pred_path("season_{s}.csv")
 SNAPSHOT_DIR = "predictions/snapshots"
 DRAFTS_DIR = "drafts"
 

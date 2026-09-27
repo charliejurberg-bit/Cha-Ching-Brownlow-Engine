@@ -17,11 +17,12 @@ from selenium.common.exceptions import WebDriverException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from webdriver_manager.chrome import ChromeDriverManager
+import season as season_cfg
 
-SEASON = 2026
+SEASON = season_cfg.LIVE_SEASON
 DOWNLOAD_DIR = os.path.abspath("data_wheelo/downloads")
-OUTPUT_CSV = "data_wheelo/wheelo_2026.csv"
-AFLTABLES_CSV = "data_2026/afltables_2026.csv"
+OUTPUT_CSV = f"data_wheelo/wheelo_{season_cfg.LIVE_SEASON}.csv"
+AFLTABLES_CSV = season_cfg.data_path("afltables_{s}.csv")
 BASE_URL = "https://www.wheeloratings.com/afl_match_stats.html"
 
 # ── Fetch outcomes ───────────────────────────────────────────
@@ -67,7 +68,7 @@ ROUND_OFFSET = 1 if SEASON >= OPENING_ROUND_FIRST_SEASON else 0
 # Model Comparison sums the 'Votes' column per player to reproduce
 # wheeloratings.com's published leaderboard exactly (not our match-stats sum).
 BROWNLOW_CSV_URL = "https://www.wheeloratings.com/src/data/wheelo-brownlow-predictions.csv"
-BROWNLOW_OUTPUT = "data_2026/wheelo_brownlow_predictions.csv"
+BROWNLOW_OUTPUT = season_cfg.data_path("wheelo_brownlow_predictions.csv")
 
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 

@@ -36,7 +36,8 @@ stay the classifier's, and the stack first speaks for 2027.
 SEASON ROLLOVER
 Actual votes come from game_level_<s>.csv up to 2025 and from
 data_<s>/brownlow_votes_<s>.csv from 2026 (scripts/fetch_brownlow_votes.py).
-ranker_backtest.LAST_SEASON must move to 2027 once the 2027 count is in.
+ranker_backtest.LAST_SEASON follows the vote files, so after the 2027 count
+scripts/fetch_brownlow_votes.py 2027 then python stack.py train is the whole job.
 """
 
 import argparse

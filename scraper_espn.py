@@ -8,13 +8,16 @@ import re
 import shutil
 import pandas as pd
 from io import StringIO
+import season
 
-_ESPN_URL = (
-    "https://www.espn.com.au/afl/story/_/page/POINTSBET20242/"
-    "afl-2026-brownlow-medal-predictor-tracker-leaderboard-odds-every-vote"
-)
-_ESPN_CSV = 'data_2026/espn_predictions.csv'
-_ESPN_ROUND_CSV = 'data_2026/espn_round_votes.csv'
+# ESPN publishes a new tracker article each season, so the slug is per season
+# in season.py. None until it exists: fetch() then skips with a note rather than
+# scraping last season's article as if it were this one.
+_ESPN_SLUG = season.cfg()["espn_slug"]
+_ESPN_URL = (f"https://www.espn.com.au/afl/story/_/page/POINTSBET20242/{_ESPN_SLUG}"
+             if _ESPN_SLUG else None)
+_ESPN_CSV = season.data_path("espn_predictions.csv")
+_ESPN_ROUND_CSV = season.data_path("espn_round_votes.csv")
 
 _UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -221,6 +224,9 @@ def _parse_round_votes(html_text):
 
 
 def fetch():
+    if _ESPN_URL is None:
+        print(f"[ESPN] no tracker article set for {season.LIVE_SEASON} in season.py; skipped")
+        return False
     try:
         html = _pw_get_html(
             _ESPN_URL,

@@ -34,11 +34,16 @@ club names: the two feeds spell six clubs differently and name matching there is
 exactly the trap `AFL_AWARD_TEAM_FIXES` exists to document.
 """
 
+import os
+import sys
+
 import requests
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import season as season_cfg  # noqa: E402
 
 CFS = "https://api.afl.com.au/cfs/afl"
 BASE = "https://aflapi.afl.com.au/afl/v2"
-SEASON_PID = "CD_S2026014"
 
 HDRS = {
     "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -50,6 +55,30 @@ HDRS = {
 }
 
 TMO = (5, 20)
+
+_IDS = {}
+
+
+def season_ids(season=None):
+    """(numeric compSeason id, provider id) for a season's Premiership, e.g.
+    (85, "CD_S2026014") for 2026. Looked up by NAME from the same list
+    count_night.season_id() reads, so a new season needs no constant here.
+    These were written in as 85 and "CD_S2026014" until 27 September 2026."""
+    season = season_cfg.LIVE_SEASON if season is None else season
+    if season not in _IDS:
+        r = requests.get(f"{BASE}/competitions/1/compseasons?pageSize=20", headers=HDRS, timeout=TMO)
+        r.raise_for_status()
+        for c in r.json().get("compSeasons", []):
+            if str(season) in c.get("name", "") and "Premiership" in c.get("name", ""):
+                _IDS[season] = (c["id"], c["providerId"])
+                break
+        else:
+            # LookupError, not SystemExit: the dashboard imports this and catches
+            # Exception, which SystemExit is not. Before the AFL publishes a new
+            # season's compSeason (the weeks after a rollover), SystemExit went
+            # straight through the Live Tracker's handler.
+            raise LookupError(f"no Premiership compSeason found for {season}")
+    return _IDS[season]
 
 
 def token(sess=None):
@@ -93,7 +122,7 @@ def award_roster():
     """
     out, page = [], 0
     while True:
-        r = requests.get(f"{BASE}/compseasons/85/award/brownlow"
+        r = requests.get(f"{BASE}/compseasons/{season_ids()[0]}/award/brownlow"
                          f"?page={page}&pageSize=100", headers=HDRS, timeout=TMO)
         if r.status_code != 200:
             break
@@ -118,8 +147,11 @@ def award_roster():
     return out
 
 
-def raw(season=SEASON_PID, sess=None, tok=None):
-    """The live payload: (status, matchVotes, leaderboard)."""
+def raw(season=None, sess=None, tok=None):
+    """The live payload: (status, matchVotes, leaderboard). `season` is the
+    provider id (CD_S2026014); None means season.LIVE_SEASON's."""
+    if season is None:
+        season = season_ids()[1]
     if tok is None:
         tok, sess = token(sess)
     h = {"x-media-mis-token": tok}
@@ -132,7 +164,7 @@ def raw(season=SEASON_PID, sess=None, tok=None):
     return sj.get("status"), sj.get("matchVotes", []), l.json().get("leaderboard", [])
 
 
-def players(season=SEASON_PID, roster=True):
+def players(season=None, roster=True):
     """Live votes in the award endpoint's player shape.
 
     Returns (status, rows). Votes are built from ``matchVotes`` rather than

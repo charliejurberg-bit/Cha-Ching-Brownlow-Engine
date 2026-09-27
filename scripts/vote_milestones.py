@@ -43,6 +43,9 @@ import sys
 
 import pandas as pd
 
+sys.path.insert(0, __import__('os').path.dirname(__import__('os').path.dirname(__import__('os').path.abspath(__file__))))
+import season as season_cfg  # noqa: E402
+
 COLS = ['Season', 'First.name', 'Surname', 'ID', 'Playing.for', 'Brownlow.Votes']
 OLD = 'data_history/fitzroy_stats_1965_2006.csv.gz'
 NEW = 'fitzroy_stats_all.csv'
@@ -104,9 +107,9 @@ def career_table(a):
 
 def scenarios(player):
     """2026 floor / expected / rounded / ceiling for one player."""
-    se = pd.read_csv('predictions/season_2026.csv')
-    sp = pd.read_csv('predictions/season_projection_2026.csv')
-    g = pd.read_csv('predictions/game_level_2026.csv').drop_duplicates(
+    se = pd.read_csv(season_cfg.pred_path('season_{s}.csv'))
+    sp = pd.read_csv(season_cfg.pred_path('season_projection_{s}.csv'))
+    g = pd.read_csv(season_cfg.pred_path('game_level_{s}.csv')).drop_duplicates(
         ['Round_num', 'ID'], keep='first').copy()
     g['_k'] = (g.Round_num.astype(str) + '|' + g['Home.team'].astype(str)
                + '|' + g['Away.team'].astype(str))
@@ -185,7 +188,7 @@ def main():
         print(f"ambiguous pre-1984 names, left unmerged: {', '.join(amb)}")
 
     if args.top:
-        se = pd.read_csv('predictions/season_2026.csv').nlargest(args.top, 'Exp_Total_Votes')
+        se = pd.read_csv(season_cfg.pred_path('season_{s}.csv')).nlargest(args.top, 'Exp_Total_Votes')
         for p in se.Player_Name:
             report(p, a, car, amb, scenarios(p))
     elif args.player:

@@ -18,6 +18,13 @@ import user_auth
 import features as feat
 from theme import inject_global_theme, PLOTLY_TOUCH_CONFIG
 from brownlow_medallists import get_medallists
+import season as season_cfg
+
+# The season the site treats as live: predictions without votes yet, the Live
+# Tracker, Polls a Vote. Set in season.py, never here. Seasons below it are
+# history and read their actual votes, which is why season_rollover.py must
+# backfill a season's count before LIVE_SEASON moves past it.
+LIVE_SEASON = season_cfg.LIVE_SEASON
 
 st.set_page_config(page_title="Cha Ching | AFL Brownlow Medal Predictor", page_icon="assets/favicon.png", layout="wide", initial_sidebar_state="collapsed")
 
@@ -1647,7 +1654,7 @@ def load_backtest():
 
 @st.cache_data(ttl=3600)
 def load_season_projection():
-    path = f"{PRED_DIR}/season_projection_2026.csv"
+    path = f"{PRED_DIR}/season_projection_{LIVE_SEASON}.csv"
     return _fix_team_names(pd.read_csv(path)) if os.path.exists(path) else None
 
 # Columns the Stat Filter page actually reads. Passed to load_all_historical()
@@ -1981,7 +1988,7 @@ def compute_player_efficiency_career():
 # behind an hour-long cache. It's a 6KB read, so there is nothing to win anyway.
 @st.cache_data(ttl=300)
 def load_best_odds():
-    path = "data_2026/best_odds.csv"
+    path = season_cfg.data_path("best_odds.csv")
     return _fix_team_names(pd.read_csv(path)) if os.path.exists(path) else None
 
 # Model Comparison source files. Paths are module-level because the page also
@@ -1991,9 +1998,9 @@ def load_best_odds():
 # glyph cannot leave a comparison testing for the old one.
 _MC_NA = '\u00b7'
 
-_MC_CC_PATH = "predictions/season_2026.csv"
-_MC_WH_PUB  = "data_2026/wheelo_brownlow_predictions.csv"
-_MC_WH_PATH = "data_wheelo/wheelo_2026.csv"   # legacy fallback
+_MC_CC_PATH = season_cfg.pred_path("season_{s}.csv")
+_MC_WH_PUB  = season_cfg.data_path("wheelo_brownlow_predictions.csv")
+_MC_WH_PATH = f"data_wheelo/wheelo_{LIVE_SEASON}.csv"   # legacy fallback
 
 @st.cache_data(ttl=3600)
 def _load_model_comparison():
@@ -2015,7 +2022,7 @@ def _load_model_comparison():
         wh_src = 'legacy'
     return cc, wh, wh_src
 
-_PREDICTOR_SNAPSHOT = "data_2026/brownlow_predictor_snapshot.json"
+_PREDICTOR_SNAPSHOT = season_cfg.data_path("brownlow_predictor_snapshot.json")
 _FULL_VOTE_POOL = 207 * 6      # 18 clubs x 23 / 2 games, 3-2-1 each
 
 
@@ -2122,7 +2129,7 @@ def fetch_live_brownlow_data():
             if _sd not in sys.path:
                 sys.path.insert(0, _sd)
             import bfawards_feed as _bf
-            live_status, live_players = _bf.players(with_ids=False)
+            live_status, live_players = _bf.players(roster=False)
         except Exception:
             live_players, live_status = None, None
 
@@ -2220,9 +2227,9 @@ def fetch_live_brownlow_data():
         return {**_empty, "error": str(exc)}
 
 
-_BF_CSV   = "data_2026/betfair_predictions.csv"
-_ESPN_CSV = "data_2026/espn_predictions.csv"
-_AFL_CSV  = "data_2026/afl_predictor_predictions.csv"
+_BF_CSV   = season_cfg.data_path("betfair_predictions.csv")
+_ESPN_CSV = season_cfg.data_path("espn_predictions.csv")
+_AFL_CSV  = season_cfg.data_path("afl_predictor_predictions.csv")
 
 _PW_UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -2309,7 +2316,7 @@ def _aflt_name_reference():
     The target side of the name reconciliation in features.py. Model Comparison
     joins five feeds on player name, and each spells them differently; this is
     the one spelling they are all resolved onto."""
-    path = "data_2026/afltables_2026.csv"
+    path = season_cfg.data_path("afltables_{s}.csv")
     if not os.path.exists(path):
         return pd.DataFrame()
     df = pd.read_csv(path, low_memory=False)
@@ -2704,7 +2711,7 @@ selected_season = st.session_state.season_by_page.get(_season_page, DEFAULT_SEAS
 # unknown falls back to the default season.
 if selected_season != CAREER and selected_season not in AVAILABLE_SEASONS:
     selected_season = DEFAULT_SEASON
-is_2026 = (selected_season == 2026)
+is_2026 = (selected_season == LIVE_SEASON)   # 'the live season'; name predates season.py
 is_career = (selected_season == CAREER)
 
 # ── Data loading ─────────────────────────────────────────────
@@ -3440,14 +3447,14 @@ if _page == 'Predictions':
         '</style>'
         '<div class="title-bar"><span class="pred-flush" style="display:none"></span>'
         '<h2 style="color:#e9eef3;margin:0">Predictions</h2>'
-        '<p style="color:var(--muted);margin:4px 0 0 0">2026 season overview · value finder</p></div>',
+        f'<p style="color:var(--muted);margin:4px 0 0 0">{LIVE_SEASON} season overview · value finder</p></div>',
         unsafe_allow_html=True,
     )
     _home_tab, _vf_tab = st.tabs(["Home", "Value Finder"])
 
     with _home_tab:
         st.markdown('<span class="pred-flush" style="display:none"></span>', unsafe_allow_html=True)
-        SEASON = 2026
+        SEASON = LIVE_SEASON
         CURRENT_ROUND = _display_round(max_season_rounds, SEASON)
 
         df = load_season(SEASON)
@@ -3486,7 +3493,7 @@ if _page == 'Predictions':
   </h1>
   <p style="font-family:'IBM Plex Mono',monospace;color:var(--muted);font-size:12px;
             margin:0;max-width:560px;line-height:1.7;letter-spacing:0.02em;">
-    Brownlow Medal predictor · 2026 season · XGBoost v4.0 &nbsp;·&nbsp;
+    Brownlow Medal predictor · {LIVE_SEASON} season · XGBoost v4.0 &nbsp;·&nbsp;
     <span style="color:var(--text);font-weight:600;">MAE 0.095</span>
   </p>
 </div>
@@ -5890,7 +5897,7 @@ def _render_stat_filter():
         '<h1 style="font-family:\'Archivo\',sans-serif;font-size:34px;font-weight:800;'
         'color:#e9eef3;margin:4px 0 2px;line-height:1.05">Threshold to votes</h1>'
         '<div style="color:#7e8c99;font-size:13px">How historical Brownlow polling '
-        'responds as you raise a stat threshold · 2007–2026</div>'
+        f'responds as you raise a stat threshold · 2007–{LIVE_SEASON}</div>'
         '</div>',
         unsafe_allow_html=True,
     )
@@ -6067,7 +6074,7 @@ def _render_stat_filter():
             # ── 4. Threshold sweep — same poll/3-vote/avg formulas as the old
             #    disposal table, with the active stat's own min filter dropped so
             #    the full sweep shows. Votes only exist pre-2026.
-            _sweep_mask = _base_mask & (hist['Season'] < 2026)
+            _sweep_mask = _base_mask & (hist['Season'] < LIVE_SEASON)
             for _lab, _col, _val, _mn, _mx in _stat_sliders:
                 if _col != active_col and _val > _mn:
                     _sweep_mask &= (hist[_col] >= _val)
@@ -6107,18 +6114,18 @@ def _render_stat_filter():
 
             # Vote pool (pre-2026 only), reused for the breakdown strip. Only the
             # votes column is counted below, so carry just that.
-            vote_data = filtered_sf.loc[filtered_sf['Season'] < 2026, ['Brownlow.Votes']]
+            vote_data = filtered_sf.loc[filtered_sf['Season'] < LIVE_SEASON, ['Brownlow.Votes']]
             n3 = int((vote_data['Brownlow.Votes'] == 3).sum())
             n2 = int((vote_data['Brownlow.Votes'] == 2).sum())
             n1 = int((vote_data['Brownlow.Votes'] == 1).sum())
             n0 = int((vote_data['Brownlow.Votes'] == 0).sum())
             vote_total = len(vote_data)
 
-            if (filtered_sf['Season'] == 2026).any():
-                _n26 = int((filtered_sf['Season'] == 2026).sum())
+            if (filtered_sf['Season'] == LIVE_SEASON).any():
+                _n26 = int((filtered_sf['Season'] == LIVE_SEASON).sum())
                 st.markdown(
                     f'<div style="color:#7e8c99;font-size:12px;margin:2px 0 6px">'
-                    f'{_n26:,} of these are 2026 games. Votes not yet assigned, so all '
+                    f'{_n26:,} of these are {LIVE_SEASON} games. Votes not yet assigned, so all '
                     f'rates below use {season_range[0]}–2025.</div>',
                     unsafe_allow_html=True,
                 )
@@ -6260,7 +6267,7 @@ def _render_stat_filter():
             # object dtype and no longer picked up by that formatter.
             if 'Votes' in _sf_disp.columns:
                 _sf_disp['Votes'] = [
-                    _SF_NO_VOTES if s == 2026 or pd.isna(v) else f'{v:.1f}'
+                    _SF_NO_VOTES if s == LIVE_SEASON or pd.isna(v) else f'{v:.1f}'
                     for v, s in zip(_sf_disp['Votes'], _sf_disp['Season'])
                 ]
             # Two bases on one line, so both get named. cur_games is the same
@@ -6272,9 +6279,9 @@ def _render_stat_filter():
             # count, so anyone counting rows on screen lands on a number the
             # caption shows. Sort is Season-descending, so the 2026 rows are the
             # ones the 200-row cap keeps.
-            _shown_sf = int((_sf_disp['Season'] < 2026).sum())
+            _shown_sf = int((_sf_disp['Season'] < LIVE_SEASON).sum())
             _shown26_sf = len(_sf_disp) - _shown_sf
-            _pending_sf = (f', plus {_shown26_sf:,} from 2026 pending votes'
+            _pending_sf = (f', plus {_shown26_sf:,} from {LIVE_SEASON} pending votes'
                            if _shown26_sf else '')
             # Club goes before the 2026 clause so the pending-votes count is not
             # separated from the figure it qualifies.
@@ -6763,7 +6770,7 @@ if _page == 'Live Tracker':
     # in _SEASON_PAGES, so `selected_season` is not its source of truth. One
     # constant feeds both the model frame and the public watchlist's season
     # column, so the two can never drift apart.
-    _LT_SEASON       = 2026
+    _LT_SEASON       = LIVE_SEASON
 
     # Small fallback header for the error / no-data states only. The live panel
     # folds its own topbar (title + LIVE pill) into the single redesign iframe.
@@ -7695,7 +7702,7 @@ if _page == 'Model Comparison':
         '<div style="margin:2px 0 18px">'
         '<div style="font-family:\'DM Mono\',monospace;font-size:10.5px;font-weight:500;'
         'letter-spacing:.14em;text-transform:uppercase;color:#7e8c99">'
-        'Model comparison · 2026</div>'
+        f'Model comparison · {LIVE_SEASON}</div>'
         '<h1 style="font-family:\'Archivo\',sans-serif;font-size:38px;font-weight:700;'
         'letter-spacing:-.022em;color:#e9eef3;margin:6px 0 0;line-height:1.05">'
         'Where we differ from the field</h1>'
@@ -7705,7 +7712,7 @@ if _page == 'Model Comparison':
 
     # ── Load all five data sources ────────────────────────────
 
-    _mc_tab1, _mc_tab3 = st.tabs(['2026 (Live)', 'Insights'])
+    _mc_tab1, _mc_tab3 = st.tabs([f'{LIVE_SEASON} (Live)', 'Insights'])
 
     with _mc_tab1:
         # theme.py tints [data-testid="stTabs"] with --surface; neutralise it for
@@ -7720,6 +7727,12 @@ if _page == 'Model Comparison':
         )
 
         _mc_cc_raw, _mc_wh_raw, _mc_wh_src = _load_model_comparison()
+        # Between a season rollover and the new season's first prediction run
+        # there is no live-season file at all. Say so, and let every table below
+        # build empty rather than fail on a frame with no columns.
+        if _mc_cc_raw is None:
+            st.info(f"No {LIVE_SEASON} predictions yet. This tab fills in once the "
+                    f"first round of {LIVE_SEASON} has been played and predicted.")
 
         # ── 3. Toolbar ────────────────────────────────────────────
         # The three columns are created here, at the row's visual position, but
@@ -7752,7 +7765,7 @@ if _page == 'Model Comparison':
         # must not be written back to the key.
         _mc_rounded = (_mc_scale == '3-2-1')
         if _mc_rounded:
-            _mc_r = load_season_rounded(2026)
+            _mc_r = load_season_rounded(LIVE_SEASON)
             if _mc_r is not None and not _mc_r.empty:
                 # Same three columns _load_model_comparison() yields, so every
                 # line below this is indifferent to which board it is holding.
@@ -7931,7 +7944,8 @@ if _page == 'Model Comparison':
                              '_cc': _r_cc, '_afl': _r_afl, '_bf': _r_bf,
                              '_wh': _r_wh, '_espn': _r_espn})
 
-        _pc_df = (pd.DataFrame(_pc_rows)
+        _pc_df = (pd.DataFrame(_pc_rows, columns=['Player', '_mk', '_cons', '_cc', '_afl',
+                                                  '_bf', '_wh', '_espn'])
                   .sort_values('_cons').reset_index(drop=True).head(25))
         _pc_df.insert(0, 'Consensus', range(1, len(_pc_df) + 1))
 
@@ -8515,7 +8529,7 @@ def _render_rg_footer():
 # Live Tracker pins _LT_SEASON: this page has no Season control and is not in
 # _SEASON_PAGES. One constant feeds the picks' season column, and it matches the
 # 2026 model frame the consensus loaders below read.
-_PAV_SEASON = 2026
+_PAV_SEASON = LIVE_SEASON
 
 
 def render_polls_a_vote(season: int):
@@ -8684,7 +8698,7 @@ def render_polls_a_vote(season: int):
         #    official AFL award API). Previously this slot read season_2026.csv,
         #    which is Cha Ching's OWN output — a mislabel that double-counted Cha
         #    Ching. Now it's real AFL data.
-        _afl_csv = "data_2026/afl_predictor_predictions.csv"
+        _afl_csv = season_cfg.data_path("afl_predictor_predictions.csv")
         if _pav_load and os.path.exists(_afl_csv):
             _afldf = pd.read_csv(_afl_csv)
             if 'Total_Votes' in _afldf.columns:
@@ -8692,7 +8706,7 @@ def render_polls_a_vote(season: int):
                             for _, r in _afldf.iterrows()}
         # 2b. AFL Predictor — per-round votes (verdict) from afl_predictor_round_votes.csv.
         #     Rounds are AFL/display convention, matching My_Rounds and the others.
-        _afl_round_csv = "data_2026/afl_predictor_round_votes.csv"
+        _afl_round_csv = season_cfg.data_path("afl_predictor_round_votes.csv")
         if _pav_load and os.path.exists(_afl_round_csv):
             _aflr = pd.read_csv(_afl_round_csv)
             if {'Player', 'Round', 'Vote'} <= set(_aflr.columns):
@@ -8703,7 +8717,7 @@ def render_polls_a_vote(season: int):
         # 3. Wheelo: season sum (radar) + per-round ExpVotes (verdict).
         #    Round key = Round - 1 (wheelo_2026.csv Round is AFLTables convention,
         #    same +1 as CC). NaN ExpVotes rounds are skipped → NA, not disagree.
-        _wh26 = "data_wheelo/wheelo_2026.csv"
+        _wh26 = f"data_wheelo/wheelo_{LIVE_SEASON}.csv"
         if _pav_load and os.path.exists(_wh26):
             _whdf = pd.read_csv(_wh26)
             _wh_col = next((c for c in ['ExpVotes', 'RatingPoints'] if c in _whdf.columns), None)
@@ -8719,7 +8733,7 @@ def render_polls_a_vote(season: int):
                         _con_wheelo_round.setdefault(_wk, {})[
                             int(_wr['Round']) - 1] = float(_wr['ExpVotes'])
         # 4. Betfair — season totals (radar) from the cached CSV.
-        _bf_csv = "data_2026/betfair_predictions.csv"
+        _bf_csv = season_cfg.data_path("betfair_predictions.csv")
         if _pav_load and os.path.exists(_bf_csv):
             _bfdf = pd.read_csv(_bf_csv)
             if 'Total_Votes' in _bfdf.columns:
@@ -8728,7 +8742,7 @@ def render_polls_a_vote(season: int):
         # 4b. Betfair — per-round votes (round verdict) from betfair_round_votes.csv,
         #     written by scraper_betfair.py from the same JSON feed. Rounds are
         #     AFL/display convention, matching My_Rounds and CC Round_num-1.
-        _bf_round_csv = "data_2026/betfair_round_votes.csv"
+        _bf_round_csv = season_cfg.data_path("betfair_round_votes.csv")
         if _pav_load and os.path.exists(_bf_round_csv):
             _bfr = pd.read_csv(_bf_round_csv)
             if {'Player', 'Round', 'Vote'} <= set(_bfr.columns):
@@ -8737,7 +8751,7 @@ def render_polls_a_vote(season: int):
                     _con_bf_round.setdefault(_norm(_rr['Player']), {})[
                         int(_rr['Round'])] = float(_rr['Vote'] or 0)
         # 5. ESPN — season totals (radar) from the cached CSV.
-        _espn_csv = "data_2026/espn_predictions.csv"
+        _espn_csv = season_cfg.data_path("espn_predictions.csv")
         if _pav_load and os.path.exists(_espn_csv):
             _espndf = pd.read_csv(_espn_csv)
             if 'Total_Votes' in _espndf.columns:
@@ -8748,7 +8762,7 @@ def render_polls_a_vote(season: int):
         #     matching the others. ESPN names only vote-getters, so absence in a
         #     covered round is disagreement, not silence — _espn_rounds_covered records
         #     which rounds ESPN published so a missing player reads TIPS_OTHER, not NA.
-        _espn_round_csv = "data_2026/espn_round_votes.csv"
+        _espn_round_csv = season_cfg.data_path("espn_round_votes.csv")
         if _pav_load and os.path.exists(_espn_round_csv):
             _espnr = pd.read_csv(_espn_round_csv)
             if {'Player', 'Round', 'Vote'} <= set(_espnr.columns):

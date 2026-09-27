@@ -1,7 +1,8 @@
 # -*- coding: utf-8 -*-
-"""The actual 2026 Brownlow votes, per player per game, off the AFL's live feed.
+"""A season's actual Brownlow votes, per player per game, off the AFL's live feed.
 
-    python scripts/fetch_brownlow_votes.py
+    python scripts/fetch_brownlow_votes.py            # season.LIVE_SEASON
+    python scripts/fetch_brownlow_votes.py 2027       # after the 2027 count
 
 Writes `data_2026/brownlow_votes_2026.csv`: one row per vote-getter per game,
 keyed the way `predictions/game_level_2026.csv` is (Round_num, Home.team,
@@ -29,9 +30,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import bfawards_feed  # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-GAME_LEVEL = os.path.join(REPO, "predictions", "game_level_2026.csv")
-OUT = os.path.join(REPO, "data_2026", "brownlow_votes_2026.csv")
-GAMES = 207
+sys.path.insert(0, REPO)
+import season as season_cfg  # noqa: E402
 
 # The feed's club names against the AFLTables spellings game_level uses.
 FEED_CLUBS = {
@@ -46,7 +46,13 @@ def _norm(s):
 
 
 def main():
-    status, match_votes, _ = bfawards_feed.raw()
+    season = int(sys.argv[1]) if len(sys.argv) > 1 else season_cfg.LIVE_SEASON
+    GAME_LEVEL = os.path.join(REPO, season_cfg.pred_path("game_level_{s}.csv", season))
+    OUT = os.path.join(REPO, season_cfg.data_path("brownlow_votes_{s}.csv", season))
+    GAMES = season_cfg.cfg(season)["games"]
+    if not GAMES:
+        raise SystemExit(f"season.py has no game count for {season}; set it first")
+    status, match_votes, _ = bfawards_feed.raw(bfawards_feed.season_ids(season)[1])
     if status != "CONCLUDED":
         raise SystemExit(f"feed status is {status!r}, not CONCLUDED: the count "
                          "is not final, refusing to write a partial record")
@@ -61,7 +67,9 @@ def main():
 
     rows, missed = [], []
     for m in match_votes:
-        rn = m["roundNumber"] + 1
+        # The feed numbers Opening Round 0; AFLTables numbers it raw round 1.
+        # True from 2024 (the first Opening Round), the same law as _display_round.
+        rn = m["roundNumber"] + (1 if season >= 2024 else 0)
         for v in m.get("votes") or []:
             if not v.get("votes"):
                 continue
@@ -80,7 +88,7 @@ def main():
                               f"({len(hit)} candidates)")
                 continue
             r = hit.iloc[0]
-            rows.append({"Season": 2026, "Round_num": rn,
+            rows.append({"Season": season, "Round_num": rn,
                          "Home.team": r["Home.team"], "Away.team": r["Away.team"],
                          "Player_Name": r.Player_Name, "Playing.for": club,
                          "ID": r.ID, "Brownlow.Votes": v["votes"],

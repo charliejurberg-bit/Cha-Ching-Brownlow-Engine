@@ -73,6 +73,8 @@ import sys
 
 import pandas as pd
 
+import season as season_cfg
+
 # Imported, never re-copied. _display_round already exists in three places
 # (dashboard.py, draft_posts.py, streaks.py), each with its own copy of the
 # season constant, and a fourth copy is a defect not a convenience.
@@ -84,13 +86,14 @@ from draft_posts import (
     load_latest_round,
 )
 
-BEST_ODDS = "data_2026/best_odds.csv"
+BEST_ODDS = season_cfg.data_path("best_odds.csv")
 
 OUT_DIR = "site"
 OUT_PATH = os.path.join(OUT_DIR, "landing.json")
 
-# Count night, fixed. Not derived from anything in the data.
-BROWNLOW_NIGHT = "2026-09-21"
+# Count night, fixed. Not derived from anything in the data. Set per season in
+# season.py; None until the AFL announces it, which main() reports.
+BROWNLOW_NIGHT = season_cfg.cfg()["count_night"]
 
 # Hero chips: the round's three highest by Exp_Votes.
 CHIPS_N = 3
@@ -356,6 +359,12 @@ def build_summary():
 
 
 def main():
+    if not BROWNLOW_NIGHT:
+        # brownlowNight is a required string in the front end's schema, so a
+        # null would fail its validator. Leave the last good artifact in place.
+        print(f"! season.py has no count_night for {season_cfg.LIVE_SEASON}; "
+              f"set it before site/landing.json can be written")
+        return 1
     for path in (GAME_LEVEL, SEASON):
         if not os.path.exists(path):
             print(f"! {path} not found. Run predict_2026.py first.")

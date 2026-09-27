@@ -50,6 +50,9 @@ from datetime import datetime, timezone
 
 import requests
 
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import season as season_cfg  # noqa: E402
+
 BASE = "https://aflapi.afl.com.au/afl/v2"
 HDRS = {
     "User-Agent": ("Mozilla/5.0 (Windows NT 10.0; Win64; x64) "
@@ -58,10 +61,13 @@ HDRS = {
     "Accept": "application/json",
     "Referer": "https://www.afl.com.au/brownlow-medal/live-tracker",
 }
-SNAPSHOT = "data_2026/brownlow_predictor_snapshot.json"
-SEASON = 2026
-GAMES_2026 = 207          # 18 clubs x 23 / 2, see CLAUDE.md
-FULL_VOTES = GAMES_2026 * 6
+SNAPSHOT = season_cfg.data_path("brownlow_predictor_snapshot.json")
+SEASON = season_cfg.LIVE_SEASON
+# 207 in 2026, 18 clubs x 23 / 2 (CLAUDE.md). From season.py, which leaves it
+# None until the fixture is known; FULL_VOTES is then None and the COUNTED
+# test cannot fire, which fails toward UNKNOWN rather than toward "final".
+GAMES_2026 = season_cfg.cfg()["games"]
+FULL_VOTES = GAMES_2026 * 6 if GAMES_2026 else None
 TMO = (5, 15)
 
 
@@ -142,7 +148,7 @@ def classify(cur, snap):
     if not full:
         done = len(cur["rounds_with_votes"])
         return "COUNTING", (f"partial: {cur['total_votes']:,} of "
-                            f"{FULL_VOTES:,} votes, {done} of 25 rounds "
+                            f"{FULL_VOTES or 0:,} votes, {done} of 25 rounds "
                             f"populated. The count is running")
     return "COUNTED", (f"complete at {cur['total_votes']:,} votes and "
                        f"different from the snapshot. The count has finished")
@@ -161,7 +167,7 @@ def cmd_snapshot(args):
     d = digest(players)
     if d["total_votes"] != FULL_VOTES:
         print(f"WARNING: feed holds {d['total_votes']:,} votes, not the "
-              f"{FULL_VOTES:,} a complete predictor carries. Snapshotting "
+              f"{FULL_VOTES or 0:,} a complete predictor carries. Snapshotting "
               f"anyway, but check whether the count has already started.")
     d["taken_at"] = datetime.now(timezone.utc).isoformat(timespec="seconds")
     d["season"] = sname

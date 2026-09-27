@@ -70,7 +70,24 @@ import features as feat
 REPO = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(REPO, "predictions", "ranker_backtest_game_level.csv")
 OUT_2026 = os.path.join(REPO, "predictions", "ranker_2026_regime_layer.csv")
-FIRST_SEASON, LAST_SEASON = 2007, 2026
+FIRST_SEASON = 2007
+
+
+def _counted_seasons():
+    """Seasons whose actual votes are on disk. Up to 2025 the game_level files
+    carry them; from 2026 they live in data_<s>/brownlow_votes_<s>.csv, written
+    by scripts/fetch_brownlow_votes.py after the count. The last of these is the
+    newest season a model can be trained or scored on, so a new count extends
+    everything here with no constant to move."""
+    out = [s for s in range(FIRST_SEASON, 2026)]
+    s = 2026
+    while os.path.exists(os.path.join(REPO, f"data_{s}", f"brownlow_votes_{s}.csv")):
+        out.append(s)
+        s += 1
+    return out
+
+
+LAST_SEASON = _counted_seasons()[-1]
 CLASSIFIER = dict(n_estimators=300, max_depth=7, learning_rate=0.05, subsample=0.85,
                   colsample_bytree=0.8, min_child_weight=7, gamma=0.1, reg_alpha=0.2,
                   reg_lambda=2.0, random_state=42, n_jobs=-1)     # brownlow_model.py's
@@ -98,12 +115,14 @@ def load():
     # 78 rows of 2025 carry one player twice in a game; see CLAUDE.md.
     A = A.drop_duplicates(["gid", "Player_Name", "Playing.for"]).reset_index(drop=True)
     A = feat.fill_missing_ids(A, A)
-    # 2026's file still reads 0 votes on every row; the count lives elsewhere.
-    v = pd.read_csv(calibration.VOTES_2026)
-    A = A.merge(v[KEY + ["Brownlow.Votes"]].rename(columns={"Brownlow.Votes": "_v26"}), on=KEY, how="left")
-    m26 = A.Season == 2026
-    A.loc[m26, "Brownlow.Votes"] = A.loc[m26, "_v26"].fillna(0)
-    A = A.drop(columns="_v26")
+    # From 2026 the game_level file reads 0 votes on every row (it is the live
+    # prediction); the count lives in data_<s>/brownlow_votes_<s>.csv.
+    for s in range(2026, LAST_SEASON + 1):
+        v = pd.read_csv(os.path.join(REPO, f"data_{s}", f"brownlow_votes_{s}.csv"))
+        A = A.merge(v[KEY + ["Brownlow.Votes"]].rename(columns={"Brownlow.Votes": "_v"}), on=KEY, how="left")
+        m = A.Season == s
+        A.loc[m, "Brownlow.Votes"] = A.loc[m, "_v"].fillna(0)
+        A = A.drop(columns="_v")
     sv = A.groupby(["Season", "ID"])["Brownlow.Votes"].sum().rename("votes").reset_index()
     adv = pd.read_csv(os.path.join(REPO, "data_advanced", "score_involvements.csv"))
     A = feat.build_extra_features(A, sv, adv)

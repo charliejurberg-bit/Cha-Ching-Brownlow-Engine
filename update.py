@@ -1,23 +1,27 @@
 """One-click weekly update.
 
-Eleven steps in two loops, each run as its own subprocess. The R loop goes first
-because predict_2026.py depends on the CSVs it writes.
+Every step runs for season.LIVE_SEASON (season.py); the "_2026" in some script
+names predates that and means nothing now.
+
+Eleven steps in two loops (twelve when the coaches fetch is on), each run as its
+own subprocess. The R loop goes first because predict_2026.py depends on the
+CSVs it writes.
 
 R loop:
-    1. data_2026/fetch_stats_2026.R   2026 player stats from AFLTables (fitzRoy)
-
-The 2026 coaches fetch is commented out of r_scripts for the season end. Read
-the inline comment there before restoring it for 2027.
+    1. fetch_stats.R <season>    player stats from AFLTables (fitzRoy)
+       fetch_coaches.R <season>  coaches votes, GUARDED, only when season.py
+                                 sets coaches_fetch (off for 2026, on for 2027)
 
 Python loop:
     2. scraper_odds.py         Oddschecker bookmaker odds
     3. scraper_betfair.py      Betfair predictions
     4. scraper_espn.py         ESPN predictions, season totals and per-round
+                               (skips until season.py has the season's article)
     5. scraper_afl.py          AFL Predictor votes
-    6. update_wheelo_2026.py   Wheelo 2026 ratings
+    6. update_wheelo_2026.py   Wheelo ratings
     7. scraper_advanced.py     footywire advanced stats for the season
     8. build_score_involvements.py   joins them onto fitzRoy IDs
-    9. predict_2026.py         2026 predictions (stack.py applies here once it
+    9. predict_2026.py         predictions (stack.py applies here once it
                                is trained on an earlier season than the one
                                predicted; see stack.py)
    10. draft_posts.py          drafts/round_<display>.md
@@ -49,6 +53,8 @@ sequence is two commands:
 import subprocess
 import sys
 import os
+
+import season
 from datetime import datetime
 
 R_PATHS = [
@@ -74,7 +80,7 @@ def find_rscript():
             continue
     return None
 
-def run_r_script(r_script_path, description):
+def run_r_script(r_script_path, description, args=()):
     print(f"\n{'='*50}")
     print(f"Running R: {description}...")
     print('='*50)
@@ -94,7 +100,7 @@ def run_r_script(r_script_path, description):
     # caller, so a broader catch would bury faults rather than step past a
     # known one.
     try:
-        result = subprocess.run([rscript, r_script_path], capture_output=False,
+        result = subprocess.run([rscript, r_script_path, *args], capture_output=False,
                                 text=True, timeout=R_TIMEOUT)
     except subprocess.TimeoutExpired:
         print(f"! {r_script_path} exceeded the {R_TIMEOUT}s limit and was killed, "
@@ -123,24 +129,21 @@ if __name__ == "__main__":
     print(f"Started: {start.strftime('%Y-%m-%d %H:%M')}")
 
     # R data fetch first — predict_2026.py depends on these CSVs
+    SEASON = str(season.LIVE_SEASON)
     r_scripts = [
-        ("data_2026/fetch_stats_2026.R", "Fetching 2026 player stats from AFLTables (R/fitzRoy)"),
-        # Disabled for this run. The 2026 coaches feed has gone private, so
-        # fetch_coaches_votes() no longer returns the season. fetch_coaches.R's
-        # write.csv is unconditional and unguarded: an empty or truncated frame
-        # is written straight over data_2026/coaches_votes_2026.csv, destroying
-        # all 22 published rounds. That file is already complete through R22 and
-        # no further rounds are coming, so there is nothing to gain by running
-        # it and a whole season of votes to lose. Losing it would also route
-        # every game to the no-coaches variant, not just the unpublished ones.
-        # data_2026/coaches_votes_2026_prev.csv is a byte copy kept as insurance.
-        # Restore this line when the feed returns, or for the 2027 season.
-        # ("data_2026/fetch_coaches.R", "Fetching 2026 coaches votes (R/fitzRoy)"),
+        ("fetch_stats.R", (SEASON,), f"Fetching {SEASON} player stats from AFLTables (R/fitzRoy)"),
     ]
-    for r_script, description in r_scripts:
+    # The coaches fetch is on per season in season.py. It is off for 2026, whose
+    # rounds 24-25 were transcribed by hand past where fitzRoy's feed stopped.
+    # fetch_coaches.R replaces the old unguarded data_2026/fetch_coaches.R and
+    # refuses to write a fetch missing ANY game already on disk, which is what
+    # a refetch did on 27 September 2026 (finals labelled as rounds 24-29).
+    if season.cfg().get("coaches_fetch"):
+        r_scripts.append(("fetch_coaches.R", (SEASON,), f"Fetching {SEASON} coaches votes (R/fitzRoy, guarded)"))
+    for r_script, args, description in r_scripts:
         if os.path.exists(r_script):
             print(f"\n>> {description}...")
-            run_r_script(r_script, description)
+            run_r_script(r_script, description, args)
         else:
             print(f"\n! {r_script} not found — skipping")
 
@@ -149,15 +152,15 @@ if __name__ == "__main__":
         ("scraper_betfair.py",     "Scraping Betfair Brownlow predictions"),
         ("scraper_espn.py",        "Scraping ESPN Brownlow predictions (season + per-round votes)"),
         ("scraper_afl.py",         "Scraping AFL Predictor Brownlow votes"),
-        ("update_wheelo_2026.py",  "Updating Wheelo 2026 ratings"),
+        ("update_wheelo_2026.py",  f"Updating Wheelo {SEASON} ratings"),
         # footywire's metres gained / real score involvements / intercepts. The
         # stack's ranker reads them (stack.py) and the rebuilt join also feeds the
         # dashboard's Stat Filter. build_score_involvements.py joins the rounds
         # already in game_level_2026.csv; the round being predicted is joined in
         # memory by stack.advanced_for. So: scrape, rebuild, predict.
-        (("scraper_advanced.py", "2026"), "Scraping footywire advanced stats"),
+        (("scraper_advanced.py", SEASON), "Scraping footywire advanced stats"),
         ("build_score_involvements.py", "Joining footywire stats onto player IDs"),
-        ("predict_2026.py",        "Generating 2026 predictions"),
+        ("predict_2026.py",        f"Generating {SEASON} predictions"),
         ("draft_posts.py",         "Generating draft posts"),
         ("landing_summary.py",     "Writing site/landing.json for the front door"),
     ]

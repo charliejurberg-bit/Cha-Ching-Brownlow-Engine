@@ -49,48 +49,43 @@ def fetch_squiggle_stats(season=2026):
     return df
 
 def fetch_coaches_votes_2026():
-    """Pull 2026 coaches votes via fitzRoy R script"""
+    """Coaches votes for season.LIVE_SEASON, through the GUARDED fetch_coaches.R.
+
+    This used to write its own R script, with season 2026 and an unconditional
+    write.csv, to data_2026/fetch_coaches.R and run it. That is the refetch
+    CLAUDE.md warns deletes the hand-transcribed rounds 24-25, and on 27
+    September 2026 the feed would have done exactly that (finals labelled as
+    rounds 24-29). fetch_coaches.R refuses any fetch missing a game already on
+    disk. season.py can also switch the fetch off for a season, as it is for 2026.
+    """
     import subprocess
-    r_script = """
-library(fitzRoy)
-coaches <- fetch_coaches_votes(season = 2026, comp = "AFLM")
-write.csv(coaches, "data_2026/coaches_votes_2026.csv", row.names = FALSE)
-cat("Done\\n")
-"""
-    script_path = "data_2026/fetch_coaches.R"
-    with open(script_path, 'w') as f:
-        f.write(r_script)
-    
-    # Try to find Rscript
+    import season
+    if not season.cfg().get("coaches_fetch"):
+        print(f"coaches fetch is off for {season.LIVE_SEASON} in season.py; skipped")
+        return False
     r_paths = [
         r"C:\Program Files\R\R-4.6.0\bin\Rscript.exe",
+        r"C:\Program Files\R\R-4.5.3\bin\Rscript.exe",
         r"C:\Program Files\R\R-4.5.0\bin\Rscript.exe",
         r"C:\Program Files\R\R-4.4.0\bin\Rscript.exe",
-        r"C:\Program Files\R\R-4.3.0\bin\Rscript.exe",
-        "Rscript"
+        "Rscript",
     ]
-    
     for rpath in r_paths:
         try:
-            result = subprocess.run([rpath, script_path], capture_output=True, text=True, timeout=120)
-            if result.returncode == 0:
-                print("✓ Coaches votes fetched via R")
-                return True
-            else:
-                print(f"R error: {result.stderr[:200]}")
+            result = subprocess.run([rpath, "fetch_coaches.R", str(season.LIVE_SEASON)],
+                                    capture_output=True, text=True, timeout=300)
         except FileNotFoundError:
             continue
-        except Exception as e:
-            print(f"R error: {e}")
-            continue
-    
-    print("⚠ Could not run R automatically. Please run fetch_coaches.R manually in RGui.")
+        print(result.stdout[-400:])
+        return result.returncode == 0
+    print("Could not find Rscript. Run: Rscript fetch_coaches.R <season>")
     return False
 
 if __name__ == "__main__":
     print("=" * 50)
-    print("2026 STATS SCRAPER")
+    import season
+    print(f"{season.LIVE_SEASON} STATS SCRAPER")
     print("=" * 50)
-    df = fetch_squiggle_stats(2026)
+    df = fetch_squiggle_stats(season.LIVE_SEASON)
     fetch_coaches_votes_2026()
     print("\nDone. Run predict_2026.py next.")

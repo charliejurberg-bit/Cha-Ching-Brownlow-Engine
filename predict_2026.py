@@ -1,6 +1,8 @@
 """
-2026 In-Season Predictor v4.0
-Uses saved model with Wheelo features, late-season form, and momentum features
+In-Season Predictor v4.0, for season.LIVE_SEASON (the filename predates it).
+Uses saved model with Wheelo features, late-season form, and momentum features.
+From the first season after stack.pkl's training window, stack.py replaces the
+classifier's probabilities; see "Stacked probabilities" below.
 """
 
 import pandas as pd
@@ -10,9 +12,11 @@ from sklearn.preprocessing import LabelEncoder
 import xgboost as xgb
 import pickle
 import os, warnings
+import season
 warnings.filterwarnings('ignore')
 
-os.makedirs("data_2026", exist_ok=True)
+SEASON = season.LIVE_SEASON
+os.makedirs(season.data_dir(), exist_ok=True)
 os.makedirs("predictions", exist_ok=True)
 
 # ── Load saved model ─────────────────────────────────────────
@@ -58,15 +62,15 @@ COACHES_FEATURES = feat.COACHES_FEATURES
 TARGET = 'Brownlow.Votes'
 
 # ── Load 2026 stats ──────────────────────────────────────────
-print("\nLoading 2026 data...")
-path_2026 = "data_2026/afltables_2026.csv"
+print(f"\nLoading {SEASON} data...")
+path_2026 = season.data_path("afltables_{s}.csv")
 if not os.path.exists(path_2026):
-    print("ERROR: afltables_2026.csv not found. Run the R script first.")
+    print(f"ERROR: {path_2026} not found. Run the R script first.")
     exit()
 
 df26 = pd.read_csv(path_2026, low_memory=False)
 df26['Playing.for'] = df26['Playing.for'].replace('Footscray', 'Western Bulldogs')
-df26['Season'] = 2026
+df26['Season'] = SEASON
 df26['Round_num'] = pd.to_numeric(df26['Round'], errors='coerce')
 # Finals are string-labeled (QF/EF/SF/PF/GF) -> NaN; dynamic max H&A round from data
 df26 = df26[df26['Round_num'].notna()].copy()
@@ -81,8 +85,8 @@ df26 = feat.add_row_stats(df26)
 df26['Margin_Bucket_enc'] = le.transform(df26['Margin_Bucket'].fillna('unknown'))
 
 # Merge coaches votes
-if os.path.exists("data_2026/coaches_votes_2026.csv"):
-    cv26 = pd.read_csv("data_2026/coaches_votes_2026.csv")
+if os.path.exists(season.data_path("coaches_votes_{s}.csv")):
+    cv26 = pd.read_csv(season.data_path("coaches_votes_{s}.csv"))
     cv26['Round'] = pd.to_numeric(cv26['Round'], errors='coerce')
     cv26['Coaches.Votes'] = pd.to_numeric(cv26['Coaches.Votes'], errors='coerce').fillna(0)
 
@@ -199,9 +203,9 @@ else:
     df26['Coaches_Votes'] = 0
 
 # Merge 2026 Wheelo data if available
-wheelo_2026_path = "data_wheelo/wheelo_2026.csv"
+wheelo_2026_path = f"data_wheelo/wheelo_{SEASON}.csv"
 if os.path.exists(wheelo_2026_path) and WHEELO_FEATURES:
-    print("  Merging 2026 Wheelo data...")
+    print(f"  Merging {SEASON} Wheelo data...")
     w26 = pd.read_csv(wheelo_2026_path, low_memory=False)
     w26['Round_num'] = pd.to_numeric(w26['Round'], errors='coerce')
     w26 = w26.rename(columns={'Player': 'Player_Name'})
@@ -318,7 +322,7 @@ df26_valid['Exp_Votes'] = df26_valid['P_1']*1+df26_valid['P_2']*2+df26_valid['P_
 # BEFORE the same-name disambiguation below, because its footywire join and its
 # last-season votes are keyed on the undecorated name and on ID.
 import stack
-df26_valid = stack.apply_if_ready(df26_valid, 2026)
+df26_valid = stack.apply_if_ready(df26_valid, SEASON)
 
 # Disambiguate players who share a name but play for different teams
 player_teams = df26_valid.groupby('Player_Name')['Playing.for'].nunique()
@@ -328,7 +332,7 @@ df26_valid['Player_Name'] = df26_valid.apply(
     axis=1
 )
 
-df26_valid.to_csv("predictions/game_level_2026.csv", index=False)
+df26_valid.to_csv(season.pred_path("game_level_{s}.csv"), index=False)
 
 totals = df26_valid.groupby('Player_Name').agg(
     Team=('Playing.for','last'), Games=('Round_num','count'),
@@ -337,11 +341,13 @@ totals = df26_valid.groupby('Player_Name').agg(
     Exp_2vote_games=('P_2','sum'), Exp_1vote_games=('P_1','sum'),
 ).reset_index().sort_values('Exp_Total_Votes', ascending=False)
 
-totals.to_csv("predictions/season_2026.csv", index=False)
+totals.to_csv(season.pred_path("season_{s}.csv"), index=False)
 current_round = int(df26_valid['Round_num'].max())
 
 # ── Season projection ─────────────────────────────────────────
-TOTAL_HA_ROUNDS = 23
+# Raw AFLTables rounds, the unit current_round is in. This was 23, the games a
+# club plays, which against a raw round understated the rounds left by two.
+TOTAL_HA_ROUNDS = season.cfg()["raw_rounds"] or max_ha_round
 remaining_rounds = max(0, TOTAL_HA_ROUNDS - current_round)
 
 # Monte Carlo: simulate 10,000 realisations of the rounds already played,
@@ -390,10 +396,10 @@ season_proj = season_proj[['Player', 'Team', 'Actual_Votes', 'Games_Played',
                             'Projected_Remaining', 'Season_Total_Projected',
                             'Floor_Projection', 'Ceiling_Projection']]\
     .sort_values('Season_Total_Projected', ascending=False).reset_index(drop=True)
-season_proj.to_csv("predictions/season_projection_2026.csv", index=False)
+season_proj.to_csv(season.pred_path("season_projection_{s}.csv"), index=False)
 print(f"Season projection saved ({remaining_rounds} rounds remaining of {TOTAL_HA_ROUNDS}).")
 
-print(f"\nOK 2026 predictions - {len(totals)} players through Round {current_round}")
+print(f"\nOK {SEASON} predictions - {len(totals)} players through Round {current_round}")
 print("\n=== TOP 15 PROJECTED (v4.0) ===")
 print(totals[['Player_Name','Team','Games','Exp_Total_Votes','Avg_Poll_Prob']].head(15).to_string(index=False))
 print("\nDone. Refresh dashboard.")

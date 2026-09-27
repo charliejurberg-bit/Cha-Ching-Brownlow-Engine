@@ -46,7 +46,7 @@ import count_night as cn                                    # noqa: E402
 import count_tweets as ct                                   # noqa: E402
 import night_pack as npk                                    # noqa: E402
 
-SLIP = "data_betting/brownlow_slip_2026.csv"
+SLIP = f"data_betting/brownlow_slip_{npk.CUR_SEASON}.csv"
 SIMS = 20000
 
 # Named player sets the group markets settle on. Sportsbet's own groupings,

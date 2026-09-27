@@ -52,9 +52,9 @@ Twitter/X: `@ChaChingBrwnlow` (no "o" in Brwnlow).
 - **undetected_chromedriver** — Oddschecker scraper (`scraper_odds.py`, local only)
 - **R** — seven tracked scripts, all fitzRoy: `fetch_extended_data.R`
   (2007–2014 player stats, 2006–2014 coaches votes), `scripts/build_history.R`
-  (the 1990–2006 archive, run from repo root), `data_2026/fetch_stats_2026.R`
-  (step 1 of `update.py`), `data_2026/fetch_coaches.R` (commented out of
-  `update.py`; see CLAUDE.md "Update chain" before running it), and
+  (the 1990–2006 archive, run from repo root), `fetch_stats.R <season>`
+  (step 1 of `update.py`), `fetch_coaches.R <season>` (guarded; on in
+  `update.py` only when `season.py` says so; see CLAUDE.md "Update chain"), and
   `scripts/fetch_coaches_2003_2005.R`, `fetch_coaches_2015_2025.R`,
   `fetch_results_pre1965.R`. **`data_pull.py` does no work: it is 0 bytes**,
   and has been empty since the initial commit.

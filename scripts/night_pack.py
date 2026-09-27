@@ -64,14 +64,15 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import all_time_tables as att            # noqa: E402
+import season as season_cfg               # noqa: E402
 
 OUT_DIR = os.path.join("drafts", "brownlow_night")
 CACHE = os.path.join(os.environ.get("TEMP", "/tmp"), "night_pack_cache.pkl")
 
 PRE_FILE = "data_history/brownlow_seasons_1924_1983.csv"
 COACHES_ALL = "coaches_votes_all.csv"
-COACHES_CUR = "data_2026/coaches_votes_2026.csv"
-CUR_SEASON = 2026
+CUR_SEASON = season_cfg.LIVE_SEASON
+COACHES_CUR = season_cfg.data_path("coaches_votes_{s}.csv")
 OPENING_ROUND_FROM = 2024      # AFLTables numbers Opening Round as Round 1
 
 # Seasons whose vote pool is double every other season's: two field umpires
@@ -139,9 +140,9 @@ def load(refresh=False):
     car, amb = vm.career_table(vm.modern())
     d["career"], d["career_ambiguous"] = car, amb
 
-    d["season_2026"] = pd.read_csv("predictions/season_2026.csv")
-    d["proj_2026"] = pd.read_csv("predictions/season_projection_2026.csv")
-    gl = pd.read_csv("predictions/game_level_2026.csv", low_memory=False)
+    d["season_2026"] = pd.read_csv(season_cfg.pred_path("season_{s}.csv"))
+    d["proj_2026"] = pd.read_csv(season_cfg.pred_path("season_projection_{s}.csv"))
+    gl = pd.read_csv(season_cfg.pred_path("game_level_{s}.csv"), low_memory=False)
     # game_level carries exactly-duplicated rows (89 in 2026); see CLAUDE.md.
     # Deduped on name and club, NOT on ID. fitzRoy returns no ID for twelve 2026
     # players (Charlie Cameron, Jack Ross and Jack Graham among them) and

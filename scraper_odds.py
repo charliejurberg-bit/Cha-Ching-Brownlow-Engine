@@ -26,8 +26,9 @@ from bs4 import BeautifulSoup
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
+import season
 
-os.makedirs("data_2026", exist_ok=True)
+os.makedirs(season.data_dir(), exist_ok=True)
 
 DEBUG = False  # When True: save page source to oddschecker_debug.html and exit
 
@@ -272,7 +273,7 @@ if __name__ == "__main__":
         n_bookies = len(bookie_cols)
 
         # ── Wide-format CSV ──────────────────────────────────────
-        df.to_csv("data_2026/bookmaker_odds.csv", index=False)
+        df.to_csv(season.data_path("bookmaker_odds.csv"), index=False)
 
         # Archive it long-format: the wide frame's bookmaker columns depend on
         # what Oddschecker rendered that run, so appending it as-is would go
@@ -284,7 +285,7 @@ if __name__ == "__main__":
         )
         long_df["scraped_at"] = now
         long_df = long_df[["player", "bookie", "odds", "scraped_at"]]
-        _append_history(long_df, "data_2026/bookmaker_odds_history.csv")
+        _append_history(long_df, season.data_path("bookmaker_odds_history.csv"))
 
         # ── Best-odds CSV (dashboard compat) ─────────────────────
         # Filter Betfair prices below 1.5 — those are lay prices, not back prices.
@@ -316,15 +317,15 @@ if __name__ == "__main__":
             .sort_values("best_odds")
             .reset_index(drop=True)
         )
-        best_df.to_csv("data_2026/best_odds.csv", index=False)
-        _append_history(best_df, "data_2026/best_odds_history.csv")
+        best_df.to_csv(season.data_path("best_odds.csv"), index=False)
+        _append_history(best_df, season.data_path("best_odds_history.csv"))
 
         # ── Summary ──────────────────────────────────────────────
         print(f"Players found  : {n_players}")
         print(f"Bookmakers kept: {n_bookies}")
         print(f"Bookmakers     : {', '.join(bookie_cols)}")
-        print(f"\nSaved -> data_2026/bookmaker_odds.csv  ({n_players} players x {n_bookies} bookmakers)")
-        print(f"Saved -> data_2026/best_odds.csv")
+        print(f"\nSaved -> {season.data_path('bookmaker_odds.csv')}  ({n_players} players x {n_bookies} bookmakers)")
+        print(f"Saved -> {season.data_path('best_odds.csv')}")
 
         print(f"\nTop 15 shortest-priced (best odds available):")
         print(best_df.head(15).to_string(index=False))

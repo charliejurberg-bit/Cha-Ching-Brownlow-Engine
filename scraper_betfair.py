@@ -15,13 +15,14 @@ import shutil
 import datetime
 import pandas as pd
 import requests
+import season
 
 _API_BASE = 'https://betfair-data-supplier-prod.herokuapp.com/api'
-_BF_CSV = 'data_2026/betfair_predictions.csv'
+_BF_CSV = season.data_path("betfair_predictions.csv")
 # Per-round 3-2-1 the season total is built from. Drives the Polls-a-Vote
 # round verdict. Rounds are Betfair's native round_number (AFL/display
 # convention: 0 = Opening Round), matching the dashboard's My_Rounds picks.
-_BF_ROUND_CSV = 'data_2026/betfair_round_votes.csv'
+_BF_ROUND_CSV = season.data_path("betfair_round_votes.csv")
 
 _UA = (
     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) "

@@ -25,6 +25,7 @@ import os
 import shutil
 import pandas as pd
 import requests
+import season
 
 _BASE = "https://aflapi.afl.com.au/afl/v2"
 _HDRS = {
@@ -33,8 +34,8 @@ _HDRS = {
     "Accept": "application/json",
     "Referer": "https://www.afl.com.au/brownlow-medal/live-tracker",
 }
-_SEASON_CSV = "data_2026/afl_predictor_predictions.csv"
-_ROUND_CSV = "data_2026/afl_predictor_round_votes.csv"
+_SEASON_CSV = season.data_path("afl_predictor_predictions.csv")
+_ROUND_CSV = season.data_path("afl_predictor_round_votes.csv")
 
 
 def _save_with_backup(df, csv_path):

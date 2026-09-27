@@ -30,10 +30,12 @@ python predict_2026.py
 
 ## Update chain
 
-`python update.py` runs the eleven step weekly chain: one R step (2026 stats) then
-ten Python steps (odds, Betfair, ESPN, AFL predictor, Wheelo, footywire advanced
-stats and their ID join, predictions, drafts, `site/landing.json`). The 2026 coaches fetch is commented out of it, see
-below. Nothing in the chain stops on a failed step; read each step's exit code.
+`python update.py` runs the weekly chain for `season.LIVE_SEASON`: an R step
+(`fetch_stats.R <season>`, plus the guarded `fetch_coaches.R <season>` when
+`season.py` switches it on, off for 2026) then ten Python steps (odds, Betfair,
+ESPN, AFL predictor, Wheelo, footywire advanced stats and their ID join,
+predictions, drafts, `site/landing.json`). Nothing in the chain stops on a
+failed step; read each step's exit code. See "Season rollover" below.
 The 2026 home and away season is over, so the chain has nothing left to fetch
 this year. One-off checks tied to a particular round are
 recorded here.
@@ -62,11 +64,17 @@ below pass.
 
 **The hazard this creates, stated plainly.** Running the fitzRoy coaches fetch
 again overwrites the file with rounds 1 to 23 only and **silently deletes rounds
-24 and 25**, dropping routing back to 189 / 18. `data_2026/fetch_coaches.R`'s
-`write.csv` is unconditional and unguarded, which is why it stays commented out
-of `update.py`'s `r_scripts`. `coaches_votes_2026_prev.csv` does **not** protect
-against this: it predates the transcription. Re-run the append script to
-recover, or restore the committed file.
+24 and 25**, dropping routing back to 189 / 18. The old
+`data_2026/fetch_coaches.R` wrote unconditionally and is deleted; its
+replacement, root `fetch_coaches.R`, **refuses any fetch missing a game already
+on disk**. A row-count or last-round guard is not enough, measured on 27
+September 2026: the feed returned 1,380 rows through "round 29" against the
+file's 1,346 through round 25, passing both, yet its rounds 24-29 were the
+finals mislabelled, 12 rows each, and still lacked the hand-transcribed home
+and away rounds. `season.py` also keeps the coaches fetch off for 2026.
+`coaches_votes_2026_prev.csv` does **not** protect against this: it predates
+the transcription. Re-run the append script to recover, or restore the
+committed file.
 
 **Two checks that make coaches-vote data verifiable, and should be used again.**
 
@@ -105,6 +113,41 @@ never engages. The predicate fixed in commit `800acc7` (`(s != 0).any()` to
 `(s > 0).any()`) is NaN safe and was proven against raw round 23 while that
 round was genuinely unpublished. Keep it NaN safe in any rewrite.
 
+## Season rollover
+
+**`season.py` holds the live season. Nothing else may write a season number.**
+Every script in `update.py`'s chain, the count-night tools and the dashboard's
+live-season logic read `season.LIVE_SEASON`; the `_2026` left in some filenames
+(`predict_2026.py`, `update_wheelo_2026.py`) predates it and means nothing.
+`BROWNLOW_SEASON=2027 <command>` overrides it for one run, for rehearsal.
+
+The whole rollover, after a count:
+
+```bash
+python scripts/fetch_brownlow_votes.py 2027   # save the count; refuses a partial one
+python season_rollover.py 2028                # check only
+python season_rollover.py 2028 --apply        # backfill, retrain stack, switch season
+```
+
+`--apply` backfills the finished season's votes into `game_level_<old>.csv` and
+`season_<old>.csv`, because from 2026 those files are written as live
+predictions with 0 votes and the dashboard reads any season below
+`LIVE_SEASON` as history. Skipping it makes every player of the old season
+read as never polling. Then fill `season.SEASONS[<new>]` as the values become
+known: `landing_summary.py` will not write without `count_night`, and
+`scraper_espn.py` skips without `espn_slug`.
+
+**Rehearsed on 27 September 2026, not assumed.** Rolled to 2027 with no 2027
+data at all, all seven Brownlow pages rendered; two failures were found and
+fixed. Model Comparison crashed on an empty consensus table. The Live Tracker
+hung because `bfawards_feed.season_ids` raised `SystemExit`, which the
+dashboard's `except Exception` does not catch, for a season the AFL had not
+published yet. Then everything was restored; 2026 output is byte identical.
+
+**Two page comparisons can differ run to run with no code change.** Model
+Comparison and the Live Tracker order tied rows through a set, and string
+hashing is randomised per process. Compare them under `PYTHONHASHSEED=0`.
+
 ## Project structure
 
 ```
@@ -116,7 +159,12 @@ brownlow_engine/
 │
 ├── brownlow_model.py     # Model training (v4.0) — runs once per season
 ├── predict_2026.py       # In-season predictor — run after each round
-├── update.py             # Eleven step weekly chain, ends with site/landing.json
+├── update.py             # Weekly chain for season.LIVE_SEASON, ends with site/landing.json
+├── season.py             # THE live season, and per-season values (round and game
+│                         #   counts, count night, ESPN article, coaches fetch on/off)
+├── season_rollover.py    # One command to move to a new season; see "Season rollover"
+├── fetch_stats.R         # Rscript fetch_stats.R <season>: AFLTables stats
+├── fetch_coaches.R       # Rscript fetch_coaches.R <season>: coaches votes, GUARDED
 ├── stack.py              # FROM 2027 the shipping vote model: classifier + within-
 │                         #   game ranker + regime layer, predictions/stack.pkl.
 │                         #   predict_2026.py applies it only to a season AFTER the
@@ -204,8 +252,8 @@ brownlow_engine/
 ├── data_2026/            # Current season raw data
 │   ├── afltables_2026.csv    # Player stats (from R/fitzRoy)
 │   ├── coaches_votes_2026.csv    # Rounds 1-23 fitzRoy, 24-25 hand-transcribed.
-│   │                             #   Do NOT refetch, see "Update chain"
-│   ├── fetch_coaches.R           # Unguarded write.csv. Stays out of update.py
+│   │                             #   Do NOT force a refetch, see "Update chain"
+│   ├── brownlow_votes_2026.csv   # The actual count, per player per game
 │   ├── bookmaker_odds.csv    # Wide: Player | Bookie1 | Bookie2 | …
 │   └── best_odds.csv         # Long: player, best_odds, implied_prob, best_bookie
 │
@@ -714,7 +762,8 @@ https://api.afl.com.au/cfs/afl/bfawards/season/{seasonProviderId}
 https://api.afl.com.au/cfs/afl/bfawards/leaderboard/season/{seasonProviderId}
 ```
 
-`CD_S2026014` is 2026's. It needs the same `x-media-mis-token` that
+`CD_S2026014` is 2026's; `bfawards_feed.season_ids()` now looks both ids up by
+season name, so a new season needs no constant. It needs the same `x-media-mis-token` that
 `fetch_match_chains.py` mints (`POST /cfs/afl/WMCTok`, with `Origin`, `Referer`
 and an explicit `Content-Length: 0`), and it returns **401** without one.
 

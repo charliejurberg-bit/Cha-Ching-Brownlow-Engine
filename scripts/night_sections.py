@@ -1011,7 +1011,7 @@ def _scenarios(d):
     s["club"] = s.raw_club.map(canonical_club)
     bad = sorted(s.loc[~s.club.isin(KNOWN_CLUBS), "raw_club"].unique())
     if bad:
-        raise SystemExit(f"2026 club label(s) not in the vote archive: {bad}")
+        raise SystemExit(f"{CUR_SEASON} club label(s) not in the vote archive: {bad}")
     s = s.drop(columns=["raw_club"])
     pr = d["proj_2026"][["Player", "Floor_Projection", "Ceiling_Projection"]]
     s = s.merge(pr, left_on="name", right_on="Player", how="left")
@@ -1316,18 +1316,18 @@ def build_players(d, top=40):
         pid = int(r.ID)
         rows = []
 
-        rows.append(("2026 model", "games played", f"{int(r.games)}"))
-        rows.append(("2026 model", "projected rank", f"{int(r['rank'])}"))
+        rows.append((f"{CUR_SEASON} model", "games played", f"{int(r.games)}"))
+        rows.append((f"{CUR_SEASON} model", "projected rank", f"{int(r['rank'])}"))
         for lbl in ("floor", "exp", "rounded", "ceiling"):
-            rows.append(("2026 model", lbl, f"{float(r[lbl]):.1f}"))
+            rows.append((f"{CUR_SEASON} model", lbl, f"{float(r[lbl]):.1f}"))
 
         if r["name"] in cur_cv_by_name.index:
             c = cur_cv_by_name.loc[r["name"]]
-            rows.append(("2026 coaches", "coaches votes",
+            rows.append((f"{CUR_SEASON} coaches", "coaches votes",
                          f"{float(c.cv):.0f}"))
-            rows.append(("2026 coaches", "rank",
+            rows.append((f"{CUR_SEASON} coaches", "rank",
                          f"{int(cv_order[r['name']])}"))
-            rows.append(("2026 coaches", "10-vote games", f"{int(c.tens)}"))
+            rows.append((f"{CUR_SEASON} coaches", "10-vote games", f"{int(c.tens)}"))
 
         if pid in car.index:
             base = float(car.loc[pid, "votes"])
