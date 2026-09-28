@@ -304,6 +304,69 @@ def load_season_rounded(season):
 
 
 @_cached
+def load_game_career():
+    """Every season's game frame stacked, with names disambiguated ACROSS seasons.
+
+    dashboard.load_game_career reads the CSVs again through load_all_historical;
+    this builds the same frame from load_game, so each row also keeps the name
+    the season view shows it under, in `_season_name`. The two differ only for
+    a person whose name collides in some other season: 'Josh Kennedy' in a
+    season with one of them, 'Josh Kennedy (Sydney)' in the career view.
+    """
+    frames = []
+    for s in sorted(available_seasons()):
+        g = load_game(s)
+        if g is None:
+            continue
+        g = g.copy()
+        g['Season'] = s
+        g['_season_name'] = g['Player_Name']
+        g['Player_Name'] = g['_base_name'] if '_base_name' in g.columns else g['Player_Name']
+        g = g.drop(columns=[c for c in ('_base_name',) if c in g.columns])
+        frames.append(g)
+    if not frames:
+        return None
+    g = pd.concat(frames, ignore_index=True)
+    if 'Playing.for' in g.columns:
+        g['Team'] = g['Team'].fillna(g['Playing.for']) if 'Team' in g.columns else g['Playing.for']
+    return _disambiguate_players(g)
+
+
+def efficiency_from_df(df):
+    """dashboard._efficiency_from_df: the Polling DNA rates per player."""
+    overall = df.groupby('Player_Name').agg(
+        Games=('Round_num', 'count'),
+        Total_Votes=('Brownlow.Votes', 'sum'),
+        Poll_Rate=('Brownlow.Votes', lambda x: (x > 0).mean()),
+    ).reset_index()
+    hd = df[df['Disposals'] >= 30].groupby('Player_Name').agg(
+        HD_Games=('Round_num', 'count'),
+        HD_Poll_Rate=('Brownlow.Votes', lambda x: (x > 0).mean()),
+    ).reset_index()
+    wins = df[df['Is_Win'] == 1].groupby('Player_Name').agg(
+        Win_Poll_Rate=('Brownlow.Votes', lambda x: (x > 0).mean()),
+    ).reset_index()
+    losses = df[df['Is_Loss'] == 1].groupby('Player_Name').agg(
+        Loss_Poll_Rate=('Brownlow.Votes', lambda x: (x > 0).mean()),
+    ).reset_index()
+    eff = overall.merge(hd, on='Player_Name', how='left')
+    eff = eff.merge(wins, on='Player_Name', how='left')
+    return eff.merge(losses, on='Player_Name', how='left')
+
+
+def voted_seasons(g):
+    """Seasons whose game file carries a count. The live season reads 0 votes
+    until season_rollover.py backfills it, and must not dilute career rates."""
+    tot = g.groupby('Season')['Brownlow.Votes'].sum()
+    return sorted(int(s) for s in tot[tot > 0].index)
+
+
+def load_best_odds():
+    path = season_cfg.data_path("best_odds.csv")
+    return _fix_team_names(pd.read_csv(path)) if os.path.exists(path) else None
+
+
+@_cached
 def load_season_projection():
     path = f"{PRED_DIR}/season_projection_{LIVE_SEASON}.csv"
     return _fix_team_names(pd.read_csv(path)) if os.path.exists(path) else None

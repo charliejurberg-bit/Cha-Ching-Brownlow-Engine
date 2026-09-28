@@ -14,7 +14,7 @@ order, movement arrows, the Floor-Ceiling lift and the round grid all follow
 the Leaderboard block in dashboard.py line for line (see the comments there for
 why each rule exists). site_data.py holds the loaders.
 
-Pages exported so far: Leaderboard.
+Pages exported so far: Leaderboard, Player Profile.
 """
 
 import json
@@ -54,7 +54,7 @@ def _movement(board, g, col, live):
     return dict(zip(m['Player_Name'], m['Move']))
 
 
-def _board(season, rounded, live):
+def _board(season, rounded, live, slugs):
     """One board (decimal or 3-2-1) in page order, or None if unavailable."""
     board = sd.load_season_rounded(season) if rounded else sd.load_season(season)
     if board is None or board.empty:
@@ -86,6 +86,7 @@ def _board(season, rounded, live):
         pr = rmap.get(name, {})
         row = {
             "name": name,
+            "slug": slugs.get(name),
             "team": str(r.Team),
             "games": int(r.Games) if pd.notna(r.Games) else 0,
             "votes": _num(r.Exp_Total_Votes, dp),
@@ -103,13 +104,13 @@ def _board(season, rounded, live):
     return {"rounds": rounds, "players": players}
 
 
-def export_leaderboard(season):
+def export_leaderboard(season, slugs):
     live = season == sd.LIVE_SEASON
-    decimal = _board(season, False, live)
+    decimal = _board(season, False, live, slugs)
     if decimal is None:
         print(f"  {season}: no season file, skipped")
         return None
-    rounded = _board(season, True, live)
+    rounded = _board(season, True, live, slugs)
     rounds = decimal["rounds"] or (rounded or {}).get("rounds", [])
     return {
         "season": season,
@@ -118,6 +119,155 @@ def export_leaderboard(season):
         "roundLabels": [str(sd.display_round(rn, season)) for rn in rounds],
         "boards": {"decimal": decimal, "rounded": rounded},
     }
+
+
+# ── Player Profile ─────────────────────────────────────────────
+# One file per person, every game of the career, under players/<slug>.json.
+# The page filters it to a season or shows it whole, so Profile, DNA and
+# Compare (season or career) all read the same rows. profile/<season>.json and
+# profile/career.json carry what needs the whole field: the picker, the
+# DNA rank, season totals for Compare and, for the live season only, odds.
+
+# Per-game columns: (output key, source column, decimals). Decimals None keeps
+# an integer. Columns absent from a season's file export as null.
+_GAME_COLS = (
+    ("round", "Round_num", None),
+    ("team", "Team", "str"),
+    ("home", "Home.team", "str"),
+    ("away", "Away.team", "str"),
+    ("win", "Is_Win", None),
+    ("loss", "Is_Loss", None),
+    ("disp", "Disposals", None),
+    ("goals", "Goals", None),
+    ("kicks", "Kicks", None),
+    ("clr", "Clearances", None),
+    ("cp", "Contested.Possessions", None),
+    ("cv", "Coaches_Votes", None),
+    ("tck", "Tackles", None),
+    ("si", sd._SI_COL, None),
+    ("bv", "Brownlow.Votes", None),
+    ("ev", "Exp_Votes", 3),
+    ("poll", "Poll_Prob", 4),
+    ("p1", "P_1", 4), ("p2", "P_2", 4), ("p3", "P_3", 4),
+    ("g1", "P_1_game", 4), ("g2", "P_2_game", 4), ("g3", "P_3_game", 4),
+)
+
+
+def _slug(name):
+    s = "".join(c.lower() if c.isalnum() else "-" for c in name)
+    return "-".join(p for p in s.split("-") if p)
+
+
+def _col(df, src, dp):
+    if src not in df.columns:
+        return [None] * len(df)
+    if dp == "str":
+        # The fixture columns never went through _fix_team_names, so 2007
+        # still says Kangaroos there while Team says North Melbourne.
+        return [None if pd.isna(v) else sd._TEAM_ALIASES.get(str(v), str(v)) for v in df[src]]
+    return [_num(v, 0 if dp is None else dp) for v in df[src]]
+
+
+def _eff_rows(eff):
+    out = {}
+    for r in eff.itertuples(index=False):
+        out[r.Player_Name] = {
+            "games": int(r.Games),
+            "poll": _num(r.Poll_Rate, 4),
+            "win": _num(r.Win_Poll_Rate, 4),
+            "loss": _num(r.Loss_Poll_Rate, 4),
+            "hd": _num(r.HD_Poll_Rate, 4),
+            "hdGames": 0 if pd.isna(r.HD_Games) else int(r.HD_Games),
+        }
+    return out
+
+
+def export_profiles(seasons):
+    g = sd.load_game_career()
+    if g is None:
+        print("  profiles: no game files, skipped")
+        return {}
+    g = g.sort_values(["Player_Name", "Season", "Round_num"], kind="stable")
+
+    # Slugs from the career name, which is unique per person. A slug collision
+    # between two different names (punctuation only) takes a numeric suffix.
+    slug_of, taken = {}, set()
+    for name in sorted(g["Player_Name"].unique()):
+        s, i = _slug(name), 2
+        while s in taken:
+            s, i = f"{_slug(name)}-{i}", i + 1
+        taken.add(s)
+        slug_of[name] = s
+
+    pdir = os.path.join(OUT_DIR, "players")
+    os.makedirs(pdir, exist_ok=True)
+    total = 0
+    for name, pg in g.groupby("Player_Name", sort=False):
+        obj = {
+            "name": name,
+            "slug": slug_of[name],
+            "team": str(pg["Team"].iloc[-1]),
+            "games": {"season": [int(s) for s in pg["Season"]]},
+        }
+        obj["games"].update({k: _col(pg, src, dp) for k, src, dp in _GAME_COLS})
+        # The season view's name, only where it differs from the career one.
+        sn = [None if a == name else a for a in pg["_season_name"]]
+        if any(sn):
+            obj["games"]["seasonName"] = sn
+        total += _write(os.path.join(pdir, f"{slug_of[name]}.json"), obj)
+    # A player file for a person no longer in any season would be stale.
+    for f in os.listdir(pdir):
+        if f.endswith(".json") and f[:-5] not in taken:
+            os.remove(os.path.join(pdir, f))
+    print(f"  players: {len(slug_of)} files, {total / 1024 / 1024:.1f} MB")
+
+    # Season-view name -> slug, per season, for the pickers and the Leaderboard.
+    season_slug = {}
+    for (s, sn), name in (g.groupby(["Season", "_season_name"])["Player_Name"].first().items()):
+        season_slug.setdefault(int(s), {})[sn] = slug_of[name]
+
+    prdir = os.path.join(OUT_DIR, "profile")
+    odds = sd.load_best_odds()
+    for s in seasons:
+        board = sd.load_season(s)
+        gs = sd.load_game(s)
+        if board is None or gs is None:
+            continue
+        live = s == sd.LIVE_SEASON
+        eff = _eff_rows(sd.efficiency_from_df(gs))
+        players = []
+        for r in board.itertuples(index=False):
+            nm = str(r.Player_Name)
+            if nm not in season_slug.get(s, {}):
+                continue
+            players.append({
+                "name": nm,
+                "slug": season_slug[s][nm],
+                "team": str(r.Team),
+                "expTotal": _num(r.Exp_Total_Votes, 2),
+                "avgPoll": _num(r.Avg_Poll_Prob, 4),
+                "eff": eff.get(nm),
+            })
+        players.sort(key=lambda p: p["name"])
+        obj = {"season": s, "live": live, "maxRound": int(gs["Round_num"].max()), "players": players}
+        # Odds are the live season's market. dashboard.py joins them onto any
+        # season by name, which prices a 2019 comparison at 2026 odds; here
+        # they ship only with the season they belong to.
+        if live and odds is not None:
+            obj["odds"] = {str(r.player): [_num(r.best_odds, 2), _num(r.implied_prob, 3)]
+                           for r in odds.itertuples(index=False) if pd.notna(r.best_odds)}
+        _write(os.path.join(prdir, f"{s}.json"), obj)
+
+    voted = sd.voted_seasons(g)
+    eff_c = _eff_rows(sd.efficiency_from_df(g[g["Season"].isin(voted)]))
+    last = g.groupby("Player_Name").agg(team=("Team", "last"), games=("Round_num", "size"))
+    career = [{"name": n, "slug": slug_of[n], "team": str(r.team), "games": int(r.games),
+               "eff": eff_c.get(n)} for n, r in last.iterrows()]
+    career.sort(key=lambda p: p["name"])
+    _write(os.path.join(prdir, "career.json"),
+           {"votedSeasons": voted, "players": career})
+    print(f"  profile: {len(seasons)} season indexes + career ({len(career)} players)")
+    return season_slug
 
 
 def _write(path, obj):
@@ -132,9 +282,12 @@ def _write(path, obj):
 def main(argv):
     all_seasons = sd.available_seasons()
     seasons = [int(a) for a in argv] if argv else all_seasons
+    # Profiles first: player files span every season, so they are always
+    # rebuilt whole, and the Leaderboard links each row to one.
+    season_slug = export_profiles(all_seasons)
     lb_dir = os.path.join(OUT_DIR, "leaderboard")
     for s in seasons:
-        data = export_leaderboard(s)
+        data = export_leaderboard(s, season_slug.get(s, {}))
         if data is None:
             continue
         size = _write(os.path.join(lb_dir, f"{s}.json"), data)

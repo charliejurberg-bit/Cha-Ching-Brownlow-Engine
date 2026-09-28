@@ -178,10 +178,28 @@ export, both boards, arrows included. It passed for 2026, 2025, 2019, 2010 and
 
 | Page | Status |
 |---|---|
-| Leaderboard | Ported: `/leaderboard`, `/leaderboard/[season]`. Built and checked locally; not yet deployed |
-| Player Profile, Stat Filter, Game Analysis, Model Comparison | Still Streamlit; the new nav deep links to them |
+| Leaderboard | Live, 28 Sep 2026: `/leaderboard`, `/leaderboard/[season]`. Names link to Player Profile |
+| Player Profile | Ported: `/player/[slug]/[season or career]`. Profile, DNA, Compare. Figures checked against the Streamlit page for Daicos 2025 and career (strip, DNA rates, threshold finder, vote distribution). Not ported: the signed-in "Track this H2H" control, which comes with accounts |
+| Stat Filter, Game Analysis, Model Comparison | Still Streamlit; the new nav deep links to them |
 | Live Tracker | Still Streamlit. Its port is a Next.js route that mints the AFL token and proxies `bfawards` with a 60s cache, and must be ready for the 2027 count |
 | Polls a Vote | Still Streamlit. Ports to `@supabase/ssr` against the same tables and RLS |
+
+**Player Profile data.** `players/<slug>.json` is one person's every game,
+columnar, keyed by the career-disambiguated name (`site_data.load_game_career`),
+with the season view's name carried per row where it differs.
+`profile/<season>.json` and `profile/career.json` hold the field: picker, DNA
+rates (`site_data.efficiency_from_df`), season totals and, live season only,
+odds. 2,328 files, about 27 MB; a weekly run rewrites only the live season's
+players. Four places the port deliberately differs from Streamlit, each a bug
+there: the H2H ledger names the opponent from the player's club against the
+fixture and flags a shared game by fixture (Streamlit needed `Home.Away` and
+`Game_ID`, which only 2026 has, so before 2026 it named the player's own club as
+the opponent whenever it was the home side and never found a shared game); odds
+appear only on the live season (Streamlit priced any season at 2026 odds); a
+draw reads D in the game log, not L; and the DNA rank is tie-aware (`#=3`)
+where Streamlit's unstable sort put tied players in arbitrary order.
+The fixture columns get the team alias fix at export, because 2007 still says
+Kangaroos there.
 
 **Previewing an export that is not pushed:** in the Next.js repo,
 `ENGINE_LOCAL_DIR=C:\Users\charl\Python\brownlow_engine npm run dev` reads
