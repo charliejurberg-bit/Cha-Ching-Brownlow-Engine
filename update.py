@@ -26,14 +26,14 @@ Python loop:
                                predicted; see stack.py)
    10. draft_posts.py          drafts/round_<display>.md
    11. landing_summary.py      site/landing.json
+   12. export_site.py          site/data/, the JSON the Next.js pages read
 
-Step 11 writes an artifact, not a page. site/landing.json is git tracked, so
-running this changes nothing the public can see: the numbers reach the live site
-only once the file is committed and pushed, and an uncommitted run leaves the
-site on last week's figures. Committing is necessary rather than sufficient. The
-front end is a separate repo that statically imports its own copy of the file,
-so the pushed artifact still has to get across to that repo before a build will
-show it.
+Steps 11 and 12 write artifacts, not pages. Both are git tracked, so running
+this changes nothing the public can see: the numbers reach the live site only
+once the files are committed and pushed to master, and an uncommitted run leaves
+the site on last week's figures. The front end (the cha-ching-brownlow repo)
+fetches them from raw.githubusercontent.com and revalidates hourly, falling back
+to its own committed copy of landing.json when the fetch fails.
 
 Nothing here stops on failure. A missing target is skipped with a note and a
 non-zero exit only prints a warning, so every step runs regardless of what the
@@ -163,6 +163,7 @@ if __name__ == "__main__":
         ("predict_2026.py",        f"Generating {SEASON} predictions"),
         ("draft_posts.py",         "Generating draft posts"),
         ("landing_summary.py",     "Writing site/landing.json for the front door"),
+        ("export_site.py",         "Writing site/data/ for the Next.js pages"),
     ]
     for script, description in py_scripts:
         # An entry is a script name, or a (script, arg, ...) tuple for a step

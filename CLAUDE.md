@@ -32,9 +32,9 @@ python predict_2026.py
 
 `python update.py` runs the weekly chain for `season.LIVE_SEASON`: an R step
 (`fetch_stats.R <season>`, plus the guarded `fetch_coaches.R <season>` when
-`season.py` switches it on, off for 2026) then ten Python steps (odds, Betfair,
+`season.py` switches it on, off for 2026) then eleven Python steps (odds, Betfair,
 ESPN, AFL predictor, Wheelo, footywire advanced stats and their ID join,
-predictions, drafts, `site/landing.json`). Nothing in the chain stops on a
+predictions, drafts, `site/landing.json`, `site/data/`). Nothing in the chain stops on a
 failed step; read each step's exit code. See "Season rollover" below.
 The 2026 home and away season is over, so the chain has nothing left to fetch
 this year. One-off checks tied to a particular round are
@@ -148,6 +148,47 @@ published yet. Then everything was restored; 2026 output is byte identical.
 Comparison and the Live Tracker order tied rows through a set, and string
 hashing is randomised per process. Compare them under `PYTHONHASHSEED=0`.
 
+## Streamlit to Next.js migration
+
+**Started 28 September 2026. The public Brownlow pages are moving, one at a
+time, into the Next.js app in `C:\Users\charl\web\cha-ching-brownlow\`** (the
+landing page's repo, branch `main`, Vercel, `chachingbrownlow.com`). Decided
+with Charlie: the pages live in that repo, not a new one, and **the Betting Hub
+is retired, not migrated**. It keeps running on Streamlit only until the
+Streamlit app itself is switched off.
+
+**Python stays the engine and never runs on Vercel.** `export_site.py` (step 12
+of `update.py`) writes small per-page JSON under `site/data/`, tracked, and the
+Next.js pages fetch it from raw.githubusercontent.com on **master** with hourly
+ISR, exactly as the landing page reads `site/landing.json`. So a commit and push
+of this repo is what publishes new figures. `site/data/index.json` lists the
+seasons and the live season. Nothing on the site recomputes a figure: rank
+order, movement, the Floor-Ceiling lift and the round grid all arrive computed.
+
+**`site_data.py` is a deliberate, temporary copy of the dashboard's loaders**
+(`load_game`, `load_season`, `load_game_rounded`, `load_season_rounded`,
+`round_vote_matrix`, `_fit_game_probs`, the identity helpers). Refactoring
+`dashboard.py` to share them risked the live app and its memory ceiling on
+Streamlit Cloud, so each function is ported under the same name. **A change to
+one of those loaders in `dashboard.py` must be mirrored in `site_data.py`**, and
+`python scripts/check_site_parity.py [seasons]` proves they agree: it renders
+the Streamlit Leaderboard headless and compares 200 rows cell for cell with the
+export, both boards, arrows included. It passed for 2026, 2025, 2019, 2010 and
+2007 on the day it was written. The copy dies with `dashboard.py`.
+
+| Page | Status |
+|---|---|
+| Leaderboard | Ported: `/leaderboard`, `/leaderboard/[season]`. Built and checked locally; not yet deployed |
+| Player Profile, Stat Filter, Game Analysis, Model Comparison | Still Streamlit; the new nav deep links to them |
+| Live Tracker | Still Streamlit. Its port is a Next.js route that mints the AFL token and proxies `bfawards` with a 60s cache, and must be ready for the 2027 count |
+| Polls a Vote | Still Streamlit. Ports to `@supabase/ssr` against the same tables and RLS |
+
+**Previewing an export that is not pushed:** in the Next.js repo,
+`ENGINE_LOCAL_DIR=C:\Users\charl\Python\brownlow_engine npm run dev` reads
+`site/data/` from disk instead of GitHub (`lib/engine.ts`). Never set it on
+Vercel. That repo's `next.config.mjs` has `ignoreBuildErrors: true`, so run
+`npx tsc --noEmit` yourself; the build will not.
+
 ## Project structure
 
 ```
@@ -160,6 +201,10 @@ brownlow_engine/
 ├── brownlow_model.py     # Model training (v4.0) — runs once per season
 ├── predict_2026.py       # In-season predictor — run after each round
 ├── update.py             # Weekly chain for season.LIVE_SEASON, ends with site/landing.json
+│                         #   then export_site.py → site/data/
+├── site_data.py          # The dashboard's loaders without Streamlit. A COPY during
+│                         #   the migration; see "Streamlit to Next.js migration"
+├── export_site.py        # Writes site/data/<page>/<season>.json for the Next.js app
 ├── season.py             # THE live season, and per-season values (round and game
 │                         #   counts, count night, ESPN article, coaches fetch on/off)
 ├── season_rollover.py    # One command to move to a new season; see "Season rollover"
