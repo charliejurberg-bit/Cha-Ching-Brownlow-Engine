@@ -14,7 +14,7 @@ order, movement arrows, the Floor-Ceiling lift and the round grid all follow
 the Leaderboard block in dashboard.py line for line (see the comments there for
 why each rule exists). site_data.py holds the loaders.
 
-Pages exported so far: Leaderboard, Player Profile, Game Analysis.
+Pages exported so far: Leaderboard, Player Profile, Game Analysis, Stat Filter.
 """
 
 import json
@@ -22,6 +22,7 @@ import os
 import sys
 from datetime import datetime, timezone
 
+import numpy as np
 import pandas as pd
 
 import site_data as sd
@@ -328,6 +329,78 @@ def export_games(season, slugs):
             "games": games}
 
 
+# ── Stat Filter ────────────────────────────────────────────────
+# statfilter.json: every game 1990 on (sd.load_stat_filter_frame), for the
+# page to filter in the browser. Visitors combine nine thresholds with player,
+# club, result and season, so nothing here can be precomputed; instead the
+# frame ships whole, about 1.3 MB gzipped.
+#
+# Encoding: rows sorted by season then round (stable). Each column is a string
+# with one character per row from _SF_ALPHA, value = index; the last character
+# means null. Stats are floored first: for a whole-number threshold t,
+# x >= t exactly when floor(x) >= t, so every filter the page offers gives the
+# same answer. RatingPoints goes negative and carries an offset. Player is two
+# characters, an index into `players`.
+_SF_ALPHA = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+_SF_NULL = len(_SF_ALPHA) - 1
+_SF_STATS = (  # key, column, offset
+    ("bv", "Brownlow.Votes", 0), ("disp", "Disposals", 0), ("goals", "Goals", 0),
+    ("kicks", "Kicks", 0), ("clr", "Clearances", 0), ("cp", "Contested.Possessions", 0),
+    ("cv", "Coaches_Votes", 0), ("tck", "Tackles", 0), ("si", sd._SI_COL, 0),
+    ("rating", "RatingPoints", 12),
+)
+
+
+def _sf_col(values, offset=0):
+    out = []
+    for x in values:
+        if x is None or pd.isna(x):
+            out.append(_SF_ALPHA[_SF_NULL])
+            continue
+        v = int(np.floor(float(x))) + offset
+        if not 0 <= v < _SF_NULL:
+            raise SystemExit(f"statfilter: value {x} (+{offset}) outside the one-character range")
+        out.append(_SF_ALPHA[v])
+    return "".join(out)
+
+
+def export_stat_filter():
+    g, meta = sd.load_stat_filter_frame()
+    if g is None:
+        return None
+    g = g.sort_values(["Season", "Round_num"], kind="stable").reset_index(drop=True)
+    ids = sorted(g["ID"].unique())
+    if len(ids) > len(_SF_ALPHA) ** 2:
+        raise SystemExit("statfilter: more players than two characters can index")
+    pidx = {pid: i for i, pid in enumerate(ids)}
+    newest = g.drop_duplicates("ID", keep="last").set_index("ID")["Player_Name"]
+    teams = sorted(g["Team"].dropna().astype(str).unique())
+    tidx = {t: i for i, t in enumerate(teams)}
+    A = _SF_ALPHA
+    seasons = []
+    for s, grp in g.groupby("Season", sort=True):
+        seasons.append([int(s), int(grp.index[0]), len(grp)])
+    result = ["W" if w == 1 else "L" if l == 1 else "D" for w, l in zip(g["Is_Win"], g["Is_Loss"])]
+    obj = {
+        "n": len(g),
+        "liveSeason": sd.LIVE_SEASON,
+        "alphabet": A,
+        "seasons": seasons,
+        "round": _sf_col(g["Round_num"]),
+        "result": "".join(result),
+        "player": "".join(A[pidx[p] // len(A)] + A[pidx[p] % len(A)] for p in g["ID"]),
+        "team": "".join(A[tidx[str(t)]] for t in g["Team"]),
+        "stats": {k: _sf_col(g[c], off) if c in g.columns else A[_SF_NULL] * len(g)
+                  for k, c, off in _SF_STATS},
+        "offsets": {k: off for k, _, off in _SF_STATS if off},
+        "players": [[int(p), str(newest[p]), meta["labels"][p]] for p in ids],
+        "teams": teams,
+        "floors": {k: meta["floors"][c] for k, c, _ in _SF_STATS if c in meta["floors"]},
+        "nullIdsDropped": meta["null_ids_dropped"],
+    }
+    return obj
+
+
 def _write(path, obj):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = path + ".tmp"
@@ -355,6 +428,10 @@ def main(argv):
         if ga is not None:
             size = _write(os.path.join(OUT_DIR, "games", f"{s}.json"), ga)
             print(f"  games {s}: {len(ga['games'])} matches, {size / 1024:.0f} KB")
+    sf = export_stat_filter()
+    if sf is not None:
+        size = _write(os.path.join(OUT_DIR, "statfilter.json"), sf)
+        print(f"  statfilter: {sf['n']:,} games, {size / 1024:.0f} KB")
     # The index lists what exists on disk, not what this run touched, so a
     # partial run never shrinks the season picker.
     on_disk = sorted((int(f[:-5]) for f in os.listdir(lb_dir)

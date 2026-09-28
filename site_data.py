@@ -361,6 +361,90 @@ def voted_seasons(g):
     return sorted(int(s) for s in tot[tot > 0].index)
 
 
+# ── Stat Filter ────────────────────────────────────────────────
+_HISTORY_DIR = "data_history"
+_STAT_FILTER_COLS = (
+    'Player_Name', 'Season', 'Round_num', 'Playing.for', 'Team', 'Brownlow.Votes',
+    'Is_Win', 'Is_Loss', 'Disposals', 'Goals', 'Kicks', 'Clearances',
+    'Contested.Possessions', 'Coaches_Votes', 'Tackles',
+    'RatingPoints', 'Exp_Votes', 'ID',
+)
+SF_SLIDER_COLS = (
+    'Disposals', 'Goals', 'Kicks', 'Clearances', 'Contested.Possessions',
+    'Coaches_Votes', 'Tackles', _SI_COL, 'RatingPoints',
+)
+
+
+@_cached
+def load_stat_filter_frame():
+    """dashboard._load_stat_filter_frame: every game 1990 on, keyed on fitzRoy ID.
+
+    Returns (frame, meta) with meta holding the null-ID drop count, each slider
+    column's first season with data ('floors') and the ID -> option label map.
+    See the dashboard docstring for why this frame is keyed on ID and skips
+    _disambiguate_players.
+    """
+    import re
+    rx = re.compile(r"^game_level_(\d{4})\.csv$")
+    want = set(_STAT_FILTER_COLS) | {'Player_Name', 'Round_num', 'Team', 'Playing.for', 'ID'}
+    frames = []
+    for directory in (PRED_DIR, _HISTORY_DIR):
+        if not os.path.isdir(directory):
+            continue
+        for fname in sorted(os.listdir(directory)):
+            m = rx.match(fname)
+            if not m:
+                continue
+            path = os.path.join(directory, fname)
+            avail = set(pd.read_csv(path, nrows=0).columns)
+            df = _fix_team_names(pd.read_csv(path, usecols=list(want & avail), low_memory=False))
+            df['Season'] = int(m.group(1))
+            frames.append(df)
+    if not frames:
+        return None, {}
+    g = pd.concat(frames, ignore_index=True)
+    if 'Playing.for' in g.columns:
+        g['Team'] = g['Team'].fillna(g['Playing.for']) if 'Team' in g.columns else g['Playing.for']
+    null_ids = int(g['ID'].isna().sum())
+    g = g[g['ID'].notna()].copy()
+    g['ID'] = g['ID'].astype('int64')
+    if os.path.exists(_SI_PATH):
+        si = pd.read_csv(_SI_PATH, usecols=['Season', 'Round_num', 'ID', _SI_COL])
+        si['ID'] = si['ID'].astype('int64')
+        si = si.drop_duplicates(['Season', 'Round_num', 'ID'])
+        g = g.merge(si, on=['Season', 'Round_num', 'ID'], how='left')
+    floors = {}
+    for col in SF_SLIDER_COLS:
+        if col in g.columns:
+            seen = g.loc[g[col].notna(), 'Season']
+            if len(seen):
+                floors[col] = int(seen.min())
+    span = g.groupby('ID')['Season'].agg(['min', 'max'])
+    newest = g.sort_values('Season').drop_duplicates('ID', keep='last').set_index('ID')
+    name_of = newest['Player_Name'].astype(str)
+    club_of = newest['Team'].astype(str)
+    shared = name_of.groupby(name_of).transform('size') > 1
+    labels, extra = {}, {}
+    for pid, nm in name_of.items():
+        if not shared[pid]:
+            labels[pid] = nm
+            continue
+        lo, hi = int(span.loc[pid, 'min']), int(span.loc[pid, 'max'])
+        extra[pid] = [f"{lo}-{hi}" if lo != hi else f"{lo}"]
+        labels[pid] = f"{nm} ({extra[pid][0]})"
+    for tiebreak in (lambda pid: club_of.get(pid, ''), lambda pid: f"#{pid}"):
+        counts = {}
+        for lab in labels.values():
+            counts[lab] = counts.get(lab, 0) + 1
+        clashing = [pid for pid in extra if counts[labels[pid]] > 1]
+        if not clashing:
+            break
+        for pid in clashing:
+            extra[pid].append(tiebreak(pid))
+            labels[pid] = f"{name_of[pid]} ({', '.join(extra[pid])})"
+    return g, {'null_ids_dropped': null_ids, 'floors': floors, 'labels': labels}
+
+
 def load_best_odds():
     path = season_cfg.data_path("best_odds.csv")
     return _fix_team_names(pd.read_csv(path)) if os.path.exists(path) else None
