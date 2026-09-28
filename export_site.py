@@ -14,7 +14,7 @@ order, movement arrows, the Floor-Ceiling lift and the round grid all follow
 the Leaderboard block in dashboard.py line for line (see the comments there for
 why each rule exists). site_data.py holds the loaders.
 
-Pages exported so far: Leaderboard, Player Profile.
+Pages exported so far: Leaderboard, Player Profile, Game Analysis.
 """
 
 import json
@@ -270,6 +270,64 @@ def export_profiles(seasons):
     return season_slug
 
 
+# ── Game Analysis ──────────────────────────────────────────────
+# games/<season>.json: every match of the season with its players ranked by
+# expected votes, as the Streamlit page draws them. Player rows are arrays to
+# keep a season small: [name, side, exp votes, fitted P(3) %, disposals,
+# contested possessions, clearances, goals, coaches votes]. Side is 0 for the
+# home club, 1 for the away club, or the club name if it matches neither.
+_GA_ROW = ("name", "side", "ev", "p3", "disp", "cp", "clr", "goals", "cv")
+
+
+def _side(team, head):
+    t = sd._TEAM_ALIASES.get(str(team), str(team))
+    home = sd._TEAM_ALIASES.get(str(head["Home.team"]), str(head["Home.team"]))
+    away = sd._TEAM_ALIASES.get(str(head["Away.team"]), str(head["Away.team"]))
+    return 0 if t == home else 1 if t == away else t
+
+
+def _int0(v):
+    return 0 if v is None or pd.isna(v) else int(round(float(v)))
+
+
+def export_games(season, slugs):
+    g = sd.load_game(season)
+    if g is None:
+        return None
+    g = g.copy()
+    g["_key"] = g["Round_num"].astype(str) + "|" + g["Home.team"] + " vs " + g["Away.team"]
+    p3col = "P_3_game" if "P_3_game" in g.columns else "P_3"
+    games = []
+    # File order of first appearance, as the page's drop_duplicates takes it.
+    for key in g["_key"].drop_duplicates():
+        gp = g[g["_key"] == key]
+        # One player can sit in a game twice (78 rows in 2025, see CLAUDE.md);
+        # the page listed both copies. Dedupe on the player, keeping the first.
+        gp = gp.drop_duplicates("Player_Name")
+        gp = gp.sort_values("Exp_Votes", ascending=False, kind="stable")
+        head = gp.iloc[0]
+        games.append({
+            "round": int(head["Round_num"]),
+            "home": sd._TEAM_ALIASES.get(str(head["Home.team"]), str(head["Home.team"])),
+            "away": sd._TEAM_ALIASES.get(str(head["Away.team"]), str(head["Away.team"])),
+            "homeScore": None if pd.isna(head["Home.score"]) else int(head["Home.score"]),
+            "awayScore": None if pd.isna(head["Away.score"]) else int(head["Away.score"]),
+            "players": [
+                # Rounded once, to what the page shows and the way it rounds:
+                # a second rounding on the site moved ~1 cell in 60 by 0.01.
+                [str(n), _side(t, head), 0.0 if pd.isna(ev) else round(float(ev), 2),
+                 int(round((0 if pd.isna(p3) else float(p3)) * 100)),
+                 _int0(d), _int0(cp), _int0(c), _int0(gl), _int0(cv)]
+                for n, t, ev, p3, d, cp, c, gl, cv in zip(
+                    gp["Player_Name"], gp["Team"], gp["Exp_Votes"], gp[p3col], gp["Disposals"],
+                    gp["Contested.Possessions"], gp["Clearances"], gp["Goals"], gp["Coaches_Votes"])
+            ],
+        })
+    return {"season": season, "live": season == sd.LIVE_SEASON, "row": list(_GA_ROW),
+            "slugs": {n: slugs[n] for n in g["Player_Name"].unique() if n in slugs},
+            "games": games}
+
+
 def _write(path, obj):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = path + ".tmp"
@@ -293,6 +351,10 @@ def main(argv):
         size = _write(os.path.join(lb_dir, f"{s}.json"), data)
         n = len(data["boards"]["decimal"]["players"])
         print(f"  leaderboard {s}: {n} players, {size / 1024:.0f} KB")
+        ga = export_games(s, season_slug.get(s, {}))
+        if ga is not None:
+            size = _write(os.path.join(OUT_DIR, "games", f"{s}.json"), ga)
+            print(f"  games {s}: {len(ga['games'])} matches, {size / 1024:.0f} KB")
     # The index lists what exists on disk, not what this run touched, so a
     # partial run never shrinks the season picker.
     on_disk = sorted((int(f[:-5]) for f in os.listdir(lb_dir)

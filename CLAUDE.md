@@ -180,7 +180,8 @@ export, both boards, arrows included. It passed for 2026, 2025, 2019, 2010 and
 |---|---|
 | Leaderboard | Live, 28 Sep 2026: `/leaderboard`, `/leaderboard/[season]`. Names link to Player Profile |
 | Player Profile | Ported: `/player/[slug]/[season or career]`. Profile, DNA, Compare. Figures checked against the Streamlit page for Daicos 2025 and career (strip, DNA rates, threshold finder, vote distribution). Not ported: the signed-in "Track this H2H" control, which comes with accounts |
-| Stat Filter, Game Analysis, Model Comparison | Still Streamlit; the new nav deep links to them |
+| Game Analysis | Ported: `/games`, `/games/[season]`, with `?round=<AFL round>` or `?team=<club>` for sharing. `check_site_parity.py` compares every card of the default round, all rows shown; passes for 2026, 2025, 2019, 2010, 2007. Values are exported already rounded to what the page shows, because rounding twice moved about one cell in 60. One deliberate difference: a player carried twice in one game (2025 round 24) is listed once |
+| Stat Filter, Model Comparison | Still Streamlit; the new nav deep links to them |
 | Landing page links | Open Leaderboard, Launch Dashboard and the footer's Leaderboard link go to `/leaderboard` (28 Sep 2026). Open Live Tracker still deep links into Streamlit; switch it when that page moves |
 | Live Tracker | Still Streamlit. Its port is a Next.js route that mints the AFL token and proxies `bfawards` with a 60s cache, and must be ready for the 2027 count |
 | Polls a Vote | Still Streamlit. Ports to `@supabase/ssr` against the same tables and RLS |

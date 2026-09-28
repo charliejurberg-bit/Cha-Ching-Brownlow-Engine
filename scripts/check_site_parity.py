@@ -6,7 +6,8 @@
 Renders dashboard.py's Leaderboard headless (streamlit AppTest), reads its table
 straight out of the page HTML, and compares the first 200 rows cell for cell
 with site/data/leaderboard/<season>.json: rank order, name, club, games, total,
-actual votes and every round cell. Run from the repo root after
+actual votes and every round cell. Game Analysis is checked the same way for
+its default view. Run from the repo root after
 export_site.py. Exits 1 on any difference.
 
 It exists because site_data.py is a copy of the dashboard's loaders (see its
@@ -104,9 +105,43 @@ def check(season, mode):
     return not bad
 
 
+def check_games(season):
+    """Game Analysis, default view (the season's last round): every card's
+    heading, podium order and first ten table rows against games/<season>.json."""
+    data = json.load(open(f"site/data/games/{season}.json", encoding="utf-8"))
+    last = max(g["round"] for g in data["games"])
+    want = [g for g in data["games"] if g["round"] == last]
+    at = AppTest.from_file("dashboard.py", default_timeout=600)
+    at.session_state["page"] = "Game Analysis"
+    at.session_state["active_hub"] = "brownlow"
+    at.session_state["season_by_page"] = {"Game Analysis": season}
+    at.run()
+    if at.exception:
+        raise SystemExit(f"page raised: {at.exception[0].value}")
+    cards = [m.value for m in at.markdown if 'class="ga-game"' in m.value]
+    bad = []
+    if len(cards) != len(want):
+        bad.append(f"cards page {len(cards)} vs json {len(want)}")
+    for i, (c, w) in enumerate(zip(cards, want), start=1):
+        body = c.split("<tbody>", 1)[1]
+        for j, (tr, p) in enumerate(zip(_ROW.findall(body), w["players"][:10]), start=1):
+            cells = [html.unescape(_TAG.sub("", x)).strip() for x in _CELL.findall(tr)]
+            name = html.unescape(re.search(r'ga-pname">(.*?)</span>', tr).group(1))
+            got = [name] + cells[1:]
+            exp = [p[0], f"{p[2]:.2f}", f"{round(p[3])}%"] + [str(v) for v in p[4:]]
+            if got != exp:
+                bad.append(f"game {i} row {j}: {[(g, e) for g, e in zip(got, exp) if g != e][:3]}")
+    tag = f"{season} games"
+    print(f"FAIL {tag}: {len(bad)} differences" if bad else f"ok   {tag}: {len(want)} games of round {last} identical")
+    for b in bad[:10]:
+        print("   ", b)
+    return not bad
+
+
 def main(argv):
     seasons = [int(a) for a in argv] or [2026, 2025]
-    ok = all([check(s, m) for s in seasons for m in ("Decimal", "3-2-1")])
+    ok = all([check(s, m) for s in seasons for m in ("Decimal", "3-2-1")]
+             + [check_games(s) for s in seasons])
     sys.exit(0 if ok else 1)
 
 
