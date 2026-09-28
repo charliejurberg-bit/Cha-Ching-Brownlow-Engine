@@ -14,7 +14,8 @@ order, movement arrows, the Floor-Ceiling lift and the round grid all follow
 the Leaderboard block in dashboard.py line for line (see the comments there for
 why each rule exists). site_data.py holds the loaders.
 
-Pages exported so far: Leaderboard, Player Profile, Game Analysis, Stat Filter.
+Pages exported so far: Leaderboard, Player Profile, Game Analysis, Stat Filter, Model
+Comparison.
 """
 
 import json
@@ -401,6 +402,239 @@ def export_stat_filter():
     return obj
 
 
+# ── Model Comparison ───────────────────────────────────────────
+# modelcomp.json: the consensus table (both vote scales) and the Insights tab,
+# finished, so the page only filters and draws. The consensus logic is the
+# Model Comparison block of dashboard.py, moved with the same pandas calls so
+# ranks come out identical. One change: the dashboard gathers candidates into a
+# set and sorts them with an unstable sort, so tied consensus rows swap places
+# between runs (CLAUDE.md, "Two page comparisons can differ run to run"). Here
+# candidates are iterated in sorted order and sorted stably, so ties are fixed.
+import re as _re
+
+_MC_TEAM_COLOURS = {
+    'Collingwood': '#4a4a4a', 'Geelong': '#1b3a6b', 'Port Adelaide': '#2e7d7d',
+    'Western Bulldogs': '#a33333', 'Brisbane Lions': '#6b1a2f', 'Brisbane': '#6b1a2f',
+    'Sydney': '#c0392b', 'Hawthorn': '#8b5e3c', 'Fremantle': '#6c3483', 'GWS': '#c06a20',
+    'Greater Western Sydney': '#c06a20', 'Carlton': '#1a3a5c', 'Melbourne': '#1a3060',
+    'Richmond': '#8b7a00', 'West Coast': '#003087', 'Adelaide': '#c72c41',
+    'Essendon': '#cc0000', 'St Kilda': '#cc2222', 'Gold Coast': '#e07000',
+    'North Melbourne': '#003fa0',
+}
+_NAME_SUFFIX_RE = _re.compile(r'\s+(?:Jr\.?|Sr\.?|Snr\.?|II|III|IV|V)$', _re.IGNORECASE)
+_UNICODE_DASHES_RE = _re.compile(r'[‐‑‒–—―−﹘﹣－]')
+
+
+def _normalise_name(name):
+    """dashboard.normalise_name: the cross-model match key."""
+    if pd.isna(name):
+        return ''
+    s = str(name).title().strip()
+    s = _UNICODE_DASHES_RE.sub('-', s)
+    s = s.replace("'", '').replace('-', ' ')
+    while '  ' in s:
+        s = s.replace('  ', ' ')
+    return _NAME_SUFFIX_RE.sub('', s).strip()
+
+
+def _mc_name_reference():
+    path = sd.season_cfg.data_path("afltables_{s}.csv")
+    if not os.path.exists(path):
+        return pd.DataFrame()
+    df = pd.read_csv(path, low_memory=False)
+    df['Round_num'] = pd.to_numeric(df['Round'], errors='coerce')
+    df = df.dropna(subset=['Round_num'])
+    df['Player_Name'] = df['First.name'].str.strip() + ' ' + df['Surname'].str.strip()
+    return df[['Player_Name', 'Playing.for', 'Round_num']]
+
+
+def _mc_feed(csv_path, team_col=None, team_fixes=None, label='feed'):
+    """dashboard._load_csv_fallback + _resolve_feed_names."""
+    import features as feat
+    if not os.path.exists(csv_path):
+        return pd.DataFrame()
+    df = pd.read_csv(csv_path)
+    if 'Rank' not in df.columns:
+        df['Rank'] = df.index + 1
+    ref = _mc_name_reference()
+    if ref.empty or df.empty or 'Player' not in df.columns:
+        return df
+    if team_col and team_col in df.columns:
+        fd = df.copy()
+        if team_fixes:
+            fd[team_col] = fd[team_col].replace(team_fixes)
+        out, _ = feat.resolve_feed_names(fd, ref, feed_name_col='Player', feed_team_col=team_col,
+                                         feed_round_col=None, label=label, verbose=False)
+        out[team_col] = df[team_col].values
+        return out
+    out, _ = feat.resolve_names_simple(df, ref['Player_Name'].unique(), 'Player', label=label, verbose=False)
+    return out
+
+
+def _file_stamp(path):
+    if not os.path.exists(path):
+        return None
+    return datetime.fromtimestamp(os.path.getmtime(path)).strftime('%d %b %H:%M')
+
+
+def _mc_sources():
+    """The four outside boards, each with Player, <X>_Rank and _match_key."""
+    import features as feat
+    dp = sd.season_cfg.data_path
+    afl_raw = _mc_feed(dp("afl_predictor_predictions.csv"), 'Team', feat.COACHES_TEAM_FIXES, 'afl-predictor')
+    afl = pd.DataFrame()
+    if not afl_raw.empty and 'Total_Votes' in afl_raw.columns:
+        s = afl_raw.sort_values('Total_Votes', ascending=False).reset_index(drop=True)
+        s['AFL_Rank'] = s.index + 1
+        afl = s[['Player', 'Total_Votes', 'AFL_Rank']].rename(columns={'Total_Votes': 'AFL_Votes'})
+        afl['Player'] = afl['Player'].str.title().str.strip()
+    bf = _mc_feed(dp("betfair_predictions.csv"), 'Team', feat.BETFAIR_TEAM_FIXES, 'betfair')
+    if not bf.empty:
+        bf = bf.rename(columns={'Total_Votes': 'BF_Votes', 'Rank': 'BF_Rank'}, errors='ignore')
+        bf['Player'] = bf['Player'].str.title().str.strip()
+    wh = pd.DataFrame()
+    pub, legacy = dp("wheelo_brownlow_predictions.csv"), f"data_wheelo/wheelo_{sd.LIVE_SEASON}.csv"
+    if os.path.exists(pub):
+        raw = pd.read_csv(pub, usecols=lambda c: c in {'Player', 'Votes'})
+        if {'Player', 'Votes'} <= set(raw.columns):
+            agg = raw.groupby('Player')['Votes'].sum().reset_index().sort_values(
+                'Votes', ascending=False).reset_index(drop=True)
+            agg['WH_Rank'] = agg.index + 1
+            wh = agg.rename(columns={'Votes': 'WH_Votes'})
+    elif os.path.exists(legacy):
+        raw = pd.read_csv(legacy, usecols=lambda c: c in {'Player', 'ExpVotes', 'RatingPoints'})
+        col = next((c for c in ['ExpVotes', 'RatingPoints'] if c in raw.columns), None)
+        if col:
+            agg = raw.groupby('Player')[col].sum().reset_index().sort_values(
+                col, ascending=False).reset_index(drop=True)
+            agg['WH_Rank'] = agg.index + 1
+            wh = agg.rename(columns={col: 'WH_Votes'})
+    if not wh.empty:
+        wh['Player'] = wh['Player'].str.title().str.strip()
+    espn = _mc_feed(dp("espn_predictions.csv"), label='espn')
+    if not espn.empty:
+        espn = espn.rename(columns={'Total_Votes': 'ESPN_Votes', 'Rank': 'ESPN_Rank'}, errors='ignore')
+        espn['Player'] = espn['Player'].str.title().str.strip()
+    return afl, bf, wh, espn
+
+
+def _mc_board(cc_raw, sources):
+    afl, bf, wh, espn = sources
+    cc = pd.DataFrame()
+    if cc_raw is not None:
+        cc_raw = cc_raw.sort_values('Exp_Total_Votes', ascending=False).reset_index(drop=True)
+        cc_raw['CC_Rank'] = cc_raw.index + 1
+        cols = ['Player_Name', 'Exp_Total_Votes', 'CC_Rank'] + (['Team'] if 'Team' in cc_raw.columns else [])
+        cc = cc_raw[cols].rename(columns={'Player_Name': 'Player', 'Exp_Total_Votes': 'CC_Votes'})
+        cc['Player'] = cc['Player'].str.title().str.strip()
+    models = [(cc, 'CC_Rank'), (afl, 'AFL_Rank'), (bf, 'BF_Rank'), (wh, 'WH_Rank'), (espn, 'ESPN_Rank')]
+    for df, _ in models:
+        if not df.empty and 'Player' in df.columns:
+            df['_match_key'] = df['Player'].apply(_normalise_name)
+    canonical = {}
+    for df in (espn, wh, bf, afl, cc):
+        if not df.empty and '_match_key' in df.columns:
+            for p, k in zip(df['Player'], df['_match_key']):
+                canonical[k] = p
+    cc_team = dict(zip(cc['_match_key'], cc['Team'])) if 'Team' in cc.columns and not cc.empty else {}
+
+    def rank_of(df, k, rc):
+        if df.empty or '_match_key' not in df.columns:
+            return None
+        hit = df[df['_match_key'] == k]
+        return int(hit.iloc[0][rc]) if not hit.empty else None
+
+    keys = set()
+    for df, _ in models:
+        if not df.empty and '_match_key' in df.columns:
+            keys.update(df.head(20)['_match_key'].tolist())
+    rows = []
+    for k in sorted(keys):
+        rk = [rank_of(df, k, rc) for df, rc in models]
+        avail = [r for r in rk if r is not None]
+        cons = round(sum(avail) / len(avail), 1) if avail else 40.0
+        rows.append({'player': canonical.get(k, k), 'key': k, 'consAvg': cons,
+                     'cc': rk[0], 'afl': rk[1], 'bf': rk[2], 'wh': rk[3], 'espn': rk[4]})
+    rows.sort(key=lambda r: r['consAvg'])
+    rows = rows[:25]
+    avail_models = [(df, rc) for df, rc in models if not df.empty]
+    agree_thr = max(3, len(avail_models) - 1)
+    for i, r in enumerate(rows, start=1):
+        others = [r[c] for c in ('afl', 'bf', 'wh', 'espn') if r[c] is not None]
+        r['cons'] = i
+        r['edge'] = int(round(sum(others) / len(others) - r['cc'])) if r['cc'] is not None and others else None
+        top10 = [(rank_of(df, r['key'], rc) or 99) <= 10 for df, rc in avail_models]
+        r['full'] = i <= 10 and all(top10)
+        r['strong'] = i <= 10 and sum(top10) >= agree_thr
+        r['out'] = r['edge'] is not None and abs(r['edge']) >= 5
+        a = [r[c] for c in ('cc', 'afl', 'bf', 'wh', 'espn') if r[c] is not None]
+        r['nAvail'] = len(a)
+        r['spread'] = (max(a) - min(a)) if a else None
+        team = cc_team.get(r['key'], '')
+        r['colour'] = _MC_TEAM_COLOURS.get(team, '#7e8c99')
+        del r['key']
+    return {'rows': rows, 'agreeThr': agree_thr, 'nModels': len(avail_models)}
+
+
+def export_model_comparison():
+    from brownlow_medallists import get_medallists
+    live = sd.LIVE_SEASON
+    cc_path = sd.season_cfg.pred_path("season_{s}.csv")
+    cc_dec = (pd.read_csv(cc_path, usecols=lambda c: c in {'Player_Name', 'Team', 'Exp_Total_Votes'})
+              if os.path.exists(cc_path) else None)
+    sources = _mc_sources()
+    decimal = _mc_board(cc_dec, sources)
+    r = sd.load_season_rounded(live)
+    rounded = (_mc_board(r[['Player_Name', 'Team', 'Exp_Total_Votes']].copy(), _mc_sources())
+               if r is not None and not r.empty else None)
+    dp = sd.season_cfg.data_path
+    obj = {
+        'season': live,
+        'hasPredictions': cc_dec is not None,
+        'boards': {'decimal': decimal, 'rounded': rounded},
+        'stamps': {'afl': _file_stamp(dp("afl_predictor_predictions.csv")),
+                   'espn': _file_stamp(dp("espn_predictions.csv")),
+                   'betfair': _file_stamp(dp("betfair_predictions.csv"))},
+    }
+
+    # Insights: the walk-forward backtest and feature importance.
+    bt_path = os.path.join(sd.PRED_DIR, "backtest_results.csv")
+    if os.path.exists(bt_path):
+        bt = pd.read_csv(bt_path)
+        seasons = []
+        for season in sorted(bt['Season'].unique()):
+            s = bt[bt['Season'] == season]
+            top10 = s[s['Rank_Predicted'] <= 10]
+            avg_err = (top10['Predicted_Votes'] - top10['Actual_Votes']).abs().mean()
+            meds = get_medallists(season)
+            ranks = []
+            for nm, tm in meds:
+                hit = s[(s['Player'] == nm) & (s['Team'] == tm)]
+                if not hit.empty:
+                    ranks.append(int(hit['Rank_Predicted'].iloc[0]))
+            meds_set = set(meds)
+            seasons.append({
+                'season': int(season),
+                'winner': ' & '.join(nm for nm, _ in meds) or '?',
+                'predRank': min(ranks) if ranks else None,
+                'top3': any(x <= 3 for x in ranks), 'top5': any(x <= 5 for x in ranks),
+                'top10': any(x <= 10 for x in ranks),
+                'avgErr': round(float(avg_err), 1),
+                'scatter': [[str(p), str(t), _num(a, 1), _num(pv, 2), (p, t) in meds_set]
+                            for p, t, a, pv in top10.sort_values('Rank_Predicted')[
+                                ['Player', 'Team', 'Actual_Votes', 'Predicted_Votes']].itertuples(index=False)],
+            })
+        obj['insights'] = {'btMin': int(bt['Season'].min()), 'btMax': int(bt['Season'].max()),
+                           'seasons': seasons}
+    imp_path = os.path.join(sd.PRED_DIR, "feature_importance.csv")
+    if os.path.exists(imp_path):
+        imp = pd.read_csv(imp_path)
+        imp['pct'] = (imp['Importance'] * 100).round(2)
+        imp = imp.sort_values('pct', ascending=False).reset_index(drop=True)
+        obj['importance'] = [[str(f), float(p)] for f, p in zip(imp['Feature'], imp['pct'])]
+    return obj
+
+
 def _write(path, obj):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = path + ".tmp"
@@ -432,6 +666,9 @@ def main(argv):
     if sf is not None:
         size = _write(os.path.join(OUT_DIR, "statfilter.json"), sf)
         print(f"  statfilter: {sf['n']:,} games, {size / 1024:.0f} KB")
+    mc = export_model_comparison()
+    size = _write(os.path.join(OUT_DIR, "modelcomp.json"), mc)
+    print(f"  modelcomp: {len(mc['boards']['decimal']['rows'])} consensus rows, {size / 1024:.0f} KB")
     # The index lists what exists on disk, not what this run touched, so a
     # partial run never shrinks the season picker.
     on_disk = sorted((int(f[:-5]) for f in os.listdir(lb_dir)

@@ -138,10 +138,62 @@ def check_games(season):
     return not bad
 
 
+def check_modelcomp():
+    """Model Comparison, decimal board plus the Insights season table.
+
+    Rows are compared by player, not by position: the dashboard orders tied
+    consensus rows through a set, so its order changes with PYTHONHASHSEED,
+    and the export fixes it. Each player's five ranks, spread and consensus
+    number must match, and the export's order must be non-decreasing."""
+    data = json.load(open("site/data/modelcomp.json", encoding="utf-8"))
+    at = AppTest.from_file("dashboard.py", default_timeout=600)
+    at.session_state["page"] = "Model Comparison"
+    at.session_state["active_hub"] = "brownlow"
+    at.run()
+    if at.exception:
+        raise SystemExit(f"page raised: {at.exception[0].value}")
+    tbl = next(m.value for m in at.markdown if 'class="mc-tbl"' in m.value)
+    page = {}
+    for tr in _ROW.findall(tbl.split("<tbody>", 1)[1]):
+        c = [html.unescape(_TAG.sub("", x)).strip() for x in _CELL.findall(tr)]
+        # Cells carry a direction caret (drawn by the site from the same
+        # numbers); the rank is what is compared.
+        page[c[1]] = [x.lstrip("▴▾") for x in c[2:]]
+    na = "·"
+    bad = []
+    rows = data["boards"]["decimal"]["rows"]
+    for r in rows:
+        want = [na if r[k] is None else str(r[k]) for k in ("cc", "afl", "bf", "wh", "espn")]
+        want.append(na if r["spread"] is None else str(r["spread"]))
+        got = page.get(r["player"])
+        if got is None:
+            bad.append(f"{r['player']}: not on the page")
+        elif got != want:
+            bad.append(f"{r['player']}: page {got} vs json {want}")
+    if set(page) != {r["player"] for r in rows}:
+        bad.append(f"player sets differ: {sorted(set(page) ^ {r['player'] for r in rows})}")
+    if any(a["consAvg"] > b["consAvg"] for a, b in zip(rows, rows[1:])):
+        bad.append("export order is not by consensus")
+    # Insights season table.
+    ins = next((m.value for m in at.markdown if "Actual winner" in m.value), "")
+    for tr in _ROW.findall(ins)[1:]:
+        c = [html.unescape(_TAG.sub("", x)).strip() for x in _CELL.findall(tr)]
+        w = next((x for x in data["insights"]["seasons"] if str(x["season"]) == c[0]), None)
+        exp = [str(w["season"]), w["winner"], "—" if w["predRank"] is None else f"#{w['predRank']}",
+               f"{w['avgErr']:.1f}"] if w else None
+        if c != exp:
+            bad.append(f"insights {c[0]}: page {c} vs json {exp}")
+    print(f"FAIL modelcomp: {len(bad)} differences" if bad else
+          f"ok   modelcomp: {len(rows)} consensus rows and {len(data['insights']['seasons'])} backtest seasons identical")
+    for b in bad[:10]:
+        print("   ", b)
+    return not bad
+
+
 def main(argv):
     seasons = [int(a) for a in argv] or [2026, 2025]
     ok = all([check(s, m) for s in seasons for m in ("Decimal", "3-2-1")]
-             + [check_games(s) for s in seasons])
+             + [check_games(s) for s in seasons] + [check_modelcomp()])
     sys.exit(0 if ok else 1)
 
 
