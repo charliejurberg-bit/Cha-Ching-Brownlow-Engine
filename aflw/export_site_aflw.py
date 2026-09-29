@@ -160,6 +160,11 @@ def main():
     sfo["comp"] = "aflw"
     es._write(os.path.join(OUT, "statfilter.json"), sfo)
     es._write(os.path.join(OUT, "tracker.json"), tracker(sd.load_game(LIVE)))
+    import landing_aflw
+    land = landing_aflw.build(frames[LIVE][0], frames[LIVE][1], LIVE)
+    es._write(os.path.join(OUT, "landing.json"), land)
+    print(f"  landing: round {land['round']}, leader {land['leader']['name']} {land['leader']['votes']}, "
+          f"{len(land['ticker'])} fixtures")
     es._write(os.path.join(OUT, "modelcomp.json"), insights(frames))
     es._write(os.path.join(OUT, "polls.json"), {
         "season": LIVE, "afl": None, "aflRound": None, "bf": None, "bfRound": None,
