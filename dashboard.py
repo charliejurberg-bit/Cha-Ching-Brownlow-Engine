@@ -59,11 +59,14 @@ if os.environ.get("CC_STREAMLIT_LIVE") != "1":
         '<p style="color:#7e8c99;font-size:14px;line-height:1.6;margin:0 0 26px">'
         'Every Brownlow page, the leaderboard, player profiles, the Live Tracker and '
         'Polls a Vote, now lives at chachingbrownlow.com. Your account and picks came with it.</p>'
-        f'<a href="{_dest}" target="_top" style="display:inline-block;background:#34d399;color:#0a1017;'
-        'font-weight:600;text-decoration:none;padding:11px 24px;border-radius:9px">'
-        'Go to chachingbrownlow.com &rarr;</a></div>',
+        '</div>',
         unsafe_allow_html=True,
     )
+    # st.link_button, not an <a target="_top">: Streamlit Cloud serves the app
+    # in a sandboxed iframe that silently refuses top-level navigation from a
+    # plain link. The button opens a new tab, which the sandbox allows.
+    _c = st.columns([2, 1, 2])[1]
+    _c.link_button("Go to chachingbrownlow.com →", _dest, type="primary", use_container_width=True)
     st.stop()
 
 # Every document on the page — the app shell and each srcdoc iframe — must ask
