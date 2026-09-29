@@ -253,6 +253,15 @@ site toggle comes after the model.
 - **The fitzRoy AFLW coaches feed mislabels rounds** like the men's: in
   September 2026 it served round 7 again as rounds 8-10. `build.py` keeps a
   coaches round only if its fixtures are that round's played matches.
+- **On the site since 29 September 2026**: an AFL | AFLW switch beside the
+  wordmark, every page under `/aflw/...`, the same components fed
+  `site/data/aflw/` (`aflw/export_site_aflw.py`, which points the men's
+  exporters at `aflw/site_frames.py`). Every AFLW history figure is out of
+  sample: each season from a model fitted on the others. 2022's two seasons are
+  ids 2022.6 / 2022.7 (labels in the Next.js `lib/comp.ts`); 2018 and 2019 are
+  not on the site. AFLW account rows (picks, watchlist, H2H) sit at season
+  100000 + year in the same tables. **Weekly: `python aflw/update.py`, then
+  commit and push**; it is not part of `update.py`.
 - **Umpires see stats from 2026 in AFLW too** (afl.com.au/aflw/news/1625586).
   `aflw/regime.py` measured the men's 2026 shift against year-to-year spread:
   only disposals (+30%) and goals (+33%) moved beyond an ordinary year.
