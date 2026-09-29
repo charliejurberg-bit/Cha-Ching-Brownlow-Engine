@@ -39,6 +39,13 @@ def _num(x, dp):
     return int(v) if dp == 0 else v
 
 
+def _sid(s):
+    """A season id for the wire: an int, except AFLW's two 2022 seasons, which
+    are 2022.6 and 2022.7 (aflw/site_frames.py). int() would merge them."""
+    f = float(s)
+    return int(f) if f.is_integer() else round(f, 1)
+
+
 def _movement(board, g, col, live):
     """Rank change since the previous round, measured in the board's own units.
     Live season only, as on the page."""
@@ -209,7 +216,7 @@ def export_profiles(seasons):
             "name": name,
             "slug": slug_of[name],
             "team": str(pg["Team"].iloc[-1]),
-            "games": {"season": [int(s) for s in pg["Season"]]},
+            "games": {"season": [_sid(s) for s in pg["Season"]]},
         }
         obj["games"].update({k: _col(pg, src, dp) for k, src, dp in _GAME_COLS})
         # The season view's name, only where it differs from the career one.
@@ -226,7 +233,7 @@ def export_profiles(seasons):
     # Season-view name -> slug, per season, for the pickers and the Leaderboard.
     season_slug = {}
     for (s, sn), name in (g.groupby(["Season", "_season_name"])["Player_Name"].first().items()):
-        season_slug.setdefault(int(s), {})[sn] = slug_of[name]
+        season_slug.setdefault(_sid(s), {})[sn] = slug_of[name]
 
     prdir = os.path.join(OUT_DIR, "profile")
     odds = sd.load_best_odds()
