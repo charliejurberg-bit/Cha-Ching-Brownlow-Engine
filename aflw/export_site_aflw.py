@@ -97,7 +97,8 @@ def tracker(g):
     counted = g["Brownlow.Votes"].notna().all()
     if counted:
         rows["bv"] = [int(v) for v in g["Brownlow.Votes"]]
-    return {"season": LIVE, "counted": bool(counted), "countNight": None,
+    import landing_aflw
+    return {"season": LIVE, "counted": bool(counted), "countNight": landing_aflw.AFLW_COUNT_NIGHT,
             "games": [[int(r), str(h), str(a)] for r, h, a in zip(gm.Round_num, gm["Home.team"], gm["Away.team"])],
             "players": players, "rows": rows,
             # The AFL's own player ids are the feed's ids: the map is exact.

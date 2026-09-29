@@ -21,7 +21,7 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, REPO)
 import landing_summary as ls  # noqa: E402
 
-AFLW_COUNT_NIGHT = None          # e.g. "2026-11-23" once announced
+AFLW_COUNT_NIGHT = "2026-11-23"   # W Awards, Monday 23 November 2026 (Charlie, 29 Sep 2026)
 EM_DASH = ls.EM_DASH
 
 
