@@ -14,8 +14,11 @@ shows what the model would have said without having seen its count.
 
 Season ids are numbers, as the site's routes expect. 2022 held two seasons, so
 they are 2022.6 and 2022.7, labelled "2022 S6" / "2022 S7" by SEASON_LABELS.
-2018 and 2019 are left out: no votes per match or complete totals exist, so a
-history page for them would show predictions against nothing.
+2018 and 2019 have no votes per match and no complete totals. They carry the
+published leading vote-getters only (data_aflw/totals_partial_<year>.csv:
+Wikipedia's top 10, plus Jess Duffin's 2019 six from North Melbourne's own
+article, where Wikipedia's table stops mid-tie). Every other player's actual is
+unknown and stays NaN, never 0.
 """
 
 import os
@@ -29,7 +32,7 @@ import evaluate as ev  # noqa: E402
 import predict as pr  # noqa: E402
 import regime as rg  # noqa: E402
 
-SEASON_IDS = {"2017": 2017, "2020": 2020, "2021": 2021, "2022S6": 2022.6, "2022S7": 2022.7,
+SEASON_IDS = {"2017": 2017, "2018": 2018, "2019": 2019, "2020": 2020, "2021": 2021, "2022S6": 2022.6, "2022S7": 2022.7,
               "2023": 2023, "2024": 2024, "2025": 2025, "2026": 2026}
 SEASON_LABELS = {2022.6: "2022 S6", 2022.7: "2022 S7"}
 LIVE = "2026"
@@ -114,7 +117,12 @@ def build_all():
             Avg_Poll_Prob=("Poll_Prob", "mean"), Exp_3vote_games=("P_3", "sum"),
             Exp_2vote_games=("P_2", "sum"), Exp_1vote_games=("P_1", "sum"), ID=("ID", "first"),
         ).reset_index()
-        se["Actual_Votes"] = se.ID.map(tot).fillna(0) if tot is not None and label != LIVE else 0
+        part = os.path.join(ev.OUT, f"totals_partial_{label}.csv")
+        if os.path.exists(part):
+            known = pd.read_csv(part).set_index("playerId").votes
+            se["Actual_Votes"] = se.ID.map(known)          # NaN: not published
+        else:
+            se["Actual_Votes"] = se.ID.map(tot).fillna(0) if tot is not None and label != LIVE else 0
         se = se.sort_values("Exp_Total_Votes", ascending=False).reset_index(drop=True)
         out[sid] = (g, se)
         print(f"  {label:7} -> {sid}: {g.Game_ID.nunique()} matches, {len(se)} players", flush=True)

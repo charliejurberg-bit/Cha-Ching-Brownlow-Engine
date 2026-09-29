@@ -103,7 +103,10 @@ def _board(season, rounded, live, slugs):
             "rounds": [_num(pr.get(rn), dp) for rn in rounds],
         }
         if not live:
-            row["actual"] = int(r.Actual_Votes) if pd.notna(r.Actual_Votes) else 0
+            # None where the count exists but this player's total was never
+            # published (AFLW 2018 and 2019 carry their top 10 only). The men's
+            # season files are always complete, so they never reach it.
+            row["actual"] = int(r.Actual_Votes) if pd.notna(r.Actual_Votes) else None
         if move.get(name):
             row["move"] = int(move[name])
         if name in ceiling:

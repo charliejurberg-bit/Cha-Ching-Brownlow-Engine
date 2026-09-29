@@ -109,7 +109,9 @@ def insights(frames):
     Insights built from each season's out-of-sample predictions."""
     out = []
     for s, (g, se) in sorted(frames.items()):
-        if s == LIVE:
+        # A season with partial actuals cannot give the top-10 error, and its
+        # rank tests would rest on a published list alone: kept off Insights.
+        if s == LIVE or se.Actual_Votes.isna().any():
             continue
         top10 = se.nlargest(10, "Exp_Total_Votes")
         top = se.Actual_Votes.max()
@@ -146,6 +148,10 @@ def main():
     season_slug = es.export_profiles(ids)
     for s in ids:
         lb = es.export_leaderboard(s, season_slug.get(es._sid(s), {}))
+        part = os.path.join(sf.ev.OUT, f"totals_partial_{int(s)}.csv") if float(s).is_integer() else ""
+        if part and os.path.exists(part):
+            src = pd.read_csv(part)
+            lb["partialActuals"] = {"published": int(len(src)), "sources": sorted(set(src.source))}
         es._write(os.path.join(OUT, "leaderboard", f"{es._sid(s)}.json"), lb)
         ga = es.export_games(s, season_slug.get(es._sid(s), {}))
         es._write(os.path.join(OUT, "games", f"{es._sid(s)}.json"), ga)
