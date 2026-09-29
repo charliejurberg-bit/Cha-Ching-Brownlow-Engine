@@ -20,6 +20,9 @@ import os
 import re
 import sys
 
+# dashboard.py shows only its "we've moved" screen unless this is set.
+os.environ.setdefault("CC_STREAMLIT_LIVE", "1")
+
 from streamlit.testing.v1 import AppTest
 
 # dashboard.py imports its siblings (betting_hub, user_auth, features); run from

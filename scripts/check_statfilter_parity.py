@@ -13,6 +13,9 @@ poll rate, 3-vote rate, average votes, the at-zero baseline, the vote
 breakdown and the leading stat. Six sets passed on 28 September 2026.
 """
 import os, re, sys, html, json, time, urllib.request
+
+# dashboard.py shows only its "we've moved" screen unless this is set.
+os.environ.setdefault("CC_STREAMLIT_LIVE", "1")
 sys.path.insert(0, os.getcwd())
 from streamlit.testing.v1 import AppTest
 from playwright.sync_api import sync_playwright

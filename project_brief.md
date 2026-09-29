@@ -152,22 +152,21 @@ Every figure in this section was re-verified on 11 August 2026 against
 `accuracy_report.py --source backtest`. The bucket percentages, the 3,054 game
 count, the 8.38%, and the 22.23% all reproduce exactly.
 
-**MAE figures: UNRESOLVED. Do not quote any of them.**
+**MAE: resolved 29 September 2026, out of sample, on current artifacts.**
+`python scripts/measure_mae.py` reproduces both. Per player-game,
+|actual votes - Exp_Votes|, beside the all-zero baseline:
 
-`brownlow_model.py` states that the v1–v4 MAE figures (0.0954 / 0.0910 / 0.0902
-/ 0.0904) were all measured with a momentum leak in place and none is
-comparable. The claim is not one line: it spans three consecutive `print` calls
-opening at `Pre-2026-audit figures`, and the "none of them is comparable"
-conclusion sits in the last of the three, so reading only the first line gets
-the figures without the verdict. The current printed baseline is the line
-anchored at `Baselines: 0.0953 full model` — **0.0953 full model, 0.1013
-no-coaches**.
+| Set | MAE | All-zero | Games |
+|---|---|---|---|
+| Walk-forward 2008-2025 (`backtest_game_level.csv`) | 0.1126 | 0.1346 | 3,468 |
+| Forward 2026 (model trained through 2025) | 0.0920 | 0.1304 | 207 |
 
-A separate set attributed to a Wheelo alignment fix (2023 0.1022, 2024 0.0971,
-2025 0.0985, overall 0.0969) appears in the brief's history. It is not known
-whether that set predates the 2026 audit and therefore carries the same leak.
-Resolve by re-running against the current model before any MAE figure is used
-anywhere, public or internal.
+The v1-v4 figures (0.0954 / 0.0910 / 0.0902 / 0.0904) stay retired: all were
+measured with the momentum leak in place. `brownlow_model.py`'s printed
+"0.0953 full model" is grouped-CV on training seasons and is not comparable to
+either row above. The Wheelo-fix set (overall 0.0969) is unverified and should
+not be used. The copy rule on accuracy percentages still applies to posts; the
+site's public figure remains the top-pick record (145 of 207 in 2026).
 
 ## File structure
 
@@ -728,38 +727,37 @@ Copy rules, permanent:
 
 ## Current priorities
 
-Rewritten 14 September 2026. The season's work has converged on one date.
+Rewritten 29 September 2026. The 2026 count is done (21 September, Nick Daicos
+47), the pipeline is rolled over to 2027, every public page is on the Next.js
+site, and the Streamlit app shows only a "we've moved" screen.
 
-**Before count night (21 September 2026).** The engine is built, verified on the
-deployed app in all six feed states (signed in and out) and pushed; the tweet
-copy is signed off. What is left is operational:
+**Charlie's, cannot be done from here:**
 
-1. **Rehearse the phone check-in once.** Start the watcher detached with the
-   command in CLAUDE.md's "Count night runbook", connect from the phone over
-   Remote Control, confirm the log reads `refusing: PREDICTOR` plus a heartbeat,
-   run `--last`, stop it by PID. Safe now because the feed is serving the
-   predictor. Afterwards confirm `drafts/count_night_drafted_2026.txt` was not
-   created. Not yet done: no `drafts/count_night_tweets.txt` exists.
-2. **The PC on the night:** on AC, and no Windows Update restart pending. Sleep
-   is already off (measured 13 September).
-3. **Open the site before the count starts.** The keep-alive job lands every 1.6
-   to 5.6 hours, not every 15 minutes, so a cold start is still possible.
-4. Betting strategy and markets for the night (private, Charlie's).
+1. Sign in on chachingbrownlow.com and check `/live-tracker`, `/polls-a-vote`
+   and the Player Profile Compare tab's "Track this H2H". The signed-in panels
+   have been type-checked and built but never seen in a browser.
+2. Supabase, Authentication, URL Configuration: add chachingbrownlow.com, the
+   www form and the Vercel preview pattern to Redirect URLs, or sign-up
+   confirmation mail lands on the retired Streamlit app.
+3. Delete the Streamlit Cloud app when ready. The repo side is done: the app
+   serves only the moved screen and the keep-alive workflow is gone.
+4. Sign off (or rewrite) `drafts/scorecard_2026.md`, the three model scorecard
+   posts from `scripts/scorecard_posts.py`. Counts only, no percentages.
 
-One thing cannot be tested in advance: how far the AFL feed lags the broadcast.
+**Before 2027 starts:**
 
-**After the count.**
-
-5. Load the real 2026 votes. AFLTables' `brownlow2026rbr.html` already lists
-   all 207 fixtures and fills after the count, in the archive's own format.
-   Resolve 2026 inclusion across the four actual-votes paths at the same time.
-6. Scorecard and results posts. Still no accuracy percentage unless Charlie
-   supplies it, and no MAE until item 7.
-7. Resolve the MAE question above.
+5. Fill `season.SEASONS[2027]` as the values are published: `raw_rounds` and
+   `games` from the fixture, `count_night`, `espn_slug`. `landing_summary.py`
+   keeps the 2026 result on the front page until `count_night` is set.
+6. Nothing else for the site: it moves to 2027 by itself once the first 2027
+   round is predicted (`season.current_season()`), and the Live Tracker goes
+   live on its own on count night.
+7. `stack.py` (the recalibrated vote model) applies to 2027 automatically; it
+   is trained through 2026. Do not publish or stake v4 classifier
+   probabilities before then (CLAUDE.md, "Model architecture").
 8. Fit `Exp_Votes` within each game at the source (parked 14 September; see
-   CLAUDE.md, "Prediction outputs").
-9. Delete `handover_2026-09-11_count_night.md`.
-10. The off-season list below.
+   CLAUDE.md, "Prediction outputs"). Largely superseded by `stack.py`, whose
+   `Exp_Votes` already sums to 6 per game; decide whether v4 still needs it.
 
 **Carried from the July list, status by repo evidence:**
 

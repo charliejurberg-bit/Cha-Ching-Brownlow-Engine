@@ -181,7 +181,7 @@ of this repo is what publishes new figures. `site/data/index.json` lists the
 seasons and the live season. Nothing on the site recomputes a figure: rank
 order, movement, the Floor-Ceiling lift and the round grid all arrive computed.
 
-**`site_data.py` is a deliberate, temporary copy of the dashboard's loaders**
+**`site_data.py` began as a deliberate copy of the dashboard's loaders**
 (`load_game`, `load_season`, `load_game_rounded`, `load_season_rounded`,
 `round_vote_matrix`, `_fit_game_probs`, the identity helpers). Refactoring
 `dashboard.py` to share them risked the live app and its memory ceiling on
@@ -190,12 +190,16 @@ one of those loaders in `dashboard.py` must be mirrored in `site_data.py`**, and
 `python scripts/check_site_parity.py [seasons]` proves they agree: it renders
 the Streamlit Leaderboard headless and compares 200 rows cell for cell with the
 export, both boards, arrows included. It passed for 2026, 2025, 2019, 2010 and
-2007 on the day it was written. The copy dies with `dashboard.py`.
+2007 on the day it was written. **Since the Streamlit app was retired (29
+September 2026) `site_data.py` is the source of truth** and the mirroring rule
+no longer applies; the parity scripts still run (they set `CC_STREAMLIT_LIVE=1`
+to get past the moved screen) and are worth running only if someone edits the
+dashboard's loaders for reference.
 
 | Page | Status |
 |---|---|
 | Leaderboard | Live, 28 Sep 2026: `/leaderboard`, `/leaderboard/[season]`. Names link to Player Profile |
-| Player Profile | Ported: `/player/[slug]/[season or career]`. Profile, DNA, Compare. Figures checked against the Streamlit page for Daicos 2025 and career (strip, DNA rates, threshold finder, vote distribution). Not ported: the signed-in "Track this H2H" control, which comes with accounts |
+| Player Profile | Ported: `/player/[slug]/[season or career]`. Profile, DNA, Compare. Figures checked against the Streamlit page for Daicos 2025 and career (strip, DNA rates, threshold finder, vote distribution). "Track this H2H" added 29 Sep 2026 (Compare tab, signed in; saves Player_Name pairs with null IDs, which the tracker resolves by name) |
 | Game Analysis | Ported: `/games`, `/games/[season]`, with `?round=<AFL round>` or `?team=<club>` for sharing. `check_site_parity.py` compares every card of the default round, all rows shown; passes for 2026, 2025, 2019, 2010, 2007. Values are exported already rounded to what the page shows, because rounding twice moved about one cell in 60. One deliberate difference: a player carried twice in one game (2025 round 24) is listed once |
 | Stat Filter | Ported: `/stat-filter`. The one page that computes in the browser: visitors combine nine thresholds with player, club, result and season, so `statfilter.json` ships every game since 1990 (296,006 rows, about 1.3 MB gzipped), one character per value per column, stats floored (which leaves every whole-number threshold test unchanged). The browser fetches it straight from raw GitHub, because Next's data cache refuses anything over 2 MB; `engineClientUrl` in `lib/engine.ts` swaps in a dev-only local route under `ENGINE_LOCAL_DIR`. `scripts/check_statfilter_parity.py` drives the running site against Streamlit on six filter sets; all matched on every readout |
 | Model Comparison | Ported: `/model-comparison`, both tabs. `modelcomp.json` carries the finished consensus table (both scales) and the Insights data. `check_site_parity.py` compares every consensus row by player plus the backtest season table, and passed under three `PYTHONHASHSEED`s. Tied consensus rows are now in a fixed order: the dashboard's set-plus-unstable-sort reordered them every run. The admin Refresh ESPN / Betfair buttons were not ported; the weekly update writes those files |
@@ -276,7 +280,7 @@ brownlow_engine/
 │   │                     #   count night: count_night.py (feed state + snapshot),
 │   │                     #   count_tweets.py (the --watch drafter), count_sim.py
 │   │                     #   (who wins from here), night_pack.py + night_sections.py
-│   │                     #   (research pack), vote_milestones.py, keepalive.py
+│   │                     #   (research pack), vote_milestones.py
 │   │                     #   post cards: *_card.py, round_votes_chart.py
 │   │                     #   data builders: fetch_match_chains.py → data_chains/
 │   │                     #   (read back by period_records.py), build_brownlow_seasons.py,
@@ -381,13 +385,15 @@ brownlow_engine/
   assumed: see `project_brief.md`, "## Model". Do not restate this as 2015–2025
 - **CV**: 5-fold `GroupKFold` grouped by season (no data leakage across seasons)
 - **Sample weights**: last-5-rounds of each season weighted 2× (recency bias)
-- **MAE**: **UNRESOLVED. Do not quote any MAE figure**, public or internal. The
-  v1–v4 numbers (0.0954 / 0.0910 / 0.0902 / 0.0904) that this line previously
-  stated as fact were all measured with a momentum leak in place, so none is
-  comparable to the others or to the current model. `brownlow_model.py` prints
-  them under the label "Pre-2026-audit figures"; its current printed baselines
-  are 0.0953 full model and 0.1013 no-coaches. Re-run against the current model
-  before any MAE figure is used anywhere. See `project_brief.md`, "## Model".
+- **MAE**: **resolved 29 September 2026, out of sample:** 0.1126 walk-forward
+  2008-2025 (all-zero baseline 0.1346, 3,468 games) and 0.0920 on 2026, a true
+  forward test (baseline 0.1304, 207 games), per player-game.
+  `python scripts/measure_mae.py` reproduces both from files, retraining
+  nothing. The v1–v4 numbers (0.0954 / 0.0910 / 0.0902 / 0.0904) stay retired,
+  all measured with the momentum leak in place, and `brownlow_model.py`'s
+  printed "0.0953 full model" is grouped CV on training seasons, comparable to
+  neither. See `project_brief.md`, "## Model". Posts still carry no accuracy
+  percentage unless Charlie supplies it.
   The Predictions page's "MAE 0.095" header and tile were replaced on 27
   September 2026 by the top-pick record, computed from files by
   `top_pick_record()` in `dashboard.py` (2026: 145 of 207, 70%).
@@ -818,15 +824,12 @@ NOTHING, with no error).
 **Nothing here posts.** `--watch` and `--last` only draft. Posting is Charlie's,
 from his phone.
 
-**The site needs no action.** The Live Tracker flips itself from PREDICTION to
-LIVE COUNT off the feed, and `.github/workflows/keepalive.yml` keeps the app
-awake. Open the site yourself before the count anyway: the job fires every 1.6 to
-5.6 hours in practice, so the first visitor after a quiet spell can still meet a
-cold start. If asked whether it is live, **do not use
-`python scripts/count_night.py status`**: it reads the award endpoint, which
-never flips, and it answered PREDICTOR through a count that was 80% complete.
-`python -c "import sys;sys.path.insert(0,'scripts');import bfawards_feed as
-b;print(b.players(roster=False)[0])"` prints the live feed's own status field.
+**The site needs no action.** From 2027 the Live Tracker is the Next.js page
+`/live-tracker`, which flips itself from the model board to the live count off
+the feed's own status field, with no cold start to worry about. If asked
+whether the count is live, `python scripts/count_night.py status` answers from
+that same feed (repointed 29 September 2026; on the night of the 2026 count it
+read the award endpoint and wrongly said PREDICTOR throughout).
 
 ## Count night and the Live Tracker
 
@@ -874,16 +877,15 @@ work unchanged. Three things in it are load-bearing:
 - **`roster=False` skips the 21-page award walk** for the Live Tracker, which
   refetches every 60 seconds and bridges on name plus club.
 
-**What is repointed and what is not, as of 22 September 2026:**
+**What is repointed and what is not, as of 29 September 2026:**
 
 | Reads the live feed | Still reads the stale award endpoint |
 |---|---|
-| `count_tweets._read_feed` | `count_night.py` (`status`, `fetch`, `classify`) |
+| `count_tweets._read_feed` | `count_night.py` `snapshot`, `fetch`, `classify` (legacy) |
 | `count_slip.py` | |
-| `dashboard.fetch_live_brownlow_data` (falls back) | |
-
-`python scripts/count_night.py status` therefore printed PREDICTOR all through
-a count that was 80% done. Fix it before 2027 or delete the command.
+| `count_night.py` `status`, `rounds` | |
+| the Next.js `/api/tracker` route | |
+| `dashboard.fetch_live_brownlow_data` (falls back; app retired) | |
 
 Everything below this block is the 2026 pre-count design. Keep it for the
 fallback path, which `dashboard.py` still uses when the live feed is
@@ -940,8 +942,9 @@ the old 300 the board could sit five minutes stale with the votes already
 public. A round is read out every five or six minutes; unknown until the night
 is how fast the AFL feed updates against the broadcast.
 
-**The app is kept awake by `.github/workflows/keepalive.yml`**, driving a real
-browser via `scripts/keepalive.py`. A curl ping cannot do this job: Streamlit
+**Retired with the app, 29 September 2026: `.github/workflows/keepalive.yml`
+and `scripts/keepalive.py` are deleted.** For the record, the job drove a real
+browser. A curl ping cannot do this job: Streamlit
 Cloud serves the host page with a 200 while the app behind it sleeps, and the
 sleep screen is itself a 200. **The cron asks for every 15 minutes and GitHub
 does not deliver it:** the ten runs from 12 to 14 September 2026 all succeeded,
@@ -1019,6 +1022,13 @@ loaders (`current_user`, `load_poll_picks`, `load_h2h_pair`, `load_watchlist`);
 they are the page's whole interface to an account.
 
 ## Dashboard pages
+
+**The Streamlit app is retired (29 September 2026).** `dashboard.py` stops after
+`st.set_page_config` with a "we've moved" screen that sends an old `?page=`
+deep link to its chachingbrownlow.com path, unless `CC_STREAMLIT_LIVE=1` is set.
+The file stays because `calibration.py` and `sb_3vote_board.py` lift functions
+out of it by AST and the parity scripts render it headless. Everything below
+describes the retired app.
 
 Navigation is a **tab bar of at most two rows** (the hub row is admin-only, see
 the row table below), and both rows are `st.button`s laid out in

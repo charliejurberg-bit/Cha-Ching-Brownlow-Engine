@@ -1,8 +1,18 @@
 """Count-night feed handling: snapshot the predictor now, tell it from the count later.
 
-    python scripts/count_night.py snapshot     # run ONCE, before count night
-    python scripts/count_night.py status       # what is the feed serving right now
-    python scripts/count_night.py rounds       # per-round votes, if the count is live
+    python scripts/count_night.py status [--season 2026]   # what is the count doing
+    python scripts/count_night.py rounds [--season 2026]   # per-round votes, once counting
+    python scripts/count_night.py snapshot                 # legacy, see below
+
+STATUS AND ROUNDS READ THE LIVE FEED (since 29 September 2026). On count night
+2026 the award endpoint below never flipped: it served the predictor all night
+and `status` answered PREDICTOR through a count that was 80% done. Both commands
+now read scripts/bfawards_feed.py, the feed the AFL's own live tracker page
+uses, whose explicit `status` field (LIVE during the count, CONCLUDED after it)
+needs no snapshot. Everything from here down describes the snapshot design,
+which the Streamlit Live Tracker's fallback path used; it is kept for the
+record and for `snapshot`, and its central claim, that the award endpoint
+carries the count on the night, turned out false.
 
 THE PROBLEM THIS SOLVES, AND WHY IT NEEDS A BEFORE-PICTURE
 The AFL award endpoint that dashboard.fetch_live_brownlow_data reads carries the
@@ -51,6 +61,7 @@ from datetime import datetime, timezone
 import requests
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import season as season_cfg  # noqa: E402
 
 BASE = "https://aflapi.afl.com.au/afl/v2"
@@ -189,37 +200,53 @@ def cmd_snapshot(args):
     return 0
 
 
+def _live(args):
+    """(status, rows, label) off the live feed for --season (default LIVE_SEASON)."""
+    import bfawards_feed as bf
+    season = args.season or SEASON
+    try:
+        pid = bf.season_ids(season)[1]
+    except LookupError:
+        return None, [], f"{season}: the AFL has not published this season yet"
+    status, rows = bf.players(pid, roster=False)
+    return status, rows, f"{season} ({pid})"
+
+
+def _state(status, total):
+    if status == "CONCLUDED":
+        return "COUNTED"
+    if status == "LIVE":
+        return "COUNTED" if FULL_VOTES and total >= FULL_VOTES else "COUNTING" if total else "LIVE, NOTHING READ YET"
+    return f"NOT STARTED (feed status {status!r})"
+
+
 def cmd_status(args):
-    sid, sname = season_id()
-    cur = digest(fetch(sid))
-    snap = load_snapshot()
-    state, why = classify(cur, snap)
-    print(f"{sname}")
-    print(f"  state:  {state}")
-    print(f"  reason: {why}")
-    print(f"  feed:   {cur['n_players']} players, {cur['total_votes']:,} "
-          f"votes, {len(cur['rounds_with_votes'])} rounds")
-    if state in ("COUNTING", "COUNTED"):
-        top = sorted(cur["players"].items(), key=lambda kv: -kv[1])[:10]
-        for k, v in top:
-            print(f"    {k.split('|')[0]:28} {v}")
+    status, rows, label = _live(args)
+    print(label)
+    if status is None and not rows:
+        return 0
+    total = sum(r["totalVotes"] for r in rows)
+    rounds = sorted({int(k) for r in rows for k in r["rounds"]})
+    print(f"  state:  {_state(status, total)}")
+    print(f"  feed:   {len(rows)} vote-getters, {total:,} votes, "
+          f"{len(rounds)} rounds{f' ({rounds[0]}-{rounds[-1]})' if rounds else ''}")
+    for r in sorted(rows, key=lambda r: -r["totalVotes"])[:10]:
+        print(f"    {r['firstName'] + ' ' + r['surname']:28} {r['totalVotes']}")
     return 0
 
 
 def cmd_rounds(args):
-    sid, _ = season_id()
-    cur = digest(fetch(sid))
-    snap = load_snapshot()
-    state, why = classify(cur, snap)
-    if state == "PREDICTOR":
-        raise SystemExit(f"refusing: {why}. These are predictions, not votes.")
-    if state == "UNKNOWN":
-        raise SystemExit(f"refusing: {why}")
-    for rnd in cur["rounds_with_votes"]:
-        got = cur["per_round"][str(rnd)]
-        label = "Opening Round" if rnd == 0 else f"Round {rnd}"
-        print(f"{label}:")
-        for name, pts in sorted(got.items(), key=lambda kv: -kv[1]):
+    status, rows, label = _live(args)
+    if status not in ("LIVE", "CONCLUDED"):
+        raise SystemExit(f"refusing: {label}, feed status {status!r}. Nothing has been counted.")
+    per = {}
+    for r in rows:
+        for k, entries in r["rounds"].items():
+            for e in entries:
+                per.setdefault(int(k), []).append((e["points"], f"{r['firstName']} {r['surname']}"))
+    for rnd in sorted(per):
+        print("Opening Round:" if rnd == 0 else f"Round {rnd}:")
+        for pts, name in sorted(per[rnd], key=lambda x: -x[0]):
             print(f"  {pts}  {name}")
     return 0
 
@@ -229,8 +256,10 @@ def main(argv=None):
     sub = ap.add_subparsers(dest="cmd", required=True)
     sp = sub.add_parser("snapshot", help="save the pre-count predictor state")
     sp.add_argument("--force", action="store_true")
-    sub.add_parser("status", help="what the feed is serving right now")
-    sub.add_parser("rounds", help="per-round votes, if the count is live")
+    for name, h in (("status", "what the live count is doing right now"),
+                    ("rounds", "per-round votes, once the count has started")):
+        p = sub.add_parser(name, help=h)
+        p.add_argument("--season", type=int, help="default: season.LIVE_SEASON")
     args = ap.parse_args(argv)
     return {"snapshot": cmd_snapshot, "status": cmd_status,
             "rounds": cmd_rounds}[args.cmd](args)

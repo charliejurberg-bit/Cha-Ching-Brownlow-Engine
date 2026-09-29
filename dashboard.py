@@ -28,6 +28,44 @@ LIVE_SEASON = season_cfg.LIVE_SEASON
 
 st.set_page_config(page_title="Cha Ching | AFL Brownlow Medal Predictor", page_icon="assets/favicon.png", layout="wide", initial_sidebar_state="collapsed")
 
+# ── RETIRED 29 September 2026 ─────────────────────────────────
+# Every public page now lives at chachingbrownlow.com (the Next.js app), and the
+# Betting Hub was retired rather than moved. The deployed Streamlit app shows
+# only this screen, sending an old ?page= deep link to its new home.
+#
+# The rest of this file stays for two reasons: calibration.py and
+# sb_3vote_board.py lift functions out of it by AST, and the parity scripts
+# (scripts/check_site_parity.py, check_statfilter_parity.py) still render its
+# pages headless for reference, setting CC_STREAMLIT_LIVE=1 to get past here.
+_NEW_SITE = "https://chachingbrownlow.com"
+_NEW_PATHS = {
+    "Leaderboard": "/leaderboard", "Player Profile": "/player", "Stat Filter": "/stat-filter",
+    "Game Analysis": "/games", "Model Comparison": "/model-comparison",
+    "Live Tracker": "/live-tracker", "Polls a Vote": "/polls-a-vote",
+}
+if os.environ.get("CC_STREAMLIT_LIVE") != "1":
+    _dest = _NEW_SITE + _NEW_PATHS.get(st.query_params.get("page", ""), "")
+    st.markdown(
+        '<style>[data-testid="stToolbar"],header{display:none!important}'
+        '.stApp{background:#0a1017}</style>'
+        '<div style="max-width:560px;margin:14vh auto 0;text-align:center;'
+        'font-family:Sora,sans-serif;color:#e9eef3">'
+        '<div style="font-family:Archivo,sans-serif;font-weight:900;font-size:40px;letter-spacing:.02em">'
+        '<span style="background:linear-gradient(180deg,#fff,#9fb3c4);-webkit-background-clip:text;'
+        'background-clip:text;color:transparent">CHA</span> '
+        '<span style="background:linear-gradient(120deg,#34d399,#f0b429);-webkit-background-clip:text;'
+        'background-clip:text;color:transparent">CHING</span></div>'
+        '<p style="font-size:17px;margin:22px 0 8px">We\'ve moved.</p>'
+        '<p style="color:#7e8c99;font-size:14px;line-height:1.6;margin:0 0 26px">'
+        'Every Brownlow page, the leaderboard, player profiles, the Live Tracker and '
+        'Polls a Vote, now lives at chachingbrownlow.com. Your account and picks came with it.</p>'
+        f'<a href="{_dest}" target="_top" style="display:inline-block;background:#34d399;color:#0a1017;'
+        'font-weight:600;text-decoration:none;padding:11px 24px;border-radius:9px">'
+        'Go to chachingbrownlow.com &rarr;</a></div>',
+        unsafe_allow_html=True,
+    )
+    st.stop()
+
 # Every document on the page — the app shell and each srcdoc iframe — must ask
 # for this EXACT url. An iframe is a separate document and cannot inherit the
 # shell's fonts, but it does share the HTTP cache, so an identical url is served
