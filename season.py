@@ -25,7 +25,9 @@ one refuses or falls back and says which, rather than borrowing last season's.
 
 import os
 
-LIVE_SEASON = int(os.environ.get("BROWNLOW_SEASON", "2026"))
+_REPO = os.path.dirname(os.path.abspath(__file__))
+
+LIVE_SEASON = int(os.environ.get("BROWNLOW_SEASON", "2027"))
 
 SEASONS = {
     2026: {
@@ -56,6 +58,26 @@ def cfg(season=None):
     if season not in SEASONS:
         raise SystemExit(f"season.py has no entry for {season}; add one to SEASONS")
     return SEASONS[season]
+
+
+def counted(season):
+    """True once `season`'s Brownlow count is saved (scripts/fetch_brownlow_votes.py
+    refuses a partial one, so the file existing means the count is complete)."""
+    return os.path.exists(os.path.join(_REPO, data_path("brownlow_votes_{s}.csv", season)))
+
+
+def current_season():
+    """The season the public site leads with: LIVE_SEASON once it has
+    predictions, otherwise the latest season that does.
+
+    Between a rollover and the new season's first predicted round, LIVE_SEASON
+    has nothing to show, and every default page would otherwise open on an
+    empty season. The weekly chain keeps reading LIVE_SEASON; only the site's
+    defaults read this."""
+    for s in range(LIVE_SEASON, LIVE_SEASON - 5, -1):
+        if os.path.exists(os.path.join(_REPO, pred_path("game_level_{s}.csv", s))):
+            return s
+    return LIVE_SEASON
 
 
 def data_dir(season=None):
