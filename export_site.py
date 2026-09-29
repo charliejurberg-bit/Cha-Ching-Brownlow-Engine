@@ -14,8 +14,8 @@ order, movement arrows, the Floor-Ceiling lift and the round grid all follow
 the Leaderboard block in dashboard.py line for line (see the comments there for
 why each rule exists). site_data.py holds the loaders.
 
-Pages exported so far: Leaderboard, Player Profile, Game Analysis, Stat Filter, Model
-Comparison.
+Pages exported: Leaderboard, Player Profile, Game Analysis, Stat Filter, Model
+Comparison, Live Tracker (tracker.json) and Polls a Vote (polls.json).
 """
 
 import json
@@ -437,8 +437,8 @@ def _normalise_name(name):
     return _NAME_SUFFIX_RE.sub('', s).strip()
 
 
-def _mc_name_reference():
-    path = sd.season_cfg.data_path("afltables_{s}.csv")
+def _mc_name_reference(season=None):
+    path = sd.season_cfg.data_path("afltables_{s}.csv", season)
     if not os.path.exists(path):
         return pd.DataFrame()
     df = pd.read_csv(path, low_memory=False)
@@ -448,7 +448,7 @@ def _mc_name_reference():
     return df[['Player_Name', 'Playing.for', 'Round_num']]
 
 
-def _mc_feed(csv_path, team_col=None, team_fixes=None, label='feed'):
+def _mc_feed(csv_path, team_col=None, team_fixes=None, label='feed', season=None):
     """dashboard._load_csv_fallback + _resolve_feed_names."""
     import features as feat
     if not os.path.exists(csv_path):
@@ -456,7 +456,7 @@ def _mc_feed(csv_path, team_col=None, team_fixes=None, label='feed'):
     df = pd.read_csv(csv_path)
     if 'Rank' not in df.columns:
         df['Rank'] = df.index + 1
-    ref = _mc_name_reference()
+    ref = _mc_name_reference(season)
     if ref.empty or df.empty or 'Player' not in df.columns:
         return df
     if team_col and team_col in df.columns:
@@ -477,23 +477,23 @@ def _file_stamp(path):
     return datetime.fromtimestamp(os.path.getmtime(path)).strftime('%d %b %H:%M')
 
 
-def _mc_sources():
+def _mc_sources(season):
     """The four outside boards, each with Player, <X>_Rank and _match_key."""
     import features as feat
-    dp = sd.season_cfg.data_path
-    afl_raw = _mc_feed(dp("afl_predictor_predictions.csv"), 'Team', feat.COACHES_TEAM_FIXES, 'afl-predictor')
+    dp = lambda name: sd.season_cfg.data_path(name, season)
+    afl_raw = _mc_feed(dp("afl_predictor_predictions.csv"), 'Team', feat.COACHES_TEAM_FIXES, 'afl-predictor', season)
     afl = pd.DataFrame()
     if not afl_raw.empty and 'Total_Votes' in afl_raw.columns:
         s = afl_raw.sort_values('Total_Votes', ascending=False).reset_index(drop=True)
         s['AFL_Rank'] = s.index + 1
         afl = s[['Player', 'Total_Votes', 'AFL_Rank']].rename(columns={'Total_Votes': 'AFL_Votes'})
         afl['Player'] = afl['Player'].str.title().str.strip()
-    bf = _mc_feed(dp("betfair_predictions.csv"), 'Team', feat.BETFAIR_TEAM_FIXES, 'betfair')
+    bf = _mc_feed(dp("betfair_predictions.csv"), 'Team', feat.BETFAIR_TEAM_FIXES, 'betfair', season)
     if not bf.empty:
         bf = bf.rename(columns={'Total_Votes': 'BF_Votes', 'Rank': 'BF_Rank'}, errors='ignore')
         bf['Player'] = bf['Player'].str.title().str.strip()
     wh = pd.DataFrame()
-    pub, legacy = dp("wheelo_brownlow_predictions.csv"), f"data_wheelo/wheelo_{sd.LIVE_SEASON}.csv"
+    pub, legacy = dp("wheelo_brownlow_predictions.csv"), f"data_wheelo/wheelo_{season}.csv"
     if os.path.exists(pub):
         raw = pd.read_csv(pub, usecols=lambda c: c in {'Player', 'Votes'})
         if {'Player', 'Votes'} <= set(raw.columns):
@@ -511,14 +511,14 @@ def _mc_sources():
             wh = agg.rename(columns={col: 'WH_Votes'})
     if not wh.empty:
         wh['Player'] = wh['Player'].str.title().str.strip()
-    espn = _mc_feed(dp("espn_predictions.csv"), label='espn')
+    espn = _mc_feed(dp("espn_predictions.csv"), label='espn', season=season)
     if not espn.empty:
         espn = espn.rename(columns={'Total_Votes': 'ESPN_Votes', 'Rank': 'ESPN_Rank'}, errors='ignore')
         espn['Player'] = espn['Player'].str.title().str.strip()
     return afl, bf, wh, espn
 
 
-def _mc_board(cc_raw, sources):
+def _mc_board(cc_raw, sources, actual=None):
     afl, bf, wh, espn = sources
     cc = pd.DataFrame()
     if cc_raw is not None:
@@ -572,24 +572,39 @@ def _mc_board(cc_raw, sources):
         r['spread'] = (max(a) - min(a)) if a else None
         team = cc_team.get(r['key'], '')
         r['colour'] = _MC_TEAM_COLOURS.get(team, '#7e8c99')
+        if actual is not None:
+            r['actual'] = actual.get(r['key'], 0)
         del r['key']
     return {'rows': rows, 'agreeThr': agree_thr, 'nModels': len(avail_models)}
 
 
 def export_model_comparison():
+    """The consensus board for the season the site leads with.
+
+    That is season_cfg.current_season(), not LIVE_SEASON: straight after a
+    rollover the new season has no boards yet, and the finished one is still
+    the story. Once that season is counted each row carries its actual votes.
+    """
     from brownlow_medallists import get_medallists
-    live = sd.LIVE_SEASON
-    cc_path = sd.season_cfg.pred_path("season_{s}.csv")
-    cc_dec = (pd.read_csv(cc_path, usecols=lambda c: c in {'Player_Name', 'Team', 'Exp_Total_Votes'})
+    live = sd.season_cfg.current_season()
+    counted = sd.season_cfg.counted(live)
+    cc_path = sd.season_cfg.pred_path("season_{s}.csv", live)
+    cc_dec = (pd.read_csv(cc_path, usecols=lambda c: c in {'Player_Name', 'Team', 'Exp_Total_Votes', 'Actual_Votes'})
               if os.path.exists(cc_path) else None)
-    sources = _mc_sources()
-    decimal = _mc_board(cc_dec, sources)
+    actual = None
+    if counted and cc_dec is not None and 'Actual_Votes' in cc_dec.columns:
+        actual = {_normalise_name(str(n).title().strip()): int(v)
+                  for n, v in zip(cc_dec['Player_Name'], cc_dec['Actual_Votes'].fillna(0))}
+    sources = _mc_sources(live)
+    decimal = _mc_board(cc_dec.drop(columns=['Actual_Votes'], errors='ignore') if cc_dec is not None else None,
+                        sources, actual)
     r = sd.load_season_rounded(live)
-    rounded = (_mc_board(r[['Player_Name', 'Team', 'Exp_Total_Votes']].copy(), _mc_sources())
+    rounded = (_mc_board(r[['Player_Name', 'Team', 'Exp_Total_Votes']].copy(), _mc_sources(live), actual)
                if r is not None and not r.empty else None)
-    dp = sd.season_cfg.data_path
+    dp = lambda name: sd.season_cfg.data_path(name, live)
     obj = {
         'season': live,
+        'counted': counted,
         'hasPredictions': cc_dec is not None,
         'boards': {'decimal': decimal, 'rounded': rounded},
         'stamps': {'afl': _file_stamp(dp("afl_predictor_predictions.csv")),
@@ -635,6 +650,184 @@ def export_model_comparison():
     return obj
 
 
+# ── Live Tracker and Polls a Vote ──────────────────────────────
+# Both pages work on one season, the one the site leads with
+# (season_cfg.current_season()), and share one model export: tracker.json holds
+# every player-game of that season with the per-round signal the Streamlit
+# Live Tracker assembles in _assemble_live_tracker. polls.json adds the four
+# outside boards Polls a Vote reads for its consensus verdict.
+#
+# The live AFL feed is never read at runtime here. When the season is counted
+# the actual votes ride in tracker.json and the page needs nothing else; before
+# that, the Next.js route /api/tracker proxies the AFL feed and the page joins it
+# to this file by AFL provider id through `feedMap`, which this export builds
+# with features.resolve_feed_names. The site cannot run that resolver, and a
+# name that fails to bridge reads as a model value of ZERO (see the Live Tracker
+# section of CLAUDE.md), so the bridge is done here, where the real one lives.
+
+def _tracker_frame(season):
+    g = sd.load_game(season)
+    if g is None or g.empty:
+        return None
+    g = g.copy()
+    g['Round_num'] = pd.to_numeric(g['Round_num'], errors='coerce')
+    g = g.dropna(subset=['Round_num', 'Player_Name'])
+    g['_gk'] = sd._game_key(g)
+    # A player carried twice in one game (CLAUDE.md, 2025 round 24) counts once.
+    g = g.drop_duplicates(['Player_Name', '_gk']).reset_index(drop=True)
+    g['_dr'] = [sd.display_round(r, season) for r in g['Round_num']]
+    return g
+
+
+def _tracker_players(g):
+    team_col = 'Playing.for' if 'Playing.for' in g.columns else 'Team'
+    last = g.sort_values('Round_num').groupby('Player_Name').last()
+    names = sorted(last.index)
+    pick = g['Player'].fillna(g['Player_Name']) if 'Player' in g.columns else g['Player_Name']
+    pick_of = dict(zip(g['Player_Name'], pick))
+    base_of = dict(zip(g['Player_Name'], g['_base_name'] if '_base_name' in g.columns else g['Player_Name']))
+    import features as feat
+    out = []
+    for n in names:
+        pid = last.loc[n, 'ID'] if 'ID' in last.columns else None
+        pid = str(int(float(pid))) if pid is not None and pd.notna(pid) else None
+        out.append({'n': n, 'b': str(base_of[n]), 'p': str(pick_of[n]), 't': str(last.loc[n, team_col]),
+                    'id': pid, 'k': feat.normalise_name(pick_of[n])})
+    return out
+
+
+def _tracker_feed_map(season, g, players):
+    """{AFL provider id: player index} from the award endpoint's roster.
+
+    Empty, never raising, when the AFL has not published the season or the
+    network is down: the page then falls back to a plain name and club match,
+    which is what an unbridged player needs anyway.
+    """
+    import features as feat
+    try:
+        import requests
+        sys.path.insert(0, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'scripts'))
+        import bfawards_feed as bf
+        roster = bf.award_roster(season)
+        r = requests.get(f"{bf.BASE}/teams?pageSize=50", headers=bf.HDRS, timeout=bf.TMO)
+        r.raise_for_status()
+        tname = {t['id']: t['name'] for t in r.json().get('teams', []) if isinstance(t.get('id'), int)}
+    except Exception as e:
+        print(f"  tracker: no AFL roster for {season} ({type(e).__name__}); feedMap left empty")
+        return {}
+    if not roster:
+        return {}
+    feed = pd.DataFrame({
+        'pid': [p['providerId'] for p in roster],
+        'Player': [f"{p['firstName']} {p['surname']}".strip() for p in roster],
+        'Team': [tname.get(p.get('teamId'), '') for p in roster],
+    })
+    feed['Team'] = feed['Team'].replace(feat.AFL_AWARD_TEAM_FIXES)
+    team_col = 'Playing.for' if 'Playing.for' in g.columns else 'Team'
+    target = pd.DataFrame({'Player_Name': g['_base_name'] if '_base_name' in g.columns else g['Player_Name'],
+                           'Playing.for': g[team_col], 'Round_num': g['Round_num']})
+    out, _ = feat.resolve_feed_names(feed, target, feed_name_col='Player', feed_team_col='Team',
+                                     feed_round_col=None, label='afl-roster', verbose=False)
+    idx = {(feat.normalise_name(p['b']), p['t']): i for i, p in enumerate(players)}
+    fmap = {}
+    for pid, nm, tm in zip(out['pid'], out['Player'], out['Team']):
+        i = idx.get((feat.normalise_name(nm), tm))
+        if i is not None:
+            fmap[pid] = i
+    print(f"  tracker: feedMap bridges {len(fmap)} of {len(roster)} AFL roster players")
+    return fmap
+
+
+def export_tracker():
+    season = sd.season_cfg.current_season()
+    g = _tracker_frame(season)
+    if g is None:
+        return None
+    counted = sd.season_cfg.counted(season)
+    players = _tracker_players(g)
+    pix = {p['n']: i for i, p in enumerate(players)}
+    games = g.drop_duplicates('_gk').sort_values(['Round_num', 'Home.team'])
+    gix = {k: i for i, k in enumerate(games['_gk'])}
+    rows = {
+        'pi': [pix[n] for n in g['Player_Name']],
+        'dr': [int(d) for d in g['_dr']],
+        'g': [gix[k] for k in g['_gk']],
+        'ev': [_num(x, 3) for x in g['Exp_Votes']],
+        'pp': [_num(x, 3) for x in g['Poll_Prob']],
+        'p1': [_num(x, 3) for x in g['P_1']],
+        'p2': [_num(x, 3) for x in g['P_2']],
+        'p3': [_num(x, 3) for x in g['P_3']],
+    }
+    if counted:
+        rows['bv'] = [int(v) for v in pd.to_numeric(g['Brownlow.Votes'], errors='coerce').fillna(0)]
+    cfg = sd.season_cfg.SEASONS.get(season, {})
+    return {
+        'season': season,
+        'counted': counted,
+        'countNight': cfg.get('count_night'),
+        'games': [[int(d), str(h), str(a)] for d, h, a in
+                  zip(games['_dr'], games['Home.team'], games['Away.team'])],
+        'players': players,
+        'rows': rows,
+        'feedMap': {} if counted else _tracker_feed_map(season, g, players),
+    }
+
+
+def export_polls(season):
+    """The four outside boards, keyed by features.normalise_name, for the
+    Polls a Vote consensus. Thresholds and round conventions are the page's
+    (render_polls_a_vote in dashboard.py); this only moves the data."""
+    import features as feat
+    dp = lambda name: sd.season_cfg.data_path(name, season)
+    k = feat.normalise_name
+
+    def totals(path):
+        if not os.path.exists(path):
+            return None
+        df = pd.read_csv(path)
+        if 'Total_Votes' not in df.columns:
+            return None
+        return {k(p): _num(v if pd.notna(v) else 0, 2) for p, v in zip(df['Player'], df['Total_Votes'])}
+
+    def rounds(path):
+        if not os.path.exists(path):
+            return None
+        df = pd.read_csv(path)
+        if not {'Player', 'Round', 'Vote'} <= set(df.columns):
+            return None
+        out = {}
+        for p, r, v in zip(df['Player'], df['Round'], df['Vote']):
+            out.setdefault(k(p), []).append([int(r), _num(v if pd.notna(v) else 0, 2)])
+        return out
+
+    wh_total, wh_round = {}, {}
+    wpath = f"data_wheelo/wheelo_{season}.csv"
+    if os.path.exists(wpath):
+        wh = pd.read_csv(wpath)
+        col = next((c for c in ['ExpVotes', 'RatingPoints'] if c in wh.columns), None)
+        if col:
+            for p, s in wh.groupby('Player')[col].sum().items():
+                wh_total[k(p)] = _num(s, 2)
+        if {'ExpVotes', 'Round'} <= set(wh.columns):
+            for p, r, v in zip(wh['Player'], wh['Round'], wh['ExpVotes']):
+                if pd.isna(v) or pd.isna(r):
+                    continue
+                wh_round.setdefault(k(p), []).append([int(r) - 1, _num(v, 2)])
+    espn_round = rounds(dp("espn_round_votes.csv"))
+    return {
+        'season': season,
+        'afl': totals(dp("afl_predictor_predictions.csv")),
+        'aflRound': rounds(dp("afl_predictor_round_votes.csv")),
+        'bf': totals(dp("betfair_predictions.csv")),
+        'bfRound': rounds(dp("betfair_round_votes.csv")),
+        'wh': wh_total,
+        'whRound': wh_round,
+        'espn': totals(dp("espn_predictions.csv")),
+        'espnRound': espn_round,
+        'espnRounds': sorted({r for v in (espn_round or {}).values() for r, _ in v}),
+    }
+
+
 def _write(path, obj):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = path + ".tmp"
@@ -669,16 +862,29 @@ def main(argv):
     mc = export_model_comparison()
     size = _write(os.path.join(OUT_DIR, "modelcomp.json"), mc)
     print(f"  modelcomp: {len(mc['boards']['decimal']['rows'])} consensus rows, {size / 1024:.0f} KB")
+    tr = export_tracker()
+    if tr is not None:
+        size = _write(os.path.join(OUT_DIR, "tracker.json"), tr)
+        print(f"  tracker {tr['season']}: {len(tr['players'])} players, "
+              f"{'counted' if tr['counted'] else 'not counted'}, {size / 1024:.0f} KB")
+        pv = export_polls(tr['season'])
+        size = _write(os.path.join(OUT_DIR, "polls.json"), pv)
+        print(f"  polls {pv['season']}: {size / 1024:.0f} KB")
     # The index lists what exists on disk, not what this run touched, so a
-    # partial run never shrinks the season picker.
+    # partial run never shrinks the season picker. currentSeason is the one the
+    # default pages open on (season_cfg.current_season); liveSeason is
+    # LIVE_SEASON, which straight after a rollover has no files yet.
     on_disk = sorted((int(f[:-5]) for f in os.listdir(lb_dir)
                       if f.endswith(".json") and f[:-5].isdigit()), reverse=True)
+    current = sd.season_cfg.current_season()
     _write(os.path.join(OUT_DIR, "index.json"), {
         "liveSeason": sd.LIVE_SEASON,
+        "currentSeason": current,
+        "counted": [s for s in on_disk if sd.season_cfg.counted(s) or s < sd.LIVE_SEASON],
         "seasons": on_disk,
         "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     })
-    print(f"  index: {len(on_disk)} seasons, live {sd.LIVE_SEASON}")
+    print(f"  index: {len(on_disk)} seasons, live {sd.LIVE_SEASON}, current {current}")
 
 
 if __name__ == "__main__":

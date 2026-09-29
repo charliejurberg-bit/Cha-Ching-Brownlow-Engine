@@ -86,14 +86,20 @@ from draft_posts import (
     load_latest_round,
 )
 
-BEST_ODDS = season_cfg.data_path("best_odds.csv")
+# The season the site leads with, not LIVE_SEASON: straight after a rollover the
+# new season has no predictions and the finished one is still the front page.
+CURRENT = season_cfg.current_season()
+GAME_LEVEL_CUR = season_cfg.pred_path("game_level_{s}.csv", CURRENT)
+SEASON_CUR = season_cfg.pred_path("season_{s}.csv", CURRENT)
+
+BEST_ODDS = season_cfg.data_path("best_odds.csv", CURRENT)
 
 OUT_DIR = "site"
 OUT_PATH = os.path.join(OUT_DIR, "landing.json")
 
 # Count night, fixed. Not derived from anything in the data. Set per season in
 # season.py; None until the AFL announces it, which main() reports.
-BROWNLOW_NIGHT = season_cfg.cfg()["count_night"]
+BROWNLOW_NIGHT = season_cfg.cfg(CURRENT)["count_night"]
 
 # Hero chips: the round's three highest by Exp_Votes.
 CHIPS_N = 3
@@ -347,15 +353,55 @@ def build_summary():
     carries it: `round` is the display number, and the console line prints both
     so a reader can see the conversion that was applied.
     """
-    rnd, latest_raw, season = load_latest_round()
-    season_now = pd.read_csv(SEASON, usecols=['Player_Name', 'Exp_Total_Votes'])
-    return {
+    rnd, latest_raw, season = load_latest_round(GAME_LEVEL_CUR)
+    season_now = pd.read_csv(SEASON_CUR, usecols=['Player_Name', 'Exp_Total_Votes'])
+    out = {
         'round': _display_round(latest_raw, season),
         'brownlowNight': BROWNLOW_NIGHT,
         'leader': build_leader(season_now),
         'chips': build_chips(rnd),
         'ticker': build_ticker(rnd),
-    }, latest_raw
+    }
+    if season_cfg.counted(CURRENT):
+        out['final'] = build_final()
+    return out, latest_raw
+
+
+FINAL_BOARD_N = 10
+
+
+def build_final():
+    """The count, once it is saved: the medallist and the top of the board.
+
+    Written only when data_<season>/brownlow_votes_<season>.csv exists, which
+    scripts/fetch_brownlow_votes.py refuses to write for a partial count, so
+    the landing page never calls a result early. Ranks are tie-aware (a shared
+    rank carries '=' on the page), and every player level with the top is a
+    winner, so a tied medal reads as one.
+    """
+    se = pd.read_csv(SEASON_CUR, usecols=['Player_Name', 'Team', 'Actual_Votes', 'Exp_Total_Votes'])
+    se['Actual_Votes'] = pd.to_numeric(se['Actual_Votes'], errors='coerce').fillna(0).astype(int)
+    se = se.sort_values(['Actual_Votes', 'Player_Name'], ascending=[False, True]).reset_index(drop=True)
+    if se.empty or se['Actual_Votes'].iloc[0] <= 0:
+        raise ValueError("counted season with no votes in season file; run season_rollover.py --apply")
+    top = int(se['Actual_Votes'].iloc[0])
+    below = se.loc[se['Actual_Votes'] < top, 'Actual_Votes']
+    board = []
+    for _, r in se.head(FINAL_BOARD_N).iterrows():
+        v = int(r['Actual_Votes'])
+        rank = int((se['Actual_Votes'] > v).sum()) + 1
+        tied = int((se['Actual_Votes'] == v).sum()) > 1
+        board.append({'rank': rank, 'tied': tied, 'name': str(r['Player_Name']).strip(),
+                      'team': _team_code(r['Team']), 'votes': v,
+                      'model': round(float(r['Exp_Total_Votes']), 1)})
+    winners = [b['name'] for b in board if b['votes'] == top]
+    return {
+        'season': int(CURRENT),
+        'winners': winners,
+        'votes': top,
+        'margin': int(top - below.iloc[0]) if not below.empty else 0,
+        'board': board,
+    }
 
 
 def main():
@@ -365,7 +411,7 @@ def main():
         print(f"! season.py has no count_night for {season_cfg.LIVE_SEASON}; "
               f"set it before site/landing.json can be written")
         return 1
-    for path in (GAME_LEVEL, SEASON):
+    for path in (GAME_LEVEL_CUR, SEASON_CUR):
         if not os.path.exists(path):
             print(f"! {path} not found. Run predict_2026.py first.")
             return 1

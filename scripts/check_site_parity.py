@@ -146,6 +146,15 @@ def check_modelcomp():
     and the export fixes it. Each player's five ranks, spread and consensus
     number must match, and the export's order must be non-decreasing."""
     data = json.load(open("site/data/modelcomp.json", encoding="utf-8"))
+    # The export leads with season.current_season(); the Streamlit page reads
+    # LIVE_SEASON. Between a rollover and the new season's first predictions
+    # those differ, and comparing them only measures that.
+    sys.path.insert(0, os.getcwd())
+    import season as season_cfg
+    if data["season"] != season_cfg.LIVE_SEASON:
+        print(f"skip modelcomp: the export shows {data['season']}, the Streamlit page "
+              f"{season_cfg.LIVE_SEASON}. Check it with BROWNLOW_SEASON={data['season']}.")
+        return True
     at = AppTest.from_file("dashboard.py", default_timeout=600)
     at.session_state["page"] = "Model Comparison"
     at.session_state["active_hub"] = "brownlow"

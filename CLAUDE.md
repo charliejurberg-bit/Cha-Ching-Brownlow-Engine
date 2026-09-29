@@ -2,11 +2,13 @@
 
 AFL Brownlow Medal predictor plus a betting tracker. XGBoost model (v4.0) trained on 2007–2025 data. Dashboard live on Streamlit Cloud.
 
-**Where things stand (14 September 2026):** the 2026 home and away season is
-complete and fully predicted (207 games, coaches votes for all of them). The
-count is **21 September 2026**; its engine is built, verified and pushed, and
-the "Count night runbook" below is the whole procedure. What remains before it
-is operational, listed under "Current priorities" in `project_brief.md`.
+**Where things stand (29 September 2026):** the 2026 count is done (21
+September, Nick Daicos 47) and saved, and the pipeline has been **rolled over to
+2027**: `season.LIVE_SEASON` is 2027 and 2026 is a finished season carrying its
+actual votes in `game_level_2026.csv` / `season_2026.csv`. 2027 has no data yet,
+so the public site leads with 2026 through `season.current_season()` (see
+"Season rollover"). Every public page is now on the Next.js site; see "Streamlit
+to Next.js migration".
 
 **Only the Betting Hub is personal.** The Brownlow section is the free public product, launched to AFL betting forums with no paywall and no paid tips; the Betting Hub is private and admin-gated. Treat any copy decision as public-facing unless it lives behind the gate.
 
@@ -137,6 +139,20 @@ read as never polling. Then fill `season.SEASONS[<new>]` as the values become
 known: `landing_summary.py` will not write without `count_night`, and
 `scraper_espn.py` skips without `espn_slug`.
 
+**Done for real on 29 September 2026** (2026 to 2027, stack already trained
+through 2026 so step 2 was a no-op). Two helpers in `season.py` came with it and
+are what the public site reads, never `LIVE_SEASON` directly:
+`current_season()` is `LIVE_SEASON` once it has a `game_level` file, otherwise
+the latest season that does, so between a rollover and the new season's first
+predicted round every default page, `landing_summary.py`, the Model Comparison
+export and the Live Tracker / Polls a Vote exports stay on the finished season
+instead of opening on an empty one. `counted(season)` is whether
+`data_<s>/brownlow_votes_<s>.csv` exists; it flips the tracker, Polls a Vote,
+Model Comparison and the landing page (`final` block in `site/landing.json`)
+from live to finished. The weekly chain still reads `LIVE_SEASON`. The
+Streamlit app reads `LIVE_SEASON` too, so its Model Comparison, Live Tracker
+and Polls a Vote show an empty 2027; it is being retired, so that is accepted.
+
 **Rehearsed on 27 September 2026, not assumed.** Rolled to 2027 with no 2027
 data at all, all seven Brownlow pages rendered; two failures were found and
 fixed. Model Comparison crashed on an empty consensus table. The Live Tracker
@@ -183,9 +199,9 @@ export, both boards, arrows included. It passed for 2026, 2025, 2019, 2010 and
 | Game Analysis | Ported: `/games`, `/games/[season]`, with `?round=<AFL round>` or `?team=<club>` for sharing. `check_site_parity.py` compares every card of the default round, all rows shown; passes for 2026, 2025, 2019, 2010, 2007. Values are exported already rounded to what the page shows, because rounding twice moved about one cell in 60. One deliberate difference: a player carried twice in one game (2025 round 24) is listed once |
 | Stat Filter | Ported: `/stat-filter`. The one page that computes in the browser: visitors combine nine thresholds with player, club, result and season, so `statfilter.json` ships every game since 1990 (296,006 rows, about 1.3 MB gzipped), one character per value per column, stats floored (which leaves every whole-number threshold test unchanged). The browser fetches it straight from raw GitHub, because Next's data cache refuses anything over 2 MB; `engineClientUrl` in `lib/engine.ts` swaps in a dev-only local route under `ENGINE_LOCAL_DIR`. `scripts/check_statfilter_parity.py` drives the running site against Streamlit on six filter sets; all matched on every readout |
 | Model Comparison | Ported: `/model-comparison`, both tabs. `modelcomp.json` carries the finished consensus table (both scales) and the Insights data. `check_site_parity.py` compares every consensus row by player plus the backtest season table, and passed under three `PYTHONHASHSEED`s. Tied consensus rows are now in a fixed order: the dashboard's set-plus-unstable-sort reordered them every run. The admin Refresh ESPN / Betfair buttons were not ported; the weekly update writes those files |
-| Landing page links | Open Leaderboard, Launch Dashboard and the footer's Leaderboard link go to `/leaderboard` (28 Sep 2026). Open Live Tracker still deep links into Streamlit; switch it when that page moves |
-| Live Tracker | Still Streamlit. Its port is a Next.js route that mints the AFL token and proxies `bfawards` with a 60s cache, and must be ready for the 2027 count |
-| Polls a Vote | Still Streamlit. Ports to `@supabase/ssr` against the same tables and RLS |
+| Landing page links | All internal (29 Sep 2026); Open Live Tracker goes to `/live-tracker`. With `final` in `landing.json` the hero, stat strip, cards and ticker report the result instead of the run-in |
+| Live Tracker | Ported 29 Sep 2026: `/live-tracker`. `tracker.json` (`export_tracker`) holds the current season's per-round model signal and, once counted, the votes, so a finished count never touches the AFL. Before that the page polls `/api/tracker` every 60s, a route that mints the token and relays `bfawards/season/<id>` with `revalidate = 60`, and joins it by AFL provider id through `feedMap`, which the export builds with the real `resolve_feed_names` (666 of 669 model players for 2026). Checked: the feed path and the saved count agree on every round of all 183 vote-getters. Zone 1 can be pointed at any counted round; ranks are tie-aware. The ★ watchlist editor, picks (Zone 3) and H2H panel read the same Supabase tables; the signed-in panels were NOT exercised in a browser (no test account), only type-checked |
+| Polls a Vote | Ported 29 Sep 2026: `/polls-a-vote`, against `user_poll_picks` with the anon key and RLS, saving the same `Player` spelling Streamlit did. `polls.json` (`export_polls`) carries the four outside boards keyed by `normalise_name`. Once the season is counted each pick shows what the player polled in its rounds and the add form closes. Signed-in paths type-checked only, as above |
 
 **Player Profile data.** `players/<slug>.json` is one person's every game,
 columnar, keyed by the career-disambiguated name (`site_data.load_game_career`),

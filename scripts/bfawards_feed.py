@@ -105,7 +105,7 @@ def team_ids():
     return out
 
 
-def award_roster():
+def award_roster(season=None):
     """Every eligible player from the award endpoint, votes stripped.
 
     Downstream keys players on the award endpoint's numeric ``id``, and the
@@ -122,7 +122,7 @@ def award_roster():
     """
     out, page = [], 0
     while True:
-        r = requests.get(f"{BASE}/compseasons/{season_ids()[0]}/award/brownlow"
+        r = requests.get(f"{BASE}/compseasons/{season_ids(season)[0]}/award/brownlow"
                          f"?page={page}&pageSize=100", headers=HDRS, timeout=TMO)
         if r.status_code != 200:
             break

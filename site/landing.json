@@ -181,5 +181,95 @@
         ]
       ]
     }
-  ]
+  ],
+  "final": {
+    "season": 2026,
+    "winners": [
+      "Nick Daicos"
+    ],
+    "votes": 47,
+    "margin": 11,
+    "board": [
+      {
+        "rank": 1,
+        "tied": false,
+        "name": "Nick Daicos",
+        "team": "COL",
+        "votes": 47,
+        "model": 39.6
+      },
+      {
+        "rank": 2,
+        "tied": false,
+        "name": "Bailey Smith",
+        "team": "GEE",
+        "votes": 36,
+        "model": 29.4
+      },
+      {
+        "rank": 3,
+        "tied": false,
+        "name": "Marcus Bontempelli",
+        "team": "WB",
+        "votes": 34,
+        "model": 26.1
+      },
+      {
+        "rank": 4,
+        "tied": false,
+        "name": "Max Gawn",
+        "team": "MEL",
+        "votes": 28,
+        "model": 15.9
+      },
+      {
+        "rank": 5,
+        "tied": true,
+        "name": "Harry Sheezel",
+        "team": "NTH",
+        "votes": 27,
+        "model": 19.4
+      },
+      {
+        "rank": 5,
+        "tied": true,
+        "name": "Patrick Cripps",
+        "team": "CAR",
+        "votes": 27,
+        "model": 22.2
+      },
+      {
+        "rank": 5,
+        "tied": true,
+        "name": "Will Ashcroft",
+        "team": "BRI",
+        "votes": 27,
+        "model": 24.5
+      },
+      {
+        "rank": 8,
+        "tied": true,
+        "name": "Isaac Heeney",
+        "team": "SYD",
+        "votes": 26,
+        "model": 22.9
+      },
+      {
+        "rank": 8,
+        "tied": true,
+        "name": "Zak Butters",
+        "team": "PTA",
+        "votes": 26,
+        "model": 17.0
+      },
+      {
+        "rank": 10,
+        "tied": false,
+        "name": "Izak Rankine",
+        "team": "ADE",
+        "votes": 25,
+        "model": 19.0
+      }
+    ]
+  }
 }
