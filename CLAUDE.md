@@ -202,7 +202,7 @@ dashboard's loaders for reference.
 | Player Profile | Ported: `/player/[slug]/[season or career]`. Profile, DNA, Compare. Figures checked against the Streamlit page for Daicos 2025 and career (strip, DNA rates, threshold finder, vote distribution). "Track this H2H" added 29 Sep 2026 (Compare tab, signed in; saves Player_Name pairs with null IDs, which the tracker resolves by name) |
 | Game Analysis | Ported: `/games`, `/games/[season]`, with `?round=<AFL round>` or `?team=<club>` for sharing. `check_site_parity.py` compares every card of the default round, all rows shown; passes for 2026, 2025, 2019, 2010, 2007. Values are exported already rounded to what the page shows, because rounding twice moved about one cell in 60. One deliberate difference: a player carried twice in one game (2025 round 24) is listed once |
 | Stat Filter | Ported: `/stat-filter`. The one page that computes in the browser: visitors combine nine thresholds with player, club, result and season, so `statfilter.json` ships every game since 1990 (296,006 rows, about 1.3 MB gzipped), one character per value per column, stats floored (which leaves every whole-number threshold test unchanged). The browser fetches it straight from raw GitHub, because Next's data cache refuses anything over 2 MB; `engineClientUrl` in `lib/engine.ts` swaps in a dev-only local route under `ENGINE_LOCAL_DIR`. `scripts/check_statfilter_parity.py` drives the running site against Streamlit on six filter sets; all matched on every readout |
-| Model Comparison | Ported: `/model-comparison`, both tabs. `modelcomp.json` carries the finished consensus table (both scales) and the Insights data. `check_site_parity.py` compares every consensus row by player plus the backtest season table, and passed under three `PYTHONHASHSEED`s. Tied consensus rows are now in a fixed order: the dashboard's set-plus-unstable-sort reordered them every run. The admin Refresh ESPN / Betfair buttons were not ported; the weekly update writes those files. Insights adds every counted season after the backtest as a "live" row (29 Sep 2026: 2026), built from the published season file the way `backtest.py` builds a season, plus a scorecard and a calibration table off the displayed `P_3_game` (`_forward_scorecard`). That table does NOT reproduce the "by model p bucket" table under "Model architecture" (whose source column is unrecorded); the site's is the reproducible one |
+| Model Comparison | Ported: `/model-comparison`, both tabs. `modelcomp.json` carries the finished consensus table (both scales) and the Insights data. `check_site_parity.py` compares every consensus row by player plus the backtest season table, and passed under three `PYTHONHASHSEED`s. Tied consensus rows are now in a fixed order: the dashboard's set-plus-unstable-sort reordered them every run. The admin Refresh ESPN / Betfair buttons were not ported; the weekly update writes those files. Insights adds every counted season after the backtest as a "live" row (29 Sep 2026: 2026), built from the published season file the way `backtest.py` builds a season, plus a scorecard and a calibration table off the displayed `P_3_game` (`_forward_scorecard`). That is the "displayed" column of the table under "Model architecture"; `scripts/calibration_2026.py` prints it beside the priced one |
 | Landing page links | All internal (29 Sep 2026); Open Live Tracker goes to `/live-tracker`. With `final` in `landing.json` the hero, stat strip, cards and ticker report the result instead of the run-in |
 | Live Tracker | Ported 29 Sep 2026: `/live-tracker`. `tracker.json` (`export_tracker`) holds the current season's per-round model signal and, once counted, the votes, so a finished count never touches the AFL. Before that the page polls `/api/tracker` every 60s, a route that mints the token and relays `bfawards/season/<id>` with `revalidate = 60`, and joins it by AFL provider id through `feedMap`, which the export builds with the real `resolve_feed_names` (666 of 669 model players for 2026). Checked: the feed path and the saved count agree on every round of all 183 vote-getters. Zone 1 can be pointed at any counted round; ranks are tie-aware. The ★ watchlist editor, picks (Zone 3) and H2H panel read the same Supabase tables; the signed-in panels were NOT exercised in a browser (no test account), only type-checked |
 | Polls a Vote | Ported 29 Sep 2026: `/polls-a-vote`, against `user_poll_picks` with the anon key and RLS, saving the same `Player` spelling Streamlit did. `polls.json` (`export_polls`) carries the four outside boards keyed by `normalise_name`. Once the season is counted each pick shows what the player polled in its rounds and the add form closes. Signed-in paths type-checked only, as above |
@@ -473,19 +473,34 @@ What the ordering got right: the winner, the top three in order, 17 of the top
 games (70.0%)** against a 56.6% backtest baseline. The 3-2-1 board read Daicos
 48 against an actual 47, Cripps and Heeney exactly, MAE 1.70 votes.
 
-What the probabilities got wrong, by model `p` bucket:
+What the probabilities got wrong. **There are two P(3)s and they must not be
+confused**; `python scripts/calibration_2026.py` prints both, every 2026
+player-game, from files:
 
-| Model p | n | Model says | Actually happened |
-|---|---|---|---|
-| 0.60 to 1.00 | 94 | 75.5% | **86.2%** |
-| 0.35 to 0.60 | 118 | 48.7% | **55.9%** |
-| 0.20 to 0.35 | 107 | 26.4% | 19.6% |
-| 0.10 to 0.20 | 192 | 14.0% | 10.4% |
-| 0.05 to 0.10 | 149 | 7.8% | 4.0% |
+| Stated P(3) | Displayed (`P_3_game`): n, said, took the 3 | Priced (isotonic, `sb_3vote_board`): n, said, took the 3 |
+|---|---|---|
+| 0.60 to 1.00 | 97, 71.6%, **86.6%** | 94, 75.5%, **86.2%** |
+| 0.35 to 0.60 | 114, 47.9%, **55.3%** | 117, 48.7%, **56.4%** |
+| 0.20 to 0.35 | 108, 26.8%, 19.4% | 108, 26.4%, 19.4% |
+| 0.10 to 0.20 | 152, 14.2%, 12.5% | 162, 14.1%, 12.3% |
+| 0.05 to 0.10 | 188, 7.4%, 6.4% | 100, 7.9%, 6.0% |
+| Favourite per game | said 58.6%, took 142 of 207 | said 60.5%, took 143 of 207 |
 
-It understates near-certainties and roughly doubles the tail. On the favourite
-it said 60.5% where the market said 69.5% and the truth was **69.6%**: the book
-was almost exactly right and the model nine points low.
+**Displayed** is what readers saw on Game Analysis and the Player Profile, and is
+the table on the site's Model Insights tab. **Priced** is that figure through
+the isotonic map `sb_3vote_board.py` fits on the 2008-2025 backtest to price
+Sportsbet's board; it was never shown to a reader.
+
+Corrected 29 September 2026. The table first recorded here was the PRICED
+figure presented as "model `p`", with no column named. Its top three buckets and
+its 60.5% favourite reproduce exactly from the priced column; its bottom two
+(192 at 14.0% to 10.4%, 149 at 7.8% to 4.0%) and its 69.6% favourite hit rate
+do not reproduce from anything on disk, most likely an earlier state of the
+files, and are withdrawn. With them goes the claim that the model "roughly
+doubles the tail": the tail is overstated by one to two points, not twofold.
+What stands in both columns: near-certainties understated by about 15 points
+and the favourite by about 10, with the market (69.5% on the favourite) close
+to the truth.
 
 Two consequences worth stating before anyone builds on these numbers again. Any
 EV screen over them points the wrong way twice, refusing the favourites the
