@@ -83,6 +83,7 @@ BROWNLOW_MEDALLISTS = {
     2023: [("Lachie Neale", "Brisbane Lions")],
     2024: [("Patrick Cripps", "Carlton")],
     2025: [("Matt Rowell", "Gold Coast")],
+    2026: [("Nick Daicos", "Collingwood")],
 }
 
 
@@ -137,6 +138,7 @@ MEDALLIST_IDS = {
     2023: [12055],  # Lachie Neale
     2024: [12261],  # Patrick Cripps
     2025: [12768],  # Matt Rowell
+    2026: [12943],  # Nick Daicos, 47 votes (data_2026/brownlow_votes_2026.csv)
 }
 
 

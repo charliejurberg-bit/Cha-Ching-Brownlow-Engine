@@ -578,6 +578,41 @@ def _mc_board(cc_raw, sources, actual=None):
     return {'rows': rows, 'agreeThr': agree_thr, 'nModels': len(avail_models)}
 
 
+_CALIB_EDGES = [0.05, 0.10, 0.20, 0.35, 0.60, 1.0001]
+
+
+def _forward_scorecard(season):
+    """How a season the site predicted live went, from files. Counts, not
+    claims: every figure is re-derivable from the season's game file.
+
+    Calibration reads P_3_game, the within-game fitted P(3) that Game Analysis
+    and the Player Profile displayed, bucketed by what it said. MAE is
+    scripts/measure_mae.py's definition. The top pick is the raw P_3 argmax,
+    dashboard.top_pick_record's rule, so it matches the published 145 of 207.
+    """
+    g = sd.load_game(season).drop_duplicates(['Player_Name', 'Round_num', 'Home.team', 'Away.team']).copy()
+    g['_v'] = pd.to_numeric(g['Brownlow.Votes'], errors='coerce').fillna(0)
+    gid = g['Round_num'].astype(str) + '|' + g['Home.team'] + '|' + g['Away.team']
+    ok = g.groupby(gid)['_v'].transform('sum') == 6
+    top = g[ok].loc[g[ok].groupby(gid[ok])['P_3'].idxmax()]
+    se = sd.load_season(season)
+    act = se.sort_values(['Actual_Votes', 'Exp_Total_Votes'], ascending=False)['Player_Name'].tolist()
+    mod = se.sort_values('Exp_Total_Votes', ascending=False)['Player_Name'].tolist()
+    b = pd.cut(g['P_3_game'], _CALIB_EDGES, right=False)
+    cal = g.groupby(b, observed=True).agg(n=('P_3_game', 'size'), says=('P_3_game', 'mean'),
+                                          hit=('_v', lambda v: int((v == 3).sum())))
+    return {
+        'topPick': [int((top['_v'] == 3).sum()), int(len(top))],
+        'top3InOrder': act[:3] == mod[:3],
+        'top10': len(set(act[:10]) & set(mod[:10])),
+        'top20': len(set(act[:20]) & set(mod[:20])),
+        'mae': round(float((g['_v'] - g['Exp_Votes']).abs().mean()), 4),
+        'maeZero': round(float(g['_v'].mean()), 4),
+        'calib': [[round(float(iv.left), 2), round(min(float(iv.right), 1.0), 2), int(r.n), round(float(r.says), 3), int(r.hit)]
+                  for iv, r in cal.iterrows()],
+    }
+
+
 def export_model_comparison():
     """The consensus board for the season the site leads with.
 
@@ -616,9 +651,23 @@ def export_model_comparison():
     bt_path = os.path.join(sd.PRED_DIR, "backtest_results.csv")
     if os.path.exists(bt_path):
         bt = pd.read_csv(bt_path)
+        frames = [(int(season), bt[bt['Season'] == season], False) for season in sorted(bt['Season'].unique())]
+        # Forward seasons: every counted season after the backtest, from the
+        # live predictions the site published. The same test as a backtest
+        # season (a model trained only on earlier years, scored against the
+        # count), built the way backtest.py builds one: season totals of
+        # Exp_Votes, rank method 'min'. Flagged so the page can say which is which.
+        for season in range(int(bt['Season'].max()) + 1, sd.LIVE_SEASON + 1):
+            se = sd.load_season(season) if sd.season_cfg.counted(season) else None
+            if se is None or se['Actual_Votes'].fillna(0).sum() == 0:
+                continue
+            f = se.rename(columns={'Player_Name': 'Player', 'Exp_Total_Votes': 'Predicted_Votes'})
+            f = f[['Player', 'Team', 'Actual_Votes', 'Predicted_Votes']].copy()
+            f['Actual_Votes'] = f['Actual_Votes'].fillna(0)
+            f['Rank_Predicted'] = f['Predicted_Votes'].rank(ascending=False, method='min').astype(int)
+            frames.append((season, f, True))
         seasons = []
-        for season in sorted(bt['Season'].unique()):
-            s = bt[bt['Season'] == season]
+        for season, s, forward in frames:
             top10 = s[s['Rank_Predicted'] <= 10]
             avg_err = (top10['Predicted_Votes'] - top10['Actual_Votes']).abs().mean()
             meds = get_medallists(season)
@@ -629,7 +678,8 @@ def export_model_comparison():
                     ranks.append(int(hit['Rank_Predicted'].iloc[0]))
             meds_set = set(meds)
             seasons.append({
-                'season': int(season),
+                'season': season,
+                'forward': forward,
                 'winner': ' & '.join(nm for nm, _ in meds) or '?',
                 'predRank': min(ranks) if ranks else None,
                 'top3': any(x <= 3 for x in ranks), 'top5': any(x <= 5 for x in ranks),
@@ -639,8 +689,11 @@ def export_model_comparison():
                             for p, t, a, pv in top10.sort_values('Rank_Predicted')[
                                 ['Player', 'Team', 'Actual_Votes', 'Predicted_Votes']].itertuples(index=False)],
             })
+        for x in seasons:
+            if x['forward']:
+                x['live'] = _forward_scorecard(x['season'])
         obj['insights'] = {'btMin': int(bt['Season'].min()), 'btMax': int(bt['Season'].max()),
-                           'seasons': seasons}
+                           'fwdMax': max(x['season'] for x in seasons), 'seasons': seasons}
     imp_path = os.path.join(sd.PRED_DIR, "feature_importance.csv")
     if os.path.exists(imp_path):
         imp = pd.read_csv(imp_path)
