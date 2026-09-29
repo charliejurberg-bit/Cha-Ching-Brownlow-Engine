@@ -121,8 +121,8 @@ def main(argv):
         cols[f"ev_{name}"] = 3 * P[:, 0] + 2 * P[:, 1] + P[:, 2]
         board[f"ev_{name}"] = pd.Series(cols[f"ev_{name}"]).groupby(live.playerId.values).sum()
         print(f"  scenario {name:12} extra weights: " + (", ".join(f"{a} +{b:.2f}" for a, b in delta.items()) or "none"))
-    keep = ["season", "rnd", "matchId", "playerId", "player", "team", "opponent"] + \
-        [c for c in live.columns if c.startswith(("P3_", "P2_", "P1_", "ev_"))]
+    live = pd.concat([live, pd.DataFrame(cols)], axis=1)
+    keep = ["season", "rnd", "matchId", "playerId", "player", "team", "opponent"] + list(cols)
     live[keep].to_csv(os.path.join(ev.OUT, f"predictions_{season}.csv"), index=False)
     board = board.sort_values("ev_proportional", ascending=False)
     board.to_csv(os.path.join(ev.OUT, f"board_{season}.csv"))
