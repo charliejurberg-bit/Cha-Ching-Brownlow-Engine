@@ -80,3 +80,7 @@ ChaChingContent/
 # cache: scripts/fetch_injury_lists.py refetches anything missing, and the
 # parsed result lands in the tracked data_injury/injury_list_<season>.csv.
 data_injury/raw/
+
+# AFLW: rebuilt by aflw/build.py and aflw/evaluate.py
+data_aflw/frame.csv
+data_aflw/_mens_small.pkl
