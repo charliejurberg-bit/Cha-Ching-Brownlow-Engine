@@ -230,6 +230,35 @@ Kangaroos there.
 Vercel. That repo's `next.config.mjs` has `ignoreBuildErrors: true`, so run
 `npx tsc --noEmit` yourself; the build will not.
 
+## AFLW Best and Fairest (started 29 September 2026)
+
+**A separate model from the Brownlow, by Charlie's call and by measurement**:
+the men's model applied to AFLW scored ll3 1.90 against 1.67 for an AFLW
+model (`aflw/evaluate.py`). Everything lives in `aflw/` and `data_aflw/`; the
+site toggle comes after the model.
+
+- **Votes per match: 500 games, seven seasons**, each joined to stats by AFL
+  player id, every match totalling 6, published totals reconciling:
+  2017, 2020, 2021, 2022S6, 2022S7 recovered from AFL articles
+  (`aflw/recover_votes.py`, womens.afl ones through the Internet Archive);
+  2024, 2025 from the live feed (`aflw/fetch_votes.py`). 2023 has season totals
+  only (`recover_totals.py`); 2018 and 2019 have nothing complete. Source
+  traps are in memory, `aflw-bf-data-sources`.
+- **2022 held two seasons**, labelled 2022S6 and 2022S7 everywhere.
+- **The model** is Plackett-Luce over within-match features plus coaches votes
+  (`pl_coach`), trained on 2020, 2021, 2024, 2025. Held-out calibration is
+  close (60%+ band said 73.9%, took 69.1%; pooled sharpness gamma 1.00).
+  Adding 2023 through its totals moved nothing (ll3 1.664 vs 1.665), so more
+  totals-only seasons are not worth chasing for training.
+- **The fitzRoy AFLW coaches feed mislabels rounds** like the men's: in
+  September 2026 it served round 7 again as rounds 8-10. `build.py` keeps a
+  coaches round only if its fixtures are that round's played matches.
+- **Umpires see stats from 2026 in AFLW too** (afl.com.au/aflw/news/1625586).
+  `aflw/regime.py` measured the men's 2026 shift against year-to-year spread:
+  only disposals (+30%) and goals (+33%) moved beyond an ordinary year.
+  `predict.py` carries three scenarios (none, proportional, full); the default
+  is proportional. After the AFLW count, refit on 2026 instead.
+
 ## Project structure
 
 ```

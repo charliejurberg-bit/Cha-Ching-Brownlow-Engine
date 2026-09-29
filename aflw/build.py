@@ -94,6 +94,22 @@ def add_coaches(df, season):
     if not os.path.exists(path) or season.startswith("2022"):
         return df, None
     c = pd.read_csv(path)
+    # The fitzRoy AFLW feed mislabels rounds, as the men's does (CLAUDE.md,
+    # "Update chain"): in September 2026 it served round 7's votes again as
+    # "rounds 8, 9 and 10", none of which had been played. A coaches round is
+    # kept only if its fixtures are a subset of that round's played matches.
+    played = {r: set(map(frozenset, g[["home", "away"]].values.tolist())) for r, g in df.groupby("rnd")}
+    keep = []
+    for rnd, g in c.groupby("Round"):
+        try:
+            fx = {frozenset((rv.club(h), rv.club(a))) for h, a in g[["Home.Team", "Away.Team"]].drop_duplicates().values}
+        except ValueError:
+            fx = {None}
+        if fx <= played.get(int(rnd), set()):
+            keep.append(rnd)
+        else:
+            print(f"    coaches {season} round {rnd}: fixtures are not that round's played matches; dropped")
+    c = c[c.Round.isin(keep)]
     df["coaches"] = 0.0
     miss = 0
     for (rnd, h, a), g in c.groupby(["Round", "Home.Team", "Away.Team"]):

@@ -1,0 +1,2647 @@
+season,rnd,matchId,playerId,player,team,opponent
+2026,1,CD_M20262640101,CD_I1021367,J'Noemi Anderson,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1005452,Nicola Barr,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1015147,Charlotte Baskaran,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1027544,Zoe Besanko,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1015094,Alice Burke,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1021819,Sophie Butterworth,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1009866,Rene Caris,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1019689,Amber Clarke,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1014962,Ella Friend,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1022701,Alana Gee,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1032982,Abby Hobson,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I296158,Bianca Jakobsson,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1004415,Jaimee Lambert,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1009867,Georgia Patrikios,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1014556,Hannah Priest,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1014841,Ashleigh Richards,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1014835,Tyanna Smith,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1009838,Jesse Tawhiao-Wardlaw,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1021793,Paige Trudgeon,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1009873,Olivia Vesely,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1012987,Serene Watson,St Kilda,Carlton
+2026,1,CD_M20262640101,CD_I1012709,Tara Bohanna,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1022224,Brooke Boileau,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1007152,Harriet Cordner,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1019736,Yasmin Duursma,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1033158,Dayna Finn,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1014373,Ciara Fitzgerald,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1033159,Erone Fitzpatrick,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1022236,Jessica Good,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1025995,Lily Goss,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1022744,Madeline Hendrie,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1015047,Mimi Hill,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1021924,Lila Keck,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1013027,Abbie McKay,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1010102,Nell Morris-Dalton,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1042237,Siofra O'Connell,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1007026,Gabriella Pound,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1023948,Poppy Scholz,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1019887,Amelia Velardo,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I997663,Darcy Vescio,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1019819,Brooke Vickers,Carlton,St Kilda
+2026,1,CD_M20262640101,CD_I1010662,Claudia Whitfort,Carlton,St Kilda
+2026,1,CD_M20262640102,CD_I997649,Kaitlyn Ashmore,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I998155,Emily Bates,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1019035,Greta Bodey,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1019828,Keely Coyne,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1025163,Jacqueline Dupuy,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1019883,Laura Elliott,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1025669,Annabelle Embelton,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1019821,Jasmine Fleming,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1025671,Daisy Flockart,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1019830,Bridie Hipwell,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1033163,Niamh Martin,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1029626,Aine McDonagh,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1021824,Hayley McLaughlin,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1014869,Jenna Richardson,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1012575,Casey Sherriff,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1013015,Tamara Smith,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1021417,Poppy Stockwell,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1021837,Laura Stone,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1026929,Lucy Wales,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1022111,Eliza West,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1021822,Mikayla Williamson,Hawthorn,Melbourne
+2026,1,CD_M20262640102,CD_I1032967,Jordyn Allen,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1025564,Mia Austin,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1014367,Alyssa Bannan,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1019713,Georgia Campbell,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1019435,Lauren Clifton,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1014904,Megan Fitzsimon,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1015025,Georgia Gall,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1014793,Tahlia Gillard,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1018966,Sinead Goldrick,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1009853,Tyla Hanks,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I998039,Tayla Harris,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1012713,Shelley Heath-Barker,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1009980,Kate Hore,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1021845,Jacinta Hose,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1007011,Sarah Lampard,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1025617,Maggie Mahony,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1015088,Eliza McNamara,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1026372,Molly O'Hehir,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I998149,Paxy Paxman,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1009861,Olivia Purcell,Melbourne,Hawthorn
+2026,1,CD_M20262640102,CD_I1035371,Ryleigh Wotherspoon,Melbourne,Hawthorn
+2026,1,CD_M20262640109,CD_I1007157,Libby Birch,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1036302,Blaithin Bogue,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1003018,Jenna Bruton,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1015175,Tess Craven,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1015097,Bella Eddey,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1013442,Jasmine Ferguson,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I296154,Jasmine Garner,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1042264,Amy Gavin Mangan,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1001686,Emma King,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1009772,Mia King,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1031354,Claire Mahony,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1019811,Alice O'Loughlin,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1029615,Erika O'Shea,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1003023,Tahlia Randall,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1010677,Kim Rennie,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1010265,Ash Riddell,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I997700,Eliza Shannon,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1018403,Eilish Sheerin,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1007138,Kate Shierlaw,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1015124,Ruby Tripodi,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1029618,Vikki Wall,North Melbourne,Geelong Cats
+2026,1,CD_M20262640109,CD_I1009906,Mikayla Bowen,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1024642,Priya Bowering,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1026281,Evie Cowcher,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1012640,Julia Crockett-Grills,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1036297,Piper Dunlop,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1012560,Chantel Emonson,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1014785,Zali Friswell,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1021933,Alexis Gregor,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1022127,Claudia Gunjaca,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1024296,Rachel Kearns,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1026053,Emma Kilpatrick,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1026947,Chantal Mason,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I997709,Amy McDonald,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1033166,Aishling Moloney,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1009863,Nina Morrison,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1048156,Emma Murray,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1021927,Bryde O'Rourke,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1018405,Jacqueline Parry,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1014810,Georgie Prespakis,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1007342,Chloe Scheer,Geelong Cats,North Melbourne
+2026,1,CD_M20262640109,CD_I1009860,Rebecca Webster,Geelong Cats,North Melbourne
+2026,1,CD_M20262640104,CD_I1031398,Isabel Bacon,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1026016,Montana Beruldsen,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I998157,Katie Brennan,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1042794,Aoibhin Cleary,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1010104,Monique Conti,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1024984,Ally Dallaway,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1021410,Dana East,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1031412,Mackenzie Ford,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1021524,Libby Graham,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1012668,Caitlin Greiser,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1021923,Sierra Grieves,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1016865,Poppy Kelly,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1012700,Beth Lynch,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1014882,Laura McClelland,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1017023,Rebecca Miller,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1042084,Baia Pugh,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1017025,Gabby Seymour,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1010688,Maddie Shevlin,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1026531,Charli Wicksteed,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1026479,Olivia Wolmarans,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1014781,Emelia Yassir,Richmond,Collingwood
+2026,1,CD_M20262640104,CD_I1032594,Josephine Bamford,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1030373,Mischa Barwin,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I997729,Brittany Bonnici,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1009798,Mattea Breed,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1025615,Charlotte Brewer,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1012964,Dominique Carbone,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1025419,Ashley Centra,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1025609,Lucille Cronin,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1003019,Sabrina Frederick,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1026294,Ariana Hetherington,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1034054,Zara Neuwirth,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1025895,Violet Patterson,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1019724,Carly Remmos,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1019806,Jemma Rigoni,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1013706,Sarah Rowe,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1012662,Airlie Runnalls,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1007027,Ruby Schleicher,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1025421,Amber Schutte,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1033496,Amy Smith,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1035558,Imogen Trengove,Collingwood,Richmond
+2026,1,CD_M20262640104,CD_I1009831,Tarni White,Collingwood,Richmond
+2026,1,CD_M20262640103,CD_I1030203,Dekota Baron,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1017314,Daisy D'Arcy,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1024535,Darcie Davies,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1030201,Georja Davies,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1010257,Clara Fitzpatrick,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1024552,Havana Harris,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1005269,Anne Hatchard,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1021365,Annabel Kievit,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1030188,Sunny Lappin,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1033165,Niamh McLaughlin,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I997708,Lily Mithen,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1030195,Mikayla Nurse,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1032499,Bronte Parker,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1024299,Paige Price,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1037639,Lily Quigley,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1015068,Charlie Rowbottom,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1026104,Mia Salisbury,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1021456,Lucy Single,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1028846,Heidi Talbot,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1030189,Ava Usher,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1030199,Alannah Welsh,Gold Coast SUNS,Western Bulldogs
+2026,1,CD_M20262640103,CD_I1010686,Elle Bennetts,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I997728,Deanna Berry,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I296125,Ellie Blackburn,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1031784,Cleo Buttifant,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1012637,Mikala Cann,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1028464,Dominique Carruthers,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1012694,Alice Edmonds,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1014372,Jess Fitzgerald,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1010103,Isabella Grant,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1022203,Elaine Grigg,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1013032,Britney Gutknecht,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1015091,Sarah Hartwig,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1024553,Kaylee Kimber,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1012595,Vaomua Laloifi,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1031390,Emma McDonald,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1025611,Sarah Poustie,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1015137,Isabelle Pritchard,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1022695,Jasmyn Smith,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1032565,Amaia Wain,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1021853,Rylie Wilcox,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640103,CD_I1025517,Heidi Woodley,Western Bulldogs,Gold Coast SUNS
+2026,1,CD_M20262640105,CD_I1023389,Chloe Adams,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1012580,Sophie Alexander,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1025565,Grace Belloni,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1033877,Nalu Brothwell,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1019705,Mia Busch,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1006997,Stephanie Cain,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1021409,Matilda Dyke,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1009976,Maddison Gay,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1025525,Amy Gaylor,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I997745,Georgia Gee,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1025674,Emily Gough,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1032974,Maggie Johnstone,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1021412,Maggie MacLachlan,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1010264,Alexandra Morcom,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1033167,Courtney Murphy,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1013522,Georgia Nanscawen,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1009885,Madison Prespakis,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1014663,Zoe Prowse,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1031378,Holly Ridewood,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1010690,Bonnie Toogood,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1027783,Stephanie Wales,Essendon,Brisbane Lions
+2026,1,CD_M20262640105,CD_I1007130,Shannon Campbell,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1009847,Sophie Conway,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1019057,Dakota Davidson,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1021530,Shanae Davison,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1009833,Isabel Dawes,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1042795,Neasa Dooley,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1033157,Jennifer Dunne,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1009828,Jade Ellenger,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1029938,Marlo Graham,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1009836,Natalie Grider,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1029614,Eleanor Hartill,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1009844,Tahlia Hickie,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1005661,Breanna Koenen,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1021441,Charlotte Mullins,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1019034,Orla O'Dwyer,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1026111,Sophie Peters,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1009824,Lily Postlethwaite,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1019053,Catherine Svarc,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1016938,Ruby Svarc,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1014917,Lily-Rose Williamson,Brisbane Lions,Essendon
+2026,1,CD_M20262640105,CD_I1026137,Claudia Wright,Brisbane Lions,Essendon
+2026,1,CD_M20262640106,CD_I1007313,Jess Allan,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1005285,Sarah Allan,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1011080,Chelsea Biddell,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1032590,Chloe Bown,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1035375,Amy Boyle-Carr,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1011057,Teah Charlton,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1042707,Kayleigh Cronin,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1009856,Grace Egan,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1022193,Sarah Goodwin,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1033016,Olivia Gorman,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1014599,Caitlin Gould,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1005258,Eloise Jones,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1026159,Juliet Kelly,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1018874,Niamh Kelly,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1019456,Keeley Kustermann,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1031080,Christina Leuzzi,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1005279,Ebony Marinoff,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1014662,Kiera Mueller,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1011069,Hannah Munyard,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1011095,Madison Newman,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1019431,Brooke Tonon,Adelaide Crows,Sydney Swans
+2026,1,CD_M20262640106,CD_I1033348,Imogen Brown,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1029279,Holly Cooper,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1023842,Zippy Fish,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1014359,Laura Gardiner,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1021884,Sarah Grunden,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1015152,Montana Ham,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1009803,Alexia Hamilton,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1022350,Cynthia Hamilton,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1025616,Lara Hausegger,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1019834,Sofia Hurley,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1033164,Paris McCarthy,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1009865,Lucy McEvoy,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1010263,Chloe Molloy,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1015181,Darcy Moloney,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1015012,Ally Morphett,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1033168,Julie O'Sullivan,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1024294,Lulu Pullar,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1032556,Maddie Quinn,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1012989,Taylor Smith,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1009813,Brenna Tarrant,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640106,CD_I1015174,Ash Van Loon,Sydney Swans,Adelaide Crows
+2026,1,CD_M20262640107,CD_I1042277,Matilda Banfield,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I998030,Kiara Bowers,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1010663,Ashleigh Brazill,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1048494,Aoife Healy,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1024636,Lily Johnson,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1029621,Megan Kauffman,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1021898,Tunisha Kikoak,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1029623,Orlagh Lally,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1021399,Jessica Low,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1014034,Aisling McCarthy,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I998040,Hayley Miller,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1009882,Gabrielle Newton,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1007144,Gabby O'Sullivan,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1005437,Laura Pugh,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1012994,Bella Smith,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1013937,Angelique Stannett,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1026384,Indi Strom,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1017347,Mim Strom,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1012236,Sarah Verrier,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1031272,Indiana West,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1009764,Eden Zanker,Fremantle,Port Adelaide
+2026,1,CD_M20262640107,CD_I1025893,Ella Boag,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1022299,Amelie Borg,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1022220,Molly Brooksby,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1026412,Olivia Crane,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1012241,Abbey Dowrick,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1030962,Sophie Eaton,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1026143,Emily Elkington,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1022726,Teagan Germech,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1022181,Shineah Goody,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1011062,Cheyenne Hammond,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1022745,Ella Heads,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1007141,Gemma Houghton,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I997686,Kirsty Lamb,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1019059,Maria Moloney,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1005955,Justine Mules-Robinson,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1007360,Ebony O'Dea,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1019509,Katelyn Pope,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1023943,Matilda Scholz,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1014624,Indy Tahau,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1005264,Ashleigh Woodland,Port Adelaide,Fremantle
+2026,1,CD_M20262640107,CD_I1022248,Lauren Young,Port Adelaide,Fremantle
+2026,1,CD_M20262640108,CD_I1005453,Rebecca Beeson,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1009962,Poppy Boltz,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1021894,Madison Brazendale,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1022736,Jessica Doyle,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I998029,Alicia Eva,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1017292,Tarni Evans,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1036298,Caitlin Fletcher,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1009822,Georgia Garnett,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1023433,Sara Howley,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I997725,Isabel Huntington,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1037629,Yasmeen Janschek,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1042797,Grace Kos,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1007017,Tilly Lucas-Rodd,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1025924,Grace Martin,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1029617,Cambridge McCormick,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1022723,Brodee Mowbray,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1036083,Eilish O'Dowd,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1009799,Alyce Parker,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1021436,Mikayla Pauga,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1015105,Daisy Walker,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1032569,Kiera Yerbury,GWS GIANTS,West Coast Eagles
+2026,1,CD_M20262640108,CD_I1037133,Sanne Bakker,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1012259,Jaide Britton,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1023815,Abbygail Bushby,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1023857,Georgie Cleaver,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1021411,Amy Franklin,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I998041,Kellie Gibson,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1017333,Isabella Lewis,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1022775,Lucia Painter,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1025962,Charlotte Riggs,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1022823,Ella Roberts,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1009907,Roxanne Roux,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1027057,Mia Russo,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1010097,Isabella Shannon,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1014991,Keeley Skepper,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1032980,Jovie Skewes-Clinton,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1026141,Ella Slocombe,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1007029,Belinda Smith,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I998032,Emma Swanson,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1021419,Charlotte Thomas,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1022825,Lauren Wakfer,West Coast Eagles,GWS GIANTS
+2026,1,CD_M20262640108,CD_I1027611,Zoe Wakfer,West Coast Eagles,GWS GIANTS
+2026,2,CD_M20262640202,CD_I1012661,Lauren Ahrens,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1010686,Elle Bennetts,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I997728,Deanna Berry,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1033876,Mizuki Brothwell,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1031784,Cleo Buttifant,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1012637,Mikala Cann,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1028464,Dominique Carruthers,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1012694,Alice Edmonds,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1014372,Jess Fitzgerald,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1010103,Isabella Grant,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1022203,Elaine Grigg,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1013032,Britney Gutknecht,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1015091,Sarah Hartwig,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1012595,Vaomua Laloifi,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1031390,Emma McDonald,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1025611,Sarah Poustie,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1015137,Isabelle Pritchard,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1022695,Jasmyn Smith,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1032565,Amaia Wain,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1021853,Rylie Wilcox,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1025517,Heidi Woodley,Western Bulldogs,Richmond
+2026,2,CD_M20262640202,CD_I1031398,Isabel Bacon,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1026016,Montana Beruldsen,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I998157,Katie Brennan,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1042794,Aoibhin Cleary,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1010104,Monique Conti,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1024984,Ally Dallaway,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1031248,Fina Dethlefsen,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1021410,Dana East,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1031412,Mackenzie Ford,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1021524,Libby Graham,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1012668,Caitlin Greiser,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1021923,Sierra Grieves,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1016865,Poppy Kelly,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1012700,Beth Lynch,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1014882,Laura McClelland,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1017023,Rebecca Miller,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1017025,Gabby Seymour,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1010688,Maddie Shevlin,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1026531,Charli Wicksteed,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1026479,Olivia Wolmarans,Richmond,Western Bulldogs
+2026,2,CD_M20262640202,CD_I1014781,Emelia Yassir,Richmond,Western Bulldogs
+2026,2,CD_M20262640208,CD_I1037133,Sanne Bakker,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1012259,Jaide Britton,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1023815,Abbygail Bushby,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1023857,Georgie Cleaver,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1023854,Natasha Entwistle,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1021411,Amy Franklin,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I998041,Kellie Gibson,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1022818,Sarah Lakay,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1017333,Isabella Lewis,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1022775,Lucia Painter,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1025962,Charlotte Riggs,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1022823,Ella Roberts,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1009907,Roxanne Roux,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1027057,Mia Russo,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1010097,Isabella Shannon,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1014991,Keeley Skepper,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1026141,Ella Slocombe,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1007029,Belinda Smith,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I998032,Emma Swanson,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1022825,Lauren Wakfer,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1027611,Zoe Wakfer,West Coast Eagles,Gold Coast SUNS
+2026,2,CD_M20262640208,CD_I1009868,Maddy Brancatisano,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1017314,Daisy D'Arcy,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1024535,Darcie Davies,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1030201,Georja Davies,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1010257,Clara Fitzpatrick,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1024552,Havana Harris,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1005269,Anne Hatchard,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1021365,Annabel Kievit,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1030188,Sunny Lappin,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1013028,Katie Lynch,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1033165,Niamh McLaughlin,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I997708,Lily Mithen,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1030195,Mikayla Nurse,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1032499,Bronte Parker,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1024299,Paige Price,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1037639,Lily Quigley,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1015068,Charlie Rowbottom,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1021456,Lucy Single,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1028846,Heidi Talbot,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1030189,Ava Usher,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640208,CD_I1030199,Alannah Welsh,Gold Coast SUNS,West Coast Eagles
+2026,2,CD_M20262640201,CD_I1009906,Mikayla Bowen,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1024642,Priya Bowering,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1026281,Evie Cowcher,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1012640,Julia Crockett-Grills,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1036297,Piper Dunlop,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1012560,Chantel Emonson,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1014785,Zali Friswell,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1021933,Alexis Gregor,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1022127,Claudia Gunjaca,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1024296,Rachel Kearns,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1026053,Emma Kilpatrick,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1026947,Chantal Mason,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I997709,Amy McDonald,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1033166,Aishling Moloney,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1009863,Nina Morrison,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1048156,Emma Murray,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1021927,Bryde O'Rourke,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1018405,Jacqueline Parry,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1014810,Georgie Prespakis,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1007342,Chloe Scheer,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1009860,Rebecca Webster,Geelong Cats,St Kilda
+2026,2,CD_M20262640201,CD_I1005452,Nicola Barr,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1015147,Charlotte Baskaran,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1027544,Zoe Besanko,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1015094,Alice Burke,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1021819,Sophie Butterworth,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1009866,Rene Caris,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1019689,Amber Clarke,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1014962,Ella Friend,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1022701,Alana Gee,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1009855,Darcy Guttridge,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I296158,Bianca Jakobsson,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1048496,Saoirse Lally,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1004415,Jaimee Lambert,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1009867,Georgia Patrikios,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1014556,Hannah Priest,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1014841,Ashleigh Richards,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1014835,Tyanna Smith,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1009838,Jesse Tawhiao-Wardlaw,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1021793,Paige Trudgeon,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1009873,Olivia Vesely,St Kilda,Geelong Cats
+2026,2,CD_M20262640201,CD_I1012987,Serene Watson,St Kilda,Geelong Cats
+2026,2,CD_M20262640203,CD_I1007130,Shannon Campbell,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1009847,Sophie Conway,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1026937,Rania Crozier,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1021530,Shanae Davison,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1009833,Isabel Dawes,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1042795,Neasa Dooley,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1033157,Jennifer Dunne,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1009828,Jade Ellenger,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1029938,Marlo Graham,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1009836,Natalie Grider,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1029614,Eleanor Hartill,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1009844,Tahlia Hickie,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1005661,Breanna Koenen,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1021441,Charlotte Mullins,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1019034,Orla O'Dwyer,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1026111,Sophie Peters,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1009824,Lily Postlethwaite,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1019053,Catherine Svarc,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1016938,Ruby Svarc,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1014917,Lily-Rose Williamson,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1026137,Claudia Wright,Brisbane Lions,North Melbourne
+2026,2,CD_M20262640203,CD_I1007157,Libby Birch,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1036302,Blaithin Bogue,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1003018,Jenna Bruton,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1015175,Tess Craven,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1015097,Bella Eddey,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1013442,Jasmine Ferguson,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I296154,Jasmine Garner,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1042264,Amy Gavin Mangan,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I998150,Emma Kearney,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1009772,Mia King,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1031354,Claire Mahony,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1019811,Alice O'Loughlin,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1029615,Erika O'Shea,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1003023,Tahlia Randall,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1010677,Kim Rennie,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1010265,Ash Riddell,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I997700,Eliza Shannon,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1018403,Eilish Sheerin,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1007138,Kate Shierlaw,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1015124,Ruby Tripodi,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640203,CD_I1029618,Vikki Wall,North Melbourne,Brisbane Lions
+2026,2,CD_M20262640209,CD_I1033348,Imogen Brown,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1029279,Holly Cooper,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1023842,Zippy Fish,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1014359,Laura Gardiner,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1021884,Sarah Grunden,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1015152,Montana Ham,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1009803,Alexia Hamilton,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1022350,Cynthia Hamilton,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1025616,Lara Hausegger,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1019834,Sofia Hurley,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1033164,Paris McCarthy,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1009865,Lucy McEvoy,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1010263,Chloe Molloy,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1015181,Darcy Moloney,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1015012,Ally Morphett,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1033168,Julie O'Sullivan,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1032556,Maddie Quinn,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1012989,Taylor Smith,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1009813,Brenna Tarrant,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1032563,Molly Thomas,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1015174,Ash Van Loon,Sydney Swans,Essendon
+2026,2,CD_M20262640209,CD_I1023389,Chloe Adams,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1012580,Sophie Alexander,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1025565,Grace Belloni,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1033877,Nalu Brothwell,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1019705,Mia Busch,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1006997,Stephanie Cain,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1009857,Georgia Clarke,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1021409,Matilda Dyke,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1009976,Maddison Gay,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1025525,Amy Gaylor,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I997745,Georgia Gee,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1025674,Emily Gough,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1032974,Maggie Johnstone,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1021412,Maggie MacLachlan,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1010264,Alexandra Morcom,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1013522,Georgia Nanscawen,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1009885,Madison Prespakis,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1014663,Zoe Prowse,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1031378,Holly Ridewood,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1010690,Bonnie Toogood,Essendon,Sydney Swans
+2026,2,CD_M20262640209,CD_I1027783,Stephanie Wales,Essendon,Sydney Swans
+2026,2,CD_M20262640204,CD_I997736,Jordyn Allen,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1032594,Josephine Bamford,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1022112,Imogen Barnett,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1030373,Mischa Barwin,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I997729,Brittany Bonnici,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1009798,Mattea Breed,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1025419,Ashley Centra,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1003020,Brianna Davey,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1026294,Ariana Hetherington,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1042246,Kellyann Hogan,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1009845,Kalinda Howarth,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1013946,Maisie Nankivell,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1025895,Violet Patterson,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1019724,Carly Remmos,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1019806,Jemma Rigoni,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1013706,Sarah Rowe,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1012662,Airlie Runnalls,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1007027,Ruby Schleicher,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1025421,Amber Schutte,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1035558,Imogen Trengove,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1009831,Tarni White,Collingwood,Fremantle
+2026,2,CD_M20262640204,CD_I1042277,Matilda Banfield,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I998030,Kiara Bowers,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1010663,Ashleigh Brazill,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1048494,Aoife Healy,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1029621,Megan Kauffman,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1021898,Tunisha Kikoak,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1029623,Orlagh Lally,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1021399,Jessica Low,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1014034,Aisling McCarthy,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I998040,Hayley Miller,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1009882,Gabrielle Newton,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1012242,Emma O'Driscoll,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1007144,Gabby O'Sullivan,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1005437,Laura Pugh,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1012994,Bella Smith,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1013937,Angelique Stannett,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1026384,Indi Strom,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1017347,Mim Strom,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1012236,Sarah Verrier,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1031272,Indiana West,Fremantle,Collingwood
+2026,2,CD_M20262640204,CD_I1009764,Eden Zanker,Fremantle,Collingwood
+2026,2,CD_M20262640206,CD_I1032967,Jordyn Allen,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1025564,Mia Austin,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1014367,Alyssa Bannan,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1019713,Georgia Campbell,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1019435,Lauren Clifton,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1025819,Laela Ebert,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1014904,Megan Fitzsimon,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1015025,Georgia Gall,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1014793,Tahlia Gillard,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1018966,Sinead Goldrick,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1009853,Tyla Hanks,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I998039,Tayla Harris,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1012713,Shelley Heath-Barker,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1009980,Kate Hore,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1007011,Sarah Lampard,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1015088,Eliza McNamara,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1026372,Molly O'Hehir,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I998149,Paxy Paxman,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1021828,Alyssia Pisano,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1009861,Olivia Purcell,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1035371,Ryleigh Wotherspoon,Melbourne,GWS GIANTS
+2026,2,CD_M20262640206,CD_I1005453,Rebecca Beeson,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1009962,Poppy Boltz,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1021894,Madison Brazendale,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1022736,Jessica Doyle,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I998029,Alicia Eva,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1017292,Tarni Evans,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1036298,Caitlin Fletcher,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1009822,Georgia Garnett,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1023433,Sara Howley,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I997725,Isabel Huntington,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1037629,Yasmeen Janschek,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1042797,Grace Kos,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1007017,Tilly Lucas-Rodd,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1025924,Grace Martin,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1029617,Cambridge McCormick,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1022723,Brodee Mowbray,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1036083,Eilish O'Dowd,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1009799,Alyce Parker,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1021436,Mikayla Pauga,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1015105,Daisy Walker,GWS GIANTS,Melbourne
+2026,2,CD_M20262640206,CD_I1032569,Kiera Yerbury,GWS GIANTS,Melbourne
+2026,2,CD_M20262640205,CD_I1007152,Harriet Cordner,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1019736,Yasmin Duursma,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1033158,Dayna Finn,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1014373,Ciara Fitzgerald,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1033159,Erone Fitzpatrick,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1022236,Jessica Good,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1025995,Lily Goss,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1022744,Madeline Hendrie,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1015047,Mimi Hill,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1021924,Lila Keck,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1013027,Abbie McKay,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1025677,Sophie McKay,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1010102,Nell Morris-Dalton,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1042237,Siofra O'Connell,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1007026,Gabriella Pound,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1023948,Poppy Scholz,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1019711,Keeley Sherar,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1019887,Amelia Velardo,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I997663,Darcy Vescio,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1019819,Brooke Vickers,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1010662,Claudia Whitfort,Carlton,Adelaide Crows
+2026,2,CD_M20262640205,CD_I1007313,Jess Allan,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1005285,Sarah Allan,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1011080,Chelsea Biddell,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1032590,Chloe Bown,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1035375,Amy Boyle-Carr,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1011057,Teah Charlton,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1042707,Kayleigh Cronin,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1022756,Jemmika Douglas,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1009856,Grace Egan,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1022193,Sarah Goodwin,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1033016,Olivia Gorman,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1014599,Caitlin Gould,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1005258,Eloise Jones,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1026159,Juliet Kelly,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1018874,Niamh Kelly,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1019456,Keeley Kustermann,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1031080,Christina Leuzzi,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1005279,Ebony Marinoff,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1011069,Hannah Munyard,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1011095,Madison Newman,Adelaide Crows,Carlton
+2026,2,CD_M20262640205,CD_I1019431,Brooke Tonon,Adelaide Crows,Carlton
+2026,2,CD_M20262640207,CD_I1025893,Ella Boag,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1022299,Amelie Borg,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1022220,Molly Brooksby,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1026412,Olivia Crane,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1012241,Abbey Dowrick,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1030962,Sophie Eaton,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1026143,Emily Elkington,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1022726,Teagan Germech,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1022181,Shineah Goody,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1011062,Cheyenne Hammond,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1022745,Ella Heads,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1007141,Gemma Houghton,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I997686,Kirsty Lamb,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1019059,Maria Moloney,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1005955,Justine Mules-Robinson,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1007360,Ebony O'Dea,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1019509,Katelyn Pope,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1023943,Matilda Scholz,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1014624,Indy Tahau,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1005264,Ashleigh Woodland,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1022248,Lauren Young,Port Adelaide,Hawthorn
+2026,2,CD_M20262640207,CD_I1032571,Mikaylah Antony,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I997649,Kaitlyn Ashmore,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I998155,Emily Bates,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1019035,Greta Bodey,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1019828,Keely Coyne,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1025163,Jacqueline Dupuy,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1019883,Laura Elliott,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1025669,Annabelle Embelton,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1025671,Daisy Flockart,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1019830,Bridie Hipwell,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1029626,Aine McDonagh,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1021824,Hayley McLaughlin,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1014869,Jenna Richardson,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1012575,Casey Sherriff,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1013015,Tamara Smith,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1021417,Poppy Stockwell,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1021837,Laura Stone,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1021844,Jess Vukic,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1026929,Lucy Wales,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1022111,Eliza West,Hawthorn,Port Adelaide
+2026,2,CD_M20262640207,CD_I1021822,Mikayla Williamson,Hawthorn,Port Adelaide
+2026,3,CD_M20262640301,CD_I1007157,Libby Birch,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1036302,Blaithin Bogue,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1013943,Tessa Boyd,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1003018,Jenna Bruton,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1015175,Tess Craven,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1015097,Bella Eddey,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1014982,Abby Favell,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1013442,Jasmine Ferguson,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I296154,Jasmine Garner,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1042264,Amy Gavin Mangan,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I998150,Emma Kearney,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1001686,Emma King,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1031354,Claire Mahony,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1019811,Alice O'Loughlin,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1003023,Tahlia Randall,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1010677,Kim Rennie,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1010265,Ash Riddell,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I997700,Eliza Shannon,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1007138,Kate Shierlaw,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1015124,Ruby Tripodi,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1029618,Vikki Wall,North Melbourne,Western Bulldogs
+2026,3,CD_M20262640301,CD_I1012661,Lauren Ahrens,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1010686,Elle Bennetts,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1031784,Cleo Buttifant,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1012637,Mikala Cann,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1028464,Dominique Carruthers,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1012694,Alice Edmonds,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1014372,Jess Fitzgerald,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1013026,Elisabeth Georgostathis,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1010103,Isabella Grant,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1022203,Elaine Grigg,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1013032,Britney Gutknecht,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1015189,Keeley Hardingham,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1015091,Sarah Hartwig,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1024553,Kaylee Kimber,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1012595,Vaomua Laloifi,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1031390,Emma McDonald,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1025611,Sarah Poustie,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1015137,Isabelle Pritchard,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1022695,Jasmyn Smith,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1021853,Rylie Wilcox,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640301,CD_I1025517,Heidi Woodley,Western Bulldogs,North Melbourne
+2026,3,CD_M20262640302,CD_I1007313,Jess Allan,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1005285,Sarah Allan,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1011080,Chelsea Biddell,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1032590,Chloe Bown,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1011057,Teah Charlton,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1042707,Kayleigh Cronin,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1022756,Jemmika Douglas,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1009856,Grace Egan,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1022193,Sarah Goodwin,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1033016,Olivia Gorman,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1014599,Caitlin Gould,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1005258,Eloise Jones,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1018875,Grace Kelly,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1026159,Juliet Kelly,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1018874,Niamh Kelly,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1019456,Keeley Kustermann,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1031080,Christina Leuzzi,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1005279,Ebony Marinoff,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1011069,Hannah Munyard,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1011095,Madison Newman,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1024085,India Rasheed,Adelaide Crows,West Coast Eagles
+2026,3,CD_M20262640302,CD_I1037133,Sanne Bakker,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1012259,Jaide Britton,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1023815,Abbygail Bushby,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1023857,Georgie Cleaver,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1023854,Natasha Entwistle,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1021411,Amy Franklin,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I998041,Kellie Gibson,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1022818,Sarah Lakay,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1017333,Isabella Lewis,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1022775,Lucia Painter,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1025962,Charlotte Riggs,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1022823,Ella Roberts,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1010097,Isabella Shannon,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1014991,Keeley Skepper,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1026141,Ella Slocombe,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1007029,Belinda Smith,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1007523,Lisa Steane,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I998032,Emma Swanson,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1021419,Charlotte Thomas,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1022825,Lauren Wakfer,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640302,CD_I1027611,Zoe Wakfer,West Coast Eagles,Adelaide Crows
+2026,3,CD_M20262640303,CD_I1033348,Imogen Brown,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1023842,Zippy Fish,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1014359,Laura Gardiner,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1021884,Sarah Grunden,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1015152,Montana Ham,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1009803,Alexia Hamilton,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1022350,Cynthia Hamilton,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1025616,Lara Hausegger,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1019834,Sofia Hurley,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1031562,Emma Juneja,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1033164,Paris McCarthy,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1009865,Lucy McEvoy,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1010263,Chloe Molloy,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1015181,Darcy Moloney,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1015012,Ally Morphett,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1033168,Julie O'Sullivan,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1032556,Maddie Quinn,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1036296,Caitlin Reid,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1009813,Brenna Tarrant,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1032563,Molly Thomas,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1015174,Ash Van Loon,Sydney Swans,St Kilda
+2026,3,CD_M20262640303,CD_I1015147,Charlotte Baskaran,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1027544,Zoe Besanko,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1015094,Alice Burke,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1021819,Sophie Butterworth,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1014962,Ella Friend,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1022701,Alana Gee,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1009855,Darcy Guttridge,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1032982,Abby Hobson,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I296158,Bianca Jakobsson,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1048496,Saoirse Lally,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1004415,Jaimee Lambert,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1026239,Maya Louvel-Finn,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1029952,Jade McLay,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1009867,Georgia Patrikios,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1014556,Hannah Priest,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1014841,Ashleigh Richards,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1014835,Tyanna Smith,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1009838,Jesse Tawhiao-Wardlaw,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1021793,Paige Trudgeon,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1009873,Olivia Vesely,St Kilda,Sydney Swans
+2026,3,CD_M20262640303,CD_I1012987,Serene Watson,St Kilda,Sydney Swans
+2026,3,CD_M20262640304,CD_I1005453,Rebecca Beeson,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1009962,Poppy Boltz,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1021894,Madison Brazendale,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1022736,Jessica Doyle,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I998029,Alicia Eva,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1017292,Tarni Evans,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1036298,Caitlin Fletcher,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1009822,Georgia Garnett,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1023433,Sara Howley,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I997725,Isabel Huntington,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1037629,Yasmeen Janschek,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1042797,Grace Kos,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1007017,Tilly Lucas-Rodd,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1025924,Grace Martin,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1029617,Cambridge McCormick,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1022723,Brodee Mowbray,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1036083,Eilish O'Dowd,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1009799,Alyce Parker,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1021436,Mikayla Pauga,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1017286,Emily Pease,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1032569,Kiera Yerbury,GWS GIANTS,Port Adelaide
+2026,3,CD_M20262640304,CD_I1025893,Ella Boag,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1022299,Amelie Borg,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1022220,Molly Brooksby,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1026412,Olivia Crane,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1012241,Abbey Dowrick,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1026143,Emily Elkington,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1022726,Teagan Germech,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1022181,Shineah Goody,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1011062,Cheyenne Hammond,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1022745,Ella Heads,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1007141,Gemma Houghton,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1019059,Maria Moloney,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1005955,Justine Mules-Robinson,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1007360,Ebony O'Dea,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1019509,Katelyn Pope,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1023943,Matilda Scholz,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1022210,Sachi Syme,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1014624,Indy Tahau,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1022196,Piper Window,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1005264,Ashleigh Woodland,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640304,CD_I1022248,Lauren Young,Port Adelaide,GWS GIANTS
+2026,3,CD_M20262640305,CD_I1032967,Jordyn Allen,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1025564,Mia Austin,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1014367,Alyssa Bannan,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1019713,Georgia Campbell,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1015029,Maeve Chaplin,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1025819,Laela Ebert,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1014904,Megan Fitzsimon,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1015025,Georgia Gall,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1014793,Tahlia Gillard,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1018966,Sinead Goldrick,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1009853,Tyla Hanks,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I998039,Tayla Harris,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1012713,Shelley Heath-Barker,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1009980,Kate Hore,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1007011,Sarah Lampard,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1015088,Eliza McNamara,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1026372,Molly O'Hehir,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I998149,Paxy Paxman,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1005863,Lauren Pearce,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1009861,Olivia Purcell,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1035371,Ryleigh Wotherspoon,Melbourne,Brisbane Lions
+2026,3,CD_M20262640305,CD_I1007130,Shannon Campbell,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1009847,Sophie Conway,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1019057,Dakota Davidson,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1021530,Shanae Davison,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1009833,Isabel Dawes,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1042795,Neasa Dooley,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1033157,Jennifer Dunne,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1009828,Jade Ellenger,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1029938,Marlo Graham,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1009836,Natalie Grider,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1029614,Eleanor Hartill,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1009844,Tahlia Hickie,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1005661,Breanna Koenen,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1021441,Charlotte Mullins,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1019034,Orla O'Dwyer,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1026111,Sophie Peters,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1009824,Lily Postlethwaite,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1019053,Catherine Svarc,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1016938,Ruby Svarc,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1014917,Lily-Rose Williamson,Brisbane Lions,Melbourne
+2026,3,CD_M20262640305,CD_I1026137,Claudia Wright,Brisbane Lions,Melbourne
+2026,3,CD_M20262640306,CD_I1009868,Maddy Brancatisano,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1017314,Daisy D'Arcy,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1024535,Darcie Davies,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1030201,Georja Davies,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1010257,Clara Fitzpatrick,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1024552,Havana Harris,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1005269,Anne Hatchard,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1021365,Annabel Kievit,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1030188,Sunny Lappin,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1013028,Katie Lynch,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1033165,Niamh McLaughlin,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1030195,Mikayla Nurse,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1032499,Bronte Parker,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1024299,Paige Price,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1037639,Lily Quigley,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1015068,Charlie Rowbottom,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1026104,Mia Salisbury,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1021456,Lucy Single,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1028846,Heidi Talbot,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1030189,Ava Usher,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1030199,Alannah Welsh,Gold Coast SUNS,Geelong Cats
+2026,3,CD_M20262640306,CD_I1009906,Mikayla Bowen,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1024642,Priya Bowering,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1026281,Evie Cowcher,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1012640,Julia Crockett-Grills,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1036297,Piper Dunlop,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1012560,Chantel Emonson,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1014785,Zali Friswell,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1021933,Alexis Gregor,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1022127,Claudia Gunjaca,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1024296,Rachel Kearns,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1026053,Emma Kilpatrick,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1026947,Chantal Mason,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1033166,Aishling Moloney,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1009863,Nina Morrison,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1048156,Emma Murray,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1021927,Bryde O'Rourke,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1018405,Jacqueline Parry,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1014810,Georgie Prespakis,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1007342,Chloe Scheer,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I998164,Nicola Stevens,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640306,CD_I1009860,Rebecca Webster,Geelong Cats,Gold Coast SUNS
+2026,3,CD_M20262640307,CD_I997736,Jordyn Allen,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1032594,Josephine Bamford,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1030373,Mischa Barwin,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I997729,Brittany Bonnici,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1025615,Charlotte Brewer,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1010096,Lauren Butler,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1012964,Dominique Carbone,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1025419,Ashley Centra,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1003020,Brianna Davey,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1003019,Sabrina Frederick,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1026294,Ariana Hetherington,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1042246,Kellyann Hogan,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1009845,Kalinda Howarth,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1019724,Carly Remmos,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1019806,Jemma Rigoni,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1013706,Sarah Rowe,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1012662,Airlie Runnalls,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1007027,Ruby Schleicher,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1025421,Amber Schutte,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1035558,Imogen Trengove,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1009831,Tarni White,Collingwood,Hawthorn
+2026,3,CD_M20262640307,CD_I1032571,Mikaylah Antony,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I997649,Kaitlyn Ashmore,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I998155,Emily Bates,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1019035,Greta Bodey,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1025163,Jacqueline Dupuy,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1019883,Laura Elliott,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1025669,Annabelle Embelton,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1019821,Jasmine Fleming,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1025671,Daisy Flockart,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1019830,Bridie Hipwell,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1029626,Aine McDonagh,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1021824,Hayley McLaughlin,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1014869,Jenna Richardson,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1012575,Casey Sherriff,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1013015,Tamara Smith,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1021417,Poppy Stockwell,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1021837,Laura Stone,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1021844,Jess Vukic,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1026929,Lucy Wales,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1022111,Eliza West,Hawthorn,Collingwood
+2026,3,CD_M20262640307,CD_I1021822,Mikayla Williamson,Hawthorn,Collingwood
+2026,3,CD_M20262640308,CD_I1042277,Matilda Banfield,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I998030,Kiara Bowers,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1025550,Georgie Brisbane,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1031366,Holly Egan,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1048494,Aoife Healy,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1029621,Megan Kauffman,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1029623,Orlagh Lally,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1021399,Jessica Low,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1014034,Aisling McCarthy,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1023849,Noa McNaughton,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I998040,Hayley Miller,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1009882,Gabrielle Newton,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1012242,Emma O'Driscoll,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1007144,Gabby O'Sullivan,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1012994,Bella Smith,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1013937,Angelique Stannett,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1026384,Indi Strom,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1017347,Mim Strom,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1012236,Sarah Verrier,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1031272,Indiana West,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1009764,Eden Zanker,Fremantle,Carlton
+2026,3,CD_M20262640308,CD_I1012709,Tara Bohanna,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1022224,Brooke Boileau,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1007152,Harriet Cordner,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1019736,Yasmin Duursma,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1033158,Dayna Finn,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1014373,Ciara Fitzgerald,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1033159,Erone Fitzpatrick,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1022236,Jessica Good,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1025995,Lily Goss,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1022744,Madeline Hendrie,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1015047,Mimi Hill,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1021924,Lila Keck,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1013027,Abbie McKay,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1025677,Sophie McKay,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1010102,Nell Morris-Dalton,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1042237,Siofra O'Connell,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1007026,Gabriella Pound,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1023948,Poppy Scholz,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1019711,Keeley Sherar,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1019887,Amelia Velardo,Carlton,Fremantle
+2026,3,CD_M20262640308,CD_I1010662,Claudia Whitfort,Carlton,Fremantle
+2026,3,CD_M20262640309,CD_I1012580,Sophie Alexander,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1025565,Grace Belloni,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1033877,Nalu Brothwell,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1019705,Mia Busch,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1006997,Stephanie Cain,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1009857,Georgia Clarke,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1021409,Matilda Dyke,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1025525,Amy Gaylor,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I997745,Georgia Gee,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1025674,Emily Gough,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1032974,Maggie Johnstone,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1021412,Maggie MacLachlan,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1010264,Alexandra Morcom,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1013522,Georgia Nanscawen,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1009885,Madison Prespakis,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1014663,Zoe Prowse,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1031378,Holly Ridewood,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1010690,Bonnie Toogood,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1009765,Sophie Van De Heuvel,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1027783,Stephanie Wales,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1012558,Brooke Walker,Essendon,Richmond
+2026,3,CD_M20262640309,CD_I1031398,Isabel Bacon,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1026016,Montana Beruldsen,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I998157,Katie Brennan,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1042794,Aoibhin Cleary,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1010104,Monique Conti,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1024984,Ally Dallaway,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1031248,Fina Dethlefsen,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1021410,Dana East,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1031412,Mackenzie Ford,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1021524,Libby Graham,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1012668,Caitlin Greiser,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1021923,Sierra Grieves,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1016865,Poppy Kelly,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1012700,Beth Lynch,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1014882,Laura McClelland,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1017023,Rebecca Miller,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1017025,Gabby Seymour,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1021834,Georgia Stubs,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1026531,Charli Wicksteed,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1026479,Olivia Wolmarans,Richmond,Essendon
+2026,3,CD_M20262640309,CD_I1014781,Emelia Yassir,Richmond,Essendon
+2026,4,CD_M20262640401,CD_I1010686,Elle Bennetts,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1031784,Cleo Buttifant,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1012637,Mikala Cann,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1028464,Dominique Carruthers,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1012694,Alice Edmonds,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1014372,Jess Fitzgerald,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1016971,Ellie Gavalas,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1013026,Elisabeth Georgostathis,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1010103,Isabella Grant,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1022203,Elaine Grigg,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1013032,Britney Gutknecht,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1015189,Keeley Hardingham,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1015091,Sarah Hartwig,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1024553,Kaylee Kimber,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1012595,Vaomua Laloifi,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1031390,Emma McDonald,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1025611,Sarah Poustie,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1015137,Isabelle Pritchard,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1022695,Jasmyn Smith,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1021853,Rylie Wilcox,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1025517,Heidi Woodley,Western Bulldogs,Sydney Swans
+2026,4,CD_M20262640401,CD_I1033348,Imogen Brown,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1029279,Holly Cooper,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1023842,Zippy Fish,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1014359,Laura Gardiner,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1021884,Sarah Grunden,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1015152,Montana Ham,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1009803,Alexia Hamilton,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1022350,Cynthia Hamilton,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1025616,Lara Hausegger,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1019834,Sofia Hurley,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1031562,Emma Juneja,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1025789,Tanya Kennedy,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1009865,Lucy McEvoy,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1010263,Chloe Molloy,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1015181,Darcy Moloney,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1015012,Ally Morphett,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1033168,Julie O'Sullivan,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1032556,Maddie Quinn,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1009813,Brenna Tarrant,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1032563,Molly Thomas,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640401,CD_I1015174,Ash Van Loon,Sydney Swans,Western Bulldogs
+2026,4,CD_M20262640402,CD_I1005452,Nicola Barr,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1015147,Charlotte Baskaran,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1027544,Zoe Besanko,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1021819,Sophie Butterworth,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1026494,Carys D'Addario,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1014962,Ella Friend,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1022701,Alana Gee,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1009855,Darcy Guttridge,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I296158,Bianca Jakobsson,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1004415,Jaimee Lambert,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1026239,Maya Louvel-Finn,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1013017,Molly McDonald,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1029952,Jade McLay,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1009867,Georgia Patrikios,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1014556,Hannah Priest,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1014841,Ashleigh Richards,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1014835,Tyanna Smith,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1009838,Jesse Tawhiao-Wardlaw,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1021793,Paige Trudgeon,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1009873,Olivia Vesely,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1012987,Serene Watson,St Kilda,North Melbourne
+2026,4,CD_M20262640402,CD_I1007157,Libby Birch,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1036302,Blaithin Bogue,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1003018,Jenna Bruton,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1015175,Tess Craven,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1015097,Bella Eddey,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1013442,Jasmine Ferguson,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I296154,Jasmine Garner,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1042264,Amy Gavin Mangan,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I998150,Emma Kearney,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1001686,Emma King,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1031354,Claire Mahony,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1019811,Alice O'Loughlin,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1029615,Erika O'Shea,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1003023,Tahlia Randall,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1010677,Kim Rennie,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1010265,Ash Riddell,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I997700,Eliza Shannon,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1018403,Eilish Sheerin,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1007138,Kate Shierlaw,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1015124,Ruby Tripodi,North Melbourne,St Kilda
+2026,4,CD_M20262640402,CD_I1029618,Vikki Wall,North Melbourne,St Kilda
+2026,4,CD_M20262640403,CD_I1022299,Amelie Borg,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1022220,Molly Brooksby,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1012241,Abbey Dowrick,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1030962,Sophie Eaton,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1022726,Teagan Germech,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1022181,Shineah Goody,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1011062,Cheyenne Hammond,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1022745,Ella Heads,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1007141,Gemma Houghton,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I997686,Kirsty Lamb,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1019059,Maria Moloney,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1005955,Justine Mules-Robinson,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1007360,Ebony O'Dea,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1032555,Grace Parsons,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1019509,Katelyn Pope,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1023943,Matilda Scholz,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1022210,Sachi Syme,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1026227,Julia Teakle,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1022196,Piper Window,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1005264,Ashleigh Woodland,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1022248,Lauren Young,Port Adelaide,Gold Coast SUNS
+2026,4,CD_M20262640403,CD_I1009868,Maddy Brancatisano,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1017314,Daisy D'Arcy,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1024535,Darcie Davies,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1030201,Georja Davies,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1010257,Clara Fitzpatrick,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1022192,Meara Girvan,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1024552,Havana Harris,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1005269,Anne Hatchard,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1021365,Annabel Kievit,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1030188,Sunny Lappin,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1033165,Niamh McLaughlin,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I997708,Lily Mithen,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1030195,Mikayla Nurse,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1032499,Bronte Parker,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1024299,Paige Price,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1037639,Lily Quigley,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1015068,Charlie Rowbottom,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1021456,Lucy Single,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1028846,Heidi Talbot,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1030189,Ava Usher,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640403,CD_I1030199,Alannah Welsh,Gold Coast SUNS,Port Adelaide
+2026,4,CD_M20262640404,CD_I1007130,Shannon Campbell,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1009847,Sophie Conway,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1026937,Rania Crozier,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1019057,Dakota Davidson,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1021530,Shanae Davison,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1009833,Isabel Dawes,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1033157,Jennifer Dunne,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1009828,Jade Ellenger,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1035640,Madison Evans,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1032592,Asher Fearn-Wannan,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1009836,Natalie Grider,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1009844,Tahlia Hickie,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1005661,Breanna Koenen,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1033269,Evie Long,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1021441,Charlotte Mullins,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1019034,Orla O'Dwyer,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1026111,Sophie Peters,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1009824,Lily Postlethwaite,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1019053,Catherine Svarc,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1014917,Lily-Rose Williamson,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1026137,Claudia Wright,Brisbane Lions,GWS GIANTS
+2026,4,CD_M20262640404,CD_I1005453,Rebecca Beeson,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1009962,Poppy Boltz,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1021894,Madison Brazendale,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1021895,Georgia Clark,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1022736,Jessica Doyle,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I998029,Alicia Eva,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1017292,Tarni Evans,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1036298,Caitlin Fletcher,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1009822,Georgia Garnett,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1023433,Sara Howley,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I997725,Isabel Huntington,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1037629,Yasmeen Janschek,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1042797,Grace Kos,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1007017,Tilly Lucas-Rodd,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1025924,Grace Martin,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1029617,Cambridge McCormick,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1022723,Brodee Mowbray,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1036083,Eilish O'Dowd,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1009799,Alyce Parker,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1021436,Mikayla Pauga,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640404,CD_I1017286,Emily Pease,GWS GIANTS,Brisbane Lions
+2026,4,CD_M20262640405,CD_I1031398,Isabel Bacon,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1026016,Montana Beruldsen,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I998157,Katie Brennan,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1042794,Aoibhin Cleary,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1024984,Ally Dallaway,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1012692,Kate Dempsey,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1021410,Dana East,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1031412,Mackenzie Ford,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1021524,Libby Graham,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1012668,Caitlin Greiser,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1021923,Sierra Grieves,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1016865,Poppy Kelly,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1012700,Beth Lynch,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1014882,Laura McClelland,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1017023,Rebecca Miller,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1042084,Baia Pugh,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1017025,Gabby Seymour,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1021834,Georgia Stubs,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1026531,Charli Wicksteed,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1026479,Olivia Wolmarans,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1014781,Emelia Yassir,Richmond,Fremantle
+2026,4,CD_M20262640405,CD_I1042277,Matilda Banfield,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I998030,Kiara Bowers,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1010663,Ashleigh Brazill,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1025550,Georgie Brisbane,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1031366,Holly Egan,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1048494,Aoife Healy,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1029621,Megan Kauffman,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1029623,Orlagh Lally,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1021399,Jessica Low,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1023849,Noa McNaughton,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I998040,Hayley Miller,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1009882,Gabrielle Newton,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1012242,Emma O'Driscoll,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1007144,Gabby O'Sullivan,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1026166,Madeleine Scanlon,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1012994,Bella Smith,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1013937,Angelique Stannett,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1017347,Mim Strom,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1012236,Sarah Verrier,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1031272,Indiana West,Fremantle,Richmond
+2026,4,CD_M20262640405,CD_I1009764,Eden Zanker,Fremantle,Richmond
+2026,4,CD_M20262640406,CD_I1032571,Mikaylah Antony,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I997649,Kaitlyn Ashmore,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I998155,Emily Bates,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1019035,Greta Bodey,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1019828,Keely Coyne,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1025163,Jacqueline Dupuy,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1019700,Mackenzie Eardley,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1019883,Laura Elliott,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1025669,Annabelle Embelton,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1019821,Jasmine Fleming,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1025671,Daisy Flockart,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1029626,Aine McDonagh,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1021824,Hayley McLaughlin,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1014869,Jenna Richardson,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1012575,Casey Sherriff,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1013015,Tamara Smith,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1021417,Poppy Stockwell,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1021837,Laura Stone,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1026929,Lucy Wales,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1022111,Eliza West,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1021822,Mikayla Williamson,Hawthorn,Adelaide Crows
+2026,4,CD_M20262640406,CD_I1007313,Jess Allan,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1005285,Sarah Allan,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1011080,Chelsea Biddell,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1032590,Chloe Bown,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1011057,Teah Charlton,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1042707,Kayleigh Cronin,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1022756,Jemmika Douglas,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1009856,Grace Egan,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1022193,Sarah Goodwin,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1033016,Olivia Gorman,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1014599,Caitlin Gould,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1005258,Eloise Jones,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1018875,Grace Kelly,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1026159,Juliet Kelly,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1018874,Niamh Kelly,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1019456,Keeley Kustermann,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1005279,Ebony Marinoff,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1011069,Hannah Munyard,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1011095,Madison Newman,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1024085,India Rasheed,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640406,CD_I1030952,Lucy Waye,Adelaide Crows,Hawthorn
+2026,4,CD_M20262640407,CD_I1009906,Mikayla Bowen,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1026281,Evie Cowcher,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1012640,Julia Crockett-Grills,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1012560,Chantel Emonson,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1021933,Alexis Gregor,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1022127,Claudia Gunjaca,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1024296,Rachel Kearns,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1015195,Annie Lee,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1026947,Chantal Mason,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1033166,Aishling Moloney,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1033129,Renee Morgan,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1009863,Nina Morrison,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1048156,Emma Murray,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1021927,Bryde O'Rourke,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1018405,Jacqueline Parry,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1014810,Georgie Prespakis,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1007342,Chloe Scheer,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I998164,Nicola Stevens,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1012253,Jasmin Stewart,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1018955,Kate Surman,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1009860,Rebecca Webster,Geelong Cats,Essendon
+2026,4,CD_M20262640407,CD_I1012580,Sophie Alexander,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1025565,Grace Belloni,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1033877,Nalu Brothwell,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1019705,Mia Busch,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1006997,Stephanie Cain,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1009857,Georgia Clarke,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1021409,Matilda Dyke,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1025525,Amy Gaylor,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I997745,Georgia Gee,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1025674,Emily Gough,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1032974,Maggie Johnstone,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1021412,Maggie MacLachlan,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1010264,Alexandra Morcom,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1013522,Georgia Nanscawen,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1009885,Madison Prespakis,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1014663,Zoe Prowse,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1031378,Holly Ridewood,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1010690,Bonnie Toogood,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1009765,Sophie Van De Heuvel,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1027783,Stephanie Wales,Essendon,Geelong Cats
+2026,4,CD_M20262640407,CD_I1012558,Brooke Walker,Essendon,Geelong Cats
+2026,4,CD_M20262640408,CD_I1012709,Tara Bohanna,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1022224,Brooke Boileau,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1007152,Harriet Cordner,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1019736,Yasmin Duursma,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1033158,Dayna Finn,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1014373,Ciara Fitzgerald,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1033159,Erone Fitzpatrick,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1022236,Jessica Good,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1025995,Lily Goss,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1022744,Madeline Hendrie,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1015047,Mimi Hill,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1021924,Lila Keck,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1013027,Abbie McKay,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1010102,Nell Morris-Dalton,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1042237,Siofra O'Connell,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1042236,Aisling Reidy,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1023948,Poppy Scholz,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1019711,Keeley Sherar,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1019887,Amelia Velardo,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1019819,Brooke Vickers,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I1010662,Claudia Whitfort,Carlton,Collingwood
+2026,4,CD_M20262640408,CD_I997736,Jordyn Allen,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1032594,Josephine Bamford,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1030373,Mischa Barwin,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I997729,Brittany Bonnici,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1025615,Charlotte Brewer,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1012964,Dominique Carbone,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1025609,Lucille Cronin,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1003020,Brianna Davey,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1003019,Sabrina Frederick,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1026294,Ariana Hetherington,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1009845,Kalinda Howarth,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1015070,Eliza James,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1025548,Georgia Knight,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1034054,Zara Neuwirth,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1025895,Violet Patterson,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1019724,Carly Remmos,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1012662,Airlie Runnalls,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1007027,Ruby Schleicher,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1025421,Amber Schutte,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1035558,Imogen Trengove,Collingwood,Carlton
+2026,4,CD_M20262640408,CD_I1009831,Tarni White,Collingwood,Carlton
+2026,4,CD_M20262640409,CD_I1037133,Sanne Bakker,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1012259,Jaide Britton,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1023815,Abbygail Bushby,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1027545,Kayla Dalgleish,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1023854,Natasha Entwistle,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1021411,Amy Franklin,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I998041,Kellie Gibson,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1022818,Sarah Lakay,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1017333,Isabella Lewis,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1022775,Lucia Painter,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1025962,Charlotte Riggs,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1022823,Ella Roberts,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1009907,Roxanne Roux,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1027057,Mia Russo,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1014991,Keeley Skepper,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1026141,Ella Slocombe,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1007029,Belinda Smith,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I998032,Emma Swanson,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1021419,Charlotte Thomas,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1022825,Lauren Wakfer,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1027611,Zoe Wakfer,West Coast Eagles,Melbourne
+2026,4,CD_M20262640409,CD_I1032967,Jordyn Allen,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1014367,Alyssa Bannan,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1019713,Georgia Campbell,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1015029,Maeve Chaplin,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1025819,Laela Ebert,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1014904,Megan Fitzsimon,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1015025,Georgia Gall,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1014793,Tahlia Gillard,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1018966,Sinead Goldrick,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1009853,Tyla Hanks,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I998039,Tayla Harris,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1012713,Shelley Heath-Barker,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1009980,Kate Hore,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1007011,Sarah Lampard,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1025617,Maggie Mahony,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1015088,Eliza McNamara,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1026372,Molly O'Hehir,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I998149,Paxy Paxman,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1021828,Alyssia Pisano,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1009861,Olivia Purcell,Melbourne,West Coast Eagles
+2026,4,CD_M20262640409,CD_I1035371,Ryleigh Wotherspoon,Melbourne,West Coast Eagles
+2026,5,CD_M20262640501,CD_I1032571,Mikaylah Antony,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I997649,Kaitlyn Ashmore,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I998155,Emily Bates,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1019828,Keely Coyne,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1025163,Jacqueline Dupuy,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1019700,Mackenzie Eardley,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1019883,Laura Elliott,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1025669,Annabelle Embelton,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1019821,Jasmine Fleming,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1025671,Daisy Flockart,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1033163,Niamh Martin,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1029626,Aine McDonagh,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1021824,Hayley McLaughlin,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1014869,Jenna Richardson,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1012575,Casey Sherriff,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1013015,Tamara Smith,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1021417,Poppy Stockwell,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1021837,Laura Stone,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1026929,Lucy Wales,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1022111,Eliza West,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1021822,Mikayla Williamson,Hawthorn,Western Bulldogs
+2026,5,CD_M20262640501,CD_I1010686,Elle Bennetts,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1031784,Cleo Buttifant,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1012637,Mikala Cann,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1028464,Dominique Carruthers,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1012694,Alice Edmonds,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1014372,Jess Fitzgerald,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1016971,Ellie Gavalas,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1013026,Elisabeth Georgostathis,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1010103,Isabella Grant,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1022203,Elaine Grigg,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1013032,Britney Gutknecht,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1015091,Sarah Hartwig,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1024553,Kaylee Kimber,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1012595,Vaomua Laloifi,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1031390,Emma McDonald,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1015201,Analea McKee,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1025611,Sarah Poustie,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1015137,Isabelle Pritchard,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1022695,Jasmyn Smith,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1021853,Rylie Wilcox,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640501,CD_I1025517,Heidi Woodley,Western Bulldogs,Hawthorn
+2026,5,CD_M20262640502,CD_I1030203,Dekota Baron,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1009868,Maddy Brancatisano,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1017314,Daisy D'Arcy,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1024535,Darcie Davies,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1030201,Georja Davies,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1010257,Clara Fitzpatrick,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1022192,Meara Girvan,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1024552,Havana Harris,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1005269,Anne Hatchard,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1021365,Annabel Kievit,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1030188,Sunny Lappin,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1033165,Niamh McLaughlin,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I997708,Lily Mithen,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1030195,Mikayla Nurse,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1032499,Bronte Parker,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1024299,Paige Price,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1037639,Lily Quigley,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1015068,Charlie Rowbottom,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1021456,Lucy Single,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1028846,Heidi Talbot,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I1030189,Ava Usher,Gold Coast SUNS,Collingwood
+2026,5,CD_M20262640502,CD_I997736,Jordyn Allen,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1032594,Josephine Bamford,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1030373,Mischa Barwin,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I997729,Brittany Bonnici,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1009798,Mattea Breed,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1012964,Dominique Carbone,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1025419,Ashley Centra,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1025609,Lucille Cronin,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1003020,Brianna Davey,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1003019,Sabrina Frederick,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1026294,Ariana Hetherington,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1009845,Kalinda Howarth,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1015070,Eliza James,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1034054,Zara Neuwirth,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1025895,Violet Patterson,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1019724,Carly Remmos,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1019806,Jemma Rigoni,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1012662,Airlie Runnalls,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1025421,Amber Schutte,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1035558,Imogen Trengove,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640502,CD_I1009831,Tarni White,Collingwood,Gold Coast SUNS
+2026,5,CD_M20262640503,CD_I1007313,Jess Allan,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1005285,Sarah Allan,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1011080,Chelsea Biddell,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1032590,Chloe Bown,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1011057,Teah Charlton,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1042707,Kayleigh Cronin,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1022756,Jemmika Douglas,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1009856,Grace Egan,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1022193,Sarah Goodwin,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1033016,Olivia Gorman,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1014599,Caitlin Gould,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1005258,Eloise Jones,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1018875,Grace Kelly,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1026159,Juliet Kelly,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1018874,Niamh Kelly,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1019456,Keeley Kustermann,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1005279,Ebony Marinoff,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1011069,Hannah Munyard,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1011095,Madison Newman,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1024085,India Rasheed,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1030952,Lucy Waye,Adelaide Crows,Geelong Cats
+2026,5,CD_M20262640503,CD_I1009906,Mikayla Bowen,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1026281,Evie Cowcher,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1012640,Julia Crockett-Grills,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1036297,Piper Dunlop,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1012560,Chantel Emonson,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1014785,Zali Friswell,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1021933,Alexis Gregor,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1022127,Claudia Gunjaca,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1024296,Rachel Kearns,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1015195,Annie Lee,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1026947,Chantal Mason,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1033166,Aishling Moloney,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1033129,Renee Morgan,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1009863,Nina Morrison,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1048156,Emma Murray,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1021927,Bryde O'Rourke,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1018405,Jacqueline Parry,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1014810,Georgie Prespakis,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1007342,Chloe Scheer,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1018955,Kate Surman,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640503,CD_I1009860,Rebecca Webster,Geelong Cats,Adelaide Crows
+2026,5,CD_M20262640504,CD_I1012259,Jaide Britton,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1023815,Abbygail Bushby,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1023857,Georgie Cleaver,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1027545,Kayla Dalgleish,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1021411,Amy Franklin,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1027055,Sienna Gerardi,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I998041,Kellie Gibson,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1022818,Sarah Lakay,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1017333,Isabella Lewis,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1022775,Lucia Painter,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1025962,Charlotte Riggs,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1022823,Ella Roberts,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1027057,Mia Russo,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1021416,Beth Schilling,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1010097,Isabella Shannon,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1014991,Keeley Skepper,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1007029,Belinda Smith,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I998032,Emma Swanson,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1021419,Charlotte Thomas,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1022825,Lauren Wakfer,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1027611,Zoe Wakfer,West Coast Eagles,Brisbane Lions
+2026,5,CD_M20262640504,CD_I1005630,Alexandra Anderson,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1007130,Shannon Campbell,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1009847,Sophie Conway,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1026937,Rania Crozier,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1019057,Dakota Davidson,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1021530,Shanae Davison,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1009833,Isabel Dawes,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1033157,Jennifer Dunne,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1009828,Jade Ellenger,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1032592,Asher Fearn-Wannan,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1029938,Marlo Graham,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1009836,Natalie Grider,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1029614,Eleanor Hartill,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1009844,Tahlia Hickie,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1005661,Breanna Koenen,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1021441,Charlotte Mullins,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1019034,Orla O'Dwyer,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1026111,Sophie Peters,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1019053,Catherine Svarc,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1016938,Ruby Svarc,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640504,CD_I1026137,Claudia Wright,Brisbane Lions,West Coast Eagles
+2026,5,CD_M20262640505,CD_I1032967,Jordyn Allen,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1025564,Mia Austin,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1014367,Alyssa Bannan,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1019713,Georgia Campbell,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1015029,Maeve Chaplin,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1019435,Lauren Clifton,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1025819,Laela Ebert,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1014904,Megan Fitzsimon,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1015025,Georgia Gall,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1014793,Tahlia Gillard,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1009853,Tyla Hanks,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I998039,Tayla Harris,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1012713,Shelley Heath-Barker,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1009980,Kate Hore,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1007011,Sarah Lampard,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1025617,Maggie Mahony,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1015088,Eliza McNamara,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1026372,Molly O'Hehir,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I998149,Paxy Paxman,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1009861,Olivia Purcell,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1035371,Ryleigh Wotherspoon,Melbourne,Port Adelaide
+2026,5,CD_M20262640505,CD_I1022299,Amelie Borg,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1022220,Molly Brooksby,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1026412,Olivia Crane,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1012241,Abbey Dowrick,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1030962,Sophie Eaton,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1026143,Emily Elkington,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1022726,Teagan Germech,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1022181,Shineah Goody,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1011062,Cheyenne Hammond,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1022745,Ella Heads,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1007141,Gemma Houghton,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I997686,Kirsty Lamb,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1019059,Maria Moloney,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1005955,Justine Mules-Robinson,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1007360,Ebony O'Dea,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1032555,Grace Parsons,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1019509,Katelyn Pope,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1023943,Matilda Scholz,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1026227,Julia Teakle,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1022196,Piper Window,Port Adelaide,Melbourne
+2026,5,CD_M20262640505,CD_I1005264,Ashleigh Woodland,Port Adelaide,Melbourne
+2026,5,CD_M20262640506,CD_I1031398,Isabel Bacon,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1026016,Montana Beruldsen,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I998157,Katie Brennan,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1042794,Aoibhin Cleary,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1031248,Fina Dethlefsen,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1021410,Dana East,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1031412,Mackenzie Ford,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1021524,Libby Graham,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1021923,Sierra Grieves,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1016865,Poppy Kelly,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1012700,Beth Lynch,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1014882,Laura McClelland,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1014375,Ellie McKenzie,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1007327,Montana McKinnon,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1042084,Baia Pugh,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1017025,Gabby Seymour,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1010688,Maddie Shevlin,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1021834,Georgia Stubs,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1026531,Charli Wicksteed,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1026479,Olivia Wolmarans,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1014781,Emelia Yassir,Richmond,St Kilda
+2026,5,CD_M20262640506,CD_I1005452,Nicola Barr,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1015147,Charlotte Baskaran,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1027544,Zoe Besanko,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1021819,Sophie Butterworth,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1025521,Kyla Forbes,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1014962,Ella Friend,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1022701,Alana Gee,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1009855,Darcy Guttridge,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I296158,Bianca Jakobsson,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1004415,Jaimee Lambert,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1026239,Maya Louvel-Finn,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1013017,Molly McDonald,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1029952,Jade McLay,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1009867,Georgia Patrikios,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1014556,Hannah Priest,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1014841,Ashleigh Richards,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1014835,Tyanna Smith,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1009838,Jesse Tawhiao-Wardlaw,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1021793,Paige Trudgeon,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1009873,Olivia Vesely,St Kilda,Richmond
+2026,5,CD_M20262640506,CD_I1012987,Serene Watson,St Kilda,Richmond
+2026,5,CD_M20262640507,CD_I1033348,Imogen Brown,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1029279,Holly Cooper,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1023842,Zippy Fish,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1014359,Laura Gardiner,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1007006,Jas Grierson,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1021884,Sarah Grunden,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1015152,Montana Ham,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1022350,Cynthia Hamilton,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1025616,Lara Hausegger,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1019834,Sofia Hurley,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1031562,Emma Juneja,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1025789,Tanya Kennedy,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1033164,Paris McCarthy,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1009865,Lucy McEvoy,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1010263,Chloe Molloy,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1015181,Darcy Moloney,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1033168,Julie O'Sullivan,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1024294,Lulu Pullar,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1032556,Maddie Quinn,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1012989,Taylor Smith,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1015174,Ash Van Loon,Sydney Swans,GWS GIANTS
+2026,5,CD_M20262640507,CD_I1005453,Rebecca Beeson,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1009962,Poppy Boltz,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1021894,Madison Brazendale,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1021895,Georgia Clark,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1022736,Jessica Doyle,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I998029,Alicia Eva,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1017292,Tarni Evans,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1036298,Caitlin Fletcher,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1009822,Georgia Garnett,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1023433,Sara Howley,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I997725,Isabel Huntington,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1037629,Yasmeen Janschek,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1042797,Grace Kos,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1007017,Tilly Lucas-Rodd,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1025924,Grace Martin,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1029617,Cambridge McCormick,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1036083,Eilish O'Dowd,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1009799,Alyce Parker,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1021436,Mikayla Pauga,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1017286,Emily Pease,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640507,CD_I1015105,Daisy Walker,GWS GIANTS,Sydney Swans
+2026,5,CD_M20262640508,CD_I1007157,Libby Birch,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1036302,Blaithin Bogue,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1015175,Tess Craven,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1015097,Bella Eddey,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1013442,Jasmine Ferguson,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I296154,Jasmine Garner,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1042264,Amy Gavin Mangan,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I998150,Emma Kearney,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1001686,Emma King,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1031354,Claire Mahony,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1019811,Alice O'Loughlin,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1029615,Erika O'Shea,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1003023,Tahlia Randall,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1010677,Kim Rennie,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1010265,Ash Riddell,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I997700,Eliza Shannon,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1018403,Eilish Sheerin,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1007138,Kate Shierlaw,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1015124,Ruby Tripodi,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1029618,Vikki Wall,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1021879,Kristie-Lee Weston-Turner,North Melbourne,Carlton
+2026,5,CD_M20262640508,CD_I1012709,Tara Bohanna,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1022224,Brooke Boileau,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1007152,Harriet Cordner,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1019736,Yasmin Duursma,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1033158,Dayna Finn,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1014373,Ciara Fitzgerald,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1033159,Erone Fitzpatrick,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1022236,Jessica Good,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1025995,Lily Goss,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1022744,Madeline Hendrie,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1015047,Mimi Hill,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1021924,Lila Keck,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1013027,Abbie McKay,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1010102,Nell Morris-Dalton,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1042237,Siofra O'Connell,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1007026,Gabriella Pound,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1042236,Aisling Reidy,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1023948,Poppy Scholz,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1019887,Amelia Velardo,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1019819,Brooke Vickers,Carlton,North Melbourne
+2026,5,CD_M20262640508,CD_I1010662,Claudia Whitfort,Carlton,North Melbourne
+2026,5,CD_M20262640509,CD_I1042277,Matilda Banfield,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I998030,Kiara Bowers,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1010663,Ashleigh Brazill,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1025550,Georgie Brisbane,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1031366,Holly Egan,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1048494,Aoife Healy,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1029621,Megan Kauffman,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1021898,Tunisha Kikoak,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1029623,Orlagh Lally,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1021399,Jessica Low,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1023849,Noa McNaughton,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I998040,Hayley Miller,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1009882,Gabrielle Newton,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1012242,Emma O'Driscoll,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1007144,Gabby O'Sullivan,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1026166,Madeleine Scanlon,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1012994,Bella Smith,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1013937,Angelique Stannett,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1012236,Sarah Verrier,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1031272,Indiana West,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1009764,Eden Zanker,Fremantle,Essendon
+2026,5,CD_M20262640509,CD_I1005361,Daria Bannister,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1025565,Grace Belloni,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1033877,Nalu Brothwell,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1019705,Mia Busch,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1006997,Stephanie Cain,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1009857,Georgia Clarke,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1021409,Matilda Dyke,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1025525,Amy Gaylor,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I997745,Georgia Gee,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1025674,Emily Gough,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1025587,Madison Ibrahim,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1032974,Maggie Johnstone,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1010279,Bess Keaney,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1010264,Alexandra Morcom,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1013522,Georgia Nanscawen,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1009885,Madison Prespakis,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1014663,Zoe Prowse,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1031378,Holly Ridewood,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1010690,Bonnie Toogood,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1009765,Sophie Van De Heuvel,Essendon,Fremantle
+2026,5,CD_M20262640509,CD_I1027783,Stephanie Wales,Essendon,Fremantle
+2026,6,CD_M20262640601,CD_I1014559,Najwa Allen,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1032571,Mikaylah Antony,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I997649,Kaitlyn Ashmore,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1019828,Keely Coyne,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1025163,Jacqueline Dupuy,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1019700,Mackenzie Eardley,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1019883,Laura Elliott,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1025669,Annabelle Embelton,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1019821,Jasmine Fleming,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1025671,Daisy Flockart,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1019830,Bridie Hipwell,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1033163,Niamh Martin,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1029626,Aine McDonagh,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1021824,Hayley McLaughlin,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1014869,Jenna Richardson,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1012575,Casey Sherriff,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1013015,Tamara Smith,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1021417,Poppy Stockwell,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1026929,Lucy Wales,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1022111,Eliza West,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1021822,Mikayla Williamson,Hawthorn,North Melbourne
+2026,6,CD_M20262640601,CD_I1036302,Blaithin Bogue,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1013943,Tessa Boyd,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1003018,Jenna Bruton,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1015175,Tess Craven,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1015097,Bella Eddey,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1014982,Abby Favell,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1013442,Jasmine Ferguson,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I296154,Jasmine Garner,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1042264,Amy Gavin Mangan,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1001686,Emma King,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1031354,Claire Mahony,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1019811,Alice O'Loughlin,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1029615,Erika O'Shea,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1003023,Tahlia Randall,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1010677,Kim Rennie,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1010265,Ash Riddell,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I997700,Eliza Shannon,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1018403,Eilish Sheerin,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1015124,Ruby Tripodi,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1029618,Vikki Wall,North Melbourne,Hawthorn
+2026,6,CD_M20262640601,CD_I1021879,Kristie-Lee Weston-Turner,North Melbourne,Hawthorn
+2026,6,CD_M20262640602,CD_I997736,Jordyn Allen,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1032594,Josephine Bamford,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I997729,Brittany Bonnici,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1009798,Mattea Breed,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1012964,Dominique Carbone,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1025419,Ashley Centra,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1025609,Lucille Cronin,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1003019,Sabrina Frederick,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1026294,Ariana Hetherington,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1015070,Eliza James,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1048151,Olivia Lewis,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1034054,Zara Neuwirth,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1025895,Violet Patterson,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1019724,Carly Remmos,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1019806,Jemma Rigoni,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1013706,Sarah Rowe,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1012662,Airlie Runnalls,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1007027,Ruby Schleicher,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1025421,Amber Schutte,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1035558,Imogen Trengove,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1009831,Tarni White,Collingwood,Geelong Cats
+2026,6,CD_M20262640602,CD_I1009906,Mikayla Bowen,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1026281,Evie Cowcher,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1012640,Julia Crockett-Grills,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1036297,Piper Dunlop,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1012560,Chantel Emonson,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1021933,Alexis Gregor,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1022127,Claudia Gunjaca,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1024296,Rachel Kearns,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1015195,Annie Lee,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1026947,Chantal Mason,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1033166,Aishling Moloney,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1033129,Renee Morgan,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1009863,Nina Morrison,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1048156,Emma Murray,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1021927,Bryde O'Rourke,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1018405,Jacqueline Parry,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1014810,Georgie Prespakis,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1007342,Chloe Scheer,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I998164,Nicola Stevens,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1018955,Kate Surman,Geelong Cats,Collingwood
+2026,6,CD_M20262640602,CD_I1009860,Rebecca Webster,Geelong Cats,Collingwood
+2026,6,CD_M20262640603,CD_I1032967,Jordyn S. Allen,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1025564,Mia Austin,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1014367,Alyssa Bannan,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1019713,Georgia Campbell,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1015029,Maeve Chaplin,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1019435,Lauren Clifton,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1025819,Laela Ebert,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1014904,Megan Fitzsimon,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1015025,Georgia Gall,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1014793,Tahlia Gillard,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1009853,Tyla Hanks,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I998039,Tayla Harris,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1012713,Shelley Heath-Barker,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1009980,Kate Hore,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1007011,Sarah Lampard,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1019702,Jorja Livingstone,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1025617,Maggie Mahony,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1026372,Molly O'Hehir,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I998149,Paxy Paxman,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1009861,Olivia Purcell,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1035371,Ryleigh Wotherspoon,Melbourne,Carlton
+2026,6,CD_M20262640603,CD_I1009963,Lauren Bella,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1012709,Tara Bohanna,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1007152,Harriet Cordner,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1019736,Yasmin Duursma,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1033158,Dayna Finn,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1014373,Ciara Fitzgerald,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1033159,Erone Fitzpatrick,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1022236,Jessica Good,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1025995,Lily Goss,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1022744,Madeline Hendrie,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1015047,Mimi Hill,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1021924,Lila Keck,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1013027,Abbie McKay,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1025677,Sophie McKay,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1010102,Nell Morris-Dalton,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1042237,Siofra O'Connell,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1023948,Poppy Scholz,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1019711,Keeley Sherar,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1019887,Amelia Velardo,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1019819,Brooke Vickers,Carlton,Melbourne
+2026,6,CD_M20262640603,CD_I1010662,Claudia Whitfort,Carlton,Melbourne
+2026,6,CD_M20262640604,CD_I1022299,Amelie Borg,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1023952,Lucy Boyd,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1022220,Molly Brooksby,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1012241,Abbey Dowrick,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1030962,Sophie Eaton,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1026143,Emily Elkington,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1022726,Teagan Germech,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1022181,Shineah Goody,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1011062,Cheyenne Hammond,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1007141,Gemma Houghton,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I997686,Kirsty Lamb,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1019059,Maria Moloney,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1005955,Justine Mules-Robinson,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1007360,Ebony O'Dea,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1032555,Grace Parsons,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1019509,Katelyn Pope,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1023943,Matilda Scholz,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1026227,Julia Teakle,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1022196,Piper Window,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1005264,Ashleigh Woodland,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1022248,Lauren Young,Port Adelaide,Sydney Swans
+2026,6,CD_M20262640604,CD_I1033348,Imogen Brown,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1029279,Holly Cooper,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1023842,Zippy Fish,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1014359,Laura Gardiner,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1007006,Jas Grierson,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1021884,Sarah Grunden,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1015152,Montana Ham,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1009803,Alexia Hamilton,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1022350,Cynthia Hamilton,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1025616,Lara Hausegger,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1031562,Emma Juneja,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1025789,Tanya Kennedy,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1033164,Paris McCarthy,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1009865,Lucy McEvoy,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1010263,Chloe Molloy,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1015012,Ally Morphett,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1033168,Julie O'Sullivan,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1024294,Lulu Pullar,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1032556,Maddie Quinn,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1012989,Taylor Smith,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640604,CD_I1015174,Ash Van Loon,Sydney Swans,Port Adelaide
+2026,6,CD_M20262640605,CD_I1042277,Matilda Banfield,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I998030,Kiara Bowers,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1010663,Ashleigh Brazill,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1025550,Georgie Brisbane,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1031366,Holly Egan,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1048494,Aoife Healy,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1029621,Megan Kauffman,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1029623,Orlagh Lally,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1021399,Jessica Low,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1014034,Aisling McCarthy,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1023849,Noa McNaughton,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I998040,Hayley Miller,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1009882,Gabrielle Newton,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1007144,Gabby O'Sullivan,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1026166,Madeleine Scanlon,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1012994,Bella Smith,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1013937,Angelique Stannett,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1017347,Mim Strom,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1012236,Sarah Verrier,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1031272,Indiana West,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1009764,Eden Zanker,Fremantle,Western Bulldogs
+2026,6,CD_M20262640605,CD_I1010686,Elle Bennetts,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I296125,Ellie Blackburn,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1031784,Cleo Buttifant,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1012637,Mikala Cann,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1028464,Dominique Carruthers,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1012694,Alice Edmonds,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1014372,Jess Fitzgerald,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1016971,Ellie Gavalas,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1013026,Elisabeth Georgostathis,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1010103,Isabella Grant,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1022203,Elaine Grigg,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1013032,Britney Gutknecht,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1015091,Sarah Hartwig,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1024553,Kaylee Kimber,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1012595,Vaomua Laloifi,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1031390,Emma McDonald,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1015137,Isabelle Pritchard,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1022695,Jasmyn Smith,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I296141,Louise Stephenson,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1021853,Rylie Wilcox,Western Bulldogs,Fremantle
+2026,6,CD_M20262640605,CD_I1025517,Heidi Woodley,Western Bulldogs,Fremantle
+2026,6,CD_M20262640606,CD_I1005453,Rebecca Beeson,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1009962,Poppy Boltz,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1021894,Madison Brazendale,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1021895,Georgia Clark,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1022736,Jessica Doyle,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I998029,Alicia Eva,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1017292,Tarni Evans,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1036298,Caitlin Fletcher,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1009822,Georgia Garnett,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1023433,Sara Howley,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I997725,Isabel Huntington,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1037629,Yasmeen Janschek,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1042797,Grace Kos,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1007017,Tilly Lucas-Rodd,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1025924,Grace Martin,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1029617,Cambridge McCormick,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1036083,Eilish O'Dowd,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1009799,Alyce Parker,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1021436,Mikayla Pauga,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1017286,Emily Pease,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1015105,Daisy Walker,GWS GIANTS,Richmond
+2026,6,CD_M20262640606,CD_I1031398,Isabel Bacon,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1026016,Montana Beruldsen,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I998157,Katie Brennan,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1042794,Aoibhin Cleary,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1031248,Fina Dethlefsen,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1021410,Dana East,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1031412,Mackenzie Ford,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1021524,Libby Graham,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1012668,Caitlin Greiser,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1021923,Sierra Grieves,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1016865,Poppy Kelly,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1012700,Beth Lynch,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1014882,Laura McClelland,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1014375,Ellie McKenzie,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1017023,Rebecca Miller,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1042084,Baia Pugh,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1017025,Gabby Seymour,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1021834,Georgia Stubs,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1026531,Charli Wicksteed,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1026479,Olivia Wolmarans,Richmond,GWS GIANTS
+2026,6,CD_M20262640606,CD_I1014781,Emelia Yassir,Richmond,GWS GIANTS
+2026,6,CD_M20262640607,CD_I1023389,Chloe Adams,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1025565,Grace Belloni,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1033877,Nalu Brothwell,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1019705,Mia Busch,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1006997,Stephanie Cain,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1009857,Georgia Clarke,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1021409,Matilda Dyke,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1025525,Amy Gaylor,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I997745,Georgia Gee,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1025674,Emily Gough,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1025587,Madison Ibrahim,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1010279,Bess Keaney,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1021412,Maggie MacLachlan,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1010264,Alexandra Morcom,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1013522,Georgia Nanscawen,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1009885,Madison Prespakis,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1014663,Zoe Prowse,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1031378,Holly Ridewood,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1010690,Bonnie Toogood,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1009765,Sophie Van De Heuvel,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1027783,Stephanie Wales,Essendon,Gold Coast SUNS
+2026,6,CD_M20262640607,CD_I1030203,Dekota Baron,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1009868,Maddy Brancatisano,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1017314,Daisy D'Arcy,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1024535,Darcie Davies,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1030201,Georja Davies,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1010257,Clara Fitzpatrick,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1022192,Meara Girvan,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1024536,Tara Harrington,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1024552,Havana Harris,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1005269,Anne Hatchard,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1021365,Annabel Kievit,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1030188,Sunny Lappin,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1033165,Niamh McLaughlin,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I997708,Lily Mithen,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1032499,Bronte Parker,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1024299,Paige Price,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1015068,Charlie Rowbottom,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1026104,Mia Salisbury,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1028846,Heidi Talbot,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1030189,Ava Usher,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640607,CD_I1030199,Alannah Welsh,Gold Coast SUNS,Essendon
+2026,6,CD_M20262640608,CD_I1005452,Nicola Barr,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1015147,Charlotte Baskaran,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1027544,Zoe Besanko,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1009866,Rene Caris,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1026494,Carys D'Addario,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1025521,Kyla Forbes,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1014962,Ella Friend,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1022701,Alana Gee,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1009855,Darcy Guttridge,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I296158,Bianca Jakobsson,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1048496,Saoirse Lally,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1004415,Jaimee Lambert,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1026239,Maya Louvel-Finn,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1013017,Molly McDonald,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1029952,Jade McLay,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1009867,Georgia Patrikios,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1014841,Ashleigh Richards,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1014835,Tyanna Smith,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1009838,Jesse Tawhiao-Wardlaw,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1021793,Paige Trudgeon,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1012987,Serene Watson,St Kilda,West Coast Eagles
+2026,6,CD_M20262640608,CD_I1012259,Jaide Britton,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1023857,Georgie Cleaver,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1027545,Kayla Dalgleish,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1021411,Amy Franklin,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1027055,Sienna Gerardi,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I998041,Kellie Gibson,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1022818,Sarah Lakay,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1017333,Isabella Lewis,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1022775,Lucia Painter,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1025428,Jessica Rentsch,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1025962,Charlotte Riggs,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1022823,Ella Roberts,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1027057,Mia Russo,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1021416,Beth Schilling,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1010097,Isabella Shannon,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1014991,Keeley Skepper,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1007029,Belinda Smith,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I998032,Emma Swanson,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1021419,Charlotte Thomas,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1022825,Lauren Wakfer,West Coast Eagles,St Kilda
+2026,6,CD_M20262640608,CD_I1027611,Zoe Wakfer,West Coast Eagles,St Kilda
+2026,6,CD_M20262640609,CD_I1005630,Alexandra Anderson,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1007130,Shannon Campbell,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1009847,Sophie Conway,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1026937,Rania Crozier,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1019057,Dakota Davidson,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1021530,Shanae Davison,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1009833,Isabel Dawes,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1033157,Jennifer Dunne,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1032592,Asher Fearn-Wannan,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1029938,Marlo Graham,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1009836,Natalie Grider,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1029614,Eleanor Hartill,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1009844,Tahlia Hickie,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1005661,Breanna Koenen,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1033269,Evie Long,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1019034,Orla O'Dwyer,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1026111,Sophie Peters,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1019053,Catherine Svarc,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1016938,Ruby Svarc,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1014917,Lily-Rose Williamson,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1026137,Claudia Wright,Brisbane Lions,Adelaide Crows
+2026,6,CD_M20262640609,CD_I1007313,Jess Allan,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1005285,Sarah Allan,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1011080,Chelsea Biddell,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1032590,Chloe Bown,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1035375,Amy Boyle-Carr,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1011057,Teah Charlton,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1042707,Kayleigh Cronin,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1022756,Jemmika Douglas,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1009856,Grace Egan,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1022193,Sarah Goodwin,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1033016,Olivia Gorman,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1014599,Caitlin Gould,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1005258,Eloise Jones,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1018875,Grace Kelly,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1018874,Niamh Kelly,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1019456,Keeley Kustermann,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1005279,Ebony Marinoff,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1011069,Hannah Munyard,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1011095,Madison Newman,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1024085,India Rasheed,Adelaide Crows,Brisbane Lions
+2026,6,CD_M20262640609,CD_I1030952,Lucy Waye,Adelaide Crows,Brisbane Lions
+2026,7,CD_M20262640701,CD_I1009906,Mikayla Bowen,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1026281,Evie Cowcher,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1012640,Julia Crockett-Grills,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1036297,Piper Dunlop,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1012560,Chantel Emonson,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1021933,Alexis Gregor,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1022127,Claudia Gunjaca,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1024296,Rachel Kearns,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1015195,Annie Lee,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1026947,Chantal Mason,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I997709,Amy McDonald,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1033166,Aishling Moloney,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1009863,Nina Morrison,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1048156,Emma Murray,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1018405,Jacqueline Parry,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1014810,Georgie Prespakis,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1007342,Chloe Scheer,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I998164,Nicola Stevens,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1012253,Jasmin Stewart,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1018955,Kate Surman,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1009860,Rebecca Webster,Geelong Cats,Hawthorn
+2026,7,CD_M20262640701,CD_I1032571,Mikaylah Antony,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I997649,Kaitlyn Ashmore,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1019828,Keely Coyne,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1025163,Jacqueline Dupuy,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1019700,Mackenzie Eardley,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1019883,Laura Elliott,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1025669,Annabelle Embelton,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1019821,Jasmine Fleming,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1025671,Daisy Flockart,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1019830,Bridie Hipwell,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1033163,Niamh Martin,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1029626,Aine McDonagh,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1021824,Hayley McLaughlin,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1014869,Jenna Richardson,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1012575,Casey Sherriff,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1013015,Tamara Smith,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1021417,Poppy Stockwell,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1021837,Laura Stone,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1026929,Lucy Wales,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1022111,Eliza West,Hawthorn,Geelong Cats
+2026,7,CD_M20262640701,CD_I1021822,Mikayla Williamson,Hawthorn,Geelong Cats
+2026,7,CD_M20262640702,CD_I1023389,Chloe Adams,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1025565,Grace Belloni,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1033877,Nalu Brothwell,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1019705,Mia Busch,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1006997,Stephanie Cain,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1009857,Georgia Clarke,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1021409,Matilda Dyke,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1009976,Maddison Gay,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1025525,Amy Gaylor,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I997745,Georgia Gee,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1025674,Emily Gough,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1010279,Bess Keaney,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1021412,Maggie MacLachlan,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1010264,Alexandra Morcom,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1013522,Georgia Nanscawen,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1009885,Madison Prespakis,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1014663,Zoe Prowse,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1031378,Holly Ridewood,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1010690,Bonnie Toogood,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1009765,Sophie Van De Heuvel,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1027783,Stephanie Wales,Essendon,West Coast Eagles
+2026,7,CD_M20262640702,CD_I1012259,Jaide Britton,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1023815,Abbygail Bushby,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1023857,Georgie Cleaver,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1027545,Kayla Dalgleish,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1021411,Amy Franklin,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I998041,Kellie Gibson,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1022818,Sarah Lakay,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1017333,Isabella Lewis,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1022775,Lucia Painter,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1025428,Jessica Rentsch,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1025962,Charlotte Riggs,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1022823,Ella Roberts,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1021415,Courtney Rowley,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1027057,Mia Russo,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1021416,Beth Schilling,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1010097,Isabella Shannon,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1014991,Keeley Skepper,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1007029,Belinda Smith,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I998032,Emma Swanson,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1021419,Charlotte Thomas,West Coast Eagles,Essendon
+2026,7,CD_M20262640702,CD_I1022825,Lauren Wakfer,West Coast Eagles,Essendon
+2026,7,CD_M20262640703,CD_I1010686,Elle Bennetts,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I296125,Ellie Blackburn,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1031784,Cleo Buttifant,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1012637,Mikala Cann,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1014372,Jess Fitzgerald,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1016971,Ellie Gavalas,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1013026,Elisabeth Georgostathis,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1010103,Isabella Grant,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1022203,Elaine Grigg,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1013032,Britney Gutknecht,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1015189,Keeley Hardingham,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1015091,Sarah Hartwig,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1024553,Kaylee Kimber,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1012595,Vaomua Laloifi,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1031390,Emma McDonald,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1015201,Analea McKee,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1025611,Sarah Poustie,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1015137,Isabelle Pritchard,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1022695,Jasmyn Smith,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1021853,Rylie Wilcox,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1025517,Heidi Woodley,Western Bulldogs,Port Adelaide
+2026,7,CD_M20262640703,CD_I1022299,Amelie Borg,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1023952,Lucy Boyd,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1022220,Molly Brooksby,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1012241,Abbey Dowrick,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1030962,Sophie Eaton,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1026143,Emily Elkington,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1030964,Jasmine Evans,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1022726,Teagan Germech,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1022181,Shineah Goody,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1011062,Cheyenne Hammond,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1009843,Ellie Hampson,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1007141,Gemma Houghton,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I997686,Kirsty Lamb,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1019059,Maria Moloney,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1005955,Justine Mules-Robinson,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1007360,Ebony O'Dea,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1023943,Matilda Scholz,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1026227,Julia Teakle,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1022196,Piper Window,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1005264,Ashleigh Woodland,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640703,CD_I1022248,Lauren Young,Port Adelaide,Western Bulldogs
+2026,7,CD_M20262640704,CD_I1009963,Lauren Bella,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1007152,Harriet Cordner,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1019736,Yasmin Duursma,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1033158,Dayna Finn,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1014373,Ciara Fitzgerald,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1033159,Erone Fitzpatrick,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1022236,Jessica Good,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1025995,Lily Goss,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1022744,Madeline Hendrie,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1015047,Mimi Hill,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1013027,Abbie McKay,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1025677,Sophie McKay,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1032580,Tayla McMillan,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1010102,Nell Morris-Dalton,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1042237,Siofra O'Connell,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1042236,Aisling Reidy,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1023948,Poppy Scholz,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1019711,Keeley Sherar,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1019887,Amelia Velardo,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1019819,Brooke Vickers,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1010662,Claudia Whitfort,Carlton,Richmond
+2026,7,CD_M20262640704,CD_I1031398,Isabel Bacon,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1026016,Montana Beruldsen,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I998157,Katie Brennan,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1042794,Aoibhin Cleary,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1031248,Fina Dethlefsen,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1021410,Dana East,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1031412,Mackenzie Ford,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1021524,Libby Graham,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1012668,Caitlin Greiser,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1021923,Sierra Grieves,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1012700,Beth Lynch,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1014882,Laura McClelland,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1014375,Ellie McKenzie,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1007327,Montana McKinnon,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1048495,Ana Mulholland,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1042084,Baia Pugh,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1019762,Paige Scott,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1017025,Gabby Seymour,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1021834,Georgia Stubs,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1026531,Charli Wicksteed,Richmond,Carlton
+2026,7,CD_M20262640704,CD_I1026479,Olivia Wolmarans,Richmond,Carlton
+2026,7,CD_M20262640705,CD_I1032967,Jordyn S. Allen,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1025564,Mia Austin,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1014367,Alyssa Bannan,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1019713,Georgia Campbell,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1015029,Maeve Chaplin,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1025819,Laela Ebert,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1014904,Megan Fitzsimon,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1015025,Georgia Gall,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1014793,Tahlia Gillard,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1009853,Tyla Hanks,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I998039,Tayla Harris,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1012713,Shelley Heath-Barker,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1009980,Kate Hore,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1007011,Sarah Lampard,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1019702,Jorja Livingstone,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1025617,Maggie Mahony,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1026372,Molly O'Hehir,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I998149,Paxy Paxman,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1021828,Alyssia Pisano,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1009861,Olivia Purcell,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1035371,Ryleigh Wotherspoon,Melbourne,North Melbourne
+2026,7,CD_M20262640705,CD_I1007157,Libby Birch,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1036302,Blaithin Bogue,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1003018,Jenna Bruton,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1015175,Tess Craven,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1013442,Jasmine Ferguson,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I296154,Jasmine Garner,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1022885,Taylah Gatt,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1042264,Amy Gavin Mangan,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I998150,Emma Kearney,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1001686,Emma King,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1031354,Claire Mahony,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1019811,Alice O'Loughlin,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1029615,Erika O'Shea,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1003023,Tahlia Randall,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1010677,Kim Rennie,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1010265,Ash Riddell,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I997700,Eliza Shannon,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1018403,Eilish Sheerin,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1007138,Kate Shierlaw,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1015124,Ruby Tripodi,North Melbourne,Melbourne
+2026,7,CD_M20262640705,CD_I1029618,Vikki Wall,North Melbourne,Melbourne
+2026,7,CD_M20262640706,CD_I997736,Jordyn Allen,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1032594,Josephine Bamford,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I997729,Brittany Bonnici,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1009798,Mattea Breed,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1012964,Dominique Carbone,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1025419,Ashley Centra,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1025609,Lucille Cronin,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1003020,Brianna Davey,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1003019,Sabrina Frederick,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1026294,Ariana Hetherington,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1015070,Eliza James,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1048151,Olivia Lewis,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1025895,Violet Patterson,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1019724,Carly Remmos,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1019806,Jemma Rigoni,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1013706,Sarah Rowe,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1012662,Airlie Runnalls,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1007027,Ruby Schleicher,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1025421,Amber Schutte,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1035558,Imogen Trengove,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1009831,Tarni White,Collingwood,GWS GIANTS
+2026,7,CD_M20262640706,CD_I1005453,Rebecca Beeson,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1009962,Poppy Boltz,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1021894,Madison Brazendale,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1021895,Georgia Clark,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1022736,Jessica Doyle,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I998029,Alicia Eva,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1017292,Tarni Evans,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1036298,Caitlin Fletcher,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1009822,Georgia Garnett,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1023433,Sara Howley,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I997725,Isabel Huntington,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1037629,Yasmeen Janschek,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1042797,Grace Kos,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1007017,Tilly Lucas-Rodd,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1029617,Cambridge McCormick,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1036083,Eilish O'Dowd,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1009799,Alyce Parker,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1021436,Mikayla Pauga,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1017286,Emily Pease,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1015105,Daisy Walker,GWS GIANTS,Collingwood
+2026,7,CD_M20262640706,CD_I1032569,Kiera Yerbury,GWS GIANTS,Collingwood
+2026,7,CD_M20262640707,CD_I1007313,Jess Allan,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1005285,Sarah Allan,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1011080,Chelsea Biddell,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1032590,Chloe Bown,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1035375,Amy Boyle-Carr,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1011057,Teah Charlton,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1042707,Kayleigh Cronin,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1022756,Jemmika Douglas,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1009856,Grace Egan,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1022193,Sarah Goodwin,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1033016,Olivia Gorman,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1014599,Caitlin Gould,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1005258,Eloise Jones,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1018875,Grace Kelly,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1018874,Niamh Kelly,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1019456,Keeley Kustermann,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1005279,Ebony Marinoff,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1011069,Hannah Munyard,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1011095,Madison Newman,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1024085,India Rasheed,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1030952,Lucy Waye,Adelaide Crows,Fremantle
+2026,7,CD_M20262640707,CD_I1042277,Matilda Banfield,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I998030,Kiara Bowers,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1010663,Ashleigh Brazill,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1031366,Holly Egan,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1048494,Aoife Healy,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1024636,Lily Johnson,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1029621,Megan Kauffman,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1029623,Orlagh Lally,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1021399,Jessica Low,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1014034,Aisling McCarthy,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1023849,Noa McNaughton,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I998040,Hayley Miller,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1009882,Gabrielle Newton,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1007144,Gabby O'Sullivan,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1012994,Bella Smith,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1013937,Angelique Stannett,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1026384,Indi Strom,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1017347,Mim Strom,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1012236,Sarah Verrier,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1031272,Indiana West,Fremantle,Adelaide Crows
+2026,7,CD_M20262640707,CD_I1009764,Eden Zanker,Fremantle,Adelaide Crows
+2026,7,CD_M20262640708,CD_I1033348,Imogen Brown,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1029279,Holly Cooper,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1023842,Zippy Fish,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1014359,Laura Gardiner,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1021884,Sarah Grunden,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1015152,Montana Ham,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1009803,Alexia Hamilton,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1022350,Cynthia Hamilton,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1025616,Lara Hausegger,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1031562,Emma Juneja,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1025789,Tanya Kennedy,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1031564,Amelia Martin,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1033164,Paris McCarthy,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1009865,Lucy McEvoy,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1010263,Chloe Molloy,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1015012,Ally Morphett,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1033168,Julie O'Sullivan,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1024294,Lulu Pullar,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1032556,Maddie Quinn,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1012989,Taylor Smith,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1015174,Ash Van Loon,Sydney Swans,Brisbane Lions
+2026,7,CD_M20262640708,CD_I1005630,Alexandra Anderson,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1007130,Shannon Campbell,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1009847,Sophie Conway,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1026937,Rania Crozier,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1019057,Dakota Davidson,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1021530,Shanae Davison,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1009833,Isabel Dawes,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1033157,Jennifer Dunne,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1032592,Asher Fearn-Wannan,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1009836,Natalie Grider,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1029614,Eleanor Hartill,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1009844,Tahlia Hickie,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1005661,Breanna Koenen,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1033269,Evie Long,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1021441,Charlotte Mullins,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1019034,Orla O'Dwyer,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1026111,Sophie Peters,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1019053,Catherine Svarc,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1016938,Ruby Svarc,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1014917,Lily-Rose Williamson,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640708,CD_I1026137,Claudia Wright,Brisbane Lions,Sydney Swans
+2026,7,CD_M20262640709,CD_I1030203,Dekota Baron,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1009868,Maddy Brancatisano,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1017314,Daisy D'Arcy,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1024535,Darcie Davies,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1030201,Georja Davies,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1010257,Clara Fitzpatrick,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1022192,Meara Girvan,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1024552,Havana Harris,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1005269,Anne Hatchard,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1032495,Rhianna Ingram,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1021365,Annabel Kievit,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1030188,Sunny Lappin,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1033165,Niamh McLaughlin,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I997708,Lily Mithen,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1032499,Bronte Parker,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1024299,Paige Price,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1037639,Lily Quigley,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1015068,Charlie Rowbottom,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1028846,Heidi Talbot,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1030189,Ava Usher,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1030199,Alannah Welsh,Gold Coast SUNS,St Kilda
+2026,7,CD_M20262640709,CD_I1025662,Zoe Barbakos,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1005452,Nicola Barr,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1015147,Charlotte Baskaran,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1027544,Zoe Besanko,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1021819,Sophie Butterworth,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1009866,Rene Caris,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1026218,Emmelie Fiedler,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1025521,Kyla Forbes,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1022701,Alana Gee,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1009855,Darcy Guttridge,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I296158,Bianca Jakobsson,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1004415,Jaimee Lambert,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1026239,Maya Louvel-Finn,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1013017,Molly McDonald,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1029952,Jade McLay,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1009867,Georgia Patrikios,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1014841,Ashleigh Richards,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1025415,Chelsea Sutton,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1009838,Jesse Tawhiao-Wardlaw,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1021793,Paige Trudgeon,St Kilda,Gold Coast SUNS
+2026,7,CD_M20262640709,CD_I1012987,Serene Watson,St Kilda,Gold Coast SUNS

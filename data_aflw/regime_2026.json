@@ -1,0 +1,67 @@
+{
+  "features": [
+    "disposals_cz",
+    "contestedPossessions_cz",
+    "clearances.totalClearances_cz",
+    "goals_cz",
+    "tackles_cz",
+    "marks_cz",
+    "inside50s_cz",
+    "hitouts_cz",
+    "marksInside50_cz",
+    "goalAssists_cz",
+    "win"
+  ],
+  "common": {
+    "Disposals": "disposals",
+    "Contested.Possessions": "contestedPossessions",
+    "Clearances": "clearances.totalClearances",
+    "Goals": "goals",
+    "Tackles": "tackles",
+    "Marks": "marks",
+    "Inside.50s": "inside50s",
+    "Hit.Outs": "hitouts",
+    "Marks.Inside.50": "marksInside50",
+    "Goal.Assists": "goalAssists"
+  },
+  "delta": {
+    "disposals_cz": 0.5727,
+    "contestedPossessions_cz": 0.0,
+    "clearances.totalClearances_cz": 0.0,
+    "goals_cz": 0.3568,
+    "tackles_cz": 0.0,
+    "marks_cz": 0.0,
+    "inside50s_cz": 0.0,
+    "hitouts_cz": 0.0,
+    "marksInside50_cz": 0.0,
+    "goalAssists_cz": 0.0,
+    "win": 0.0
+  },
+  "shift_all": {
+    "disposals_cz": 0.5727,
+    "contestedPossessions_cz": 0.1008,
+    "clearances.totalClearances_cz": -0.0008,
+    "goals_cz": 0.3568,
+    "tackles_cz": -0.0231,
+    "marks_cz": -0.1661,
+    "inside50s_cz": 0.0611,
+    "hitouts_cz": 0.0814,
+    "marksInside50_cz": 0.0997,
+    "goalAssists_cz": 0.014,
+    "win": -0.0547
+  },
+  "spreads": {
+    "disposals_cz": 2.04,
+    "contestedPossessions_cz": 0.92,
+    "clearances.totalClearances_cz": -0.01,
+    "goals_cz": 2.13,
+    "tackles_cz": -0.23,
+    "marks_cz": -0.92,
+    "inside50s_cz": 1.36,
+    "hitouts_cz": 0.4,
+    "marksInside50_cz": 1.25,
+    "goalAssists_cz": 0.3,
+    "win": -0.63
+  },
+  "rule": "delta = men's 2026 weight minus its 2021-25 mean, kept only where |shift| >= 2 year-to-year spreads (2015-25); add lambda * delta . x_cz to the AFLW score"
+}
