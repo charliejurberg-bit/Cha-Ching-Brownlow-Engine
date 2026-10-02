@@ -33,17 +33,22 @@ import shutil
 import sys
 
 import pandas as pd
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFilter
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import tiktok_market as tm                                         # noqa: E402
 from afl_headshots import head                                     # noqa: E402
 from sb_3vote_board import _dashboard_ns                           # noqa: E402
 from countdown_card import BG, EMERALD, INK, MUTED, GOLD, LINE, S, font  # noqa: E402
 from tiktok_market import (                                        # noqa: E402
     BOOK, COUNT_DATE, CUT_BOT, CUT_TOP, PHONE_DIR, TIER_COL, TIER_LABEL,
-    draw_closer, masthead, pill, place_cut, save, wash,
+    backdrop, blur_text, cut_shadow, draw_closer, fade_alpha, masthead, pill,
+    place_cut, prob_bar, caption_len, prune, rg_line, save, soft_glow,
+    tier_for, tier_split, trim_cut, wash, add_no_odds_arg, CLOSER_LINES,
+    CLOSER_LINES_CLEAN,
+    odds_paths, order_picks, set_no_odds, slide_stem,
 )
 from tiktok_top10 import (                                         # noqa: E402
     W, H, M, SAFE_TOP, SAFE_BOT, BAR, DOMAIN, accent, fit_font, _initials,
@@ -81,9 +86,17 @@ MAX_GAMES = 2
 
 # Chosen off sb_poll_board.csv on 18 September 2026. Every pick clears the
 # market book's own back rule: at least +15% on the model, still positive when
-# blended halfway to Wheelo's expected votes, and at least a 15% chance. Tiers
-# are by the model's chance, not by price: safe 70%+, value 45 to 70%,
-# longshot under 45%. Within a tier, ranked by the smaller of the two edges.
+# blended halfway to Wheelo's expected votes, and at least a 15% chance. Within
+# a tier, ranked by the smaller of the two edges.
+#
+# THE TIER IS NOT DECLARED HERE. It is derived from the price by
+# tiktok_market.tier_for, so the chip cannot contradict the figure printed
+# beside it. THIS MARKET HAS NO LONGSHOT AND CANNOT HAVE ONE: the whole
+# Sportsbet to-poll-a-vote board runs $1.09 to $7.25, which is the market
+# saying a vote is easy to poll, so nothing on it reaches the $10.00 floor.
+# Conor Nash at $5.90 is the longest price available and he is a VALUE pick.
+# Do not reach for a longshot by loosening the band; reach for one by finding
+# a market that has them.
 # `stats` is what each highlighted game row shows: disposals and coaches votes
 # on every slide, then the one figure that is the player's own case.
 PICKS = [
@@ -144,7 +157,8 @@ def build():
             ))
 
         out.append(dict(
-            key=p["key"], name=p["name"], club=str(row.club), tier=p["tier"],
+            key=p["key"], name=p["name"], club=str(row.club),
+            tier=tier_for(row.odds),
             games=len(gm), proj=float(gm.Exp_Votes.sum()),
             price=f"${row.odds:,.2f}", fair=f"${row.fair:,.2f}",
             model=float(row.p), implied=float(row.implied), ev=float(row.ev),
@@ -181,7 +195,11 @@ def draw_slide(p):
     k.line([0, CUT_END * S, W * S, CUT_END * S], fill=LINE, width=max(1, S))
 
     masthead(img, k, m, right, MARKET)
-    pill(k, m, (CUT_END - 74) * S, TIER_LABEL[p["tier"]], TIER_COL[p["tier"]])
+    if tm.NO_ODDS:
+        pill(k, m, (CUT_END - 74) * S, "MODEL %.0f%%" % (p["model"] * 100),
+             EMERALD)
+    else:
+        pill(k, m, (CUT_END - 74) * S, TIER_LABEL[p["tier"]], TIER_COL[p["tier"]])
 
     nm = p["name"].upper()
     k.text((m, 954 * S), nm, font=fit_font(k, nm, "name", 66, right - m), fill=INK)
@@ -196,8 +214,10 @@ def draw_slide(p):
     k.text((m + rw + 20 * S, 1038 * S), f"{p['proj']:.1f} PROJECTED VOTES",
            font=font("display", 24), fill=acc)
 
-    k.text((m, 1088 * S), p["price"], font=font("fig", 100), fill=GOLD)
-    fw = k.textlength(p["price"], font=font("fig", 100))
+    hero = ("%.0f%%" % (p["model"] * 100)) if tm.NO_ODDS else p["price"]
+    k.text((m, 1088 * S), hero, font=font("fig", 100),
+           fill=EMERALD if tm.NO_ODDS else GOLD)
+    fw = k.textlength(hero, font=font("fig", 100))
     k.text((m + fw + 24 * S, 1108 * S), "TO POLL", font=font("display", 25), fill=INK)
     k.text((m + fw + 24 * S, 1142 * S), "A VOTE", font=font("display", 25), fill=INK)
 
@@ -205,12 +225,18 @@ def draw_slide(p):
     k.rectangle([m, y, right, y + bh], fill=BAR)
     span = right - m
     k.rectangle([m, y, m + int(span * p["model"]), y + bh], fill=EMERALD)
-    tick = m + int(span * p["implied"])
-    k.rectangle([tick - 2 * S, y - 8 * S, tick + 2 * S, y + bh + 8 * S], fill=GOLD)
-    k.text((m, y + bh + 12 * S), "MODEL %.0f%%" % (p["model"] * 100),
-           font=font("display", 23), fill=EMERALD)
-    k.text((right, y + bh + 12 * S), "PRICE IMPLIES %.0f%%" % (p["implied"] * 100),
-           font=font("display", 23), fill=GOLD, anchor="ra")
+    if tm.NO_ODDS:
+        k.text((m, y + bh + 12 * S), "MODEL CHANCE OVER THE SEASON",
+               font=font("display", 23), fill=EMERALD)
+    else:
+        tick = m + int(span * p["implied"])
+        k.rectangle([tick - 2 * S, y - 8 * S, tick + 2 * S, y + bh + 8 * S],
+                    fill=GOLD)
+        k.text((m, y + bh + 12 * S), "MODEL %.0f%%" % (p["model"] * 100),
+               font=font("display", 23), fill=EMERALD)
+        k.text((right, y + bh + 12 * S),
+               "PRICE IMPLIES %.0f%%" % (p["implied"] * 100),
+               font=font("display", 23), fill=GOLD, anchor="ra")
 
     game_rows(k, m, right, p["highlight"], acc)
     return img, soft
@@ -290,34 +316,95 @@ def game_rows(k, m, right, games, acc):
             x += k.textlength(label, font=lf) + z["gap"] * sc * S
 
 
+# THE COVER NAMES NOBODY, AND THAT IS THE WHOLE DESIGN
+# It is a slip: six rows carrying the club colour, the tier, the price and the
+# model-against-market bar, with the NAME BLURRED OUT of every one. A cover
+# that lists the six answers the deck before it is swiped, and the six names
+# are the only thing on it a reader cannot work out for himself. Everything
+# else stays sharp on purpose, because the club bar and the price are what
+# make it a guess rather than a blank.
+COVER_TITLE = ("BROWNLOW BETS", "TO POLL A VOTE")
+COVER_TITLE_CLEAN = ("THE BROWNLOW MODEL", "TO POLL A VOTE")
+# 0.30 of the cap height. Below about 0.22 a name is still readable at full
+# size, which defeats the point on the one surface that gets screenshotted.
+# The gain is the alpha lifted back after the blur, chosen by rendering the
+# longest name at 1.6 / 2.1 / 2.6 / 3.2 and looking: under about 2 the row
+# reads as faded rather than hidden, and by 3.2 it has flattened into a solid
+# bar and stopped reading as a name at all.
+NAME_BLUR, NAME_BLUR_GAIN = 0.30, 2.6
+
+
 def draw_cover(picks):
-    """tiktok_market's cover with this market's name in the emerald line."""
+    """The six as a slip, with every name blurred out."""
     img = Image.new("RGB", (W * S, H * S), BG)
     k = ImageDraw.Draw(img)
     m, right = M * S, (W - M) * S
-    rule = 812
-    wash(img, "Cha Ching", rule * S)
+
+    backdrop(img, int(W * 0.30 * S), 820 * S)
+
+    # One figure behind the slip, as a silhouette rather than a face: this
+    # cover withholds identity, and a readable face on it contradicts six
+    # blurred names. Faded LATE, because the slip's own top edge already cuts
+    # the figure at the chest and an early fade left a head with no shoulders.
+    c = trim_cut(max(picks, key=lambda q: q["ev"])["name"], 560 * S)
+    if c:
+        c = fade_alpha(c, 0.88)
+        a = c.getchannel("A")
+        x, y = int(W * 0.76 * S) - c.width // 2, 430 * S
+        img.paste(Image.new("RGB", c.size, GOLD), (x, y),
+                  a.filter(ImageFilter.GaussianBlur(11 * S))
+                   .point(lambda v: int(v * 0.30)))
+        img.paste(Image.new("RGB", c.size, "#0c1620"), (x, y), a)
+
     masthead(img, k, m, right, f"{SEASON} MODEL")
+    tt = COVER_TITLE_CLEAN if tm.NO_ODDS else COVER_TITLE
+    tf = min((fit_font(k, ln, "display", 76, int(W * 0.56 * S) - m)
+              for ln in tt), key=lambda f: f.size)
+    k.text((m, (SAFE_TOP + 58) * S), tt[0], font=tf, fill=INK)
+    k.text((m, (SAFE_TOP + 138) * S), tt[1], font=tf,
+           fill=EMERALD if tm.NO_ODDS else GOLD)
 
-    lines = ("BEST PICKS FOR", "THE BROWNLOW")
-    tf = min((fit_font(k, ln, "display", 96, right - m) for ln in lines),
-             key=lambda f: f.size)
-    for i, ln in enumerate(lines):
-        k.text((m, (500 + i * 104) * S), ln, font=tf, fill=INK)
-    k.text((m, 722 * S), MARKET,
-           font=fit_font(k, MARKET, "display", 52, right - m), fill=EMERALD)
-    k.line([m, rule * S, right, rule * S], fill=LINE, width=max(1, S))
+    # The slip. Cha Ching's card and not a bookmaker's: the book is named as
+    # the price source in the footer, exactly as the slides name it.
+    x0, y0, x1, y1 = m, 764 * S, right, 1432 * S
+    k.rectangle([x0, y0, x1, y1], fill="#0c141c", outline=LINE, width=max(1, 2 * S))
+    k.rectangle([x0, y0, x1, y0 + 54 * S], fill="#121d28")
+    # NOT the market name and NOT the season: the title above the slip already
+    # says "TO POLL A VOTE" and the masthead already says "2026 MODEL".
+    k.text((x0 + 22 * S, y0 + 27 * S), "SELECTION", font=font("display", 22),
+           fill=MUTED, anchor="lm")
+    k.text((x1 - 22 * S, y0 + 27 * S),
+           "MODEL CHANCE" if tm.NO_ODDS else "PRICE  ·  MODEL v MARKET",
+           font=font("display", 22), fill=MUTED, anchor="rm")
 
-    cw = (right - m) / 3
+    ry, pitch = y0 + 54 * S, 92 * S
     for i, p in enumerate(picks):
-        cx = m + cw * (i % 3)
-        yy = (866 + (i // 3) * 206) * S
-        k.text((cx, yy), p["price"], font=fit_font(k, p["price"], "fig", 72, cw - 24 * S),
-               fill=GOLD)
-        k.text((cx, yy + 92 * S), TIER_LABEL[p["tier"]], font=font("display", 22),
-               fill=MUTED)
+        y = ry + i * pitch
+        if i:
+            k.line([x0 + 18 * S, y, x1 - 18 * S, y], fill=LINE, width=max(1, S))
+        k.rectangle([x0, y + 20 * S, x0 + 5 * S, y + 62 * S], fill=accent(p["club"]))
+        nm = p["name"].upper()
+        nf = fit_font(k, nm, "display", 28, 360 * S)
+        blur_text(img, (x0 + 26 * S, y + 22 * S), nm, nf, INK,
+                  max(2, round(nf.size * NAME_BLUR)), gain=NAME_BLUR_GAIN)
+        k.text((x0 + 26 * S, y + 58 * S),
+               f"{p['games']} GAMES" if tm.NO_ODDS else TIER_LABEL[p["tier"]],
+               font=font("display", 19), fill=MUTED)
+        fig = ("%.0f%%" % (p["model"] * 100)) if tm.NO_ODDS else p["price"]
+        k.text((x1 - 22 * S, y + 20 * S), fig, font=font("fig", 40),
+               fill=EMERALD if tm.NO_ODDS else GOLD, anchor="ra")
+        prob_bar(k, x1 - 272 * S, x1 - 22 * S, y + 70 * S, p["model"],
+                 p["implied"], h=9)
 
-    k.text((right, 1296 * S), "SWIPE", font=font("display", 32), fill=EMERALD,
+    k.text((x0 + 22 * S, y1 - 34 * S),
+           f"{SEASON} MODEL PROJECTION" if tm.NO_ODDS else f"PRICES {BOOK}",
+           font=font("display", 19), fill=MUTED, anchor="lm")
+    k.text((x1 - 22 * S, y1 - 34 * S), "SWIPE FOR THE NAMES",
+           font=font("display", 19), fill=EMERALD, anchor="rm")
+
+    if not tm.NO_ODDS:
+        rg_line(k, m, 1466 * S)
+    k.text((right, 1466 * S), "SWIPE", font=font("display", 26), fill=EMERALD,
            anchor="ra")
     return img
 
@@ -326,10 +413,46 @@ def draw_cover(picks):
 def caption(picks):
     """Templated, like every other draft in this repo: a templated post cannot
     invent an accuracy claim under time pressure."""
+    if tm.NO_ODDS:
+        # No book, no price, no tier, and no responsible-gambling block: on a
+        # post with no market on it the 18+ line tells a classifier the post
+        # is about betting. See tiktok_market.NO_ODDS.
+        out = [
+            f"The model simulated the whole {SEASON} Brownlow count. These "
+            f"{len(picks)} are its best chances to poll a vote.",
+            "",
+            "Every home and away game went through the model, which then ran "
+            "the count to get each player's chance of polling at least one "
+            "vote across the season.",
+            "",
+        ]
+        for p in picks:
+            hl = p["highlight"]
+            games = ", ".join(
+                f"{g['round'].lower()} v {g['opp']} ({g['chance'] * 100:.0f}%)"
+                for g in hl)
+            out.append(f"{p['name']}, {p['model'] * 100:.0f}%. "
+                       f"{'Best chances' if len(hl) > 1 else 'Best chance'}: "
+                       f"{games}.")
+        out += [
+            "",
+            "The bar on each slide is his chance over the season. Under it "
+            "are the games he is most likely to poll in, with the model's "
+            "chance for that game on its own.",
+            "",
+            "This is a model, not a leak: no "
+            f"{SEASON} vote is public until the count on {COUNT_DATE}.",
+            "",
+            f"The full board, every player and every game, is at {DOMAIN}.",
+            "",
+            "Which one has the model got wrong?",
+        ]
+        return "\n".join(out)
+
     out = [
         "Six Brownlow players to poll a vote, priced by the model.",
         "",
-        f"Three safe, two value, one longshot. Every home and away game of the "
+        f"{tier_split(picks).capitalize()}. Every home and away game of the "
         f"{SEASON} season went through the model, which then simulated the whole "
         "count to get each player's chance of polling at least one vote. That "
         f"chance was then set against every price on the {BOOK.title()} board.",
@@ -379,7 +502,7 @@ def write_copy(picks, paths, softs):
     cap, tags = caption(picks), hashtags(picks)
     out = [f"# TikTok carousel, to poll a vote, {SEASON}", "",
            "## Caption", "", "```", cap, "", tags, "```", "",
-           f"{len(cap) + len(tags) + 2} characters including hashtags. "
+           f"{caption_len(cap, tags)} characters including hashtags. "
            "TikTok's limit is 2,200.", "", "## Slides", "",
            "| # | File | Player | Club | Games | Price | Model | Fair | Edge "
            "| Highlighted |",
@@ -430,7 +553,7 @@ def write_copy(picks, paths, softs):
     for n, sc in softs:
         out.append(f"- {n}'s headshot is upscaled {sc:.1f} times and will look "
                    f"soft on a phone.")
-    path = os.path.join(REPO, "drafts", f"tiktok_poll_{SEASON}.md")
+    path = os.path.join(REPO, "drafts", f"tiktok_poll_{SEASON}{'_noodds' if tm.NO_ODDS else ''}.md")
     with open(path, "w", encoding="utf-8") as fh:
         fh.write("\n".join(out) + "\n")
     return path
@@ -439,46 +562,55 @@ def write_copy(picks, paths, softs):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--only", help="render one pick by key, or 'cover' / 'closer'")
+    add_no_odds_arg(ap)
     ap.add_argument("--no-phone", action="store_true",
                     help="skip the copy into the OneDrive folder")
     a = ap.parse_args()
+    set_no_odds(a.no_odds)
+    out_dir, phone_dir = odds_paths(OUT_DIR, PHONE_DIR)
     os.chdir(REPO)
 
-    picks = build()
+    picks = order_picks(build())
     if a.only:
         one = [p for p in picks if p["key"] == a.only]
         if a.only == "cover":
-            print(save(draw_cover(picks), os.path.join(OUT_DIR, "01_cover.png")))
+            print(save(draw_cover(picks), os.path.join(out_dir, "01_cover.png")))
         elif a.only == "closer":
-            print(save(draw_closer(), os.path.join(OUT_DIR, "99_closer.png")))
+            print(save(draw_closer(CLOSER_LINES_CLEAN if tm.NO_ODDS else CLOSER_LINES), os.path.join(out_dir, "99_closer.png")))
         elif one:
             img, _ = draw_slide(one[0])
-            print(save(img, os.path.join(OUT_DIR, f"only_{a.only}.png")))
+            print(save(img, os.path.join(out_dir, f"only_{a.only}.png")))
         else:
             raise SystemExit(f"no pick keyed {a.only!r}; "
                              f"have {[p['key'] for p in picks]}")
         return
 
     paths, softs = [], []
-    paths.append(save(draw_cover(picks), os.path.join(OUT_DIR, "01_cover.png")))
+    paths.append(save(draw_cover(picks), os.path.join(out_dir, "01_cover.png")))
     for i, p in enumerate(picks):
         img, soft = draw_slide(p)
         paths.append(save(img, os.path.join(
-            OUT_DIR, f"{i + 2:02d}_{p['tier'].lower()}_{p['key']}.png")))
+            out_dir, slide_stem(p, i + 2) + ".png")))
         if soft and soft > 1.8:
             softs.append((p["name"], soft))
-    paths.append(save(draw_closer(),
-                      os.path.join(OUT_DIR, f"{len(picks) + 2:02d}_closer.png")))
+    paths.append(save(draw_closer(CLOSER_LINES_CLEAN if tm.NO_ODDS else CLOSER_LINES),
+                      os.path.join(out_dir, f"{len(picks) + 2:02d}_closer.png")))
 
     copy = write_copy(picks, paths, softs)
-    print(f"  {len(paths)} slides to {OUT_DIR}")
+    prune([out_dir], {os.path.basename(x) for x in paths})
+    print(f"  {len(paths)} slides to {out_dir}")
     print(f"  copy: {copy}")
 
     if not a.no_phone:
-        os.makedirs(PHONE_DIR, exist_ok=True)
+        os.makedirs(phone_dir, exist_ok=True)
         for p in paths:
-            shutil.copy2(p, os.path.join(PHONE_DIR, PHONE_PREFIX + os.path.basename(p)))
-        print(f"  copied to {PHONE_DIR}")
+            shutil.copy2(p, os.path.join(phone_dir, PHONE_PREFIX + os.path.basename(p)))
+        # phone_dir is shared with the 3 vote deck, so the pattern carries this
+        # deck's prefix. Without it the prune would delete that deck's slides.
+        prune([phone_dir],
+              {PHONE_PREFIX + os.path.basename(x) for x in paths},
+              pattern=r"^" + PHONE_PREFIX + r"\d{2}_.+\.png$")
+        print(f"  copied to {phone_dir}")
 
 
 if __name__ == "__main__":

@@ -788,6 +788,41 @@ refused West Coast's "Tylah Williams" against a roster holding Bailey and Jack
 Williams. Dropping that roster hop is not cosmetic: it counts "Dan Curtin" as
 missing the rounds Daniel Curtin played, and gives him no career.
 
+## Historical claims: default scope is ALL TIME
+
+**Charlie's rule (1 October 2026): every "most / first / last time" stat is
+checked all time, from the VFL's first season in 1897, by default.** Narrow it
+to the AFL era (1990 on) or another window only when Charlie asks, or when the
+all-time version is too broad to be interesting, and then say which window in
+the claim itself. Never let a data file's start year set the scope silently:
+the repo's per-game archive starts in 1965, and a ranking built on it alone
+truncates careers (Doug Wade carried 834 career goals to North Melbourne in
+1973, the 1965-on data reads 626) and misses earlier cases outright (Charlie
+Dibbs, 216 games, to Geelong in 1936).
+
+Sources that reach 1897, all off AFLTables, no token needed:
+
+- **`afltables.com/afl/stats/<season>.html`**: every player, per club, per
+  season: GM, GL, and BR (votes, 1984 on). Key players by the **player link
+  href** (`players/G/Gary_Ablett1.html`), never by name: it is unique, so
+  namesakes and father-son pairs (the two Gary Abletts, the two Herbie
+  Matthews) stay apart. GM and GL **include finals**. All 130 seasons fetch in
+  a few minutes at a 0.5s delay.
+- **`afltables.com/afl/stats/teams/<club>/<season>_gbg.html`**: per-round
+  goals (and other stats), with finals as `SF`/`PF`/`GF` columns, so a
+  home-and-away-only figure (the Coleman count) is the sum of the `R<n>`
+  columns. Needed whenever finals would change a ranking.
+- **`afltables.com/afl/stats/players/<key>`**: date of birth, for any age
+  qualifier.
+- **Pre-1984 Brownlow votes**: `data_history/brownlow_seasons_1924_1983.csv`,
+  season totals only (see the next section, including the doubled 1976-77
+  pool).
+
+Three things the all-time data does not do for you: a mid-season move
+shows as two clubs in one season with no order; the stats pages cannot tell
+a trade from free agency or a delisted pick-up ("changed clubs" is the honest
+claim); and the Fitzroy to Brisbane Lions merger in 1997 reads as a move.
+
 ## Brownlow votes before 1984
 
 **Every per-game vote source in this repo starts in 1984**, and that is a

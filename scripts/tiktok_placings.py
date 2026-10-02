@@ -51,12 +51,21 @@ import pandas as pd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import tiktok_market as tm                                         # noqa: E402
 from sb_3vote_board import _dashboard_ns                           # noqa: E402
-from tiktok_market import (                                        # noqa: E402
-    BOOK, COUNT_DATE, PHONE_DIR, SEASON, TIER_LABEL, draw_closer, draw_cover,
-    draw_slide, hashtags, save,
+from countdown_card import (                                       # noqa: E402
+    BG, EMERALD, GOLD, INK, LINE, MUTED, S, font,
 )
-from tiktok_top10 import DOMAIN, SAFE_BOT, SAFE_TOP, rank_text    # noqa: E402
+from tiktok_market import (                                        # noqa: E402
+    BOOK, COUNT_DATE, PHONE_DIR, SEASON, TIER_LABEL, accent, add_no_odds_arg,
+    backdrop, blur_text, caption_len, draw_closer, draw_slide, hashtags,
+    masthead, odds_paths, order_picks, prob_bar, prune, rg_line, save,
+    set_no_odds, slide_stem, tier_for, tier_split,
+)
+from tiktok_top10 import (                                         # noqa: E402
+    DOMAIN, M, SAFE_BOT, SAFE_TOP, W, H, fit_font, rank_text,
+)
+from PIL import Image, ImageDraw                                   # noqa: E402
 
 REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 BOARD = os.path.join(REPO, "data_betting", "sb_placings_board.csv")
@@ -84,20 +93,62 @@ STATS = {
     "games":  ("games", "GAMES", "{:.0f}"),
 }
 
-# Player, board, tier, and the four cells that are his own case (slots 1, 2, 4
-# and 5). Everything else is read.
+# Player, board, and the four cells that are his own case (slots 1, 2, 4 and
+# 5). Everything else is read, INCLUDING THE TIER: tiktok_market.tier_for
+# derives it from the price, so the chip cannot contradict the figure beside it.
+#
+# THREE PER BAND, AND THE THREE ARE THE THREE BIGGEST EDGES IN IT
+# Re-chosen 19 September 2026 off sb_placings_board.csv, by the rule the 3 vote
+# deck uses: drop refused rows, require at least a 15% chance and at least +15%
+# on the model, one pick per player at his own biggest edge, then take the top
+# by edge in each band.
+#
+# THE SAFE BAND IS CHOSEN ON PROBABILITY, NOT ON EDGE, AND THAT IS DELIBERATE
+# Every other pick on every deck is here because the model and the book
+# disagree. A safe pick is not: it is here because the model says it lands.
+# The deck owner's rule, 19 September 2026, is that a safe pick does not need
+# an edge, it needs to be highly likely to get up.
+#
+# The two things cannot be had at once, and the board says so exactly. Inside
+# the $2.00 band: at 80% or better the longest price on offer is $1.11, at 60%
+# it is $1.42, and only by dropping to 50% does it reach $1.95. The book
+# prices a near-certainty correctly, so every pick below carries NEGATIVE EV,
+# from -8.8% to -14.3%. That is the cost of the word "safe" and it is paid
+# knowingly.
+#
+# Two guards on it. SAFE_MIN_P is what "highly likely" means, so the rule is
+# checkable rather than a feel; and SAFE_MIN_PRICE stops a refresh putting
+# Daicos at $1.001 on a slide, where a 100% chance returns a tenth of a cent
+# in the dollar and the thing is not a bet at all.
+#
+# THE COPY MUST NOT CLAIM AN EDGE THESE DO NOT HAVE. The caption used to say
+# the gap between model and price "is the whole reason the pick is on the
+# list", which is now true of six picks and false of three. It has been split
+# in two. The slide needs no special case: its bar draws the model against the
+# price honestly, so a safe pick renders with the price ahead, which is the
+# truth about it.
+SAFE_MIN_P = 0.80
+SAFE_MIN_PRICE = 1.05
+#
+# Ordered by ascending price, so the deck escalates and ends on the $71.
 PICKS = [
-    dict(key="sheezel", name="Harry Sheezel", board=10, tier="SAFE",
+    dict(key="sheezel", name="Harry Sheezel", board=20,
          cells=["disp", "d30", "fav", "si"]),
-    dict(key="walsh", name="Sam Walsh", board=20, tier="SAFE",
+    dict(key="ashcroft", name="Will Ashcroft", board=10,
+         cells=["fav", "bog", "disp", "poll50"]),
+    dict(key="baileysmith", name="Bailey Smith", board=3,
+         cells=["disp", "d30", "poll50", "cp"]),
+    dict(key="walsh", name="Sam Walsh", board=20,
          cells=["disp", "d30", "bog", "games"]),
-    dict(key="hornefrancis", name="Jason Horne-Francis", board=10, tier="SAFE",
+    dict(key="hornefrancis", name="Jason Horne-Francis", board=10,
          cells=["clr", "goals", "poll50", "bog"]),
-    dict(key="bolton", name="Shai Bolton", board=20, tier="VALUE",
+    dict(key="neale", name="Lachie Neale", board=5,
+         cells=["disp", "d30", "cp", "bog"]),
+    dict(key="bolton", name="Shai Bolton", board=20,
          cells=["si", "goals", "bog", "fav"]),
-    dict(key="ashcroft", name="Will Ashcroft", board=3, tier="VALUE",
-         cells=["fav", "bog", "disp", "d30"]),
-    dict(key="oliver", name="Clayton Oliver", board=10, tier="LONGSHOT",
+    dict(key="sparrow", name="Tom Sparrow", board=20,
+         cells=["clr", "goals", "cp", "games"]),
+    dict(key="oliver", name="Clayton Oliver", board=10,
          cells=["cp", "clr", "disp", "d30"]),
 ]
 TIER_SHORT = {"SAFE": "SAFE", "VALUE": "VALUE", "LONGSHOT": "LONGSHOT"}
@@ -166,14 +217,138 @@ def build():
                              f"of {int(x.games)} games")
         cells = [(STATS[c][2].format(float(x[STATS[c][0]])), STATS[c][1]) for c in keys]
         out.append(dict(
-            key=p["key"], name=p["name"], club=str(row.club), tier=p["tier"],
+            key=p["key"], name=p["name"], club=str(row.club),
+            tier=tier_for(row.odds),
             board=n, rank=rank, price=f"${row.odds:,.2f}", fair=f"${row.fair:,.2f}",
             model=float(row.p), implied=1.0 / float(row.odds), cells=cells,
             mast="PLACINGS", lead=f"TOP {n} FINISH", qual=f"MODEL RANK {rank}",
             note=("TO FINISH", f"TOP {n}"),
-            cover_label=f"{TIER_SHORT[p['tier']]} · TOP {n}",
+            cover_label=((f"TOP {n} FINISH") if tm.NO_ODDS else
+                         (f"{TIER_SHORT[tier_for(row.odds)]}  ·  "
+                          f"TOP {n} FINISH")),
         ))
     return out
+
+
+# ------------------------------------------------------------------ cover
+# THIS DECK GETS ITS OWN COVER, NOT tiktok_market's SLIP
+# The 3 vote and poll decks both open on the blurred slip, and three decks
+# opening on the same object read as one post published three times. This one
+# has something neither of those has: a pick here is a FINISHING POSITION, and
+# the six sit across three different boards. Grouping them under the board each
+# is backed for says what the deck is before a word of it is read.
+#
+# Names are blurred exactly as on the slip: the board, the price and the club
+# colour are the tease, and the names are the only thing a reader cannot work
+# out for himself.
+LADDER_TOP, LADDER_BOT = 686, 1412
+# Nominal geometry and type. The whole ladder is scaled down from these when
+# the picks do not fit; nothing here is a hard size.
+BAND_HEAD, BAND_GAP, ROW_PITCH = 50, 18, 74
+F_BOARD, F_COUNT, F_NAME, F_PRICE = 30, 22, 26, 38
+MIN_SCALE = 0.68
+NAME_BLUR, NAME_BLUR_GAIN = 0.30, 2.6
+
+
+def _ladder_scale(n_bands, n_rows):
+    """One factor applied to every height and every type size on the ladder.
+
+    THE LADDER MUST SHRINK AS A WHOLE, NOT ROW BY ROW. The first version
+    solved only for row pitch and clamped it to a minimum, which is a
+    contradiction: clamping is exactly what stops it fitting. At three bands
+    and seven picks it was fine; adding the safe tier took it to four bands
+    and nine picks, the clamp held the pitch at its floor, and the last band
+    ran straight through the footer.
+
+    Scaling the band header, the gap, the pitch and the four type sizes
+    together keeps the proportions, so a fuller ladder reads as the same
+    object set smaller rather than as a squashed one.
+    """
+    room = LADDER_BOT - LADDER_TOP
+    need = (n_bands * BAND_HEAD + (n_bands - 1) * BAND_GAP + n_rows * ROW_PITCH)
+    sc = max(MIN_SCALE, min(1.0, room / need))
+    # MIN_SCALE is a legibility floor, so past it the ladder cannot fit and
+    # scaling further would only make it unreadable as well as overflowing.
+    # Say so: a cover running through its own footer is the kind of fault that
+    # is obvious in the file and invisible in a build log. Roughly ten picks
+    # across four boards is the ceiling for this layout.
+    if need * sc > room:
+        print(f"  WARNING: ladder needs {need * sc:.0f}px of {room}px for "
+              f"{n_rows} picks across {n_bands} boards. The cover will "
+              f"overflow. Drop a pick or raise MIN_SCALE deliberately.")
+    return sc
+
+
+def _boards_upper(picks):
+    """"TOP 5, 10 AND 20", off the picks themselves."""
+    ns = [str(n) for n in sorted({int(q["board"]) for q in picks})]
+    return "TOP " + (", ".join(ns[:-1]) + " AND " + ns[-1]
+                     if len(ns) > 1 else ns[0])
+
+
+def draw_cover(picks, sub=None):
+    """The six grouped by the board each one is backed to finish inside."""
+    img = Image.new("RGB", (W * S, H * S), BG)
+    k = ImageDraw.Draw(img)
+    m, right = M * S, (W - M) * S
+
+    backdrop(img, int(W * 0.50 * S), 1000 * S)
+    masthead(img, k, m, right, f"{SEASON} MODEL")
+
+    tl = ("WHERE DOES HE", "FINISH?")
+    tf = min((fit_font(k, ln, "display", 78, right - m) for ln in tl),
+             key=lambda f: f.size)
+    for i, ln in enumerate(tl):
+        k.text((m, (SAFE_TOP + 54 + i * 80) * S), ln, font=tf, fill=INK)
+    k.text((m, (SAFE_TOP + 218) * S),
+           sub or f"{len(picks)} PLACINGS THE MODEL LIKES",
+           font=font("display", 28), fill=GOLD)
+
+    # Only boards that actually carry a pick get a band. A TOP 3 rail with
+    # nothing on it reads as a rendering fault, not as an empty market.
+    boards = sorted({int(q["board"]) for q in picks})
+    by = {n: [q for q in picks if int(q["board"]) == n] for n in boards}
+    sc = _ladder_scale(len(boards), len(picks))
+    head, gap, pitch = BAND_HEAD * sc, BAND_GAP * sc, ROW_PITCH * sc
+    f_board, f_count = font("display", round(F_BOARD * sc)), font("display", round(F_COUNT * sc))
+    f_price = font("fig", round(F_PRICE * sc))
+
+    y = LADDER_TOP * S
+    for n in boards:
+        rows = by[n]
+        bh = (head + pitch * len(rows)) * S
+        k.rectangle([m, y, right, y + bh], fill="#0c141c", outline=LINE,
+                    width=max(1, S))
+        k.rectangle([m, y, m + 6 * S, y + bh], fill=GOLD)
+        k.text((m + 24 * S, y + head / 2 * S), f"TOP {n} FINISH",
+               font=f_board, fill=INK, anchor="lm")
+        k.text((right - 24 * S, y + head / 2 * S),
+               f"{len(rows)} PICK{'S' if len(rows) > 1 else ''}",
+               font=f_count, fill=MUTED, anchor="rm")
+        for i, q in enumerate(rows):
+            mid = y + (head + pitch * i + pitch / 2) * S
+            k.rectangle([m + 24 * S, mid - 19 * sc * S, m + 29 * S,
+                         mid + 19 * sc * S], fill=accent(q["club"]))
+            nm = q["name"].upper()
+            nf = fit_font(k, nm, "display", round(F_NAME * sc), 300 * S)
+            blur_text(img, (m + 46 * S, mid), nm, nf, INK,
+                      max(2, round(nf.size * NAME_BLUR)),
+                      anchor="lm", gain=NAME_BLUR_GAIN)
+            fig = ("%.0f%%" % (q["model"] * 100)) if tm.NO_ODDS else q["price"]
+            k.text((right - 24 * S, mid), fig, font=f_price,
+                   fill=EMERALD if tm.NO_ODDS else GOLD, anchor="rm")
+            prob_bar(k, right - 300 * S, right - 150 * S, mid - 4 * S,
+                     q["model"], q["implied"], h=8)
+        y += bh + gap * S
+
+    k.text((m, 1436 * S),
+           f"{SEASON} MODEL PROJECTION" if tm.NO_ODDS else f"PRICES {BOOK}",
+           font=font("display", 19), fill=MUTED)
+    k.text((right, 1436 * S), "SWIPE FOR THE NAMES", font=font("display", 20),
+           fill=EMERALD, anchor="ra")
+    if not tm.NO_ODDS:
+        rg_line(k, m, 1472 * S)
+    return img
 
 
 CLOSER = ("THE MODEL RAN THE COUNT",
@@ -182,36 +357,100 @@ CLOSER = ("THE MODEL RAN THE COUNT",
           f"NO {SEASON} VOTE IS PUBLIC",
           f"UNTIL THE COUNT ON {COUNT_DATE.split()[-2].upper()} "
           f"{COUNT_DATE.split()[-1].upper()}.")
+CLOSER_CLEAN = ("THE MODEL RAN THE COUNT",
+                f"{SIMS} TIMES, THEN COUNTED",
+                "WHERE EVERY PLAYER FINISHED.",
+                f"NO {SEASON} VOTE IS PUBLIC",
+                f"UNTIL THE COUNT ON {COUNT_DATE.split()[-2].upper()} "
+                f"{COUNT_DATE.split()[-1].upper()}.")
 
 
 # ------------------------------------------------------------------ copy
+def _board_list(picks):
+    """"top 5, top 10 and top 20", off the picks themselves."""
+    bs = [f"top {n}" for n in sorted({int(p["board"]) for p in picks})]
+    return ", ".join(bs[:-1]) + (" and " + bs[-1] if len(bs) > 1 else bs[0])
+
+
 def caption(picks):
     """Templated, like every other draft in this repo, and for the same reason:
     a templated post cannot invent an accuracy claim under time pressure."""
+    if tm.NO_ODDS:
+        # No book, no price, no tier, no dead-heat rule and no responsible
+        # gambling block: on a post with no market on it the 18+ line tells a
+        # classifier the post is about betting. See tiktok_market.NO_ODDS.
+        out = [
+            f"The model ran the {SEASON} Brownlow count {SIMS} times. Here is "
+            f"where it has {len(picks)} players finishing.",
+            "",
+            f"Across the {_board_list(picks)} finish markets. Every home and "
+            "away game went through the model, the whole count was simulated "
+            "from those games, and this is how often each player landed "
+            "inside the finish.",
+            "",
+        ]
+        for q in picks:
+            out.append(f"{q['name']}, top {q['board']}, "
+                       f"{q['model'] * 100:.0f}%")
+        out += [
+            "",
+            "The bar on each slide is that chance. Projected votes and model "
+            f"rank are the decimal board at {DOMAIN}. Games as favourite: the "
+            "model's most likely player to poll the 3. Games likely to poll: "
+            "better than even to poll at all. Coaches BOG: he topped the "
+            "coaches' votes.",
+            "",
+            "This is a model, not a leak: no "
+            f"{SEASON} vote is public until the count on {COUNT_DATE}.",
+            "",
+            "Which one has the model got wrong?",
+        ]
+        return "\n".join(out)
+
     out = [
-        f"The model ran the {SEASON} count {SIMS} times. Six placings where it "
-        "disagrees with the book.",
+        # COUNTED, and no longer claiming all of them disagree with the book:
+        # the safe picks are chosen on probability and the book has those
+        # about right. It said "Six placings where it disagrees with the
+        # book" while nine were on the deck and three of the nine agreed.
+        f"The model ran the {SEASON} count {SIMS} times. Here are "
+        f"{len(picks)} Brownlow placings worth a look.",
         "",
-        "Three safe, two value, one longshot, across the top 3, top 5, top 10 and "
-        "top 20 finish markets. Every home and away game went through the model, "
-        "the whole count was simulated from those games, and each runner's chance "
-        "of the finish was set against what the book is paying.",
+        # The boards are COUNTED off the picks, never listed by hand. This
+        # line asserted "top 3, top 5, top 10 and top 20" while no pick sat on
+        # the top 3 board at all, which is the same stale-assertion bug the
+        # tier split had.
+        f"{tier_split(picks).capitalize()}, across the "
+        f"{_board_list(picks)} finish markets, priced off the "
+        f"{BOOK.title()} board. Every home and away game went through the "
+        "model, the whole count was simulated from those games, and each "
+        "chance was set against the price.",
         "",
     ]
     for p in picks:
-        out.append(f"{TIER_LABEL[p['tier']].lower()}: {p['name']}, top {p['board']} "
-                   f"finish, {p['price']} ({BOOK.title()}), model "
-                   f"{p['model'] * 100:.0f}%")
+        # NINE picks, so the per-pick line is as short as it can be while
+        # staying searchable. The book is named once above instead of nine
+        # times here, which is 117 characters of a 362 character overrun.
+        out.append(f"{TIER_LABEL[p['tier']].lower()}: {p['name']}, top "
+                   f"{p['board']}, {p['price']}, model {p['model'] * 100:.0f}%")
     out += [
         "",
+        # THE TWO KINDS OF PICK ARE DESCRIBED SEPARATELY, because they are on
+        # the list for opposite reasons and one sentence covering both would
+        # have to claim an edge the safe picks do not have.
         "The bar on each slide is the model's chance against the chance the "
-        "price implies. The gap between them is the whole reason the pick is "
-        "on the list.",
+        "price implies. On the value and longshot picks the model is ahead, "
+        "and that gap is why the pick is there.",
         "",
+        "The safe picks are the other way round and are not value bets. The "
+        "model makes them highly likely to land and the book prices a near "
+        "certainty about right, so the price sits ahead. Anchors, not edges.",
+        "",
+        # Same three definitions, one clause each. The slides use labels a
+        # reader cannot infer, so this paragraph has to stay; it does not have
+        # to be a paragraph of sentences.
         f"Projected votes and model rank are the decimal board at {DOMAIN}. "
-        "Games as favourite counts the games where he is the model's most likely "
-        "player to poll the 3, and games likely to poll the ones where it makes "
-        "him better than even to poll at all. Coaches BOG counts the games where "
+        "Games as favourite: the model's most likely player to poll the 3. "
+        "Games likely to poll: better than even to poll at all. Coaches BOG: "
         "he topped the coaches' votes.",
         "",
         "Two things said plainly. This is a model, not a leak: no "
@@ -232,7 +471,7 @@ def write_copy(picks, paths, softs):
     cap, tags = caption(picks), hashtags(picks)
     out = [f"# TikTok carousel, placings, {SEASON}", "",
            "## Caption", "", "```", cap, "", tags, "```", "",
-           f"{len(cap) + len(tags) + 2} characters including hashtags. "
+           f"{caption_len(cap, tags)} characters including hashtags. "
            "TikTok's limit is 2,200.", "", "## Slides", "",
            "| # | File | Player | Board | Price | Model | Fair | Model rank |",
            "|---|---|---|---|---|---|---|---|"]
@@ -273,7 +512,7 @@ def write_copy(picks, paths, softs):
     for n, sc in softs:
         out.append(f"- {n}'s headshot is upscaled {sc:.1f} times and will look "
                    f"soft on a phone.")
-    path = os.path.join(REPO, "drafts", f"tiktok_placings_{SEASON}.md")
+    path = os.path.join(REPO, "drafts", f"tiktok_placings_{SEASON}{'_noodds' if tm.NO_ODDS else ''}.md")
     with open(path, "w", encoding="utf-8") as fh:
         fh.write("\n".join(out) + "\n")
     return path
@@ -282,49 +521,57 @@ def write_copy(picks, paths, softs):
 def main():
     ap = argparse.ArgumentParser(description=__doc__)
     ap.add_argument("--only", help="render one pick by key, or 'cover' / 'closer'")
+    add_no_odds_arg(ap)
     ap.add_argument("--no-phone", action="store_true",
                     help="skip the copy into the OneDrive folder")
     a = ap.parse_args()
+    set_no_odds(a.no_odds)
+    out_dir, phone_sub = odds_paths(OUT_DIR, PHONE_SUB)
     os.chdir(REPO)
 
-    picks = build()
-    sub = "TOP 3, 5, 10 AND 20"
+    picks = order_picks(build())
+    # COUNTED off the picks, like the caption's board list and the tier split.
+    # Hard-typed, this read "TOP 3, 5, 10 AND 20" over a ladder with no top 3
+    # band on it, because the deck's only top 3 pick left in the re-pick.
+    sub = _boards_upper(picks)
     if a.only:
         one = [p for p in picks if p["key"] == a.only]
         if a.only == "cover":
-            print(save(draw_cover(picks, sub), os.path.join(OUT_DIR, "01_cover.png")))
+            print(save(draw_cover(picks, sub), os.path.join(out_dir, "01_cover.png")))
         elif a.only == "closer":
-            print(save(draw_closer(CLOSER), os.path.join(OUT_DIR, "99_closer.png")))
+            print(save(draw_closer(CLOSER_CLEAN if tm.NO_ODDS else CLOSER), os.path.join(out_dir, "99_closer.png")))
         elif one:
             img, _ = draw_slide(one[0])
-            print(save(img, os.path.join(OUT_DIR, f"only_{a.only}.png")))
+            print(save(img, os.path.join(out_dir, f"only_{a.only}.png")))
         else:
             raise SystemExit(f"no pick keyed {a.only!r}; "
                              f"have {[p['key'] for p in picks]}")
         return
 
-    paths, softs = [save(draw_cover(picks, sub), os.path.join(OUT_DIR, "01_cover.png"))], []
+    paths, softs = [save(draw_cover(picks, sub), os.path.join(out_dir, "01_cover.png"))], []
     for i, p in enumerate(picks):
         img, soft = draw_slide(p)
         paths.append(save(img, os.path.join(
-            OUT_DIR, f"{i + 2:02d}_{p['tier'].lower()}_{p['key']}.png")))
+            out_dir, slide_stem(p, i + 2) + ".png")))
         if soft and soft > 1.8:
             softs.append((p["name"], soft))
-    paths.append(save(draw_closer(CLOSER),
-                      os.path.join(OUT_DIR, f"{len(picks) + 2:02d}_closer.png")))
+    paths.append(save(draw_closer(CLOSER_CLEAN if tm.NO_ODDS else CLOSER),
+                      os.path.join(out_dir, f"{len(picks) + 2:02d}_closer.png")))
 
     copy = write_copy(picks, paths, softs)
-    print(f"  {len(paths)} slides to {OUT_DIR}")
+    prune([out_dir], {os.path.basename(x) for x in paths})
+    print(f"  {len(paths)} slides to {out_dir}")
     print(f"  copy: {copy}")
     for p in picks:
         print(f"  {p['tier']:8s} {p['name']:20s} top {p['board']:<2} {p['price']:>7} "
               f"model {p['model']:.1%}  rank {p['rank']}")
 
     if not a.no_phone:
-        os.makedirs(PHONE_SUB, exist_ok=True)
+        os.makedirs(phone_sub, exist_ok=True)
         for p in paths:
-            shutil.copy2(p, os.path.join(PHONE_SUB, os.path.basename(p)))
-        print(f"  copied to {PHONE_SUB}")
+            shutil.copy2(p, os.path.join(phone_sub, os.path.basename(p)))
+        prune([phone_sub], {os.path.basename(x) for x in paths})
+        print(f"  copied to {phone_sub}")
 
 
 if __name__ == "__main__":
