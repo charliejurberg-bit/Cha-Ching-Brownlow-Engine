@@ -95,6 +95,7 @@ import sys
 import pandas as pd
 
 import features as feat
+import post_format as pf
 from club_aliases import canonical_club
 
 # ─────────────────────────────────────────────────────────────
@@ -425,6 +426,29 @@ def _write(lines, name, out_dir=DRAFTS_DIR):
 # Builder
 # ─────────────────────────────────────────────────────────────
 
+POST_ROWS = 6
+
+
+def _posts(shown, stat, threshold, floor, latest_season):
+    """The ladder as one post. Anyone who got there in the latest season is
+    the subject and goes in caps; the scope is the stat's floor season."""
+    if not shown:
+        return []
+    words = stat.replace(".", " ").lower()
+    text = [f"Fewest V/@AFL games to {pf.num(threshold)} career {words}, "
+            f"since {floor}:", ""]
+    subjects = []
+    for r in shown[:POST_ROWS]:
+        new = r['on'][:4] == str(latest_season)
+        codes = "/".join(pf.code(c) for c in str(r['clubs']).split(", ") if c)
+        nm = pf.subject(r['name']) if new else r['name']
+        text.append(f"  {r['games']} - {nm} ({codes})")
+        if new:
+            subjects.append(str(r['clubs']).split(", ")[-1])
+    text += ["", pf.tags(subjects, "@AFL")]
+    return [(f"Fewest games to {pf.num(threshold)} {words}", "\n".join(text))]
+
+
 def build_fewest_games(stat, threshold, top_n=10, out_dir=DRAFTS_DIR, **kw):
     """Players ranked by games played to reach `threshold` of `stat`."""
     if stat not in STAT_FLOORS:
@@ -499,6 +523,7 @@ def build_fewest_games(stat, threshold, top_n=10, out_dir=DRAFTS_DIR, **kw):
         pid = int(r['ID'])
         rows.append({
             'who': _who(r['Player'], pid),
+            'name': str(r['Player']),
             'clubs': clubs.get(pid, ""),
             'debut': int(debut.loc[pid]),
             'games': int(r['game_no']),
@@ -586,6 +611,8 @@ def build_fewest_games(stat, threshold, top_n=10, out_dir=DRAFTS_DIR, **kw):
             str(r['games']), r['on']]) + " |")
     L.append("")
 
+    L = pf.insert_ready(L, _posts(shown, stat, threshold, floor,
+                                  prov['season_max']))
     name = f"fewest_games_{_slug(stat)}_{threshold:g}"
     out_path = _write(L, name, out_dir=out_dir)
     print(f"OK wrote {out_path} ({len(rows):,} players reached "

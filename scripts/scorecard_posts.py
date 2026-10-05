@@ -22,6 +22,7 @@ import sys
 import pandas as pd
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+import post_format as pf  # noqa: E402
 import season as season_cfg  # noqa: E402
 import site_data as sd  # noqa: E402
 
@@ -119,15 +120,12 @@ def main(argv):
     posts = build(season)
     out = os.path.join("drafts", f"scorecard_{season}.md")
     os.makedirs("drafts", exist_ok=True)
+    lines = pf.insert_ready(
+        [f"# {season} model scorecard: DRAFTS, not signed off", ""], posts)
     with open(out, "w", encoding="utf-8") as f:
-        f.write(f"# {season} model scorecard: DRAFTS, not signed off\n\n")
-        for name, body in posts:
-            f.write(f"--- {name} [{len(body)} chars] ---\n{body}\n\n")
-    long = [n for n, b in posts if len(b) > 280]
-    if long:
-        print(f"! over 280 characters: {', '.join(long)}")
+        f.write("\n".join(lines).rstrip() + "\n")
     for name, body in posts:
-        print(f"--- {name} [{len(body)} chars] ---\n{body}\n")
+        print(pf.txt_block(body, name))
     print(f"wrote {out}")
 
 

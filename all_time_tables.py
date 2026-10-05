@@ -71,6 +71,7 @@ import sys
 
 import pandas as pd
 
+import post_format as pf
 from club_aliases import canonical_club
 
 # ─────────────────────────────────────────────────────────────
@@ -423,6 +424,26 @@ def _write(lines, name, out_dir=DRAFTS_DIR):
     return out_path
 
 
+POST_ROWS = 6
+
+
+def _scope(prov):
+    """The window as the post states it. Both ends, because the frame stops
+    at the last counted season it was built from and a reader must not take a
+    list that cannot hold this season as one that includes it."""
+    return f"{prov['season_min']}-{prov['season_max']}"
+
+
+def _codes(clubs, sep):
+    return "/".join(pf.code(c.strip()) for c in str(clubs).split(sep)
+                    if c.strip())
+
+
+def _ready(L, label, header, lines):
+    text = [header, ""] + ["  " + x for x in lines] + ["", "#Brownlow @AFL"]
+    return pf.insert_ready(L, [(label, "\n".join(text))])
+
+
 def _table(lines, head, rule, body_rows):
     lines.append(head)
     lines.append(rule)
@@ -461,8 +482,10 @@ def build_pair_season_totals(top_n=10, out_dir=DRAFTS_DIR, **kw):
                 'season': int(season),
                 'club': club,
                 'a': _who(a['Player_Name'], a['ID']),
+                'a_name': str(a['Player_Name']),
                 'a_votes': int(a['votes']),
                 'b': _who(b['Player_Name'], b['ID']),
+                'b_name': str(b['Player_Name']),
                 'b_votes': int(b['votes']),
                 'combined': int(a['votes']) + int(b['votes']),
             })
@@ -495,6 +518,12 @@ def build_pair_season_totals(top_n=10, out_dir=DRAFTS_DIR, **kw):
             str(r['combined'])]) + " |"
          for i, r in enumerate(shown, 1)])
 
+    L = _ready(L, "Teammate pairs",
+               f"Most Brownlow votes by two teammates in one season, "
+               f"{_scope(prov)}:",
+               [f"{r['combined']} - {r['a_name']} {r['a_votes']} & "
+                f"{r['b_name']} {r['b_votes']} ({pf.code(r['club'])} "
+                f"{r['season']})" for r in shown[:POST_ROWS]])
     out_path = _write(L, "pairs", out_dir=out_dir)
     print(f"OK wrote {out_path} ({len(rows):,} eligible pairs, top {len(shown)} shown)")
     print("   " + _gap_line(shown, 'combined', "combined votes").replace("**", ""))
@@ -545,6 +574,11 @@ def build_club_season_totals(top_n=10, out_dir=DRAFTS_DIR, **kw):
             str(r['pollers']), str(r['players'])]) + " |"
          for i, r in enumerate(shown, 1)])
 
+    L = _ready(L, "Club seasons",
+               f"Most Brownlow votes polled by one club in a season, "
+               f"{_scope(prov)}:",
+               [f"{r['votes']} - {r['club']} {r['season']}"
+                for r in shown[:POST_ROWS]])
     out_path = _write(L, "clubs", out_dir=out_dir)
     print(f"OK wrote {out_path} ({len(rows):,} club-seasons, top {len(shown)} shown)")
     print("   " + _gap_line(shown, 'votes', "votes").replace("**", ""))
@@ -573,6 +607,7 @@ def build_three_vote_games(top_n=10, out_dir=DRAFTS_DIR, **kw):
     rows = [{
         'season': int(r['Season']),
         'who': _who(r['Player_Name'], r['ID']),
+        'name': str(r['Player_Name']),
         'club': r['clubs'],
         'three_vote_games': int(r['three_vote_games']),
         'season_votes': int(r['season_votes']),
@@ -607,6 +642,11 @@ def build_three_vote_games(top_n=10, out_dir=DRAFTS_DIR, **kw):
             str(r['three_vote_games']), str(r['season_votes'])]) + " |"
          for i, r in enumerate(shown, 1)])
 
+    L = _ready(L, "3-vote games in a season",
+               f"Most 3-vote games in a Brownlow season, {_scope(prov)}:",
+               [f"{r['three_vote_games']} - {r['name']} "
+                f"({_codes(r['club'], ' / ')} {r['season']})"
+                for r in shown[:POST_ROWS]])
     out_path = _write(L, "three_vote", out_dir=out_dir)
     print(f"OK wrote {out_path} ({len(rows):,} player-seasons, top {len(shown)} shown)")
     print("   " + _gap_line(shown, 'three_vote_games', "3-vote games").replace("**", ""))
@@ -658,6 +698,7 @@ def build_career_three_vote_games(top_n=10, out_dir=DRAFTS_DIR, **kw):
 
     rows = [{
         'who': _who(r['Player_Name'], r['ID']),
+        'name': str(r['Player_Name']),
         'clubs': r['clubs'],
         'three_vote_games': int(r['three_vote_games']),
         'career_votes': int(r['career_votes']),
@@ -707,6 +748,10 @@ def build_career_three_vote_games(top_n=10, out_dir=DRAFTS_DIR, **kw):
             str(r['games'])]) + " |"
          for i, r in enumerate(shown, 1)])
 
+    L = _ready(L, "Career 3-vote games",
+               f"Most career 3-vote games in the Brownlow, {_scope(prov)}:",
+               [f"{r['three_vote_games']} - {r['name']} "
+                f"({_codes(r['clubs'], ',')})" for r in shown[:POST_ROWS]])
     out_path = _write(L, "career_three_vote", out_dir=out_dir)
     print(f"OK wrote {out_path} ({len(rows):,} players with a 3-vote game, "
           f"top {len(shown)} shown)")

@@ -80,6 +80,7 @@ import sys
 import pandas as pd
 
 import fewest_games as fg
+import post_format as pf
 from club_aliases import canonical_club
 from draft_posts import _display_round
 # Floors, the drift guard and the two formatters are imported rather than
@@ -259,6 +260,12 @@ def _streaks_for(df, stat, threshold, season):
     return floor, active, best, len(sub)
 
 
+def _club_on(df, pid, date):
+    """The club `pid` played for on `date`."""
+    hit = df.loc[(df['ID'] == pid) & (df['Date'] == date), 'Playing.for']
+    return canonical_club(hit.iloc[-1]) if len(hit) else None
+
+
 def _decorate(df, rows, names, last_round):
     """Add name, clubs, missed-match disclosure and last-seen round."""
     out = []
@@ -267,6 +274,11 @@ def _decorate(df, rows, names, last_round):
         pid = int(r['ID'])
         out.append({
             'who': fg._who(names.get(pid), pid),
+            'name': str(names.get(pid)),
+            'id': pid,
+            # The club of the run's last game. r['clubs'] is sorted by name,
+            # so its last entry is alphabetical, not chronological.
+            'club_last': _club_on(df, pid, r['end']),
             'clubs': ", ".join(r['clubs']),
             'n': int(r['n']),
             'start': r['start'].strftime('%Y-%m-%d'),
@@ -336,6 +348,58 @@ def _header(L, prov, season):
              "ID beside the name. Clubs are canonicalised through "
              "`club_aliases.canonical_club()`.")
     L.append("")
+
+
+def _words(stat, threshold):
+    return f"{threshold:g}+ {stat.replace('.', ' ').lower()}"
+
+
+def _posts_one(stat, threshold, floor, act_rows, all_rows):
+    """Two posts: the live runs, and the longest on record with anyone whose
+    run is still alive in caps."""
+    posts = []
+    live_ids = {(r['id'], r['start']) for r in act_rows}
+    if act_rows:
+        text = [f"Longest active streaks of games with {_words(stat, threshold)}:",
+                ""]
+        text += [f"  {r['n']} - {r['name']} ({pf.code(r['club_last'])})"
+                 for r in act_rows[:6]]
+        text += ["", pf.tags([r['club_last'] for r in act_rows[:1]], "@AFL")]
+        posts.append(("Active streaks", "\n".join(text)))
+    if all_rows:
+        text = [f"Most consecutive V/@AFL games with {_words(stat, threshold)}, "
+                f"since {floor}:", ""]
+        caps = []
+        for r in all_rows[:6]:
+            alive = (r['id'], r['start']) in live_ids
+            nm = pf.subject(r['name']) if alive else r['name']
+            if alive:
+                caps.append(r['club_last'])
+            text.append(f"  {r['n']} - {nm} ({pf.code(r['club_last'])}) "
+                        f"{r['start'][:4]}")
+        text += ["", pf.tags(caps, "@AFL")]
+        posts.append(("Longest on record", "\n".join(text)))
+    return posts
+
+
+# A run shorter than this is not a streak worth a line in a post.
+POST_MIN_RUN = 3
+
+
+def _posts_board(blocks, season, wanted=None):
+    """The board as one post: the leading live run on each threshold."""
+    lines = []
+    for b in blocks:
+        if not b['act'] or b['act'][0]['n'] < POST_MIN_RUN:
+            continue
+        r = b['act'][0]
+        lines.append(f"  {_words(b['stat'], b['threshold'])}: {r['n']}, "
+                     f"{r['name']} ({pf.code(r['club_last'])})")
+    if not lines:
+        return []
+    text = [f"Longest active streaks in {season}:", ""] + lines
+    text += ["", pf.tags(sorted(wanted) if wanted else None, "@AFL")]
+    return [("Streak board", "\n".join(text))]
 
 
 def _streak_table(L, rows, label, stat):
@@ -408,6 +472,9 @@ def build_stat_streaks(stat, threshold, season, top_n=10, out_dir=DRAFTS_DIR,
         L.append("No run of any length.")
     L.append("")
 
+    L = pf.insert_ready(L, _posts_one(stat, threshold, floor, act_rows,
+                                      all_rows),
+                        f"No run to report for {threshold:g}+ {stat}.")
     name = f"streaks_{fg._slug(stat)}_{threshold:g}_{season}"
     out_path = _write(L, name, out_dir=out_dir)
     print(f"OK wrote {out_path} ({len(active):,} active, {len(best):,} players "
@@ -534,6 +601,8 @@ def build_streak_board(season, pairs=None, top_n=3, clubs=None,
 
     # The club filter goes in the filename, so a fixture cut cannot overwrite
     # the full board. Same trap milestones.py records.
+    L = pf.insert_ready(L, _posts_board(blocks, season, wanted),
+                        f"No active run of {POST_MIN_RUN}+ on any threshold.")
     name = f"streak_board_{season}"
     if wanted is not None:
         name += "_" + "_".join(fg._slug(c).replace('_', '')

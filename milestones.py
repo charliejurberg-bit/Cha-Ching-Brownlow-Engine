@@ -98,6 +98,7 @@ import sys
 import pandas as pd
 
 import fewest_games as fg
+import post_format as pf
 from club_aliases import canonical_club
 # Imported rather than copied. CLAUDE.md records that _display_round already
 # exists in three places (dashboard.py, draft_posts.py, streaks.py) and that
@@ -370,6 +371,47 @@ def _ladder_line(stat, spec, reached):
             f"have ever reached the first rung.")
 
 
+def _post_tags(rows):
+    """Club handles when the post is about three clubs or fewer, then @AFL."""
+    clubs = list(dict.fromkeys(r['club'] for r in rows))
+    return pf.tags(clubs if len(clubs) <= 3 else None, "@AFL")
+
+
+def _posts_passed(rows, ladders, disp):
+    """One post per ladder that moved: every rung crossed, biggest first."""
+    posts = []
+    for stat, spec in ladders.items():
+        hit = [r for r in rows if r['stat'] == stat]
+        if not hit:
+            continue
+        text = [f"Career {spec['unit']} milestones reached in Round {disp}:", ""]
+        text += [f"  {pf.num(r['rung'])} - {r['name']} ({pf.code(r['club'])})"
+                 for r in hit]
+        text += ["", _post_tags(hit)]
+        posts.append((f"{stat}, Round {disp}", "\n".join(text)))
+    return posts
+
+
+def _posts_upcoming(rows, ladders, disp_next):
+    """One post per ladder: who is within reach and exactly what they need.
+    Worded as a need, never as a forecast, so it stays true if he misses."""
+    posts = []
+    for stat, spec in ladders.items():
+        hit = [r for r in rows if r['stat'] == stat]
+        if not hit:
+            continue
+        unit = spec['unit']
+        text = [f"Career {unit} milestones in reach in Round {disp_next}:", ""]
+        for r in hit:
+            need = ("1 more game" if stat == GAMES_LADDER and r['gap'] == 1
+                    else f"{pf.num(r['gap'])} more")
+            text.append(f"  {r['name']} ({pf.code(r['club'])}) needs {need} "
+                        f"for {pf.num(r['rung'])}")
+        text += ["", _post_tags(hit)]
+        posts.append((f"{stat}, Round {disp_next}", "\n".join(text)))
+    return posts
+
+
 def _write(lines, name, out_dir=DRAFTS_DIR):
     os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, f"{name}.md")
@@ -437,6 +479,7 @@ def build_milestones_passed(season, round_num, ladders=None,
                     'rung': rung,
                     'unit': spec['unit'],
                     'who': fg._who(r['Player'], r['ID']),
+                    'name': str(r['Player']),
                     'club': canonical_club(r['Playing.for']),
                     'opp': _opponent(r),
                     'on': r['Date'].strftime('%Y-%m-%d'),
@@ -514,6 +557,8 @@ def build_milestones_passed(season, round_num, ladders=None,
                 str(r['opp']), r['on'], f"{r['total']:,.0f}"]) + " |")
     L.append("")
 
+    L = pf.insert_ready(L, _posts_passed(rows, ladders, disp),
+                        f"No milestone was crossed in Round {disp}.")
     name = f"milestones_passed_{season}_r{disp}"
     out_path = _write(L, name, out_dir=out_dir)
     print(f"OK wrote {out_path} ({len(rows):,} milestone(s) crossed in "
@@ -595,6 +640,7 @@ def build_milestones_upcoming(season, games_ahead=1, ladders=None,
             rows.append({
                 'stat': stat, 'rung': rung, 'unit': spec['unit'],
                 'who': fg._who(r['Player'], pid),
+                'name': str(r['Player']),
                 'club': club if club else canonical_club(r['Playing.for']),
                 'total': total, 'gap': gap,
                 'games': int(season_games.loc[pid]),
@@ -699,6 +745,9 @@ def build_milestones_upcoming(season, games_ahead=1, ladders=None,
     # the full round table, which is the same trap two files apart: both are
     # legitimate outputs for the same season and round, and the narrower one
     # silently replacing the wider one is not detectable by reading either.
+    L = pf.insert_ready(L, _posts_upcoming(rows, ladders, disp_next),
+                        f"Nobody is within reach of a milestone in Round "
+                        f"{disp_next}.")
     name = f"milestones_upcoming_{season}_r{disp_next}"
     if wanted is not None:
         name += "_" + "_".join(fg._slug(c).replace('_', '')

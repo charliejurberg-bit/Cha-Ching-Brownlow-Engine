@@ -41,6 +41,7 @@ import sys
 from datetime import datetime
 
 import pandas as pd
+import post_format as pf
 import season as season_cfg
 
 GAME_LEVEL = season_cfg.pred_path("game_level_{s}.csv")
@@ -183,20 +184,15 @@ def section_three_two_one(rnd, disp_round):
         top = g.sort_values(
             ['Exp_Votes', 'Player_Name'], ascending=[False, True]
         ).head(TOP_N_PER_GAME)
-        out.append(f"### {home} v {away}")
-        out.append("")
-        out.append("```")
-        out.append(f"Round {disp_round} Predicted Votes")
-        out.append(f"{home} v {away}")
+        text = [f"Round {disp_round} Predicted Votes", f"{home} v {away}"]
         for slot, (_, r) in zip(range(TOP_N_PER_GAME, 0, -1), top.iterrows()):
-            out.append(
+            text.append(
                 f"{slot}. {_label_with_team(r['Player_Name'], r['Playing.for'])} "
                 f"{r['Exp_Votes']:.2f}"
             )
-        out.append("")
-        out.append(f"See them all on the Game Analysis tab at {SITE_URL}")
-        out.append("```")
-        out.append("")
+        text += ["", f"See them all on the Game Analysis tab at {SITE_URL}",
+                 pf.tags("#Brownlow", pf.match_tag(home, away))]
+        out += pf.block("\n".join(text), f"{home} v {away}")
     return out
 
 
@@ -278,24 +274,20 @@ def section_movers(season_now, disp_round, snapshot_path=None, played=None):
         The sign comes from the delta itself rather than from a per-block
         argument, so a riser prints +21 and a faller -4 off one template.
         """
-        out.append(f"### {title}")
-        out.append("")
         if rows.empty:
+            out.append(f"### {title}")
+            out.append("")
             out.append("None.")
             out.append("")
             return
-        out.append("```")
-        out.append(f"Round {disp_round} Movement - Biggest {title}")
-        out.append("")
+        text = [f"Round {disp_round} Leaderboard Movement - Biggest {title}", ""]
         for _, r in rows.iterrows():
-            out.append(
+            text.append(
                 f"{r['Player_Name']} {int(r['delta']):+d} "
                 f"from {int(r['rank_prev'])} to {int(r['rank_now'])}"
             )
-        out.append("")
-        out.append(f"See the full leaderboard at {SITE_URL}")
-        out.append("```")
-        out.append("")
+        text += ["", f"See the full leaderboard at {SITE_URL}", "#AFL #Brownlow"]
+        out.extend(pf.block("\n".join(text), title))
 
     _block("Risers", risers)
     _block("Fallers", fallers)
@@ -525,6 +517,17 @@ def build_closest_calls(season, round_num, path=GAME_LEVEL, out_dir=DRAFTS_DIR):
             cells.append(str(r['source']))
         L.append("| " + " | ".join(cells) + " |")
     L.append("")
+
+    # The post: the two tightest games, top two named in each. Built from the
+    # same sorted rows as the table, so the two cannot disagree.
+    text = [f"Round {disp_round}'s closest calls for the 3 votes:", ""]
+    for r in rows[:2]:
+        text.append(f"{r['fixture']}")
+        text.append(f"  {r['first']} {_fmt_votes(r['first_v'])}")
+        text.append(f"  {r['second']} {_fmt_votes(r['second_v'])}")
+        text.append("")
+    text += [f"Every game at {SITE_URL}", "#AFL #Brownlow"]
+    L = pf.insert_ready(L, [("Closest calls", "\n".join(text))])
 
     os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, f"closest_calls_r{disp_round}.md")

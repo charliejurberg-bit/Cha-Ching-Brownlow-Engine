@@ -85,6 +85,7 @@ import sys
 import pandas as pd
 
 import fewest_games as fg
+import post_format as pf
 from club_aliases import canonical_club
 # Imported rather than copied, for the reason milestones.py records: CLAUDE.md
 # already tracks three copies of this and a fourth makes that worse.
@@ -265,6 +266,44 @@ def _round_label(row):
     return f"{season} R{_display_round(int(rn), season)}"
 
 
+# A round best is a post when it reaches this all-time rank. Beyond it the
+# all-time list it would sit on does not show it.
+POST_MAX_RANK = 10
+POST_ROWS = 6
+
+
+def _stat_words(stat):
+    return {"Hit.Outs": "hitouts", "Inside.50s": "inside 50s"}.get(
+        stat, stat.replace(".", " ").lower())
+
+
+def _posts(sections, disp):
+    """One post per stat whose round best sits in the all-time top
+    POST_MAX_RANK: the all-time list with the round's entry in caps."""
+    posts = []
+    for stat, sec in sections:
+        if sec is None or sec['rank'] > POST_MAX_RANK:
+            continue
+        rows = [r for r in sec['all_rows'] if not r['appended']][:POST_ROWS]
+        here = [r for r in sec['all_rows'] if r['is_here']]
+        if not any(r['is_here'] for r in rows):
+            rows = rows[:POST_ROWS - 1] + here[:1]
+        text = [f"Most {_stat_words(stat)} in a V/@AFL game since "
+                f"{sec['floor']}:", ""]
+        for r in rows:
+            nm = pf.subject(r['name']) if r['is_here'] else r['name']
+            text.append(f"  {r['v']:g} - {nm} ({pf.code(r['club'])}) "
+                        f"{r['when']}")
+        if sec['rank'] > 1 and sec['equal'] > 1:
+            text += ["", f"Equal {pf.ordinal(sec['rank'])} since "
+                         f"{sec['floor']}."]
+        clubs = list(dict.fromkeys(r['club'] for r in here))
+        text += ["", pf.tags(clubs, "@AFL")]
+        posts.append((f"{stat}, ranks {pf.ordinal(sec['rank'])}",
+                      "\n".join(text)))
+    return posts
+
+
 def _write(lines, name, out_dir=DRAFTS_DIR):
     os.makedirs(out_dir, exist_ok=True)
     out_path = os.path.join(out_dir, f"{name}.md")
@@ -359,6 +398,7 @@ def build_round_bests(season, round_num, stats=None, top_n=10, round_top=5,
             return {
                 'rank': r_rank,
                 'who': fg._who(r['Player'], r['ID']),
+                'name': str(r['Player']),
                 'club': canonical_club(r['Playing.for']),
                 'when': _round_label(r),
                 'v': float(r['v']),
@@ -514,6 +554,9 @@ def build_round_bests(season, round_num, stats=None, top_n=10, round_top=5,
                          f"line.")
             L.append("")
 
+    L = pf.insert_ready(L, _posts(sections, disp),
+                        f"No round best reached the all-time top "
+                        f"{POST_MAX_RANK} in Round {disp}.")
     name = f"round_bests_{season}_r{disp}"
     out_path = _write(L, name, out_dir=out_dir)
     print(f"OK wrote {out_path} ({len(headline)} of {len(stats)} stats ranked, "

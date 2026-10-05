@@ -52,6 +52,8 @@ from PIL import Image, ImageDraw, ImageFilter
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import post_format as pf                                          # noqa: E402
+
 import leaderboard_card as lb                                      # noqa: E402
 from countdown_card import (                                       # noqa: E402
     BG, EMERALD, INK, MUTED, RANK_INK, GOLD, LINE, S,
@@ -640,7 +642,7 @@ def write_copy(b, paths, softs, missing):
     out = [f"# TikTok carousel, the model's top 10, {s}", ""]
     cap = caption(b)
     tags = hashtags(b)
-    out += ["## Caption", "", "```", cap, "", tags, "```", "",
+    out += ["## Caption", "", "```text", pf.clean(cap + "\n\n" + tags), "```", "",
             f"{len(cap) + len(tags) + 2} characters including hashtags. "
             "TikTok's limit is 2,200.", "",
             "## Slides", ""]

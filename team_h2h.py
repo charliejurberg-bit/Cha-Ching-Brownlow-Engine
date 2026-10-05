@@ -16,10 +16,12 @@ before the tier existed, and the only addition is a section 12 heading carrying
 the same "Not run, opt-in via" stub sections 10 and 11 already print. See
 team_h2h_spec.md section 14.
 
-Output is a **markdown facts file** to drafts/, which is gitignored. No tweet
-copy and no draft: draft_gate.py has no team-mode coverage, so nothing here is
-post-ready and nothing here claims to be. Copy is written separately once the
-gate covers team mode.
+Output is a **markdown facts file** to drafts/, which is gitignored. Since 5
+October 2026 it opens with a "Ready to post" section (`_posts`): the all-time
+series record and any live winning run of 3 or more, built on the 1897-on
+series whatever `--extended` says. Those two are plain counts off the same
+tables the file prints. Nothing else here is copy, and draft_gate.py still has
+no team-mode coverage, so the cut sections stay facts only.
 
 Three things the writer is built to prevent, each from the spec:
 
@@ -47,6 +49,7 @@ import sys
 
 import pandas as pd
 
+import post_format as pf
 from team_h2h_crossopp import LIVE_STREAK_TRIGGER, cross_opponent_streaks
 from team_h2h_pre1965 import (EXTENDED_CAVEAT, EXTENDED_FLOOR,
                               MIXED_FLOOR_WARNING, extended_series)
@@ -323,6 +326,48 @@ def _extended_lines(subject, opponent, scope, fixture_date, table):
     return L, cuts, em
 
 
+# A live run shorter than this is not posted.
+POST_MIN_STREAK = 3
+
+
+def _posts(subject, opponent, table):
+    """Ready posts, always on the ALL-TIME series (1897 on) whatever --extended
+    says, because every "most / first / last" claim is all time by default.
+    Two posts: the series record, and a live winning run of POST_MIN_STREAK or
+    more by either side, with whether it is that side's longest."""
+    posts = []
+    ext = extended_series(subject, opponent, main=table)
+    ov = ext['all_overview'].iloc[0]
+    w, l, d = int(ov.wins), int(ov.losses), int(ov.draws)
+    first = str(ext['meta'].iloc[0].first_meeting_all)[:4]
+    hs = (subject, opponent)
+    text = [f"{subject} v {opponent}, every V/@AFL meeting since {first}:", "",
+            f"  {subject} {w} wins", f"  {opponent} {l} wins"]
+    if d:
+        text.append(f"  {pf.plural(d, 'draw')}")
+    text += ["", pf.tags(hs, "@AFL")]
+    posts.append(("Series record", "\n".join(text)))
+
+    for side, other in ((subject, opponent), (opponent, subject)):
+        e = ext if side == subject else extended_series(side, other, main=table)
+        ws = e['all_win_streaks']
+        ws = ws[ws.basis == 'match'].set_index('kind')
+        live, best = int(ws.loc['live', 'length']), int(ws.loc['longest', 'length'])
+        if live < POST_MIN_STREAK:
+            continue
+        start = int(ws.loc['live', 'start_season'])
+        line = (f"{side} have won their last {live} against {other}, a run "
+                f"that began in {start}.")
+        if live >= best:
+            line += f" Their longest ever in the fixture, since {first}."
+        else:
+            line += (f" Their longest is {best}, from "
+                     f"{int(ws.loc['longest', 'start_season'])} to "
+                     f"{int(ws.loc['longest', 'end_season'])}.")
+        posts.append(("Live streak", "\n".join([line, "", pf.tags(hs, "@AFL")])))
+    return posts
+
+
 def build_facts(subject, opponent, scope='all', fixture_date=None,
                 without=(), matches=None, extended=False):
     """Return the facts file as markdown text, and the run's own metadata."""
@@ -562,6 +607,7 @@ def build_facts(subject, opponent, scope='all', fixture_date=None,
                             if extended_meta is not None else None),
            'pre_meetings': (int(extended_meta.pre_meetings)
                             if extended_meta is not None else None)}
+    L = pf.insert_ready(L, _posts(subject, opponent, table))
     return '\n'.join(L), run
 
 

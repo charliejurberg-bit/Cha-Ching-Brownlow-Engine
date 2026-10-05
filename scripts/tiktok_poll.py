@@ -38,6 +38,8 @@ from PIL import Image, ImageDraw, ImageFilter
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import post_format as pf                                          # noqa: E402
+
 import tiktok_market as tm                                         # noqa: E402
 from afl_headshots import head                                     # noqa: E402
 from sb_3vote_board import _dashboard_ns                           # noqa: E402
@@ -501,7 +503,7 @@ def hashtags(picks):
 def write_copy(picks, paths, softs):
     cap, tags = caption(picks), hashtags(picks)
     out = [f"# TikTok carousel, to poll a vote, {SEASON}", "",
-           "## Caption", "", "```", cap, "", tags, "```", "",
+           "## Caption", "", "```text", pf.clean(cap + "\n\n" + tags), "```", "",
            f"{caption_len(cap, tags)} characters including hashtags. "
            "TikTok's limit is 2,200.", "", "## Slides", "",
            "| # | File | Player | Club | Games | Price | Model | Fair | Edge "

@@ -499,6 +499,84 @@ def strip_claim_comments(text):
     return CLAIM_COMMENT_LINE_RE.sub("", text)
 
 
+# A wrapped line is long; a list line is short or indented. A line at least
+# this long followed by an unindented one is a hard wrap inside a sentence.
+_WRAP_MIN = 50
+_FENCE_RE = re.compile(r"^```[^\n]*\n(.*?)^```[ \t]*$", re.MULTILINE | re.DOTALL)
+
+
+def _unwrap(lines):
+    """Undo hard wrapping inside each paragraph of a blockquoted post. A pasted
+    post keeps every newline, so an 80-column wrap in the draft becomes a line
+    break mid-sentence on X. List lines are short or indented and are kept."""
+    out = []
+    for ln in lines:
+        if (out and out[-1] and ln and not ln[0].isspace()
+                and len(out[-1]) >= _WRAP_MIN
+                and not re.match(r"[-*•]|\d+[.)]\s|@|#", ln)):
+            out[-1] = out[-1].rstrip() + " " + ln.strip()
+        else:
+            out.append(ln)
+    return out
+
+
+def ready_posts(draft_text):
+    """Every post in a draft as (label, exact paste text).
+
+    A post is a fenced block or a run of blockquote lines. Claim comments are
+    stripped, the "> " markers removed and hard wraps undone. The label is the
+    nearest heading above the post.
+    """
+    text = strip_claim_comments(draft_text)
+    posts, heading = [], None
+    fenced = {m.start(): m for m in _FENCE_RE.finditer(text)}
+    lines = text.split("\n")
+    i, offset = 0, 0
+    while i < len(lines):
+        ln = lines[i]
+        if offset in fenced:
+            m = fenced[offset]
+            posts.append((heading, m.group(1).rstrip("\n")))
+            consumed = text.count("\n", m.start(), m.end()) + 1
+            for k in range(consumed):
+                offset += len(lines[i + k]) + 1
+            i += consumed
+            continue
+        if ln.startswith("#") and re.match(r"#{1,6}\s", ln):
+            heading = ln.lstrip("#").strip()
+        if ln.startswith(">"):
+            block = []
+            while i < len(lines) and lines[i].startswith(">"):
+                block.append(re.sub(r"^> ?", "", lines[i]))
+                offset += len(lines[i]) + 1
+                i += 1
+            posts.append((heading, "\n".join(_unwrap(block))))
+            continue
+        offset += len(ln) + 1
+        i += 1
+    return posts
+
+
+def write_ready(draft_path, draft_text):
+    """Write <draft>.ready.md: only the posts, fenced, each checked by
+    post_format. Called after every check has passed, so a ready file exists
+    only for a draft the gate cleared."""
+    import post_format as pf
+    posts = []
+    for n, (label, body) in enumerate(ready_posts(draft_text), 1):
+        try:
+            pf.clean(body)
+        except pf.PostFormatError as exc:
+            fail("paste", f"post {n} ({label or 'unlabelled'}) cannot be "
+                          f"pasted as written: {exc}")
+        posts.append((label or f"Post {n}", body))
+    out = draft_path.with_name(draft_path.stem + ".ready.md")
+    lines = pf.insert_ready([f"# {draft_path.stem}: ready to post", ""], posts,
+                            "The draft holds no fenced or blockquoted post.")
+    out.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+    return out, len(posts)
+
+
 def blank_claim_comments(text):
     """The draft with claim comments blanked to spaces, offsets preserved.
 
@@ -1842,6 +1920,12 @@ def main(argv):
     check_club_scope(facts, facts_text, facts_path)
     check_subject_drift(facts, facts_text, facts_path)
 
+    # Only for a real draft. The test fixtures pass through main() too, and a
+    # ready file beside them is litter.
+    ready_path, n_posts = (write_ready(draft_path, draft_text)
+                           if draft_path.resolve().parent.name == "drafts"
+                           else (None, 0))
+
     n_rates = len(facts.get("rates") or [])
     n_totals = len(facts.get("totals") or [])
     n_tables = len(facts.get("ranked_tables") or [])
@@ -1855,6 +1939,8 @@ def main(argv):
         f"superlative, denominator, orphan-number, depth, finals, base-rate, "
         f"club-scope and subject-drift checks all clear."
     )
+    if ready_path is not None:
+        print(f"      {n_posts} post(s) ready to paste in {ready_path}")
     return 0
 
 

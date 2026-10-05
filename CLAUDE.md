@@ -316,8 +316,11 @@ brownlow_engine/
 │                         #   currently join at 100.00%
 ├── fixture_recon.py      # Per-fixture PLAYER-level recon (blocks 1-8 of
 │                         #   fixture_recon_spec.md) → gitignored drafts/. Review
-│                         #   material, never post-ready. Team-level records are
-│                         #   team_h2h.py's, not duplicated here
+│                         #   material, except the one block-2 post at the top
+│                         #   (see "Drafts are paste-ready"). Team-level records
+│                         #   are team_h2h.py's, not duplicated here
+├── post_format.py        # Every draft post goes through this: clean, refuse,
+│                         #   fence. See "Drafts are paste-ready"
 ├── data_pull.py          # EMPTY, 0 bytes. Not a fetcher. The R paths that do
 │                         #   work are fetch_extended_data.R and scripts/build_history.R
 ├── fetch_extended_data.R # R script for fitzRoy data (coaches votes etc.)
@@ -633,6 +636,51 @@ Recalibrate against `backtest_game_level.csv` and validate on the 207 games of
   Done in the dashboard so the 3-2-1 rule stays solely in `load_game_rounded`,
   which means `season_projection_2026.csv` carries the raw p90 and the board
   shows the lifted figure. That file has exactly one consumer, the Leaderboard.
+
+## Drafts are paste-ready (from 5 October 2026)
+
+**Every script that writes to drafts/ opens its file with a "Ready to post"
+section: one fenced ```text block per post, holding exactly what gets pasted
+and nothing else, labelled outside the fence with its X length.** Recon and
+method sit below the line. Charlie copies at speed, often from his phone, so a
+post that needs editing before it can go out is a bug.
+
+`post_format.py` is the only way a script emits a post. `pf.block()` /
+`pf.insert_ready()` wrap posts and `pf.clean()` runs on every one. It strips
+trailing space, collapses blank runs, restores AFLTables' stripped O' names
+(OHalloran to O'Halloran), and **raises** on an em or en dash, markdown,
+a `>` or `|` line, a backtick, or a `nan` / `None` leaking from a frame. A raise
+is a broken template, so fix the template, never the check. Helpers give the
+house format measured from @sirswampthing (memory `swamp-tweet-format`):
+`pf.code()` (FREM, COLL), `pf.handle()`, `pf.match_tag()` (#AFLCatsTigers),
+`pf.tags()`, `pf.subject()` (caps for the post's subject).
+
+| Script | Posts at the top of its file |
+|---|---|
+| `draft_posts.py` | each game's 3-2-1, risers, fallers; closest calls |
+| `scripts/scorecard_posts.py` | the season scorecard posts |
+| `milestones.py` | passed and in-reach, one post per ladder |
+| `round_bests.py` | any round best inside the all-time top 10, as the list |
+| `fewest_games.py` | the ladder, this season's achievers in caps |
+| `all_time_tables.py` | each of the four tables |
+| `streaks.py` | live projected-poll runs |
+| `stat_streaks.py` | live and longest runs; the board (runs of 3+) |
+| `team_h2h.py` | all-time series record, live run of 3+ (always 1897 on) |
+| `fixture_recon.py` | most Brownlow votes in the fixture |
+| `draft_gate.py` | on PASS, `<draft>.ready.md` beside a drafts/ file |
+| `scripts/tiktok_*.py` | the caption, now checked by `pf.clean()` |
+
+Not converted, on purpose: `scripts/count_tweets.py` already writes plain
+`--- label [N chars] ---` posts that are relayed verbatim and signed off;
+`scripts/night_pack.py` is a lookup pack for answering questions, not drafts;
+the `*_card.py` scripts make images.
+
+**Hand-written drafts follow the same rule.** A session writing post copy into
+drafts/ puts each post in its own ```text fence, unwrapped (a pasted post keeps
+every newline, so an 80-column wrap becomes a break mid-sentence on X). A
+gated draft (one with a `.facts.json`) is pasted from its `.ready.md`, never
+from the draft itself: the gate strips claim comments, unwraps blockquotes and
+writes that file only on a PASS.
 
 ## Score involvements: two different quantities, one name
 

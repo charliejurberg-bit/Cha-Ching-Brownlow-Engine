@@ -48,6 +48,8 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+import post_format as pf                                          # noqa: E402
+
 from afl_headshots import head                                     # noqa: E402
 from countdown_card import (                                       # noqa: E402
     BG, EMERALD, INK, MUTED, RANK_INK, GOLD, LINE, S, draw_mark, font,
@@ -840,7 +842,7 @@ def hashtags(picks):
 def write_copy(picks, paths, softs):
     cap, tags = caption(picks), hashtags(picks)
     out = [f"# TikTok carousel, to poll the 3 votes, {SEASON}", "",
-           "## Caption", "", "```", cap, "", tags, "```", "",
+           "## Caption", "", "```text", pf.clean(cap + "\n\n" + tags), "```", "",
            f"{caption_len(cap, tags)} characters including hashtags. "
            "TikTok's limit is 2,200.", "", "## Slides", "",
            "| # | File | Player | Round | Price | Model | Fair |",

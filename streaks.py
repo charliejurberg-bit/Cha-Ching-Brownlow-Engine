@@ -101,6 +101,8 @@ from datetime import datetime
 
 import pandas as pd
 
+import post_format as pf
+
 PRED_DIR = "predictions"
 DRAFTS_DIR = "drafts"
 CUR_SEASON = 2026
@@ -515,7 +517,21 @@ def build_markdown(live, best, prev_idx, latest_raw, disp_round, below):
           "yes" if r["active"] else "no"]
          for i, (_, r) in enumerate(best.iterrows(), start=1)],
     )
-    return lines
+
+    # The post: report 1, the live streaks, in the list format. "Projected to
+    # poll" is the model's top three in the game, which is what the table counts.
+    posts = []
+    if not live.empty:
+        text = [f"Longest active runs of games projected to poll, after Round "
+                f"{disp_round}:", ""]
+        text += [f"  {int(r['trailing'])} - {r['Player_Name']} "
+                 f"({pf.code(r['Team'])}), since "
+                 f"{_rounds_label(r['trailing_start'], CUR_SEASON)}"
+                 for _, r in live.head(6).iterrows()]
+        text += ["", "#AFL #Brownlow"]
+        posts.append(("Active projected-poll streaks", "\n".join(text)))
+    return pf.insert_ready(lines, posts,
+                           f"No live streak reaches {MIN_ACTIVE_STREAK} games.")
 
 
 def write_markdown(lines, disp_round):

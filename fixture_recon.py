@@ -48,6 +48,7 @@ import sys
 
 import pandas as pd
 
+import post_format as pf
 from club_aliases import canonical_club
 
 OUT_DIR = 'drafts'
@@ -258,7 +259,8 @@ def block2_fixture_votes(fx, min_polls=2):
         seasons = sorted(detail['Season'].astype(int).tolist())
         gaps = [b - a for a, b in zip(seasons, seasons[1:])]
         rows.append({
-            'ID': pid, 'who': _label(g['Name'].iloc[0], pid), 'club': club, **t,
+            'ID': pid, 'who': _label(g['Name'].iloc[0], pid),
+            'name': str(g['Name'].iloc[0]), 'club': club, **t,
             'contiguous': all(gp <= 1 for gp in gaps) if gaps else True,
             'detail': "; ".join(
                 "{} R{} {}v".format(int(r['Season']), r['Round'],
@@ -789,6 +791,7 @@ def render(home, away, venue_strings, venue_label):
     b2 = block2_fixture_votes(fx)
     L += _tbl(b2, ['who', 'club', 'meetings', 'polls', 'zeros', 'votes',
                    'contiguous', 'detail'], limit=15)
+    posts = _posts_fixture(home, away, fx, b2, cur, votes)
 
     a("## Block 3, expected votes in the {} meeting{}".format(
         CURRENT_SEASON, "" if len(season_meetings) < 2 else "s"))
@@ -954,7 +957,44 @@ def render(home, away, venue_strings, venue_label):
             venue_label, d['composition']['venue_split'] or "no polls"))
         a("")
 
-    return L
+    return pf.insert_ready(
+        L, posts, "Nobody has polled twice or more in this fixture.")
+
+
+def _post_names(votes):
+    """ID to the name a post prints. Two IDs on one name (the Gary Abletts)
+    become Snr and Jnr by first season when a decade or more apart; any other
+    clash keeps the plain name and is left for review."""
+    votes = votes[votes['ID'].notna()]
+    first = votes.groupby('ID')['Season'].min()
+    name = votes.drop_duplicates('ID').set_index('ID')['Name']
+    out = {int(i): str(v) for i, v in name.items()}
+    for nm, ids in name.groupby(name).groups.items():
+        if len(ids) == 2:
+            a, b = sorted(ids, key=lambda i: first[i])
+            if first[b] - first[a] >= 10:
+                out[int(a)], out[int(b)] = f"{nm} Snr", f"{nm} Jnr"
+    return out
+
+
+def _posts_fixture(home, away, fx, b2, cur, votes, n=6):
+    """Block 2 as a post: most Brownlow votes in the fixture, players still at
+    either club in caps. The window is printed at both ends, because it is
+    the archive's (1990 on, counted seasons only) and not the fixture's."""
+    if not len(b2):
+        return []
+    lo, hi = int(fx['Season'].min()), int(fx['Season'].max())
+    live = set(cur.loc[cur['Playing.for'].map(canonical_club).isin({home, away}),
+                       'ID'].dropna().astype(int))
+    names = _post_names(votes)
+    text = [f"Most Brownlow votes in {home} v {away} games, {lo}-{hi}:", ""]
+    for r in b2.head(n).to_dict('records'):
+        nm = names.get(int(r['ID']), r['name'])
+        nm = pf.subject(nm) if int(r['ID']) in live else nm
+        text.append(f"  {pf.num(r['votes'])} - {nm} ({pf.code(r['club'])}), "
+                    f"{pf.plural(r['meetings'], 'game')}")
+    text += ["", pf.tags((home, away), "#Brownlow", pf.match_tag(home, away))]
+    return [("Fixture Brownlow votes", "\n".join(text))]
 
 
 def main(argv=None):
