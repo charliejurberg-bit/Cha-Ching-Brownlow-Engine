@@ -466,6 +466,54 @@ disposals, goals, marks, tackles, hitouts. It draws the 3, then the 2, then the
 - **Rollover to 2027:** move `ranker_backtest.LAST_SEASON`, write
   `data_2027/brownlow_votes_2027.csv` after that count, rerun `python stack.py train`.
 
+**Why the stack ships as built: the off-season check, 5 October 2026.** In plain
+terms: the model picks the right player but undersold its picks in 2026 (said
+59%, took the 3 about 70%), because 2026 was the first season umpires saw stats
+and they voted more predictably. The stack's final layer, fitted on 2026's
+votes, teaches it both to be more confident and to weight stats the way the
+umpires now do. Every figure below is out of sample:
+
+| 2026, P(3) of each game's favourite | Said | Took | Log loss |
+|---|---|---|---|
+| Displayed on the site (classifier, `P_3_game`) | 58.6% | 68.6% | |
+| Stack, layer fitted on 2025 | 57.5% | 72.0% | 0.911 |
+| Stack, layer fitted on 2026 rounds 1-8, scored on 9-25 | 66.5% | 75.7% | 0.798 |
+| Stack, layer fitted on 2026, each round held out | 71.9% | 72.5% | 0.813 |
+
+- **The stack alone does not fix 2026; the 2026-fitted layer does.** Fitted on
+  earlier seasons, the stack is as compressed on 2026 as the classifier. In
+  2013-2025 pooled it is calibrated (favourite said 59.9%, took 59.5%), so the
+  2026 defect was the umpires changing, not the model.
+- **The regime z terms carry real 2026 signal.** Layer on 2026 rounds 1-8 scored
+  on 9-25: 0.830 without the z terms, 0.798 with them; rounds 1-13 to 14-25:
+  0.772 against 0.726.
+- **They cost something in an ordinary year.** Walk-forward 2014-2025, layer
+  fitted on the season before, mean log loss: one season with z 1.230 (the
+  shipping recipe, worst of the five), one season no z 1.203, three seasons no z
+  1.197, three seasons with z 1.201. Ridge on the z weights (50) cut the
+  ordinary-year cost to 1.213 but gave back most of the 2026 gain.
+- **Decision: ship the one-season layer with z, fitted on 2026,** because
+  umpires keep stats access and ignoring the regime brings back exactly the
+  compression that broke 2026. **If the 2027 count shows the shift faded,
+  fall back to three seasons without z.**
+- **The layer can never be refitted mid-season.** Votes are secret until the
+  count, so the 2026 layer is what readers see all of 2027 and it is judged only
+  after the 2027 count. Until then any published probability is "fitted to
+  2026", not proven. The rounds 1-8 test above uses 2026 votes and is not a
+  2027 option; it only measures what a 2026-fitted layer captures.
+- **Mechanics rehearsed:** the saved `stack.pkl`, its guard relaxed in memory,
+  ran over all 207 games of `game_level_2026.csv` with no null `P_*` and every
+  game summing to exactly 1 for `P_3` and 6 for `Exp_Votes`. That proves it runs,
+  not its 2026 figures (in sample).
+- **This settles the parked `Exp_Votes` fix for the live season** (see below):
+  from 2027 `predict_2026.py` takes `P_1`-`P_3` and `Exp_Votes` from the stack.
+  Only the historical figures in `brownlow_model.py` and `backtest.py` stay the
+  classifier's.
+- The test scripts were scratch and are not in the repo. Both tests reuse
+  `ranker_backtest` functions: base models trained on seasons before s, then
+  `fit_pl` on season s-1's (or early 2026's) out-of-sample scores, with and
+  without `regime_z`.
+
 **Feature groups:**
 1. **Base** (28): raw stats (Kicks, Disposals, Goals, Clearances, etc.) + engineered ratios (`Kick_to_HB_ratio`, `Contested_rate`, `Disposal_efficiency`, `Score_Involvements`, `Impact_Score`) + game context (Margin, Is_Win, Coaches_Votes)
 2. **Wheelo** (20, per `predictions/wheelo_features.pkl`; all 20 are in `features.pkl`): `RatingPoints`, `ExpVotes`, per-quarter ratings (`Rating_Q1`–`Q4`), equity components, ground ball gets, Supercoach, `TimeOnGround`, `DisposalEfficiency` + `Rating_Q4_premium`, `Best_quarter_rating`
@@ -493,7 +541,8 @@ its own, so a 2026 game's `P_3` sums anywhere from 38% to 199% (112 of 207 over
   games (P(3) Brier x1000 13.54 raw, 13.14 divided, 13.01 fitted). Keying is on
   name plus ID, because ID is blank on 92 rows of 2026 and pandas 3 turns a
   blank into a missing key rather than the string "nan".
-- **Fitting `Exp_Votes` itself is parked until after count night.** It would
+- **Fitting `Exp_Votes` itself was parked until after count night**, and from
+  2027 the stack does it (see "Why the stack ships as built"). It would
   move public totals a week before the count (Heeney 22.9 to 21.1, Gawn 17th to
   14th, Daicos 48 to 46 on the 3-2-1 board). A source fix belongs in
   `predict_2026.py`, `brownlow_model.py` and `backtest.py`, which all compute
