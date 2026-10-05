@@ -1,0 +1,37 @@
+# After a push that changes the site's data, expire every page's cached copy on
+# chachingbrownlow.com at once, so the landing page, leaderboard and the rest all
+# switch together instead of each on its own hourly clock.
+#
+# It waits first: raw.githubusercontent.com caches each file for 5 minutes
+# (max-age=300), so a refresh fired straight after the push could re-fetch the
+# old files and lock them in for another hour.
+#
+# Needs the repo secret REVALIDATE_SECRET, equal to the Vercel env var of the
+# same name (the Next.js route app/api/revalidate/route.ts).
+name: refresh-site
+
+on:
+  push:
+    branches: [master]
+    paths: ["site/**"]
+  workflow_dispatch:
+
+concurrency:
+  group: refresh-site
+  cancel-in-progress: true   # a second push restarts the wait; one refresh covers both
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Wait out the raw GitHub cache
+        if: github.event_name == 'push'
+        run: sleep 330
+      - name: Expire the site's engine data
+        env:
+          SECRET: ${{ secrets.REVALIDATE_SECRET }}
+        run: |
+          if [ -z "$SECRET" ]; then echo "REVALIDATE_SECRET is not set on this repo"; exit 1; fi
+          curl --fail-with-body --retry 3 --retry-delay 10 -sS -X POST \
+            -H "Authorization: Bearer $SECRET" https://chachingbrownlow.com/api/revalidate

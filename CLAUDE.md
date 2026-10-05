@@ -177,7 +177,16 @@ Streamlit app itself is switched off.
 of `update.py`) writes small per-page JSON under `site/data/`, tracked, and the
 Next.js pages fetch it from raw.githubusercontent.com on **master** with hourly
 ISR, exactly as the landing page reads `site/landing.json`. So a commit and push
-of this repo is what publishes new figures. `site/data/index.json` lists the
+of this repo is what publishes new figures. **Every page switches together
+about six minutes after the push** (from 5 October 2026):
+`.github/workflows/refresh-site.yml` runs on any push touching `site/`, waits
+out raw GitHub's 5-minute cache, then POSTs the site's `/api/revalidate`, which
+expires the `engine` fetch tag on every page at once. Before it, each page and
+file ran its own hourly clock and a push reached the landing page and the
+leaderboard up to two hours apart. It needs `REVALIDATE_SECRET` set, the same
+value, as a GitHub repo secret here and a Vercel env var there; without it the
+pages fall back to the hourly refresh, nothing breaks. Run it by hand from the
+repo's Actions tab ("refresh-site", Run workflow). `site/data/index.json` lists the
 seasons and the live season. Nothing on the site recomputes a figure: rank
 order, movement, the Floor-Ceiling lift and the round grid all arrive computed.
 
