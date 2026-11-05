@@ -97,7 +97,7 @@ def fetch():
 
 
 # ------------------------------------------------------------------ simulate
-def _prepare(frame):
+def _prepare(frame, gamma=GAMMA):
     """Per-game arrays of (player index, p3, p2, p1), sharpened, plus sigma."""
     f = frame.copy()
     f["_key"] = f.Player_Name.astype(str) + "|" + f["Playing.for"].astype(str)
@@ -112,7 +112,7 @@ def _prepare(frame):
             p = grp[c].to_numpy(dtype=np.float64).clip(0, None)
             if p.sum() <= 0:
                 break
-            p = (p / p.sum()) ** GAMMA
+            p = (p / p.sum()) ** gamma
             cols.append(p / p.sum())
         if len(cols) == 3:
             games.append((grp._pidx.to_numpy(), *cols))

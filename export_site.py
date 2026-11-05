@@ -891,6 +891,81 @@ def export_polls(season):
     }
 
 
+# ── Team Votes ─────────────────────────────────────────────────
+# teams/<season>.json: per club, each runner's chance of polling the most votes
+# at his club (team_votes.py, dead heats split). Every chance on the page is out
+# of sample: the live and current seasons from the predictions the site
+# published, 2008-2025 from the walk-forward backtest (each season predicted by
+# a model that never saw it), not from the in-sample game_level files behind
+# the history Leaderboards. 2007 has no out-of-sample predictions and is not
+# offered. Projected votes appear only where they are the Leaderboard's own
+# figure, the published seasons.
+_TEAM_RUNNERS = 6
+_TEAM_SIMS = 20_000
+_TEAM_FIRST = 2008
+_backtest_cache = []
+
+
+def _team_frame(season):
+    """(frame, source) for a season's club markets, or (None, None)."""
+    if season >= 2026:
+        g = sd.load_game(season)
+        return (None, None) if g is None else (g, "published")
+    if not _backtest_cache:
+        _backtest_cache.append(pd.read_csv(os.path.join(sd.PRED_DIR, "backtest_game_level.csv")))
+    b = _backtest_cache[0]
+    b = b[b.Season == season]
+    return (None, None) if b.empty else (b, "backtest")
+
+
+def export_teams(season, slugs):
+    import team_votes as tv
+    if season < _TEAM_FIRST:
+        return None
+    g, source = _team_frame(season)
+    if g is None:
+        return None
+    g = g.drop_duplicates(subset=["Round_num", "Home.team", "Away.team", "Player_Name"]).copy()
+    g["Playing.for"] = g["Playing.for"].map(lambda t: sd._TEAM_ALIASES.get(str(t), str(t)))
+    sim = tv.simulate(g, _TEAM_SIMS, seed=season)
+    counted = sd.season_cfg.counted(season) or season < sd.LIVE_SEASON
+    got, votes = tv.actual_share(g) if counted else (None, None)
+
+    def slug_of(name, club):
+        return slugs.get(name) or slugs.get(f"{name} ({club})")
+
+    clubs, fav_led, fav_said = [], 0.0, 0.0
+    for club, c in sim.groupby("club"):
+        c = c.sort_values("p_lead", ascending=False, kind="stable")
+        keep = c.head(_TEAM_RUNNERS)
+        if counted:
+            # the club's actual leader always shows, wherever the model had him
+            keep = pd.concat([keep, c[(got.reindex(c.index) > 0) & ~c.index.isin(keep.index)]])
+            fav_said += float(c.p_lead.iloc[0])
+            fav_led += float(got.get(c.index[0], 0.0))
+        keep = keep[(keep.p_lead >= 0.005) | (counted and got.reindex(keep.index).fillna(0) > 0)]
+        clubs.append({
+            "club": club,
+            "runners": [{
+                "name": r.player,
+                "slug": slug_of(r.player, club),
+                "p": round(float(r.p_lead), 4),
+                "proj": round(float(r.exp_votes), 1) if source == "published" else None,
+                "votes": int(votes[k]) if counted else None,
+                "lead": round(float(got.get(k, 0.0)), 4) if counted else None,
+            } for k, r in keep.iterrows()],
+        })
+    out = {"season": season, "live": season == sd.LIVE_SEASON and not counted,
+           "counted": bool(counted), "source": source, "clubs": clubs}
+    if counted:
+        out["summary"] = {"clubs": len(clubs), "favLed": round(fav_led, 1), "favSaid": round(fav_said, 1)}
+    else:
+        last = int(g.Round_num.max())
+        disp = last - 1 if season >= 2024 else last
+        out["through"] = "Opening Round" if disp == 0 else f"Round {disp}"
+    return out
+
+
 def _write(path, obj):
     os.makedirs(os.path.dirname(path), exist_ok=True)
     tmp = path + ".tmp"
@@ -918,6 +993,17 @@ def main(argv):
         if ga is not None:
             size = _write(os.path.join(OUT_DIR, "games", f"{s}.json"), ga)
             print(f"  games {s}: {len(ga['games'])} matches, {size / 1024:.0f} KB")
+        tm = export_teams(s, season_slug.get(s, {}))
+        if tm is not None:
+            size = _write(os.path.join(OUT_DIR, "teams", f"{s}.json"), tm)
+            extra = (f"favourite led {tm['summary']['favLed']} of {tm['summary']['clubs']}, "
+                     f"said {tm['summary']['favSaid']}") if tm["counted"] else f"through {tm['through']}"
+            print(f"  teams {s}: {tm['source']}, {extra}, {size / 1024:.0f} KB")
+    # Which seasons the Team Votes page offers: what is on disk, as for the index.
+    tm_dir = os.path.join(OUT_DIR, "teams")
+    if os.path.isdir(tm_dir):
+        _write(os.path.join(tm_dir, "index.json"), {"seasons": sorted(
+            (int(f[:-5]) for f in os.listdir(tm_dir) if f[:-5].isdigit()), reverse=True)})
     sf = export_stat_filter()
     if sf is not None:
         size = _write(os.path.join(OUT_DIR, "statfilter.json"), sf)
