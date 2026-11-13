@@ -84,3 +84,6 @@ data_injury/raw/
 # AFLW: rebuilt by aflw/build.py and aflw/evaluate.py
 data_aflw/frame.csv
 data_aflw/_mens_small.pkl
+
+# Game Day Desk: generated (python desk/record_book.py) and live state
+desk/data/
