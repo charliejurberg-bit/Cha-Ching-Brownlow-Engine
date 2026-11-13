@@ -108,7 +108,7 @@ nav.tabs{display:none}
 <textarea id="clip" aria-hidden="true" style="position:fixed;left:-9999px;top:0"></textarea>
 
 <script>
-const TIER_COLOR = {'ALL-TIME RECORD':'#f0b429','ALL-TIME TOP 10':'#f0b429','COMBO':'#f0b429','AGE':'#f0b429','EARLY CAREER':'#34d399','CLUB RECORD':'#34d399','RECORD V OPP':'#34d399','GROUND RECORD':'#34d399','SEASON HIGH':'#8fb3d9','CAREER HIGH':'#8fb3d9','MILESTONE':'#c3ccd5'};
+const TIER_COLOR = {'ALL-TIME RECORD':'#f0b429','ALL-TIME TOP 10':'#f0b429','COMBO':'#f0b429','FASTEST':'#f0b429','AGE':'#f0b429','EARLY CAREER':'#34d399','CLUB RECORD':'#34d399','RECORD V OPP':'#34d399','GROUND RECORD':'#34d399','SEASON HIGH':'#8fb3d9','CAREER HIGH':'#8fb3d9','MILESTONE':'#c3ccd5'};
 const TIERS = Object.keys(TIER_COLOR);
 const STATS = ['Disposals','Kicks','Handballs','Marks','Goals','Tackles','Clearances','Hitouts'];
 const SHORT = {'Score Involvements':'Score inv','Metres Gained':'Metres','Intercept Marks':'Int marks'};
@@ -139,7 +139,7 @@ function renderTiers(){
 function needLine(a){
   if (a.tier === 'COMBO') return a.rare ? `${a.rare} before` : 'First';
   if (a.state === 'IN REACH') return `${a.needs} more`;
-  if (a.tier === 'AGE') return a.state.toLowerCase().replace(/^./,c=>c.toUpperCase());
+  if (a.tier === 'AGE' || a.tier === 'FASTEST') return a.state.toLowerCase().replace(/^./,c=>c.toUpperCase());
   return {BROKEN:'Broken',EQUALLED:'Equalled',ENTERED:'In',REACHED:'Reached',TODAY:'Today'}[a.state] || a.state;
 }
 
@@ -162,7 +162,7 @@ function renderAlerts(){
       </div>
       <div class="facts">
         <div class="fact"><span class="lbl">Target</span><b style="${a.tier==='COMBO'?'font-size:12px;font-weight:500':''}">${esc(a.v)}</b></div>
-        <div class="fact"><span class="lbl">${a.tier==='COMBO'?'Rarity':a.tier==='AGE'?'Standing':'Needs'}</span><b style="color:${a.state==='IN REACH'?'var(--emerald)':c}">${esc(needLine(a))}</b></div>
+        <div class="fact"><span class="lbl">${a.tier==='COMBO'?'Rarity':(a.tier==='AGE'||a.tier==='FASTEST')?'Standing':'Needs'}</span><b style="color:${a.state==='IN REACH'?'var(--emerald)':c}">${esc(needLine(a))}</b></div>
         <div class="fact"><span class="lbl">Held by</span><b style="font-family:Sora;font-size:12px;font-weight:500">${esc(a.holders || '-')}</b></div>
       </div>
       <div class="post">${esc(a.post)}</div>

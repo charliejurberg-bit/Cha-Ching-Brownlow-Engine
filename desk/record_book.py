@@ -18,9 +18,11 @@ date of birth and their career-best game in each stat.
 
 Two brackets for the age and early-career alerts:
 
-  early            per stat, per career game n (1 to 100): the most of it a
-                   player had through his first n games (n = 1 is debut).
+  early            per stat, at debut and games 50, 100, 150 ... 450: the most
+                   of it a player had through his first n games.
                    Only careers that began inside the stat's coverage count.
+  fastest          per career total (FASTEST_MARKS), the game number each
+                   player reached it in, sorted
   milestone_ages   per milestone, the age every player reached it, sorted
 
 Ages come from a date of birth worked out per player from AFLTables' Age
@@ -116,8 +118,25 @@ MILESTONES = {
 # One season was not enough: a player who missed a whole year injured (Logan
 # McDonald and Phoenix Gothard, 2025) came back unknown, with no career.
 ACTIVE_SEASONS = 3
-EARLY_GAMES = 100
+# Career-total records at round game counts only: "most goals in a player's
+# first 92 games" is a number cut to fit; 50, 100, 150 are what people count.
+EARLY_BANDS = [1, *range(50, 451, 50)]
 EARLY_TOP = 5
+# Fewest games to a career total. Wider than MILESTONES on purpose: "the
+# fastest to 3000 disposals" is a post even where "reaches 3000" is not.
+FASTEST_MARKS = {
+    'Goals': [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000],
+    'Disposals': [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000],
+    'Marks': [500, 1000, 1500, 2000, 2500],
+    'Tackles': [500, 750, 1000, 1250, 1500],
+    'Clearances': [500, 750, 1000, 1250, 1500],
+    'Hitouts': [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 10000],
+    'Kicks': [1000, 2000, 3000, 4000, 5000],
+    'Handballs': [1000, 2000, 3000, 4000],
+    'Contested Possessions': [1000, 2000, 3000],
+    'Inside 50s': [500, 1000, 1500],
+}
+FASTEST_TOP = 5
 # Share of a season's team-games with a non-zero total. 0.8, not 0.9: 2020's
 # shortened quarters left 15% of team-games without a bounce, which a 0.9 cut
 # read as bounces starting in 2021 when they are recorded from 1999. Hitouts
@@ -235,17 +254,17 @@ def age_text(dob: pd.Timestamp, on: pd.Timestamp) -> str:
 
 
 def early_career(d: pd.DataFrame, debut: pd.Series) -> dict:
-    """Per stat with long coverage, per career game n, the top EARLY_TOP
-    running totals through game n."""
+    """Per stat with long coverage, at debut and each EARLY_BANDS game, the
+    top EARLY_TOP running totals through that game."""
     out = {}
-    e = d[d.GameNo <= EARLY_GAMES].sort_values(['ID', 'GameNo'])
+    e = d[d.GameNo <= max(EARLY_BANDS)].sort_values(['ID', 'GameNo'])
     for key, col in STATS.items():
         if key in FEED_ONLY:
             continue
         start = coverage_from(d, col)
         f = e[e.ID.map(debut) >= start][['ID', 'Player', 'Season', 'Playing.for', 'GameNo', col]].rename(columns={'Playing.for': 'Club'})
         f['cum'] = f[col].fillna(0).groupby(f.ID).cumsum()
-        f = f[f.cum > 0]
+        f = f[(f.cum > 0) & f.GameNo.isin(EARLY_BANDS)]
         by_n = {}
         for n, g in f.groupby('GameNo'):
             g = g.sort_values(['cum', 'Season'], ascending=[False, True])
@@ -253,6 +272,25 @@ def early_career(d: pd.DataFrame, debut: pd.Series) -> dict:
             by_n[str(int(n))] = [{'v': int(r.cum), 'player': r.Player, 'club': r.Club, 'season': int(r.Season)}
                                  for r in g[g.cum >= cut].itertuples()]
         out[key] = {'from': start, 'by_n': by_n}
+    return out
+
+
+def fastest(d: pd.DataFrame, debut: pd.Series, frm: dict) -> dict:
+    """Per FASTEST_MARKS total, the game number each player reached it in:
+    every count kept (sorted) to rank a new one, the fastest named."""
+    out = {}
+    s = d.sort_values(['ID', 'GameNo'])
+    for stat, marks in FASTEST_MARKS.items():
+        f = s[s.ID.map(debut) >= frm[stat]]
+        run = f[STATS[stat]].fillna(0).groupby(f.ID).cumsum()
+        out[stat] = {'from': frm[stat]}
+        for m in marks:
+            hit = f[run >= m].drop_duplicates('ID').sort_values(['GameNo', 'Season'])
+            if hit.empty:
+                continue
+            out[stat][str(m)] = {'games': [int(x) for x in hit.GameNo],
+                                 'top': [{'v': int(r.GameNo), 'player': r.Player, 'season': int(r.Season)}
+                                         for r in hit.head(FASTEST_TOP).itertuples()]}
     return out
 
 
@@ -436,7 +474,9 @@ def build(before: str | None = None) -> dict:
                                 for k, ms in MILESTONES.items()}
     debut = d.groupby('ID').Season.min()
     book['early'] = early_career(d, debut)
-    book['milestone_ages'] = milestone_ages(d, debut, {k: book['stats'][k]['from'] for k in STATS})
+    frm = {k: book['stats'][k]['from'] for k in STATS}
+    book['milestone_ages'] = milestone_ages(d, debut, frm)
+    book['fastest'] = fastest(d, debut, frm)
     print(f'{len(book["players"])} active players')
     # Every game, for the desk's rarity counts, stat combinations and ages.
     games = d[['Season', 'Date', 'Round', 'ID', 'Player', 'Playing.for', 'Opponent', 'DOB', 'Age', 'GameNo',

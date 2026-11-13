@@ -13,8 +13,9 @@ Alert kinds, each a tier:
                       fewer before (the Jagga Smith post)
     AGE               youngest (or oldest) to have this many in a game: top
                       three, or the youngest since someone 20+ years ago
-    EARLY CAREER      most on debut, or most through a player's first n
-                      games (n up to 100), career totals inside coverage
+    EARLY CAREER      most on debut, or most through a player's first 50, 100,
+                      150 ... games, career totals inside coverage
+    FASTEST           fewest games to a career total (5000 disposals), top 3
     CLUB RECORD       the record for the player's club
     RECORD V OPP      the record against today's opponent      (hidden)
     GROUND RECORD     the record at today's ground              (hidden)
@@ -44,7 +45,7 @@ sys.path.insert(0, str(ROOT))
 import post_format as pf  # noqa: E402
 from features import normalise_name  # noqa: E402
 
-TIERS = ['ALL-TIME RECORD', 'ALL-TIME TOP 10', 'COMBO', 'AGE', 'EARLY CAREER', 'CLUB RECORD', 'RECORD V OPP',
+TIERS = ['ALL-TIME RECORD', 'ALL-TIME TOP 10', 'COMBO', 'FASTEST', 'AGE', 'EARLY CAREER', 'CLUB RECORD', 'RECORD V OPP',
          'GROUND RECORD', 'SEASON HIGH', 'CAREER HIGH', 'MILESTONE']
 
 FLOOR = {'Disposals': 30, 'Kicks': 20, 'Handballs': 18, 'Marks': 11, 'Goals': 5,
@@ -406,7 +407,7 @@ def early_alerts(book: dict, pl: dict, g: int | None, me: dict | None, f: float,
                  season: int, label: str) -> list[dict]:
     """Most on debut (g = 1), or most through the first g games."""
     early = book.get('early') or {}
-    if not g or g > 100:
+    if not g:
         return []
     out = []
     for stat in EARLY_STATS:
@@ -443,6 +444,62 @@ def early_alerts(book: dict, pl: dict, g: int | None, me: dict | None, f: float,
                     'holders': pf.clean(f"{lst[0]['player']}, {lst[0]['season']}"), 'rare': rare,
                     'rare_text': (f"debut record{since(frm)}" if g == 1 else f"record through {g} games{since(frm)}"),
                     'post': pf.clean(f"{lead}{head}\n\n{body}\n\n{tagline(base['club'], game)}")})
+    return out
+
+
+FASTEST_SHOW = 3    # alert only inside the fastest three
+FASTEST_MIN_FIELD = 5   # "fastest of 2 to 9000 hitouts" is a milestone, not a fastest
+
+
+def fastest_alerts(book: dict, pl: dict, g: int | None, me: dict | None, f: float, base: dict, game: dict,
+                   season: int, label: str) -> list[dict]:
+    """Fewest games to a career total, when today is the game he gets there
+    in and he is among the fastest three."""
+    fast = book.get('fastest') or {}
+    if not g or not me:
+        return []
+    out = []
+    for stat, marks in fast.items():
+        if me['debut'] < marks['from']:
+            continue            # career started before the stat was recorded
+        v = pl['stats'].get(stat, 0)
+        before = me['totals'].get(stat, 0)
+        nxt = next((int(m) for m in marks if m != 'from' and int(m) > before), None)
+        if nxt is None or v <= 0:
+            continue
+        cum = before + v
+        if cum >= nxt:
+            state, needs = 'REACHED', 0
+        elif 0.5 <= f < 1 and before + v / f >= nxt:
+            state, needs = 'IN REACH', nxt - cum
+        else:
+            continue
+        rec = marks.get(str(nxt))
+        if not rec or len(rec['games']) < FASTEST_MIN_FIELD:
+            continue
+        n = int(np.searchsorted(np.array(rec['games']), g, side='left'))   # strictly fewer games
+        if n >= FASTEST_SHOW:
+            continue
+        tie = n < len(rec['games']) and rec['games'][n] == g
+        nn, frm = noun(stat), marks['from']
+        rows = [dict(r) for r in rec['top']] + [{'v': g, 'player': pf.subject(pl['name']), 'season': season, 'me': True}]
+        rows.sort(key=lambda r: r['v'])       # stable: an equal earlier holder stays ahead
+        i = next(i for i, r in enumerate(rows) if r.get('me'))
+        body = '\n'.join(f"  {r['v']} - {r['player']} {r['season']}" for r in rows[:max(4, i + 1)])
+        lead = (f"{pf.subject(pl['name'])} is {needs} {nn} from {nxt} in game {g}{at_label(label)}.\n\n"
+                if state == 'IN REACH' else '')
+        # A tie shares the rank: "equal fastest", "=2ND FASTEST", never an
+        # outright claim the earlier holder already has.
+        word = ('equal ' if tie else '') + ('fastest' if n == 0 else f'{pf.ordinal(n + 1)} fastest')
+        state = state if state == 'IN REACH' else ('EQUALLED' if tie and n == 0 else
+                                                     ('=' if tie else '') + word.replace('equal ', '').upper())
+        out.append({**base, 'tier': 'FASTEST', 'stat': stat, 'state': state, 'now': cum, 'v': f'{nxt} in {g}',
+                    'needs': needs, 'unit': f'career {nn}, game {g}',
+                    'holders': pf.clean(f"{rec['top'][0]['player']}, {rec['top'][0]['v']} games"),
+                    'rare': n + 1,
+                    'rare_text': f"{word} of {len(rec['games']) + 1} players to {nxt} {nn}{since(frm)}",
+                    'post': pf.clean(f"{lead}Fewest games to {nxt} V/@AFL career {nn}{since(frm)}:\n\n{body}"
+                                     f"\n\n{tagline(base['club'], game)}")})
     return out
 
 
@@ -555,6 +612,7 @@ def game_alerts(book: dict, hist: History, ident: Identity, game: dict, lines: l
                                    age, age_text(dob, day) if dob is not None else None)
         alerts += age_alerts(hist, book, pl, int(pid) if pid else None, dob, day, base, game, season, label)
         alerts += early_alerts(book, pl, g_no, me, f, base, game, season, label)
+        alerts += fastest_alerts(book, pl, g_no, me, f, base, game, season, label)
     leaders = {}
     for stat in book['stats']:
         top = sorted(lines, key=lambda p: -p['stats'].get(stat, 0))[:3]
