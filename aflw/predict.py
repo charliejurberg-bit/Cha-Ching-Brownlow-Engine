@@ -43,6 +43,16 @@ import regime as rg  # noqa: E402
 FEATS = ev.FULL + ["coaches_z", "coaches_pct"]
 
 
+def blind(f, season):
+    """f with `season`'s votes hidden from every fit. Once a season is counted
+    its votes join the frame, and without this the board for that season would
+    be refitted on its own answers (2026: Garner 25.5 to 26.4 the morning after
+    the count). The predicted season's rows stay in place to be scored."""
+    f = f.copy()
+    f.loc[f.season.astype(str) == str(season), "label_kind"] = "blind"
+    return f
+
+
 def train_set(f):
     return f[(f.label_kind == "match")].dropna(subset=["coaches"]).reset_index(drop=True)
 
@@ -102,6 +112,7 @@ def main(argv):
     f = pd.read_csv(os.path.join(ev.OUT, "frame.csv"), low_memory=False)
     f["margin_c"] = f.margin.clip(-60, 60) / 30
     season = argv[0] if argv else f.season.iloc[-1]
+    f = blind(f, season)
     tr = train_set(f)
     th = ev.fit_pl(tr, FEATS)
     gamma = fit_gamma(f)

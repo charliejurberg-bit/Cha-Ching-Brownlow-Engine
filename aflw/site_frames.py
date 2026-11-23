@@ -49,11 +49,15 @@ def probs(f, season):
     lab = f[f.label_kind == "match"]
     test = rg.zs(f[f.season == season].reset_index(drop=True))
     if season == LIVE:
-        th = ev.fit_pl(pr.train_set(f), pr.FEATS)
-        delta = pr.regime_delta(f)["proportional"]
+        fb = pr.blind(f, LIVE)
+        th = ev.fit_pl(pr.train_set(fb), pr.FEATS)
+        delta = pr.regime_delta(fb)["proportional"]
         k = len(pr.FEATS)
         return test, ev.pl_probs(test, pr.score(test, th, 1.0, delta), th[k], th[k + 1])
-    train = lab[lab.season != season]
+    # The live season stays out of the history fits too, so a count landing
+    # does not move every past season's figures overnight. Fold it in when the
+    # model is refitted on the new rules (CLAUDE.md, "AFLW Best and Fairest").
+    train = lab[(lab.season != season) & (lab.season != LIVE)]
     has_cv = test.coaches.notna().any()
     feats = pr.FEATS if has_cv else ev.FULL
     if has_cv:
@@ -102,6 +106,11 @@ def to_mens_schema(d, P, sid):
     return g, d
 
 
+def counted(d):
+    """Whether this season's count is saved: every match row carries its votes."""
+    return bool(len(d)) and bool((d.label_kind == "match").all()) and bool(d.votes.notna().all())
+
+
 def build_all():
     """{season id: (game frame, season totals frame)}."""
     f = frame()
@@ -122,7 +131,7 @@ def build_all():
             known = pd.read_csv(part).set_index("playerId").votes
             se["Actual_Votes"] = se.ID.map(known)          # NaN: not published
         else:
-            se["Actual_Votes"] = se.ID.map(tot).fillna(0) if tot is not None and label != LIVE else 0
+            se["Actual_Votes"] = se.ID.map(tot).fillna(0) if tot is not None and (label != LIVE or counted(d)) else 0
         se = se.sort_values("Exp_Total_Votes", ascending=False).reset_index(drop=True)
         out[sid] = (g, se)
         print(f"  {label:7} -> {sid}: {g.Game_ID.nunique()} matches, {len(se)} players", flush=True)

@@ -45,7 +45,10 @@ def install(frames):
     games = {s: fit(g.copy()) for s, (g, _) in frames.items()}
     seasons = {s: se for s, (_, se) in frames.items()}
     sd._memo.clear()
-    sd.LIVE_SEASON = LIVE
+    # Once the count is saved the live season reads as history, as the men's
+    # does after a rollover: leaderboard, profiles and games carry the actual
+    # votes. Nothing below compares LIVE_SEASON except to ask "is this live".
+    sd.LIVE_SEASON = LIVE + 1 if (frames[LIVE][1].Actual_Votes > 0).any() else LIVE
     sd.available_seasons = lambda: sorted(games, reverse=True)
     sd.load_game = lambda s: games.get(s)
     sd.load_season = lambda s: seasons.get(s)
@@ -173,7 +176,7 @@ def main():
     seasons = sorted((es._sid(s) for s in ids), reverse=True)
     es._write(os.path.join(OUT, "index.json"), {
         "liveSeason": LIVE, "currentSeason": LIVE,
-        "counted": [s for s in seasons if s != LIVE], "seasons": seasons,
+        "counted": [s for s in seasons if s != LIVE or land.get("final")], "seasons": seasons,
         "labels": {str(k): v for k, v in sf.SEASON_LABELS.items()},
         "generated": datetime.now(timezone.utc).isoformat(timespec="seconds"),
     })

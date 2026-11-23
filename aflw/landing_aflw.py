@@ -46,4 +46,23 @@ def build(g, se, season):
                    "clear": round(top - second, 1), "bestOdds": EM_DASH},
         "chips": ls.build_chips(rnd),
         "ticker": ls.build_ticker(rnd),
+        **({"final": final(se, season)} if (se.Actual_Votes > 0).any() else {}),
     }
+
+
+def final(se, season):
+    """The count, in landing_summary.build_final's shape. Written only once the
+    season's votes are saved, which aflw/fetch_votes.py refuses for a partial
+    count. Ranks are tie-aware and every player level with the top is a winner."""
+    se = se.assign(Actual_Votes=se.Actual_Votes.fillna(0).astype(int)).sort_values(
+        ["Actual_Votes", "Player_Name"], ascending=[False, True]).reset_index(drop=True)
+    top = int(se.Actual_Votes.iloc[0])
+    below = se.loc[se.Actual_Votes < top, "Actual_Votes"]
+    board = []
+    for _, r in se.head(ls.FINAL_BOARD_N).iterrows():
+        v = int(r.Actual_Votes)
+        board.append({"rank": int((se.Actual_Votes > v).sum()) + 1, "tied": int((se.Actual_Votes == v).sum()) > 1,
+                      "name": str(r.Player_Name).strip(), "team": ls._team_code(r.Team), "votes": v,
+                      "model": round(float(r.Exp_Total_Votes), 1)})
+    return {"season": int(season), "winners": [b["name"] for b in board if b["votes"] == top], "votes": top,
+            "margin": int(top - below.iloc[0]) if not below.empty else 0, "board": board}
